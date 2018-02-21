@@ -1,4 +1,4 @@
-#Mosaic 
+# Mosaic 
 
 A platform for individuals to complete small tasks
 
