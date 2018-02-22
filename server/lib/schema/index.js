@@ -26,7 +26,7 @@ const makeObjectType = (model, references) => (
 )
 
 let blockType = makeObjectType(models.Block,
-  [['blockVersions', () => blockVersionType, 'BlockVersions']]
+  [['blockVersions', () => new GraphQLList(blockVersionType), 'BlockVersions']]
 )
 
 let blockVersionType = makeObjectType(models.BlockVersion, []
