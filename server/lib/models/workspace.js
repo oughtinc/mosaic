@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
-    }
+    },
   }, {
       hooks: {
         beforeCreate: async (workspace, options) => {
@@ -43,11 +43,18 @@ module.exports = (sequelize, DataTypes) => {
     Workspace.QuestionBlock = Workspace.belongsTo(models.Block, { as: 'questionBlock', foreignKey: 'questionId' })
     Workspace.AnswerBlock = Workspace.belongsTo(models.Block, { as: 'answerBlock', foreignKey: 'answerId' })
     Workspace.ScratchpadBlock = Workspace.belongsTo(models.Block, { as: 'scratchpadBlock', foreignKey: 'scratchpadId' })
+    Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: 'parentWorkspace', foreignKey: 'parentId' })
+    Workspace.ChildWorkspace = Workspace.hasOne(models.Workspace, { as: 'childWorkspace', foreignKey: 'parentId' })
   }
   Workspace.prototype.recentWorkspaceVersion = async function () {
-    const workspaceVersions = await this.getWorkspaceVersions();
-    // console.log("Got recent versions!", workspaceVersions)
-    return workspaceVersions[0]
+    const workspaceVersion = await sequelize.models.WorkspaceVersion.findAll({
+      limit: 1,
+      where: {
+        workspaceId: this.id,
+      },
+      order: [['createdAt', 'DESC']]
+    })
+    return workspaceVersion[0]
   }
   Workspace.prototype.createWorkspaceVersion = async function (newInputs) {
     const previousWorkspaceVersion = await this.recentWorkspaceVersion();
@@ -79,6 +86,13 @@ module.exports = (sequelize, DataTypes) => {
     }
     const newWorkspaceVersion = await this.createWorkspaceVersion(newInputs)
   }
+
+  Workspace.prototype.createChild = async function () {
+    const child = await this.createChildWorkspace();
+    const recentWorkspaceVersion = await this.recentWorkspaceVersion();
+    this.createWorkspaceVersion({childrenIds: [...recentWorkspaceVersion.childrenIds, child.id]})
+    return child
+  }
+
   return Workspace;
 };
-

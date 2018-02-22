@@ -9,6 +9,15 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
+    childrenIds: {
+      type: DataTypes.ARRAY(Sequelize.TEXT),
+      defaultValue: []
+    },
+    isArchived: {
+      type: DataTypes.BOOLEAN(),
+      defaultValue: false,
+      allowNull: false
+    },
   });
   WorkspaceVersion.associate = function(models){
     WorkspaceVersion.Workspace = WorkspaceVersion.belongsTo(models.Workspace, {foreignKey: 'workspaceId'})

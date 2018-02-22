@@ -42,6 +42,7 @@ module.exports = {
     await queryInterface.createTable('Workspaces', {
       id: ID,
       ...standardColumns,
+      parentId: referenceTo("Workspaces"),
       questionId: referenceTo("Blocks"),
       answerId: referenceTo("Blocks"),
       scratchpadId: referenceTo("Blocks")
@@ -50,6 +51,15 @@ module.exports = {
     await queryInterface.createTable('WorkspaceVersions', {
       id: ID,
       ...standardColumns,
+      childrenIds: {
+        type: Sequelize.ARRAY(Sequelize.TEXT),
+        defaultValue: []
+      },
+      isArchived: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       workspaceId: referenceTo("Workspaces"),
       questionVersionId: referenceTo("BlockVersions"),
       answerVersionId: referenceTo("BlockVersions"),

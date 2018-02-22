@@ -48,7 +48,7 @@ let workspaceVersionType = makeObjectType(models.WorkspaceVersion,
     ['scratchpadBlockVersion', () => blockVersionType, 'ScratchpadBlockVersion'],
   ]
 )
-// {workspaceId: {type: GraphQLString}, ..._.pick(attributeFields(models.BlockVersion), ['blockId', 'value'])},
+
 const BlockInput = new GraphQLInputObjectType({
   name: "blockVersionInput",
   fields: _.pick(attributeFields(models.BlockVersion), 'value', 'blockId'),
@@ -70,13 +70,22 @@ let schema = new GraphQLSchema({
       updateBlockVersions: {
         type: blockVersionType,
         args: {workspaceId: {type: GraphQLString}, blockVersions: {type: new GraphQLList(BlockInput)}},
-        resolve: async (a, {workspaceId, blockVersions}) => {
+        resolve: async (_, {workspaceId, blockVersions}) => {
           const workspace = await models.Workspace.findById(workspaceId)
-        const recent = await workspace.recentWorkspaceVersion();
+          const recent = await workspace.recentWorkspaceVersion();
           await workspace.updateBlockVersions(blockVersions);
           return {value: "sdafasdf"}
         }
-      }
+      },
+      createChildWorkspace: {
+        type: workspaceType,
+        args: {workspaceId: {type: GraphQLString}},
+        resolve: async(_, {workspaceId}) => {
+          const workspace = await models.Workspace.findById(workspaceId)
+          const child = await workspace.createChild(); 
+          return child
+        }
+      },
     }
   })
 });
