@@ -68,13 +68,21 @@ let schema = new GraphQLSchema({
     name: 'RootMutationType',
     fields : {
       updateBlockVersions: {
-        type: blockVersionType,
+        type: workspaceType,
         args: {workspaceId: {type: GraphQLString}, blockVersions: {type: new GraphQLList(BlockInput)}},
         resolve: async (_, {workspaceId, blockVersions}) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const recent = await workspace.recentWorkspaceVersion();
           await workspace.updateBlockVersions(blockVersions);
-          return {value: "sdafasdf"}
+          return workspace
+        }
+      },
+      updateWorkspace: {
+        type: workspaceType,
+        args: {workspaceId: {type: GraphQLString}, childWorkspaceOrder: {type: new GraphQLList(GraphQLString)}},
+        resolve: async (_, {workspaceId, childWorkspaceOrder}) => {
+          const workspace = await models.Workspace.findById(workspaceId)
+          return workspace.createWorkspaceVersion({childWorkspaceOrder})
         }
       },
       createChildWorkspace: {

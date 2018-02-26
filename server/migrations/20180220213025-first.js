@@ -51,9 +51,13 @@ module.exports = {
     await queryInterface.createTable('WorkspaceVersions', {
       id: ID,
       ...standardColumns,
-      childrenIds: {
+      childWorkspaceOrder: {
         type: Sequelize.ARRAY(Sequelize.TEXT),
         defaultValue: []
+      },
+      childWorkspaceVersionIds: {
+        type: Sequelize.JSON,
+        defaultValue: {}
       },
       isArchived: {
         type: Sequelize.BOOLEAN,

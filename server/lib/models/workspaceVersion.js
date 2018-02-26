@@ -9,10 +9,16 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
-    childrenIds: {
-      type: DataTypes.ARRAY(Sequelize.TEXT),
+    childWorkspaceOrder: {
+      type: DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue: []
     },
+    //This field represents cached data. You can find it from the relevant timestamps.
+    childWorkspaceVersionIds: {
+      type: DataTypes.JSON,
+      defaultValue: {}
+    },
+    //This field represents cached data. You can find it from checking if its in the childWorkspaceOrder of its parent.
     isArchived: {
       type: DataTypes.BOOLEAN(),
       defaultValue: false,

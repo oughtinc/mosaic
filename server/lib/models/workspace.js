@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
     Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: 'parentWorkspace', foreignKey: 'parentId' })
     Workspace.ChildWorkspace = Workspace.hasOne(models.Workspace, { as: 'childWorkspace', foreignKey: 'parentId' })
   }
+
   Workspace.prototype.recentWorkspaceVersion = async function () {
     const workspaceVersion = await sequelize.models.WorkspaceVersion.findAll({
       limit: 1,
@@ -56,16 +57,64 @@ module.exports = (sequelize, DataTypes) => {
     })
     return workspaceVersion[0]
   }
-  Workspace.prototype.createWorkspaceVersion = async function (newInputs) {
-    const previousWorkspaceVersion = await this.recentWorkspaceVersion();
-    const previousValues = _.pick(previousWorkspaceVersion.dataValues, ['questionVersionId', 'answerVersionId', 'scratchpadVersionId'])
-    return await sequelize.models.WorkspaceVersion.create({...previousValues, ...newInputs, workspaceId: this.id })
+
+  const UPDATABLE_VALUES = ['isArchived', 'childWorkspaceOrder', 'childWorkspaceVersionIds', 'questionVersionId', 'answerVersionId', 'scratchpadVersionId', 'workspaceId']
+
+  Workspace.prototype.createWorkspaceVersion = async function (_newInputs) {
+    //Private functions
+    async function archiveRemovedChildren(previousChildWorkspaceOrder, newChildWorkspaceOrder) {
+      let updatedWorkspaceVersionIds = {}
+      if (newChildWorkspaceOrder) {
+        const removedWorksaceId = _.difference(previousChildWorkspaceOrder, newChildWorkspaceOrder)
+        for (workspaceId of removedWorksaceId) {
+          const workspace = await sequelize.models.Workspace.findbyId(workspaceId)
+          if (!workspace.isArchived) {
+            const workspaceVersion = await workspace.createWorkspaceVersion({isArchived: true})
+            updatedWorkspaceVersionIds[workspace.id] = workspaceVersion.id
+          }
+        }
+      }
+      return updatedWorkspaceVersionIds
+    }
+
+    function combineChildWorkspaceVersionIds(previousValues, newInputs = {}, updatedWorkspaceVersionIdsFromDeletions) {
+      return {...previousValues.childWorkspaceVersionIds, ...newInputs.updateChildWorkspaceVersionIds, ...updatedWorkspaceVersionIdsFromDeletions}
+    }
+
+    async function newChildWorkspaceVersionIds(previousValues, newInputs) {
+      const updatedWorkspaceVersionIdsFromDeletions = await archiveRemovedChildren(previousValues.childWorkspaceOrder, newInputs.childWorkspaceOrder)
+      return combineChildWorkspaceVersionIds(previousValues, newInputs = {}, updatedWorkspaceVersionIdsFromDeletions)
+    } 
+
+    async function updateParent(workspace, newWorkspaceVersionId) {
+      if (!!workspace.parentId) {
+        const parent = await workspace.getParentWorkspace();
+        await parent.createWorkspaceVersion({childrenWorkspaceVersionIds: {[workspace.id]: newWorkspaceVersionId}})
+      }
+    }
+
+    let newInputs = {..._newInputs}
+    const previousWorkspaceVersion = await this.recentWorkspaceVersion()
+    const previousValues = previousWorkspaceVersion.dataValues
+
+    newInputs.childWorkspaceVersionIds = await newChildWorkspaceVersionIds(previousValues, newInputs)
+    const newValue = {...previousValues, ...newInputs, workspaceId: this.id };
+    const newWorkspaceVersion = sequelize.models.WorkspaceVersion.create(_.pick(newValue, UPDATABLE_VALUES))
+    await updateParent(this, newWorkspaceVersion.id)
+    return newWorkspaceVersion
   }
+
+  Workspace.prototype.updateIsArchivedCache = async function () {
+    const recentVersion = this.recentWorkspaceVersion();
+    const parent = this.ParentWorkspace
+  }
+
   Workspace.prototype.updateBlockVersions = async function (blockVersions) {
     const recentWorkspaceVersion = await this.recentWorkspaceVersion()
     if (false) {
       throw new Error("Multiple BlockVersions for same blockID")
     }
+    //These should really be validations.
     if (false) {
       throw new Error("Referenced blockId does not exist on referenced workspace.")
     }
@@ -87,10 +136,17 @@ module.exports = (sequelize, DataTypes) => {
     const newWorkspaceVersion = await this.createWorkspaceVersion(newInputs)
   }
 
+  Workspace.prototype.workSpaceOrderAppend = function (element) {
+    return [...this.childWorkspaceVersionIds, element]
+  }
+
   Workspace.prototype.createChild = async function () {
-    const child = await this.createChildWorkspace();
-    const recentWorkspaceVersion = await this.recentWorkspaceVersion();
-    this.createWorkspaceVersion({childrenIds: [...recentWorkspaceVersion.childrenIds, child.id]})
+    const child = await this.createChildWorkspace()
+    const childVersion = await child.recentWorkspaceVersion()
+    this.createWorkspaceVersion({
+      childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
+      updateChildWorkspaceVersionIds: {[child.id]: childVersoin.id}
+    })
     return child
   }
 
