@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     WorkspaceVersion.QuestionBlockVersion = WorkspaceVersion.belongsTo(models.BlockVersion, {as: 'questionBlockVersion', foreignKey: 'questionVersionId'})
     WorkspaceVersion.AnswerBlockVersion = WorkspaceVersion.belongsTo(models.BlockVersion, {as: 'answerBlockVersion', foreignKey: 'answerVersionId'})
     WorkspaceVersion.ScratchpadBlockVersion = WorkspaceVersion.belongsTo(models.BlockVersion, {as: 'scratchpadBlockVersion', foreignKey: 'scratchpadVersionId'})
+    WorkspaceVersion.WorkspacePointerCollectionVersion = WorkspaceVersion.belongsTo(models.WorkspacePointerCollectionVersion, {as: 'workspacePointerCollectionVersion', foreignKey: 'workspacePointersCollectionVersionId'})
   }
   return WorkspaceVersion;
 };
-

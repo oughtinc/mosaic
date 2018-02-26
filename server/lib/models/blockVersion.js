@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   BlockVersion.associate = function(models){
     BlockVersion.Block = BlockVersion.belongsTo(models.Block, {foreignKey: 'blockId'})
+    BlockVersion.WorkspacePointerInputVersions = BlockVersion.hasMany(models.WorkspacePointerInputVersion, {as:'workspacePointerInputVersions',  foreignKey: 'blockVersionId'})
   }
   return BlockVersion;
 };

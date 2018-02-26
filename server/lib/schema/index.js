@@ -26,10 +26,15 @@ const makeObjectType = (model, references) => (
 )
 
 let blockType = makeObjectType(models.Block,
-  [['blockVersions', () => new GraphQLList(blockVersionType), 'BlockVersions']]
+  [
+    ['blockVersions', () => new GraphQLList(blockVersionType), 'BlockVersions'],
+    ['pointers', () => new GraphQLList(pointerType), 'Pointers']
+  ],
 )
 
-let blockVersionType = makeObjectType(models.BlockVersion, []
+let blockVersionType = makeObjectType(models.BlockVersion, [
+    ['workspacePointerInputVersions', () => new GraphQLList(workspacePointerInputVersionType), 'WorkspacePointerInputVersions']
+  ]
 )
 
 let workspaceType = makeObjectType(models.Workspace,
@@ -46,12 +51,40 @@ let workspaceVersionType = makeObjectType(models.WorkspaceVersion,
     ['questionBlockVersion', () => blockVersionType, 'QuestionBlockVersion'],
     ['answerBlockVersion', () => blockVersionType, 'AnswerBlockVersion'],
     ['scratchpadBlockVersion', () => blockVersionType, 'ScratchpadBlockVersion'],
+    ['workspacePointerCollectionVersion', () => workspacePointerCollectionVersionType, 'WorkspacePointerCollectionVersion']
+  ]
+)
+
+let workspacePointerInputVersionType = makeObjectType(models.WorkspacePointerInputVersion,
+  [
+    ['pointer', () => pointerType, 'Pointer'],
+    ['blockVersion', () => blockVersionType, 'BlockVersion'],
+    ['workspacePointerCollectionVersion', () => workspacePointerCollectionVersionType, 'WorkspacePointerCollectionVersion']
+  ]
+)
+
+let workspacePointerCollectionVersionType = makeObjectType(models.WorkspacePointerCollectionVersion,
+  [
+    ['workspace', () => workspaceType, 'Workspace'],
+    ['workspacePointerInputVersions', () => new GraphQLList(workspacePointerInputVersionType), 'WorkspacePointerInputVersions']
+  ]
+)
+
+let pointerType = makeObjectType(models.Pointer,
+  [
+    ['sourceBlock', () => blockType, 'SourceBlock'],
+    ['workspacePointerInputVersions', () => new GraphQLList(workspacePointerInputVersionType), 'WorkspacePointerInputVersions']
   ]
 )
 
 const BlockInput = new GraphQLInputObjectType({
   name: "blockVersionInput",
   fields: _.pick(attributeFields(models.BlockVersion), 'value', 'blockId'),
+})
+
+const PointerInput = new GraphQLInputObjectType({
+  name: "PointerInput",
+  fields: _.pick(attributeFields(models.Pointer), 'value', 'pointerId'),
 })
 
 let schema = new GraphQLSchema({
@@ -94,6 +127,15 @@ let schema = new GraphQLSchema({
           return child
         }
       },
+      createPointer: {
+        type: pointerType,
+        args: {blockId: {type: GraphQLString}},
+        resolve: async(_, {blockId}) => {
+          const block = await models.Block.findById(blockId)
+          const pointer = await workspace.createPointer(); 
+          return pointer
+        }
+      }
     }
   })
 });

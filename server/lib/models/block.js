@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     Block.QuestionWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'questionId'})
     Block.AnswerWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'answerId'})
     Block.ScratchpadWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'scratchpadId'})
+    Block.Pointers = Block.hasMany(models.Pointer, {as: 'pointers', foreignKey: "sourceBlockId"})
   }
   return Block;
 };

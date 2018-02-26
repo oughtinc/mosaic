@@ -45,6 +45,7 @@ module.exports = (sequelize, DataTypes) => {
     Workspace.ScratchpadBlock = Workspace.belongsTo(models.Block, { as: 'scratchpadBlock', foreignKey: 'scratchpadId' })
     Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: 'parentWorkspace', foreignKey: 'parentId' })
     Workspace.ChildWorkspace = Workspace.hasOne(models.Workspace, { as: 'childWorkspace', foreignKey: 'parentId' })
+    Workspace.WorkspacePointerCollectionVersions = Workspace.hasMany(models.WorkspacePointerCollectionVersion, { as: 'workspacePointerCollectionVersions', foreignKey: 'workspaceId' })
   }
 
   Workspace.prototype.recentWorkspaceVersion = async function () {
