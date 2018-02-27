@@ -3,7 +3,7 @@ const Sequelize = require('sequelize')
 var _ = require('lodash');
 
 module.exports = (sequelize, DataTypes) => {
-  var WorkspacePointerInputVersion = sequelize.define('WorkspacePointerInputVersion', {
+  var WorkspaceImportPointerVersion = sequelize.define('WorkspaceImportPointerVersion', {
     id: {
       type: DataTypes.UUID(),
       primaryKey: true,
@@ -16,25 +16,25 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
   })
-  WorkspacePointerInputVersion.associate = function(models){
-      WorkspacePointerInputVersion.Pointer = WorkspacePointerInputVersion.belongsTo(
+  WorkspaceImportPointerVersion.associate = function(models){
+      WorkspaceImportPointerVersion.Pointer = WorkspaceImportPointerVersion.belongsTo(
         models.Pointer, {
           as: 'pointer',
           foreignKey: 'pointerId'
         }
       )
-      WorkspacePointerInputVersion.BlockVersion = WorkspacePointerInputVersion.belongsTo(
+      WorkspaceImportPointerVersion.BlockVersion = WorkspaceImportPointerVersion.belongsTo(
         models.BlockVersion, {
           as: 'blockVersion',
           foreignKey: 'blockVersionId'
         }
       )
-      WorkspacePointerInputVersion.WorkspacePointerCollectionVersion = WorkspacePointerInputVersion.belongsTo(
+      WorkspaceImportPointerVersion.WorkspacePointerCollectionVersion = WorkspaceImportPointerVersion.belongsTo(
         models.WorkspacePointerCollectionVersion, {
           as: 'workspacePointersCollectionVersion',
           foreignKey: 'workspacePointersCollectionVersionId'
         }
       )
   }
-  return WorkspacePointerInputVersion
+  return WorkspaceImportPointerVersion
 }

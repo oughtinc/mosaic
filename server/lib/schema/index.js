@@ -17,13 +17,13 @@ const generateReferences = (model, references) => {
   return all
 }
 
-const makeObjectType = (model, references) => (
-  new GraphQLObjectType({
+const makeObjectType = (model, references) => {
+  return new GraphQLObjectType({
     name: model.name,
     description: model.name,
     fields: () => _.assign(attributeFields(model), generateReferences(model, references))
   })
-)
+}
 
 let blockType = makeObjectType(models.Block,
   [
@@ -33,7 +33,7 @@ let blockType = makeObjectType(models.Block,
 )
 
 let blockVersionType = makeObjectType(models.BlockVersion, [
-    ['workspacePointerInputVersions', () => new GraphQLList(workspacePointerInputVersionType), 'WorkspacePointerInputVersions']
+    ['workspaceImportPointerVersions', () => new GraphQLList(workspaceImportPointerVersionType), 'WorkspaceImportPointerVersions']
   ]
 )
 
@@ -55,7 +55,7 @@ let workspaceVersionType = makeObjectType(models.WorkspaceVersion,
   ]
 )
 
-let workspacePointerInputVersionType = makeObjectType(models.WorkspacePointerInputVersion,
+let workspaceImportPointerVersionType = makeObjectType(models.WorkspaceImportPointerVersion,
   [
     ['pointer', () => pointerType, 'Pointer'],
     ['blockVersion', () => blockVersionType, 'BlockVersion'],
@@ -66,14 +66,14 @@ let workspacePointerInputVersionType = makeObjectType(models.WorkspacePointerInp
 let workspacePointerCollectionVersionType = makeObjectType(models.WorkspacePointerCollectionVersion,
   [
     ['workspace', () => workspaceType, 'Workspace'],
-    ['workspacePointerInputVersions', () => new GraphQLList(workspacePointerInputVersionType), 'WorkspacePointerInputVersions']
+    ['workspaceImportPointerVersions', () => new GraphQLList(workspaceImportPointerVersionType), 'WorkspaceImportPointerVersions']
   ]
 )
 
 let pointerType = makeObjectType(models.Pointer,
   [
     ['sourceBlock', () => blockType, 'SourceBlock'],
-    ['workspacePointerInputVersions', () => new GraphQLList(workspacePointerInputVersionType), 'WorkspacePointerInputVersions']
+    ['workspaceImportPointerVersions', () => new GraphQLList(workspaceImportPointerVersionType), 'WorkspaceImportPointerVersions']
   ]
 )
 

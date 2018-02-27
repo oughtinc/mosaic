@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   })
   Pointer.associate = function(models){
       Pointer.SourceBlock = Pointer.belongsTo(models.Block, {as: 'sourceBlock', foreignKey: 'sourceBlockId'})
-      Pointer.WorkspacePointerInputVersions = Pointer.hasMany(models.WorkspacePointerInputVersion, {as: 'workspacePointerInputVersions', foreignKey: 'pointerId'})
+      Pointer.WorkspaceImportPointerVersions = Pointer.hasMany(models.WorkspaceImportPointerVersion, {as: 'workspaceImportPointerVersions', foreignKey: 'pointerId'})
   }
   return Pointer
 }

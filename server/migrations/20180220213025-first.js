@@ -58,7 +58,7 @@ module.exports = {
       workspaceId: referenceTo("Workspaces"),
     });
 
-    await queryInterface.createTable('WorkspacePointerInputVersions', {
+    await queryInterface.createTable('WorkspaceImportPointerVersions', {
       id: ID,
       isExpanded: Sequelize.BOOLEAN,
       pointerId: referenceTo("Pointers"),

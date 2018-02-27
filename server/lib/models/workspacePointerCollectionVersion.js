@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   })
   WorkspacePointerCollectionVersion.associate = function(models){
       WorkspacePointerCollectionVersion.Workspace = WorkspacePointerCollectionVersion.belongsTo(models.Workspace, {foreignKey: 'workspaceId'})
-      WorkspacePointerCollectionVersion.WorkspacePointerInputVersions = WorkspacePointerCollectionVersion.hasMany(models.WorkspacePointerInputVersion, {foreignKey: 'workspacePointersCollectionVersionId'})
+      WorkspacePointerCollectionVersion.WorkspaceImportPointerVersions = WorkspacePointerCollectionVersion.hasMany(models.WorkspaceImportPointerVersion, {foreignKey: 'workspacePointersCollectionVersionId'})
   }
   return WorkspacePointerCollectionVersion
 }
