@@ -16,6 +16,16 @@ module.exports = (sequelize, DataTypes) => {
     value:  {
         type: DataTypes.JSON(),
         allowNull: false
+    },
+    cachedImportPointerValues:  {
+        type: DataTypes.JSON(),
+        defaultValue: {},
+        allowNull: false
+    },
+    cachedExportPointerValues:  {
+        type: DataTypes.JSON(),
+        defaultValue: {},
+        allowNull: false
     }
   });
   BlockVersion.associate = function(models){

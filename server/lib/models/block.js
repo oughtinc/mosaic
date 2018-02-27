@@ -11,15 +11,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     hooks: {
-        // afterCreate: async (block, options) => {
-        //   await block.createBlockVersion({value: {}})
-        // }
+        afterCreate: async (block, options) => {
+          await block.createBlockVersion({value: {}})
+        }
     },
     getterMethods: {
-        async recentBlockVersion() {
-            const blockVersions = await this.getBlockVersion();//sequelize.models.BlockVersion.findAll({where: {blockId: this.id}})
-            return blockVersions[0]
-        },
         async workspace() {
             const questionWorkspace = await this.getQuestionWorkspace();//sequelize.models.BlockVersion.findAll({where: {blockId: this.id}})
             const answerWorkspace = await this.getAnswerWorkspace();//sequelize.models.BlockVersion.findAll({where: {blockId: this.id}})
@@ -28,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
   });
+
   Block.associate = function (models) {
     Block.BlockVersions = Block.hasMany(models.BlockVersion, {as: 'blockVersions', foreignKey: 'blockId'})
     Block.QuestionWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'questionId'})
@@ -35,5 +32,63 @@ module.exports = (sequelize, DataTypes) => {
     Block.ScratchpadWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'scratchpadId'})
     Block.Pointers = Block.hasMany(models.Pointer, {as: 'pointers', foreignKey: "sourceBlockId"})
   }
+
+  const UPDATABLE_VALUES = ['value', 'cachedPointerValues', 'cachedOutputPointerValues']
+
+  Block.prototype.recentBlockVersion = async function () {
+    const _blockVersions = await sequelize.models.BlockSpace.findAll({
+      limit: 1,
+      where: {
+        blockId: this.id,
+      },
+      order: [['createdAt', 'DESC']]
+    })
+    return _blockVersions[0]
+  }
+
   return Block;
 };
+
+  // Block.prototype.createBlockVersion = async function(_newInputs) {
+  //   function findInputPointerIds(value) {
+  //     return []
+  //   }
+
+  //   function findOutputPointerValues(value) {
+  //     return {}
+  //   }
+
+  //   //TODO: Warning: This always finds the most recent input Pointer, which could break transactions.
+  //   async function updateCachedInputPointerValues(value) {
+  //     const inputPointerIds = findInputPointerIds(value)
+  //     let pointerValues = {}
+  //     for (inputPointerId of inputPointerIds) {
+  //       const inputPointer = await sequelize.models.Pointer.findById(inputPointerId)
+  //       const value = await inputPointer.getValue()
+  //       pointerValues[inputPointerId] = value
+  //     }
+
+  //     return {deletedInputPointers, addedInputPointers}
+  //   }
+
+  //   async function updateCachedOutputPointerValues(value) {
+  //     const outputPointerValues = findOutputPointerValues(value)
+  //     // for (pointerId of Object.entries(outputPointerValues)){
+
+  //     // }
+  //     return {deletedOutputPointers, updatedOutputPointers, createdOutputPointers}
+  //   }
+
+  //   let newInputs = {..._newInputs}
+  //   const recentBlockVersion = await this.recentBlockVersion()
+  //   const previousValues = previousWorkspaceVersion.dataValues
+  //   const newValue = {...previousValues, ...newInputs, blockId: this.id };
+
+  //   const newBlockVersion = sequelize.models.BlockVersion.create(_.pick(newValue, UPDATABLE_VALUES))
+
+  //   const {deletedInputPointers, addedInputPointers} = updateCachedInputPointerValues(newValue.value)
+  //   const updatesForPointersCollectionVersion = {blockId, inputPointerChanges: {deletedInputPointers, addedInputPointers}}
+
+  //   const newWorkspacePointersCollectionVersion = updateWorkspacePointersCollectionVersion({deletedInputPointers, addedInputPointers})
+  //   return newBlockVersion, newWorkspacePointersCollectionVersion
+  // }

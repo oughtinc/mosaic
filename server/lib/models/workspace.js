@@ -29,11 +29,16 @@ module.exports = (sequelize, DataTypes) => {
           const answerVersion = await sequelize.models.BlockVersion.create({ blockId: answer.id, value: {} });
           const scratchpadVersion = await sequelize.models.BlockVersion.create({ blockId: scratchpad.id, value: {} });
 
+          const workspacePointersCollectionVersion = await sequelize.models.WorkspacePointersCollectionVersion.create({
+            workspaceId: workspace.id
+          });
+
           const workspaceVersion = await sequelize.models.WorkspaceVersion.create({
             workspaceId: workspace.id,
             questionVersionId: questionVersion.id,
             answerVersionId: answerVersion.id,
             scratchpadVersionId: scratchpadVersion.id,
+            workspacePointersCollectionVersionId: workspacePointersCollectionVersion.id
           });
         }
       }
@@ -134,8 +139,19 @@ module.exports = (sequelize, DataTypes) => {
         newInputs["scratchpadVersionId"] = blockVersion.id
       }
     }
-    const newWorkspaceVersion = await this.createWorkspaceVersion(newInputs)
+    //1: Find all new or modified output Pointers from changed blockVersions
+    //2: Find all of the new input Pointers Values, given the recent changes that have yet to save.
+    //3: Make new BlockVersions with these inputs & outputs. When you save, if there are any altered or removed outputs, XXXX.
+    //4: Make a list of all pointerInputVersions that will need to be created given the new inputs.
+    // const workspacePointerCollectionVersion = await this.createWorkspacePointerCollectionVersion({newInputPointers, newOutputPointers})
+    // const newWorkspaceVersion = await this.createWorkspaceVersion(newInputs)
   }
+
+  // Workspace.prototype.updateBlockVersions = async function (blockVersions) {
+  //   for (blockVersion of blockVersions){
+  //     updateCachedInputs(blockVersion) // BlockVersions should change, but nothing else should change.
+  //   }
+  // }
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceVersionIds, element]
