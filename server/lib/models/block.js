@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Block.associate = function (models) {
+    Block.Transaction = Block.hasOne(models.Transaction, {as: 'transaction', foreignKey: "transactionId"})
     Block.BlockVersions = Block.hasMany(models.BlockVersion, {as: 'blockVersions', foreignKey: 'blockId'})
     Block.QuestionWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'questionId'})
     Block.AnswerWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'answerId'})

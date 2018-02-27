@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
   WorkspaceVersion.associate = function(models){
+    WorkspaceVersion.Transaction = WorkspaceVersion.hasOne(models.Transaction, {as: 'transaction', foreignKey: "transactionId"})
     WorkspaceVersion.Workspace = WorkspaceVersion.belongsTo(models.Workspace, {foreignKey: 'workspaceId'})
     WorkspaceVersion.QuestionBlockVersion = WorkspaceVersion.belongsTo(models.BlockVersion, {as: 'questionBlockVersion', foreignKey: 'questionVersionId'})
     WorkspaceVersion.AnswerBlockVersion = WorkspaceVersion.belongsTo(models.BlockVersion, {as: 'answerBlockVersion', foreignKey: 'answerVersionId'})

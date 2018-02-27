@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   })
   WorkspacePointerCollectionVersion.associate = function(models){
+      WorkspacePointerCollectionVersion.Transaction = WorkspacePointerCollectionVersion.hasOne(models.Transaction, {as: 'transaction', foreignKey: "transactionId"})
       WorkspacePointerCollectionVersion.Workspace = WorkspacePointerCollectionVersion.belongsTo(models.Workspace, {foreignKey: 'workspaceId'})
       WorkspacePointerCollectionVersion.WorkspaceImportPointerVersions = WorkspacePointerCollectionVersion.hasMany(models.WorkspaceImportPointerVersion, {foreignKey: 'workspacePointersCollectionVersionId'})
   }

@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     },
   })
   Pointer.associate = function(models){
+      Pointer.Transaction = Pointer.hasOne(models.Transaction, {as: 'transaction', foreignKey: "transactionId"})
       Pointer.SourceBlock = Pointer.belongsTo(models.Block, {as: 'sourceBlock', foreignKey: 'sourceBlockId'})
       Pointer.WorkspaceImportPointerVersions = Pointer.hasMany(models.WorkspaceImportPointerVersion, {as: 'workspaceImportPointerVersions', foreignKey: 'pointerId'})
   }
