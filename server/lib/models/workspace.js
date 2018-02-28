@@ -112,11 +112,29 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Workspace.prototype.updateIsArchivedCache = async function () {
-    const recentVersion = this.recentWorkspaceVersion();
+    const recentVersion = await this.recentWorkspaceVersion();
     const parent = this.ParentWorkspace
   }
 
+  Workspace.prototype.getBlocks = async function () {
+    const questionBlock = await this.getQuestionBlock();
+    const answerBlock = await this.getAnswerBlock();
+    const scratchpadBlock = await this.getScratchpadBlock();
+    return [questionBlock, answerBlock, scratchpadBlock]
+  }
+
+  Workspace.prototype.getBlockVersions = async function () {
+    const recentVersion = await this.recentWorkspaceVersion();
+    return await recentVersion.getBlockVersions();
+  }
+
+  Workspace.prototype.getWorkspacePointersCollectionVersion = async function () {
+    const recentVersion = await this.recentWorkspaceVersion();
+  }
+
   Workspace.prototype.updateBlockVersions = async function (blockVersions) {
+    const newTransaction = await sequelize.models.Transaction.create();
+
     const recentWorkspaceVersion = await this.recentWorkspaceVersion()
     if (false) {
       throw new Error("Multiple BlockVersions for same blockID")
@@ -140,6 +158,7 @@ module.exports = (sequelize, DataTypes) => {
         newInputs["scratchpadVersionId"] = blockVersion.id
       }
     }
+
     //1: Find all new or modified output Pointers from changed blockVersions
     //2: Find all of the new input Pointers Values, given the recent changes that have yet to save.
     //3: Make new BlockVersions with these inputs & outputs. When you save, if there are any altered or removed outputs, XXXX.
@@ -156,6 +175,11 @@ module.exports = (sequelize, DataTypes) => {
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceVersionIds, element]
+  }
+
+
+  Workspace.prototype.updatePointersCollection = async function (transaction, modifiedExportedPointerIds) {
+    const newPointerCollectionVersion = await this.createWorkspacePointerCollectionVersion({transactionId: transaction.id})
   }
 
   Workspace.prototype.createChild = async function () {

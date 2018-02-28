@@ -47,49 +47,47 @@ module.exports = (sequelize, DataTypes) => {
     return _blockVersions[0]
   }
 
+  Block.prototype.createBlockVersion = async function(_newInputs) {
+    function findInputPointerIds(value) {
+      return []
+    }
+
+    function findOutputPointerValues(value) {
+      return {}
+    }
+
+    //TODO: Warning: This always finds the most recent input Pointer, which could break transactions.
+    async function updateCachedInputPointerValues(value) {
+      const inputPointerIds = findInputPointerIds(value)
+      let pointerValues = {}
+      for (inputPointerId of inputPointerIds) {
+        const inputPointer = await sequelize.models.Pointer.findById(inputPointerId)
+        const value = await inputPointer.getValue()
+        pointerValues[inputPointerId] = value
+      }
+
+      return {deletedInputPointers, addedInputPointers}
+    }
+
+    async function updateCachedOutputPointerValues(value) {
+      const outputPointerValues = findOutputPointerValues(value)
+      // for (pointerId of Object.entries(outputPointerValues)){
+
+      // }
+      return {deletedOutputPointers, updatedOutputPointers, createdOutputPointers}
+    }
+
+    let newInputs = {..._newInputs}
+    const recentBlockVersion = await this.recentBlockVersion()
+    const previousValues = previousWorkspaceVersion.dataValues
+    const newValue = {...previousValues, ...newInputs, blockId: this.id }
+
+    const newBlockVersion = sequelize.models.BlockVersion.create(_.pick(newValue, UPDATABLE_VALUES))
+
+    const {deletedImportPointers, addedImportPointers} = updateCachedInputPointerValues(newValue.value)
+
+    return newBlockVersion
+  }
+
   return Block;
 };
-
-  // Block.prototype.createBlockVersion = async function(_newInputs) {
-  //   function findInputPointerIds(value) {
-  //     return []
-  //   }
-
-  //   function findOutputPointerValues(value) {
-  //     return {}
-  //   }
-
-  //   //TODO: Warning: This always finds the most recent input Pointer, which could break transactions.
-  //   async function updateCachedInputPointerValues(value) {
-  //     const inputPointerIds = findInputPointerIds(value)
-  //     let pointerValues = {}
-  //     for (inputPointerId of inputPointerIds) {
-  //       const inputPointer = await sequelize.models.Pointer.findById(inputPointerId)
-  //       const value = await inputPointer.getValue()
-  //       pointerValues[inputPointerId] = value
-  //     }
-
-  //     return {deletedInputPointers, addedInputPointers}
-  //   }
-
-  //   async function updateCachedOutputPointerValues(value) {
-  //     const outputPointerValues = findOutputPointerValues(value)
-  //     // for (pointerId of Object.entries(outputPointerValues)){
-
-  //     // }
-  //     return {deletedOutputPointers, updatedOutputPointers, createdOutputPointers}
-  //   }
-
-  //   let newInputs = {..._newInputs}
-  //   const recentBlockVersion = await this.recentBlockVersion()
-  //   const previousValues = previousWorkspaceVersion.dataValues
-  //   const newValue = {...previousValues, ...newInputs, blockId: this.id };
-
-  //   const newBlockVersion = sequelize.models.BlockVersion.create(_.pick(newValue, UPDATABLE_VALUES))
-
-  //   const {deletedInputPointers, addedInputPointers} = updateCachedInputPointerValues(newValue.value)
-  //   const updatesForPointersCollectionVersion = {blockId, inputPointerChanges: {deletedInputPointers, addedInputPointers}}
-
-  //   const newWorkspacePointersCollectionVersion = updateWorkspacePointersCollectionVersion({deletedInputPointers, addedInputPointers})
-  //   return newBlockVersion, newWorkspacePointersCollectionVersion
-  // }
