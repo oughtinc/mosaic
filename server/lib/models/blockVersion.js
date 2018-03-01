@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSON(),
       allowNull: false
     },
-    cachedImportPointerValues: {
-      type: DataTypes.JSON(),
+    cachedImportPointerIds: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: {},
       allowNull: false
     },
@@ -35,18 +35,23 @@ module.exports = (sequelize, DataTypes) => {
     BlockVersion.WorkspaceImportPointerVersions = BlockVersion.hasMany(models.WorkspaceImportPointerVersion, { as: 'workspaceImportPointerVersions', foreignKey: 'blockVersionId' })
   }
 
-  BlockVersion.prototype.calculateImportCacheFromValue = async function (oldBlockVersion) {
-    return [
-      {
-        id: "12345",
-      },
-      {
-        id: "abcdefg",
-      }
-    ]
+  const UPDATABLE_VALUES = ['value', 'cachedImportPointerIds', 'cachedExportPointerValues']
+
+  BlockVersion.createAndUpdateCaches = async function (newVersion) {
+    const newBlockVersion = await sequelize.models.BlockVersion.build(_.pick(newValue, UPDATABLE_VALUES))
+    newBlockVersion.cachedImportPointerIds = this.valueToImportPointerIds()
+    newBlockVersion.cachedExportPointerValues = this.valueToExportPointerValues()
+    await newBlockVersion.save()
+    return newBlockVersion
   }
 
-  BlockVersion.prototype.calculateExportCacheFromValue = async function (oldBlockVersion) {
+  BlockVersion.prototype.valueToImportPointerIds = async function () {
+    //TODO: DO this one
+    return ["s8fj", "sdfsdf", "sfdsdf"]
+  }
+
+  BlockVersion.prototype.valueToExportPointerValues = async function () {
+    //TODO: DO this one
     return [
       {
         id: "3f3f3f",
@@ -59,55 +64,24 @@ module.exports = (sequelize, DataTypes) => {
     ]
   }
 
-  BlockVersion.prototype.importCacheDifference = async function (oldBlockVersion) {
-    const oldCache = oldBlockVersion.calculateImportCacheFromValue()
-    const newCache = this.calculateImportCacheFromValue()
-
-    return {
-      deletions: [
-        {
-          id: "33f3",
-          value: false,
-          isDeleted: false,
-        }
-      ],
-      additions: [
-        {
-          id: 'w3f3wf',
-          needsSourceCache: true
-        }
-      ]
-    }
-  }
-
-  BlockVersion.prototype.exportCacheDifference = async function (oldBlockVersion) {
-    const oldCache = oldBlockVersion.calculateExportCacheFromValue()
-    const newCache = this.calculateExportCacheFromValue()
-    return {
-      updates: [
-        {
-          id: "3f3f3",
-          isDeleted: true,
-          value: false,
-        },
-        {
-          id: "3f3f3f",
-          isDeleted: false,
-          value: "sdfsdf $a1",
-          importedPointerIds: [
-            "a1"
-          ]
-        }
-      ]
-    }
-  }
-
-  BlockVersion.prototype.cacheDifference = async function (oldBlockVersion) {
-    const cacheChanges = {
-      imports: this.importCacheDifference(oldBlockVersion),
-      exports: this.exportCacheDifference(oldBlockVersion)
-    }
-    return cacheChanges;
+  BlockVersion.prototype.cachedExportPointerValuesDifference = async function (oldBlockVersion) {
+    return [
+      {
+        pointerId: "3f3f3",
+        pointerVersionId: "3f3f3f",
+        isDeleted: true,
+        value: false,
+      },
+      {
+        pointerId: "sdfsdf",
+        pointerVersionId: "3f3f3f",
+        isDeleted: false,
+        value: "sdfsdf $a1",
+        importedPointerIds: [
+          "a1"
+        ]
+      }
+    ]
   }
 
   return BlockVersion;

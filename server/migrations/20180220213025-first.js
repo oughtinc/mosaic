@@ -58,8 +58,8 @@ module.exports = {
       ...standardColumns,
       blockId: referenceTo("Blocks"),
       value: Sequelize.JSON,
-      cachedOutputPointerValues: Sequelize.JSON,
-      cachedImportPointerIds: Sequelize.ARRAY(Sequelize.TEXT),
+      cachedImportPointerIds: Sequelize.ARRAY(Sequelize.STRING),
+      cachedExportPointerValues: Sequelize.JSON,
     })
 
     await queryInterface.createTable('Workspaces', {

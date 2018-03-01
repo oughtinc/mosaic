@@ -106,7 +106,8 @@ let schema = new GraphQLSchema({
         resolve: async (_, {workspaceId, blockVersions}) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const recent = await workspace.recentWorkspaceVersion();
-          await workspace.updateBlockVersions(blockVersions);
+          const transaction = await new BlockUpdateTransaction(blockVersions)
+          await transaction.run()
           return workspace
         }
       },

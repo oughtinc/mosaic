@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     childWorkspaceOrder: {
-      type: DataTypes.ARRAY(DataTypes.TEXT),
+      type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: []
     },
     //This field represents cached data. You can find it from the relevant timestamps.
@@ -41,10 +41,11 @@ module.exports = (sequelize, DataTypes) => {
     return await collection.getWorkspacePointerInputVersions()
   }
 
-  WorkspaceVersion.prototype.updateForNewExportedPointerIds = async function (transaction, modifiedExportedPointers) {
-    async function createUpdatedPointerInputVersion(_pointerInputVersion, _newPointerCollectionVersion, _modifiedExportedPointers){
+  WorkspaceVersion.createWithExportedPointerVersions = async function (oldWorkspaceVersion, transaction, modifiedExportedPointerVersions) {
+
+    async function createUpdatedPointerInputVersion(_pointerInputVersion, _newPointerCollectionVersion, _modifiedExportedPointerVersions){
       let newInputs = { transactionId: transaction.id, workspacePointerCollectionVersionId: _newPointerCollectionVersion.id }
-      const modifiedPointer = _modifiedExportedPointers.find(m => m.pointerId === _pointerInputVersion.exportingPointerId)
+      const modifiedPointer = _modifiedExportedPointerVersions.find(m => m.pointerId === _pointerInputVersion.exportingPointerId)
       if (modifiedPointer) {
         newInputs.exportingBlockVersionId = modifiedPointer.exportingBlockVersionId
       }
@@ -54,22 +55,28 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
 
-    const oldPointerCollectionVersion = await this.getWorkspacePointerCollectionVersion();
-    const oldPointerInputVersions = await oldPointerCollectionVersion.getWorkspacePointerInputVersions()
+    async function createNewPointerCollectionVersion() {
+      const oldPointerCollectionVersion = await oldWorkspaceVersion.getWorkspacePointerCollectionVersion();
+      const oldPointerInputVersions = await oldPointerCollectionVersion.getWorkspacePointerInputVersions()
 
-    const newPointerCollectionVersion = await this.createWorkspacePointerCollectionVersion({ transactionId: transaction.id })
+      const newPointerCollectionVersion = await oldWorkspaceVersion.createWorkspacePointerCollectionVersion({ transactionId: transaction.id })
 
-    for (const pointerInputVersion of oldPointerInputVersions) {
-      await createUpdatedPointerInputVersion(pointerInputVersion, newPointerCollectionVersion, modifiedExportedPointers)
+      for (const pointerInputVersion of oldPointerInputVersions) {
+        await createUpdatedPointerInputVersion(pointerInputVersion, newPointerCollectionVersion, modifiedExportedPointerVersions)
+      }
+
+      return newPointerCollectionVersion
     }
 
-    const workspace = await this.getWorkspace()
+
+    const newPointerCollectionVersion = await createNewPointerCollectionVersion()
+    const workspace = await oldWorkspaceVersion.getWorkspace()
     const newWorkspaceVersion = await workspace.createWorkspaceVersion({
       transactionId: transaction.id,
       workspacePointersCollectionVersionId: newPointerCollectionVersion.id
     })
 
-    await this.ensureWorkspaceVersionConsistency()
+    await newWorkspaceVersion.ensureWorkspaceVersionConsistency(transaction)
 
     return newWorkspaceVersion
   }
@@ -96,10 +103,11 @@ module.exports = (sequelize, DataTypes) => {
   //-------------------------------------------------------------------------------------------------
   WorkspaceVersion.prototype.ensureWorkspaceVersionConsistency = async function (transaction) {
     await this.ensureAllBlockVersionInputsInPointerInputs(transaction)
+    //Later we could ensure consistency in other ways
   }
 
   //Makes a list of all pointerIds that are imported in the workspace, but not included in WorkspacePointerInputVersions
-  WorkspaceVersion.prototype.missingImportPointerIds = function () {
+  WorkspaceVersion.prototype.missingImportPointerIds = async function () {
     const importingPointerIds = await this.importingPointerIds()
     const oldPointerInputVersions = await this.getWorkspacePointerInputVersions()
     return _.difference(importingPointerIds, oldPointerInputVersions.map(v => v.exportingPointerId))

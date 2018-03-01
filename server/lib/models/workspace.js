@@ -132,47 +132,6 @@ module.exports = (sequelize, DataTypes) => {
     const recentVersion = await this.recentWorkspaceVersion();
   }
 
-  Workspace.prototype.updateBlockVersions = async function (blockVersions) {
-    const newTransaction = await sequelize.models.Transaction.create();
-
-    const recentWorkspaceVersion = await this.recentWorkspaceVersion()
-    if (false) {
-      throw new Error("Multiple BlockVersions for same blockID")
-    }
-    //These should really be validations.
-    if (false) {
-      throw new Error("Referenced blockId does not exist on referenced workspace.")
-    }
-    let newInputs = {};
-    for (const blockVersionData of blockVersions) {
-      if (this.questionId === blockVersionData.blockId) {
-        const blockVersion = await sequelize.models.BlockVersion.create(blockVersionData);
-        newInputs["questionVersionId"] = blockVersion.id
-      }
-      if (this.answerId === blockVersionData.blockId) {
-        const blockVersion = await sequelize.models.BlockVersion.create(blockVersionData);
-        newInputs["answerVersionId"] = blockVersion.id
-      }
-      if (this.scratchpadId === blockVersionData.blockId) {
-        const blockVersion = await sequelize.models.BlockVersion.create(blockVersionData);
-        newInputs["scratchpadVersionId"] = blockVersion.id
-      }
-    }
-
-    //1: Find all new or modified output Pointers from changed blockVersions
-    //2: Find all of the new input Pointers Values, given the recent changes that have yet to save.
-    //3: Make new BlockVersions with these inputs & outputs. When you save, if there are any altered or removed outputs, XXXX.
-    //4: Make a list of all pointerInputVersions that will need to be created given the new inputs.
-    // const workspacePointerCollectionVersion = await this.createWorkspacePointerCollectionVersion({newInputPointers, newOutputPointers})
-    // const newWorkspaceVersion = await this.createWorkspaceVersion(newInputs)
-  }
-
-  // Workspace.prototype.updateBlockVersions = async function (blockVersions) {
-  //   for (blockVersion of blockVersions){
-  //     updateCachedInputs(blockVersion) // BlockVersions should change, but nothing else should change.
-  //   }
-  // }
-
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceVersionIds, element]
   }

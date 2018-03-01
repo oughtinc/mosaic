@@ -18,16 +18,30 @@ module.exports = (sequelize, DataTypes) => {
       Pointer.WorkspaceImportPointerVersions = Pointer.hasMany(models.WorkspaceImportPointerVersion, {as: 'workspaceImportPointerVersions', foreignKey: 'pointerId'})
   }
 
-  Pointer.prototype.importingWorkspaceIds = async function() {
-    const workspaceImportPointerVersions = this.getWorkspaceImportPointerVersions();
+  Pointer.prototype._importingWorkspacePointerCollections = async function() {
+    const workspaceImportPointerVersions = this.getWorkspaceImportPointerVersions()
     const workspacePointerCollectionIds = _.uniq(workspaceImportPointerVersions.map(e => e.workspacePointersCollectionVersionId))
-    let workspaceCollections = []
+
+    let workspacePointerCollections = []
     for (const id of workspacePointerCollectionIds) {
       const collection = await sequelize.models.WorkspacePointerCollectionVersion.findById(id)
-      workspaceCollections.push(collection)
+      workspacePointerCollections.push(collection)
     }
+    return workspacePointerCollections 
+  }
+
+  Pointer.prototype._importingWorkspacesIds = async function() {
+    const _importingWorkspacePointerCollections = await this._importingWorkspacePointerCollections()
     const workspaceIds = _.uniq(workspaceCollections.map(w => w.workspaceId))
-    return workspaceIds
+  }
+
+  Pointer.prototype.importingWorkspaces = async function() {
+    let workspaces = []
+    const _importingWorkspacesIds = await this._importingWorkspacesIds()
+    for (const _importingWorkspacesId of _importingWorkspacesIds) {
+      workspaces = [...workspaces, await sequelize.models.Workspace.findById(_importingWorkspacesId)]
+    }
+    return workspaces
   }
 
   Pointer.prototype.recentSourceBlockVersion = async function() {
@@ -38,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Pointer.prototype.recentVersion = async function() {
     const blockVersion = await this.recentSourceBlockVersion()
-    return blockVersion.cachedOutputPointerValues[this.id]
+    return blockVersion.cachedExportPointerValues[this.id]
   }
 
   return Pointer

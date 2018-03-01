@@ -5,7 +5,7 @@ var _ = require('lodash');
 module.exports = (sequelize, DataTypes) => {
   var Transaction = sequelize.define('Transaction', {
     id: {
-      type: DataTypes.Integer(),
+      type: DataTypes.INTEGER(),
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
