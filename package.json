@@ -12,5 +12,10 @@
     "postinstall": "npm run server/install"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "final-form": "^4.2.1",
+    "prop-types": "^15.6.1",
+    "react-final-form": "^3.1.2"
+  }
 }
