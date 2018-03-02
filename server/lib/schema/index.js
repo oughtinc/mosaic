@@ -97,7 +97,8 @@ let schema = new GraphQLSchema({
         args: {workspaceId: {type: GraphQLString}, childWorkspaceOrder: {type: new GraphQLList(GraphQLString)}},
         resolve: async (_, {workspaceId, childWorkspaceOrder}) => {
           const workspace = await models.Workspace.findById(workspaceId)
-          return workspace.update({childWorkspaceOrder})
+          const event = await models.Event.create()
+          return workspace.update({childWorkspaceOrder}, {event})
         }
       },
       createChildWorkspace: {
@@ -105,7 +106,8 @@ let schema = new GraphQLSchema({
         args: {workspaceId: {type: GraphQLString}},
         resolve: async(_, {workspaceId}) => {
           const workspace = await models.Workspace.findById(workspaceId)
-          const child = await workspace.createChild(); 
+          const event = await models.Event.create()
+          const child = await workspace.createChild({event})
           return child
         }
       },
