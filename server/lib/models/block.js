@@ -1,5 +1,6 @@
 'use strict';
 const Sequelize = require('sequelize')
+const addEvents = require('./addEvents.js');
 
 module.exports = (sequelize, DataTypes) => {
   var Block = sequelize.define('Block', {
@@ -8,6 +9,13 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
+    },
+    type: {
+      type: DataTypes.ENUM('QUESTION', 'ANSWER', 'SCRATCHPAD'),
+      allowNull: false
+    },
+    value: {
+      type: DataTypes.JSON
     }
   }, {
     hooks: {
@@ -20,19 +28,11 @@ module.exports = (sequelize, DataTypes) => {
             const blockVersions = await this.getBlockVersion();//sequelize.models.BlockVersion.findAll({where: {blockId: this.id}})
             return blockVersions[0]
         },
-        async workspace() {
-            const questionWorkspace = await this.getQuestionWorkspace();//sequelize.models.BlockVersion.findAll({where: {blockId: this.id}})
-            const answerWorkspace = await this.getAnswerWorkspace();//sequelize.models.BlockVersion.findAll({where: {blockId: this.id}})
-            const scratchpadWorkspace = await this.getScratchpadWorkspace();//sequelize.models.BlockVersion.findAll({where: {blockId: this.id}})
-            return questionWorkspace || answerWorkspace || scratchpadWorkspace;
-        }
     }
   });
   Block.associate = function (models) {
-    Block.BlockVersions = Block.hasMany(models.BlockVersion, {as: 'blockVersions', foreignKey: 'blockId'})
-    Block.QuestionWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'questionId'})
-    Block.AnswerWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'answerId'})
-    Block.ScratchpadWorkspace = Block.hasOne(models.Workspace, {foreignKey: 'scratchpadId'})
+    Block.Workspace = Block.belongsTo(models.Workspace, {foreignKey: 'workspaceId'})
+    addEvents().run(Block, models)
   }
   return Block;
 };
