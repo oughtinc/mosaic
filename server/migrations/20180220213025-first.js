@@ -81,7 +81,7 @@ module.exports = {
 
     await queryInterface.createTable('Blocks', {
       ...standardColumns,
-      questionId: referenceTo("Workspaces"),
+      workspaceId: referenceTo("Workspaces"),
       type: {
         type: Sequelize.ENUM('QUESTION', 'ANSWER', 'SCRATCHPAD'),
         allowNull: false

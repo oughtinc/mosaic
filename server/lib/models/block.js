@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
+    ...addEvents().eventRelationshipColumns(DataTypes),
     type: {
       type: DataTypes.ENUM('QUESTION', 'ANSWER', 'SCRATCHPAD'),
       allowNull: false
