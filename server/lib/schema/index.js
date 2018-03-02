@@ -81,15 +81,17 @@ let schema = new GraphQLSchema({
     name: 'RootMutationType',
     fields : {
       updateBlocks: {
-        type: workspaceType,
+        type: new GraphQLList(blockType),
         args: {workspaceId: {type: GraphQLString}, blocks: {type: new GraphQLList(BlockInput)}},
         resolve: async (_, {workspaceId, blocks}) => {
           const event = await models.Event.create()
+          let newBlocks = []
           for (const _block of blocks){
             const block = await models.Block.findById(_block.id)
             await block.update({..._block}, {event})
+            newBlocks = [...newBlocks, block]
           }
-          return await models.Workspace.findById(workspaceId)
+          return newBlocks
         }
       },
       updateWorkspace: {
