@@ -77,12 +77,11 @@ module.exports = (sequelize, DataTypes) => {
     return [...this.childWorkspaceVersionIds, element]
   }
 
-  Workspace.prototype.createChild = async function () {
-    const child = await this.createChildWorkspace()
-    const childVersion = await child.recentWorkspaceVersion()
+  Workspace.prototype.createChild = async function ({event}) {
+    const child = await this.createChildWorkspace({}, {event})
     await this.update({
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
-    })
+    }, {event})
     return child
   }
 
