@@ -84,10 +84,12 @@ let schema = new GraphQLSchema({
         type: workspaceType,
         args: {workspaceId: {type: GraphQLString}, blocks: {type: new GraphQLList(BlockInput)}},
         resolve: async (_, {workspaceId, blocks}) => {
+          const event = await models.Event.create()
           for (const _block of blocks){
-            const block = models.Workspace.findById(_blocks.id)
-            block.update({_block})
+            const block = await models.Block.findById(_block.id)
+            await block.update({..._block}, {event})
           }
+          return await models.Workspace.findById(workspaceId)
         }
       },
       updateWorkspace: {

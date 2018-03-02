@@ -6,21 +6,26 @@ function addEvents(model, models) {
 const eventRelationshipColumns = (DataTypes) => ({
     createdAtEventId: {
         type: DataTypes.INTEGER(),
-        allowNull: false,
     },
     updatedAtEventId: {
         type: DataTypes.INTEGER(),
-        allowNull: false,
     }
 })
 
 const beforeValidate = {
-    beforeValidate: async (item, { event }) => {
-        if (event && event.dataValues) {
-            item.createdAtEventId = event.dataValues.id,
-                item.updatedAtEventId = event.dataValues.id
+    beforeValidate: (item, options) => {
+        const event = options.event
+        if (event) {
+            if (!item.createdAtEventId) {
+                item.createdAtEventId = event.dataValues.id
+            }
+            item.updatedAtEventId = event.dataValues.id
         }
-        return item
+    },
+    beforeUpdate: (item, options) => {
+        //This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
+        //See: https://github.com/sequelize/sequelize/issues/3534 
+        options.fields = item.changed();
     }
 }
 

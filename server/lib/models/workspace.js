@@ -68,7 +68,6 @@ module.exports = (sequelize, DataTypes) => {
       }
     });
   Workspace.associate = function (models) {
-    Workspace.QuestionBlock = Workspace.belongsTo(models.Block, { as: 'questionBlock', foreignKey: 'questionId' })
     Workspace.ChildWorkspace = Workspace.hasOne(models.Workspace, { as: 'childWorkspace', foreignKey: 'parentId' })
     Workspace.Blocks = Workspace.hasMany(models.Block, { as: 'blocks', foreignKey: 'workspaceId' })
     addEvents().run(Workspace, models)
