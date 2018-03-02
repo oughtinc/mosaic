@@ -1,0 +1,32 @@
+'use strict';
+const Sequelize = require('sequelize')
+var _ = require('lodash');
+const addEvents = require('./addEvents.js');
+
+module.exports = (sequelize, DataTypes) => {
+  var Pointer = sequelize.define('Pointer', {
+    id: {
+      type: DataTypes.UUID(),
+      primaryKey: true,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull: false,
+    }
+  })
+
+  Pointer.associate = function(models){
+    Pointer.SourceBlock = Pointer.belongsTo(models.Block, {as: 'sourceBlock', foreignKey: 'sourceBlockId'})
+    Pointer.PointerImports = Pointer.hasMany(models.PointerImport, {as: 'pointerImport', foreignKey: 'pointerId'})
+    addEvents().run(Pointer, models)
+  }
+
+  Pointer.prototype.importingWorkspaces = async function() {
+    let workspaces = []
+    const pointerImports = await this.getPointerImports()
+    for (const pointerImport of pointerImports) {
+      workspaces = [...workspaces, await pointerImport.getWorkspace()]
+    }
+    return workspaces
+  }
+
+  return Pointer
+};
