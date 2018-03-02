@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
+    ...addEvents().eventRelationshipColumns(DataTypes),
     childWorkspaceOrder: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue: []
@@ -23,16 +24,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
       hooks: {
         beforeCreate: async (workspace, options) => {
-          const question = await sequelize.models.Block.create();
-          const answer = await sequelize.models.Block.create();
-          const scratchpad = await sequelize.models.Block.create();
-          workspace.questionId = question.id;
-          workspace.answerId = answer.id;
-          workspace.scratchpadId = scratchpad.id;
+          return workspace
+        },
+        afterCreate: async (workspace, options) => {
+          await workspace.createBlock({type: "QUESTION"})
+          await workspace.createBlock({type: "ANSWER"})
+          await workspace.createBlock({type: "SCRATCHPAD"})
         },
         afterUpdate: async (workspace, options) => {
-          console.log("HI!!!", workspace,  options)
-
           async function archiveRemovedChildren(previousChildWorkspaceOrder, newChildWorkspaceOrder) {
             let updatedWorkspaceVersionIds = {}
             if (newChildWorkspaceOrder) {
@@ -72,8 +71,8 @@ module.exports = (sequelize, DataTypes) => {
     });
   Workspace.associate = function (models) {
     Workspace.QuestionBlock = Workspace.belongsTo(models.Block, { as: 'questionBlock', foreignKey: 'questionId' })
-    Workspace.Blocks = Workspace.hasMany(models.Block, { as: 'blocks', foreignKey: 'workspaceId' })
     Workspace.ChildWorkspace = Workspace.hasOne(models.Workspace, { as: 'childWorkspace', foreignKey: 'parentId' })
+    Workspace.Blocks = Workspace.hasMany(models.Block, { as: 'blocks', foreignKey: 'workspaceId' })
     addEvents().run(Workspace, models)
   }
 

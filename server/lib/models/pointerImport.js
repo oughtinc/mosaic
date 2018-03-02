@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
-    }
+    },
+    ...addEvents().eventRelationshipColumns(DataTypes),
   })
 
   PointerImport.associate = function(models){
