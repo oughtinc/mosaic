@@ -20,9 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     hooks: {
-        // afterCreate: async (block, options) => {
-        //   await block.createBlockVersion({value: {}})
-        // }
+        ...addEvents().beforeValidate,
     },
     getterMethods: {
         async recentBlockVersion() {
