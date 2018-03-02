@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     ...addEvents().eventRelationshipColumns(DataTypes),
+  }, {
+    hooks: {
+        ...addEvents().beforeValidate,
+    },
   })
 
   PointerImport.associate = function(models){

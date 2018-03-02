@@ -23,13 +23,11 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
       hooks: {
-        beforeCreate: async (workspace, options) => {
-          return workspace
-        },
-        afterCreate: async (workspace, options) => {
-          await workspace.createBlock({type: "QUESTION"})
-          await workspace.createBlock({type: "ANSWER"})
-          await workspace.createBlock({type: "SCRATCHPAD"})
+        ...addEvents().beforeValidate,
+        afterCreate: async (workspace, {event}) => {
+          await workspace.createBlock({type: "QUESTION"}, {event})
+          await workspace.createBlock({type: "ANSWER"}, {event})
+          await workspace.createBlock({type: "SCRATCHPAD"}, {event})
         },
         afterUpdate: async (workspace, options) => {
           async function archiveRemovedChildren(previousChildWorkspaceOrder, newChildWorkspaceOrder) {
