@@ -4,6 +4,11 @@ import { Form, Field } from "react-final-form";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
+import { type, Node, Value } from 'slate';
+import { Editor } from 'slate-react';
+import Plain from 'slate-plain-serializer';
+
+
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -40,37 +45,65 @@ export class FormPagePresentational extends React.Component<any, any> {
       console.log(workspace);
       let initialValues = {};
       for (const block of workspace.blocks) {
-          initialValues[block.id] = block.value && block.value.text;
+          initialValues[block.id] = block.value && Value.fromJSON(block.value);
       }
       const onSubmit = async (values) => {
           let inputs: any = [];
           for (const key of Object.keys(values)) {
-              inputs = [...inputs, {id: key, value: {text: values[key]}}];
+              inputs = [...inputs, {id: key, value: JSON.stringify(values[key].toJSON())}];
           }
           const variables = {blocks: inputs};
+          console.log(variables)
           this.props.updateBlocks({
             variables,
           });
       };
+      const question = workspace.blocks.find(b => b.type === "QUESTION")
+      const answer = workspace.blocks.find(b => b.type === "ANSWER")
+      const scratchpad = workspace.blocks.find(b => b.type === "SCRATCHPAD")
+      console.log(question)
       return (
         <div>
-        <h1>🏁 React Final Form - Simple Example</h1>
+        <h1>
+          <Editor
+          value={Value.fromJSON(question.value)}
+          onChange={() => {}}
+          />
+        </h1>
         <Form
           onSubmit={onSubmit}
           initialValues={initialValues}
           render={({ handleSubmit, reset, submitting, pristine, values }) => (
             <form onSubmit={handleSubmit}>
-            {workspace.blocks.map((b) => (
-              <div>
-                <label>{b.type}</label>
+
+              <h3> Scratchpad </h3>
                 <Field
-                  name={b.id}
-                  component="input"
-                  type="text"
-                  placeholder="Contents"
+                  name={scratchpad.id}
+                  render={({ input, meta }) => (
+                    <div>
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                      <Editor
+                      value={input.value}
+                      onChange={(c) => {input.onChange(c.value)}}
+                      />
+                    </div>
+                  )}
                 />
-              </div>
-            ))}
+
+              <h3> Answer </h3>
+                <Field
+                  name={answer.id}
+                  render={({ input, meta }) => (
+                    <div>
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                      <Editor
+                      value={input.value}
+                      onChange={(c) => {input.onChange(c.value)}}
+                      />
+                    </div>
+                  )}
+                />
+
               <div className="buttons">
                 <button type="submit" disabled={submitting || pristine}>
                   Submit
@@ -82,7 +115,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                   Reset
                 </button>
               </div>
-              <pre>{JSON.stringify(values)}</pre>
             </form>
           )}
         />

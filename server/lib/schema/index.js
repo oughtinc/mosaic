@@ -5,6 +5,8 @@ import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSc
 import * as aasync from "async";
 import * as pluralize from "pluralize";
 import * as Case from "Case";
+import GraphQLJSON from 'graphql-type-json';
+import Sequelize from 'sequelize'
 
 const generateReferences = (model, references) => {
   let all = {};
@@ -105,11 +107,11 @@ let schema = new GraphQLSchema({
       },
       createChildWorkspace: {
         type: workspaceType,
-        args: {workspaceId: {type: GraphQLString}},
-        resolve: async(_, {workspaceId}) => {
+        args: {workspaceId: {type: GraphQLString}, question: {type: GraphQLJSON}},
+        resolve: async(_, {workspaceId, question}) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const event = await models.Event.create()
-          const child = await workspace.createChild({event})
+          const child = await workspace.createChild({event, question})
           return child
         }
       },
