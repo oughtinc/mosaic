@@ -42,6 +42,8 @@ let blockType = makeObjectType(models.Block,
 let workspaceType = makeObjectType(models.Workspace,
   [
     ...standardReferences,
+    ['childWorkspaces', () => new GraphQLList(workspaceType), 'ChildWorkspaces'],
+    ['parentWorkspace', () => new GraphQLList(workspaceType), 'ParentWorkspace'],
     ['blocks', () => new GraphQLList(blockType), 'Blocks'],
   ]
 )
@@ -111,7 +113,7 @@ let schema = new GraphQLSchema({
         resolve: async(_, {workspaceId, question}) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const event = await models.Event.create()
-          const child = await workspace.createChild({event, question})
+          const child = await workspace.createChild({event, question: JSON.parse(question)})
           return child
         }
       },

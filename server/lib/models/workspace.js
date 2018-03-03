@@ -28,57 +28,23 @@ module.exports = (sequelize, DataTypes) => {
           await workspace.createBlock({type: "ANSWER"}, {event})
           await workspace.createBlock({type: "SCRATCHPAD"}, {event})
         },
-        afterUpdate: async (workspace, options) => {
-          async function archiveRemovedChildren(previousChildWorkspaceOrder, newChildWorkspaceOrder) {
-            let updatedWorkspaceVersionIds = {}
-            if (newChildWorkspaceOrder) {
-              const removedWorksaceId = _.difference(previousChildWorkspaceOrder, newChildWorkspaceOrder)
-              for (workspaceId of removedWorksaceId) {
-                const workspace = await sequelize.models.Workspace.findbyId(workspaceId)
-                if (!workspace.isArchived) {
-                  const workspaceVersion = await workspace.createWorkspaceVersion({ isArchived: true })
-                  updatedWorkspaceVersionIds[workspace.id] = workspaceVersion.id
-                }
-              }
-            }
-            return updatedWorkspaceVersionIds
-          }
-
-          function combineChildWorkspaceVersionIds(previousValues, newInputs = {}, updatedWorkspaceVersionIdsFromDeletions) {
-            return { ...previousValues.childWorkspaceVersionIds, ...newInputs.updateChildWorkspaceVersionIds, ...updatedWorkspaceVersionIdsFromDeletions }
-          }
-
-          async function newChildWorkspaceVersionIds(previousValues, newInputs) {
-            const updatedWorkspaceVersionIdsFromDeletions = await archiveRemovedChildren(previousValues.childWorkspaceOrder, newInputs.childWorkspaceOrder)
-            return combineChildWorkspaceVersionIds(previousValues, newInputs = {}, updatedWorkspaceVersionIdsFromDeletions)
-          }
-
-          async function updateParent(workspace, newWorkspaceVersionId) {
-            if (!!workspace.parentId) {
-              const parent = await workspace.getParentWorkspace();
-              await parent.createWorkspaceVersion({ childrenWorkspaceVersionIds: { [workspace.id]: newWorkspaceVersionId } })
-            }
-          }
-
-          await archiveRemovedChildren(previousValues.childWorkspaceOrder, newInputs.childWorkspaceOrder)
-
-          await updateParent(workspace, newWorkspaceVersion.id)
-        }
       }
     });
   Workspace.associate = function (models) {
-    Workspace.ChildWorkspace = Workspace.hasOne(models.Workspace, { as: 'childWorkspace', foreignKey: 'parentId' })
+    Workspace.ChildWorkspaces = Workspace.hasMany(models.Workspace, { as: 'childWorkspaces', foreignKey: 'parentId' })
+    Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: 'parentWorkspace', foreignKey: 'parentId' })
     Workspace.Blocks = Workspace.hasMany(models.Block, { as: 'blocks', foreignKey: 'workspaceId' })
     addEvents().run(Workspace, models)
   }
 
   Workspace.createAsChild = async function ({parentId, question}, {event}) {
     const _workspace = await sequelize.models.Workspace.create({parentId}, {event})
-    await _workspace.createBlock({type: "QUESTION"}, {event})
+    await _workspace.createBlock({type: "QUESTION", value: question}, {event})
+    return _workspace
   }
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {
-    return [...this.childWorkspaceVersionIds, element]
+    return [...this.childWorkspaceOrder, element]
   }
 
   Workspace.prototype.createChild = async function ({event, question}) {
