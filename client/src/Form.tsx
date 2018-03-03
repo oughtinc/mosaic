@@ -8,23 +8,29 @@ import { type, Node, Value } from 'slate';
 import { Editor } from 'slate-react';
 import Plain from 'slate-plain-serializer';
 
-
-
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const WORKSPACE_QUERY = gql`
-    query{
+    query workspaces{
         workspaces{
-        id
-        blocks{
+          id
+          childWorkspaces{
             id
-            value
-            type
-        }
+            blocks{
+              id
+              value
+              type
+            }
+          }
+          blocks{
+              id
+              value
+              type
+          }
         }
     }
  `;
- 
+
 const UPDATE_BLOCKS = gql`
     mutation updateBlocks($blocks:[blockInput]){
         updateBlocks(blocks:$blocks){
@@ -35,39 +41,88 @@ const UPDATE_BLOCKS = gql`
     }
 `;
 
+const NEW_CHILD = gql`
+  mutation createChildWorkspace($workspaceId:String, $question:JSON){
+    createChildWorkspace(workspaceId:$workspaceId, question:$question ){
+        id
+    }
+  }
+`;
+
+export class ChildForm extends React.Component<any, any> {
+  public render() {
+    const onSubmit = async (values) => {
+      this.props.onMutate(JSON.stringify(values['new'].toJSON()))
+    }
+    return (
+      <Form
+        onSubmit={onSubmit}
+        initialValues={{ 'new':  Plain.deserialize("") }}
+        render={({ handleSubmit, reset, submitting, pristine, values }) => (
+          <div>
+            <form onSubmit={handleSubmit}>
+              <h3> New Child </h3>
+              <Field
+                name={'new'}
+                render={({ input, meta }) => (
+                  <div>
+                    {meta.touched && meta.error && <span>{meta.error}</span>}
+                    <Editor
+                      value={input.value}
+                      onChange={(c) => { input.onChange(c.value) }}
+                    />
+                  </div>
+                )}
+              />
+              <div className="buttons">
+                <button type="submit" disabled={submitting || pristine}>
+                  Submit
+                </button>
+                <button
+                  type="button"
+                  onClick={reset}
+                  disabled={submitting || pristine}>
+                  Reset
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      />
+    )
+  }
+}
+
 export class FormPagePresentational extends React.Component<any, any> {
   public render() {
-      const props: any = this.props;
-      const workspace = props.workspaces.workspaces && props.workspaces.workspaces[0];
-      if (!workspace) {
-          return <div> Loading </div>;
+    const workspace = this.props.workspaces.workspaces && this.props.workspaces.workspaces[0];
+    if (!workspace) {
+      return <div> Loading </div>;
+    }
+    let initialValues = {};
+    for (const block of workspace.blocks) {
+      initialValues[block.id] = block.value ? Value.fromJSON(block.value) : Plain.deserialize("");
+    }
+    const onSubmit = async (values) => {
+      let inputs: any = [];
+      for (const key of Object.keys(values)) {
+        inputs = [...inputs, { id: key, value: JSON.stringify(values[key].toJSON()) }];
       }
-      console.log(workspace);
-      let initialValues = {};
-      for (const block of workspace.blocks) {
-          initialValues[block.id] = block.value && Value.fromJSON(block.value);
-      }
-      const onSubmit = async (values) => {
-          let inputs: any = [];
-          for (const key of Object.keys(values)) {
-              inputs = [...inputs, {id: key, value: JSON.stringify(values[key].toJSON())}];
-          }
-          const variables = {blocks: inputs};
-          console.log(variables)
-          this.props.updateBlocks({
-            variables,
-          });
-      };
-      const question = workspace.blocks.find(b => b.type === "QUESTION")
-      const answer = workspace.blocks.find(b => b.type === "ANSWER")
-      const scratchpad = workspace.blocks.find(b => b.type === "SCRATCHPAD")
-      console.log(question)
-      return (
-        <div>
+      const variables = { blocks: inputs };
+      this.props.updateBlocks({
+        variables,
+      });
+    };
+    const question = workspace.blocks.find(b => b.type === "QUESTION")
+    const answer = workspace.blocks.find(b => b.type === "ANSWER")
+    const scratchpad = workspace.blocks.find(b => b.type === "SCRATCHPAD")
+    console.log(scratchpad)
+    return (
+      <div>
         <h1>
           <Editor
-          value={Value.fromJSON(question.value)}
-          onChange={() => {}}
+            value={Value.fromJSON(question.value)}
+            onChange={() => { }}
           />
         </h1>
         <Form
@@ -77,32 +132,32 @@ export class FormPagePresentational extends React.Component<any, any> {
             <form onSubmit={handleSubmit}>
 
               <h3> Scratchpad </h3>
-                <Field
-                  name={scratchpad.id}
-                  render={({ input, meta }) => (
-                    <div>
-                      {meta.touched && meta.error && <span>{meta.error}</span>}
-                      <Editor
+              <Field
+                name={scratchpad.id}
+                render={({ input, meta }) => (
+                  <div>
+                    {meta.touched && meta.error && <span>{meta.error}</span>}
+                    <Editor
                       value={input.value}
-                      onChange={(c) => {input.onChange(c.value)}}
-                      />
-                    </div>
-                  )}
-                />
+                      onChange={(c) => { input.onChange(c.value) }}
+                    />
+                  </div>
+                )}
+              />
 
               <h3> Answer </h3>
-                <Field
-                  name={answer.id}
-                  render={({ input, meta }) => (
-                    <div>
-                      {meta.touched && meta.error && <span>{meta.error}</span>}
-                      <Editor
+              <Field
+                name={answer.id}
+                render={({ input, meta }) => (
+                  <div>
+                    {meta.touched && meta.error && <span>{meta.error}</span>}
+                    <Editor
                       value={input.value}
-                      onChange={(c) => {input.onChange(c.value)}}
-                      />
-                    </div>
-                  )}
-                />
+                      onChange={(c) => { input.onChange(c.value) }}
+                    />
+                  </div>
+                )}
+              />
 
               <div className="buttons">
                 <button type="submit" disabled={submitting || pristine}>
@@ -118,12 +173,33 @@ export class FormPagePresentational extends React.Component<any, any> {
             </form>
           )}
         />
-        </div>
+        <ChildForm onMutate={(question) => {this.props.createChild({variables: {workspaceId: workspace.id, question}})}}/>
+        {workspace.childWorkspaces.map(c => {
+          const question = c.blocks.find(b => (b.type === "QUESTION"))
+          console.log(c, question)
+          return (
+            <div>
+              {c.id}
+              {question.value &&
+                <Editor
+                  value={Value.fromJSON(question.value)}
+                  onChange={(c) => { console.log(c) }}
+                />
+              }
+            </div>
+          )
+        })}
+      </div>
     );
   }
 }
 
 export const FormPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspaces" }),
-  graphql(UPDATE_BLOCKS, { name: "updateBlocks" })
+  graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
+  graphql(NEW_CHILD, { name: "createChild", options: {
+    refetchQueries:[
+      'workspaces' 
+    ]
+  } })
 )(FormPagePresentational);
