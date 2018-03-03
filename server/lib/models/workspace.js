@@ -25,7 +25,6 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         ...addEvents().beforeValidate,
         afterCreate: async (workspace, {event}) => {
-          await workspace.createBlock({type: "QUESTION"}, {event})
           await workspace.createBlock({type: "ANSWER"}, {event})
           await workspace.createBlock({type: "SCRATCHPAD"}, {event})
         },
@@ -73,12 +72,17 @@ module.exports = (sequelize, DataTypes) => {
     addEvents().run(Workspace, models)
   }
 
+  Workspace.createAsChild = async function ({parentId, question}, {event}) {
+    const _workspace = await sequelize.models.Workspace.create({parentId}, {event})
+    await _workspace.createBlock({type: "QUESTION"}, {event})
+  }
+
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceVersionIds, element]
   }
 
-  Workspace.prototype.createChild = async function ({event}) {
-    const child = await this.createChildWorkspace({}, {event})
+  Workspace.prototype.createChild = async function ({event, question}) {
+    const child = await sequelize.models.Workspace.createAsChild({parentId: this.id, question}, {event})
     await this.update({
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
     }, {event})

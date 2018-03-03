@@ -2,6 +2,7 @@
     "extends": [
       "tslint-react"
     ],
+    "defaultSeverity": "warning",
     "rules": {
       "no-default-export": true,
       "adjacent-overload-signatures": true,

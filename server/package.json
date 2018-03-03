@@ -39,6 +39,7 @@
     "graphql-sequelize": "^5.6.1",
     "graphql-tag": "^2.5.0",
     "graphql-tools": "^2.5.1",
+    "graphql-type-json": "^0.2.0",
     "lodash": "^4.17.4",
     "pg": "^7.3.0",
     "pg-hstore": "^2.3.2",

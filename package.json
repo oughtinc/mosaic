@@ -1,5 +1,5 @@
 {
-  "name": "sps",
+  "name": "mosaic",
   "version": "1.0.0",
   "description": "Simple prediction service",
   "main": "index.js",
@@ -13,9 +13,5 @@
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "final-form": "^4.2.1",
-    "prop-types": "^15.6.1",
-    "react-final-form": "^3.1.2"
-  }
+  "dependencies": {}
 }
