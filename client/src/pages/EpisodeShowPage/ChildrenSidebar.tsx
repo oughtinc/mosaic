@@ -1,26 +1,28 @@
 import * as React from "react";
-import { Editor } from 'slate-react';
-import { type, Node, Value } from 'slate';
-import styled from 'styled-components';
+import { Editor } from "slate-react";
+import { type, Node, Value } from "slate";
+import styled from "styled-components";
 import { Form, Field } from "react-final-form";
-import Plain from 'slate-plain-serializer';
+import Plain from "slate-plain-serializer";
 import { BlockEditor } from "./BlockEditor";
+import _ = require("lodash");
+import { Button } from "react-bootstrap";
 
 class ChildForm extends React.Component<any, any> {
     public render() {
         const onSubmit = async (values) => {
-            this.props.onMutate(JSON.stringify(values['new'].toJSON()))
-        }
+            this.props.onMutate(JSON.stringify(values.new.toJSON()));
+        };
         return (
             <Form
                 onSubmit={onSubmit}
-                initialValues={{ 'new': Plain.deserialize("") }}
+                initialValues={{ new: Plain.deserialize("") }}
                 render={({ handleSubmit, reset, submitting, pristine, values }) => (
                     <div>
 
                         <form onSubmit={handleSubmit}>
                             <BlockEditor
-                                name={'new'}
+                                name={"new"}
                                 isInField={true}
                             />
                             <div className="buttons">
@@ -38,7 +40,7 @@ class ChildForm extends React.Component<any, any> {
                     </div>
                 )}
             />
-        )
+        );
     }
 }
 
@@ -46,11 +48,13 @@ const ChildStyle = styled.div`
   border: 1px solid #ddd;
   padding: 3px;
   margin-bottom: 3px;
-`
+`;
 
 export class Child extends React.Component<any, any> {
     public render() {
-        const question = this.props.workspace.blocks.find(b => (b.type === "QUESTION"))
+        const workspace = this.props.workspace;
+        const question = workspace.blocks.find((b) => (b.type === "QUESTION"));
+        const answer = workspace.blocks.find((b) => (b.type === "ANSWER"));
         return (
             <ChildStyle>
                 {question.value &&
@@ -59,8 +63,15 @@ export class Child extends React.Component<any, any> {
                         value={Value.fromJSON(question.value)}
                     />
                 }
+                {answer.value &&
+                    <BlockEditor
+                        isInField={false}
+                        value={_.isEmpty(answer.value) ? Plain.deserialize("") : Value.fromJSON(answer.value)}
+                    />
+                }
+                <Button href={`/workspaces/${workspace.id}`} > Here </Button>
             </ChildStyle>
-        )
+        );
     }
 }
 export class ChildrenSidebar extends React.Component<any, any> {
@@ -70,7 +81,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 {this.props.workspaces.length &&
                     <div>
                         <h3> Existing Children </h3>
-                        {this.props.workspaces.map(workspace => (
+                        {this.props.workspaces.map((workspace) => (
                             <Child workspace={workspace} key={workspace.id} />
                         ))}
                     </div>
@@ -78,6 +89,6 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 <h3> Add a new Question </h3>
                 <ChildForm onMutate={this.props.onCreateChild} />
             </div>
-        )
+        );
     }
 }

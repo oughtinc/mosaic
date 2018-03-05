@@ -24,9 +24,15 @@ module.exports = (sequelize, DataTypes) => {
   }, {
       hooks: {
         ...addEvents().beforeValidate,
-        afterCreate: async (workspace, {event}) => {
-          await workspace.createBlock({type: "ANSWER"}, {event})
+        afterCreate: async (workspace, {event, questionValue}) => {
+          const blocks = await workspace.getBlocks();
+          if (questionValue) {
+            await workspace.createBlock({type: "QUESTION", value: questionValue}, {event})
+          } else {
+            await workspace.createBlock({type: "QUESTION"}, {event})
+          }
           await workspace.createBlock({type: "SCRATCHPAD"}, {event})
+          await workspace.createBlock({type: "ANSWER"}, {event})
         },
       }
     });
@@ -38,8 +44,7 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Workspace.createAsChild = async function ({parentId, question}, {event}) {
-    const _workspace = await sequelize.models.Workspace.create({parentId}, {event})
-    await _workspace.createBlock({type: "QUESTION", value: question}, {event})
+    const _workspace = await sequelize.models.Workspace.create({parentId}, {event, questionValue:question})
     return _workspace
   }
 
