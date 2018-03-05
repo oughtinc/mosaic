@@ -20,12 +20,12 @@ services:
     command: "bash -c 'sleep 5 && cd /data && yarn && yarn run build && yarn run db:migrate && yarn run db:seed && yarn run start'"
     depends_on:
       - postgres
-  # web:
-  #   image: node:9.7  
-  #   depends_on:
-  #      - api
-  #   volumes:
-  #     - ./client:/data
-  #   ports:
-  #     - "127.0.0.1:3000:3000"
-  #   command: "bash -c 'cd /data && yarn install && yarn run start'"
+  web:
+    image: node:9.7  
+    depends_on:
+       - api
+    volumes:
+      - ./client:/data
+    ports:
+      - "3000:3000"
+    command: "bash -c 'cd /data && yarn install && yarn run start'"
