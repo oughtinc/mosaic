@@ -7,6 +7,7 @@ import Plain from "slate-plain-serializer";
 import { BlockEditor } from "./BlockEditor";
 import _ = require("lodash");
 import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 class ChildForm extends React.Component<any, any> {
     public render() {
@@ -69,7 +70,10 @@ export class Child extends React.Component<any, any> {
                         value={_.isEmpty(answer.value) ? Plain.deserialize("") : Value.fromJSON(answer.value)}
                     />
                 }
-                <Button href={`/workspaces/${workspace.id}`} > Here </Button>
+
+                <Link to={`/workspaces/${workspace.id}`}>
+                    <Button> Open </Button>
+                </Link>
             </ChildStyle>
         );
     }
@@ -78,15 +82,19 @@ export class ChildrenSidebar extends React.Component<any, any> {
     public render() {
         return (
             <div>
-                {this.props.workspaces.length &&
+                {!!this.props.workspaceOrder.length &&
                     <div>
                         <h3> Existing Children </h3>
-                        {this.props.workspaces.map((workspace) => (
-                            <Child workspace={workspace} key={workspace.id} />
-                        ))}
+                        {this.props.workspaceOrder.map((workspaceId) => {
+                            const workspace = this.props.workspaces.find((w) => w.id === workspaceId);
+                            return (
+                                <Child workspace={workspace} key={workspace.id} />
+                            );
+                        }
+                        )}
                     </div>
                 }
-                <h3> Add a new Question </h3>
+                <h3> Add a new Child Question </h3>
                 <ChildForm onMutate={this.props.onCreateChild} />
             </div>
         );
