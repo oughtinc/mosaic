@@ -74,6 +74,9 @@ export class Child extends React.Component<any, any> {
                 <Link to={`/workspaces/${workspace.id}`}>
                     <Button> Open </Button>
                 </Link>
+                <Button onClick={this.props.onDelete}>
+                   Archive 
+                </Button>
             </ChildStyle>
         );
     }
@@ -88,7 +91,11 @@ export class ChildrenSidebar extends React.Component<any, any> {
                         {this.props.workspaceOrder.map((workspaceId) => {
                             const workspace = this.props.workspaces.find((w) => w.id === workspaceId);
                             return (
-                                <Child workspace={workspace} key={workspace.id} />
+                                <Child
+                                    workspace={workspace}
+                                    key={workspace.id}
+                                    onDelete={() => {this.props.changeOrder(this.props.workspaceOrder.filter( (w) => w !== workspace.id)); }}
+                                />
                             );
                         }
                         )}
