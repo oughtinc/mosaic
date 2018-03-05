@@ -6,10 +6,11 @@ import { compose } from "recompose";
 import { type, Node, Value } from "slate";
 import { Editor } from "slate-react";
 import Plain from "slate-plain-serializer";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, Button } from "react-bootstrap";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { BlockEditor } from "./BlockEditor";
+import { Link } from "react-router-dom";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -17,6 +18,8 @@ const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
         workspace(id: $id){
           id
+          parentId
+          childWorkspaceOrder
           childWorkspaces{
             id
             blocks{
@@ -44,6 +47,14 @@ const UPDATE_BLOCKS = gql`
     }
 `;
 
+const UPDATE_WORKSPACE = gql`
+    mutation updateWorkspace($id: String!, $childWorkspaceOrder: [String]){
+        updateWorkspace(id: $id, childWorkspaceOrder: $childWorkspaceOrder){
+            id
+        }
+    }
+`;
+
 const NEW_CHILD = gql`
   mutation createChildWorkspace($workspaceId:String, $question:JSON){
     createChildWorkspace(workspaceId:$workspaceId, question:$question ){
@@ -54,7 +65,6 @@ const NEW_CHILD = gql`
 
 export class FormPagePresentational extends React.Component<any, any> {
     public render() {
-        console.log("GOT WORKSPACE", this.props);
         const workspace = this.props.workspace.workspace;
         if (!workspace) {
             return <div> Loading </div>;
@@ -85,6 +95,11 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 isInField={false}
                                 value={!!question.value ? Value.fromJSON(question.value) : Plain.deserialize("")}
                             />
+                            {workspace.parentId &&
+                                <Link to={`/workspaces/${workspace.parentId}`}>
+                                    <Button> To Parent </Button>
+                                </Link>
+                            }
                         </h1>
                     </Col>
                 </Row>
@@ -124,6 +139,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                     <Col sm={3}>
                         <ChildrenSidebar
                             workspaces={workspace.childWorkspaces}
+                            workspaceOrder={workspace.childWorkspaceOrder}
                             onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                         />
                     </Col>
@@ -134,15 +150,20 @@ export class FormPagePresentational extends React.Component<any, any> {
 }
 
 const options: any = ({ match }) => ({
-  variables: { id: match.params.workspaceId },
+  variables:  {id: match.params.workspaceId },
 });
 
 export const EpisodeShowPage = compose(
-    graphql(WORKSPACE_QUERY, { name: "workspace", options }),
-    graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
+    graphql(WORKSPACE_QUERY, {name: "workspace", options }),
+    graphql(UPDATE_BLOCKS, {name:  "updateBlocks" }),
+    graphql(UPDATE_WORKSPACE, {name: "updateWorkspace", options: {
+            refetchQueries:  [
+                "workspace",
+            ],
+    }}),
     graphql(NEW_CHILD, {
-        name: "createChild", options: {
-            refetchQueries: [
+        name:  "createChild", options: {
+            refetchQueries:  [
                 "workspace",
             ],
         },
