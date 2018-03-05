@@ -3,9 +3,9 @@ import { Form, Field } from "react-final-form";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { type, Node, Value } from 'slate';
-import { Editor } from 'slate-react';
-import Plain from 'slate-plain-serializer';
+import { type, Node, Value } from "slate";
+import { Editor } from "slate-react";
+import Plain from "slate-plain-serializer";
 import { Row, Col } from "react-bootstrap";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
@@ -14,8 +14,8 @@ import { BlockEditor } from "./BlockEditor";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const WORKSPACE_QUERY = gql`
-    query workspaces{
-        workspaces{
+    query workspace($id: String!){
+        workspace(id: $id){
           id
           childWorkspaces{
             id
@@ -54,7 +54,8 @@ const NEW_CHILD = gql`
 
 export class FormPagePresentational extends React.Component<any, any> {
     public render() {
-        const workspace = this.props.workspaces.workspaces && this.props.workspaces.workspaces[0];
+        console.log("GOT WORKSPACE", this.props);
+        const workspace = this.props.workspace.workspace;
         if (!workspace) {
             return <div> Loading </div>;
         }
@@ -72,9 +73,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                 variables,
             });
         };
-        const question = workspace.blocks.find(b => b.type === "QUESTION")
-        const answer = workspace.blocks.find(b => b.type === "ANSWER")
-        const scratchpad = workspace.blocks.find(b => b.type === "SCRATCHPAD")
+        const question = workspace.blocks.find((b) => b.type === "QUESTION");
+        const answer = workspace.blocks.find((b) => b.type === "ANSWER");
+        const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
         return (
             <div>
                 <Row>
@@ -82,7 +83,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         <h1>
                             <BlockEditor
                                 isInField={false}
-                                value={Value.fromJSON(question.value)}
+                                value={!!question.value ? Value.fromJSON(question.value) : Plain.deserialize("")}
                             />
                         </h1>
                     </Col>
@@ -123,7 +124,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                     <Col sm={3}>
                         <ChildrenSidebar
                             workspaces={workspace.childWorkspaces}
-                            onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }) }}
+                            onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                         />
                     </Col>
                 </Row>
@@ -132,14 +133,18 @@ export class FormPagePresentational extends React.Component<any, any> {
     }
 }
 
+const options: any = ({ match }) => ({
+  variables: { id: match.params.workspaceId },
+});
+
 export const EpisodeShowPage = compose(
-    graphql(WORKSPACE_QUERY, { name: "workspaces" }),
+    graphql(WORKSPACE_QUERY, { name: "workspace", options }),
     graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
     graphql(NEW_CHILD, {
         name: "createChild", options: {
             refetchQueries: [
-                'workspaces'
-            ]
-        }
+                "workspace",
+            ],
+        },
     })
 )(FormPagePresentational);

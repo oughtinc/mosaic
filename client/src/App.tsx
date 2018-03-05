@@ -42,7 +42,7 @@ const LandingPage = () => (
 
 const Routes = () => (
   <div>
-    <Route exact={true} path="/" component={EpisodeShowPage} />
+    <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
   </div>
 );
 
