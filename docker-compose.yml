@@ -3,31 +3,33 @@ services:
   postgres:
     image: postgres:10.3
     restart: always
-    environment:
-      POSTGRES_USER: mosaic
-      POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM
-      POSTGRES_DB: mosaic_dev
-    ports:
-      - "5432:5432"
+    environment: 
+      POSTGRES_DB: mosaic_dev 
+      POSTGRES_USER: mosaic 
+      POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM 
+    expose: 
+      - 5432
   api:
     image: node:9.7
-    depends_on:
-      - postgres
+    environment: 
+        CONNECTION_STRING_DEV: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
     ports:
       - "8080:8080"
     volumes:
       - ./server:/data      
     expose:
       - 8080
-    command: "bash -c 'sleep 5 && cd /data && yarn && yarn run build && yarn run db:create && yarn run db:migrate && yarn run db:seed && yarn run start'"
+    command: "bash -c 'sleep 5 && cd /data && yarn && yarn run build && yarn run db:migrate && yarn run db:seed && yarn run start'"
+    depends_on:
+      - postgres 
   web:
     image: node:9.7  
     depends_on:
-      - api
+       - api
     volumes:
       - ./client:/data
     ports:
       - "127.0.0.1:3000:3000"
     expose:
       - 3000
-    command: "bash -c 'cd /data && yarn && yarn run start'"
+    command: "bash -c 'cd /data && yarn install && yarn run start'"

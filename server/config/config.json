@@ -1,10 +1,6 @@
 {
   "development": {
-    "user": "mosaic",
-    "username": "mosaic",      
-    "password": "MDaUA2P4ZbkJPCKEM",
-    "database": "mosaic_dev",
-    "host": "postgres",
+    "use_env_variable": "CONNECTION_STRING_DEV",
     "dialect": "postgres"
   },
   "test": {
