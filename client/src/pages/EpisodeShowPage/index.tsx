@@ -7,6 +7,8 @@ import { compose } from "recompose";
 import { type, Node, Value } from 'slate';
 import { Editor } from 'slate-react';
 import Plain from 'slate-plain-serializer';
+import { ChildrenSidebar } from "./ChildrenSidebar";
+import { Row, Col } from "react-bootstrap";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -119,6 +121,9 @@ export class FormPagePresentational extends React.Component<any, any> {
     console.log(scratchpad)
     return (
       <div>
+        <Row>
+            <Col>
+
         <h1>
           <Editor
             value={Value.fromJSON(question.value)}
@@ -174,27 +179,15 @@ export class FormPagePresentational extends React.Component<any, any> {
           )}
         />
         <ChildForm onMutate={(question) => {this.props.createChild({variables: {workspaceId: workspace.id, question}})}}/>
-        {workspace.childWorkspaces.map(c => {
-          const question = c.blocks.find(b => (b.type === "QUESTION"))
-          console.log(c, question)
-          return (
-            <div>
-              {c.id}
-              {question.value &&
-                <Editor
-                  value={Value.fromJSON(question.value)}
-                  onChange={(c) => { console.log(c) }}
-                />
-              }
-            </div>
-          )
-        })}
+        <ChildrenSidebar workspaces={workspace.childWorkspaces}/>
+            </Col>
+        </Row>
       </div>
     );
   }
 }
 
-export const FormPage = compose(
+export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspaces" }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
   graphql(NEW_CHILD, { name: "createChild", options: {

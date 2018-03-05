@@ -8,7 +8,7 @@ import { createStore, combineReducers } from "redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { FormPage } from "./Form";
+import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
@@ -42,7 +42,7 @@ const LandingPage = () => (
 
 const Routes = () => (
   <div>
-    <Route exact={true} path="/" component={FormPage} />
+    <Route exact={true} path="/" component={EpisodeShowPage} />
   </div>
 );
 
