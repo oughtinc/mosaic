@@ -6,6 +6,7 @@
     "apollo-cache-inmemory": "^1.1.9",
     "apollo-client": "^2.2.5",
     "apollo-link-http": "^1.5.2",
+    "apollo-utilities": "^1.0.8",
     "bootstrap": "^3.3.7",
     "final-form": "^4.2.1",
     "graphql": "^0.11.3",

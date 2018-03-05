@@ -78,6 +78,11 @@ let schema = new GraphQLSchema({
       workspaces: {
         type: new GraphQLList(workspaceType),
         resolve: resolver(models.Workspace)
+      },
+      workspace: {
+        type: workspaceType,
+        args: {id: {type: GraphQLString}},
+        resolve: resolver(models.Workspace)
       }
     }
   }),
