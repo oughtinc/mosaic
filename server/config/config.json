@@ -1,9 +1,10 @@
 {
   "development": {
-    "username": "ozziegooen",
-    "password": "",
-    "database": "rqa_development",
-    "host": "127.0.0.1",
+    "user": "mosaic",
+    "username": "mosaic",      
+    "password": "MDaUA2P4ZbkJPCKEM",
+    "database": "mosaic_dev",
+    "host": "postgres",
     "dialect": "postgres"
   },
   "test": {
