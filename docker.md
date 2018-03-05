@@ -8,6 +8,8 @@ Before running this, make sure you have the latest node image:
 docker pull node:latest
 ```
 
+Execute all `docker run` commands below in the Mosaic root folder.
+
 ## Server
 
 1. Update server/config/config.json, e.g. like this:
@@ -72,7 +74,7 @@ This is accessible at http://0.0.0.0:8081/
 
 ```
 docker run -it -p 3000:3000 -v "`pwd`":/data node bash
-cd /data
+cd /data/client
 yarn
 yarn run start
 ```
