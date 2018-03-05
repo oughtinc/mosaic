@@ -4,7 +4,6 @@ import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import { createStore, combineReducers } from "redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
@@ -19,10 +18,6 @@ const client: any = new ApolloClient({
   link: new HttpLink({ uri: SERVER_URL || "http://localhost:8080/graphql" }),
   cache: new InMemoryCache(),
 });
-
-const store = createStore(
-  reduxDevtoolsMiddleware
-);
 
 export class Layout extends React.Component {
   public render() {
