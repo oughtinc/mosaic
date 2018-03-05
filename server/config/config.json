@@ -1,9 +1,6 @@
 {
   "development": {
-    "username": "ozziegooen",
-    "password": "",
-    "database": "rqa_development",
-    "host": "127.0.0.1",
+    "use_env_variable": "CONNECTION_STRING_DEV",
     "dialect": "postgres"
   },
   "test": {
