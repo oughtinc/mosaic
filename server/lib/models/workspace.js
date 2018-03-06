@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         ...addEvents().beforeValidate,
         afterCreate: async (workspace, {event, questionValue}) => {
           const blocks = await workspace.getBlocks();
+          console.log("CREATING blocks NOW", questionValue)
           if (questionValue) {
             await workspace.createBlock({type: "QUESTION", value: questionValue}, {event})
           } else {

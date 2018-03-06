@@ -113,6 +113,15 @@ let schema = new GraphQLSchema({
           return workspace.update({childWorkspaceOrder}, {event})
         }
       },
+      createWorkspace: {
+        type: workspaceType,
+        args: {question: {type: GraphQLJSON}},
+        resolve: async(_, {question}) => {
+          const event = await models.Event.create()
+          const workspace = await models.Workspace.create({},{event, questionValue: JSON.parse(question)})
+          return workspace
+        }
+      },
       createChildWorkspace: {
         type: workspaceType,
         args: {workspaceId: {type: GraphQLString}, question: {type: GraphQLJSON}},
