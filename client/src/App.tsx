@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
+import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
@@ -37,6 +38,7 @@ const LandingPage = () => (
 
 const Routes = () => (
   <div>
+    <Route exact={true} path="/" component={RootWorkspacePage} />
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
   </div>
 );

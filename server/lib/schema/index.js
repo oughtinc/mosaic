@@ -77,6 +77,7 @@ let schema = new GraphQLSchema({
     fields: {
       workspaces: {
         type: new GraphQLList(workspaceType),
+        args: {where: {type: GraphQLJSON}},
         resolve: resolver(models.Workspace)
       },
       workspace: {
