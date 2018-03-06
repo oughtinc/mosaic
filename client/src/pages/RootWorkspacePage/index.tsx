@@ -7,8 +7,8 @@ import { Button } from "react-bootstrap";
 import styled from "styled-components";
 import Plain from "slate-plain-serializer";
 import { Form } from "react-final-form";
-import { BlockEditor } from "../EpisodeShowPage/BlockEditor";
 import { Value } from "slate";
+import { Block } from "../EpisodeShowPage/Block";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
@@ -51,7 +51,7 @@ const ParentWorkspace = ({workspace}) => {
     return (
     <WorkspaceStyle>
         {question && question.value &&
-            <BlockEditor
+            <Block
                 isInField={false}
                 value={Value.fromJSON(question.value)}
             />
@@ -78,7 +78,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
                     <div>
 
                         <form onSubmit={handleSubmit}>
-                            <BlockEditor
+                            <Block
                                 name={"new"}
                                 isInField={true}
                             />

@@ -9,8 +9,8 @@ import Plain from "slate-plain-serializer";
 import { Row, Col, Button } from "react-bootstrap";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
-import { BlockEditor } from "./BlockEditor";
 import { Link } from "react-router-dom";
+import { Block } from "./Block";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -91,7 +91,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                 <Row>
                     <Col sm={12}>
                         <h1>
-                            <BlockEditor
+                            <Block
                                 isInField={false}
                                 value={!!question.value ? Value.fromJSON(question.value) : Plain.deserialize("")}
                             />
@@ -112,12 +112,12 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 <form onSubmit={handleSubmit}>
 
                                     <h3> Scratchpad </h3>
-                                    <BlockEditor
+                                    <Block
                                         isInField={true}
                                         name={scratchpad.id}
                                     />
                                     <h3> Answer </h3>
-                                    <BlockEditor
+                                    <Block
                                         isInField={true}
                                         name={answer.id}
                                     />
