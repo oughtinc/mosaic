@@ -11,13 +11,6 @@ import { Menu } from "./Menu";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportMark } from "./PointerImportMark";
 
-const FormStyle = styled.div`
-    background-color: #eee;
-    border-radius: 2px;
-    padding: 3px;
-    margin-bottom: 10px;
-`;
-
 export class BlockEditor extends React.Component<any, any> {
     public menu;
 
@@ -41,8 +34,6 @@ export class BlockEditor extends React.Component<any, any> {
         const menu = this.menu;
         if (!menu) { return; }
         menu.style.opacity = 1;
-        // menu.style.top = `210px`;
-        // menu.style.left = `256px`;
         menu.style.top = location.top;
         menu.style.left = location.left;
         console.log(menu.style);
@@ -106,7 +97,6 @@ export class BlockEditor extends React.Component<any, any> {
         } else {
             return (
                 <div>
-                    <FormStyle>
                         <Menu
                             menuRef={this.menuRef}
                             value={value}
@@ -134,7 +124,6 @@ export class BlockEditor extends React.Component<any, any> {
                             renderMark={this.renderMark}
                         />
 
-                    </FormStyle>
                 </div>
             );
         }
