@@ -19,7 +19,6 @@ const HoverMenu = styled.span`
 export class Menu extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.state = {opacity: 1, top: "0px", left: "0px"};
     }
     /**
      * Check if the current selection has a mark with `type` in it.
