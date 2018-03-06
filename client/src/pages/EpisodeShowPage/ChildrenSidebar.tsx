@@ -4,10 +4,10 @@ import { type, Node, Value } from "slate";
 import styled from "styled-components";
 import { Form, Field } from "react-final-form";
 import Plain from "slate-plain-serializer";
-import { BlockEditor } from "./BlockEditor";
 import _ = require("lodash");
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { Block } from "./Block";
 
 class ChildForm extends React.Component<any, any> {
     public render() {
@@ -22,7 +22,7 @@ class ChildForm extends React.Component<any, any> {
                     <div>
 
                         <form onSubmit={handleSubmit}>
-                            <BlockEditor
+                            <Block
                                 name={"new"}
                                 isInField={true}
                             />
@@ -59,13 +59,13 @@ export class Child extends React.Component<any, any> {
         return (
             <ChildStyle>
                 {question.value &&
-                    <BlockEditor
+                    <Block
                         isInField={false}
                         value={Value.fromJSON(question.value)}
                     />
                 }
                 {answer.value &&
-                    <BlockEditor
+                    <Block
                         isInField={false}
                         value={_.isEmpty(answer.value) ? Plain.deserialize("") : Value.fromJSON(answer.value)}
                     />
