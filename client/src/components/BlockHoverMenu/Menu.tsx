@@ -60,6 +60,13 @@ export class Menu extends React.Component<any> {
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef}>
         <HoverMenu>
+          {blockEditor && (blockEditor.hoveredItem.hoverItemType === "SELECTED_TEXT") &&
+            <div>
+              <Button bsSize={"small"} onClick={() => {}} >
+                  Thing 
+              </Button>
+            </div>
+          }
           {blockEditor && (blockEditor.hoveredItem.hoverItemType === "IMPORT") &&
             <ImportMenu
               blockEditor={this.props.blockEditor}
