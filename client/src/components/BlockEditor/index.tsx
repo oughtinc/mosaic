@@ -13,7 +13,7 @@ import { PointerImportMark } from "./PointerImportMark";
 import { compose } from "recompose";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
 import { connect } from "react-redux";
-import { changeHoverItem } from "../../modules/blockEditor/actions";
+import { changeHoverItem, changePointerReference } from "../../modules/blockEditor/actions";
 
 class BlockEditorPresentational extends React.Component<any, any> {
     public menu;
@@ -37,7 +37,11 @@ class BlockEditorPresentational extends React.Component<any, any> {
         const {hoveredItem} = this.props.blockEditor;
         const { value } = this.props;
         const menu = this.menu;
-        if (!menu || !hoveredItem.id) { return; }
+
+        if (!menu || !hoveredItem.id) {
+            // menu.style.opacity = 0;
+            return;
+        }
 
         menu.style.opacity = 1;
         menu.style.top = hoveredItem.top;
@@ -52,16 +56,23 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
 
     public renderMark(props) {
+        console.log("Renderrrring inside");
         const { children, mark } = props;
         switch (mark.type) {
             case "pointerExport":
                 return <PointerExportMark mark={mark.toJSON()}>{children}</PointerExportMark>;
             case "pointerImport":
+                const {internalReferenceId} = mark.toJSON().data;
+                const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
+                const isOpen = reference && reference.isOpen;
+                console.log("import", internalReferenceId, reference, isOpen);
                 return (
                     <PointerImportMark
                         mark={mark.toJSON()}
-                        onMouseOver={({top, left}) => this.props.changeHoverItem({ hoverItemType: "INPUT", id: mark.toJSON().data.internalReferenceId, top, left })}
-                        onMouseOut={() => this.props.changeHoverItem({ hoverItemType: null, id: null })}
+                        onMouseOver={({top, left}) => this.props.changeHoverItem({ hoverItemType: "INPUT", id: internalReferenceId, top, left })}
+                        onMouseOut={() => {}}
+                        isOpen={!!isOpen}
+                        // onMouseOut={() => this.props.changeHoverItem({ hoverItemType: null, id: null })}
                     >
                         {children}
                     </PointerImportMark>
@@ -79,6 +90,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
         const value = block.value;
         const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
+        console.log("Rerndering");
         if (readOnly) {
             return (
                 <Editor
@@ -94,6 +106,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
                         menuRef={this.menuRef}
                         value={value}
                         onChange={onChange}
+                        blockEditor={this.props.blockEditor}
+                        onChangePointerReference={this.props.changePointerReference}
                     />
                     <Button
                         onClick={(e) => onChange(this.updateValue(e, value))}
@@ -125,6 +139,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
 export const BlockEditor: any = compose(
     connect(
-        ({ blocks, blockEditor}) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem }
+        ({ blocks, blockEditor}) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem, changePointerReference }
     )
 )(BlockEditorPresentational);

@@ -2,6 +2,9 @@ import * as React from "react";
 import * as uuidv1 from "uuid/v1";
 import styled from "styled-components";
 import ReactDOM = require("react-dom");
+import { changeHoverItem } from "../../modules/blockEditor/actions";
+import { connect } from "react-redux";
+import { compose } from "recompose";
 
 const ClosedPointerImport = styled.span`
     background-color: rgba(86, 214, 252, 0.66);
@@ -29,31 +32,29 @@ const OpenPointerImport = styled.span`
     }
 `;
 
-export class PointerImportMark extends React.Component<any, any> {
+class PointerImportMarkPresentational extends React.Component<any, any> {
     public inner;
     public constructor(props: any) {
         super(props);
-        this.state = { isOpen: false };
         this.innerRef = this.innerRef.bind(this);
     }
 
     public innerRef(menu: any) {
-        console.log("Here", menu);
         this.inner = menu;
     }
 
     public getLocation() {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        console.log("bounds", rect);
-        return {top: `${rect.top - 30}px`, left: `${rect.left}px`};
+        return {top: `${rect.top - 80}px`, left: `${rect.left}px`};
     }
 
     public render() {
-        console.log("import", this.props);
-        if (!this.state.isOpen) {
+        const {internalReferenceId} = this.props.mark.data;
+        const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
+        const isOpen = reference && reference.isOpen;
+        if (!isOpen) {
             return (
                 <ClosedPointerImport
-                    onClick={() => { this.setState({ isOpen: !this.state.isOpen }); }}
                     onMouseOver={() => this.props.onMouseOver(this.getLocation())}
                     onMouseOut={this.props.onMouseOut}
                 >
@@ -64,10 +65,19 @@ export class PointerImportMark extends React.Component<any, any> {
             );
         } else {
             return (
-                <OpenPointerImport onClick={() => { this.setState({ isOpen: !this.state.isOpen }); }}>
+                <OpenPointerImport
+                    onMouseOver={() => this.props.onMouseOver(this.getLocation())}
+                    onMouseOut={this.props.onMouseOut}
+                >
                     This is a very funny sentence that will go right here...
                 </OpenPointerImport>
             );
         }
     }
 }
+
+export const PointerImportMark: any = compose(
+    connect(
+        ({ blockEditor}) => ({ blockEditor }), {changeHoverItem }
+    )
+)(PointerImportMarkPresentational);
