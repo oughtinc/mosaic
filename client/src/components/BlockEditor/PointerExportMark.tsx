@@ -11,7 +11,7 @@ const PointerExportStyle = styled.span`
     border-radius: 2px;
 `;
 
-export class PointerExportMarkPresentational extends React.Component<any> {
+export class PointerExportMarkPresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.onMouseOver = this.onMouseOver.bind(this);
@@ -25,7 +25,7 @@ export class PointerExportMarkPresentational extends React.Component<any> {
 
     public onMouseOver() {
         const { top, left } = this.getLocation();
-        this.props.changeHoverItem({ hoverItemType: "EXPORT", id: this.props.mark.data.pointerId, top, left });
+        this.props.changeHoverItem({ hoverItemType: "EXPORT", id: this.props.mark.data.pointerId, top, left, blockId: this.props.blockId });
     }
 
     public render() {

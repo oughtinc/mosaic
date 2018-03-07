@@ -5,6 +5,7 @@ import _ = require("lodash");
 
 import { Block, Mark } from "slate";
 
+// Note for the future: block.value.document.getOrderedMarks().
 function allLeaves(node, existing= []) {
     if (node.object === "text") {
         return [...existing, ...node.toJSON().leaves];
