@@ -33,12 +33,6 @@ export class Layout extends React.Component {
   }
 }
 
-const LandingPage = () => (
-  <div>
-    hi there!
-  </div>
-);
-
 const Routes = () => (
   <div>
     <Route exact={true} path="/" component={RootWorkspacePage} />
