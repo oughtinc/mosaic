@@ -1,25 +1,25 @@
 version: "3"
 services:
-  # postgres:
-  #   image: postgres:10.3
-  #   restart: always
-  #   environment: 
-  #     POSTGRES_DB: mosaic_dev 
-  #     POSTGRES_USER: mosaic 
-  #     POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM 
-  #   ports:
-  #     - "5432:5432"
-  # api:
-  #   image: node:9.7
-  #   environment: 
-  #       CONNECTION_STRING_DEV: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./server:/data      
-  #   command: "bash -c 'sleep 5 && cd /data && yarn && yarn run build && yarn run db:migrate && yarn run db:seed && yarn run start'"
-  #   depends_on:
-  #     - postgres
+  postgres:
+    image: postgres:10.3
+    restart: always
+    environment: 
+      POSTGRES_DB: mosaic_dev 
+      POSTGRES_USER: mosaic 
+      POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM 
+    ports:
+      - "5432:5432"
+  api:
+    image: node:9.7
+    environment: 
+        CONNECTION_STRING_DEV: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/data      
+    command: "bash -c 'sleep 5 && cd /data && yarn && yarn run build && yarn run db:migrate && yarn run db:seed && yarn run start'"
+    depends_on:
+      - postgres
   web:
     image: node:9.7  
     # depends_on:
