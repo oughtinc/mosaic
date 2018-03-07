@@ -30,7 +30,16 @@ class BlockEditorPresentational extends React.Component<any, any> {
         const selection = window.getSelection();
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        const _top = `${(rect.top - 50).toFixed(2)}px`;
+
+        if (rect.width === 0) {
+            window.setTimeout(
+                () => {
+                this.props.changeHoverItem({ hoverItemType: "NONE", id: false, top: false, left: false, blockId: false  });
+                }, 10);
+            return;
+        }
+
+        const _top = `${(rect.top - 44).toFixed(2)}px`;
         const _left = `${(rect.left.toFixed(2))}px`;
         const { hoveredItem: { id, top, left } } = this.props.blockEditor;
         if ((_top !== top) || (_left !== left)) {
