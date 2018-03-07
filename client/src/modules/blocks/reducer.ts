@@ -48,7 +48,8 @@ export const blockReducer = (state = {blocks: []}, action) => {
             }),
         };
       case UPDATE_BLOCK:
-        return Object.assign({...state, ...{
+        return {
+            ...state, 
             blocks: state.blocks.map((block: any) => {
                 if (block.id !== action.id) {
                     return block;
@@ -69,8 +70,7 @@ export const blockReducer = (state = {blocks: []}, action) => {
                     }
                 }
             }),
-            }}
-        );
+            };
       default:
         return state;
     }
