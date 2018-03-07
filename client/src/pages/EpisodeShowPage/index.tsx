@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Form, Field } from "react-final-form";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
@@ -14,6 +13,7 @@ import { Link } from "react-router-dom";
 import { Block } from "./Block";
 import { addBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
+import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -94,6 +94,7 @@ export class FormPagePresentational extends React.Component<any, any> {
         const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
         return (
             <div>
+                <BlockHoverMenu>
                 <Row>
                     <Col sm={12}>
                         <h1>
@@ -130,6 +131,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         />
                     </Col>
                 </Row>
+                </BlockHoverMenu>
             </div>
         );
     }

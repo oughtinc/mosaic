@@ -36,61 +36,23 @@ export class ImportMenu extends React.Component<any, any> {
   }
 }
 
-export class Menu extends React.Component<any, any> {
+export class ExportMenu extends React.Component<any, any> {
+  public render() {
+    const {blockEditor: {hoveredItem: {id}, pointerReferences}, onChangePointerReference} = this.props;
+    return (
+      <div>
+        <Button bsSize={"small"} onClick={() => {}} >
+            Remove Pointer 
+        </Button>
+      </div>
+    );
+  }
+}
+
+export class Menu extends React.Component<any> {
   public constructor(props: any) {
     super(props);
   }
-  /**
-   * Check if the current selection has a mark with `type` in it.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
-
-  public hasMark(type) {
-    const { value } = this.props;
-    return value.activeMarks.some((mark) => mark.type === type);
-  }
-
-  /**
-   * When a mark button is clicked, toggle the current mark.
-   *
-   * @param {Event} event
-   * @param {String} type
-   */
-
-  public onClickMark(event, type) {
-    const { value, onChange } = this.props;
-    event.preventDefault();
-    const change = value.change().toggleMark(type);
-    onChange(change);
-  }
-
-  /**
-   * Render a mark-toggling toolbar button.
-   *
-   * @param {String} type
-   * @param {String} icon
-   * @return {Element}
-   */
-
-  public renderMarkButton(type, icon) {
-    const isActive = this.hasMark(type);
-    const onMouseDown = (event) => this.onClickMark(event, type);
-
-    return (
-      // eslint-disable-next-line react/jsx-no-bind
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        MARK BUTTON
-        </span>
-    );
-  }
-
-  /**
-   * Render.
-   *
-   * @return {Element}
-   */
 
   public render() {
     const root: any = window.document.getElementById("root");
@@ -98,10 +60,15 @@ export class Menu extends React.Component<any, any> {
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef}>
         <HoverMenu>
-          {blockEditor && (blockEditor.hoveredItem.hoverItemType === "INPUT") &&
+          {blockEditor && (blockEditor.hoveredItem.hoverItemType === "IMPORT") &&
             <ImportMenu
               blockEditor={this.props.blockEditor}
               onChangePointerReference={this.props.onChangePointerReference}
+            />
+          }
+          {blockEditor && (blockEditor.hoveredItem.hoverItemType === "EXPORT") &&
+            <ExportMenu
+              blockEditor={this.props.blockEditor}
             />
           }
         </HoverMenu>
