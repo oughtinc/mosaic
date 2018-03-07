@@ -52,10 +52,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
 
     public renderMark(props) {
-        const { children, mark } = props;
+        const { children, mark, blockId } = props;
         switch (mark.type) {
             case "pointerExport":
-                return <PointerExportMark mark={mark.toJSON()}>{children}</PointerExportMark>;
+                return <PointerExportMark mark={mark.toJSON()} blockId={this.props.blockId}>{children}</PointerExportMark>;
             case "pointerImport":
                 const { internalReferenceId } = mark.toJSON().data;
                 const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
