@@ -10,13 +10,36 @@ import { PointerImportMark } from "./PointerImportMark";
 import { compose } from "recompose";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
 import { connect } from "react-redux";
-import { changePointerReference } from "../../modules/blockEditor/actions";
+import { changePointerReference, changeHoverItem } from "../../modules/blockEditor/actions";
 
 class BlockEditorPresentational extends React.Component<any, any> {
     public menu;
     public constructor(props: any) {
         super(props);
         this.renderMark = this.renderMark.bind(this);
+        this.onSelect = this.onSelect.bind(this);
+    }
+
+    public onSelect(event: any) {
+        const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
+        const value = block.value;
+        if (value.isBlurred || value.isEmpty) {
+            return;
+        }
+
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const _top = `${(rect.top - 50).toFixed(2) }px`;
+        const _left = `${(rect.left.toFixed(2))}px`;
+        const {hoveredItem: {id, top, left}} = this.props.blockEditor;
+        if ((_top !== top) || (_left !== left)) {
+            window.setTimeout(
+                () => {
+                    this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: "3ws3f3fs", top: _top, left: _left });
+                }, 10
+            );
+        }
     }
 
     public toggleExport(event: any, value: any) {
@@ -80,13 +103,15 @@ class BlockEditorPresentational extends React.Component<any, any> {
                                     onChange(ch.value);
                                 }}
                             >
-                                {e.pointerId}</MenuItem>
+                                {e.pointerId}
+                            </MenuItem>
                         ))}
                     </DropdownButton>
                     <Editor
                         value={value}
                         onChange={(c) => { onChange(c.value); }}
                         renderMark={this.renderMark}
+                        onSelect={this.onSelect}
                     />
 
                 </div>
@@ -97,6 +122,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
 export const BlockEditor: any = compose(
     connect(
-        ({ blocks, blockEditor }) => ({ blocks, blockEditor }), { updateBlock }
+        ({ blocks, blockEditor }) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem }
     )
 )(BlockEditorPresentational);
