@@ -28,6 +28,9 @@ export class ImportMenu extends React.Component<any, any> {
             Expand
           </Button>
         }
+          <Button bsSize={"small"}>
+            Remove 
+          </Button>
       </div>
     );
   }

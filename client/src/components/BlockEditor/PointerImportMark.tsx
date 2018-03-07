@@ -5,6 +5,7 @@ import ReactDOM = require("react-dom");
 import { changeHoverItem } from "../../modules/blockEditor/actions";
 import { connect } from "react-redux";
 import { compose } from "recompose";
+import _ = require("lodash");
 
 const ClosedPointerImport = styled.span`
     background-color: rgba(86, 214, 252, 0.66);
@@ -45,31 +46,34 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
 
     public getLocation() {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        return {top: `${rect.top - 80}px`, left: `${rect.left}px`};
+        return {top: `${rect.top - 40}px`, left: `${rect.left + 10}px`};
     }
 
     public render() {
         const {internalReferenceId} = this.props.mark.data;
         const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
         const isOpen = reference && reference.isOpen;
+        const exportingLeaves = _.flatten(this.props.blocks.blocks.map((b) => b.exportingLeaves));
         if (!isOpen) {
+            const leafIndex = _.findIndex(exportingLeaves, (l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <ClosedPointerImport
                     onMouseOver={() => this.props.onMouseOver(this.getLocation())}
                     onMouseOut={this.props.onMouseOut}
                 >
                 <span ref={this.innerRef}>
-                $1
+                {`$${leafIndex + 1}`}
                 </span>
                 </ClosedPointerImport>
             );
         } else {
+            const importLeaf: any = exportingLeaves.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <OpenPointerImport
                     onMouseOver={() => this.props.onMouseOver(this.getLocation())}
                     onMouseOut={this.props.onMouseOut}
                 >
-                    This is a very funny sentence that will go right here...
+                {importLeaf && importLeaf.text}
                 </OpenPointerImport>
             );
         }
@@ -78,6 +82,6 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
 
 export const PointerImportMark: any = compose(
     connect(
-        ({ blockEditor}) => ({ blockEditor }), {changeHoverItem }
+        ({ blocks, blockEditor}) => ({ blocks, blockEditor }), {changeHoverItem }
     )
 )(PointerImportMarkPresentational);
