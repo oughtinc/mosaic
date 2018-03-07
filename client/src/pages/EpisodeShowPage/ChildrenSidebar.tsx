@@ -47,9 +47,9 @@ class ChildForm extends React.Component<any, any> {
 }
 
 const ChildStyle = styled.div`
-  border: 1px solid #ddd;
-  padding: 3px;
-  margin-bottom: 3px;
+    border: 2px solid #ddd;
+    padding: 1em;
+    margin-bottom: 1em;
 `;
 
 export class Child extends React.Component<any, any> {
