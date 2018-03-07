@@ -34,19 +34,20 @@ const OpenPointerImport = styled.span`
 `;
 
 class PointerImportMarkPresentational extends React.Component<any, any> {
-    public inner;
     public constructor(props: any) {
         super(props);
-        this.innerRef = this.innerRef.bind(this);
-    }
-
-    public innerRef(menu: any) {
-        this.inner = menu;
+        this.onMouseOver = this.onMouseOver.bind(this);
+        this.getLocation = this.getLocation.bind(this);
     }
 
     public getLocation() {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
         return {top: `${rect.top - 40}px`, left: `${rect.left + 10}px`};
+    }
+
+    public onMouseOver() {
+        const {top, left} = this.getLocation();
+        this.props.changeHoverItem({ hoverItemType: "IMPORT", id: this.props.mark.data.internalReferenceId, top, left });
     }
 
     public render() {
@@ -58,19 +59,17 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
             const leafIndex = _.findIndex(exportingLeaves, (l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <ClosedPointerImport
-                    onMouseOver={() => this.props.onMouseOver(this.getLocation())}
+                    onMouseOver={this.onMouseOver}
                     onMouseOut={this.props.onMouseOut}
                 >
-                <span ref={this.innerRef}>
-                {`$${leafIndex + 1}`}
-                </span>
+                    {`$${leafIndex + 1}`}
                 </ClosedPointerImport>
             );
         } else {
             const importLeaf: any = exportingLeaves.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <OpenPointerImport
-                    onMouseOver={() => this.props.onMouseOver(this.getLocation())}
+                    onMouseOver={this.onMouseOver}
                     onMouseOut={this.props.onMouseOut}
                 >
                 {importLeaf && importLeaf.text}
