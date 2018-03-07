@@ -66,6 +66,10 @@ const NEW_CHILD = gql`
   }
 `;
 
+const ParentLink = (props) => <Link to={`/workspaces/${props.parentId}`}>
+    <Button>To Parent</Button>
+  </Link>;
+
 export class FormPagePresentational extends React.Component<any, any> {
     public render() {
         const workspace = this.props.workspace.workspace;
@@ -93,46 +97,44 @@ export class FormPagePresentational extends React.Component<any, any> {
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
         const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
         return (
-            <div>
-                <BlockHoverMenu>
-                <Row>
-                    <Col sm={12}>
-                        <h1>
-                            <BlockEditor
-                                isInField={true}
-                                blockId={question.id}
-                            />
-                            {workspace.parentId &&
-                                <Link to={`/workspaces/${workspace.parentId}`}>
-                                    <Button> To Parent </Button>
-                                </Link>
-                            }
-                        </h1>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={9}>
-                        <BlockEditor
-                            isInField={true}
-                            blockId={scratchpad.id}
-                        />
-                        <BlockEditor
-                            isInField={true}
-                            blockId={answer.id}
-                        />
+          <div>
+            <BlockHoverMenu>
+              <Row>
+                <Col sm={12}>
+                  {workspace.parentId &&
+                   <ParentLink parentId={workspace.parentId}/>
+                  }                    
+                  <h1>
+                    <BlockEditor
+                      isInField={true}
+                      blockId={question.id}
+                    />                            
+                  </h1>
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={9}>
+                  <BlockEditor
+                    isInField={true}
+                    blockId={scratchpad.id}
+                  />
+                  <BlockEditor
+                    isInField={true}
+                    blockId={answer.id}
+                  />
 
-                    </Col>
-                    <Col sm={3}>
-                        <ChildrenSidebar
-                            workspaces={workspace.childWorkspaces}
-                            workspaceOrder={workspace.childWorkspaceOrder}
-                            onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
-                            changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                        />
-                    </Col>
-                </Row>
-                </BlockHoverMenu>
-            </div>
+                </Col>
+                <Col sm={3}>
+                  <ChildrenSidebar
+                    workspaces={workspace.childWorkspaces}
+                    workspaceOrder={workspace.childWorkspaceOrder}
+                    onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
+                    changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
+                  />
+                </Col>
+              </Row>
+            </BlockHoverMenu>
+          </div>
         );
     }
 }
