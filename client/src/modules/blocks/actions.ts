@@ -10,12 +10,6 @@ export const addBlocks = (blocks) => {
       blocks, 
     });
   };
-  // return {
-  //   // 'type' is a required field for an action, 
-  //   // specifying the type of action being performed
-  //   type: ADD_BLOCKS,
-  //   blocks, 
-  // };
 };
 
 export const updateBlock = ({id, value}) => {
