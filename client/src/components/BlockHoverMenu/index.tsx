@@ -54,7 +54,6 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
                     <Menu
                         menuRef={this.menuRef}
                         blockEditor={this.props.blockEditor}
-                        onChangePointerReference={this.props.changePointerReference}
                     />
                     {this.props.children}
                 </div>
@@ -64,6 +63,6 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
 
 export const BlockHoverMenu: any = compose(
     connect(
-        ({ blockEditor }) => ({ blockEditor }), { changePointerReference }
+        ({ blockEditor }) => ({ blockEditor })
     )
 )(BlockHoverMenuPresentational);
