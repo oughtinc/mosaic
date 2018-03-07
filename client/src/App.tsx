@@ -13,6 +13,8 @@ import { applyMiddleware, combineReducers, compose, createStore } from "redux";
 import { Provider } from "react-redux";
 import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
+import thunk from "redux-thunk";
+import { composeWithDevTools } from "redux-devtools-extension";
 
 const { SERVER_URL } = process.env;
 
@@ -47,11 +49,9 @@ const Routes = () => (
 const reduxDevtoolsMiddleware =
   (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__();
 
-let middleware = false;
+// let middleware: any = thunk;
 
-if (!!reduxDevtoolsMiddleware) {
-  middleware = reduxDevtoolsMiddleware;
-}
+// let middleWare = !!reduxDevtoolsMiddleware ? thunk : applyMiddleware(reduxDevtoolsMiddleware, thunk);
 
 const store = createStore(
   combineReducers(
@@ -60,7 +60,7 @@ const store = createStore(
       blockEditor: blockEditorReducer,
     } as any
   ),
-  middleware
+  composeWithDevTools(applyMiddleware(thunk))
 );
 
 class App extends React.Component {

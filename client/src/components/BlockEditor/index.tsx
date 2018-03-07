@@ -30,23 +30,16 @@ class BlockEditorPresentational extends React.Component<any, any> {
         const selection = window.getSelection();
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        const _top = `${(rect.top - 50).toFixed(2) }px`;
+        const _top = `${(rect.top - 50).toFixed(2)}px`;
         const _left = `${(rect.left.toFixed(2))}px`;
-        const {hoveredItem: {id, top, left}} = this.props.blockEditor;
+        const { hoveredItem: { id, top, left } } = this.props.blockEditor;
         if ((_top !== top) || (_left !== left)) {
             window.setTimeout(
                 () => {
-                    this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: "3ws3f3fs", top: _top, left: _left });
+                    this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: "NOT_NEEDED", top: _top, left: _left, blockId: this.props.blockId  });
                 }, 10
             );
         }
-    }
-
-    public toggleExport(event: any, value: any) {
-        event.preventDefault();
-        const uuid = uuidv1();
-        const change = value.change().toggleMark({ type: "pointerExport", object: "mark", data: { pointerId: uuid } });
-        return change.value;
     }
 
     public renderMark(props) {
@@ -86,11 +79,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
         } else {
             return (
                 <div>
-                    <Button
-                        onClick={(e) => onChange(this.toggleExport(e, value))}
-                    >
-                        Export Selection
-                            </Button>
                     <DropdownButton title="Import" id="bg-nested-dropdown">
                         {exportingLeaves.map((e: any) => (
                             <MenuItem

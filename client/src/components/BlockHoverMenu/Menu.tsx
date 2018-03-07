@@ -2,6 +2,9 @@ import React = require("react");
 import ReactDOM = require("react-dom");
 import styled from "styled-components";
 import { Button } from "react-bootstrap";
+import { compose } from "recompose";
+import { connect } from "react-redux";
+import { changePointerReference, exportSelection } from "../../modules/blockEditor/actions";
 
 const HoverMenu = styled.span`
   background-color: #def4f757;
@@ -41,7 +44,7 @@ export class ExportMenu extends React.Component<any, any> {
     const {blockEditor: {hoveredItem: {id}, pointerReferences}, onChangePointerReference} = this.props;
     return (
       <div>
-        <Button bsSize={"small"} onClick={() => {}} >
+        <Button bsSize={"small"} onClick={() => {this.props.exportSelection(); }} >
             Remove Pointer 
         </Button>
       </div>
@@ -49,7 +52,7 @@ export class ExportMenu extends React.Component<any, any> {
   }
 }
 
-export class Menu extends React.Component<any> {
+export class MenuPresentational extends React.Component<any> {
   public constructor(props: any) {
     super(props);
   }
@@ -62,8 +65,8 @@ export class Menu extends React.Component<any> {
         <HoverMenu>
           {blockEditor && (blockEditor.hoveredItem.hoverItemType === "SELECTED_TEXT") &&
             <div>
-              <Button bsSize={"small"} onClick={() => {}} >
-                  Thing 
+              <Button bsSize={"small"} onClick={() => {this.props.exportSelection(); }} >
+                  Export 
               </Button>
             </div>
           }
@@ -76,6 +79,7 @@ export class Menu extends React.Component<any> {
           {blockEditor && (blockEditor.hoveredItem.hoverItemType === "EXPORT") &&
             <ExportMenu
               blockEditor={this.props.blockEditor}
+              exportSelection={this.props.exportSelection}
             />
           }
         </HoverMenu>
@@ -84,3 +88,9 @@ export class Menu extends React.Component<any> {
     );
   }
 }
+
+export const Menu: any = compose(
+    connect(
+        ({ blockEditor }) => ({ blockEditor }), { changePointerReference, exportSelection }
+    )
+)(MenuPresentational);
