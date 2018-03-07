@@ -7,10 +7,13 @@ import { type, Node, Value } from "slate";
 import { Editor } from "slate-react";
 import Plain from "slate-plain-serializer";
 import { Row, Col, Button } from "react-bootstrap";
+import { connect } from "react-redux";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { Block } from "./Block";
+import { addBlocks } from "../../modules/blocks/actions";
+import { BlockEditor } from "../../components/BlockEditor";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -70,9 +73,12 @@ export class FormPagePresentational extends React.Component<any, any> {
             return <div> Loading </div>;
         }
         let initialValues = {};
-        for (const block of workspace.blocks) {
-            initialValues[block.id] = block.value ? Value.fromJSON(block.value) : Plain.deserialize("");
-        }
+
+        let allBlocks = [...workspace.blocks];
+        workspace.childWorkspaces.map((c) => {
+            allBlocks = [...allBlocks, ...c.blocks];
+        });
+        this.props.addBlocks(allBlocks);
         const onSubmit = async (values) => {
             let inputs: any = [];
             for (const key of Object.keys(values)) {
@@ -91,9 +97,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                 <Row>
                     <Col sm={12}>
                         <h1>
-                            <Block
-                                isInField={false}
-                                value={!!question.value ? Value.fromJSON(question.value) : Plain.deserialize("")}
+                            <BlockEditor
+                                isInField={true}
+                                blockId={question.id}
                             />
                             {workspace.parentId &&
                                 <Link to={`/workspaces/${workspace.parentId}`}>
@@ -105,36 +111,15 @@ export class FormPagePresentational extends React.Component<any, any> {
                 </Row>
                 <Row>
                     <Col sm={9}>
-                        <Form
-                            onSubmit={onSubmit}
-                            initialValues={initialValues}
-                            render={({ handleSubmit, reset, submitting, pristine, values }) => (
-                                <form onSubmit={handleSubmit}>
-
-                                    <h3> Scratchpad </h3>
-                                    <Block
-                                        isInField={true}
-                                        name={scratchpad.id}
-                                    />
-                                    <h3> Answer </h3>
-                                    <Block
-                                        isInField={true}
-                                        name={answer.id}
-                                    />
-                                    <div className="buttons">
-                                        <button type="submit" disabled={submitting || pristine}>
-                                            Submit
-                                    </button>
-                                        <button
-                                            type="button"
-                                            onClick={reset}
-                                            disabled={submitting || pristine}>
-                                            Reset
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
+                        <BlockEditor
+                            isInField={true}
+                            blockId={scratchpad.id}
                         />
+                        <BlockEditor
+                            isInField={true}
+                            blockId={answer.id}
+                        />
+
                     </Col>
                     <Col sm={3}>
                         <ChildrenSidebar
@@ -151,22 +136,27 @@ export class FormPagePresentational extends React.Component<any, any> {
 }
 
 const options: any = ({ match }) => ({
-  variables:  {id: match.params.workspaceId },
+    variables: { id: match.params.workspaceId },
 });
 
 export const EpisodeShowPage = compose(
-    graphql(WORKSPACE_QUERY, {name: "workspace", options }),
-    graphql(UPDATE_BLOCKS, {name:  "updateBlocks" }),
-    graphql(UPDATE_WORKSPACE, {name: "updateWorkspace", options: {
-            refetchQueries:  [
-                "workspace",
-            ],
-    }}),
-    graphql(NEW_CHILD, {
-        name:  "createChild", options: {
-            refetchQueries:  [
+    graphql(WORKSPACE_QUERY, { name: "workspace", options }),
+    graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
+    graphql(UPDATE_WORKSPACE, {
+        name: "updateWorkspace", options: {
+            refetchQueries: [
                 "workspace",
             ],
         },
-    })
+    }),
+    graphql(NEW_CHILD, {
+        name: "createChild", options: {
+            refetchQueries: [
+                "workspace",
+            ],
+        },
+    }),
+    connect(
+        (state) => ({}), { addBlocks }
+    )
 )(FormPagePresentational);

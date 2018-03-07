@@ -10,8 +10,11 @@ import ReactDOM = require("react-dom");
 import { Menu } from "./Menu";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportMark } from "./PointerImportMark";
+import { compose } from "recompose";
+import { addBlocks, updateBlock } from "../../modules/blocks/actions";
+import { connect } from "react-redux";
 
-export class BlockEditor extends React.Component<any, any> {
+class BlockEditorPresentational extends React.Component<any, any> {
     public menu;
 
     public constructor(props: any) {
@@ -21,13 +24,13 @@ export class BlockEditor extends React.Component<any, any> {
         this.renderMark = this.renderMark.bind(this);
     }
 
-    public componentDidMount() {
-        this.updateMenu();
-      }
+    // public componentDidMount() {
+    //     this.updateMenu();
+    //   }
 
-      public componentDidUpdate() {
-        this.updateMenu();
-      }
+    //   public componentDidUpdate() {
+    //     this.updateMenu();
+    //   }
 
     public onPointerHover(location) {
         console.log("staring menu");
@@ -45,10 +48,10 @@ export class BlockEditor extends React.Component<any, any> {
         const menu = this.menu;
         if (!menu) { return; }
 
-        if (value.isBlurred || value.isEmpty) {
-          menu.removeAttribute("style");
-          return;
-        }
+        // if (value.isBlurred || value.isEmpty) {
+        //   menu.removeAttribute("style");
+        //   return;
+        // }
 
         const selection = window.getSelection();
         const range = selection.getRangeAt(0);
@@ -85,7 +88,10 @@ export class BlockEditor extends React.Component<any, any> {
         this.menu = menu;
     }
     public render() {
-        const { value, onChange, readOnly } = this.props;
+        const { readOnly } = this.props;
+        const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
+        const value = block.value;
+        const onChange = (value) => {this.props.updateBlock({id: block.id, value}); };
         if (readOnly) {
             return (
                 <Editor
@@ -129,3 +135,9 @@ export class BlockEditor extends React.Component<any, any> {
         }
     }
 }
+
+export const BlockEditor: any = compose(
+    connect(
+        ({blocks}) => ({blocks}), {updateBlock}
+    )
+)(BlockEditorPresentational);

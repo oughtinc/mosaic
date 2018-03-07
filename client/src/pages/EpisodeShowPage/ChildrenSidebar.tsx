@@ -8,6 +8,7 @@ import _ = require("lodash");
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { Block } from "./Block";
+import { BlockEditor } from "../../components/BlockEditor";
 
 class ChildForm extends React.Component<any, any> {
     public render() {
@@ -22,8 +23,8 @@ class ChildForm extends React.Component<any, any> {
                     <div>
 
                         <form onSubmit={handleSubmit}>
-                            <Block
-                                name={"new"}
+                            <BlockEditor
+                                blockId={"new"}
                                 isInField={true}
                             />
                             <div className="buttons">
@@ -59,15 +60,15 @@ export class Child extends React.Component<any, any> {
         return (
             <ChildStyle>
                 {question.value &&
-                    <Block
+                    <BlockEditor
                         isInField={false}
-                        value={Value.fromJSON(question.value)}
+                        blockId={question.id}
                     />
                 }
                 {answer.value &&
-                    <Block
+                    <BlockEditor
                         isInField={false}
-                        value={_.isEmpty(answer.value) ? Plain.deserialize("") : Value.fromJSON(answer.value)}
+                        blockId={answer.id}
                     />
                 }
 
@@ -102,7 +103,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     </div>
                 }
                 <h3> Add a new Child Question </h3>
-                <ChildForm onMutate={this.props.onCreateChild} />
+                {/* <ChildForm onMutate={this.props.onCreateChild} /> */}
             </div>
         );
     }
