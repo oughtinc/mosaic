@@ -13,16 +13,23 @@ function allLeaves(node, existing= []) {
     }
 }
 
-function markedLeaves(node) {
+function markedLeaves(node: any) {
     let marks = [];
     const leaves = allLeaves(node);
     return leaves.filter((l) => l.marks.length > 0);
 }
 
-function allUniqueMarks(node) {
+function exportingLeaves(node: any) {
+    const leaves = allLeaves(node);
+    const allExports = leaves.filter((b) => _.some(b.marks, ((b) => b.type === "pointerExport"))).map((l) => ({...l, pointerId: l.marks[0].data.pointerId }));
+    return allExports;
+}
+
+function allUniqueMarks(node: any) {
     let marks = [];
     const leaves = allLeaves(node);
-    const flattenedMarks = (_.flatten(leaves.map((l) => l.marks)), _.isEqual);
+    const flattenedMarks = _.flatten(leaves.map((l) => l.marks));
+    return flattenedMarks;
 }
 
 export const blockReducer = (state = {blocks: []}, action) => {
@@ -31,10 +38,12 @@ export const blockReducer = (state = {blocks: []}, action) => {
         return {
             blocks: action.blocks.map((block) => {
                 const value = block.value ? Value.fromJSON(block.value) : Plain.deserialize("");
+                const marks = allUniqueMarks(value.document);
                 return ({
                     ...block,
                     value,
-                    marks: allUniqueMarks(value.document),
+                    marks,
+                    exportingLeaves: exportingLeaves(value.document),
                 });
             }),
         };
@@ -48,12 +57,15 @@ export const blockReducer = (state = {blocks: []}, action) => {
                         return block;
                     } else {
                         let nodes = [];
+                        const leaves = markedLeaves(action.value.document);
                         const marks = allUniqueMarks(action.value.document);
-                        return {
+                        const newBlock = {
                             ...block,
                             value: action.value,
                             marks: allUniqueMarks(action.value.document),
-                        }; 
+                            exportingLeaves: exportingLeaves(action.value.document),
+                        };
+                        return newBlock;
                     }
                 }
             }),

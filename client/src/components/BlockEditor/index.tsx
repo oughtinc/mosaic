@@ -4,7 +4,7 @@ import { Editor } from "slate-react";
 import _ = require("lodash");
 import { Field } from "react-final-form";
 import styled from "styled-components";
-import { Button } from "react-bootstrap";
+import { Button, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap";
 import * as uuidv1 from "uuid/v1";
 import ReactDOM = require("react-dom");
 import { Menu } from "./Menu";
@@ -27,14 +27,14 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
     public componentDidMount() {
         this.updateMenu();
-      }
+    }
 
     public componentDidUpdate() {
         this.updateMenu();
     }
 
     public updateMenu() {
-        const {hoveredItem} = this.props.blockEditor;
+        const { hoveredItem } = this.props.blockEditor;
         const { value } = this.props;
         const menu = this.menu;
 
@@ -56,23 +56,20 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
 
     public renderMark(props) {
-        console.log("Renderrrring inside");
         const { children, mark } = props;
         switch (mark.type) {
             case "pointerExport":
                 return <PointerExportMark mark={mark.toJSON()}>{children}</PointerExportMark>;
             case "pointerImport":
-                const {internalReferenceId} = mark.toJSON().data;
+                const { internalReferenceId } = mark.toJSON().data;
                 const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
                 const isOpen = reference && reference.isOpen;
-                console.log("import", internalReferenceId, reference, isOpen);
                 return (
                     <PointerImportMark
                         mark={mark.toJSON()}
-                        onMouseOver={({top, left}) => this.props.changeHoverItem({ hoverItemType: "INPUT", id: internalReferenceId, top, left })}
-                        onMouseOut={() => {}}
+                        onMouseOver={({ top, left }) => this.props.changeHoverItem({ hoverItemType: "INPUT", id: internalReferenceId, top, left })}
+                        onMouseOut={() => { }}
                         isOpen={!!isOpen}
-                        // onMouseOut={() => this.props.changeHoverItem({ hoverItemType: null, id: null })}
                     >
                         {children}
                     </PointerImportMark>
@@ -90,7 +87,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
         const value = block.value;
         const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
-        console.log("Rerndering");
+        const exportingLeaves = _.flatten(this.props.blocks.blocks.map((b) => b.exportingLeaves));
         if (readOnly) {
             return (
                 <Editor
@@ -112,19 +109,23 @@ class BlockEditorPresentational extends React.Component<any, any> {
                     <Button
                         onClick={(e) => onChange(this.updateValue(e, value))}
                     >
-                        CHANGE
+                       Export Selection 
                             </Button>
-                    <Button
-                        onClick={(event) => {
-                            const ch = value.change()
-                                .insertText("hi there!")
-                                .extend(0 - "hi there!".length)
-                                .addMark({ type: "pointerImport", object: "mark", data: { pointerId: "sd8fjsdf8js", internalReferenceId: uuidv1() } });
-                            onChange(ch.value);
-                        }}
-                    >
-                        Add
-                            </Button>
+                    <DropdownButton title="Import" id="bg-nested-dropdown">
+                        {exportingLeaves.map((e: any) => (
+                            <MenuItem
+                                eventKey="1"
+                                onClick={(event) => {
+                                    const ch = value.change()
+                                        .insertText("~")
+                                        .extend(0 - "~".length)
+                                        .addMark({ type: "pointerImport", object: "mark", data: { pointerId: e.pointerId, internalReferenceId: uuidv1() } });
+                                    onChange(ch.value);
+                                }}
+                            >
+                                {e.pointerId}</MenuItem>
+                        ))}
+                    </DropdownButton>
                     <Editor
                         value={value}
                         onChange={(c) => { onChange(c.value); }}
@@ -139,6 +140,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
 export const BlockEditor: any = compose(
     connect(
-        ({ blocks, blockEditor}) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem, changePointerReference }
+        ({ blocks, blockEditor }) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem, changePointerReference }
     )
 )(BlockEditorPresentational);
