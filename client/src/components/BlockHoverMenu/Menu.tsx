@@ -73,7 +73,7 @@ export class MenuPresentational extends React.Component<any> {
           {blockEditor && (blockEditor.hoveredItem.hoverItemType === "IMPORT") &&
             <ImportMenu
               blockEditor={this.props.blockEditor}
-              onChangePointerReference={this.props.onChangePointerReference}
+              onChangePointerReference={this.props.changePointerReference}
             />
           }
           {blockEditor && (blockEditor.hoveredItem.hoverItemType === "EXPORT") &&
