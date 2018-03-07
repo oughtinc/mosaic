@@ -13,6 +13,7 @@ import { PointerImportMark } from "./PointerImportMark";
 import { compose } from "recompose";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
 import { connect } from "react-redux";
+import { changeHoverItem } from "../../modules/blockEditor/actions";
 
 class BlockEditorPresentational extends React.Component<any, any> {
     public menu;
@@ -20,50 +21,28 @@ class BlockEditorPresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.menuRef = this.menuRef.bind(this);
-        this.onPointerHover = this.onPointerHover.bind(this);
         this.renderMark = this.renderMark.bind(this);
+        this.updateMenu = this.updateMenu.bind(this);
     }
 
-    // public componentDidMount() {
-    //     this.updateMenu();
-    //   }
+    public componentDidMount() {
+        this.updateMenu();
+      }
 
-    //   public componentDidUpdate() {
-    //     this.updateMenu();
-    //   }
-
-    public onPointerHover(location) {
-        console.log("staring menu");
-        const menu = this.menu;
-        if (!menu) { return; }
-        menu.style.opacity = 1;
-        menu.style.top = location.top;
-        menu.style.left = location.left;
-        console.log(menu.style);
+    public componentDidUpdate() {
+        this.updateMenu();
     }
 
     public updateMenu() {
-        console.log("Updating menu");
+        const {hoveredItem} = this.props.blockEditor;
         const { value } = this.props;
         const menu = this.menu;
-        if (!menu) { return; }
+        if (!menu || !hoveredItem.id) { return; }
 
-        // if (value.isBlurred || value.isEmpty) {
-        //   menu.removeAttribute("style");
-        //   return;
-        // }
-
-        const selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
         menu.style.opacity = 1;
-        menu.style.top = `${rect.top + window.pageYOffset - menu.offsetHeight}px`;
-        menu.style.left = `${rect.left +
-          window.pageXOffset -
-          menu.offsetWidth / 2 +
-          rect.width / 2}px`;
-        console.log("menu style", menu.style.opacity, menu.style.left, menu.style.top);
-      }
+        menu.style.top = hoveredItem.top;
+        menu.style.left = hoveredItem.left;
+    }
 
     public updateValue(event: any, value: any) {
         event.preventDefault();
@@ -78,7 +57,15 @@ class BlockEditorPresentational extends React.Component<any, any> {
             case "pointerExport":
                 return <PointerExportMark mark={mark.toJSON()}>{children}</PointerExportMark>;
             case "pointerImport":
-                return <PointerImportMark mark={mark.toJSON()} onHover={this.onPointerHover}>{children}</PointerImportMark>;
+                return (
+                    <PointerImportMark
+                        mark={mark.toJSON()}
+                        onMouseOver={({top, left}) => this.props.changeHoverItem({ hoverItemType: "INPUT", id: mark.toJSON().data.internalReferenceId, top, left })}
+                        onMouseOut={() => this.props.changeHoverItem({ hoverItemType: null, id: null })}
+                    >
+                        {children}
+                    </PointerImportMark>
+                );
             default:
                 return { children };
         }
@@ -91,7 +78,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         const { readOnly } = this.props;
         const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
         const value = block.value;
-        const onChange = (value) => {this.props.updateBlock({id: block.id, value}); };
+        const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
         if (readOnly) {
             return (
                 <Editor
@@ -103,32 +90,32 @@ class BlockEditorPresentational extends React.Component<any, any> {
         } else {
             return (
                 <div>
-                        <Menu
-                            menuRef={this.menuRef}
-                            value={value}
-                            onChange={onChange}
-                        />
-                        <Button
-                            onClick={(e) => onChange(this.updateValue(e, value))}
-                        >
-                            CHANGE
+                    <Menu
+                        menuRef={this.menuRef}
+                        value={value}
+                        onChange={onChange}
+                    />
+                    <Button
+                        onClick={(e) => onChange(this.updateValue(e, value))}
+                    >
+                        CHANGE
                             </Button>
-                        <Button
-                            onClick={(event) => {
-                                const ch = value.change()
-                                    .insertText("hi there!")
-                                    .extend(0 - "hi there!".length)
-                                    .addMark({ type: "pointerImport", object: "mark", data: { pointerId: "sd8fjsdf8js" } });
-                                onChange(ch.value);
-                            }}
-                        >
-                            Add
+                    <Button
+                        onClick={(event) => {
+                            const ch = value.change()
+                                .insertText("hi there!")
+                                .extend(0 - "hi there!".length)
+                                .addMark({ type: "pointerImport", object: "mark", data: { pointerId: "sd8fjsdf8js", internalReferenceId: uuidv1() } });
+                            onChange(ch.value);
+                        }}
+                    >
+                        Add
                             </Button>
-                        <Editor
-                            value={value}
-                            onChange={(c) => { onChange(c.value); }}
-                            renderMark={this.renderMark}
-                        />
+                    <Editor
+                        value={value}
+                        onChange={(c) => { onChange(c.value); }}
+                        renderMark={this.renderMark}
+                    />
 
                 </div>
             );
@@ -138,6 +125,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
 export const BlockEditor: any = compose(
     connect(
-        ({blocks}) => ({blocks}), {updateBlock}
+        ({ blocks, blockEditor}) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem }
     )
 )(BlockEditorPresentational);

@@ -12,6 +12,7 @@ import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 import { applyMiddleware, combineReducers, compose, createStore } from "redux";
 import { Provider } from "react-redux";
 import { blockReducer } from "./modules/blocks/reducer";
+import { blockEditorReducer } from "./modules/blockEditor/reducer";
 
 const { SERVER_URL } = process.env;
 
@@ -56,6 +57,7 @@ const store = createStore(
   combineReducers(
     {
       blocks: blockReducer,
+      blockEditor: blockEditorReducer,
     } as any
   ),
   middleware

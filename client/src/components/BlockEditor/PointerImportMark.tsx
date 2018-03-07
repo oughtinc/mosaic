@@ -54,8 +54,8 @@ export class PointerImportMark extends React.Component<any, any> {
             return (
                 <ClosedPointerImport
                     onClick={() => { this.setState({ isOpen: !this.state.isOpen }); }}
-                    onMouseOver={() => this.props.onHover(this.getLocation())}
-                    onMouseOut={() => {console.log("Mouse out"); }}
+                    onMouseOver={() => this.props.onMouseOver(this.getLocation())}
+                    onMouseOut={this.props.onMouseOut}
                 >
                 <span ref={this.innerRef}>
                 $1
