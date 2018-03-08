@@ -38,11 +38,12 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
         const { value } = this.props;
         const menu = this.menu;
 
+        if (!menu) {
+            return;
+        }
+
         if (hoveredItem.hoverItemType === "NONE") {
             menu.style.opacity = 0;
-        }
-        if (!menu || !hoveredItem.id) {
-            // menu.style.opacity = 0;
             return;
         }
 
