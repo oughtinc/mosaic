@@ -6,6 +6,7 @@ import { changeHoverItem } from "../../modules/blockEditor/actions";
 import { connect } from "react-redux";
 import { compose } from "recompose";
 import _ = require("lodash");
+import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
 
 const ClosedPointerImport = styled.span`
     background-color: rgba(86, 214, 252, 0.66);
@@ -54,9 +55,8 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
         const {internalReferenceId} = this.props.mark.data;
         const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
         const isOpen = reference && reference.isOpen;
-        const exportingLeaves = _.flatten(this.props.blocks.blocks.map((b) => b.exportingLeaves));
         if (!isOpen) {
-            const leafIndex = _.findIndex(exportingLeaves, (l: any) => l.pointerId === this.props.mark.data.pointerId);
+            const leafIndex = _.findIndex(this.props.exportingLeaves, (l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <ClosedPointerImport
                     onMouseOver={this.onMouseOver}
@@ -66,7 +66,7 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
                 </ClosedPointerImport>
             );
         } else {
-            const importLeaf: any = exportingLeaves.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
+            const importLeaf: any = this.props.exportingLeaves.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <OpenPointerImport
                     onMouseOver={this.onMouseOver}
@@ -79,8 +79,15 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
     }
 }
 
+function mapStateToProps(state: any, {blockId}: any) {
+  const exportingLeaves = exportingLeavesSelector(state);
+  const {blocks, blockEditor} = state;
+  const block = blocks.blocks.find((b) => b.id === blockId);
+  return {blocks, block, blockEditor, exportingLeaves};
+}
+
 export const PointerImportMark: any = compose(
     connect(
-        ({ blocks, blockEditor}) => ({ blocks, blockEditor }), {changeHoverItem }
+        (mapStateToProps), {changeHoverItem }
     )
 )(PointerImportMarkPresentational);
