@@ -68,6 +68,12 @@ function matchExportPointerFn(pointerId: string) {
   };
 }
 
+function matchImportPointerFn(internalReferenceId: string) {
+  return function(mark: any) {
+    return (mark.type === "pointerImport") && (mark.data.internalReferenceId === internalReferenceId);
+  };
+}
+
 export const removeExportOfSelection = () => {
   return async (dispatch, getState) => {
     const {blocks, blockEditor} = await getState();
@@ -79,6 +85,38 @@ export const removeExportOfSelection = () => {
       const matchFn = matchExportPointerFn(hoveredItem.id);
       const relevantText = findTextsWithMark(block.value.document, matchFn)[0];
       const _withRemovedMarks = textWithRemovedMarks(relevantText, matchFn);
+
+      const change = block.value.change().replaceNodeByKey(relevantText.key, _withRemovedMarks);
+
+      dispatch({
+        type: UPDATE_BLOCK,
+        id: block.id,
+        value: change.value,
+      });
+
+      dispatch({
+        type: CHANGE_HOVERED_ITEM,
+        hoverItemType: "NONE",
+      });
+    } else {
+      console.error("Block was not found from action");
+    }
+  };
+};
+
+export const removeImportOfSelection = () => {
+  return async (dispatch, getState) => {
+    const {blocks, blockEditor} = await getState();
+    const {hoveredItem} = blockEditor;
+
+    const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
+    if (block) {
+      const matchFn = matchImportPointerFn(hoveredItem.id);
+      const relevantText = findTextsWithMark(block.value.document, matchFn)[0];
+      const _withRemovedMarks = Text.fromJSON({
+          ...relevantText.toJS(),
+          leaves: relevantText.toJS().leaves.filter((l) => l.marks.filter(matchFn).length === 0),
+      });
 
       const change = block.value.change().replaceNodeByKey(relevantText.key, _withRemovedMarks);
 

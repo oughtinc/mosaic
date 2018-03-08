@@ -41,7 +41,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if (rect.width === 0) {
       window.setTimeout(
         () => {
-          this.props.changeHoverItem({ hoverItemType: "NONE", id: false, top: false, left: false, blockId: false  });
+          this.props.changeHoverItem({ hoverItemType: "NONE", id: false, top: false, left: false, blockId: false });
         }, 10);
       return;
     }
@@ -52,31 +52,39 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if ((_top !== top) || (_left !== left)) {
       window.setTimeout(
         () => {
-          this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: "NOT_NEEDED", top: _top, left: _left, blockId: this.props.blockId  });
+          this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: "NOT_NEEDED", top: _top, left: _left, blockId: this.props.blockId });
         }, 10
       );
     }
   }
 
-    public renderMark(props) {
-        const { children, mark, blockId } = props;
-        switch (mark.type) {
-            case "pointerExport":
-                return <PointerExportMark mark={mark.toJSON()} blockId={this.props.blockId}>{children}</PointerExportMark>;
-            case "pointerImport":
-                const { internalReferenceId } = mark.toJSON().data;
-                const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
-                return (
-                    <PointerImportMark
-                        mark={mark.toJSON()}
-                    >
-                        {children}
-                    </PointerImportMark>
-                );
-            default:
-                return { children };
-        }
+  public renderMark(props) {
+    const { children, mark, blockId } = props;
+    switch (mark.type) {
+      case "pointerExport":
+        return (
+          <PointerExportMark
+            mark={mark.toJSON()}
+            blockId={this.props.blockId}
+          >
+            {children}
+          </PointerExportMark>
+        );
+      case "pointerImport":
+        const { internalReferenceId } = mark.toJSON().data;
+        const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
+        return (
+          <PointerImportMark
+            mark={mark.toJSON()}
+            blockId={this.props.blockId}
+          >
+            {children}
+          </PointerImportMark>
+        );
+      default:
+        return { children };
     }
+  }
 
   public render() {
     const { readOnly } = this.props;
@@ -100,13 +108,13 @@ class BlockEditorPresentational extends React.Component<any, any> {
               <MenuItem
                 eventKey="1"
                 onClick={(event) => {
-                    const ch = value.change()
-                                    .insertText("~")
-                                    .extend(0 - "~".length)
-                                    .addMark({ type: "pointerImport", object: "mark", data: { pointerId: e.pointerId, internalReferenceId: uuidv1() } });
-                    onChange(ch.value);
+                  const ch = value.change()
+                    .insertText("~")
+                    .extend(0 - "~".length)
+                    .addMark({ type: "pointerImport", object: "mark", data: { pointerId: e.pointerId, internalReferenceId: uuidv1() } });
+                  onChange(ch.value);
                 }}
-                >
+              >
                 {e.pointerId}
               </MenuItem>
             ))}
@@ -122,12 +130,12 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
         </div>
       );
-        }
     }
+  }
 }
 
 export const BlockEditor: any = compose(
-    connect(
-        ({ blocks, blockEditor }) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem }
-    )
+  connect(
+    ({ blocks, blockEditor }) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem }
+  )
 )(BlockEditorPresentational);
