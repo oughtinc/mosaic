@@ -9,7 +9,7 @@ import { Editor } from "slate-react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportMark } from "./PointerImportMark";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
-import { changePointerReference, changeHoverItem, removeHoverItem } from "../../modules/blockEditor/actions";
+import { changePointerReference, changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
@@ -71,7 +71,13 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if ((_top !== top) || (_left !== left)) {
       window.setTimeout(
         () => {
-          this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: false, top: _top, left: _left, blockId: this.props.blockId });
+          this.props.changeHoverItem({
+            hoverItemType: HOVER_ITEM_TYPES.SELECTED_TEXT,
+            id: false,
+            top: _top,
+            left: _left,
+            blockId: this.props.blockId,
+          });
         }, 10
       );
     }
