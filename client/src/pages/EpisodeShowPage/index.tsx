@@ -11,7 +11,7 @@ import { connect } from "react-redux";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { Block } from "./Block";
-import { addBlocks } from "../../modules/blocks/actions";
+import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 
@@ -71,6 +71,33 @@ const ParentLink = (props) => <Link to={`/workspaces/${props.parentId}`}>
   </Link>;
 
 export class FormPagePresentational extends React.Component<any, any> {
+  public constructor(props: any) {
+    super(props);
+    this.updateBlocks = this.updateBlocks.bind(this);
+  }
+
+    public componentWillUpdate(nextProps) {
+        const nextWorkspace = nextProps.workspace.workspace;
+        if (!this.props.workspace.workspace && !!nextWorkspace) {
+            let allBlocks = [...nextWorkspace.blocks];
+            nextWorkspace.childWorkspaces.map((c) => {
+                allBlocks = [...allBlocks, ...c.blocks];
+            });
+            this.props.addBlocks(allBlocks);
+        }
+    }
+
+    public onSubmit() {
+        const workspace = this.props.workspace.workspace;
+    }
+
+    public updateBlocks(blocks: any) {
+        const variables = { blocks };
+        this.props.updateBlocks({
+            variables,
+        });
+    }
+
     public render() {
         const workspace = this.props.workspace.workspace;
         if (!workspace) {
@@ -78,20 +105,11 @@ export class FormPagePresentational extends React.Component<any, any> {
         }
         let initialValues = {};
 
-        let allBlocks = [...workspace.blocks];
-        workspace.childWorkspaces.map((c) => {
-            allBlocks = [...allBlocks, ...c.blocks];
-        });
-        this.props.addBlocks(allBlocks);
         const onSubmit = async (values) => {
             let inputs: any = [];
             for (const key of Object.keys(values)) {
                 inputs = [...inputs, { id: key, value: JSON.stringify(values[key].toJSON()) }];
             }
-            const variables = { blocks: inputs };
-            this.props.updateBlocks({
-                variables,
-            });
         };
         const question = workspace.blocks.find((b) => b.type === "QUESTION");
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
@@ -108,21 +126,24 @@ export class FormPagePresentational extends React.Component<any, any> {
                     <BlockEditor
                       isInField={true}
                       blockId={question.id}
+                      readOnly={true}
                     />                            
                   </h1>
                 </Col>
               </Row>
               <Row>
                 <Col sm={9}>
+                  <h3>Scratchpad</h3>
                   <BlockEditor
                     isInField={true}
                     blockId={scratchpad.id}
                   />
+                  <h3>Question</h3>
                   <BlockEditor
                     isInField={true}
                     blockId={answer.id}
                   />
-
+                  <Button onClick={() => {this.props.saveBlocks({ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                 </Col>
                 <Col sm={3}>
                   <ChildrenSidebar
@@ -161,6 +182,6 @@ export const EpisodeShowPage = compose(
         },
     }),
     connect(
-        (state) => ({}), { addBlocks }
+        ({blocks}) => ({blocks}), { addBlocks, saveBlocks }
     )
 )(FormPagePresentational);

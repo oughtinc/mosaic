@@ -13,10 +13,18 @@ import { changePointerReference, changeHoverItem } from "../../modules/blockEdit
 import { compose } from "recompose";
 import { connect } from "react-redux";
 
+const BlockReadOnlyStyle = styled.div`
+    border: 1px solid #eee;
+    border-radius: 2px;
+    padding: .3em;
+`;
+
 const BlockEditorStyle = styled.div`
-    border: 1px solid #ddd;
+    background: #f4f4f4;
+    border-radius: 2px;
+    border: 1px solid #d5d5d5;
     margin-bottom: 1em;
-    padding: .5em;
+    padding: .3em;
 `;
 
 class BlockEditorPresentational extends React.Component<any, any> {
@@ -89,28 +97,34 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public render() {
     const { readOnly } = this.props;
     const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
+    if (!block) {
+      return (<div> loading... </div>);
+    }
     const value = block.value;
     const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
     const exportingLeaves = _.flatten(this.props.blocks.blocks.map((b) => b.exportingLeaves));
     if (readOnly) {
       return (
+          <BlockReadOnlyStyle>
         <Editor
-          value={this.props.value || Plain.deserialize("")}
+          value={value}
           renderMark={this.renderMark}
           readOnly={true}
         />
+          </BlockReadOnlyStyle>
       );
     } else {
       return (
         <div>
-          <DropdownButton title="Import" id="bg-nested-dropdown">
+          <BlockEditorStyle>
+          <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{marginBottom: "5px"}}>
             {exportingLeaves.map((e: any) => (
               <MenuItem
                 eventKey="1"
                 onClick={(event) => {
                   const ch = value.change()
-                    .insertText("~")
-                    .extend(0 - "~".length)
+                    .insertText("~~")
+                    .extend(0 - "~~".length)
                     .addMark({ type: "pointerImport", object: "mark", data: { pointerId: e.pointerId, internalReferenceId: uuidv1() } });
                   onChange(ch.value);
                 }}
@@ -119,7 +133,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
               </MenuItem>
             ))}
           </DropdownButton>
-          <BlockEditorStyle>
             <Editor
               value={value}
               onChange={(c) => { onChange(c.value); }}
