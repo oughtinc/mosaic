@@ -12,6 +12,7 @@ import { addBlocks, updateBlock } from "../../modules/blocks/actions";
 import { changePointerReference, changeHoverItem } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
+import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -35,8 +36,18 @@ class BlockEditorPresentational extends React.Component<any, any> {
     this.onSelect = this.onSelect.bind(this);
   }
 
+  public componentDidMount() {
+    const {name, blockId, initialValue} = this.props;
+    const blockForm = {
+      id: blockId,
+      name,
+      value: initialValue,
+    };
+    this.props.addBlocks([blockForm]);
+  }
+
   public onSelect(event: any) {
-    const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
+    const block = this.props.block;
     const value = block.value;
     if (value.isBlurred || value.isEmpty) {
       return;
@@ -96,13 +107,14 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public render() {
     const { readOnly } = this.props;
-    const block = this.props.blocks.blocks.find((b) => b.id === this.props.blockId);
+    const block = this.props.block;
     if (!block) {
       return (<div> loading... </div>);
     }
     const value = block.value;
     const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
-    const exportingLeaves = _.flatten(this.props.blocks.blocks.map((b) => b.exportingLeaves));
+    console.log("Here", this.props);
+    const exportingLeaves = this.props.exportingLeaves;
     if (readOnly) {
       return (
           <BlockReadOnlyStyle>
@@ -147,8 +159,15 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 }
 
+function mapStateToProps(state: any, {blockId}: any) {
+  const exportingLeaves = exportingLeavesSelector(state);
+  const {blocks, blockEditor} = state;
+  const block = blocks.blocks.find((b) => b.id === blockId);
+  return {block, blockEditor, exportingLeaves};
+}
+
 export const BlockEditor: any = compose(
   connect(
-    ({ blocks, blockEditor }) => ({ blocks, blockEditor }), { updateBlock, changeHoverItem }
+    mapStateToProps, { addBlocks, updateBlock, changeHoverItem }
   )
 )(BlockEditorPresentational);

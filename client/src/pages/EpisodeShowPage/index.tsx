@@ -66,25 +66,27 @@ const NEW_CHILD = gql`
   }
 `;
 
-const ParentLink = (props) => <Link to={`/workspaces/${props.parentId}`}>
-    <Button>To Parent</Button>
-  </Link>;
+const ParentLink = (props) => (
+    <Link to={`/workspaces/${props.parentId}`}>
+        <Button>To Parent</Button>
+    </Link>
+);
 
 export class FormPagePresentational extends React.Component<any, any> {
-  public constructor(props: any) {
-    super(props);
-    this.updateBlocks = this.updateBlocks.bind(this);
-  }
+    public constructor(props: any) {
+        super(props);
+        this.updateBlocks = this.updateBlocks.bind(this);
+    }
 
-    public componentWillUpdate(nextProps) {
+    public componentWillUpdate(nextProps: any) {
         const nextWorkspace = nextProps.workspace.workspace;
-        if (!this.props.workspace.workspace && !!nextWorkspace) {
-            let allBlocks = [...nextWorkspace.blocks];
-            nextWorkspace.childWorkspaces.map((c) => {
-                allBlocks = [...allBlocks, ...c.blocks];
-            });
-            this.props.addBlocks(allBlocks);
-        }
+        // if (!this.props.workspace.workspace && !!nextWorkspace) {
+        //     let allBlocks = [...nextWorkspace.blocks];
+        //     nextWorkspace.childWorkspaces.map((c) => {
+        //         allBlocks = [...allBlocks, ...c.blocks];
+        //     });
+        //     this.props.addBlocks(allBlocks);
+        // }
     }
 
     public onSubmit() {
@@ -105,57 +107,57 @@ export class FormPagePresentational extends React.Component<any, any> {
         }
         let initialValues = {};
 
-        const onSubmit = async (values) => {
-            let inputs: any = [];
-            for (const key of Object.keys(values)) {
-                inputs = [...inputs, { id: key, value: JSON.stringify(values[key].toJSON()) }];
-            }
-        };
         const question = workspace.blocks.find((b) => b.type === "QUESTION");
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
         const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
         return (
-          <div>
-            <BlockHoverMenu>
-              <Row>
-                <Col sm={12}>
-                  {workspace.parentId &&
-                   <ParentLink parentId={workspace.parentId}/>
-                  }                    
-                  <h1>
-                    <BlockEditor
-                      isInField={true}
-                      blockId={question.id}
-                      readOnly={true}
-                    />                            
-                  </h1>
-                </Col>
-              </Row>
-              <Row>
-                <Col sm={9}>
-                  <h3>Scratchpad</h3>
-                  <BlockEditor
-                    isInField={true}
-                    blockId={scratchpad.id}
-                  />
-                  <h3>Question</h3>
-                  <BlockEditor
-                    isInField={true}
-                    blockId={answer.id}
-                  />
-                  <Button onClick={() => {this.props.saveBlocks({ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
-                </Col>
-                <Col sm={3}>
-                  <ChildrenSidebar
-                    workspaces={workspace.childWorkspaces}
-                    workspaceOrder={workspace.childWorkspaceOrder}
-                    onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
-                    changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                  />
-                </Col>
-              </Row>
-            </BlockHoverMenu>
-          </div>
+            <div>
+                <BlockHoverMenu>
+                    <Row>
+                        <Col sm={12}>
+                            {workspace.parentId &&
+                                <ParentLink parentId={workspace.parentId} />
+                            }
+                            <h1>
+                                <BlockEditor
+                                    name={question.id}
+                                    blockId={question.id}
+                                    initialValue={question.value}
+                                    isInField={true}
+                                    readOnly={true}
+                                />
+                            </h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col sm={9}>
+                            <h3>Scratchpad</h3>
+                            <BlockEditor
+                                name={question.id}
+                                blockId={scratchpad.id}
+                                isInField={true}
+                                initialValue={scratchpad.value}
+                            />
+                            <h3>Question</h3>
+                            <BlockEditor
+                                name={answer.id}
+                                blockId={answer.id}
+                                isInField={true}
+                                initialValue={answer.value}
+                            />
+                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
+                        </Col>
+                        {/* <Col sm={3}>
+                            <ChildrenSidebar
+                                workspaces={workspace.childWorkspaces}
+                                workspaceOrder={workspace.childWorkspaceOrder}
+                                onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
+                                changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
+                            />
+                        </Col> */}
+                    </Row>
+                </BlockHoverMenu>
+            </div>
         );
     }
 }
@@ -182,6 +184,6 @@ export const EpisodeShowPage = compose(
         },
     }),
     connect(
-        ({blocks}) => ({blocks}), { addBlocks, saveBlocks }
+        ({ blocks }) => ({ blocks }), { addBlocks, saveBlocks }
     )
 )(FormPagePresentational);

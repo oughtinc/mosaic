@@ -63,12 +63,14 @@ export class Child extends React.Component<any, any> {
                     <BlockEditor
                         isInField={false}
                         blockId={question.id}
+                        readOnly={true}
                     />
                 }
                 {answer.value &&
                     <BlockEditor
                         isInField={false}
                         blockId={answer.id}
+                        readOnly={true}
                     />
                 }
 
