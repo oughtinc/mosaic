@@ -3,7 +3,7 @@ import React = require("react");
 import ReactDOM = require("react-dom");
 import { compose } from "recompose";
 import { connect } from "react-redux";
-import { changeHoverItem } from "../../modules/blockEditor/actions";
+import { changeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 
 const PointerExportStyle = styled.span`
     background-color: #c9f2c9;
@@ -25,7 +25,13 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
 
     public onMouseOver() {
         const { top, left } = this.getLocation();
-        this.props.changeHoverItem({ hoverItemType: "EXPORT", id: this.props.mark.data.pointerId, top, left, blockId: this.props.blockId });
+        this.props.changeHoverItem({
+            hoverItemType: HOVER_ITEM_TYPES.POINTER_EXPORT, 
+            id: this.props.mark.data.pointerId,
+            top,
+            left, 
+            blockId: this.props.blockId,
+        });
     }
 
     public render() {

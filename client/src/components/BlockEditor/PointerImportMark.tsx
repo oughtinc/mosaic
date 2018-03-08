@@ -2,7 +2,7 @@ import * as React from "react";
 import * as uuidv1 from "uuid/v1";
 import styled from "styled-components";
 import ReactDOM = require("react-dom");
-import { changeHoverItem } from "../../modules/blockEditor/actions";
+import { changeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { connect } from "react-redux";
 import { compose } from "recompose";
 import _ = require("lodash");
@@ -48,7 +48,13 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
 
     public onMouseOver() {
         const {top, left} = this.getLocation();
-        this.props.changeHoverItem({ hoverItemType: "IMPORT", id: this.props.mark.data.internalReferenceId, top, left, blockId: this.props.blockId });
+        this.props.changeHoverItem({
+            hoverItemType: HOVER_ITEM_TYPES.POINTER_IMPORT, 
+           id: this.props.mark.data.internalReferenceId,
+           top,
+           left,
+           blockId: this.props.blockId,
+        });
     }
 
     public render() {

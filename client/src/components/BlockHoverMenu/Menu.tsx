@@ -4,7 +4,8 @@ import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { compose } from "recompose";
 import { connect } from "react-redux";
-import { changePointerReference, exportSelection, removeExportOfSelection, removeImportOfSelection } from "../../modules/blockEditor/actions";
+import { changePointerReference, exportSelection, removeExportOfSelection, removeImportOfSelection, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
+import _ = require("lodash");
 
 const HoverMenu = styled.span`
   background-color: #def4f757;
@@ -60,30 +61,31 @@ export class MenuPresentational extends React.Component<any> {
   public render() {
     const root: any = window.document.getElementById("root");
     const {blockEditor} = this.props;
+    const hoverItemType = _.get(blockEditor, "hoveredItem.hoverItemType");
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef}>
+      {blockEditor &&
         <HoverMenu>
-          {blockEditor && (blockEditor.hoveredItem.hoverItemType === "SELECTED_TEXT") &&
-            <div>
+          {(hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT) &&
               <Button bsSize={"small"} onClick={() => {this.props.exportSelection(); }} >
                   Export 
               </Button>
-            </div>
           }
-          {blockEditor && (blockEditor.hoveredItem.hoverItemType === "IMPORT") &&
+          {(hoverItemType === HOVER_ITEM_TYPES.POINTER_IMPORT) &&
             <ImportMenu
               blockEditor={this.props.blockEditor}
               removeImportOfSelection={this.props.removeImportOfSelection}
               onChangePointerReference={this.props.changePointerReference}
             />
           }
-          {blockEditor && (blockEditor.hoveredItem.hoverItemType === "EXPORT") &&
+          {(hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT) &&
             <ExportMenu
               blockEditor={this.props.blockEditor}
               removeExportOfSelection={this.props.removeExportOfSelection}
             />
           }
         </HoverMenu>
+      }
       </div>,
       root
     );
