@@ -10,7 +10,7 @@ import ReactDOM = require("react-dom");
 import { Menu } from "./Menu";
 import { compose } from "recompose";
 import { connect } from "react-redux";
-import { changeHoverItem, changePointerReference } from "../../modules/blockEditor/actions";
+import { changeHoverItem, changePointerReference, removeHoverItem } from "../../modules/blockEditor/actions";
 
 class BlockHoverMenuPresentational extends React.Component<any, any> {
     public menu;
@@ -23,6 +23,10 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
 
     public componentDidMount() {
         this.updateMenu();
+    }
+
+    public componentWillUnmount() {
+        this.props.removeHoverItem();
     }
 
     public componentDidUpdate() {
@@ -66,6 +70,7 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
 
 export const BlockHoverMenu: any = compose(
     connect(
-        ({ blockEditor }) => ({ blockEditor })
+        ({ blockEditor }) => ({ blockEditor }),
+        {removeHoverItem}
     )
 )(BlockHoverMenuPresentational);

@@ -5,6 +5,13 @@ import { Text } from "slate";
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
 
+export const HOVER_ITEM_TYPES = {
+  NONE: "NONE",
+  SELECTED_TEXT: "SELECTED_TEXT",
+  POINTER_IMPORT: "POINTER_IMPORT",
+  POINTER_EXPORT: "POINTER_EXPORT",
+};
+
 export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
   return (dispatch, getState) => {
     dispatch({
@@ -14,6 +21,19 @@ export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
       top,
       left,
       blockId,
+    });
+  };
+};
+
+export const removeHoverItem = () => {
+  return (dispatch, getState) => {
+    dispatch({
+      type: CHANGE_HOVERED_ITEM,
+      id: false,
+      top: false,
+      left: false,
+      blockId: false,
+      hoverItemType: HOVER_ITEM_TYPES.NONE,
     });
   };
 };

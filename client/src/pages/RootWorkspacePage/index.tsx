@@ -8,7 +8,6 @@ import styled from "styled-components";
 import Plain from "slate-plain-serializer";
 import { Form } from "react-final-form";
 import { Value } from "slate";
-import { Block } from "../EpisodeShowPage/Block";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
@@ -50,12 +49,12 @@ const ParentWorkspace = ({workspace}) => {
     const question = workspace.blocks && workspace.blocks.find((b) => b.type === "QUESTION");
     return (
     <WorkspaceStyle>
-        {question && question.value &&
-            <Block
-                isInField={false}
-                value={Value.fromJSON(question.value)}
-            />
-        }
+        {/* {question && question.value &&
+             <Block
+                 isInField={false}
+                 value={Value.fromJSON(question.value)}
+             />
+        } */}
         <Link to={`/workspaces/${workspace.id}`}>
             <Button> Open </Button>
         </Link>
@@ -78,10 +77,9 @@ class NewWorkspaceForm extends React.Component<any, any> {
                     <div>
 
                         <form onSubmit={handleSubmit}>
-                            <Block
+                            {/* <Block
                                 name={"new"}
-                                isInField={true}
-                            />
+                            /> */}
                             <div className="buttons">
                                 <button type="submit" disabled={submitting || pristine}>
                                     Submit
