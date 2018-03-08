@@ -47,7 +47,7 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
 
     public onMouseOver() {
         const {top, left} = this.getLocation();
-        this.props.changeHoverItem({ hoverItemType: "IMPORT", id: this.props.mark.data.internalReferenceId, top, left });
+        this.props.changeHoverItem({ hoverItemType: "IMPORT", id: this.props.mark.data.internalReferenceId, top, left, blockId: this.props.blockId });
     }
 
     public render() {

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { compose } from "recompose";
 import { connect } from "react-redux";
-import { changePointerReference, exportSelection, removeExportOfSelection } from "../../modules/blockEditor/actions";
+import { changePointerReference, exportSelection, removeExportOfSelection, removeImportOfSelection } from "../../modules/blockEditor/actions";
 
 const HoverMenu = styled.span`
   background-color: #def4f757;
@@ -31,7 +31,7 @@ export class ImportMenu extends React.Component<any, any> {
             Expand
           </Button>
         }
-          <Button bsSize={"small"}>
+          <Button bsSize={"small"} onClick={() => {this.props.removeImportOfSelection(); }}>
             Remove 
           </Button>
       </div>
@@ -73,6 +73,7 @@ export class MenuPresentational extends React.Component<any> {
           {blockEditor && (blockEditor.hoveredItem.hoverItemType === "IMPORT") &&
             <ImportMenu
               blockEditor={this.props.blockEditor}
+              removeImportOfSelection={this.props.removeImportOfSelection}
               onChangePointerReference={this.props.changePointerReference}
             />
           }
@@ -91,6 +92,6 @@ export class MenuPresentational extends React.Component<any> {
 
 export const Menu: any = compose(
     connect(
-        ({ blockEditor }) => ({ blockEditor }), { changePointerReference, exportSelection, removeExportOfSelection }
+        ({ blockEditor }) => ({ blockEditor }), { changePointerReference, exportSelection, removeExportOfSelection, removeImportOfSelection }
     )
 )(MenuPresentational);
