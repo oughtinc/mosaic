@@ -10,7 +10,6 @@ import { connect } from "react-redux";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
-import { Block } from "./Block";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
@@ -78,17 +77,6 @@ export class FormPagePresentational extends React.Component<any, any> {
         this.updateBlocks = this.updateBlocks.bind(this);
     }
 
-    public componentWillUpdate(nextProps: any) {
-        const nextWorkspace = nextProps.workspace.workspace;
-        // if (!this.props.workspace.workspace && !!nextWorkspace) {
-        //     let allBlocks = [...nextWorkspace.blocks];
-        //     nextWorkspace.childWorkspaces.map((c) => {
-        //         allBlocks = [...allBlocks, ...c.blocks];
-        //     });
-        //     this.props.addBlocks(allBlocks);
-        // }
-    }
-
     public onSubmit() {
         const workspace = this.props.workspace.workspace;
     }
@@ -111,7 +99,7 @@ export class FormPagePresentational extends React.Component<any, any> {
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
         const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
         return (
-            <div>
+            <div key={workspace.id}>
                 <BlockHoverMenu>
                     <Row>
                         <Col sm={12}>
@@ -123,7 +111,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     name={question.id}
                                     blockId={question.id}
                                     initialValue={question.value}
-                                    isInField={true}
                                     readOnly={true}
                                 />
                             </h1>
@@ -132,29 +119,27 @@ export class FormPagePresentational extends React.Component<any, any> {
                     <Row>
                         <Col sm={9}>
                             <h3>Scratchpad</h3>
-                            <BlockEditor
-                                name={question.id}
-                                blockId={scratchpad.id}
-                                isInField={true}
-                                initialValue={scratchpad.value}
-                            />
+                                <BlockEditor
+                                    name={question.id}
+                                    blockId={scratchpad.id}
+                                    initialValue={scratchpad.value}
+                                />
                             <h3>Question</h3>
-                            <BlockEditor
-                                name={answer.id}
-                                blockId={answer.id}
-                                isInField={true}
-                                initialValue={answer.value}
-                            />
+                                <BlockEditor
+                                    name={answer.id}
+                                    blockId={answer.id}
+                                    initialValue={answer.value}
+                                />
                             <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
-                        {/* <Col sm={3}>
+                        <Col sm={3}>
                             <ChildrenSidebar
                                 workspaces={workspace.childWorkspaces}
                                 workspaceOrder={workspace.childWorkspaceOrder}
                                 onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
                             />
-                        </Col> */}
+                        </Col>
                     </Row>
                 </BlockHoverMenu>
             </div>

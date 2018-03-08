@@ -9,7 +9,7 @@ import { Editor } from "slate-react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportMark } from "./PointerImportMark";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
-import { changePointerReference, changeHoverItem } from "../../modules/blockEditor/actions";
+import { changePointerReference, changeHoverItem, removeHoverItem } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
@@ -60,7 +60,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if (rect.width === 0) {
       window.setTimeout(
         () => {
-          this.props.changeHoverItem({ hoverItemType: "NONE", id: false, top: false, left: false, blockId: false });
+          this.props.removeHoverItem();
         }, 10);
       return;
     }
@@ -71,7 +71,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if ((_top !== top) || (_left !== left)) {
       window.setTimeout(
         () => {
-          this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: "NOT_NEEDED", top: _top, left: _left, blockId: this.props.blockId });
+          this.props.changeHoverItem({ hoverItemType: "SELECTED_TEXT", id: false, top: _top, left: _left, blockId: this.props.blockId });
         }, 10
       );
     }
@@ -113,7 +113,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
     const value = block.value;
     const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
-    console.log("Here", this.props);
     const exportingLeaves = this.props.exportingLeaves;
     if (readOnly) {
       return (
@@ -152,7 +151,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
               onSelect={this.onSelect}
             />
           </BlockEditorStyle>
-
         </div>
       );
     }
@@ -168,6 +166,6 @@ function mapStateToProps(state: any, {blockId}: any) {
 
 export const BlockEditor: any = compose(
   connect(
-    mapStateToProps, { addBlocks, updateBlock, changeHoverItem }
+    mapStateToProps, { addBlocks, updateBlock, changeHoverItem, removeHoverItem }
   )
 )(BlockEditorPresentational);

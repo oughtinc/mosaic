@@ -7,7 +7,6 @@ import Plain from "slate-plain-serializer";
 import _ = require("lodash");
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { Block } from "./Block";
 import { BlockEditor } from "../../components/BlockEditor";
 
 class ChildForm extends React.Component<any, any> {
@@ -61,16 +60,16 @@ export class Child extends React.Component<any, any> {
             <ChildStyle>
                 {question.value &&
                     <BlockEditor
-                        isInField={false}
-                        blockId={question.id}
                         readOnly={true}
+                        blockId={question.id}
+                        initialValue={question.value}
                     />
                 }
                 {answer.value &&
                     <BlockEditor
-                        isInField={false}
-                        blockId={answer.id}
                         readOnly={true}
+                        blockId={answer.id}
+                        initialValue={answer.value}
                     />
                 }
 
