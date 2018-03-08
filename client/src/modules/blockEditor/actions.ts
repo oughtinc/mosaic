@@ -48,28 +48,49 @@ export const exportSelection = () => {
   };
 };
 
+function findTextsWithMark(document: any, markMatchFn: any) {
+  return document.getTextsAsArray().filter((t) => t.toJS().leaves.find((e) => e.marks.find(markMatchFn)));
+}
+
+function textWithRemovedMarks(text: any, markMatchFn: any) {
+  return Text.fromJSON({
+    ...text.toJS(),
+    leaves: text.toJS().leaves.map((leaf) => ({
+          ...leaf,
+          marks: leaf.marks.filter((m) => !markMatchFn(m)),
+    })),
+  });
+}
+
+function matchExportPointerFn(pointerId: string) {
+  return function(mark: any) {
+    return (mark.type === "pointerExport") && (mark.data.pointerId === pointerId);
+  };
+}
+
 export const removeExportOfSelection = () => {
   return async (dispatch, getState) => {
     const {blocks, blockEditor} = await getState();
     const {hoveredItem} = blockEditor;
 
     const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
-    if (block) {
-      const _blocks = (block.value.document.getBlocksAsArray());
-      const relevantText = block.value.document.getTextsAsArray().find((t) => t.toJS().leaves.find((e) => e.marks.find((m) => m.data.pointerId === hoveredItem.id && m.type === "pointerExport")));
-      const leaves = relevantText.toJS().leaves.map((l) => {
-        return {
-          ...l,
-          marks: l.marks.filter((m) => m.data.pointerId !== hoveredItem.id),
-        };
-      });
-      console.log(relevantText, leaves);
 
-      const change = block.value.change().replaceNodeByKey(relevantText.key, Text.fromJSON({...relevantText, leaves}));
+    if (block) {
+      const matchFn = matchExportPointerFn(hoveredItem.id);
+      const relevantText = findTextsWithMark(block.value.document, matchFn)[0];
+      const _withRemovedMarks = textWithRemovedMarks(relevantText, matchFn);
+
+      const change = block.value.change().replaceNodeByKey(relevantText.key, _withRemovedMarks);
+
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
         value: change.value,
+      });
+
+      dispatch({
+        type: CHANGE_HOVERED_ITEM,
+        hoverItemType: "NONE",
       });
     } else {
       console.error("Block was not found from action");
