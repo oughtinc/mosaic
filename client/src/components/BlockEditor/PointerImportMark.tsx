@@ -6,7 +6,7 @@ import { changeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/act
 import { connect } from "react-redux";
 import { compose } from "recompose";
 import _ = require("lodash");
-import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
+import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
 
 const ClosedPointerImport = styled.span`
     background-color: rgba(86, 214, 252, 0.66);
@@ -62,23 +62,23 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
         const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
         const isOpen = reference && reference.isOpen;
         if (!isOpen) {
-            const leafIndex = _.findIndex(this.props.exportingLeaves, (l: any) => l.pointerId === this.props.mark.data.pointerId);
+            const pointerIndex = _.findIndex(this.props.exportingPointers, (l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <ClosedPointerImport
                     onMouseOver={this.onMouseOver}
                     onMouseOut={this.props.onMouseOut}
                 >
-                    {`$${leafIndex + 1}`}
+                    {`$${pointerIndex + 1}`}
                 </ClosedPointerImport>
             );
         } else {
-            const importLeaf: any = this.props.exportingLeaves.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
+            const importingPointer: any = this.props.exportingPointers.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <OpenPointerImport
                     onMouseOver={this.onMouseOver}
                     onMouseOut={this.props.onMouseOut}
                 >
-                {importLeaf && importLeaf.text}
+                {importingPointer && importingPointer.text}
                 </OpenPointerImport>
             );
         }
@@ -86,10 +86,10 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
 }
 
 function mapStateToProps(state: any, {blockId}: any) {
-  const exportingLeaves = exportingLeavesSelector(state);
+  const exportingPointers = exportingPointersSelector(state);
   const {blocks, blockEditor} = state;
   const block = blocks.blocks.find((b) => b.id === blockId);
-  return {blocks, block, blockEditor, exportingLeaves};
+  return {blocks, block, blockEditor, exportingPointers};
 }
 
 export const PointerImportMark: any = compose(

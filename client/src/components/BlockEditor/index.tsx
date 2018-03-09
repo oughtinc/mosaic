@@ -13,8 +13,8 @@ import { addBlocks, updateBlock } from "../../modules/blocks/actions";
 import { changePointerReference, changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
-import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
 import SoftBreak from "slate-soft-break";
+import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -135,7 +135,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
     const value = block.value;
     const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
-    const exportingLeaves = this.props.exportingLeaves;
+    const exportingPointers = this.props.exportingPointers;
     if (readOnly) {
       return (
         <BlockReadOnlyStyle>
@@ -152,7 +152,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <div>
           <BlockEditorStyle>
             <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
-              {exportingLeaves.map((e: any) => (
+              {exportingPointers.map((e: any, index: any) => (
                 <MenuItem
                   eventKey="1"
                   onClick={(event) => {
@@ -169,7 +169,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
                     onChange(ch.value);
                   }}
                 >
-                  {e.pointerId}
+                  {`$${index + 1} - ${e.pointerId.slice(0, 5)} - ${e.text && e.text.slice(0, 20)}`}
                 </MenuItem>
               ))}
             </DropdownButton>
@@ -189,10 +189,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
 }
 
 function mapStateToProps(state: any, { blockId }: any) {
-  const exportingLeaves = exportingLeavesSelector(state);
+  const exportingPointers = exportingPointersSelector(state);
   const { blocks, blockEditor } = state;
   const block = blocks.blocks.find((b) => b.id === blockId);
-  return { block, blockEditor, exportingLeaves };
+  return { block, blockEditor, exportingPointers };
 }
 
 export const BlockEditor: any = compose(
