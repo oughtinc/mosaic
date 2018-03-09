@@ -11,11 +11,12 @@ export class NewBlockForm extends React.Component<any, any> {
 
     public onSubmit() {
         this.props.onMutate(JSON.stringify(this.state.value.toJSON()));
+        this.setState({id: uuidv1()});
     }
 
     public render() {
         return (
-            <div>
+            <div key={this.state.id}>
                 <BlockEditor
                     readOnly={false}
                     blockId={this.state.id}
