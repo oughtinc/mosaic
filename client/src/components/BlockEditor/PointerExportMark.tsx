@@ -5,10 +5,10 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import { changeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 
-const PointerExportStyle = styled.span`
-    background-color: #c9f2c9;
+const PointerExportStyle: any = styled.span`
+    background: ${(props: any) => props.isSelected ? "rgba(85, 228, 38, 0.9)" : "rgba(162, 238, 156, 0.5)"};
+    transition: background .2s;
     color: #000000;
-    border-radius: 2px;
 `;
 
 export class PointerExportMarkPresentational extends React.Component<any, any> {
@@ -35,8 +35,10 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
     }
 
     public render() {
+        const isSelected = this.props.hoveredItem.id === this.props.mark.data.pointerId;
         return (
             <PointerExportStyle
+                isSelected={isSelected}
                 onMouseOver={this.onMouseOver}
                 onMouseOut={this.props.onMouseOut}
             >
@@ -48,6 +50,6 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
 
 export const PointerExportMark: any = compose(
     connect(
-        ({ }) => ({ }), {changeHoverItem }
+        ({blockEditor: {hoveredItem}}) => ({hoveredItem}), {changeHoverItem }
     )
 )(PointerExportMarkPresentational);
