@@ -100,7 +100,6 @@ class NewWorkspaceForm extends React.Component<any, any> {
 
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
     public render() {
-        console.log(this.props);
         const workspaces = this.props.originWorkspaces.workspaces;
         return (
             <BlockHoverMenu>
