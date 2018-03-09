@@ -17,7 +17,7 @@ const RemovedPointer = styled.span`
     color: #7f0a0a;
 `;
 
-const ClosedPointerImport = styled.span`
+const ClosedPointerImport: any = styled.span`
     background-color: rgba(86, 214, 252, 0.66);
     padding: 0 7px;
     border-radius: 2px;
@@ -32,8 +32,8 @@ const ClosedPointerImport = styled.span`
     }
 `;
 
-const OpenPointerImport = styled.div`
-    background-color: rgba(158, 224, 244, 0.66);
+const OpenPointerImport: any = styled.div`
+    background: ${(props: any) => props.isSelected ? "rgba(111, 186, 209, 0.66)" : "rgba(158, 224, 244, 0.66)"};
     padding: 0px 5px;
     border-radius: 2px;
     font-weight: 500;
@@ -72,6 +72,8 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
         const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
         const isOpen = reference && reference.isOpen;
         const importingPointer: any = this.props.exportingPointers.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
+        const isSelected = this.props.blockEditor.hoveredItem.id === internalReferenceId;
+
         if (!importingPointer) {
             return (
                 <RemovedPointer
@@ -82,6 +84,7 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
                 </RemovedPointer>
             );
         }
+
         if (!isOpen) {
             const pointerIndex = _.findIndex(this.props.exportingPointers, (l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
@@ -92,9 +95,11 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
                     {`$${pointerIndex + 1}`}
                 </ClosedPointerImport>
             );
+
         } else {
             return (
                 <OpenPointerImport
+                    isSelected={isSelected}
                 >
                     <PointerImport
                         exportingPointer={importingPointer}
