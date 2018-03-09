@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
+import { PointerTable } from "./PointerTable";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -117,7 +118,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         </Col>
                     </Row>
                     <Row>
-                        <Col sm={9}>
+                        <Col sm={6}>
                             <h3>Scratchpad</h3>
                                 <BlockEditor
                                     name={question.id}
@@ -131,6 +132,10 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     initialValue={answer.value}
                                 />
                             <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
+                        </Col>
+                        <Col sm={3}>
+                            <h3>Pointers</h3>
+                            <PointerTable/>
                         </Col>
                         <Col sm={3}>
                             <ChildrenSidebar
