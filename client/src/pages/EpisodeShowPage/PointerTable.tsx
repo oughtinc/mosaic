@@ -26,6 +26,7 @@ const Row = styled.div`
     width: 100%;
     border-bottom: 1px solid #ddd;
     padding: .3em .5em;
+    overflow: scroll;
 `;
 
 const Text = styled.div`
@@ -45,7 +46,7 @@ export class PointerTablePresentational extends React.Component<any, any> {
         return (
             <Container>
                 {exportingPointers.map((pointer, index) => (
-                    <Row>
+                    <Row key={pointer.pointerId}>
                         <Reference>
                             {`$${index + 1} - ${pointer.pointerId.slice(0, 5)}`}
                         </Reference>

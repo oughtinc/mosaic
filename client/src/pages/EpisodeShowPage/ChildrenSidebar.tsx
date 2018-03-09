@@ -8,42 +8,8 @@ import _ = require("lodash");
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
-
-class ChildForm extends React.Component<any, any> {
-    public render() {
-        const onSubmit = async (values) => {
-            this.props.onMutate(JSON.stringify(values.new.toJSON()));
-        };
-        return (
-            <Form
-                onSubmit={onSubmit}
-                initialValues={{ new: Plain.deserialize("") }}
-                render={({ handleSubmit, reset, submitting, pristine, values }) => (
-                    <div>
-
-                        <form onSubmit={handleSubmit}>
-                            <BlockEditor
-                                blockId={"new"}
-                                isInField={true}
-                            />
-                            <div className="buttons">
-                                <button type="submit" disabled={submitting || pristine}>
-                                    Submit
-                </button>
-                                <button
-                                    type="button"
-                                    onClick={reset}
-                                    disabled={submitting || pristine}>
-                                    Reset
-                </button>
-                            </div>
-                        </form>
-                    </div>
-                )}
-            />
-        );
-    }
-}
+import * as uuidv1 from "uuid/v1";
+import { NewBlockForm } from "../../components/NewBlockForm";
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
@@ -77,7 +43,7 @@ export class Child extends React.Component<any, any> {
                     <Button> Open </Button>
                 </Link>
                 <Button onClick={this.props.onDelete}>
-                   Archive 
+                    Archive
                 </Button>
             </ChildStyle>
         );
@@ -96,7 +62,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                                 <Child
                                     workspace={workspace}
                                     key={workspace.id}
-                                    onDelete={() => {this.props.changeOrder(this.props.workspaceOrder.filter( (w) => w !== workspace.id)); }}
+                                    onDelete={() => { this.props.changeOrder(this.props.workspaceOrder.filter((w) => w !== workspace.id)); }}
                                 />
                             );
                         }
@@ -104,7 +70,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     </div>
                 }
                 <h3> Add a new Child Question </h3>
-                {/* <ChildForm onMutate={this.props.onCreateChild} /> */}
+                <NewBlockForm onMutate={this.props.onCreateChild} />
             </div>
         );
     }

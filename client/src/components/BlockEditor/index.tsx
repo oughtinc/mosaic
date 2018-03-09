@@ -40,6 +40,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     this.renderMark = this.renderMark.bind(this);
     this.renderNode = this.renderNode.bind(this);
     this.onSelect = this.onSelect.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
 
   public componentDidMount() {
@@ -47,7 +48,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const blockForm = {
       id: blockId,
       name,
-      value: initialValue,
+      value: initialValue || Plain.deserialize(""),
     };
     this.props.addBlocks([blockForm]);
   }
@@ -127,6 +128,13 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
   }
 
+  public onChange(value: any) {
+    this.props.updateBlock({ id: this.props.block.id, value }); 
+    if (this.props.onChange) {
+      this.props.onChange(value);
+    }
+  }
+
   public render() {
     const { readOnly } = this.props;
     const block = this.props.block;
@@ -134,7 +142,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return (<div> loading... </div>);
     }
     const value = block.value;
-    const onChange = (value) => { this.props.updateBlock({ id: block.id, value }); };
     const exportingPointers = this.props.exportingPointers;
     if (readOnly) {
       return (
@@ -142,6 +149,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           <Editor
             value={value}
             renderMark={this.renderMark}
+            renderNode={this.renderNode}
             readOnly={true}
             plugins={plugins}
           />
@@ -155,6 +163,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
               {exportingPointers.map((e: any, index: any) => (
                 <MenuItem
                   eventKey="1"
+                  key={e.pointerId}
                   onClick={(event) => {
                     const ch = value.change()
                       .insertInline(Inline.fromJSON({
@@ -166,7 +175,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
                           internalReferenceId: uuidv1(),
                         },
                       }));
-                    onChange(ch.value);
+                    this.onChange(ch.value);
                   }}
                 >
                   {`$${index + 1} - ${e.pointerId.slice(0, 5)} - ${e.text && e.text.slice(0, 20)}`}
@@ -175,7 +184,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
             </DropdownButton>
             <Editor
               value={value}
-              onChange={(c) => { onChange(c.value); }}
+              onChange={(c) => { this.onChange(c.value); }}
               renderMark={this.renderMark}
               renderNode={this.renderNode}
               onSelect={this.onSelect}
