@@ -3,6 +3,7 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
+import { PointerImport } from "../../components/PointerImport";
 
 const Container = styled.div`
     border: 1px solid #eee;
@@ -51,7 +52,7 @@ export class PointerTablePresentational extends React.Component<any, any> {
                             {`$${index + 1} - ${pointer.pointerId.slice(0, 5)}`}
                         </Reference>
                         <Text>
-                            {pointer.text}
+                           <PointerImport exportingPointer={pointer}/> 
                         </Text>
                     </Row>
 

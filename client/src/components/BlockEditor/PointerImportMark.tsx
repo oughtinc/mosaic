@@ -7,10 +7,19 @@ import { connect } from "react-redux";
 import { compose } from "recompose";
 import _ = require("lodash");
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
+import { PointerImport } from "../PointerImport";
+
+const RemovedPointer = styled.span`
+    background-color: rgba(252, 86, 86, 0.66);
+    padding: 0 3px;
+    border-radius: 2px;
+    font-weight: 800;
+    color: #7f0a0a;
+`;
 
 const ClosedPointerImport = styled.span`
     background-color: rgba(86, 214, 252, 0.66);
-    padding: 0px 7px;
+    padding: 0 7px;
     border-radius: 2px;
     font-weight: 800;
     color: #0a6e7f;
@@ -23,12 +32,13 @@ const ClosedPointerImport = styled.span`
     }
 `;
 
-const OpenPointerImport = styled.span`
+const OpenPointerImport = styled.div`
     background-color: rgba(158, 224, 244, 0.66);
     padding: 0px 5px;
     border-radius: 2px;
     font-weight: 500;
     transition: background-color color 0.8s; 
+    display: inline-block;
     &:hover {
         cursor: pointer;
     }
@@ -61,6 +71,17 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
         const {internalReferenceId} = this.props.mark.data;
         const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
         const isOpen = reference && reference.isOpen;
+        const importingPointer: any = this.props.exportingPointers.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
+        if (!importingPointer) {
+            return (
+                <RemovedPointer
+                    onMouseOver={this.onMouseOver}
+                    onMouseOut={this.props.onMouseOut}
+                >
+                    N/A
+                </RemovedPointer>
+            );
+        }
         if (!isOpen) {
             const pointerIndex = _.findIndex(this.props.exportingPointers, (l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
@@ -72,13 +93,14 @@ class PointerImportMarkPresentational extends React.Component<any, any> {
                 </ClosedPointerImport>
             );
         } else {
-            const importingPointer: any = this.props.exportingPointers.find((l: any) => l.pointerId === this.props.mark.data.pointerId);
             return (
                 <OpenPointerImport
-                    onMouseOver={this.onMouseOver}
-                    onMouseOut={this.props.onMouseOut}
                 >
-                {importingPointer && importingPointer.text}
+                    <PointerImport
+                        exportingPointer={importingPointer}
+                        onMouseOver={this.onMouseOver}
+                        onMouseOut={this.props.onMouseOut}
+                    />
                 </OpenPointerImport>
             );
         }

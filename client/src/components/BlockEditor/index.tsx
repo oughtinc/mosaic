@@ -15,6 +15,7 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
+import { PointerImport } from "../PointerImport";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -178,7 +179,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
                     this.onChange(ch.value);
                   }}
                 >
-                  {`$${index + 1} - ${e.pointerId.slice(0, 5)} - ${e.text && e.text.slice(0, 20)}`}
+                <span>
+                  {`$${index + 1} - ${e.pointerId.slice(0, 5)}`}
+                  <PointerImport exportingPointer={e}/>
+                </span>
                 </MenuItem>
               ))}
             </DropdownButton>
