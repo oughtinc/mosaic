@@ -9,6 +9,7 @@ import Plain from "slate-plain-serializer";
 import { Form } from "react-final-form";
 import { Value } from "slate";
 import { BlockEditor } from "../../components/BlockEditor";
+import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
@@ -125,7 +126,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
         console.log(this.props);
         const workspaces = this.props.originWorkspaces.workspaces;
         return (
-            <div>
+            <BlockHoverMenu>
                 <h1> Root Workspaces </h1>
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
@@ -133,7 +134,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                 <NewWorkspaceForm
                     onCreateWorkspace={(question) => { this.props.createWorkspace({ variables: { question } }); }}
                 />
-            </div>
+            </BlockHoverMenu>
         );
     }
 }
