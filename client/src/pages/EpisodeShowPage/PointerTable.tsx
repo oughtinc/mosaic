@@ -1,8 +1,8 @@
 import React = require("react");
 import { compose } from "recompose";
 import { connect } from "react-redux";
-import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
 import styled from "styled-components";
+import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
 
 const Container = styled.div`
     border: 1px solid #eee;
@@ -41,17 +41,16 @@ export class PointerTablePresentational extends React.Component<any, any> {
 
     // TODO: replace this character with new line: ↵
     public render() {
-        const { exportingLeaves } = this.props;
-        console.log(exportingLeaves);
+        const { exportingPointers } = this.props;
         return (
             <Container>
-                {exportingLeaves.map((leaf, index) => (
+                {exportingPointers.map((pointer, index) => (
                     <Row>
                         <Reference>
-                            {`$${index + 1} - ${leaf.pointerId.slice(0, 5)}`}
+                            {`$${index + 1} - ${pointer.pointerId.slice(0, 5)}`}
                         </Reference>
                         <Text>
-                            {leaf.text}
+                            {pointer.text}
                         </Text>
                     </Row>
 
@@ -66,8 +65,8 @@ const options: any = ({ match }) => ({
 });
 
 function mapStateToProps(state: any, { blockId }: any) {
-    const exportingLeaves = exportingLeavesSelector(state);
-    return { exportingLeaves };
+    const exportingPointers = exportingPointersSelector(state);
+    return { exportingPointers };
 }
 
 export const PointerTable = compose(
