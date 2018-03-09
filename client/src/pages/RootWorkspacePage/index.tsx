@@ -10,6 +10,7 @@ import { Form } from "react-final-form";
 import { Value } from "slate";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
+import { NewBlockForm } from "../../components/NewBlockForm";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
@@ -91,31 +92,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
         return (
             <div>
                 <h3> New Root Workspace </h3>
-                <Form
-                    onSubmit={onSubmit}
-                    initialValues={{ new: Plain.deserialize("") }}
-                    render={({ handleSubmit, reset, submitting, pristine, values }) => (
-                        <div>
-
-                            <form onSubmit={handleSubmit}>
-                                {/* <Block
-                                name={"new"}
-                            /> */}
-                                <div className="buttons">
-                                    <button type="submit" disabled={submitting || pristine}>
-                                        Submit
-                            </button>
-                                    <button
-                                        type="button"
-                                        onClick={reset}
-                                        disabled={submitting || pristine}>
-                                        Reset
-                                </button>
-                                </div>
-                            </form>
-                        </div>
-                    )}
-                />
+                <NewBlockForm onMutate={this.props.onCreateWorkspace}/>
             </div>
         );
     }
