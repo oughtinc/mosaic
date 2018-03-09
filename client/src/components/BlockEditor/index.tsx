@@ -14,6 +14,7 @@ import { changePointerReference, changeHoverItem, removeHoverItem, HOVER_ITEM_TY
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { exportingLeavesSelector } from "../../modules/blocks/ExportSelector";
+import SoftBreak from "slate-soft-break";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -28,6 +29,9 @@ const BlockEditorStyle = styled.div`
     margin-bottom: 1em;
     padding: .3em;
 `;
+const plugins = [
+    SoftBreak({}),
+  ];
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
@@ -139,6 +143,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
             value={value}
             renderMark={this.renderMark}
             readOnly={true}
+            plugins={plugins}
           />
         </BlockReadOnlyStyle>
       );
@@ -174,6 +179,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
               renderMark={this.renderMark}
               renderNode={this.renderNode}
               onSelect={this.onSelect}
+              plugins={plugins}
             />
           </BlockEditorStyle>
         </div>
