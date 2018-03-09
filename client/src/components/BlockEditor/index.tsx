@@ -3,9 +3,10 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import * as uuidv1 from "uuid/v1";
 import Plain from "slate-plain-serializer";
+import { Inline } from "slate";
 import styled from "styled-components";
 import { Button, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap";
-import { Editor } from "slate-react";
+import { Editor, findRange, getEventRange } from "slate-react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportMark } from "./PointerImportMark";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
@@ -33,11 +34,12 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.renderMark = this.renderMark.bind(this);
+    this.renderNode = this.renderNode.bind(this);
     this.onSelect = this.onSelect.bind(this);
   }
 
   public componentDidMount() {
-    const {name, blockId, initialValue} = this.props;
+    const { name, blockId, initialValue } = this.props;
     const blockForm = {
       id: blockId,
       name,
@@ -83,6 +85,20 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
   }
 
+  public renderNode(props: any) {
+    const { attributes, children, node, isSelected } = props;
+    if (node.type === "pointerImport") {
+      return (
+        <PointerImportMark
+          mark={node.toJSON()}
+          blockId={this.props.blockId}
+        />
+      );
+    } else {
+      return;
+    }
+  }
+
   public renderMark(props) {
     const { children, mark, blockId } = props;
     switch (mark.type) {
@@ -95,16 +111,12 @@ class BlockEditorPresentational extends React.Component<any, any> {
             {children}
           </PointerExportMark>
         );
+      // This can be removed soon, once database is replaced
       case "pointerImport":
-        const { internalReferenceId } = mark.toJSON().data;
-        const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
         return (
-          <PointerImportMark
-            mark={mark.toJSON()}
-            blockId={this.props.blockId}
-          >
+          <span>
             {children}
-          </PointerImportMark>
+          </span>
         );
       default:
         return { children };
@@ -122,38 +134,45 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const exportingLeaves = this.props.exportingLeaves;
     if (readOnly) {
       return (
-          <BlockReadOnlyStyle>
-        <Editor
-          value={value}
-          renderMark={this.renderMark}
-          readOnly={true}
-        />
-          </BlockReadOnlyStyle>
+        <BlockReadOnlyStyle>
+          <Editor
+            value={value}
+            renderMark={this.renderMark}
+            readOnly={true}
+          />
+        </BlockReadOnlyStyle>
       );
     } else {
       return (
         <div>
           <BlockEditorStyle>
-          <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{marginBottom: "5px"}}>
-            {exportingLeaves.map((e: any) => (
-              <MenuItem
-                eventKey="1"
-                onClick={(event) => {
-                  const ch = value.change()
-                    .insertText("~~")
-                    .extend(0 - "~~".length)
-                    .addMark({ type: "pointerImport", object: "mark", data: { pointerId: e.pointerId, internalReferenceId: uuidv1() } });
-                  onChange(ch.value);
-                }}
-              >
-                {e.pointerId}
-              </MenuItem>
-            ))}
-          </DropdownButton>
+            <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
+              {exportingLeaves.map((e: any) => (
+                <MenuItem
+                  eventKey="1"
+                  onClick={(event) => {
+                    const ch = value.change()
+                      .insertInline(Inline.fromJSON({
+                        object: "inline",
+                        type: "pointerImport",
+                        isVoid: true,
+                        data: {
+                          pointerId: e.pointerId,
+                          internalReferenceId: uuidv1(),
+                        },
+                      }));
+                    onChange(ch.value);
+                  }}
+                >
+                  {e.pointerId}
+                </MenuItem>
+              ))}
+            </DropdownButton>
             <Editor
               value={value}
               onChange={(c) => { onChange(c.value); }}
               renderMark={this.renderMark}
+              renderNode={this.renderNode}
               onSelect={this.onSelect}
             />
           </BlockEditorStyle>
@@ -163,11 +182,11 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 }
 
-function mapStateToProps(state: any, {blockId}: any) {
+function mapStateToProps(state: any, { blockId }: any) {
   const exportingLeaves = exportingLeavesSelector(state);
-  const {blocks, blockEditor} = state;
+  const { blocks, blockEditor } = state;
   const block = blocks.blocks.find((b) => b.id === blockId);
-  return {block, blockEditor, exportingLeaves};
+  return { block, blockEditor, exportingLeaves };
 }
 
 export const BlockEditor: any = compose(

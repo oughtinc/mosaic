@@ -131,14 +131,12 @@ export const removeImportOfSelection = () => {
 
     const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
     if (block) {
-      const matchFn = matchImportPointerFn(hoveredItem.id);
-      const relevantText = findTextsWithMark(block.value.document, matchFn)[0];
-      const _withRemovedMarks = Text.fromJSON({
-          ...relevantText.toJS(),
-          leaves: relevantText.toJS().leaves.filter((l) => l.marks.filter(matchFn).length === 0),
-      });
-
-      const change = block.value.change().replaceNodeByKey(relevantText.key, _withRemovedMarks);
+      const inline = block.value.document.getInlinesAsArray().find((i) => i.data.internalReferenceId === hoveredItem.internalReferenceId);
+      if (!inline) {
+        console.error("inline not found");
+        return;
+      }
+      const change = block.value.change().removeNodeByKey(inline.key);
 
       dispatch({
         type: UPDATE_BLOCK,

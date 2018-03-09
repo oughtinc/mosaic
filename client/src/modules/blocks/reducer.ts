@@ -18,7 +18,7 @@ export const blockReducer = (state = {blocks: []}, action) => {
             })],
         };
       case UPDATE_BLOCK:
-        return {
+      return {
             ...state, 
             blocks: state.blocks.map((block: any) => {
                 if (block.id !== action.id) {
