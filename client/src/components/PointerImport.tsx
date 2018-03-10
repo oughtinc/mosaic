@@ -53,7 +53,7 @@ export class PointerImport extends React.Component<any, any> {
         return (
             <div>
                 {this.props.exportingPointer.nodes.map((node) => {
-                    if (node.object === "inline") {
+                    if (node.object === "inline" || node.object === "GeneratedNestedExportNode") {
                         return <InlineNode node={node} pointerId={this.props.exportingPointer.pointerId} />;
                     } else {
                         return <LeafNode
