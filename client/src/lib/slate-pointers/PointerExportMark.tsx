@@ -11,7 +11,7 @@ const PointerExportStyle: any = styled.span`
     color: #000000;
 `;
 
-export class PointerExportMarkPresentational extends React.Component<any, any> {
+export class PointerExportMark extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.onMouseOver = this.onMouseOver.bind(this);
@@ -24,17 +24,19 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
     }
 
     public onMouseOver() {
+        console.log("Mouse over");
         const { top, left } = this.getLocation();
-        this.props.changeHoverItem({
-            hoverItemType: HOVER_ITEM_TYPES.POINTER_EXPORT, 
-            id: this.props.mark.data.pointerId,
-            top,
-            left, 
-            blockId: this.props.blockId,
-        });
+        // this.props.changeHoverItem({
+        //     hoverItemType: HOVER_ITEM_TYPES.POINTER_EXPORT, 
+        //     id: this.props.mark.data.pointerId,
+        //     top,
+        //     left, 
+        //     blockId: this.props.blockId,
+        // });
     }
 
     public render() {
+        console.log("UPDATING");
         const isSelected = false; // this.props.hoveredItem.id === this.props.mark.data.pointerId;
         return (
             <PointerExportStyle
@@ -47,9 +49,3 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
         );
     }
 }
-
-export const PointerExportMark: any = compose(
-    connect(
-        () => ({}), {changeHoverItem }
-    )
-)(PointerExportMarkPresentational);

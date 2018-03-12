@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { compose } from "recompose";
 import _ = require("lodash");
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
-import { PointerImport } from "../PointerImport";
+import { PointerImport } from "../../components/PointerImport";
 
 const RemovedPointer = styled.span`
     background-color: rgba(252, 86, 86, 0.66);

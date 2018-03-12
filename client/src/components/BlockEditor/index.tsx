@@ -31,9 +31,6 @@ const BlockEditorStyle = styled.div`
     margin-bottom: 1em;
     padding: .3em;
 `;
-const plugins = [
-    SoftBreak({}),
-  ];
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
@@ -45,6 +42,39 @@ class BlockEditorPresentational extends React.Component<any, any> {
     this.onChange = this.onChange.bind(this);
   }
 
+  public componentWillReceiveProps(newProps: any) {
+    if (
+      (JSON.stringify(newProps.blockEditor) !== JSON.stringify(this.props.blockEditor))
+      || (newProps.exportingPointers.length !== this.props.exportingPointers.length )
+    ) {
+      !!newProps && this.resetPlugins(newProps);
+    }
+  }
+
+  public resetPlugins(newProps: any) {
+    const SlatePointerInputs = {
+      onSelectNull: () => {
+        newProps.removeHoverItem();
+      },
+      onSelect: ({top, left}) => {
+          newProps.changeHoverItem({
+            hoverItemType: HOVER_ITEM_TYPES.SELECTED_TEXT,
+            id: false,
+            top,
+            left,
+            blockId: newProps.blockId,
+          });
+      },
+      blockEditor: newProps.blockEditor,
+      exportingPointers: newProps.exportingPointers,
+      changeHoverItem: newProps.changeHoverItem,
+    };
+    this.setState({plugins: [
+      SoftBreak({}),
+      SlatePointers(SlatePointerInputs),
+    ]});
+  }
+
   public componentDidMount() {
     const { name, blockId, initialValue } = this.props;
     const blockForm = {
@@ -53,33 +83,28 @@ class BlockEditorPresentational extends React.Component<any, any> {
       value: initialValue || Plain.deserialize(""),
     };
     this.props.addBlocks([blockForm]);
-    const SlatePointerInputs = {
-      onSelectNull: () => {
-        this.props.removeHoverItem();
-      },
-      onSelect: ({top, left}) => {
-          this.props.changeHoverItem({
-            hoverItemType: HOVER_ITEM_TYPES.SELECTED_TEXT,
-            id: false,
-            top,
-            left,
-            blockId: this.props.blockId,
-          });
-      },
-    };
-    this.plugins = [
-      SoftBreak({}),
-      SlatePointers(SlatePointerInputs),
-    ];
+    this.resetPlugins(this.props);
   }
 
   public renderNode(props: any) {
     const { attributes, children, node, isSelected } = props;
+
     if (node.type === "pointerImport") {
+      const {internalReferenceId, pointerId} = node.toJSON().data;
+      const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
+      const isOpen = reference && reference.isOpen;
+      const isSelected = this.props.blockEditor.hoveredItem.id === internalReferenceId;
+      const importingPointer: any = this.props.exportingPointers.find((l: any) => l.pointerId === pointerId);
+      const pointerIndex = _.findIndex(this.props.exportingPointers, (l: any) => l.pointerId === pointerId);
       return (
         <PointerImportMark
           mark={node.toJSON()}
           blockId={this.props.blockId}
+          importingPointer={importingPointer}
+          isOpen={isOpen}
+          isSelected={isSelected}
+          pointerIndex={pointerIndex}
+          changeHoverItem={this.props.changeHoverItem}
         />
       );
     } else {
@@ -131,10 +156,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <BlockReadOnlyStyle>
           <Editor
             value={value}
-            renderMark={this.renderMark}
-            renderNode={this.renderNode}
-            readOnly={true}
-            plugins={plugins}
+            readOnly={false}
+            plugins={this.state.plugins}
           />
         </BlockReadOnlyStyle>
       );
@@ -171,9 +194,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
             <Editor
               value={value}
               onChange={(c) => { this.onChange(c.value); }}
-              renderMark={this.renderMark}
-              renderNode={this.renderNode}
-              plugins={this.plugins}
+              plugins={this.state.plugins}
             />
           </BlockEditorStyle>
         </div>
