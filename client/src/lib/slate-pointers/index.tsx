@@ -1,3 +1,10 @@
+import styled from "styled-components";
+import React = require("react");
+import ReactDOM = require("react-dom");
+import { PointerExportMark } from "./PointerExportMark";
+import { PointerImportMark } from "./PointerImportMark";
+import _ = require("lodash");
+
 function SlatePointers(options: any = {}) {
   return {
     onSelect(event: any, change: any, editor: any) {
@@ -26,6 +33,61 @@ function SlatePointers(options: any = {}) {
         }, 10
       );
     },
+  shouldNodeComponentUpdate(a, b) {
+    return true;
+  },
+
+  renderNode(props: any) {
+    const { attributes, children, node, isSelected } = props;
+
+    if (node.type === "pointerImport") {
+      const {internalReferenceId, pointerId} = node.toJSON().data;
+      const reference = options.blockEditor.pointerReferences[internalReferenceId];
+      const isOpen = reference && reference.isOpen;
+      const isSelected = options.blockEditor.hoveredItem.id === internalReferenceId;
+      const importingPointer: any = options.exportingPointers.find((l: any) => l.pointerId === pointerId);
+      const pointerIndex = _.findIndex(options.exportingPointers, (l: any) => l.pointerId === pointerId);
+      return (
+        <PointerImportMark
+          mark={node.toJSON()}
+          blockId={options.blockId}
+          importingPointer={importingPointer}
+          isOpen={isOpen}
+          isSelected={isSelected}
+          pointerIndex={pointerIndex}
+          changeHoverItem={options.changeHoverItem}
+        />
+      );
+    } else {
+      return;
+    }
+  },
+
+  renderMark(props) {
+    const { children, mark, blockId } = props;
+    switch (mark.type) {
+      case "pointerExport":
+        return (
+          <PointerExportMark
+            mark={mark.toJSON()}
+            blockId={options.blockId}
+            blockEditor={options.blockEditor}
+          >
+            {children}
+          </PointerExportMark>
+        );
+      // This can be removed soon, once database is replaced
+      case "pointerImport":
+        return (
+          <span>
+            {children}
+          </span>
+        );
+      default:
+        return { children };
+    }
+  },
+
   };
 }
 

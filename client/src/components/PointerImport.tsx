@@ -26,9 +26,10 @@ export class InlineNode extends React.Component<any, any> {
 
     public render() {
         return (
-            <PointerImportMark
-                mark={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
-            />
+            <div> Thing goes here! </div>
+            // <PointerImportMark
+            //     mark={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
+            // />
         );
     }
 }

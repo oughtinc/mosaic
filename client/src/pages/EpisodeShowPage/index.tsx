@@ -125,25 +125,25 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     blockId={scratchpad.id}
                                     initialValue={scratchpad.value}
                                 />
-                            <h3>Question</h3>
+                            {/* <h3>Answer</h3>
                                 <BlockEditor
                                     name={answer.id}
                                     blockId={answer.id}
                                     initialValue={answer.value}
-                                />
-                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
+                                /> */}
+                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
                         <Col sm={3}>
                             <h3>Pointers</h3>
-                            <PointerTable/>
+                            {/* <PointerTable/> */}
                         </Col>
                         <Col sm={3}>
-                            <ChildrenSidebar
+                            {/* <ChildrenSidebar
                                 workspaces={workspace.childWorkspaces}
                                 workspaceOrder={workspace.childWorkspaceOrder}
                                 onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                            />
+                            /> */}
                         </Col>
                     </Row>
                 </BlockHoverMenu>
