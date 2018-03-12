@@ -16,6 +16,7 @@ import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
 import { PointerImport } from "../PointerImport";
+import { SlatePointers } from "../../lib/slate-pointers";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -36,11 +37,11 @@ const plugins = [
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
+  private plugins;
   public constructor(props: any) {
     super(props);
     this.renderMark = this.renderMark.bind(this);
     this.renderNode = this.renderNode.bind(this);
-    this.onSelect = this.onSelect.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
@@ -52,43 +53,24 @@ class BlockEditorPresentational extends React.Component<any, any> {
       value: initialValue || Plain.deserialize(""),
     };
     this.props.addBlocks([blockForm]);
-  }
-
-  public onSelect(event: any) {
-    const block = this.props.block;
-    const value = block.value;
-    if (value.isBlurred || value.isEmpty) {
-      return;
-    }
-
-    const selection = window.getSelection();
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-
-    if (rect.width === 0) {
-      window.setTimeout(
-        () => {
-          this.props.removeHoverItem();
-        }, 10);
-      return;
-    }
-
-    const _top = `${(rect.top - 44).toFixed(2)}px`;
-    const _left = `${(rect.left.toFixed(2))}px`;
-    const { hoveredItem: { id, top, left } } = this.props.blockEditor;
-    if ((_top !== top) || (_left !== left)) {
-      window.setTimeout(
-        () => {
+    const SlatePointerInputs = {
+      onSelectNull: () => {
+        this.props.removeHoverItem();
+      },
+      onSelect: ({top, left}) => {
           this.props.changeHoverItem({
             hoverItemType: HOVER_ITEM_TYPES.SELECTED_TEXT,
             id: false,
-            top: _top,
-            left: _left,
+            top,
+            left,
             blockId: this.props.blockId,
           });
-        }, 10
-      );
-    }
+      },
+    };
+    this.plugins = [
+      SoftBreak({}),
+      SlatePointers(SlatePointerInputs),
+    ];
   }
 
   public renderNode(props: any) {
@@ -191,8 +173,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
               onChange={(c) => { this.onChange(c.value); }}
               renderMark={this.renderMark}
               renderNode={this.renderNode}
-              onSelect={this.onSelect}
-              plugins={plugins}
+              plugins={this.plugins}
             />
           </BlockEditorStyle>
         </div>
