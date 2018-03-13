@@ -1,8 +1,6 @@
 'use strict';
-const Sequelize = require('sequelize')
-var _ = require('lodash');
 
-module.exports = (sequelize, DataTypes) => {
+const EventModel = (sequelize, DataTypes) => {
   var Event = sequelize.define('Event', {
     id: {
       type: DataTypes.INTEGER(),
@@ -30,3 +28,5 @@ module.exports = (sequelize, DataTypes) => {
   }
   return Event
 }
+
+export default EventModel;

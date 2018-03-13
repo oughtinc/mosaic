@@ -1,6 +1,13 @@
 {
-  "development": {
+  "development2": {
     "use_env_variable": "CONNECTION_STRING_DEV",
+    "dialect": "postgres"
+  },
+  "development": {
+    "username": "ozziegooen",
+    "password": null,
+    "database": "mosaic_dev",
+    "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {

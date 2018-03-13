@@ -3,7 +3,7 @@ const Sequelize = require('sequelize')
 var _ = require('lodash');
 const addEvents = require('./addEvents.js');
 
-module.exports = (sequelize, DataTypes) => {
+const WorkspaceModel = (sequelize, DataTypes) => {
   var Workspace = sequelize.define('Workspace', {
     id: {
       type: DataTypes.UUID(),
@@ -63,3 +63,5 @@ module.exports = (sequelize, DataTypes) => {
 
   return Workspace;
 };
+
+export default WorkspaceModel;
