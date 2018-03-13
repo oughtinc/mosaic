@@ -76,7 +76,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           id,
           top,
           left,
-          blockId: newProps.blockId,
+          blockId: false,
         });
       },
       blockId: newProps.blockId,
@@ -88,7 +88,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       plugins: [
         SoftBreak({}),
         SlatePointers(SlatePointerInputs),
-      ]
+      ],
     });
   }
 

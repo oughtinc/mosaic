@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
 import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
+import { ShowExpandedPointerOutsideSlate } from "../../components/ShowExpandedPointerOutsideSlate";
 
 const Container = styled.div`
     border: 1px solid #eee;
@@ -52,7 +53,10 @@ export class PointerTablePresentational extends React.Component<any, any> {
                             {`$${index + 1} - ${pointer.pointerId.slice(0, 5)}`}
                         </Reference>
                         <Text>
-                           <ShowExpandedPointer exportingPointer={pointer}/> 
+                           <ShowExpandedPointerOutsideSlate
+                            exportingPointer={pointer}
+                            blockId={this.props.blockId}
+                           /> 
                         </Text>
                     </Row>
 
@@ -68,7 +72,7 @@ const options: any = ({ match }) => ({
 
 function mapStateToProps(state: any, { blockId }: any) {
     const exportingPointers = exportingPointersSelector(state);
-    return { exportingPointers };
+    return { exportingPointers, blockEditor: state.blockEditor, blockId };
 }
 
 export const PointerTable = compose(
