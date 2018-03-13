@@ -2,9 +2,18 @@ import styled from "styled-components";
 import React = require("react");
 import ReactDOM = require("react-dom");
 import { PointerExportMark } from "./PointerExportMark";
-import { PointerImportMark } from "./PointerImportMark";
+import { PointerImportNode } from "./PointerImportNode";
 import _ = require("lodash");
 import { HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
+
+function toProps({blockEditor, exportingPointers, node}: any) {
+      const { internalReferenceId, pointerId } = node.toJSON().data;
+      const reference = blockEditor.pointerReferences[internalReferenceId];
+      const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
+      const isOpen = reference && reference.isOpen;
+      const importingPointer: any = exportingPointers.find((l: any) => l.pointerId === pointerId);
+      const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.pointerId === pointerId);
+}
 
 function SlatePointers(options: any = {}) {
   return {
@@ -42,21 +51,15 @@ function SlatePointers(options: any = {}) {
     renderNode(props: any) {
       const { attributes, children, node, isSelected } = props;
       if (node.type === "pointerImport") {
-        const { internalReferenceId, pointerId } = node.toJSON().data;
-        const reference = options.blockEditor.pointerReferences[internalReferenceId];
-        const isOpen = reference && reference.isOpen;
-        const isSelected = options.blockEditor.hoveredItem.id === internalReferenceId;
-        const importingPointer: any = options.exportingPointers.find((l: any) => l.pointerId === pointerId);
-        const pointerIndex = _.findIndex(options.exportingPointers, (l: any) => l.pointerId === pointerId);
         return (
-          <PointerImportMark
-            mark={node.toJSON()}
+          <PointerImportNode
+            nodeAsJson={node.toJSON()}
             blockId={options.blockId}
-            importingPointer={importingPointer}
-            isOpen={isOpen}
-            isSelected={isSelected}
-            pointerIndex={pointerIndex}
-            changeHoverItem={options.changeHoverItem}
+            blockEditor={options.blockEditor}
+            exportingPointers={options.exportingPointers}
+            onMouseOver={({top, left, id}) => {
+              options.onMouseOverPointerImport({top, left, id});
+            }}
           />
         );
       } else {
@@ -73,14 +76,8 @@ function SlatePointers(options: any = {}) {
               mark={mark.toJSON()}
               blockId={options.blockId}
               blockEditor={options.blockEditor}
-              changeHoverItem={({ top, left }) => {
-                options.changeHoverItem({
-                  hoverItemType: HOVER_ITEM_TYPES.POINTER_EXPORT,
-                  id: mark.toJSON().data.pointerId,
-                  top,
-                  left,
-                  blockId: options.blockId,
-                });
+              onMouseOver={({ top, left }) => {
+                options.onMouseOverPointerExport({top, left, id: mark.toJSON().data.pointerId});
               }}
             >
               {children}

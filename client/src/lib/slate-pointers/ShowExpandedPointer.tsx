@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as uuidv1 from "uuid/v1";
-import { BlockEditor } from "./BlockEditor";
 import styled from "styled-components";
+import { PointerImportNode } from "./PointerImportNode";
 
 export class LeafNode extends React.Component<any, any> {
     public render() {
@@ -24,12 +24,20 @@ export class InlineNode extends React.Component<any, any> {
     }
 
     public render() {
+        if (!this.props.blockEditor) {
+            return (
+                <span>no</span>
+            );
+        } else {
         return (
-            <div> Thing goes here! </div>
-            // <PointerImportMark
-            //     mark={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
-            // />
+            <PointerImportNode
+                blockEditor={this.props.blockEditor}
+                exportingPointers={this.props.exportingPointers}
+                nodeAsJson={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
+                onMouseOver={this.props.onMouseOver}
+            />
         );
+    }
     }
 }
 
@@ -48,17 +56,23 @@ const ClosedPointerImport = styled.span`
     }
 `;
 
-export class PointerImport extends React.Component<any, any> {
+export class ShowExpandedPointer extends React.Component<any, any> {
     public render() {
         return (
             <div>
                 {this.props.exportingPointer.nodes.map((node) => {
                     if (node.object === "inline" || node.object === "GeneratedNestedExportNode") {
-                        return <InlineNode node={node} pointerId={this.props.exportingPointer.pointerId} />;
+                        return <InlineNode
+                            node={node}
+                            blockEditor={this.props.blockEditor}
+                            exportingPointers={this.props.exportingPointers}
+                            pointerId={this.props.exportingPointer.pointerId}
+                            onMouseOver={this.props.onMouseOverPointerImport}
+                        />;
                     } else {
                         return <LeafNode
                             node={node}
-                            onMouseOver={this.props.onMouseOver}
+                            onMouseOver={this.props.onMouseOverExpandedPointer}
                             onMouseOut={this.props.onMouseOut}
                         />;
                     }
