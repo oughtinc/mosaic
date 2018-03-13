@@ -58,9 +58,13 @@ function SlatePointers(options: any = {}) {
             onMouseOver={({ top, left }) => {
               options.onMouseOverPointerExport({ top, left, id: node.toJSON().data.pointerId });
             }}
-          >
-            {children}
-          </PointerExportMark>
+            children={children}
+          />
+        );
+      }
+      if (node.type === "text") {
+        return (
+          <div>{children}</div>
         );
       }
       if (node.type === "pointerImport") {
@@ -78,25 +82,6 @@ function SlatePointers(options: any = {}) {
         return;
       }
     },
-
-    renderMark(props) {
-      const { children, mark } = props;
-      switch (mark.type) {
-        case "pointerExport":
-          return (
-            <PointerExportMark
-              onMouseOver={({ top, left }) => {
-                options.onMouseOverPointerExport({ top, left, id: mark.toJSON().data.pointerId });
-              }}
-            >
-              {children}
-            </PointerExportMark>
-          );
-        default:
-          return { children };
-      }
-    },
-
   };
 }
 

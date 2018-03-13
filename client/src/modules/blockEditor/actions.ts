@@ -101,7 +101,7 @@ export const removeExportOfSelection = () => {
         return;
       }
 
-      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key);
+      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key, {data: {pointerId: hoveredItem.id}});
 
       dispatch({
         type: UPDATE_BLOCK,
