@@ -4,51 +4,17 @@ import { type, Node, Value } from "slate";
 import styled from "styled-components";
 import { Form, Field } from "react-final-form";
 import Plain from "slate-plain-serializer";
-import { BlockEditor } from "./BlockEditor";
 import _ = require("lodash");
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
-class ChildForm extends React.Component<any, any> {
-    public render() {
-        const onSubmit = async (values) => {
-            this.props.onMutate(JSON.stringify(values.new.toJSON()));
-        };
-        return (
-            <Form
-                onSubmit={onSubmit}
-                initialValues={{ new: Plain.deserialize("") }}
-                render={({ handleSubmit, reset, submitting, pristine, values }) => (
-                    <div>
-
-                        <form onSubmit={handleSubmit}>
-                            <BlockEditor
-                                name={"new"}
-                                isInField={true}
-                            />
-                            <div className="buttons">
-                                <button type="submit" disabled={submitting || pristine}>
-                                    Submit
-                </button>
-                                <button
-                                    type="button"
-                                    onClick={reset}
-                                    disabled={submitting || pristine}>
-                                    Reset
-                </button>
-                            </div>
-                        </form>
-                    </div>
-                )}
-            />
-        );
-    }
-}
+import { BlockEditor } from "../../components/BlockEditor";
+import * as uuidv1 from "uuid/v1";
+import { NewBlockForm } from "../../components/NewBlockForm";
 
 const ChildStyle = styled.div`
-  border: 1px solid #ddd;
-  padding: 3px;
-  margin-bottom: 3px;
+    border: 2px solid #ddd;
+    padding: 1em;
+    margin-bottom: 1em;
 `;
 
 export class Child extends React.Component<any, any> {
@@ -60,14 +26,16 @@ export class Child extends React.Component<any, any> {
             <ChildStyle>
                 {question.value &&
                     <BlockEditor
-                        isInField={false}
-                        value={Value.fromJSON(question.value)}
+                        readOnly={true}
+                        blockId={question.id}
+                        initialValue={question.value}
                     />
                 }
                 {answer.value &&
                     <BlockEditor
-                        isInField={false}
-                        value={_.isEmpty(answer.value) ? Plain.deserialize("") : Value.fromJSON(answer.value)}
+                        readOnly={true}
+                        blockId={answer.id}
+                        initialValue={answer.value}
                     />
                 }
 
@@ -75,7 +43,7 @@ export class Child extends React.Component<any, any> {
                     <Button> Open </Button>
                 </Link>
                 <Button onClick={this.props.onDelete}>
-                   Archive 
+                    Archive
                 </Button>
             </ChildStyle>
         );
@@ -94,7 +62,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                                 <Child
                                     workspace={workspace}
                                     key={workspace.id}
-                                    onDelete={() => {this.props.changeOrder(this.props.workspaceOrder.filter( (w) => w !== workspace.id)); }}
+                                    onDelete={() => { this.props.changeOrder(this.props.workspaceOrder.filter((w) => w !== workspace.id)); }}
                                 />
                             );
                         }
@@ -102,7 +70,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     </div>
                 }
                 <h3> Add a new Child Question </h3>
-                <ChildForm onMutate={this.props.onCreateChild} />
+                <NewBlockForm onMutate={this.props.onCreateChild} />
             </div>
         );
     }

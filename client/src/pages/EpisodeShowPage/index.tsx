@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Form, Field } from "react-final-form";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
@@ -7,10 +6,14 @@ import { type, Node, Value } from "slate";
 import { Editor } from "slate-react";
 import Plain from "slate-plain-serializer";
 import { Row, Col, Button } from "react-bootstrap";
+import { connect } from "react-redux";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
-import { BlockEditor } from "./BlockEditor";
 import { Link } from "react-router-dom";
+import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
+import { BlockEditor } from "../../components/BlockEditor";
+import { BlockHoverMenu } from "../../components/BlockHoverMenu";
+import { PointerTable } from "./PointerTable";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -63,110 +66,114 @@ const NEW_CHILD = gql`
   }
 `;
 
+const ParentLink = (props) => (
+    <Link to={`/workspaces/${props.parentId}`}>
+        <Button>To Parent</Button>
+    </Link>
+);
+
 export class FormPagePresentational extends React.Component<any, any> {
+    public constructor(props: any) {
+        super(props);
+        this.updateBlocks = this.updateBlocks.bind(this);
+    }
+
+    public onSubmit() {
+        const workspace = this.props.workspace.workspace;
+    }
+
+    public updateBlocks(blocks: any) {
+        const variables = { blocks };
+        this.props.updateBlocks({
+            variables,
+        });
+    }
+
     public render() {
         const workspace = this.props.workspace.workspace;
         if (!workspace) {
             return <div> Loading </div>;
         }
         let initialValues = {};
-        for (const block of workspace.blocks) {
-            initialValues[block.id] = block.value ? Value.fromJSON(block.value) : Plain.deserialize("");
-        }
-        const onSubmit = async (values) => {
-            let inputs: any = [];
-            for (const key of Object.keys(values)) {
-                inputs = [...inputs, { id: key, value: JSON.stringify(values[key].toJSON()) }];
-            }
-            const variables = { blocks: inputs };
-            this.props.updateBlocks({
-                variables,
-            });
-        };
+
         const question = workspace.blocks.find((b) => b.type === "QUESTION");
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
         const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
         return (
-            <div>
-                <Row>
-                    <Col sm={12}>
-                        <h1>
-                            <BlockEditor
-                                isInField={false}
-                                value={!!question.value ? Value.fromJSON(question.value) : Plain.deserialize("")}
-                            />
+            <div key={workspace.id}>
+                <BlockHoverMenu>
+                    <Row>
+                        <Col sm={12}>
                             {workspace.parentId &&
-                                <Link to={`/workspaces/${workspace.parentId}`}>
-                                    <Button> To Parent </Button>
-                                </Link>
+                                <ParentLink parentId={workspace.parentId} />
                             }
-                        </h1>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={9}>
-                        <Form
-                            onSubmit={onSubmit}
-                            initialValues={initialValues}
-                            render={({ handleSubmit, reset, submitting, pristine, values }) => (
-                                <form onSubmit={handleSubmit}>
-
-                                    <h3> Scratchpad </h3>
-                                    <BlockEditor
-                                        isInField={true}
-                                        name={scratchpad.id}
-                                    />
-                                    <h3> Answer </h3>
-                                    <BlockEditor
-                                        isInField={true}
-                                        name={answer.id}
-                                    />
-                                    <div className="buttons">
-                                        <button type="submit" disabled={submitting || pristine}>
-                                            Submit
-                                    </button>
-                                        <button
-                                            type="button"
-                                            onClick={reset}
-                                            disabled={submitting || pristine}>
-                                            Reset
-                                        </button>
-                                    </div>
-                                </form>
-                            )}
-                        />
-                    </Col>
-                    <Col sm={3}>
-                        <ChildrenSidebar
-                            workspaces={workspace.childWorkspaces}
-                            workspaceOrder={workspace.childWorkspaceOrder}
-                            onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
-                            changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                        />
-                    </Col>
-                </Row>
+                            <h1>
+                                <BlockEditor
+                                    name={question.id}
+                                    blockId={question.id}
+                                    initialValue={question.value}
+                                    readOnly={true}
+                                />
+                            </h1>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col sm={6}>
+                            <h3>Scratchpad</h3>
+                                <BlockEditor
+                                    name={question.id}
+                                    blockId={scratchpad.id}
+                                    initialValue={scratchpad.value}
+                                />
+                            <h3>Answer</h3>
+                                <BlockEditor
+                                    name={answer.id}
+                                    blockId={answer.id}
+                                    initialValue={answer.value}
+                                />
+                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
+                        </Col>
+                        <Col sm={3}>
+                            <h3>Pointers</h3>
+                            <PointerTable/>
+                        </Col>
+                        <Col sm={3}>
+                            <ChildrenSidebar
+                                workspaces={workspace.childWorkspaces}
+                                workspaceOrder={workspace.childWorkspaceOrder}
+                                onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
+                                changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
+                            />
+                        </Col>
+                    </Row>
+                </BlockHoverMenu>
             </div>
         );
     }
 }
 
 const options: any = ({ match }) => ({
-  variables:  {id: match.params.workspaceId },
+    variables: { id: match.params.workspaceId },
 });
 
 export const EpisodeShowPage = compose(
-    graphql(WORKSPACE_QUERY, {name: "workspace", options }),
-    graphql(UPDATE_BLOCKS, {name:  "updateBlocks" }),
-    graphql(UPDATE_WORKSPACE, {name: "updateWorkspace", options: {
-            refetchQueries:  [
-                "workspace",
-            ],
-    }}),
-    graphql(NEW_CHILD, {
-        name:  "createChild", options: {
-            refetchQueries:  [
+    graphql(WORKSPACE_QUERY, { name: "workspace", options }),
+    graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
+    graphql(UPDATE_WORKSPACE, {
+        name: "updateWorkspace", options: {
+            refetchQueries: [
                 "workspace",
             ],
         },
-    })
+    }),
+    graphql(NEW_CHILD, {
+        name: "createChild", options: {
+            refetchQueries: [
+                "workspace",
+            ],
+        },
+    }),
+    connect(
+        ({ blocks }) => ({ blocks }), { addBlocks, saveBlocks }
+    )
 )(FormPagePresentational);

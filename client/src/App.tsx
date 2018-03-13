@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
@@ -9,11 +9,14 @@ import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
+import { applyMiddleware, combineReducers, compose, createStore } from "redux";
+import { Provider } from "react-redux";
+import { blockReducer } from "./modules/blocks/reducer";
+import { blockEditorReducer } from "./modules/blockEditor/reducer";
+import thunk from "redux-thunk";
+import { composeWithDevTools } from "redux-devtools-extension";
 
 const { SERVER_URL } = process.env;
-// const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
-const reduxDevtoolsMiddleware: any =
-  (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__();
 
 const client: any = new ApolloClient({
   link: new HttpLink({ uri: SERVER_URL || "http://localhost:8080/graphql" }),
@@ -30,12 +33,6 @@ export class Layout extends React.Component {
   }
 }
 
-const LandingPage = () => (
-  <div>
-    hi there!
-  </div>
-);
-
 const Routes = () => (
   <div>
     <Route exact={true} path="/" component={RootWorkspacePage} />
@@ -43,15 +40,34 @@ const Routes = () => (
   </div>
 );
 
+const reduxDevtoolsMiddleware =
+  (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__();
+
+// let middleware: any = thunk;
+
+// let middleWare = !!reduxDevtoolsMiddleware ? thunk : applyMiddleware(reduxDevtoolsMiddleware, thunk);
+
+const store = createStore(
+  combineReducers(
+    {
+      blocks: blockReducer,
+      blockEditor: blockEditorReducer,
+    } as any
+  ),
+  composeWithDevTools(applyMiddleware(thunk))
+);
+
 class App extends React.Component {
   public render() {
     return (
       <ApolloProvider client={client}>
+        <Provider store={store}>
         <BrowserRouter>
           <Layout>
             <Routes />
           </Layout>
         </BrowserRouter>
+        </Provider>
       </ApolloProvider>
     );
   }

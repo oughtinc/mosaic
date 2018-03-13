@@ -1,5 +1,45 @@
 body {
-  margin: 0;
+  margin: 1em 0 0 0;
   padding: 0;
   font-family: sans-serif;
+}
+
+.menu > * {
+  display: inline-block;
+}
+
+.menu > * + * {
+  margin-left: 15px;
+}
+
+.toolbar-menu {
+  position: relative;
+  padding: 1px 18px 17px;
+  margin: 0 -20px;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 20px;
+}
+
+.toolbar-menu .search {
+  position: relative;
+}
+
+.toolbar-menu .search-icon {
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+  color: #ccc;
+}
+
+.toolbar-menu .search-box {
+  padding-left: 2em;
+  width: 100%;
+}
+
+.hover-menu {
+  position: absolute;
+  z-index: 1;
+  top: -10000px;
+  left: -10000px;
+  opacity: 0;
 }
