@@ -22,8 +22,8 @@ services:
       - postgres
   web:
     image: node:9.7  
-    depends_on:
-       - api
+    # depends_on:
+    #    - api
     volumes:
       - ./client:/data
     ports:
