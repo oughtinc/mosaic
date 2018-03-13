@@ -29,7 +29,7 @@ export class PointerExportMark extends React.Component<any, any> {
     }
 
     public render() {
-        const isSelected = false; // this.props.hoveredItem.id === this.props.mark.data.pointerId;
+        const isSelected = this.props.blockEditor.hoveredItem.id === this.props.nodeAsJson.data.pointerId;
         return (
             <PointerExportStyle
                 isSelected={isSelected}

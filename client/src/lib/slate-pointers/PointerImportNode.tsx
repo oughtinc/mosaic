@@ -44,7 +44,7 @@ const OpenPointerImport: any = styled.div`
     }
 `;
 
-function findIn({blockEditor, exportingPointers, nodeAsJson}: any) {
+function translateProps({blockEditor, exportingPointers, nodeAsJson}: any) {
       const { internalReferenceId, pointerId } = nodeAsJson.data;
       const reference = blockEditor.pointerReferences[internalReferenceId];
       const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
@@ -68,13 +68,6 @@ export class PointerImportNode extends React.Component<any, any> {
 
     public onMouseOver() {
         const {blockEditor, exportingPointers, nodeAsJson} = this.props;
-
-        const {importingPointer, isSelected, pointerIndex, isOpen} = findIn({
-            blockEditor,
-            exportingPointers,
-            nodeAsJson,
-        });
-
         const {top, left} = this.getLocation();
         this.props.onMouseOver({top, left, id: this.props.nodeAsJson.data.internalReferenceId});
     }
@@ -82,7 +75,7 @@ export class PointerImportNode extends React.Component<any, any> {
     public render() {
         const {blockEditor, exportingPointers, nodeAsJson} = this.props;
 
-        const {importingPointer, isSelected, pointerIndex, isOpen} = findIn({
+        const {importingPointer, isSelected, pointerIndex, isOpen} = translateProps({
             blockEditor,
             exportingPointers,
             nodeAsJson,
@@ -116,8 +109,8 @@ export class PointerImportNode extends React.Component<any, any> {
                 >
                     <ShowExpandedPointer
                         blockEditor={blockEditor}
-                        exportingPointers={exportingPointers}
                         exportingPointer={importingPointer}
+                        exportingPointers={exportingPointers}
                         onMouseOverExpandedPointer={this.onMouseOver}
                         onMouseOverPointerImport={this.props.onMouseOver}
                         onMouseOut={this.props.onMouseOut}

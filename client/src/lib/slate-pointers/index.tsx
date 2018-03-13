@@ -6,13 +6,13 @@ import { PointerImportNode } from "./PointerImportNode";
 import _ = require("lodash");
 import { HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 
-function toProps({blockEditor, exportingPointers, node}: any) {
-      const { internalReferenceId, pointerId } = node.toJSON().data;
-      const reference = blockEditor.pointerReferences[internalReferenceId];
-      const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
-      const isOpen = reference && reference.isOpen;
-      const importingPointer: any = exportingPointers.find((l: any) => l.pointerId === pointerId);
-      const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.pointerId === pointerId);
+function toProps({ blockEditor, exportingPointers, node }: any) {
+  const { internalReferenceId, pointerId } = node.toJSON().data;
+  const reference = blockEditor.pointerReferences[internalReferenceId];
+  const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
+  const isOpen = reference && reference.isOpen;
+  const importingPointer: any = exportingPointers.find((l: any) => l.pointerId === pointerId);
+  const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.pointerId === pointerId);
 }
 
 function SlatePointers(options: any = {}) {
@@ -44,20 +44,33 @@ function SlatePointers(options: any = {}) {
       );
     },
 
-    shouldNodeComponentUpdate(a, b) {
+    shouldNodeComponentUpdate(a: object, b: object) {
       return true;
     },
 
     renderNode(props: any) {
       const { attributes, children, node, isSelected } = props;
+      if (node.type === "pointerExport") {
+        return (
+          <PointerExportMark
+            blockEditor={options.blockEditor}
+            nodeAsJson={node.toJSON()}
+            onMouseOver={({ top, left }) => {
+              options.onMouseOverPointerExport({ top, left, id: node.toJSON().data.pointerId });
+            }}
+          >
+            {children}
+          </PointerExportMark>
+        );
+      }
       if (node.type === "pointerImport") {
         return (
           <PointerImportNode
             nodeAsJson={node.toJSON()}
             blockEditor={options.blockEditor}
             exportingPointers={options.exportingPointers}
-            onMouseOver={({top, left, id}) => {
-              options.onMouseOverPointerImport({top, left, id});
+            onMouseOver={({ top, left, id }) => {
+              options.onMouseOverPointerImport({ top, left, id });
             }}
           />
         );
@@ -67,24 +80,17 @@ function SlatePointers(options: any = {}) {
     },
 
     renderMark(props) {
-      const { children, mark, blockId } = props;
+      const { children, mark } = props;
       switch (mark.type) {
         case "pointerExport":
           return (
             <PointerExportMark
               onMouseOver={({ top, left }) => {
-                options.onMouseOverPointerExport({top, left, id: mark.toJSON().data.pointerId});
+                options.onMouseOverPointerExport({ top, left, id: mark.toJSON().data.pointerId });
               }}
             >
               {children}
             </PointerExportMark>
-          );
-        // This can be removed soon, once database is replaced
-        case "pointerImport":
-          return (
-            <span>
-              {children}
-            </span>
           );
         default:
           return { children };
