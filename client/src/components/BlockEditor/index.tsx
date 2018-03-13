@@ -142,7 +142,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
                         type: "pointerImport",
                         isVoid: true,
                         data: {
-                          pointerId: e.pointerId,
+                          pointerId: e.data.pointerId,
                           internalReferenceId: uuidv1(),
                         },
                       }));
