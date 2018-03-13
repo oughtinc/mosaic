@@ -49,8 +49,8 @@ function translateProps({blockEditor, exportingPointers, nodeAsJson}: any) {
       const reference = blockEditor.pointerReferences[internalReferenceId];
       const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
       const isOpen = reference && reference.isOpen;
-      const importingPointer: any = exportingPointers.find((l: any) => l.pointerId === pointerId);
-      const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.pointerId === pointerId);
+      const importingPointer: any = exportingPointers.find((l: any) => l.data.pointerId === pointerId);
+      const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.data.pointerId === pointerId);
       return ({importingPointer, isSelected, isOpen, pointerIndex});
 }
 
