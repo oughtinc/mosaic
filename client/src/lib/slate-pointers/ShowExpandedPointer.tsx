@@ -16,7 +16,6 @@ export class LeafNode extends React.Component<any, any> {
     }
 }
 
-//    <ClosedPointerImport>$33</ClosedPointerImport> 
 export class InlineNode extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);

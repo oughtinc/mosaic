@@ -138,12 +138,12 @@ export class FormPagePresentational extends React.Component<any, any> {
                             <PointerTable/>
                         </Col>
                         <Col sm={3}>
-                            {/* <ChildrenSidebar
+                            <ChildrenSidebar
                                 workspaces={workspace.childWorkspaces}
                                 workspaceOrder={workspace.childWorkspaceOrder}
                                 onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                            /> */}
+                            />
                         </Col>
                     </Row>
                 </BlockHoverMenu>
