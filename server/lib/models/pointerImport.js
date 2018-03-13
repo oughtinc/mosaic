@@ -1,9 +1,8 @@
 'use strict';
-const Sequelize = require('sequelize')
-var _ = require('lodash');
-const addEvents = require('./addEvents.js');
+import Sequelize from 'sequelize';
+import addEvents from './addEvents.js';
 
-module.exports = (sequelize, DataTypes) => {
+const PointerImportModel = (sequelize, DataTypes) => {
   var PointerImport = sequelize.define('PointerImport', {
     id: {
       type: DataTypes.UUID(),
@@ -26,3 +25,5 @@ module.exports = (sequelize, DataTypes) => {
 
   return PointerImport
 };
+
+export default PointerImportModel

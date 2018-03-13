@@ -1,8 +1,8 @@
 'use strict';
-const Sequelize = require('sequelize')
-const addEvents = require('./addEvents.js');
+import Sequelize from 'sequelize';
+import addEvents from './addEvents.js';
 
-module.exports = (sequelize, DataTypes) => {
+const BlockModel = (sequelize, DataTypes) => {
   var Block = sequelize.define('Block', {
     id: {
       type: DataTypes.UUID(),
@@ -35,3 +35,5 @@ module.exports = (sequelize, DataTypes) => {
   }
   return Block;
 };
+
+export default BlockModel;
