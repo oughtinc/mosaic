@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { compose } from "recompose";
 import _ = require("lodash");
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
-import { PointerImport } from "../../components/PointerImport";
+import { ShowExpandedPointer } from "./ShowExpandedPointer";
 
 const RemovedPointer = styled.span`
     background-color: rgba(252, 86, 86, 0.66);
@@ -44,7 +44,17 @@ const OpenPointerImport: any = styled.div`
     }
 `;
 
-export class PointerImportMark extends React.Component<any, any> {
+function findIn({blockEditor, exportingPointers, nodeAsJson}: any) {
+      const { internalReferenceId, pointerId } = nodeAsJson.data;
+      const reference = blockEditor.pointerReferences[internalReferenceId];
+      const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
+      const isOpen = reference && reference.isOpen;
+      const importingPointer: any = exportingPointers.find((l: any) => l.pointerId === pointerId);
+      const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.pointerId === pointerId);
+      return ({importingPointer, isSelected, isOpen, pointerIndex});
+}
+
+export class PointerImportNode extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.onMouseOver = this.onMouseOver.bind(this);
@@ -57,21 +67,28 @@ export class PointerImportMark extends React.Component<any, any> {
     }
 
     public onMouseOver() {
-        const {top, left} = this.getLocation();
-        this.props.changeHoverItem({
-            hoverItemType: HOVER_ITEM_TYPES.POINTER_IMPORT, 
-           id: this.props.mark.data.internalReferenceId,
-           top,
-           left,
-           blockId: this.props.blockId,
+        const {blockEditor, exportingPointers, nodeAsJson} = this.props;
+
+        const {importingPointer, isSelected, pointerIndex, isOpen} = findIn({
+            blockEditor,
+            exportingPointers,
+            nodeAsJson,
         });
+
+        const {top, left} = this.getLocation();
+        this.props.onMouseOver({top, left, id: this.props.nodeAsJson.data.internalReferenceId});
     }
 
     public render() {
-        const {internalReferenceId} = this.props.mark.data;
-        const isSelected = this.props.isSelected;
-        const importingPointer = this.props.importingPointer;
-        if (!this.props.importingPointer) {
+        const {blockEditor, exportingPointers, nodeAsJson} = this.props;
+
+        const {importingPointer, isSelected, pointerIndex, isOpen} = findIn({
+            blockEditor,
+            exportingPointers,
+            nodeAsJson,
+        });
+
+        if (!importingPointer) {
             return (
                 <RemovedPointer
                     onMouseOver={this.onMouseOver}
@@ -82,8 +99,7 @@ export class PointerImportMark extends React.Component<any, any> {
             );
         }
 
-        if (!this.props.isOpen) {
-            const pointerIndex = this.props.pointerIndex;
+        if (!isOpen) {
             return (
                 <ClosedPointerImport
                     onMouseOver={this.onMouseOver}
@@ -98,9 +114,12 @@ export class PointerImportMark extends React.Component<any, any> {
                 <OpenPointerImport
                     isSelected={isSelected}
                 >
-                    <PointerImport
+                    <ShowExpandedPointer
+                        blockEditor={blockEditor}
+                        exportingPointers={exportingPointers}
                         exportingPointer={importingPointer}
-                        onMouseOver={this.onMouseOver}
+                        onMouseOverExpandedPointer={this.onMouseOver}
+                        onMouseOverPointerImport={this.props.onMouseOver}
                         onMouseOut={this.props.onMouseOut}
                     />
                 </OpenPointerImport>

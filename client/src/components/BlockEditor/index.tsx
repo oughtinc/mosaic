@@ -13,8 +13,8 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
-import { PointerImport } from "../PointerImport";
 import { SlatePointers } from "../../lib/slate-pointers";
+import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -41,9 +41,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public componentWillReceiveProps(newProps: any) {
     if (
       (JSON.stringify(newProps.blockEditor) !== JSON.stringify(this.props.blockEditor))
-      || (newProps.exportingPointers.length !== this.props.exportingPointers.length )
+      || (newProps.exportingPointers.length !== this.props.exportingPointers.length)
     ) {
-      console.log("Updating props");
       this.resetPlugins(newProps);
     }
   }
@@ -53,24 +52,44 @@ class BlockEditorPresentational extends React.Component<any, any> {
       onSelectNull: () => {
         newProps.removeHoverItem();
       },
-      onSelect: ({top, left}) => {
-          newProps.changeHoverItem({
-            hoverItemType: HOVER_ITEM_TYPES.SELECTED_TEXT,
-            id: false,
-            top,
-            left,
-            blockId: newProps.blockId,
-          });
+      onSelect: ({ top, left }) => {
+        newProps.changeHoverItem({
+          hoverItemType: HOVER_ITEM_TYPES.SELECTED_TEXT,
+          id: false,
+          top,
+          left,
+          blockId: newProps.blockId,
+        });
+      },
+      onMouseOverPointerExport: ({ top, left, id }) => {
+        newProps.changeHoverItem({
+          hoverItemType: HOVER_ITEM_TYPES.POINTER_EXPORT,
+          id,
+          top,
+          left,
+          blockId: newProps.blockId,
+        });
+      },
+      onMouseOverPointerImport: ({ top, left, id }) => {
+        newProps.changeHoverItem({
+          hoverItemType: HOVER_ITEM_TYPES.POINTER_IMPORT,
+          id,
+          top,
+          left,
+          blockId: newProps.blockId,
+        });
       },
       blockId: newProps.blockId,
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.exportingPointers,
       changeHoverItem: newProps.changeHoverItem,
     };
-    this.setState({plugins: [
-      SoftBreak({}),
-      SlatePointers(SlatePointerInputs),
-    ]});
+    this.setState({
+      plugins: [
+        SoftBreak({}),
+        SlatePointers(SlatePointerInputs),
+      ]
+    });
   }
 
   public componentDidMount() {
@@ -85,7 +104,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public onChange(value: any) {
-    this.props.updateBlock({ id: this.props.block.id, value }); 
+    this.props.updateBlock({ id: this.props.block.id, value });
     if (this.props.onChange) {
       this.props.onChange(value);
     }
@@ -132,10 +151,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
                     this.onChange(ch.value);
                   }}
                 >
-                <span>
-                  {`$${index + 1} - ${e.pointerId.slice(0, 5)}`}
-                  <PointerImport exportingPointer={e}/>
-                </span>
+                  <span>
+                    {`$${index + 1} - ${e.pointerId.slice(0, 5)}`}
+                    <ShowExpandedPointer exportingPointer={e} />
+                  </span>
                 </MenuItem>
               ))}
             </DropdownButton>

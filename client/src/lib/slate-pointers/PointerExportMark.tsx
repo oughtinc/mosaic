@@ -25,11 +25,10 @@ export class PointerExportMark extends React.Component<any, any> {
 
     public onMouseOver() {
         const { top, left } = this.getLocation();
-        this.props.changeHoverItem({top, left});
+        this.props.onMouseOver({top, left});
     }
 
     public render() {
-        console.log("UPDATING");
         const isSelected = false; // this.props.hoveredItem.id === this.props.mark.data.pointerId;
         return (
             <PointerExportStyle
