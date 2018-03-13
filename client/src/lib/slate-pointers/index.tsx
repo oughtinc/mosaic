@@ -54,7 +54,6 @@ function SlatePointers(options: any = {}) {
         return (
           <PointerImportNode
             nodeAsJson={node.toJSON()}
-            blockId={options.blockId}
             blockEditor={options.blockEditor}
             exportingPointers={options.exportingPointers}
             onMouseOver={({top, left, id}) => {
@@ -73,9 +72,6 @@ function SlatePointers(options: any = {}) {
         case "pointerExport":
           return (
             <PointerExportMark
-              mark={mark.toJSON()}
-              blockId={options.blockId}
-              blockEditor={options.blockEditor}
               onMouseOver={({ top, left }) => {
                 options.onMouseOverPointerExport({top, left, id: mark.toJSON().data.pointerId});
               }}
