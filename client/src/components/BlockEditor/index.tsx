@@ -79,10 +79,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
           blockId: false,
         });
       },
-      blockId: newProps.blockId,
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.exportingPointers,
-      changeHoverItem: newProps.changeHoverItem,
     };
     this.setState({
       plugins: [
@@ -152,7 +150,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
                   }}
                 >
                   <span>
-                    {`$${index + 1} - ${e.pointerId.slice(0, 5)}`}
+                    {`$${index + 1} - ${e.data.pointerId.slice(0, 5)}`}
                     <ShowExpandedPointer exportingPointer={e} />
                   </span>
                 </MenuItem>

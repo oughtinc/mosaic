@@ -50,7 +50,7 @@ export class PointerTablePresentational extends React.Component<any, any> {
                 {exportingPointers.map((pointer, index) => (
                     <Row key={pointer.pointerId}>
                         <Reference>
-                            {`$${index + 1} - ${pointer.pointerId.slice(0, 5)}`}
+                            {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
                         </Reference>
                         <Text>
                            <ShowExpandedPointerOutsideSlate

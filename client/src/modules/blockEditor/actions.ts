@@ -1,6 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
 import { Text } from "slate";
+import _ = require("lodash");
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -56,7 +57,8 @@ export const exportSelection = () => {
     const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
     const uuid = uuidv1();
     if (block) {
-      const change = block.value.change().addMark({ type: "pointerExport", object: "mark", data: { pointerId: uuid } });
+      // const change = block.value.change().addMark({ type: "pointerExport", object: "mark", data: { pointerId: uuid } });
+      const change = block.value.change().wrapInline({type: "pointerExport", data: { pointerId: uuid }});
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
@@ -68,30 +70,20 @@ export const exportSelection = () => {
   };
 };
 
-function findTextsWithMark(document: any, markMatchFn: any) {
-  return document.getTextsAsArray().filter((t) => t.toJS().leaves.find((e) => e.marks.find(markMatchFn)));
-}
+function getInlinesAsArray(node) {
+  let array: any = [];
 
-function textWithRemovedMarks(text: any, markMatchFn: any) {
-  return Text.fromJSON({
-    ...text.toJS(),
-    leaves: text.toJS().leaves.map((leaf) => ({
-          ...leaf,
-          marks: leaf.marks.filter((m) => !markMatchFn(m)),
-    })),
+  node.nodes.forEach((child) => {
+    if (child.object === "text") { return; }
+    if (child.object === "inline") {
+      array.push(child);
+    }
+    if (!child.isLeafInline()) {
+      array = array.concat(getInlinesAsArray(child));
+    }
   });
-}
 
-function matchExportPointerFn(pointerId: string) {
-  return function(mark: any) {
-    return (mark.type === "pointerExport") && (mark.data.pointerId === pointerId);
-  };
-}
-
-function matchImportPointerFn(internalReferenceId: string) {
-  return function(mark: any) {
-    return (mark.type === "pointerImport") && (mark.data.internalReferenceId === internalReferenceId);
-  };
+  return array;
 }
 
 export const removeExportOfSelection = () => {
@@ -102,11 +94,14 @@ export const removeExportOfSelection = () => {
     const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
 
     if (block) {
-      const matchFn = matchExportPointerFn(hoveredItem.id);
-      const relevantText = findTextsWithMark(block.value.document, matchFn)[0];
-      const _withRemovedMarks = textWithRemovedMarks(relevantText, matchFn);
+      const inlines = getInlinesAsArray(block.value.document);
+      const matchingNodes = inlines.filter((i) => i.toJSON().data.pointerId === hoveredItem.id);
+      if (!matchingNodes.length) {
+        console.error("Exporting node not found in Redux store");
+        return;
+      }
 
-      const change = block.value.change().replaceNodeByKey(relevantText.key, _withRemovedMarks);
+      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key);
 
       dispatch({
         type: UPDATE_BLOCK,

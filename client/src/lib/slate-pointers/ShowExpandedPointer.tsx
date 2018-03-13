@@ -29,15 +29,15 @@ export class InlineNode extends React.Component<any, any> {
                 <span>no</span>
             );
         } else {
-        return (
-            <PointerImportNode
-                blockEditor={this.props.blockEditor}
-                exportingPointers={this.props.exportingPointers}
-                nodeAsJson={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
-                onMouseOver={this.props.onMouseOver}
-            />
-        );
-    }
+            return (
+                <PointerImportNode
+                    blockEditor={this.props.blockEditor}
+                    exportingPointers={this.props.exportingPointers}
+                    nodeAsJson={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
+                    onMouseOver={this.props.onMouseOver}
+                />
+            );
+        }
     }
 }
 
@@ -60,7 +60,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
     public render() {
         return (
             <div>
-                {this.props.exportingPointer.nodes.map((node) => {
+                {this.props.exportingPointer.nodes.map((node, index) => {
                     if (node.object === "inline" || node.object === "GeneratedNestedExportNode") {
                         return <InlineNode
                             node={node}
@@ -71,7 +71,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                         />;
                     } else {
                         return <LeafNode
-                            node={node}
+                            node={node.leaves[0]}
                             onMouseOver={this.props.onMouseOverExpandedPointer}
                             onMouseOut={this.props.onMouseOut}
                         />;
