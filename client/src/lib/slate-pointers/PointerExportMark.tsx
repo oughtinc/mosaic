@@ -24,15 +24,8 @@ export class PointerExportMark extends React.Component<any, any> {
     }
 
     public onMouseOver() {
-        console.log("Mouse over");
         const { top, left } = this.getLocation();
-        // this.props.changeHoverItem({
-        //     hoverItemType: HOVER_ITEM_TYPES.POINTER_EXPORT, 
-        //     id: this.props.mark.data.pointerId,
-        //     top,
-        //     left, 
-        //     blockId: this.props.blockId,
-        // });
+        this.props.changeHoverItem({top, left});
     }
 
     public render() {

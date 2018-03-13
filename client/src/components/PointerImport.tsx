@@ -2,7 +2,6 @@ import * as React from "react";
 import * as uuidv1 from "uuid/v1";
 import { BlockEditor } from "./BlockEditor";
 import styled from "styled-components";
-import { PointerImportMark } from "./BlockEditor/PointerImportMark";
 
 export class LeafNode extends React.Component<any, any> {
     public render() {

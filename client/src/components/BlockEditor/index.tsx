@@ -7,8 +7,6 @@ import { Inline } from "slate";
 import styled from "styled-components";
 import { Button, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap";
 import { Editor, findRange, getEventRange } from "slate-react";
-import { PointerExportMark } from "./PointerExportMark";
-import { PointerImportMark } from "./PointerImportMark";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
 import { changePointerReference, changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
@@ -37,8 +35,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
   private plugins;
   public constructor(props: any) {
     super(props);
-    this.renderMark = this.renderMark.bind(this);
-    this.renderNode = this.renderNode.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
@@ -47,7 +43,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
       (JSON.stringify(newProps.blockEditor) !== JSON.stringify(this.props.blockEditor))
       || (newProps.exportingPointers.length !== this.props.exportingPointers.length )
     ) {
-      !!newProps && this.resetPlugins(newProps);
+      console.log("Updating props");
+      this.resetPlugins(newProps);
     }
   }
 
@@ -65,6 +62,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
             blockId: newProps.blockId,
           });
       },
+      blockId: newProps.blockId,
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.exportingPointers,
       changeHoverItem: newProps.changeHoverItem,
@@ -84,56 +82,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
     };
     this.props.addBlocks([blockForm]);
     this.resetPlugins(this.props);
-  }
-
-  public renderNode(props: any) {
-    const { attributes, children, node, isSelected } = props;
-
-    if (node.type === "pointerImport") {
-      const {internalReferenceId, pointerId} = node.toJSON().data;
-      const reference = this.props.blockEditor.pointerReferences[internalReferenceId];
-      const isOpen = reference && reference.isOpen;
-      const isSelected = this.props.blockEditor.hoveredItem.id === internalReferenceId;
-      const importingPointer: any = this.props.exportingPointers.find((l: any) => l.pointerId === pointerId);
-      const pointerIndex = _.findIndex(this.props.exportingPointers, (l: any) => l.pointerId === pointerId);
-      return (
-        <PointerImportMark
-          mark={node.toJSON()}
-          blockId={this.props.blockId}
-          importingPointer={importingPointer}
-          isOpen={isOpen}
-          isSelected={isSelected}
-          pointerIndex={pointerIndex}
-          changeHoverItem={this.props.changeHoverItem}
-        />
-      );
-    } else {
-      return;
-    }
-  }
-
-  public renderMark(props) {
-    const { children, mark, blockId } = props;
-    switch (mark.type) {
-      case "pointerExport":
-        return (
-          <PointerExportMark
-            mark={mark.toJSON()}
-            blockId={this.props.blockId}
-          >
-            {children}
-          </PointerExportMark>
-        );
-      // This can be removed soon, once database is replaced
-      case "pointerImport":
-        return (
-          <span>
-            {children}
-          </span>
-        );
-      default:
-        return { children };
-    }
   }
 
   public onChange(value: any) {
