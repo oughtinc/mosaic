@@ -106,7 +106,7 @@ module.exports = {
       ...standardColumns,
       isExpanded: Sequelize.BOOLEAN,
       pointerId: referenceTo("Pointers"),
-      exportingPointerId: referenceTo("Blocks"),
+      workspaceId: referenceTo("Workspaces"),
     })
   },
 

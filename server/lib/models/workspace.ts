@@ -38,6 +38,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     });
   Workspace.associate = function (models) {
     Workspace.ChildWorkspaces = Workspace.hasMany(models.Workspace, { as: 'childWorkspaces', foreignKey: 'parentId' })
+    Workspace.PointerImports = Workspace.hasMany(models.PointerImport, { as: 'pointerImports', foreignKey: 'workspaceId' })
     Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: 'parentWorkspace', foreignKey: 'parentId' })
     Workspace.Blocks = Workspace.hasMany(models.Block, { as: 'blocks', foreignKey: 'workspaceId' })
     addEventAssociations(Workspace, models)
@@ -50,6 +51,20 @@ const WorkspaceModel = (sequelize, DataTypes) => {
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceOrder, element]
+  }
+
+  Workspace.prototype.updatePointerImports = async function (pointerIds, {event}) {
+    const pointerImports = await this.getPointerImports()
+    for (const pointerId of _.uniq(pointerIds)){
+      if (!_.includes(pointerImports.map(p => p.pointerId), pointerId)){
+        const pointer = await sequelize.models.Pointer.findById(pointerId);
+        if (!pointer) {
+          console.error ("The relevant pointer for pointer import ", pointerId, " does not exist.")
+        } else {
+          await this.createPointerImport({pointerId}, {event})
+        }
+      }
+    }
   }
 
   Workspace.prototype.createChild = async function ({event, question}) {
