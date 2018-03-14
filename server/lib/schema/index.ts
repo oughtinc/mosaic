@@ -19,11 +19,11 @@ const generateReferences = (model, references) => {
   return all
 }
 
-const makeObjectType = (model, references) => (
+const makeObjectType = (model, references, extraFields={}) => (
   new GraphQLObjectType({
     name: model.name,
     description: model.name,
-    fields: () => _.assign(attributeFields(model), generateReferences(model, references))
+    fields: () => _.assign(attributeFields(model), generateReferences(model, references), extraFields)
   })
 )
 
@@ -45,6 +45,7 @@ let workspaceType = makeObjectType(models.Workspace,
     ['childWorkspaces', () => new GraphQLList(workspaceType), 'ChildWorkspaces'],
     ['parentWorkspace', () => new GraphQLList(workspaceType), 'ParentWorkspace'],
     ['blocks', () => new GraphQLList(blockType), 'Blocks'],
+    ['pointerImports', () => new GraphQLList(pointerImportType), 'PointerImports'],
   ]
 )
 
@@ -53,9 +54,9 @@ let eventType = makeObjectType(models.Event,[])
 let pointerType = makeObjectType(models.Pointer,
   [
     ...standardReferences,
-    ['pointerImport', () => pointerImportType, 'PointerImport']
+    ['pointerImport', () => pointerImportType, 'PointerImport'],
     ['sourceBlock', () => blockType, 'SourceBlock'],
-  ]
+  ],
 )
 
 let pointerImportType = makeObjectType(models.PointerImport,
