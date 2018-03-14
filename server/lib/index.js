@@ -1,14 +1,14 @@
 import 'babel-polyfill';
 
-import express from 'express';
+import * as express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
-import bodyParser from 'body-parser';
+import * as bodyParser from 'body-parser';
 import {schema} from './schema/index';
 var cors = require('cors');
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
-const graphQLServer:any = express();
+const graphQLServer = express();
 graphQLServer.use(cors())
 
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));

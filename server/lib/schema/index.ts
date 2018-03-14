@@ -6,8 +6,7 @@ import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSc
 import * as aasync from "async";
 import * as pluralize from "pluralize";
 import * as Case from "Case";
-import GraphQLJSON from 'graphql-type-json';
-import Sequelize from 'sequelize'
+import * as GraphQLJSON from 'graphql-type-json';
 
 const generateReferences = (model, references) => {
   let all = {};
