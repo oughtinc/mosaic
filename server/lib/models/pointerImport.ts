@@ -13,7 +13,7 @@ const PointerImportModel = (sequelize, DataTypes) => {
     ...eventRelationshipColumns(DataTypes),
   }, {
     hooks: {
-        ...eventHooks.beforeValidate,
+        beforeValidate: eventHooks.beforeValidate,
     },
   })
 
