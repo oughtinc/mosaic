@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize';
-import addEvents from './addEvents.js';
+import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 
 const PointerModel = (sequelize, DataTypes) => {
   var Pointer = sequelize.define('Pointer', {
@@ -9,17 +9,17 @@ const PointerModel = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
-    ...addEvents().eventRelationshipColumns(DataTypes),
+    ...eventRelationshipColumns(DataTypes),
   }, {
     hooks: {
-        ...addEvents().beforeValidate,
+        ...eventHooks.beforeValidate,
     },
   })
 
   Pointer.associate = function(models){
     Pointer.SourceBlock = Pointer.belongsTo(models.Block, {as: 'sourceBlock', foreignKey: 'sourceBlockId'})
     Pointer.PointerImports = Pointer.hasMany(models.PointerImport, {as: 'pointerImport', foreignKey: 'pointerId'})
-    addEvents().run(Pointer, models)
+    addEventAssociations(Pointer, models)
   }
 
   Pointer.prototype.importingWorkspaces = async function() {

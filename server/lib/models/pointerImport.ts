@@ -1,6 +1,6 @@
 'use strict';
 import Sequelize from 'sequelize';
-import addEvents from './addEvents.js';
+import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 
 const PointerImportModel = (sequelize, DataTypes) => {
   var PointerImport = sequelize.define('PointerImport', {
@@ -10,17 +10,17 @@ const PointerImportModel = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
-    ...addEvents().eventRelationshipColumns(DataTypes),
+    ...eventRelationshipColumns(DataTypes),
   }, {
     hooks: {
-        ...addEvents().beforeValidate,
+        ...eventHooks.beforeValidate,
     },
   })
 
   PointerImport.associate = function(models){
     PointerImport.Pointer = PointerImport.belongsTo(models.Pointer, {as: 'pointer', foreignKey: 'pointerId'})
     PointerImport.Workspace = PointerImport.belongsTo(models.Workspace, {as: 'workspace', foreignKey: 'workspaceId'})
-    addEvents().run(PointerImport, models)
+    addEventAssociations(PointerImport, models)
   }
 
   return PointerImport

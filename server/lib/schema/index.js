@@ -1,4 +1,5 @@
-var models = require('../models');
+// var models = require('../models');
+import models from "../models";
 import * as _ from 'lodash';
 import { resolver, attributeFields } from 'graphql-sequelize';
 import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLInputObjectType } from 'graphql';

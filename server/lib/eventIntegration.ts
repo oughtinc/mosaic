@@ -1,9 +1,10 @@
-function addEvents(model, models) {
+function addEventAssociations(model, models) {
     model.CreatedAtEvent = model.belongsTo(models.Event, { as: 'createdAtEvent', foreignKey: 'createdAtEventId' });
     model.UpdatedAtEvent = model.belongsTo(models.Event, { as: 'updatedAtEvent', foreignKey: 'updatedAtEventId' });
 };
+export {addEventAssociations}
 
-const eventRelationshipColumns = (DataTypes) => ({
+export const eventRelationshipColumns = (DataTypes) => ({
     createdAtEventId: {
         type: DataTypes.INTEGER(),
     },
@@ -12,7 +13,7 @@ const eventRelationshipColumns = (DataTypes) => ({
     }
 })
 
-const beforeValidate = {
+export const eventHooks = {
     beforeValidate: (item, options) => {
         const event = options.event
         if (event) {
@@ -28,7 +29,3 @@ const beforeValidate = {
         options.fields = item.changed();
     }
 }
-
-module.exports = function (model, models) {
-    return { run: addEvents, eventRelationshipColumns, beforeValidate }
-} 

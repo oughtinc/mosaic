@@ -1,7 +1,7 @@
 'use strict';
 const Sequelize = require('sequelize')
 var _ = require('lodash');
-const addEvents = require('./addEvents.js');
+import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 
 const WorkspaceModel = (sequelize, DataTypes) => {
   var Workspace = sequelize.define('Workspace', {
@@ -11,7 +11,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
-    ...addEvents().eventRelationshipColumns(DataTypes),
+    ...eventRelationshipColumns(DataTypes),
     childWorkspaceOrder: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue: []
@@ -23,10 +23,9 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     },
   }, {
       hooks: {
-        ...addEvents().beforeValidate,
+        ...eventHooks.beforeValidate,
         afterCreate: async (workspace, {event, questionValue}) => {
           const blocks = await workspace.getBlocks();
-          console.log("CREATING blocks NOW", questionValue)
           if (questionValue) {
             await workspace.createBlock({type: "QUESTION", value: questionValue}, {event})
           } else {
@@ -41,7 +40,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     Workspace.ChildWorkspaces = Workspace.hasMany(models.Workspace, { as: 'childWorkspaces', foreignKey: 'parentId' })
     Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: 'parentWorkspace', foreignKey: 'parentId' })
     Workspace.Blocks = Workspace.hasMany(models.Block, { as: 'blocks', foreignKey: 'workspaceId' })
-    addEvents().run(Workspace, models)
+    addEventAssociations(Workspace, models)
   }
 
   Workspace.createAsChild = async function ({parentId, question}, {event}) {

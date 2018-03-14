@@ -1,6 +1,5 @@
-'use strict';
 import Sequelize from 'sequelize';
-import addEvents from './addEvents.js';
+import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 
 const BlockModel = (sequelize, DataTypes) => {
   var Block = sequelize.define('Block', {
@@ -10,7 +9,7 @@ const BlockModel = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
-    ...addEvents().eventRelationshipColumns(DataTypes),
+    ...eventRelationshipColumns(DataTypes),
     type: {
       type: DataTypes.ENUM('QUESTION', 'ANSWER', 'SCRATCHPAD'),
       allowNull: false
@@ -20,7 +19,7 @@ const BlockModel = (sequelize, DataTypes) => {
     }
   }, {
     hooks: {
-        ...addEvents().beforeValidate,
+        ...eventHooks.beforeValidate,
     },
     getterMethods: {
         async recentBlockVersion() {
@@ -31,7 +30,7 @@ const BlockModel = (sequelize, DataTypes) => {
   });
   Block.associate = function (models) {
     Block.Workspace = Block.belongsTo(models.Workspace, {foreignKey: 'workspaceId'})
-    addEvents().run(Block, models)
+    addEventAssociations(Block, models)
   }
   return Block;
 };
