@@ -10,6 +10,16 @@ const PointerModel = (sequelize, DataTypes) => {
       allowNull: false,
     },
     ...eventRelationshipColumns(DataTypes),
+    value: {
+      type: Sequelize.VIRTUAL(Sequelize.JSON, ['id', 'sourceBlockId']), 
+      get: async function() {
+        const pointerId = this.get("id");
+        const sourceBlockId = this.get("sourceBlockId");
+        const sourceBlock = await sequelize.models.Block.findById(sourceBlockId)
+        const {cachedExportPointerValues} = sourceBlock;
+        return cachedExportPointerValues[pointerId]
+      }
+    },
   }, {
     hooks: {
         beforeValidate: eventHooks.beforeValidate,

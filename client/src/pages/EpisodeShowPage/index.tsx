@@ -23,6 +23,13 @@ const WORKSPACE_QUERY = gql`
           id
           parentId
           childWorkspaceOrder
+          pointerImports{
+            id
+            pointer {
+                id
+                value
+            }
+          }
           childWorkspaces{
             id
             blocks{
