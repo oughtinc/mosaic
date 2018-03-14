@@ -1,12 +1,17 @@
 'use strict';
 
-var fs        = require('fs');
-var path      = require('path');
-var Sequelize = require('sequelize');
+import fs from 'fs';
+import path from 'path';
+import Sequelize from 'sequelize';
 var basename  = path.basename(__filename);
 var env       = process.env.NODE_ENV || 'development';
 var config    = require(__dirname + '/../../config/config.json')[env];
-var db        = {};
+
+import BlockModel from './block'
+import EventModel from './event'
+import PointerModel from './pointer'
+import PointerImportModel from './pointerImport'
+import WorkspaceModel from './workspace'
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -14,15 +19,20 @@ if (config.use_env_variable) {
   var sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-fs
-  .readdirSync(__dirname)
-  .filter(file => {
-    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
-  })
-  .forEach(file => {
-    var model = sequelize['import'](path.join(__dirname, file));
-    db[model.name] = model;
-  });
+const models = [
+  ['event', EventModel],
+  ['block', BlockModel],
+  ['pointer', PointerModel],
+  ['pointerImport', PointerImportModel],
+  ['workspace', WorkspaceModel]
+]
+
+const db = {};
+
+models.forEach(m => {
+  const model = sequelize.import(m[0], m[1])
+  db[model.name] = model
+})
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
@@ -33,4 +43,4 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-module.exports = db;
+export default db;

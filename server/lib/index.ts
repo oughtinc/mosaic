@@ -8,7 +8,7 @@ var cors = require('cors');
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
-const graphQLServer = express();
+const graphQLServer:any = express();
 graphQLServer.use(cors())
 
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
