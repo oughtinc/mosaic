@@ -9,12 +9,14 @@ import { Button, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap";
 import { Editor, findRange, getEventRange } from "slate-react";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
 import { changePointerReference, changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
-import { compose } from "recompose";
+import { compose, withProps } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
-import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
+import { exportingPointersSelector, importingPointersSelector } from "../../modules/blocks/exportingPointers";
 import { SlatePointers } from "../../lib/slate-pointers";
 import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
+import { withApollo } from "react-apollo";
+import gql from "graphql-tag";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -42,6 +44,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if (
       (JSON.stringify(newProps.blockEditor) !== JSON.stringify(this.props.blockEditor))
       || (newProps.exportingPointers.length !== this.props.exportingPointers.length)
+      || (newProps.usefulPointers.length !== this.props.usefulPointers.length)
     ) {
       this.resetPlugins(newProps);
     }
@@ -80,7 +83,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         });
       },
       blockEditor: newProps.blockEditor,
-      exportingPointers: newProps.exportingPointers,
+      exportingPointers: [...newProps.exportingPointers, ...newProps.usefulPointers],
     };
     this.setState({
       plugins: [
@@ -172,11 +175,32 @@ function mapStateToProps(state: any, { blockId }: any) {
   const exportingPointers = exportingPointersSelector(state);
   const { blocks, blockEditor } = state;
   const block = blocks.blocks.find((b) => b.id === blockId);
-  return { block, blockEditor, exportingPointers };
+  const importingPointers = importingPointersSelector({block});
+  return { block, blockEditor, exportingPointers, importingPointers };
 }
 
 export const BlockEditor: any = compose(
   connect(
     mapStateToProps, { addBlocks, updateBlock, changeHoverItem, removeHoverItem }
-  )
+  ),
+  withApollo,
+  withProps((props: any) => {
+    let pointers: any = [];
+    for (const pointerId of props.importingPointers.map((p) => p.data.pointerId)) {
+      const result = props.client.readFragment({
+        id: `Pointer:${pointerId}`,
+        fragment: gql`
+          fragment pointer on pointer {
+            id
+            value
+          }
+        `,
+      });
+      if (result) {
+        pointers = [...pointers, result.value];
+      }
+    }
+    // console.log("FOUND THE NEEDED ONES!", pointers, props.exportingPointers);
+    return {usefulPointers: pointers};
+  }),
 )(BlockEditorPresentational);

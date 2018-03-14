@@ -2,6 +2,7 @@ import { createSelector } from "reselect";
 import _ = require("lodash");
 
 const blockSelector = (state) => state.blocks.blocks;
+const singleBlockSelector = (state) => state.block;
 
 function getInlinesAsArray(node) {
   let array: any = [];
@@ -25,6 +26,12 @@ function exportingNodes(node: any) {
     return pointers;
 }
 
+function importingNodes(node: any) {
+    const _getInlinesAsArray = getInlinesAsArray(node).map((n) => n.toJSON());
+    const pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerImport");
+    return pointers;
+}
+
 export const exportingPointersSelector = createSelector(
     blockSelector,
     (blocks) => {
@@ -32,3 +39,9 @@ export const exportingPointersSelector = createSelector(
         return pointers;
     }
 );
+
+export const importingPointersSelector = ({block}) => {
+    if (!block) { return []; }
+    const pointers = importingNodes(block.value.document);
+    return pointers;
+};
