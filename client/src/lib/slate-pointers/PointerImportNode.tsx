@@ -62,7 +62,6 @@ export class PointerImportNode extends React.Component<any, any> {
     }
 
     public onMouseOver() {
-        // const {blockEditor, exportingPointers, nodeAsJson} = this.props;
         const {top, left} = this.getLocation();
         this.props.onMouseOver({top, left, id: this.props.nodeAsJson.data.internalReferenceId});
     }

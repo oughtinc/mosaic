@@ -38,13 +38,6 @@ const Routes = () => (
   </div>
 );
 
-// const reduxDevtoolsMiddleware =
-//  (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__();
-
-// let middleware: any = thunk;
-
-// let middleWare = !!reduxDevtoolsMiddleware ? thunk : applyMiddleware(reduxDevtoolsMiddleware, thunk);
-
 const store = createStore(
   combineReducers(
     {
