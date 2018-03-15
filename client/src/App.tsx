@@ -5,11 +5,9 @@ import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
-import { applyMiddleware, combineReducers, compose, createStore } from "redux";
+import { applyMiddleware, combineReducers, createStore } from "redux";
 import { Provider } from "react-redux";
 import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
@@ -39,13 +37,6 @@ const Routes = () => (
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
   </div>
 );
-
-const reduxDevtoolsMiddleware =
-  (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__();
-
-// let middleware: any = thunk;
-
-// let middleWare = !!reduxDevtoolsMiddleware ? thunk : applyMiddleware(reduxDevtoolsMiddleware, thunk);
 
 const store = createStore(
   combineReducers(

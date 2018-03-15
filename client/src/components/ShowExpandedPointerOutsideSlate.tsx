@@ -1,4 +1,5 @@
-import React = require("react");
+import * as _ from "lodash";
+import * as React from "react";
 import { exportingPointersSelector } from "../modules/blocks/exportingPointers";
 import { compose } from "recompose";
 import { connect } from "react-redux";
@@ -21,7 +22,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
                         blockId: false,
                     });
                 }}
-                onMouseOverExpandedPointer={() => {}} 
+                onMouseOverExpandedPointer={_.noop} 
             />
         );
     }
