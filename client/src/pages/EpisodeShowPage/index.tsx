@@ -138,7 +138,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     blockId={answer.id}
                                     initialValue={answer.value}
                                 />
-                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
+                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
                         <Col sm={3}>
                             <h3>Pointers</h3>
