@@ -2,9 +2,6 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { type, Node, Value } from "slate";
-import { Editor } from "slate-react";
-import Plain from "slate-plain-serializer";
 import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 
@@ -14,8 +11,6 @@ import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
@@ -85,10 +80,6 @@ export class FormPagePresentational extends React.Component<any, any> {
         this.updateBlocks = this.updateBlocks.bind(this);
     }
 
-    public onSubmit() {
-        const workspace = this.props.workspace.workspace;
-    }
-
     public updateBlocks(blocks: any) {
         const variables = { blocks };
         this.props.updateBlocks({
@@ -101,7 +92,6 @@ export class FormPagePresentational extends React.Component<any, any> {
         if (!workspace) {
             return <div> Loading </div>;
         }
-        let initialValues = {};
 
         const question = workspace.blocks.find((b) => b.type === "QUESTION");
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
