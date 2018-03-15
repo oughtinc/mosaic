@@ -37,12 +37,13 @@ export class PointerExportMark extends React.Component<any, any> {
                 isSelected={isSelected}
                 onMouseOut={this.props.onMouseOut}
             >
-            {children.map((child) => {
+            {children.map((child, index) => {
                 const isNestedPointer = (child.props.node.object === "inline");
                 
                 if (!isNestedPointer) {
                     return (
                         <span
+                          key={index}
                           onMouseOver={this.onMouseOver}
                         >
                             {child}
