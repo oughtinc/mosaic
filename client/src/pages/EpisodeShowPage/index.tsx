@@ -14,6 +14,8 @@ import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
+import { exportingPointersSelector, exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
+import _ = require("lodash");
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -32,6 +34,13 @@ const WORKSPACE_QUERY = gql`
           }
           childWorkspaces{
             id
+            pointerImports{
+                id
+                pointer {
+                    id
+                    value
+                }
+            }
             blocks{
               id
               value
@@ -102,6 +111,9 @@ export class FormPagePresentational extends React.Component<any, any> {
             return <div> Loading </div>;
         }
         let initialValues = {};
+        const importingWorkspaces = [workspace, ...workspace.childWorkspaces];
+        let importedPointers = _.flatten(importingWorkspaces.map((w) => w.pointerImports.map((p) => p.pointer.value).filter((v) => !!v)));
+        const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers], (p) => p.data.pointerId);
 
         const question = workspace.blocks.find((b) => b.type === "QUESTION");
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
@@ -120,6 +132,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     blockId={question.id}
                                     initialValue={question.value}
                                     readOnly={true}
+                                    availablePointers={availablePointers}
                                 />
                             </h1>
                         </Col>
@@ -127,26 +140,31 @@ export class FormPagePresentational extends React.Component<any, any> {
                     <Row>
                         <Col sm={6}>
                             <h3>Scratchpad</h3>
-                                <BlockEditor
-                                    name={question.id}
-                                    blockId={scratchpad.id}
-                                    initialValue={scratchpad.value}
-                                />
+                            <BlockEditor
+                                name={question.id}
+                                blockId={scratchpad.id}
+                                initialValue={scratchpad.value}
+                                availablePointers={availablePointers}
+                            />
                             <h3>Answer</h3>
-                                <BlockEditor
-                                    name={answer.id}
-                                    blockId={answer.id}
-                                    initialValue={answer.value}
-                                />
+                            <BlockEditor
+                                name={answer.id}
+                                blockId={answer.id}
+                                initialValue={answer.value}
+                                availablePointers={availablePointers}
+                            />
                             <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
                         <Col sm={3}>
                             <h3>Pointers</h3>
-                            <PointerTable/>
+                            <PointerTable
+                                availablePointers={availablePointers}
+                            />
                         </Col>
                         <Col sm={3}>
                             <ChildrenSidebar
                                 workspaces={workspace.childWorkspaces}
+                                availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
                                 onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
@@ -162,6 +180,20 @@ export class FormPagePresentational extends React.Component<any, any> {
 const options: any = ({ match }) => ({
     variables: { id: match.params.workspaceId },
 });
+
+function visibleBlockIds(workspace: any) {
+    if (!workspace) { return []; }
+    const directBlockIds = workspace.blocks.map((b) => b.id);
+    const childBlockIds = _.flatten(workspace.childWorkspaces.map((w) => w.blocks.filter((b) => b.type !== "SCRATCHPAD"))).map((b: any) => b.id);
+    return [...directBlockIds, ...childBlockIds];
+}
+
+function mapStateToProps(state: any, { workspace }: any) {
+    const _visibleBlockIds = visibleBlockIds(workspace.workspace);
+    const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(state);
+    const { blocks, blockEditor } = state;
+    return { blocks, exportingPointers };
+}
 
 export const EpisodeShowPage = compose(
     graphql(WORKSPACE_QUERY, { name: "workspace", options }),
@@ -181,6 +213,6 @@ export const EpisodeShowPage = compose(
         },
     }),
     connect(
-        ({ blocks }) => ({ blocks }), { addBlocks, saveBlocks }
+        mapStateToProps, { addBlocks, saveBlocks }
     )
 )(FormPagePresentational);
