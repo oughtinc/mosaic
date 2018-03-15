@@ -17,13 +17,13 @@ services:
       - "8080:8080"
     volumes:
       - ./server:/data      
-    command: "bash -c 'sleep 5 && cd /data && yarn && yarn run build && yarn run db:migrate && yarn run db:seed && yarn run start'"
+    command: "bash -c 'sleep 3 && cd /data && yarn && yarn install && yarn run db:migrate && yarn run start'"
     depends_on:
       - postgres
   web:
     image: node:9.7  
-    # depends_on:
-    #    - api
+    depends_on:
+       - api
     volumes:
       - ./client:/data
     ports:
