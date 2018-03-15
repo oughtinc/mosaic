@@ -38,6 +38,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.onChange = this.onChange.bind(this);
+    this.state = {
+      plugins: []
+    };
+    this.resetPlugins(props);
   }
 
   public componentWillReceiveProps(newProps: any) {
@@ -119,13 +123,14 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
     const value = block.value;
     const exportingPointers = this.props.exportingPointers;
+    const {plugins} = this.state;
     if (readOnly) {
       return (
         <BlockReadOnlyStyle>
           <Editor
             value={value}
             readOnly={false}
-            plugins={this.state.plugins}
+            plugins={plugins}
           />
         </BlockReadOnlyStyle>
       );
@@ -162,7 +167,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
             <Editor
               value={value}
               onChange={(c) => { this.onChange(c.value); }}
-              plugins={this.state.plugins}
+              plugins={plugins}
             />
           </BlockEditorStyle>
         </div>
@@ -200,7 +205,6 @@ export const BlockEditor: any = compose(
         pointers = [...pointers, result.value];
       }
     }
-    // console.log("FOUND THE NEEDED ONES!", pointers, props.exportingPointers);
     return {usefulPointers: pointers};
   }),
 )(BlockEditorPresentational);
