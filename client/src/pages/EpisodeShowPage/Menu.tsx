@@ -1,20 +1,5 @@
 import React = require("react");
 import ReactDOM = require("react-dom");
-import styled from "styled-components";
-
-const HoverMenu = styled.span`
-  display: inline-block;
-  padding: 8px 7px 6px;
-  position: absolute;
-  z-index: 1;
-  top: -10000px;
-  left: -10000px;
-  margin-top: -6px;
-  opacity: 0;
-  background-color: #222;
-  border-radius: 4px;
-  transition: opacity 0.75s;
-`;
 
 export class Menu extends React.Component<any, any> {
     public constructor(props: any) {
@@ -28,7 +13,7 @@ export class Menu extends React.Component<any, any> {
      * @return {Boolean}
      */
   
-    public hasMark(type) {
+    public hasMark(type: any) {
       const { value } = this.props;
       return value.activeMarks.some((mark) => mark.type === type);
     }
@@ -40,7 +25,7 @@ export class Menu extends React.Component<any, any> {
      * @param {String} type
      */
   
-    public onClickMark(event, type) {
+    public onClickMark(event: any, type: any) {
       const { value, onChange } = this.props;
       event.preventDefault();
       const change = value.change().toggleMark(type);
@@ -55,7 +40,7 @@ export class Menu extends React.Component<any, any> {
      * @return {Element}
      */
   
-    public renderMarkButton(type, icon) {
+    public renderMarkButton(type: any, icon: any) {
       const isActive = this.hasMark(type);
       const onMouseDown = (event) => this.onClickMark(event, type);
   

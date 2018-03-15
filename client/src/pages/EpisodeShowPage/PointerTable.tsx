@@ -2,7 +2,6 @@ import React = require("react");
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
 import { ShowExpandedPointerOutsideSlate } from "../../components/ShowExpandedPointerOutsideSlate";
 
 const Container = styled.div`

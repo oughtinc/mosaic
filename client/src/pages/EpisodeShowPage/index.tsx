@@ -2,9 +2,6 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { type, Node, Value } from "slate";
-import { Editor } from "slate-react";
-import Plain from "slate-plain-serializer";
 import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 
@@ -16,8 +13,6 @@ import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
 import { exportingPointersSelector, exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
 import _ = require("lodash");
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
@@ -94,10 +89,6 @@ export class FormPagePresentational extends React.Component<any, any> {
         this.updateBlocks = this.updateBlocks.bind(this);
     }
 
-    public onSubmit() {
-        const workspace = this.props.workspace.workspace;
-    }
-
     public updateBlocks(blocks: any) {
         const variables = { blocks };
         this.props.updateBlocks({
@@ -110,11 +101,9 @@ export class FormPagePresentational extends React.Component<any, any> {
         if (!workspace) {
             return <div> Loading </div>;
         }
-        let initialValues = {};
         const importingWorkspaces = [workspace, ...workspace.childWorkspaces];
         let importedPointers = _.flatten(importingWorkspaces.map((w) => w.pointerImports.map((p) => p.pointer.value).filter((v) => !!v)));
         const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers], (p) => p.data.pointerId);
-
         const question = workspace.blocks.find((b) => b.type === "QUESTION");
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
         const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
@@ -138,7 +127,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         </Col>
                     </Row>
                     <Row>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <h3>Scratchpad</h3>
                             <BlockEditor
                                 name={question.id}
@@ -155,13 +144,13 @@ export class FormPagePresentational extends React.Component<any, any> {
                             />
                             <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
-                        <Col sm={3}>
+                        <Col sm={2}>
                             <h3>Pointers</h3>
                             <PointerTable
                                 availablePointers={availablePointers}
                             />
                         </Col>
-                        <Col sm={3}>
+                        <Col sm={6}>
                             <ChildrenSidebar
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}

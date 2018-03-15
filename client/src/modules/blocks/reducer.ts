@@ -1,9 +1,6 @@
-import { type, Node, Value } from "slate";
+import { Value } from "slate";
 import { ADD_BLOCKS, UPDATE_BLOCK } from "./actions";
 import Plain from "slate-plain-serializer";
-import _ = require("lodash");
-
-import { Block, Mark } from "slate";
 
 export const blockReducer = (state = {blocks: []}, action) => {
     switch (action.type) {
@@ -35,4 +32,3 @@ export const blockReducer = (state = {blocks: []}, action) => {
         return state;
     }
 };
-  
