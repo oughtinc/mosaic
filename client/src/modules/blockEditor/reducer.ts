@@ -1,4 +1,4 @@
-import { CHANGE_HOVERED_ITEM, CHANGE_POINTER_REFERENCE } from "./actions"
+import { CHANGE_HOVERED_ITEM, CHANGE_POINTER_REFERENCE } from "./actions";
 
 const initialState = {
     hoveredItem: { hoverItemType: null, id: null, top: null, left: null, blockId: null},
