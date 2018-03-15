@@ -23,6 +23,7 @@ export class NewBlockForm extends React.Component<any, any> {
                     name={`new-block-${this.state.id}`}
                     initialValue={""}
                     onChange={(value) => this.setState({value})}
+                    availablePointers={this.props.availablePointers}
                 />
                 <div className="buttons">
                     <button type="submit" onClick={this.onSubmit}>
