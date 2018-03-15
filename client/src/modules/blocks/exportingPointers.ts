@@ -1,10 +1,10 @@
+import * as _ from "lodash";
 import { createSelector } from "reselect";
-import _ = require("lodash");
 
 const blockSelector = (state) => state.blocks.blocks;
-const singleBlockSelector = (state) => state.block;
+// const singleBlockSelector = (state) => state.block;
 
-function getInlinesAsArray(node) {
+function getInlinesAsArray(node: any) {
   let array: any = [];
 
   node.nodes.forEach((child) => {

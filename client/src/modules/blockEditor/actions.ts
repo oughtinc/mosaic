@@ -1,7 +1,5 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
-import { Text } from "slate";
-import _ = require("lodash");
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -70,7 +68,7 @@ export const exportSelection = () => {
   };
 };
 
-function getInlinesAsArray(node) {
+function getInlinesAsArray(node: any) {
   let array: any = [];
 
   node.nodes.forEach((child) => {

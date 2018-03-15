@@ -42,7 +42,7 @@ export class ImportMenu extends React.Component<any, any> {
 
 export class ExportMenu extends React.Component<any, any> {
   public render() {
-    const {blockEditor: {hoveredItem: {id}, pointerReferences}, onChangePointerReference} = this.props;
+    // const {blockEditor: {hoveredItem: {id}, pointerReferences}, onChangePointerReference} = this.props;
     return (
       <div>
         <Button bsSize={"small"} onClick={() => {this.props.removeExportOfSelection(); }} >

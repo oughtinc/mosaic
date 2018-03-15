@@ -1,12 +1,7 @@
 import * as React from "react";
-import * as uuidv1 from "uuid/v1";
 import styled from "styled-components";
 import ReactDOM = require("react-dom");
-import { changeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
-import { connect } from "react-redux";
-import { compose } from "recompose";
 import _ = require("lodash");
-import { exportingPointersSelector } from "../../modules/blocks/exportingPointers";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 
 const RemovedPointer = styled.span`
@@ -67,7 +62,7 @@ export class PointerImportNode extends React.Component<any, any> {
     }
 
     public onMouseOver() {
-        const {blockEditor, exportingPointers, nodeAsJson} = this.props;
+        // const {blockEditor, exportingPointers, nodeAsJson} = this.props;
         const {top, left} = this.getLocation();
         this.props.onMouseOver({top, left, id: this.props.nodeAsJson.data.internalReferenceId});
     }

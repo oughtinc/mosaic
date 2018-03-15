@@ -1,14 +1,12 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
-import * as _ from "lodash";
 import * as uuidv1 from "uuid/v1";
 import Plain from "slate-plain-serializer";
 import { Inline } from "slate";
 import styled from "styled-components";
-import { Button, ButtonGroup, DropdownButton, MenuItem } from "react-bootstrap";
-import { Editor, findRange, getEventRange } from "slate-react";
+import { DropdownButton, MenuItem } from "react-bootstrap";
+import { Editor } from "slate-react";
 import { addBlocks, updateBlock } from "../../modules/blocks/actions";
-import { changePointerReference, changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
+import { changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose, withProps } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
@@ -34,14 +32,16 @@ const BlockEditorStyle = styled.div`
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
-  private plugins;
   public constructor(props: any) {
     super(props);
     this.onChange = this.onChange.bind(this);
     this.state = {
-      plugins: []
-    };
-    this.resetPlugins(props);
+      plugins: [],
+    };    
+  }
+
+  public componentWillMount() {
+    this.resetPlugins(this.props);
   }
 
   public componentWillReceiveProps(newProps: any) {
@@ -139,7 +139,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <div>
           <BlockEditorStyle>
             <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
-              {exportingPointers.map((e: any, index: any) => (
+              {exportingPointers.map((e: any, index: number) => (
                 <MenuItem
                   eventKey="1"
                   key={index}
