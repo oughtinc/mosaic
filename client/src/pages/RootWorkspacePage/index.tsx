@@ -5,9 +5,6 @@ import React = require("react");
 import { Link } from "react-router-dom";
 import { Button, Col, Row } from "react-bootstrap";
 import styled from "styled-components";
-import Plain from "slate-plain-serializer";
-import { Form } from "react-final-form";
-import { Value } from "slate";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
@@ -86,9 +83,6 @@ const ParentWorkspace = ({ workspace }) => {
 
 class NewWorkspaceForm extends React.Component<any, any> {
     public render() {
-        const onSubmit = async (values) => {
-            this.props.onCreateWorkspace(JSON.stringify(values.new.toJSON()));
-        };
         return (
             <div>
                 <h3> New Root Workspace </h3>
