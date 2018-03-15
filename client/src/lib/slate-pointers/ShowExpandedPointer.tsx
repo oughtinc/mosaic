@@ -39,21 +39,6 @@ export class InlineNode extends React.Component<any, any> {
     }
 }
 
-// const ClosedPointerImport = styled.span`
-//     background-color: rgba(86, 214, 252, 0.66);
-//     padding: 0px 7px;
-//     border-radius: 2px;
-//     font-weight: 800;
-//     color: #0a6e7f;
-//     transition: background-color color 0.8s; 
-//     &:hover {
-//         transition: background-color color 0.8s; 
-//         cursor: pointer;
-//         background-color: rgb(112, 183, 201);
-//         color: #044550;
-//     }
-// `;
-
 export class ShowExpandedPointer extends React.Component<any, any> {
     public render() {
         return (

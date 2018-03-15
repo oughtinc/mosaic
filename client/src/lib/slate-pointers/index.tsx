@@ -1,16 +1,6 @@
 import React = require("react");
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportNode } from "./PointerImportNode";
-// import _ = require("lodash");
-
-// function toProps({ blockEditor, exportingPointers, node }: any) {
-//   const { internalReferenceId, pointerId } = node.toJSON().data;
-//   const reference = blockEditor.pointerReferences[internalReferenceId];
-//   const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
-//   const isOpen = reference && reference.isOpen;
-//   const importingPointer: any = exportingPointers.find((l: any) => l.pointerId === pointerId);
-//   const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.pointerId === pointerId);
-// }
 
 function SlatePointers(options: any = {}) {
   return {

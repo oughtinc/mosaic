@@ -65,10 +65,6 @@ export class PointerTablePresentational extends React.Component<any, any> {
     }
 }
 
-// const options: any = ({ match }) => ({
-//     variables: { id: match.params.workspaceId },
-// });
-
 function mapStateToProps(state: any, { blockId }: any) {
     const exportingPointers = exportingPointersSelector(state);
     return { exportingPointers, blockEditor: state.blockEditor, blockId };

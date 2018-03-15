@@ -2,7 +2,6 @@ import * as _ from "lodash";
 import { createSelector } from "reselect";
 
 const blockSelector = (state) => state.blocks.blocks;
-// const singleBlockSelector = (state) => state.block;
 
 function getInlinesAsArray(node: any) {
   let array: any = [];
