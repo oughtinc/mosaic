@@ -137,7 +137,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
               {exportingPointers.map((e: any, index: any) => (
                 <MenuItem
                   eventKey="1"
-                  key={e.pointerId}
+                  key={index}
                   onClick={(event) => {
                     const ch = value.change()
                       .insertInline(Inline.fromJSON({

@@ -63,6 +63,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                     if (node.object === "inline" || node.object === "GeneratedNestedExportNode") {
                         return <InlineNode
                             node={node}
+                            key={index}
                             blockEditor={this.props.blockEditor}
                             exportingPointers={this.props.exportingPointers}
                             pointerId={this.props.exportingPointer.pointerId}
@@ -70,6 +71,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                         />;
                     } else {
                         return <LeafNode
+                            key={index}
                             node={node.leaves[0]}
                             onMouseOver={this.props.onMouseOverExpandedPointer}
                             onMouseOut={this.props.onMouseOut}

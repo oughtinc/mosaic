@@ -48,7 +48,7 @@ export class PointerTablePresentational extends React.Component<any, any> {
         return (
             <Container>
                 {exportingPointers.map((pointer, index) => (
-                    <Row key={pointer.pointerId}>
+                    <Row key={index}>
                         <Reference>
                             {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
                         </Reference>
