@@ -58,6 +58,7 @@ const ParentWorkspace = ({ workspace }) => {
                     blockId={question.id}
                     initialValue={question.value}
                     readOnly={true}
+                    allowExports={false}
                     availablePointers={[]}
                 />
             }
@@ -69,6 +70,7 @@ const ParentWorkspace = ({ workspace }) => {
                     blockId={answer.id}
                     initialValue={answer.value}
                     readOnly={true}
+                    allowExports={false}
                     availablePointers={[]}
                 />
             }
