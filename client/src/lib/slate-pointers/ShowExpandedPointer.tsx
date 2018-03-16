@@ -32,6 +32,7 @@ export class InlineNode extends React.Component<any, any> {
                     blockEditor={this.props.blockEditor}
                     exportingPointers={this.props.exportingPointers}
                     nodeAsJson={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
+                    isHoverable={this.props.isHoverable}
                     onMouseOver={this.props.onMouseOver}
                 />
             );
@@ -52,11 +53,13 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                             exportingPointers={this.props.exportingPointers}
                             pointerId={this.props.exportingPointer.pointerId}
                             onMouseOver={this.props.onMouseOverPointerImport}
+                            isHoverable={this.props.isHoverable}
                         />;
                     } else {
                         return <LeafNode
                             key={index}
                             node={node.leaves[0]}
+                            isHoverable={this.props.isHoverable}
                             onMouseOver={this.props.onMouseOverExpandedPointer}
                             onMouseOut={this.props.onMouseOut}
                         />;
