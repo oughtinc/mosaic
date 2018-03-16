@@ -104,7 +104,7 @@ module.exports = {
 
     await queryInterface.createTable('PointerImports', {
       ...standardColumns,
-      isExpanded: Sequelize.BOOLEAN,
+      isLocked: Sequelize.BOOLEAN,
       pointerId: referenceTo("Pointers"),
       workspaceId: referenceTo("Workspaces"),
     })

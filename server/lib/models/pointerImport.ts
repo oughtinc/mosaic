@@ -11,6 +11,9 @@ const PointerImportModel = (sequelize, DataTypes) => {
       allowNull: false,
     },
     ...eventRelationshipColumns(DataTypes),
+    isLocked: {
+      type: DataTypes.BOOLEAN,
+    },
   }, {
     hooks: {
         beforeValidate: eventHooks.beforeValidate,
