@@ -37,7 +37,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     this.onChange = this.onChange.bind(this);
     this.state = {
       plugins: [],
-    };    
+    };
   }
 
   public componentWillMount() {
@@ -47,8 +47,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public componentWillReceiveProps(newProps: any) {
     if (
       (JSON.stringify(newProps.blockEditor) !== JSON.stringify(this.props.blockEditor))
-      || (newProps.exportingPointers.length !== this.props.exportingPointers.length)
-      || (newProps.usefulPointers.length !== this.props.usefulPointers.length)
+      || (newProps.availablePointers.length !== this.props.availablePointers.length)
     ) {
       this.resetPlugins(newProps);
     }
@@ -87,7 +86,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         });
       },
       blockEditor: newProps.blockEditor,
-      exportingPointers: [...newProps.exportingPointers, ...newProps.usefulPointers],
+      exportingPointers: newProps.availablePointers,
     };
     this.setState({
       plugins: [
@@ -122,7 +121,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return (<div> loading... </div>);
     }
     const value = block.value;
-    const exportingPointers = this.props.exportingPointers;
+    const availablePointers = this.props.availablePointers;
     const {plugins} = this.state;
     if (readOnly) {
       return (
@@ -139,7 +138,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <div>
           <BlockEditorStyle>
             <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
-              {exportingPointers.map((e: any, index: number) => (
+              {availablePointers.map((e: any, index: number) => (
                 <MenuItem
                   eventKey="1"
                   key={index}
@@ -177,11 +176,9 @@ class BlockEditorPresentational extends React.Component<any, any> {
 }
 
 function mapStateToProps(state: any, { blockId }: any) {
-  const exportingPointers = exportingPointersSelector(state);
   const { blocks, blockEditor } = state;
   const block = blocks.blocks.find((b) => b.id === blockId);
-  const importingPointers = importingPointersSelector({block});
-  return { block, blockEditor, exportingPointers, importingPointers };
+  return { block, blockEditor };
 }
 
 export const BlockEditor: any = compose(
@@ -189,22 +186,4 @@ export const BlockEditor: any = compose(
     mapStateToProps, { addBlocks, updateBlock, changeHoverItem, removeHoverItem }
   ),
   withApollo,
-  withProps((props: any) => {
-    let pointers: any = [];
-    for (const pointerId of props.importingPointers.map((p) => p.data.pointerId)) {
-      const result = props.client.readFragment({
-        id: `Pointer:${pointerId}`,
-        fragment: gql`
-          fragment pointer on pointer {
-            id
-            value
-          }
-        `,
-      });
-      if (result) {
-        pointers = [...pointers, result.value];
-      }
-    }
-    return {usefulPointers: pointers};
-  }),
 )(BlockEditorPresentational);
