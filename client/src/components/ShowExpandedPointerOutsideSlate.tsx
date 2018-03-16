@@ -13,6 +13,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
                 exportingPointers={this.props.exportingPointers}
                 blockEditor={this.props.blockEditor}
                 exportingPointer={this.props.exportingPointer}
+                isHoverable={this.props.isHoverable}
                 onMouseOverPointerImport={({ top, left, id }) => {
                     this.props.changeHoverItem({
                         hoverItemType: HOVER_ITEM_TYPES.POINTER_IMPORT,

@@ -67,6 +67,7 @@ function SlatePointers(options: any = {}) {
             onMouseOver={({ top, left, id }) => {
               options.onMouseOverPointerImport({ top, left, id });
             }}
+            isHoverable={true}
           />
         );
       } else {

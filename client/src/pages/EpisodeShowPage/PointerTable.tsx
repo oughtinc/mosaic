@@ -53,6 +53,7 @@ export class PointerTable extends React.Component<any, any> {
                         <Text>
                            <ShowExpandedPointerOutsideSlate
                             exportingPointer={pointer}
+                            isHoverable={true}
                            /> 
                         </Text>
                     </Row>

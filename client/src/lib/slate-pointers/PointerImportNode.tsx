@@ -62,7 +62,7 @@ export class PointerImportNode extends React.Component<any, any> {
     }
 
     public onMouseOver() {
-        if (this.props.isHoverable){
+        if (this.props.isHoverable) {
             const {top, left} = this.getLocation();
             this.props.onMouseOver({top, left, id: this.props.nodeAsJson.data.internalReferenceId});
         }
@@ -110,6 +110,7 @@ export class PointerImportNode extends React.Component<any, any> {
                         onMouseOverExpandedPointer={this.onMouseOver}
                         onMouseOverPointerImport={this.props.onMouseOver}
                         onMouseOut={this.props.onMouseOut}
+                        isHoverable={this.props.isHoverable}
                     />
                 </OpenPointerImport>
             );
