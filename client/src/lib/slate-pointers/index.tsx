@@ -5,7 +5,7 @@ import { PointerImportNode } from "./PointerImportNode";
 function SlatePointers(options: any = {}) {
   return {
     onSelect(event: any, change: any, editor: any) {
-      if (options.allowExports) {
+      if (options.canExport) {
         const { value } = editor.props;
         if (value.isBlurred || value.isEmpty) {
           return;
