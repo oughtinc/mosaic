@@ -121,6 +121,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     blockId={question.id}
                                     initialValue={question.value}
                                     readOnly={true}
+                                    allowExports={false}
                                     availablePointers={availablePointers}
                                 />
                             </h1>
@@ -134,6 +135,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={scratchpad.id}
                                 initialValue={scratchpad.value}
                                 availablePointers={availablePointers}
+                                allowExports={true}
                             />
                             <h3>Answer</h3>
                             <BlockEditor
@@ -141,6 +143,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={answer.id}
                                 initialValue={answer.value}
                                 availablePointers={availablePointers}
+                                allowExports={false}
                             />
                             <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
