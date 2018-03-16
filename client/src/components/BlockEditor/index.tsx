@@ -87,7 +87,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
-      allowExports: newProps.allowExports || false,
+      canExport: newProps.canExport || false,
     };
     this.setState({
       plugins: [
@@ -129,7 +129,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <BlockReadOnlyStyle>
           <Editor
             value={value}
-            readOnly={false}
+            readOnly={true}
             plugins={plugins}
           />
         </BlockReadOnlyStyle>
