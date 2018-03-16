@@ -14,6 +14,7 @@ const ChildStyle = styled.div`
 export class Child extends React.Component<any, any> {
     public render() {
         const workspace = this.props.workspace;
+        const availablePointers = this.props.availablePointers;
         const question = workspace.blocks.find((b) => (b.type === "QUESTION"));
         const answer = workspace.blocks.find((b) => (b.type === "ANSWER"));
         return (
@@ -23,6 +24,7 @@ export class Child extends React.Component<any, any> {
                         readOnly={true}
                         blockId={question.id}
                         initialValue={question.value}
+                        availablePointers={availablePointers}
                     />
                 }
                 {answer.value &&
@@ -30,6 +32,7 @@ export class Child extends React.Component<any, any> {
                         readOnly={true}
                         blockId={answer.id}
                         initialValue={answer.value}
+                        availablePointers={availablePointers}
                     />
                 }
 
@@ -58,6 +61,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                                     workspace={workspace}
                                     key={workspace.id}
                                     onDelete={() => { this.props.changeOrder(this.props.workspaceOrder.filter((w) => w !== workspace.id)); }}
+                                    availablePointers={this.props.availablePointers}
                                 />
                             );
                         }
@@ -65,7 +69,10 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     </div>
                 }
                 <h3> Add a new Child Question </h3>
-                <NewBlockForm onMutate={this.props.onCreateChild} />
+                <NewBlockForm
+                    onMutate={this.props.onCreateChild}
+                    availablePointers={this.props.availablePointers}
+                />
             </div>
         );
     }
