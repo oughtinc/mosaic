@@ -96,7 +96,7 @@ let schema = new GraphQLSchema({
         args: {workspaceId: {type: GraphQLString}, blocks: {type: new GraphQLList(BlockInput)}},
         resolve: async (_, {workspaceId, blocks}) => {
           const event = await models.Event.create()
-          let newBlocks = []
+          let newBlocks: any = []
           for (const _block of blocks){
             const block = await models.Block.findById(_block.id)
             await block.update({..._block}, {event})
