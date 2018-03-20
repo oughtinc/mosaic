@@ -2,16 +2,12 @@ import * as React from "react";
 import Plain from "slate-plain-serializer";
 import styled from "styled-components";
 import { Editor } from "slate-react";
-import { addBlocks, updateBlock } from "../../modules/blocks/actions";
+import { addBlocks } from "../../modules/blocks/actions";
 import { changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
-import { compose, withProps } from "recompose";
+import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
-import { exportingPointersSelector, importingPointersSelector } from "../../modules/blocks/exportingPointers";
 import { SlatePointers } from "../../lib/slate-pointers";
-import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
-import { withApollo } from "react-apollo";
-import gql from "graphql-tag";
 import { BlockEditorEditing } from "./BlockEditorEditing";
 
 const BlockReadOnlyStyle = styled.div`
@@ -103,7 +99,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return (<div> loading... </div>);
     }
     const value = block.value;
-    const availablePointers = this.props.availablePointers;
     const {plugins} = this.state;
     if (readOnly) {
       return (
