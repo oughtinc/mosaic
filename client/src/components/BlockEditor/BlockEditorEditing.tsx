@@ -36,10 +36,13 @@ const UPDATE_BLOCKS = gql`
 
 export class BlockEditorEditingPresentational extends React.Component<any, any> {
 
+    private autoSaveInterval: any;
+
     public constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
-        setInterval(() => this.props.mutation(), 20000);
+        this.handleBlur = this.handleBlur.bind(this);
+        this.startAutosave = this.startAutosave.bind(this);
     }
 
     public onChange(value: any) {
@@ -52,7 +55,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     public render() {
         console.log();
         return (
-            <div onBlur={this.props.mutation}>
+            <div onBlur={this.handleBlur} onFocus={this.startAutosave}>
                 <BlockEditorStyle>
                     <div>
                         <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px", marginRight: "5px" }}>
@@ -119,6 +122,15 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                 return <FontAwesomeIcon icon={faSpinner} spin={true} />;
             }
         }
+    }
+
+    private startAutosave () {
+        this.autoSaveInterval = setInterval(this.props.mutation, 20000);
+    }
+
+    private handleBlur () {
+        this.props.mutation();
+        clearInterval(this.autoSaveInterval);
     }
 }
 
