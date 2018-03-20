@@ -10,11 +10,17 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
-import _ = require("lodash");
 import FontAwesomeIcon = require ("@fortawesome/react-fontawesome");
 import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
 import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
 import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
+
+enum MutationStatus {
+    NOT_STARTED = 0,
+    LOADING,
+    COMPLETE,
+    ERROR,
+}
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -105,7 +111,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         if (!this.props.autoSave) {
             return;
         }
-        switch (this.props.mutationStatus.status) {
+        switch (this.props && this.props.mutationStatus.status) {
             case MutationStatus.NOT_STARTED: {
                 return null;
             }
@@ -132,13 +138,6 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         this.props.mutation();
         clearInterval(this.autoSaveInterval);
     }
-}
-
-enum MutationStatus {
-    NOT_STARTED = 0,
-    LOADING,
-    COMPLETE,
-    ERROR,
 }
 
 export const BlockEditorEditing: any = compose(
