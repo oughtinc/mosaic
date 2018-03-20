@@ -11,9 +11,10 @@ import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
 import _ = require("lodash");
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import FontAwesomeIcon = require ("@fortawesome/react-fontawesome");
 import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
 import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
+import faExclamationTrianle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -104,14 +105,13 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                 return null;
             }
             case MutationStatus.LOADING: {
-                debugger;
-                return <FontAwesomeIcon icon={faSpinner} />;
+                return <FontAwesomeIcon icon={faSpinner} spin={true}/>;
             }
             case MutationStatus.COMPLETE: {
                 return <FontAwesomeIcon icon={faCheck} />;
             }
             case MutationStatus.ERROR: {
-                return <i className="fa fa-exclamation-triangle" />;
+                return <FontAwesomeIcon icon={faCheck} />;;
             }
             default: {
                 return null;
