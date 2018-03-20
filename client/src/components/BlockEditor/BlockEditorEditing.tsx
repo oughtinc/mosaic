@@ -85,9 +85,9 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                         onChange={(c) => this.onChange(c.value)}
                         plugins={this.props.plugins}
                     />
-                    <div onClick={this.props.mutation}>
+                    {this.props.autoSave && <div onClick={this.props.mutation}>
                         save me
-                    </div>
+                    </div>}
                 </BlockEditorStyle>
             </div>
         );
