@@ -11,6 +11,9 @@ import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
 import _ = require("lodash");
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
+import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -49,7 +52,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         console.log();
         return (
             <div onBlur={this.props.mutation}>
-                {this.renderSaveIcon(this.props.mutationStatus.status)}
+                {this.renderSaveIcon()}
                 <BlockEditorStyle>
                     <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
                         {this.props.availablePointers.map((e: any, index: number) => (
@@ -95,24 +98,25 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         );
     }
 
-    private renderSaveIcon(mutationStatus: MutationStatus) {
-      switch (mutationStatus) {
-        case MutationStatus.NOT_STARTED: {
-          return null;
+    private renderSaveIcon() {
+        switch (this.props.mutationStatus.status) {
+            case MutationStatus.NOT_STARTED: {
+                return null;
+            }
+            case MutationStatus.LOADING: {
+                debugger;
+                return <FontAwesomeIcon icon={faSpinner} />;
+            }
+            case MutationStatus.COMPLETE: {
+                return <FontAwesomeIcon icon={faCheck} />;
+            }
+            case MutationStatus.ERROR: {
+                return <i className="fa fa-exclamation-triangle" />;
+            }
+            default: {
+                return null;
+            }
         }
-        case MutationStatus.LOADING: {
-          return <i className="fa fa-spinner" />;
-        }
-        case MutationStatus.COMPLETE: {
-          return <i className="fa fa-check" />;
-        }
-        case MutationStatus.ERROR: {
-          return <i className="fa fa-exclamation-triangle" />;
-        }
-        default: {
-          return null;
-        }
-      }
     }
 }
 
