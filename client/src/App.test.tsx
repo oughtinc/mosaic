@@ -5,5 +5,5 @@ import { emptyStore } from './store';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
-  ReactDOM.render(<App store={emptyStore} />, div);
+  ReactDOM.render(<App store={emptyStore} rootNodeId="0" />, div);
 });
