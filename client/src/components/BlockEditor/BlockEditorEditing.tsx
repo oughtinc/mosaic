@@ -35,7 +35,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     public constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
-        // setInterval(() => this.props.mutation(), 1000);
+        setInterval(() => this.props.mutation(), 1000);
     }
 
     public onChange(value: any) {
@@ -49,7 +49,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         console.log();
         return (
             <div onBlur={this.props.mutation}>
-                <div>{this.props.mutationStatus.status}</div>
+                {this.renderSaveIcon(this.props.mutationStatus.status)}
                 <BlockEditorStyle>
                     <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
                         {this.props.availablePointers.map((e: any, index: number) => (
@@ -94,9 +94,29 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
             </div>
         );
     }
+
+    private renderSaveIcon(mutationStatus: MutationStatus) {
+      switch (mutationStatus) {
+        case MutationStatus.NOT_STARTED: {
+          return null;
+        }
+        case MutationStatus.LOADING: {
+          return <i className="fa fa-spinner" />;
+        }
+        case MutationStatus.COMPLETE: {
+          return <i className="fa fa-check" />;
+        }
+        case MutationStatus.ERROR: {
+          return <i className="fa fa-exclamation-triangle" />;
+        }
+        default: {
+          return null;
+        }
+      }
+    }
 }
 
-enum MUTATION_STATUS {
+enum MutationStatus {
     NOT_STARTED = 0,
     LOADING,
     COMPLETE,
@@ -108,16 +128,16 @@ export const BlockEditorEditing: any = compose(
         () => ({}), { updateBlock }
     ),
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer" }),
-    withState("mutationStatus", "setMutationStatus", { status: MUTATION_STATUS.NOT_STARTED }),
+    withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NOT_STARTED }),
     withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
         const mutation = (value) => {
-            setMutationStatus({ status: MUTATION_STATUS.LOADING });
+            setMutationStatus({ status: MutationStatus.LOADING });
             saveBlocksToServer({
                 variables: { blocks: { id: block.id, value: block.value.toJSON() } },
             }).then(() => {
-                setMutationStatus({ status: MUTATION_STATUS.COMPLETE });
+                setMutationStatus({ status: MutationStatus.COMPLETE });
             }).catch((e) => {
-                setMutationStatus({ status: MUTATION_STATUS.ERROR, error: e });
+                setMutationStatus({ status: MutationStatus.ERROR, error: e });
             });
         };
 
