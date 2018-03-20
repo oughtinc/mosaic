@@ -124,6 +124,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
             availablePointers={this.props.availablePointers}
             plugins={plugins}
             autoSave={this.props.autoSave}
+            onChange={this.props.onChange}
         />
       );
     }
