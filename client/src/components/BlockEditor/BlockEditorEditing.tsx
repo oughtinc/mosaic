@@ -53,39 +53,41 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         console.log();
         return (
             <div onBlur={this.props.mutation}>
-                {this.renderSaveIcon()}
                 <BlockEditorStyle>
-                    <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
-                        {this.props.availablePointers.map((e: any, index: number) => (
-                            <MenuItem
-                                eventKey="1"
-                                key={index}
-                                onClick={(event) => {
-                                    const ch = this.props.value.change()
-                                        .insertInline(Inline.fromJSON({
-                                            object: "inline",
-                                            type: "pointerImport",
-                                            isVoid: true,
-                                            data: {
-                                                pointerId: e.data.pointerId,
-                                                internalReferenceId: uuidv1(),
-                                            },
-                                        }));
-                                    this.props.onChange(ch.value);
-                                }}
-                            >
-                                <span>
-                                    {`$${index + 1} - ${e.data.pointerId.slice(0, 5)}`}
-                                    <ShowExpandedPointer
-                                        exportingPointer={e}
-                                        exportingPointers={this.props.availablePointers}
-                                        blockEditor={this.props.blockEditor}
-                                        isHoverable={false}
-                                    />
-                                </span>
-                            </MenuItem>
-                        ))}
-                    </DropdownButton>
+                    <div>
+                        <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px", marginRight: "5px" }}>
+                            {this.props.availablePointers.map((e: any, index: number) => (
+                                <MenuItem
+                                    eventKey="1"
+                                    key={index}
+                                    onClick={(event) => {
+                                        const ch = this.props.value.change()
+                                            .insertInline(Inline.fromJSON({
+                                                object: "inline",
+                                                type: "pointerImport",
+                                                isVoid: true,
+                                                data: {
+                                                    pointerId: e.data.pointerId,
+                                                    internalReferenceId: uuidv1(),
+                                                },
+                                            }));
+                                        this.props.onChange(ch.value);
+                                    }}
+                                >
+                                    <span>
+                                        {`$${index + 1} - ${e.data.pointerId.slice(0, 5)}`}
+                                        <ShowExpandedPointer
+                                            exportingPointer={e}
+                                            exportingPointers={this.props.availablePointers}
+                                            blockEditor={this.props.blockEditor}
+                                            isHoverable={false}
+                                        />
+                                    </span>
+                                </MenuItem>
+                            ))}
+                        </DropdownButton>
+                        {this.renderSaveIcon()}
+                    </div>
                     <Editor
                         value={this.props.value}
                         onChange={(c) => this.onChange(c.value)}
@@ -108,7 +110,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                 return <FontAwesomeIcon icon={faSpinner} spin={true}/>;
             }
             case MutationStatus.COMPLETE: {
-                return <FontAwesomeIcon icon={faCheck} style={{color: "green"}}/>;
+                return <FontAwesomeIcon icon={faCheck} style={{color: "rgba(0, 255, 0, 0.4)"}}/>;
             }
             case MutationStatus.ERROR: {
                 return <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: "red" }}/>;
