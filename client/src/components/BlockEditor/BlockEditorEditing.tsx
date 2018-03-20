@@ -10,6 +10,7 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
+import _ = require("lodash");
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -34,6 +35,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     public constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
+        setInterval(() => this.props.mutation(), 1000);
     }
 
     public onChange(value: any) {
