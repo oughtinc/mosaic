@@ -14,7 +14,7 @@ import _ = require("lodash");
 import FontAwesomeIcon = require ("@fortawesome/react-fontawesome");
 import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
 import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
-import faExclamationTrianle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
+import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -108,13 +108,13 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                 return <FontAwesomeIcon icon={faSpinner} spin={true}/>;
             }
             case MutationStatus.COMPLETE: {
-                return <FontAwesomeIcon icon={faCheck} />;
+                return <FontAwesomeIcon icon={faCheck} style={{color: "green"}}/>;
             }
             case MutationStatus.ERROR: {
-                return <FontAwesomeIcon icon={faCheck} />;;
+                return <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: "red" }}/>;
             }
             default: {
-                return null;
+                return <FontAwesomeIcon icon={faSpinner} spin={true} />;
             }
         }
     }
