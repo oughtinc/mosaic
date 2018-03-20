@@ -35,7 +35,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     public constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
-        setInterval(() => this.props.mutation(), 1000);
+        // setInterval(() => this.props.mutation(), 1000);
     }
 
     public onChange(value: any) {
@@ -48,7 +48,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     public render() {
         console.log();
         return (
-            <div>
+            <div onBlur={this.props.mutation}>
                 <div>{this.props.mutationStatus.status}</div>
                 <BlockEditorStyle>
                     <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px" }}>
