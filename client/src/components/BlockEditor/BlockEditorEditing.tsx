@@ -39,7 +39,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     public constructor(props: any) {
         super(props);
         this.onChange = this.onChange.bind(this);
-        setInterval(() => this.props.mutation(), 1000);
+        setInterval(() => this.props.mutation(), 20000);
     }
 
     public onChange(value: any) {
@@ -93,15 +93,15 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                         onChange={(c) => this.onChange(c.value)}
                         plugins={this.props.plugins}
                     />
-                    {this.props.autoSave && <div onClick={this.props.mutation}>
-                        save me
-                    </div>}
                 </BlockEditorStyle>
             </div>
         );
     }
 
     private renderSaveIcon() {
+        if (!this.props.autoSave) {
+            return;
+        }
         switch (this.props.mutationStatus.status) {
             case MutationStatus.NOT_STARTED: {
                 return null;
