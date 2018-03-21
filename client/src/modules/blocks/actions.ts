@@ -1,5 +1,6 @@
 export const ADD_BLOCKS = "ADD_BLOCKS";
 export const UPDATE_BLOCK = "UPDATE_BLOCK";
+export const REMOVE_BLOCKS = "REMOVE_BLOCKS";
 
 // This is an action creator
 export const addBlocks = (blocks) => {
@@ -8,6 +9,16 @@ export const addBlocks = (blocks) => {
     dispatch({
       type: ADD_BLOCKS,
       blocks, 
+    });
+  };
+};
+
+export const removeBlocks = (blockIds) => {
+  // The returned object is an action
+  return (dispatch, getState) => {
+    dispatch({
+      type: REMOVE_BLOCKS,
+      blockIds, 
     });
   };
 };

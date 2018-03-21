@@ -5,7 +5,7 @@ import { Inline } from "slate";
 import styled from "styled-components";
 import { DropdownButton, MenuItem } from "react-bootstrap";
 import { Editor } from "slate-react";
-import { addBlocks, updateBlock } from "../../modules/blocks/actions";
+import { addBlocks, updateBlock, removeBlocks } from "../../modules/blocks/actions";
 import { changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose, withProps } from "recompose";
 import { connect } from "react-redux";
@@ -15,6 +15,7 @@ import { SlatePointers } from "../../lib/slate-pointers";
 import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
 import { withApollo } from "react-apollo";
 import gql from "graphql-tag";
+import _ = require("lodash");
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -87,7 +88,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
-      canExport: newProps.canExport || false,
+      canExport: true, // newProps.canExport || false,
     };
     this.setState({
       plugins: [
@@ -99,13 +100,21 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public componentDidMount() {
     const { name, blockId, initialValue } = this.props;
+    const value = initialValue || Plain.deserialize("");
+
     const blockForm = {
       id: blockId,
       name,
-      value: initialValue || Plain.deserialize(""),
+      value,
     };
+
     this.props.addBlocks([blockForm]);
     this.resetPlugins(this.props);
+  }
+
+  public componentWillUnmount() {
+    const { blockId } = this.props;
+    this.props.removeBlocks([blockId]);
   }
 
   public onChange(value: any) {
@@ -189,7 +198,7 @@ function mapStateToProps(state: any, { blockId }: any) {
 
 export const BlockEditor: any = compose(
   connect(
-    mapStateToProps, { addBlocks, updateBlock, changeHoverItem, removeHoverItem }
+    mapStateToProps, { addBlocks, updateBlock, removeBlocks, changeHoverItem, removeHoverItem }
   ),
   withApollo,
 )(BlockEditorPresentational);

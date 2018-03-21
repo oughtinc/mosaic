@@ -11,8 +11,11 @@ import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
-import { exportingPointersSelector, exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
+import { exportingPointersSelector, exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
+import Plain from "slate-plain-serializer";
 import _ = require("lodash");
+import { Value } from "slate";
+import * as uuidv1 from "uuid/v1";
 
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
@@ -83,10 +86,42 @@ const ParentLink = (props) => (
     </Link>
 );
 
+function outputsToInputs(value: any) {
+    const nodes = value.document.nodes[0].nodes; 
+    const newNodes = nodes.map((n) => {
+        if (n.type && n.type === "pointerExport") {
+            return ({
+            object: "inline",
+            type: "pointerImport",
+            isVoid: true,
+            data: {
+                pointerId: n.data.pointerId,
+                internalReferenceId: uuidv1(),
+            },
+            });
+        } else {
+            return n;
+        }
+    });
+    const newValue = _.cloneDeep(value);
+    newValue.document.nodes[0].nodes = newNodes;
+    return newValue;
+}
+
+function findPointers(value) {
+    const _value = value ? Value.fromJSON(value) : Plain.deserialize("");
+    const pointers = exportingNodes(_value.document);
+    return pointers;
+}
+
 export class FormPagePresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.updateBlocks = this.updateBlocks.bind(this);
+    }
+
+    public componentDidMount() {
+        console.log("MOUNT");
     }
 
     public updateBlocks(blocks: any) {
@@ -101,12 +136,13 @@ export class FormPagePresentational extends React.Component<any, any> {
         if (!workspace) {
             return <div> Loading </div>;
         }
-        const importingWorkspaces = [workspace, ...workspace.childWorkspaces];
-        let importedPointers = _.flatten(importingWorkspaces.map((w) => w.pointerImports.map((p) => p.pointer.value).filter((v) => !!v)));
-        const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers], (p) => p.data.pointerId);
         const question = workspace.blocks.find((b) => b.type === "QUESTION");
         const answer = workspace.blocks.find((b) => b.type === "ANSWER");
         const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
+
+        const importingWorkspaces = [workspace, ...workspace.childWorkspaces];
+        let importedPointers = _.flatten(importingWorkspaces.map((w) => w.pointerImports.map((p) => p.pointer.value).filter((v) => !!v)));
+        const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers, ...findPointers(question.value)], (p) => p.data.pointerId);
         return (
             <div key={workspace.id}>
                 <BlockHoverMenu>
@@ -119,7 +155,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 <BlockEditor
                                     name={question.id}
                                     blockId={question.id}
-                                    initialValue={question.value}
+                                    initialValue={question.value && outputsToInputs(question.value) || false}
                                     readOnly={true}
                                     canExport={false}
                                     availablePointers={availablePointers}

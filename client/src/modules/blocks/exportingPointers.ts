@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { createSelector } from "reselect";
+import { createSelector } from "reselect"
 
 const blockSelector = (state) => state.blocks.blocks;
 
@@ -19,7 +19,7 @@ function getInlinesAsArray(node: any) {
   return array;
 }
 
-function exportingNodes(node: any) {
+export function exportingNodes(node: any) {
     const _getInlinesAsArray = getInlinesAsArray(node).map((n) => n.toJSON());
     const pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerExport");
     return pointers;

@@ -34,7 +34,13 @@ export class Layout extends React.Component {
 const Routes = () => (
   <div>
     <Route exact={true} path="/" component={RootWorkspacePage} />
-    <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
+    <Route path="/workspaces/:workspaceId" render={(props) => (
+      <EpisodeShowPage
+        {...props}
+        key={props.match.params.workspaceId}
+      />
+    )}
+    />
   </div>
 );
 
@@ -53,11 +59,11 @@ class App extends React.Component {
     return (
       <ApolloProvider client={client}>
         <Provider store={store}>
-        <BrowserRouter>
-          <Layout>
-            <Routes />
-          </Layout>
-        </BrowserRouter>
+          <BrowserRouter>
+            <Layout>
+              <Routes />
+            </Layout>
+          </BrowserRouter>
         </Provider>
       </ApolloProvider>
     );
