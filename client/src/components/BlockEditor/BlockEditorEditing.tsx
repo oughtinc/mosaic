@@ -42,35 +42,25 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         super(props);
         this.onChange = this.onChange.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
-        this.startAutosave = this.startAutosave.bind(this);
-        this.endAutosave = this.endAutosave.bind(this);
+        this.beginAutosaveInterval = this.beginAutosaveInterval.bind(this);
+        this.endAutosaveInterval = this.endAutosaveInterval.bind(this);
         this.saveToDatabase = this.saveToDatabase.bind(this);
         this.onAddPointerImport = this.onAddPointerImport.bind(this);
+        this.considerSaveToDatabase = this.considerSaveToDatabase.bind(this);
         this.state = {hasChangedSinceDatabaseSave: false};
     }
 
     public componentWillUnmount() {
-        this.endAutosave();
+        this.endAutosaveInterval();
     }
 
     public componentDidUpdate(prevProps: any) {
         const oldDocument = prevProps.block.value.document;
         const newDocument = this.props.block.value.document;
 
-        if (oldDocument.equals(newDocument)) {
-            return;
+        if (!oldDocument.equals(newDocument)) {
+            this.onValueChange();
         }
-        
-        // save immediately if a pointer was exported
-        if (this.props.block.pointerChanged) {
-            this.saveToDatabase(true);
-            return;
-        }
-        
-        // if the text of the block was changed, rather than the pointer exports,
-        // rely on autosave to save that change
-        this.startAutosave();
-        this.setState({ hasChangedSinceDatabaseSave: true });
     }
 
     public render() {
@@ -95,6 +85,19 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         );
     }
 
+    private onValueChange() {
+        const changeFromOutsideComponent = this.props.block.pointerChanged;
+        if (changeFromOutsideComponent) {
+            this.saveToDatabase();
+        } else {
+            this.beginAutosaveInterval();
+
+            if (!this.state.hasChangedSinceDatabaseSave) {
+                this.setState({ hasChangedSinceDatabaseSave: true });
+            }
+        }
+    }
+
     private onChange(value: any, pointerChanged: boolean = false) {
         this.props.updateBlock({ id: this.props.block.id, value, pointerChanged });
         if (this.props.onChange) {
@@ -116,20 +119,24 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         this.onChange(ch.value, true);
     }
 
-    private saveToDatabase(forceSave?: boolean) {
-        if (forceSave || this.state.hasChangedSinceDatabaseSave) {
-            this.props.mutation();
-            this.setState({hasChangedSinceDatabaseSave: false});
+    private considerSaveToDatabase() {
+        if (this.state.hasChangedSinceDatabaseSave) {
+            this.saveToDatabase();
         }
     }
 
-    private startAutosave() {
+    private saveToDatabase() {
+        this.props.mutation();
+        this.setState({hasChangedSinceDatabaseSave: false});
+    }
+
+    private beginAutosaveInterval() {
         if (this.props.autoSave && !this.autoSaveInterval) {
-            this.autoSaveInterval = setInterval(this.saveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
+            this.autoSaveInterval = setInterval(this.considerSaveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
         }
     }
 
-    private endAutosave() {
+    private endAutosaveInterval() {
         if (this.props.autoSave) {
             clearInterval(this.autoSaveInterval);
             delete this.autoSaveInterval;
@@ -138,8 +145,8 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
 
     private handleBlur() {
         if (this.props.autoSave) {
-            this.saveToDatabase();
-            this.endAutosave();
+            this.considerSaveToDatabase();
+            this.endAutosaveInterval();
         }
     }
 }
