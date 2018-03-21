@@ -14,7 +14,6 @@ export const addBlocks = (blocks) => {
 };
 
 export const removeBlocks = (blockIds) => {
-  // The returned object is an action
   return (dispatch, getState) => {
     dispatch({
       type: REMOVE_BLOCKS,
@@ -23,12 +22,13 @@ export const removeBlocks = (blockIds) => {
   };
 };
 
-export const updateBlock = ({id, value}) => {
+export const updateBlock = ({ id, value, pointerChanged }) => {
   return (dispatch, getState) => {
     dispatch({
       type: UPDATE_BLOCK,
       id, 
       value,
+      pointerChanged,
     });
   };
 };
