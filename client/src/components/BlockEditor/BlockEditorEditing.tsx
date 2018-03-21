@@ -53,6 +53,15 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         this.endAutosave();
     }
 
+    public componentWillReceiveProps(nextProps) {
+        const blockChanged = this.props.block.value
+            && ! _.isEqual(this.props.block.value, nextProps.block.value);
+        if (blockChanged && this.props.autoSave) {
+            this.onChange(nextProps.block.value);
+            this.saveToDatabase();
+        }
+    }
+
     public render() {
         return (
             <div>
