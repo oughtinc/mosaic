@@ -157,7 +157,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     blockId={question.id}
                                     initialValue={question.value && outputsToInputs(question.value) || false}
                                     readOnly={true}
-                                    canExport={false}
                                     availablePointers={availablePointers}
                                 />
                             </h1>
@@ -172,7 +171,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 initialValue={scratchpad.value}
                                 availablePointers={availablePointers}
                                 autoSave={true}
-                                canExport={true}
                             />
                             <h3>Answer</h3>
                             <BlockEditor
@@ -181,7 +179,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 initialValue={answer.value}
                                 availablePointers={availablePointers}
                                 autoSave={true}
-                                canExport={false}
                             />
                         </Col>
                         <Col sm={2}>

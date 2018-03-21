@@ -77,7 +77,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
-      canExport: true, // newProps.canExport || false,
     };
     this.setState({
       plugins: [
@@ -107,7 +106,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public onChange(value: any) {
-    this.props.updateBlock({ id: this.props.block.id, value });
+    // this.props.updateBlock({ id: this.props.block.id, value });
     if (this.props.onChange) {
       this.props.onChange(value);
     }
