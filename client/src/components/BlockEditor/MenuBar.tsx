@@ -55,6 +55,10 @@ export class SavingIcon extends React.Component<any, any> {
         const Icon = Icons[this.props.mutationStatus.status];
         const {hasChangedSinceDatabaseSave} = this.props;
         const inErrorState = this.props.mutationStatus === MutationStatus.Error;
+
+        // if the user types more after we show the icon,
+        // only continue to show it if there's an error
+        // to avoid distracting them w/ unimportant information.
         if (!hasChangedSinceDatabaseSave || inErrorState) {
             return (
                 <SavingIconStyle>
