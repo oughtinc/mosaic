@@ -115,10 +115,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <BlockEditorEditing
             value={value}
             readOnly={true}
+            autoSave={!!this.props.autoSave}
             block={this.props.block}
             availablePointers={this.props.availablePointers}
             plugins={plugins}
-            autoSave={this.props.autoSave === false ? false : true}
             onChange={this.props.onChange}
         />
       );

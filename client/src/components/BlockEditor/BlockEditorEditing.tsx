@@ -112,16 +112,22 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     }
 
     private startAutosave() {
-        this.autoSaveInterval = setInterval(this.saveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
+        if (this.props.autoSave) {
+            this.autoSaveInterval = setInterval(this.saveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
+        }
     }
 
     private endAutosave() {
-        clearInterval(this.autoSaveInterval);
+        if (this.props.autoSave) {
+            clearInterval(this.autoSaveInterval);
+        }
     }
 
     private handleBlur() {
-        this.saveToDatabase();
-        this.endAutosave();
+        if (this.props.autoSave) {
+            this.saveToDatabase();
+            this.endAutosave();
+        }
     }
 }
 
