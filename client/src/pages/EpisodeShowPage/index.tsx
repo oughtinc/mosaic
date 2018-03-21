@@ -147,7 +147,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 autoSave={true}
                                 canExport={false}
                             />
-                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
                         <Col sm={2}>
                             <h3>Pointers</h3>
