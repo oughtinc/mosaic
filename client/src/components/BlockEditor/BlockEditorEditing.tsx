@@ -62,7 +62,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         }
         
         // save immediately if a pointer was exported
-        if (this.props.block.pointerJustExported) {
+        if (this.props.block.pointerChanged) {
             this.saveToDatabase(true);
             return;
         }
@@ -95,8 +95,8 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         );
     }
 
-    private onChange(value: any) {
-        this.props.updateBlock({ id: this.props.block.id, value });
+    private onChange(value: any, pointerChanged: boolean = false) {
+        this.props.updateBlock({ id: this.props.block.id, value, pointerChanged });
         if (this.props.onChange) {
             this.props.onChange(value);
         }
@@ -113,7 +113,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                     internalReferenceId: uuidv1(),
                 },
             }));
-        this.onChange(ch.value);
+        this.onChange(ch.value, true);
     }
 
     private saveToDatabase(forceSave?: boolean) {

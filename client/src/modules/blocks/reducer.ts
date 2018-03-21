@@ -24,7 +24,7 @@ export const blockReducer = (state = {blocks: []}, action) => {
                     return ({
                         ...block,
                         value: action.value,
-                        pointerJustExported: action.pointerJustExported,
+                        pointerChanged: action.pointerChanged,
                     });
                 }
             }),
