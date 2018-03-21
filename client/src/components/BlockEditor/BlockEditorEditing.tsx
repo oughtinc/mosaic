@@ -54,12 +54,20 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     }
 
     public componentWillReceiveProps(nextProps) {
-        const blockChanged = this.props.block.value
-            && ! _.isEqual(this.props.block.value, nextProps.block.value);
-        if (blockChanged && this.props.autoSave) {
-            this.onChange(nextProps.block.value);
-            this.saveToDatabase();
+        const oldDocument = this.props.block.value.document;
+        const newDocument = nextProps.value.document;
+
+        if (oldDocument.equals(newDocument)) {
+            return;
         }
+            
+        if (nextProps.block.pointerAdded) {
+            setTimeout(() => this.saveToDatabase(true), 100);
+            return;
+        }
+            
+        this.startAutosave();
+        this.setState({ hasChangedSinceDatabaseSave: true });
     }
 
     public render() {
@@ -78,7 +86,6 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                         plugins={this.props.plugins}
                         spellCheck={false}
                         onBlur={this.handleBlur}
-                        onFocus={this.startAutosave}
                     />
                 </BlockEditorStyle>
             </div>
@@ -89,12 +96,6 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         this.props.updateBlock({ id: this.props.block.id, value });
         if (this.props.onChange) {
             this.props.onChange(value);
-        }
-
-        const oldDocument = this.props.block.value.document;
-        const newDocument = value.document;
-        if (!oldDocument.equals(newDocument)) {
-            this.setState({hasChangedSinceDatabaseSave: true});
         }
     }
 
@@ -112,15 +113,15 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         this.onChange(ch.value);
     }
 
-    private saveToDatabase() {
-        if (this.state.hasChangedSinceDatabaseSave) {
+    private saveToDatabase(forceSave?: boolean) {
+        if (forceSave || this.state.hasChangedSinceDatabaseSave) {
             this.props.mutation();
             this.setState({hasChangedSinceDatabaseSave: false});
         }
     }
 
     private startAutosave() {
-        if (this.props.autoSave) {
+        if (this.props.autoSave && !this.autoSaveInterval) {
             this.autoSaveInterval = setInterval(this.saveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
         }
     }
