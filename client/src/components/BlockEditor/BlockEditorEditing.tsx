@@ -10,7 +10,6 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
-import FontAwesomeIcon = require("@fortawesome/react-fontawesome");
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import _ = require("lodash");
@@ -136,16 +135,16 @@ export const BlockEditorEditing: any = compose(
         () => ({}), { updateBlock }
     ),
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer" }),
-    withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NOT_STARTED }),
+    withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
     withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
         const mutation = () => {
-            setMutationStatus({ status: MutationStatus.LOADING });
+            setMutationStatus({ status: MutationStatus.Loading });
             saveBlocksToServer({
                 variables: { blocks: { id: block.id, value: block.value.toJSON() } },
             }).then(() => {
-                setMutationStatus({ status: MutationStatus.COMPLETE });
+                setMutationStatus({ status: MutationStatus.Complete });
             }).catch((e) => {
-                setMutationStatus({ status: MutationStatus.ERROR, error: e });
+                setMutationStatus({ status: MutationStatus.Error, error: e });
             });
         };
 
