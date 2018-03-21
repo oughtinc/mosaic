@@ -34,13 +34,7 @@ export class Layout extends React.Component {
 const Routes = () => (
   <div>
     <Route exact={true} path="/" component={RootWorkspacePage} />
-    <Route path="/workspaces/:workspaceId" render={(props) => (
-      <EpisodeShowPage
-        {...props}
-        key={props.match.params.workspaceId}
-      />
-    )}
-    />
+    <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
   </div>
 );
 

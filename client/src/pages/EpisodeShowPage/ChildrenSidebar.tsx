@@ -25,7 +25,6 @@ export class Child extends React.Component<any, any> {
                         blockId={question.id}
                         initialValue={question.value}
                         availablePointers={availablePointers}
-                        canExport={false}
                     />
                 }
                 {answer.value &&
@@ -34,7 +33,6 @@ export class Child extends React.Component<any, any> {
                         blockId={answer.id}
                         initialValue={answer.value}
                         availablePointers={availablePointers}
-                        canExport={false}
                     />
                 }
 
