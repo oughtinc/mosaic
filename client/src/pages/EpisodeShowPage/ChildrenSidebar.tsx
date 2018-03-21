@@ -4,7 +4,8 @@ import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
-import { WorkspaceRelations, WorkspaceRelationTypes } from "./WorkspaceRelations";
+import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
+// import { WorkspaceRelationTypes } from "./WorkspaceRelations";
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
@@ -16,21 +17,20 @@ export class Child extends React.Component<any, any> {
     public render() {
         const workspace = this.props.workspace;
         const availablePointers = this.props.availablePointers;
-        const questionRelationship = WorkspaceRelations[WorkspaceRelationTypes.SubworkspaceQuestion];
-        const answerRelationship = WorkspaceRelations[WorkspaceRelationTypes.SubworkspaceQuestion];
-        const question = workspace.blocks.find((b) => (b.type === "QUESTION"));
-        const answer = workspace.blocks.find((b) => (b.type === "ANSWER"));
+        const questionRelationship = new WorkspaceBlockRelation(WorkspaceRelationTypes.SubworkspaceQuestion, workspace);
+        const answerRelationship = new WorkspaceBlockRelation(WorkspaceRelationTypes.SubworkspaceAnswer, workspace);
         return (
             <ChildStyle>
-                {questionRelationship &&
+                {questionRelationship.findBlock().value &&
                     <BlockEditor
-                        {...WorkspaceRelations[WorkspaceRelationTypes.SubworkspaceQuestion].blockEditorAttributes(workspace)}
+                        {...questionRelationship.blockEditorAttributes()}
                         availablePointers={availablePointers}
                     />
                 }
-                {answer.value &&
+
+                {answerRelationship.findBlock().value &&
                     <BlockEditor
-                        {...WorkspaceRelations[WorkspaceRelationTypes.SubworkspaceAnswer].blockEditorAttributes(workspace)}
+                        {...answerRelationship.blockEditorAttributes()}
                         availablePointers={availablePointers}
                     />
                 }
