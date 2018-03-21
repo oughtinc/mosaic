@@ -135,6 +135,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={scratchpad.id}
                                 initialValue={scratchpad.value}
                                 availablePointers={availablePointers}
+                                autoSave={true}
                                 canExport={true}
                             />
                             <h3>Answer</h3>
@@ -143,9 +144,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={answer.id}
                                 initialValue={answer.value}
                                 availablePointers={availablePointers}
+                                autoSave={true}
                                 canExport={false}
                             />
-                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
                         <Col sm={2}>
                             <h3>Pointers</h3>
