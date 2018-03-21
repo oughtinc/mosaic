@@ -8,11 +8,6 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
-
-import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
-import { withApollo } from "react-apollo";
-import gql from "graphql-tag";
-import _ = require("lodash");
 import { BlockEditorEditing } from "./BlockEditorEditing";
 
 const BlockReadOnlyStyle = styled.div`
@@ -106,7 +101,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public onChange(value: any) {
-    // this.props.updateBlock({ id: this.props.block.id, value });
     if (this.props.onChange) {
       this.props.onChange(value);
     }

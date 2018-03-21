@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
-// import { WorkspaceRelationTypes } from "./WorkspaceRelations";
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
