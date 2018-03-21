@@ -44,17 +44,17 @@ export class PointerDropdownMenu extends React.Component<any, any> {
 }
 
 const Icons = {
-    [MutationStatus.NOT_STARTED]: null,
-    [MutationStatus.LOADING]: <FontAwesomeIcon icon={faSpinner} spin={true} style={{color: "rgb(150,150,150)"}} />,
-    [MutationStatus.COMPLETE]: <FontAwesomeIcon icon={faCheck} style={{ color: "rgb(167, 204, 167)" }} />,
-    [MutationStatus.ERROR]: <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: "#ef0707" }} />,
+    [MutationStatus.NotStarted]: null,
+    [MutationStatus.Loading]: <FontAwesomeIcon icon={faSpinner} spin={true} style={{color: "rgb(150,150,150)"}} />,
+    [MutationStatus.Complete]: <FontAwesomeIcon icon={faCheck} style={{ color: "rgb(167, 204, 167)" }} />,
+    [MutationStatus.Error]: <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: "#ef0707" }} />,
 };
 
 export class SavingIcon extends React.Component<any, any> {
     public render() {
         const Icon = Icons[this.props.mutationStatus.status];
         const {hasChangedSinceDatabaseSave} = this.props;
-        const inErrorState = this.props.mutationStatus === MutationStatus.ERROR;
+        const inErrorState = this.props.mutationStatus === MutationStatus.Error;
         if (!hasChangedSinceDatabaseSave || inErrorState) {
             return (
                 <SavingIconStyle>
