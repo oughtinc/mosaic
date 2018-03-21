@@ -114,14 +114,63 @@ function findPointers(value) {
     return pointers;
 }
 
+const WORKSPACE_QUESTION = {
+    selector: (workspace) => (workspace.blocks.find((b) => b.type === "QUESTION")),
+    permission: "READ",
+};
+
+enum WorkspaceBlockRelations {
+    WorkspaceQuestion = 0,
+    WorkspaceScratchpad,
+    WorkspaceAnswer,
+    SubworkspaceQuestion,
+    SubworkspaceAnswer,
+}
+
+export class WorkspaceBlockRelation {
+    public type;
+    public permission;
+
+    public constructor(type: string, permission: string) {
+        console.log(1);
+        this.type = type;
+        this.permission = permission;
+    }
+
+    public workspaceBlockSelector(workspaceWithBlock: any) {
+        console.log("Finding");
+        return workspaceWithBlock.blocks.find((b) => b.type === this.type);
+    }
+
+    public blockEditorAttributes(workspaceWithBlock: any) {
+        console.log(2);
+        const block: any = this.workspaceBlockSelector(workspaceWithBlock);
+        const isReadOnly = this.type === "READ_ONLY";
+        const {value, id} = block;
+        console.log("for block", block );
+        return {
+            name: id,
+            id: id,
+            readOnly: isReadOnly,
+            initialValue: isReadOnly ? (value && outputsToInputs(value) || false) : value, 
+            // initialValue: value, 
+            autosave: !isReadOnly,
+        };
+    }
+}
+
+const Relations = {
+    [WorkspaceBlockRelations.WorkspaceQuestion]: new WorkspaceBlockRelation("QUESTION", "READ_ONLY"),
+    [WorkspaceBlockRelations.WorkspaceScratchpad]: new WorkspaceBlockRelation("SCRATCHPAD", "EDITABLE"),
+    [WorkspaceBlockRelations.WorkspaceAnswer]: new WorkspaceBlockRelation("ANSWER", "EDITABLE"),
+    [WorkspaceBlockRelations.SubworkspaceQuestion]: new WorkspaceBlockRelation("QUESTION", "EDITABLE"),
+    [WorkspaceBlockRelations.SubworkspaceAnswer]: new WorkspaceBlockRelation("ANSWER", "READ_ONLY"),
+};
+
 export class FormPagePresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.updateBlocks = this.updateBlocks.bind(this);
-    }
-
-    public componentDidMount() {
-        console.log("MOUNT");
     }
 
     public updateBlocks(blocks: any) {
@@ -143,6 +192,7 @@ export class FormPagePresentational extends React.Component<any, any> {
         const importingWorkspaces = [workspace, ...workspace.childWorkspaces];
         let importedPointers = _.flatten(importingWorkspaces.map((w) => w.pointerImports.map((p) => p.pointer.value).filter((v) => !!v)));
         const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers, ...findPointers(question.value)], (p) => p.data.pointerId);
+        console.log("rendering", Relations[WorkspaceBlockRelations.WorkspaceScratchpad].blockEditorAttributes(workspace));
         return (
             <div key={workspace.id}>
                 <BlockHoverMenu>
@@ -152,14 +202,10 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 <ParentLink parentId={workspace.parentId} />
                             }
                             <h1>
-                                <BlockEditor
-                                    name={question.id}
-                                    blockId={question.id}
-                                    initialValue={question.value && outputsToInputs(question.value) || false}
-                                    readOnly={true}
-                                    canExport={false}
+                                {/* <BlockEditor
                                     availablePointers={availablePointers}
-                                />
+                                    {...Relations[WorkspaceBlockRelations.WorkspaceQuestion].blockEditorAttributes(workspace)}
+                                /> */}
                             </h1>
                         </Col>
                     </Row>
@@ -167,22 +213,18 @@ export class FormPagePresentational extends React.Component<any, any> {
                         <Col sm={4}>
                             <h3>Scratchpad</h3>
                             <BlockEditor
-                                name={question.id}
-                                blockId={scratchpad.id}
-                                initialValue={scratchpad.value}
                                 availablePointers={availablePointers}
-                                autoSave={true}
-                                canExport={true}
+                                name={scratchpad.id}
+                                id={scratchpad.id}
+                                readOnly={false}
+                                initialValue={scratchpad.value}
+                                // {...Relations[WorkspaceBlockRelations.WorkspaceScratchpad].blockEditorAttributes(workspace)}
                             />
                             <h3>Answer</h3>
-                            <BlockEditor
-                                name={answer.id}
-                                blockId={answer.id}
-                                initialValue={answer.value}
+                            {/* <BlockEditor
                                 availablePointers={availablePointers}
-                                autoSave={true}
-                                canExport={false}
-                            />
+                                {...Relations[WorkspaceBlockRelations.WorkspaceAnswer].blockEditorAttributes(workspace)}
+                            /> */}
                         </Col>
                         <Col sm={2}>
                             <h3>Pointers</h3>
@@ -191,13 +233,13 @@ export class FormPagePresentational extends React.Component<any, any> {
                             />
                         </Col>
                         <Col sm={6}>
-                            <ChildrenSidebar
+                            {/* <ChildrenSidebar
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
                                 onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                            />
+                            /> */}
                         </Col>
                     </Row>
                 </BlockHoverMenu>

@@ -2,16 +2,12 @@ import * as React from "react";
 import Plain from "slate-plain-serializer";
 import styled from "styled-components";
 import { Editor } from "slate-react";
-import { addBlocks, updateBlock, removeBlocks } from "../../modules/blocks/actions";
+import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
 import { changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
-
-import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
-import { withApollo } from "react-apollo";
-import gql from "graphql-tag";
 import _ = require("lodash");
 import { BlockEditorEditing } from "./BlockEditorEditing";
 
@@ -77,7 +73,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
-      canExport: true, // newProps.canExport || false,
     };
     this.setState({
       plugins: [
@@ -107,7 +102,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public onChange(value: any) {
-    this.props.updateBlock({ id: this.props.block.id, value });
     if (this.props.onChange) {
       this.props.onChange(value);
     }
