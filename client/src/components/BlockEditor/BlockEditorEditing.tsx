@@ -53,19 +53,22 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         this.endAutosave();
     }
 
-    public componentWillReceiveProps(nextProps) {
-        const oldDocument = this.props.block.value.document;
-        const newDocument = nextProps.value.document;
+    public componentDidUpdate(prevProps: any) {
+        const oldDocument = prevProps.block.value.document;
+        const newDocument = this.props.block.value.document;
 
         if (oldDocument.equals(newDocument)) {
             return;
         }
-            
-        if (nextProps.block.pointerAdded) {
-            setTimeout(() => this.saveToDatabase(true), 100);
+        
+        // save immediately if a pointer was exported
+        if (this.props.block.pointerExported) {
+            this.saveToDatabase(true);
             return;
         }
-            
+        
+        // if the text of the block was changed, rather than the pointer exports,
+        // rely on autosave to save that change
         this.startAutosave();
         this.setState({ hasChangedSinceDatabaseSave: true });
     }
@@ -129,6 +132,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     private endAutosave() {
         if (this.props.autoSave) {
             clearInterval(this.autoSaveInterval);
+            delete this.autoSaveInterval;
         }
     }
 
