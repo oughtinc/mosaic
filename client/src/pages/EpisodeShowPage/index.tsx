@@ -16,6 +16,7 @@ import Plain from "slate-plain-serializer";
 import _ = require("lodash");
 import { Value } from "slate";
 import * as uuidv1 from "uuid/v1";
+import { WorkspaceRelations, WorkspaceRelationTypes } from "./WorkspaceRelations";
 
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
@@ -86,42 +87,20 @@ const ParentLink = (props) => (
     </Link>
 );
 
-function outputsToInputs(value: any) {
-    const nodes = value.document.nodes[0].nodes; 
-    const newNodes = nodes.map((n) => {
-        if (n.type && n.type === "pointerExport") {
-            return ({
-            object: "inline",
-            type: "pointerImport",
-            isVoid: true,
-            data: {
-                pointerId: n.data.pointerId,
-                internalReferenceId: uuidv1(),
-            },
-            });
-        } else {
-            return n;
-        }
-    });
-    const newValue = _.cloneDeep(value);
-    newValue.document.nodes[0].nodes = newNodes;
-    return newValue;
-}
-
 function findPointers(value) {
     const _value = value ? Value.fromJSON(value) : Plain.deserialize("");
     const pointers = exportingNodes(_value.document);
     return pointers;
 }
+const WORKSPACE_QUESTION = {
+    selector: (workspace) => (workspace.blocks.find((b) => b.type === "QUESTION")),
+    permission: "READ",
+};
 
 export class FormPagePresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.updateBlocks = this.updateBlocks.bind(this);
-    }
-
-    public componentDidMount() {
-        console.log("MOUNT");
     }
 
     public updateBlocks(blocks: any) {
@@ -153,11 +132,8 @@ export class FormPagePresentational extends React.Component<any, any> {
                             }
                             <h1>
                                 <BlockEditor
-                                    name={question.id}
-                                    blockId={question.id}
-                                    initialValue={question.value && outputsToInputs(question.value) || false}
-                                    readOnly={true}
                                     availablePointers={availablePointers}
+                                    {...WorkspaceRelations[WorkspaceRelationTypes.WorkspaceQuestion].blockEditorAttributes(workspace)}
                                 />
                             </h1>
                         </Col>
@@ -166,19 +142,13 @@ export class FormPagePresentational extends React.Component<any, any> {
                         <Col sm={4}>
                             <h3>Scratchpad</h3>
                             <BlockEditor
-                                name={question.id}
-                                blockId={scratchpad.id}
-                                initialValue={scratchpad.value}
+                                {...WorkspaceRelations[WorkspaceRelationTypes.WorkspaceScratchpad].blockEditorAttributes(workspace)}
                                 availablePointers={availablePointers}
-                                autoSave={true}
                             />
                             <h3>Answer</h3>
                             <BlockEditor
-                                name={answer.id}
-                                blockId={answer.id}
-                                initialValue={answer.value}
                                 availablePointers={availablePointers}
-                                autoSave={true}
+                                {...WorkspaceRelations[WorkspaceRelationTypes.WorkspaceAnswer].blockEditorAttributes(workspace)}
                             />
                         </Col>
                         <Col sm={2}>
