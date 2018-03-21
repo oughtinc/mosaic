@@ -61,7 +61,7 @@ export const exportSelection = () => {
         type: UPDATE_BLOCK,
         id: block.id,
         value: change.value,
-        pointerAdded: true,
+        pointerExported: true,
       });
     } else {
       console.error("Block was not found from action");
