@@ -62,7 +62,7 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         }
         
         // save immediately if a pointer was exported
-        if (this.props.block.pointerExported) {
+        if (this.props.block.pointerJustExported) {
             this.saveToDatabase(true);
             return;
         }
