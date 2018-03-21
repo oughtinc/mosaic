@@ -10,17 +10,10 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
-import FontAwesomeIcon = require ("@fortawesome/react-fontawesome");
-import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
-import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
-import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
-
-enum MutationStatus {
-    NOT_STARTED = 0,
-    LOADING,
-    COMPLETE,
-    ERROR,
-}
+import FontAwesomeIcon = require("@fortawesome/react-fontawesome");
+import { MenuBar } from "./MenuBar";
+import { MutationStatus } from "./types";
+import _ = require("lodash");
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -40,6 +33,8 @@ const UPDATE_BLOCKS = gql`
     }
 `;
 
+const AUTOSAVE_EVERY_N_SECONDS = 3;
+
 export class BlockEditorEditingPresentational extends React.Component<any, any> {
 
     private autoSaveInterval: any;
@@ -49,94 +44,84 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
         this.onChange = this.onChange.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
         this.startAutosave = this.startAutosave.bind(this);
+        this.endAutosave = this.endAutosave.bind(this);
+        this.saveToDatabase = this.saveToDatabase.bind(this);
+        this.onAddPointerImport = this.onAddPointerImport.bind(this);
+        this.state = {hasChangedSinceDatabaseSave: false};
     }
 
-    public onChange(value: any) {
-        this.props.updateBlock({ id: this.props.block.id, value });
-        if (this.props.onChange) {
-            this.props.onChange(value);
-        }
+    public componentWillUnmount() {
+        this.endAutosave();
     }
 
     public render() {
-        console.log();
         return (
-            <div onBlur={this.handleBlur} onFocus={this.startAutosave}>
+            <div>
                 <BlockEditorStyle>
-                    <div>
-                        <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px", marginRight: "5px" }}>
-                            {this.props.availablePointers.map((e: any, index: number) => (
-                                <MenuItem
-                                    eventKey="1"
-                                    key={index}
-                                    onClick={(event) => {
-                                        const ch = this.props.value.change()
-                                            .insertInline(Inline.fromJSON({
-                                                object: "inline",
-                                                type: "pointerImport",
-                                                isVoid: true,
-                                                data: {
-                                                    pointerId: e.data.pointerId,
-                                                    internalReferenceId: uuidv1(),
-                                                },
-                                            }));
-                                        this.props.onChange(ch.value);
-                                    }}
-                                >
-                                    <span>
-                                        {`$${index + 1} - ${e.data.pointerId.slice(0, 5)}`}
-                                        <ShowExpandedPointer
-                                            exportingPointer={e}
-                                            exportingPointers={this.props.availablePointers}
-                                            blockEditor={this.props.blockEditor}
-                                            isHoverable={false}
-                                        />
-                                    </span>
-                                </MenuItem>
-                            ))}
-                        </DropdownButton>
-                        {this.renderSaveIcon()}
-                    </div>
+                    <MenuBar
+                        onAddPointerImport={this.onAddPointerImport}
+                        availablePointers={this.props.availablePointers}
+                        mutationStatus={this.props.mutationStatus}
+                        hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
+                    />
                     <Editor
                         value={this.props.value}
                         onChange={(c) => this.onChange(c.value)}
                         plugins={this.props.plugins}
+                        spellCheck={false}
+                        onBlur={this.handleBlur}
+                        onFocus={this.startAutosave}
                     />
                 </BlockEditorStyle>
             </div>
         );
     }
 
-    private renderSaveIcon() {
-        if (!this.props.autoSave) {
-            return;
+    private onChange(value: any) {
+        this.props.updateBlock({ id: this.props.block.id, value });
+        if (this.props.onChange) {
+            this.props.onChange(value);
         }
-        switch (this.props && this.props.mutationStatus.status) {
-            case MutationStatus.NOT_STARTED: {
-                return null;
-            }
-            case MutationStatus.LOADING: {
-                return <FontAwesomeIcon icon={faSpinner} spin={true}/>;
-            }
-            case MutationStatus.COMPLETE: {
-                return <FontAwesomeIcon icon={faCheck} style={{color: "rgba(0, 255, 0, 0.4)"}}/>;
-            }
-            case MutationStatus.ERROR: {
-                return <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: "red" }}/>;
-            }
-            default: {
-                return <FontAwesomeIcon icon={faSpinner} spin={true} />;
-            }
+
+        const oldDocument = this.props.block.value.document;
+        const newDocument = value.document;
+        if (!oldDocument.equals(newDocument)) {
+            this.setState({hasChangedSinceDatabaseSave: true});
         }
     }
 
-    private startAutosave () {
-        this.autoSaveInterval = setInterval(this.props.mutation, 20000);
+    private onAddPointerImport(pointerId: string) {
+        const ch = this.props.value.change()
+            .insertInline(Inline.fromJSON({
+                object: "inline",
+                type: "pointerImport",
+                isVoid: true,
+                data: {
+                    pointerId: pointerId,
+                    internalReferenceId: uuidv1(),
+                },
+            }));
+        this.onChange(ch.value);
     }
 
-    private handleBlur () {
-        this.props.mutation();
+    private saveToDatabase() {
+        if (this.state.hasChangedSinceDatabaseSave) {
+            this.props.mutation();
+            this.setState({hasChangedSinceDatabaseSave: false});
+        }
+    }
+
+    private startAutosave() {
+        this.autoSaveInterval = setInterval(this.saveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
+    }
+
+    private endAutosave() {
         clearInterval(this.autoSaveInterval);
+    }
+
+    private handleBlur() {
+        this.saveToDatabase();
+        this.endAutosave();
     }
 }
 
@@ -147,7 +132,7 @@ export const BlockEditorEditing: any = compose(
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer" }),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NOT_STARTED }),
     withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
-        const mutation = (value) => {
+        const mutation = () => {
             setMutationStatus({ status: MutationStatus.LOADING });
             saveBlocksToServer({
                 variables: { blocks: { id: block.id, value: block.value.toJSON() } },
