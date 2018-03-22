@@ -11,16 +11,14 @@ const PointerExportStyle: any = styled.span`
 export class PointerExportMark extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.onMouseOver = this.onMouseOver.bind(this);
-        this.getLocation = this.getLocation.bind(this);
     }
 
-    public getLocation() {
+    public getLocation = () => {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
         return { top: `${rect.top - 40}px`, left: `${rect.left + 10}px` };
     }
 
-    public onMouseOver() {
+    public onMouseOver = () => {
         const { top, left } = this.getLocation();
         this.props.onMouseOver({top, left});
     }
