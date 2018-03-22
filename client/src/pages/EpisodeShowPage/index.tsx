@@ -96,10 +96,9 @@ function findPointers(value) {
 export class FormPagePresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.updateBlocks = this.updateBlocks.bind(this);
     }
 
-    public updateBlocks(blocks: any) {
+    public updateBlocks = (blocks: any) => {
         const variables = { blocks };
         this.props.updateBlocks({
             variables,

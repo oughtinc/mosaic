@@ -126,7 +126,7 @@ export class WorkspaceBlockRelation {
             blockId: id,
             readOnly: isReadOnly,
             initialValue: isReadOnly ? (value && outputsToInputs(value) || false) : value,
-            autoSave: !isReadOnly,
+            shouldAutosave: !isReadOnly,
         };
     }
 
