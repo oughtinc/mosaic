@@ -1,13 +1,11 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import Store, {
-  Node as NodeT,
-  HyperText as HyperTextT,
-  HyperTextArray as HyperTextArrayT,
-  Link as LinkT,
-  LinkKind,
-  isLink
-} from './store';
+import { Node as NodeT,
+         HyperText as HyperTextT,
+         HyperTextArray as HyperTextArrayT,
+         Link as LinkT,
+         LinkKind } from './data/types';
+import Store, { isLink } from './store';
 
 interface HyperTextArrayProps {
   value: HyperTextArrayT;

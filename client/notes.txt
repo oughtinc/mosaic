@@ -3,4 +3,3 @@
   - But the array refs are currently defined with respect to the local containing node
   - Current proposal: look up the id in the...
 - I'm passing down a store everywhere, but this should probably be replaced with redux or apollo.
-- Move types out of store.ts
