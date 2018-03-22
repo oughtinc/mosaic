@@ -43,7 +43,7 @@ interface BlockEditorEditingPresentationalProps {
     shouldAutosave: boolean;
     updateBlock(value: any): () => {};
     onChange(value: any): () => boolean;
-    mutation(): () => {};
+    saveBlocksMutation(): () => {};
 }
 
 interface BlockEditorEditingPresentationalState {
@@ -130,7 +130,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     private saveToDatabase = () => {
-        this.props.mutation();
+        this.props.saveBlocksMutation();
         this.setState({hasChangedSinceDatabaseSave: false});
     }
 
@@ -162,7 +162,7 @@ export const BlockEditorEditing: any = compose(
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer" }),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
     withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
-        const mutation = () => {
+        const saveBlocksMutation = () => {
             setMutationStatus({ status: MutationStatus.Loading });
             saveBlocksToServer({
                 variables: { blocks: { id: block.id, value: block.value.toJSON() } },
@@ -173,6 +173,6 @@ export const BlockEditorEditing: any = compose(
             });
         };
 
-        return { mutation, status };
+        return { saveBlocksMutation, status };
     })
 )(BlockEditorEditingPresentational);
