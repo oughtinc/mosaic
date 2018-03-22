@@ -6,11 +6,13 @@ import Sequelize from 'sequelize';
 var env       = process.env.NODE_ENV || 'development';
 var config    = require(__dirname + '/../../config/config.json')[env];
 
-import BlockModel from './block'
 import EventModel from './event'
-import PointerModel from './pointer'
-import PointerImportModel from './pointerImport'
 import WorkspaceModel from './workspace'
+import WorkspaceVersionModel from './workspaceVersion'
+import NodeModel from './node'
+import NodeVersionModel from './nodeVersion'
+import LinkModel from './link'
+import HypertextModel from './hypertext'
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -20,10 +22,12 @@ if (config.use_env_variable) {
 
 const models = [
   ['event', EventModel],
-  ['block', BlockModel],
-  ['pointer', PointerModel],
-  ['pointerImport', PointerImportModel],
-  ['workspace', WorkspaceModel]
+  ['workspace', WorkspaceModel],
+  ['workspaceVersion', WorkspaceVersionModel],
+  ['node', NodeModel],
+  ['nodeVersion', NodeVersionModel],
+  ['link', LinkModel],
+  ['hypertext', HypertextModel]
 ]
 
 const db = {};

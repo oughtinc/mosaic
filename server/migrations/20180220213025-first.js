@@ -67,55 +67,43 @@ module.exports = {
 
     await queryInterface.createTable('Workspaces', {
       ...standardColumns,
-      parentId: referenceTo("Workspaces"),
-      childWorkspaceOrder: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: []
-      },
-      hasBeenDeletedByAncestor: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      },
     })
 
-    await queryInterface.createTable('Blocks', {
+    await queryInterface.createTable('WorkspaceVersions', {
       ...standardColumns,
       workspaceId: referenceTo("Workspaces"),
-      type: {
-        type: Sequelize.ENUM('QUESTION', 'ANSWER', 'SCRATCHPAD'),
-        allowNull: false
-      },
-      value: Sequelize.JSON,
-      cachedImportPointerIds: Sequelize.ARRAY(Sequelize.STRING),
-      cachedExportPointerValues: Sequelize.JSON,
     })
 
-    await queryInterface.createTable('WorkspaceStateCache', {
+    await queryInterface.createTable('Links', {
       ...standardColumns,
-      workspaceId: referenceTo("Workspaces"),
-      cache: Sequelize.JSON
+      workspaceVersionId: referenceTo("WorkspaceVersions"),
+      kind: Sequelize.STRING,
     })
 
-    await queryInterface.createTable('Pointers', {
+    await queryInterface.createTable('Nodes', {
       ...standardColumns,
-      sourceBlockId: referenceTo("Blocks"),
     })
 
-    await queryInterface.createTable('PointerImports', {
+    await queryInterface.createTable('Hypertexts', {
       ...standardColumns,
-      isLocked: Sequelize.BOOLEAN,
-      pointerId: referenceTo("Pointers"),
-      workspaceId: referenceTo("Workspaces"),
+      content: Sequelize.JSON,
     })
+
+    await queryInterface.createTable('NodeVersion', {
+      ...standardColumns,
+      nodeId: referenceTo("Nodes"),
+      hypertextId: referenceTo("Hypertexts"),
+    })
+
   },
 
   down: async function(queryInterface, Sequelize) {
     await queryInterface.dropTable('Events')
-    await queryInterface.dropTable('Blocks')
     await queryInterface.dropTable('Workspaces')
-    await queryInterface.dropTable('WorkspaceStateCache')
-    await queryInterface.dropTable('Pointers')
-    await queryInterface.dropTable('PointerImports')
+    await queryInterface.dropTable('WorkspaceVersions')
+    await queryInterface.dropTable('Links')
+    await queryInterface.dropTable('Hypertexts')
+    await queryInterface.dropTable('Nodes')
+    await queryInterface.dropTable('NodeVersions')
   }
 };

@@ -3,8 +3,8 @@ const Sequelize = require('sequelize')
 var _ = require('lodash');
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 
-const WorkspaceModel = (sequelize, DataTypes) => {
-  var Workspace = sequelize.define('Workspace', {
+const LinkModel = (sequelize, DataTypes) => {
+  var Link = sequelize.define('Link', {
     id: {
       type: DataTypes.UUID(),
       primaryKey: true,
@@ -17,11 +17,11 @@ const WorkspaceModel = (sequelize, DataTypes) => {
         ...eventHooks.beforeValidate,
     }
   });
-  Workspace.associate = function (models) {
-    addEventAssociations(Workspace, models)
+  Link.associate = function (models) {
+    addEventAssociations(Link, models)
   }
 
-  return Workspace;
+  return Link;
 };
 
-export default WorkspaceModel;
+export default LinkModel;

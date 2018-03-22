@@ -1,9 +1,9 @@
 {
-  "development": {
+  "development2": {
     "use_env_variable": "CONNECTION_STRING_DEV",
     "dialect": "postgres"
   },
-  "development2": {
+  "development": {
     "username": "ozziegooen",
     "password": null,
     "database": "mosaic_dev",
