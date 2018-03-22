@@ -35,7 +35,7 @@ const AUTOSAVE_EVERY_N_SECONDS = 3;
 
 export class BlockEditorEditingPresentational extends React.Component<any, any> {
 
-    private autoSaveInterval: any;
+    private autosaveInterval: any;
 
     public constructor(props: any) {
         super(props);
@@ -118,20 +118,20 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
     }
 
     private beginAutosaveInterval = () => {
-        if (this.props.autoSave && !this.autoSaveInterval) {
-            this.autoSaveInterval = setInterval(this.considerSaveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
+        if (this.props.shouldAutosave && !this.autosaveInterval) {
+            this.autosaveInterval = setInterval(this.considerSaveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
         }
     }
 
     private endAutosaveInterval = () => {
-        if (this.props.autoSave) {
-            clearInterval(this.autoSaveInterval);
-            delete this.autoSaveInterval;
+        if (this.props.shouldAutosave) {
+            clearInterval(this.autosaveInterval);
+            delete this.autosaveInterval;
         }
     }
 
     private handleBlur = () => {
-        if (this.props.autoSave) {
+        if (this.props.shouldAutosave) {
             this.considerSaveToDatabase();
             this.endAutosaveInterval();
         }

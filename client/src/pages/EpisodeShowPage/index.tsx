@@ -134,7 +134,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={scratchpad.id}
                                 initialValue={scratchpad.value}
                                 availablePointers={availablePointers}
-                                autoSave={true}
+                                shouldAutosave={true}
                                 canExport={true}
                             />
                             <h3>Answer</h3>
@@ -143,7 +143,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={answer.id}
                                 initialValue={answer.value}
                                 availablePointers={availablePointers}
-                                autoSave={true}
+                                shouldAutosave={true}
                                 canExport={false}
                             />
                         </Col>
