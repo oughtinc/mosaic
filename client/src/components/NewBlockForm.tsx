@@ -17,7 +17,7 @@ export class NewBlockForm extends React.Component<any, any> {
         return (
             <div key={this.state.id}>
                 <BlockEditor
-                    autoSave={false}
+                    shouldAutosave={false}
                     readOnly={false}
                     blockId={this.state.id}
                     name={`new-block-${this.state.id}`}
