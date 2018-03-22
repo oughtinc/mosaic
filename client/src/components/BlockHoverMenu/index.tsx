@@ -9,8 +9,6 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
 
     public constructor(props: any) {
         super(props);
-        this.menuRef = this.menuRef.bind(this);
-        this.updateMenu = this.updateMenu.bind(this);
     }
 
     public componentDidMount() {
@@ -25,7 +23,7 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
         this.updateMenu();
     }
 
-    public updateMenu() {
+    public updateMenu = () => {
         const { hoveredItem } = this.props.blockEditor;
         const menu = this.menu;
 
@@ -43,7 +41,7 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
         menu.style.left = hoveredItem.left;
     }
 
-    public menuRef(menu: any) {
+    public menuRef = (menu: any) => {
         this.menu = menu;
     }
 

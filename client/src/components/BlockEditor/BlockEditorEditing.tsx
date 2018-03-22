@@ -12,7 +12,6 @@ import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
-import _ = require("lodash");
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -40,13 +39,6 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
 
     public constructor(props: any) {
         super(props);
-        this.onChange = this.onChange.bind(this);
-        this.handleBlur = this.handleBlur.bind(this);
-        this.beginAutosaveInterval = this.beginAutosaveInterval.bind(this);
-        this.endAutosaveInterval = this.endAutosaveInterval.bind(this);
-        this.saveToDatabase = this.saveToDatabase.bind(this);
-        this.onAddPointerImport = this.onAddPointerImport.bind(this);
-        this.considerSaveToDatabase = this.considerSaveToDatabase.bind(this);
         this.state = {hasChangedSinceDatabaseSave: false};
     }
 
@@ -65,48 +57,43 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
 
     public render() {
         return (
-            <div>
-                <BlockEditorStyle>
-                    <MenuBar
-                        onAddPointerImport={this.onAddPointerImport}
-                        availablePointers={this.props.availablePointers}
-                        mutationStatus={this.props.mutationStatus}
-                        hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
-                    />
-                    <Editor
-                        value={this.props.value}
-                        onChange={(c) => this.onChange(c.value)}
-                        plugins={this.props.plugins}
-                        spellCheck={false}
-                        onBlur={this.handleBlur}
-                    />
-                </BlockEditorStyle>
-            </div>
+            <BlockEditorStyle>
+                <MenuBar
+                    onAddPointerImport={this.onAddPointerImport}
+                    availablePointers={this.props.availablePointers}
+                    mutationStatus={this.props.mutationStatus}
+                    hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
+                />
+                <Editor
+                    value={this.props.value}
+                    onChange={(c) => this.onChange(c.value)}
+                    plugins={this.props.plugins}
+                    spellCheck={false}
+                    onBlur={this.handleBlur}
+                />
+            </BlockEditorStyle>
         );
     }
 
-    private onValueChange() {
+    private onValueChange = () => {
         const changeFromOutsideComponent = this.props.block.pointerChanged;
         if (changeFromOutsideComponent) {
             this.saveToDatabase();
         } else {
             this.beginAutosaveInterval();
-
-            if (!this.state.hasChangedSinceDatabaseSave) {
-                this.setState({ hasChangedSinceDatabaseSave: true });
-            }
+            this.setState({ hasChangedSinceDatabaseSave: true });
         }
     }
 
-    private onChange(value: any, pointerChanged: boolean = false) {
+    private onChange = (value: any, pointerChanged: boolean = false) => {
         this.props.updateBlock({ id: this.props.block.id, value, pointerChanged });
         if (this.props.onChange) {
             this.props.onChange(value);
         }
     }
 
-    private onAddPointerImport(pointerId: string) {
-        const ch = this.props.value.change()
+    private onAddPointerImport = (pointerId: string) => {
+        const {value} = this.props.value.change()
             .insertInline(Inline.fromJSON({
                 object: "inline",
                 type: "pointerImport",
@@ -116,34 +103,34 @@ export class BlockEditorEditingPresentational extends React.Component<any, any> 
                     internalReferenceId: uuidv1(),
                 },
             }));
-        this.onChange(ch.value, true);
+        this.onChange(value, true);
     }
 
-    private considerSaveToDatabase() {
+    private considerSaveToDatabase = () => {
         if (this.state.hasChangedSinceDatabaseSave) {
             this.saveToDatabase();
         }
     }
 
-    private saveToDatabase() {
+    private saveToDatabase = () => {
         this.props.mutation();
         this.setState({hasChangedSinceDatabaseSave: false});
     }
 
-    private beginAutosaveInterval() {
+    private beginAutosaveInterval = () => {
         if (this.props.autoSave && !this.autoSaveInterval) {
             this.autoSaveInterval = setInterval(this.considerSaveToDatabase, AUTOSAVE_EVERY_N_SECONDS * 1000);
         }
     }
 
-    private endAutosaveInterval() {
+    private endAutosaveInterval = () => {
         if (this.props.autoSave) {
             clearInterval(this.autoSaveInterval);
             delete this.autoSaveInterval;
         }
     }
 
-    private handleBlur() {
+    private handleBlur = () => {
         if (this.props.autoSave) {
             this.considerSaveToDatabase();
             this.endAutosaveInterval();

@@ -6,10 +6,9 @@ export class NewBlockForm extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
         this.state = {value: {}, id: uuidv1()};
-        this.onSubmit = this.onSubmit.bind(this);
     }
 
-    public onSubmit() {
+    public onSubmit = () => {
         this.props.onMutate(JSON.stringify(this.state.value.toJSON()));
         this.setState({id: uuidv1()});
     }
