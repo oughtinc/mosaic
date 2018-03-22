@@ -33,7 +33,24 @@ const UPDATE_BLOCKS = gql`
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
 
-export class BlockEditorEditingPresentational extends React.Component<any, any> {
+// Eventually we'll type out many of these items more spefically, but that's a future refactor.
+interface BlockEditorEditingPresentationalProps {
+    block: any;
+    availablePointers: any[];
+    value: any;
+    mutationStatus: any;
+    plugins: any[];
+    shouldAutosave: boolean;
+    updateBlock(value: any): () => {};
+    onChange(value: any): () => boolean;
+    mutation(): () => {};
+}
+
+interface BlockEditorEditingPresentationalState {
+    hasChangedSinceDatabaseSave: boolean;
+}
+
+export class BlockEditorEditingPresentational extends React.Component<BlockEditorEditingPresentationalProps, BlockEditorEditingPresentationalState> {
 
     private autosaveInterval: any;
 
