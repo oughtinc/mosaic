@@ -1,10 +1,15 @@
-export type HyperText = string | { link: number } | HyperTextArray;  // HyperTextObject
+export type HyperText = string | { link: number } | HyperTextArray; // HyperTextObject
 
-export interface HyperTextArray extends Array<HyperText> { }
+export interface HyperTextArray extends Array<HyperText> {}
 
-export interface HyperTextObject { [key: string]: HyperText; }
+export interface HyperTextObject {
+  [key: string]: HyperText;
+}
 
-export enum LinkKind { Import, Export }
+export enum LinkKind {
+  Import,
+  Export
+}
 
 export interface Link {
   node: Node;

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "https://mosaic.ought.org",        
     "outDir": "build/dist",
     "module": "esnext",
     "target": "es5",
