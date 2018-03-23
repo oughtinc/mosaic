@@ -11,7 +11,7 @@ import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
-import { exportingPointersSelector, exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
+import { exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
 import _ = require("lodash");
 
 const WORKSPACE_QUERY = gql`
@@ -183,7 +183,7 @@ function visibleBlockIds(workspace: any) {
 function mapStateToProps(state: any, { workspace }: any) {
     const _visibleBlockIds = visibleBlockIds(workspace.workspace);
     const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(state);
-    const { blocks, blockEditor } = state;
+    const { blocks } = state;
     return { blocks, exportingPointers };
 }
 
