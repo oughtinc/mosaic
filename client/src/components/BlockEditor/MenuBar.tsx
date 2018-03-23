@@ -46,41 +46,35 @@ const Icons = {
     [MutationStatus.Error]: <FontAwesomeIcon icon={faExclamationTriangle} style={{ color: "#ef0707" }} />,
 };
 
-export class SavingIcon extends React.Component<any, any> {
-    public render() {
-        const Icon = Icons[this.props.mutationStatus.status];
-        const { hasChangedSinceDatabaseSave } = this.props;
-        const inErrorState = this.props.mutationStatus === MutationStatus.Error;
+const SavingIcon = ({ mutationStatus, hasChangedSinceDatabaseSave, blockEditor }) => {
+    const Icon = Icons[mutationStatus.status];
+    const inErrorState = mutationStatus === MutationStatus.Error;
 
-        // if the user types more after we show the icon,
-        // only continue to show it if there's an error
-        // to avoid distracting them w/ unimportant information.
-        if (!hasChangedSinceDatabaseSave || inErrorState) {
-            return (
-                <SavingIconStyle>
-                    {Icon}
-                </SavingIconStyle>
-            );
-        } else {
-            return (false);
-        }
-    }
-}
-
-export class MenuBar extends React.Component<any, any> {
-    public render() {
+    // if the user types more after we show the icon,
+    // only continue to show it if there's an error
+    // to avoid distracting them w/ unimportant information.
+    if (!hasChangedSinceDatabaseSave || inErrorState) {
         return (
-            <div>
-                <PointerDropdownMenu
-                    onAddPointerImport={this.props.onAddPointerImport}
-                    availablePointers={this.props.availablePointers}
-                    blockEditor={this.props.blockEditor}
-                />
-                <SavingIcon
-                    hasChangedSinceDatabaseSave={this.props.hasChangedSinceDatabaseSave}
-                    mutationStatus={this.props.mutationStatus}
-                />
-            </div>
+            <SavingIconStyle>
+                {Icon}
+            </SavingIconStyle>
         );
+    } else {
+        return (<span />);
     }
-}
+};
+
+export const MenuBar = ({ onAddPointerImport, availablePointers, mutationStatus, hasChangedSinceDatabaseSave, blockEditor }) => (
+        <div>
+            <PointerDropdownMenu
+                onAddPointerImport={onAddPointerImport}
+                availablePointers={availablePointers}
+                blockEditor={blockEditor}
+            />
+            <SavingIcon
+                hasChangedSinceDatabaseSave={hasChangedSinceDatabaseSave}
+                mutationStatus={mutationStatus}
+                blockEditor={blockEditor}
+            />
+        </div>
+);
