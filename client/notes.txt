@@ -18,7 +18,7 @@
                     [x] workspace template object
                 [x] split hypertext.tsx into multiple files
         [x] Clean up, commit
-        [ ] Node + NodeVersion
+        [x] Node + NodeVersion
             [x] add simple fixtures
             [x] add classes
             [x] render node version, making use of hypertext render
@@ -29,66 +29,20 @@
                     - (then, we do one big query at the top, and little cached queries while rendering)
             [x] extract classes from fixtures
         [ ] Workspace + WorkspaceVersion + Link
-            [ ] render workspace, making use of node render
+            [ ] add basic workspace / workspace version / link fixtures
+            [ ] write corresponding classes
+            [ ] write components that render these classes
+                [ ] HyperText should take prop that determines how included nodes are rendered
         [ ] makeRootWorkspace
-    [ ] Render data from store    
-    [ ] try for workspace with sub-workspace
-    [ ] try for tricky other cases
-    - I'll try writing a complete workspace, just to make sure that it can be done,
-      and will go through the rendering process with that
-    - But I think simpler tests will be very useful as well
-    - I feel uncertain about what data format to use
-    - If I want the result to be close to something that can be used in the real
-      app, it seems I'd be best off doing something like the store I started with
-    - At the same time if all I'm going to do is serialize and deserialize that
-      structure, I might as well just start out with class instances
-    - My impression right now:
-      - Start with class instances, which makes it easier for me to define the data
-      - Then serialize into the kind of data that can go in the store
-      - Then make the react components just use the store
-[ ] HyperText should take prop that determines how included nodes are rendered
-[ ] (Think through how to render nested exports)
-[ ] Think through recursive fetching required to get latest state
-[ ] Think about caching node ids for hypertext
+    [ ] Try workspace with sub-workspace
+        - children
+    [ ] Exports    
+    [ ] think about what cases will be tricky, implement them
+        [ ] Showing whether things are stale
+        [ ] Recursive fetching for latest state    
 
-# Todos
+[ ] (Think about caching node ids for hypertext)
+    - probably fine to delay until this is moved to server
 
-- Links for nested nodes aren't fully worked out yet.
-  - It's important to retrieve expansion and import-export status from the current top-level node
-  - But the array refs are currently defined with respect to the local containing node
-  - Current proposal: look up the id in the...
-- I'm passing down a store everywhere, but this should probably be replaced with redux or apollo.
-- Allow root questions with data
-
-# Old fixture
-
-const node3 = {
-  id: "1341",
-  content: "This is the third node",
-  links: [],
-  previousVersion: null
-};
-
-const node2 = {
-  id: "6547",
-  content: "This is hypertext for the second node",
-  links: [],
-  previousVersion: null
-};
-
-const node1 = {
-  id: "8124",
-  content: [
-    "This is hypertext for the first node, with a link: ",
-    { link: 0 },
-    " And here's one we haven't expanded yet: ",
-    { link: 1 }
-  ],
-  links: [
-    { node: node2, kind: LinkKind.Import, expanded: true },
-    { node: node3, kind: LinkKind.Import, expanded: false }
-  ],
-  previousVersion: null
-};
-
-export const data = [node1, node2, node3];
+[ ] Use redux or apollo
+[ ] Allow root questions with data
