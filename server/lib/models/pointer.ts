@@ -1,5 +1,21 @@
 import Sequelize from 'sequelize';
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
+import _ = require('lodash');
+
+function getInlinesAsArray(node) {
+  let array: any = [];
+
+  node.nodes.forEach((child) => {
+    if (child.object === "text") { return; }
+    if (child.object === "inline") {
+      array.push(child);
+    } else {
+      array = array.concat(getInlinesAsArray(child));
+    }
+  });
+
+  return array;
+}
 
 const PointerModel = (sequelize, DataTypes) => {
   var Pointer = sequelize.define('Pointer', {
@@ -39,6 +55,27 @@ const PointerModel = (sequelize, DataTypes) => {
       workspaces = [...workspaces, await pointerImport.getWorkspace()]
     }
     return workspaces
+  }
+
+  Pointer.prototype.containedPointerIds = async function(sequelize) {
+    const directIds = await this.directImportingPointerIds()
+    let importingIds = directIds
+    for (const id of importingIds){
+      const pointer = await sequelize.models.Pointer.findById(id);
+      const directImports = await pointer.directContainedPointerIds(sequelize);
+      directImports.filter(i => !_.includes(importingIds, i)).forEach(i => {
+        importingIds.push(i)
+      })
+    }
+    return importingIds
+  }
+
+  Pointer.prototype.directContainedPointerIds = async function(sequelize) {
+    const value = await this.value
+    const inlines =  getInlinesAsArray(value)
+    const pointers =  inlines.filter((l) => !!l.data.pointerId)
+    const pointerIds = pointers.map(p => p.data.pointerId)
+    return pointerIds
   }
 
   return Pointer
