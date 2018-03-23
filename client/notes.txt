@@ -27,8 +27,7 @@
                   - this mean that we need to retrieve it
                   - this can be analogous to how graphql works later
                     - (then, we do one big query at the top, and little cached queries while rendering)
-            [ ] extract classes from fixtures
-            [ ] add more fixtures
+            [x] extract classes from fixtures
         [ ] Workspace + WorkspaceVersion + Link
             [ ] render workspace, making use of node render
         [ ] makeRootWorkspace
