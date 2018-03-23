@@ -1,6 +1,4 @@
 import React = require("react");
-import { compose } from "recompose";
-import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointerOutsideSlate } from "../../components/ShowExpandedPointerOutsideSlate";
 
@@ -35,31 +33,21 @@ const Text = styled.div`
     float: left;
 `;
 
-export class PointerTable extends React.Component<any, any> {
-    public constructor(props: any) {
-        super(props);
-    }
+export const PointerTable = ({ availablePointers }) => (
+    <Container> {availablePointers.map((pointer, index: number) => (
+        <Row key={index}>
+            <Reference>
+                {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
+            </Reference>
+            <Text>
+                <ShowExpandedPointerOutsideSlate
+                    exportingPointer={pointer}
+                    isHoverable={true}
+                />
+            </Text>
+        </Row>
 
-    // TODO: replace this character with new line: ↵
-    public render() {
-        const { availablePointers } = this.props;
-        return (
-            <Container>
-                {availablePointers.map((pointer, index) => (
-                    <Row key={index}>
-                        <Reference>
-                            {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
-                        </Reference>
-                        <Text>
-                           <ShowExpandedPointerOutsideSlate
-                            exportingPointer={pointer}
-                            isHoverable={true}
-                           /> 
-                        </Text>
-                    </Row>
+    ))}
+    </Container>
 
-                ))}
-            </Container>
-        );
-    }
-}
+);
