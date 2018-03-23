@@ -19,8 +19,11 @@
                 [x] split hypertext.tsx into multiple files
         [x] Clean up, commit
         [ ] Node + NodeVersion
+            [x] add simple fixtures
+            [x] add classes
             [ ] render node version, making use of hypertext render
-                - don't render included nodes
+                - don't render included nodes (since we don't know what version to render)
+            [ ] add more fixtures
         [ ] Workspace + WorkspaceVersion + Link
             [ ] render workspace, making use of node render
         [ ] makeRootWorkspace

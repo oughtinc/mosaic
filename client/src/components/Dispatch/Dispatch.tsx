@@ -14,7 +14,8 @@ const Dispatch: React.SFC<DispatchProps> = ({ object }) => {
   } else {
     return (
       <div>
-        <pre>{JSON.stringify(object.value, null, 2)}</pre>
+        <p>Don't know how to render {object.type}.</p>
+          <pre>{JSON.stringify(object.value, null, 2)}</pre>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 export interface Row {
   id: string,
   type: string,
-  value: Object
+  value: any
 }
 
 export interface Serializable {
@@ -13,7 +13,7 @@ export interface Serializable {
 
 export type HyperTextValue = string | HyperTextNode | HyperTextArray | HyperTextObject;
 
-export interface HyperTextNode { node: number };
+export interface HyperTextNode { nodeId: number };
 
 export interface HyperTextArray extends Array<HyperTextValue> {}
 

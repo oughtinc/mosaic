@@ -11,7 +11,8 @@ interface AppProps {
 }
 
 const App: React.SFC<AppProps> = props => {
-  // TODO: pass props.store down to components to allow 'set' actions
+  // TODO: pass props.store down to components to allow 'set' actions,
+  // and to easily retrieve other elements that are needed for rendering
   const db = props.store.dump();
   return (
     <div className="App">

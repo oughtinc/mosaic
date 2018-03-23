@@ -25,5 +25,3 @@ export default class Store {
 }
 
 export const empty = new Store([]);
-
-export const fromData = (data: Serializable[]) => new Store(data);

@@ -7,7 +7,7 @@ interface HyperTextNodeProps {
 }
 
 const HyperTextNode: React.SFC<HyperTextNodeProps> = ({ value }) => {
-  return <span className="HyperText HyperText-Node">{value.node}</span>;
+  return <span className="HyperText HyperText-Node">{value.nodeId}</span>;
 };
 
 export default HyperTextNode;

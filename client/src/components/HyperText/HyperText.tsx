@@ -13,7 +13,7 @@ import {
 import "./HyperText.css";
 
 function isNode(value: HyperTextValue) {
-  return _.isObject(value) && _.has(value, "node");
+  return _.isObject(value) && _.has(value, "nodeId");
 }
 
 interface HyperTextProps {

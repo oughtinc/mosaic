@@ -1,6 +1,6 @@
 import * as uuidv1 from "uuid/v1";
 
-import { HyperTextValue } from "./types";
+import { HyperTextValue, Serializable, Row } from "./types";
 
 // import { LinkKind } from "./types";
 //
@@ -47,34 +47,49 @@ import { HyperTextValue } from "./types";
 // }
 //
 // // --------------------------------------------------------------------
-//
-// class Node {
-//   static fromHyperText(hyperText: HyperText): Node {
-//     // TODO
-//   }
-//   static fromString(s: string): Node {
-//     return Node.fromHypertext(HyperText.fromString(s));
-//   }
-//   static fromObject(o: Object): Node {
-//     // ...
-//   }
-//   constructor(public head: NodeVersion) {
-//     null;
-//   }
-// }
-//
-// class NodeVersion {
-//   constructor(
-//     public content: HyperText,
-//     public previousVersion: NodeVersion | null
-//   ) {
-//     null;
-//   }
-// }
 
+class Node implements Serializable {
+  public id: string;
+  
+  constructor(public head: NodeVersion) {
+    this.id = uuidv1();
+  }
 
-class HyperText {
-  private id: string;
+  serialize(): Row[] {
+    return [{
+      type: "Node",
+      id: this.id,
+      value: {
+        headId: this.head.id
+      }
+    }].concat(this.head.serialize())
+  }
+}
+
+class NodeVersion implements Serializable {
+  public id: string;
+  
+  constructor(
+    private content: HyperText,
+    private previousVersion: NodeVersion | null
+  ) {
+    this.id = uuidv1();
+  }
+
+  serialize(): Row[] {
+    return [{
+      type: "NodeVersion",
+      id: this.id,
+      value: {
+      contentId: this.content.id,
+        previousVersionId: this.previousVersion ? this.previousVersion.id : null
+      }
+    }].concat(this.content.serialize()).concat(this.previousVersion ? this.previousVersion.serialize() : []);
+  }
+}
+
+class HyperText implements Serializable {
+  public id: string;
 
   constructor(private value: HyperTextValue) {
     // TODO (eventually): compute a hash, retrieve existing hypertext element
@@ -82,7 +97,7 @@ class HyperText {
     this.id = uuidv1();
   }
 
-  serialize() {
+  serialize(): Row[] {
     return [{
       type: "HyperText",
       id: this.id,
@@ -92,12 +107,15 @@ class HyperText {
 }
 
 const h1 = new HyperText("This is just text.");
-const h2 = new HyperText(["An array", "that has", "three text elements"]);
-const h3 = new HyperText({ node: 1 });
-const h4 = new HyperText(["An array", "that includes", "a node:", { node: 1 }]);
-const h5 = new HyperText({ template: "workspace", question: "the literal question", answer: "the literal answer" });
-const h6 = new HyperText({ template: "workspace", question: { node: 1 }, answer: { node: 2} });
+const nv1 = new NodeVersion(h1, null);
+const n1 = new Node(nv1);
 
-const data = [h1, h2, h3, h4, h5, h6];
+const h2 = new HyperText(["An array", "that has", "three text elements"]);
+const h3 = new HyperText({ nodeId: n1.id });
+const h4 = new HyperText(["An array", "that includes", "a node:", { nodeId: n1.id }]);
+const h5 = new HyperText({ template: "workspace", question: "the literal question", answer: "the literal answer" });
+const h6 = new HyperText({ template: "workspace", question: { nodeId: n1.id }, answer: { nodeId: n1.id} });
+
+const data = [h1, h2, h3, h4, h5, h6, nv1, n1];
 
 export default data;
