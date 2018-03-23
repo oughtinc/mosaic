@@ -23,6 +23,11 @@
             [x] add classes
             [ ] render node version, making use of hypertext render
                 - don't render included nodes (since we don't know what version to render)
+                - but we do need to render hypertext
+                  - this mean that we need to retrieve it
+                  - this can be analogous to how graphql works later
+                    - (then, we do one big query at the top, and little cached queries while rendering)
+            [ ] extract classes from fixtures
             [ ] add more fixtures
         [ ] Workspace + WorkspaceVersion + Link
             [ ] render workspace, making use of node render
@@ -42,6 +47,7 @@
       - Start with class instances, which makes it easier for me to define the data
       - Then serialize into the kind of data that can go in the store
       - Then make the react components just use the store
+[ ] HyperText should take prop that determines how included nodes are rendered
 [ ] (Think through how to render nested exports)
 [ ] Think through recursive fetching required to get latest state
 [ ] Think about caching node ids for hypertext

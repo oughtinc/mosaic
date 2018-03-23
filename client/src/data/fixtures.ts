@@ -50,25 +50,27 @@ import { HyperTextValue, Serializable, Row } from "./types";
 
 class Node implements Serializable {
   public id: string;
-  
+
   constructor(public head: NodeVersion) {
     this.id = uuidv1();
   }
 
   serialize(): Row[] {
-    return [{
-      type: "Node",
-      id: this.id,
-      value: {
-        headId: this.head.id
+    return [
+      {
+        type: "Node",
+        id: this.id,
+        value: {
+          headId: this.head.id
+        }
       }
-    }].concat(this.head.serialize())
+    ].concat(this.head.serialize());
   }
 }
 
 class NodeVersion implements Serializable {
   public id: string;
-  
+
   constructor(
     private content: HyperText,
     private previousVersion: NodeVersion | null
@@ -77,14 +79,20 @@ class NodeVersion implements Serializable {
   }
 
   serialize(): Row[] {
-    return [{
-      type: "NodeVersion",
-      id: this.id,
-      value: {
-      contentId: this.content.id,
-        previousVersionId: this.previousVersion ? this.previousVersion.id : null
+    return [
+      {
+        type: "NodeVersion",
+        id: this.id,
+        value: {
+          contentId: this.content.id,
+          previousVersionId: this.previousVersion
+            ? this.previousVersion.id
+            : null
+        }
       }
-    }].concat(this.content.serialize()).concat(this.previousVersion ? this.previousVersion.serialize() : []);
+    ]
+      .concat(this.content.serialize())
+      .concat(this.previousVersion ? this.previousVersion.serialize() : []);
   }
 }
 
@@ -98,11 +106,13 @@ class HyperText implements Serializable {
   }
 
   serialize(): Row[] {
-    return [{
-      type: "HyperText",
-      id: this.id,
-      value: this.value
-    }];
+    return [
+      {
+        type: "HyperText",
+        id: this.id,
+        value: this.value
+      }
+    ];
   }
 }
 
@@ -112,9 +122,22 @@ const n1 = new Node(nv1);
 
 const h2 = new HyperText(["An array", "that has", "three text elements"]);
 const h3 = new HyperText({ nodeId: n1.id });
-const h4 = new HyperText(["An array", "that includes", "a node:", { nodeId: n1.id }]);
-const h5 = new HyperText({ template: "workspace", question: "the literal question", answer: "the literal answer" });
-const h6 = new HyperText({ template: "workspace", question: { nodeId: n1.id }, answer: { nodeId: n1.id} });
+const h4 = new HyperText([
+  "An array",
+  "that includes",
+  "a node:",
+  { nodeId: n1.id }
+]);
+const h5 = new HyperText({
+  template: "workspace",
+  question: "the literal question",
+  answer: "the literal answer"
+});
+const h6 = new HyperText({
+  template: "workspace",
+  question: { nodeId: n1.id },
+  answer: { nodeId: n1.id }
+});
 
 const data = [h1, h2, h3, h4, h5, h6, nv1, n1];
 

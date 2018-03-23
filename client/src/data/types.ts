@@ -25,6 +25,17 @@ export interface HyperTextRow extends Row {
   value: HyperTextValue
 }
 
+// Node version
+
+export interface NodeVersionValue {
+  contentId: string,
+  previousVersionId: string | null
+}
+
+export interface NodeVersionRow extends Row {
+  value: NodeVersionValue
+}
+
 
 
 export enum LinkKind {
