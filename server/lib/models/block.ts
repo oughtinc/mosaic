@@ -31,17 +31,21 @@ function importingNodes(node: any) {
     return pointers;
 }
 
-function importingPointerIds(item){
-  if (!item.dataValues.value) {
-    return []
-  }
+async function importingPointerIds(item, sequelize){
+  if (!item.dataValues.value) { return [] }
   const value = Value.fromJSON(item.dataValues.value)
   const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
-  const pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerImport");
-  return pointers.map(p => p.data.pointerId)
+  let pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
+  let pointerIds = pointers.map(p => p.data.pointerId);
+  for (const p of pointers){
+    const _pointer = await sequelize.models.Pointer.findById(p.data.pointerId)
+    const subPointerIds = await _pointer.containedPointerIds(sequelize);
+    pointerIds = [...pointerIds, ...subPointerIds]
+  }
+  return pointerIds
 }
 
-function exportingPointerValues(item){
+async function exportingPointerValues(item){
   if (!item.dataValues.value) {
     return {}
   }
@@ -82,8 +86,8 @@ const BlockModel = (sequelize, DataTypes) => {
     hooks: {
       beforeValidate: async (item, options) => {
         eventHooks.beforeValidate(item, options);
-        item.cachedExportPointerValues = exportingPointerValues(item)
-        item.cachedImportPointerIds = importingPointerIds(item)
+        item.cachedExportPointerValues = await exportingPointerValues(item)
+        item.cachedImportPointerIds = await importingPointerIds(item, sequelize)
       },
       beforeUpdate: (item, options) => {
         options.fields = item.changed();

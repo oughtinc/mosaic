@@ -38,7 +38,6 @@ export const saveBlocks = ({ ids, updateBlocksFn }) => {
     const state = await getState();
     const _blocks = ids.map((id) => state.blocks.blocks.find((b) => b.id === id));
     const savingValues = _blocks.map((b) => ({id: b.id, value: b.value.toJSON() }));
-    // console.log("Found block", _block);
     updateBlocksFn(savingValues);
   };
 };

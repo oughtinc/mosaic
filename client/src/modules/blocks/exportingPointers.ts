@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import { createSelector } from "reselect"
+import { createSelector } from "reselect";
 
 const blockSelector = (state) => state.blocks.blocks;
 
