@@ -1,13 +1,18 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import App from "./App";
-import { seededStore } from "./store";
-import registerServiceWorker from "./registerServiceWorker";
+
+import * as store from "./store";
+import fixtures from "./data/fixtures";
+import App from "./components/App/App";
+
+// import registerServiceWorker from "./registerServiceWorker";
 import "./index.css";
 
+// TODO: pass root workspace id here
+
 ReactDOM.render(
-  <App store={seededStore} rootNodeId="8124" />,
+  <App store={store.fromData(fixtures)} />,
   document.getElementById("root") as HTMLElement
 );
 
-registerServiceWorker();
+// registerServiceWorker();

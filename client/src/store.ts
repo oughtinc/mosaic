@@ -1,29 +1,29 @@
-import * as _ from "lodash";
+import { Serializable, Row } from "./data/types";
 
-import { Node, HyperText } from "./data/types";
-import { data as initialData } from "./data/fixtures";
-
-export function isLink(value: HyperText): boolean {
-  return _.isObject(value) && _.has(value, "link");
-}
+interface DB { [key: string]: { [key: string]: Row } }
 
 export default class Store {
-  private nodeMap: { [key: string]: Node };
+  private db: DB;
 
-  constructor(private nodes: Node[]) {
-    this.nodeMap = {};
-    nodes.forEach(node => {
-      this.nodeMap[node.id] = node;
+  constructor(data: Serializable[]) {
+    this.db = {};
+    data.forEach(datum => {
+      const objects = datum.serialize();
+      objects.forEach(object => {
+        if (!this.db[object.type]) {
+          this.db[object.type] = {};
+        }
+        this.db[object.type][object.id] = object;
+      })
     });
   }
-  getNodes() {
-    return this.nodes;
+
+  dump(): DB {
+    return this.db;
   }
-  getNode(id: string): Node | undefined {
-    return this.nodeMap[id];
-  }
+  
 }
 
-export const emptyStore = new Store([]);
+export const empty = new Store([]);
 
-export const seededStore = new Store(initialData);
+export const fromData = (data: Serializable[]) => new Store(data);

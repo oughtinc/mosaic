@@ -1,10 +1,31 @@
-export type HyperText = string | { link: number } | HyperTextArray; // HyperTextObject
+export interface Row {
+  id: string,
+  type: string,
+  value: Object
+}
 
-export interface HyperTextArray extends Array<HyperText> {}
+export interface Serializable {
+  serialize: () => Row[]
+}
+
+
+// HyperText
+
+export type HyperTextValue = string | HyperTextNode | HyperTextArray | HyperTextObject;
+
+export interface HyperTextNode { node: number };
+
+export interface HyperTextArray extends Array<HyperTextValue> {}
 
 export interface HyperTextObject {
-  [key: string]: HyperText;
+  [key: string]: HyperTextValue;
 }
+
+export interface HyperTextRow extends Row {
+  value: HyperTextValue
+}
+
+
 
 export enum LinkKind {
   Import,
@@ -19,7 +40,9 @@ export interface Link {
 
 export interface Node {
   id: string;
-  content: HyperText;
+  content: HyperTextValue;
   links: Link[];
   previousVersion: Node | null;
 }
+
+

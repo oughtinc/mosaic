@@ -1,0 +1,11 @@
+.HyperText {
+}
+
+.HyperText-Node {
+    border: 2px solid #eee;
+}
+
+.HyperText-Other {
+    border: 2px solid #f00;
+    padding: .2em;
+}
