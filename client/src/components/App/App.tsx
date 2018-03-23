@@ -11,8 +11,6 @@ interface AppProps {
 }
 
 const App: React.SFC<AppProps> = props => {
-  // TODO: pass props.store down to components to allow 'set' actions,
-  // and to easily retrieve other elements that are needed for rendering
   const db = props.store.dump();
   return (
     <div className="App">
@@ -21,7 +19,7 @@ const App: React.SFC<AppProps> = props => {
         <div key={key}>
           <h3>{key}</h3>
           {_.values(objects).map(object => (
-            <div style={{ margin: "1em" }}><Dispatch key={object.id} object={object} /></div>
+            <div style={{ margin: "1em" }}><Dispatch key={object.id} object={object} store={props.store} /></div>
           ))}
         </div>
       ))}      

@@ -21,7 +21,7 @@
         [ ] Node + NodeVersion
             [x] add simple fixtures
             [x] add classes
-            [ ] render node version, making use of hypertext render
+            [x] render node version, making use of hypertext render
                 - don't render included nodes (since we don't know what version to render)
                 - but we do need to render hypertext
                   - this mean that we need to retrieve it

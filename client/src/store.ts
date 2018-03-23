@@ -21,6 +21,14 @@ export default class Store {
   dump(): DB {
     return this.db;
   }
+
+  get(objectType: string, id: string): Row | null {
+    const table = this.db[objectType];
+    if (!table) {
+      return null;
+    }
+    return table[id] || null;
+  }
   
 }
 

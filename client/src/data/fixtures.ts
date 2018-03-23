@@ -72,7 +72,7 @@ class NodeVersion implements Serializable {
   public id: string;
 
   constructor(
-    private content: HyperText,
+    private hyperText: HyperText,
     private previousVersion: NodeVersion | null
   ) {
     this.id = uuidv1();
@@ -84,14 +84,14 @@ class NodeVersion implements Serializable {
         type: "NodeVersion",
         id: this.id,
         value: {
-          contentId: this.content.id,
+          hyperTextId: this.hyperText.id,
           previousVersionId: this.previousVersion
             ? this.previousVersion.id
             : null
         }
       }
     ]
-      .concat(this.content.serialize())
+      .concat(this.hyperText.serialize())
       .concat(this.previousVersion ? this.previousVersion.serialize() : []);
   }
 }

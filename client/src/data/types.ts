@@ -28,7 +28,7 @@ export interface HyperTextRow extends Row {
 // Node version
 
 export interface NodeVersionValue {
-  contentId: string,
+  hyperTextId: string,
   previousVersionId: string | null
 }
 

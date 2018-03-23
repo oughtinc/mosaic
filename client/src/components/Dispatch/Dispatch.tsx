@@ -6,18 +6,22 @@ import * as React from "react";
 
 import HyperText from "../HyperText/HyperText";
 import NodeVersion from "../NodeVersion/NodeVersion";
+import Store from "../../store";
 import { Row, HyperTextRow, NodeVersionRow } from "../../data/types";
 
 interface DispatchProps {
   object: Row;
+  store: Store;
 }
 
-const Dispatch: React.SFC<DispatchProps> = ({ object }) => {
+const Dispatch: React.SFC<DispatchProps> = ({ object, store }) => {
   if (object.type === "HyperText") {
     return <HyperText value={(object as HyperTextRow).value} />;
   }
   if (object.type === "NodeVersion") {
-    return <NodeVersion value={(object as NodeVersionRow).value} />;
+    return (
+      <NodeVersion value={(object as NodeVersionRow).value} store={store} />
+    );
   }
   return (
     <div>
