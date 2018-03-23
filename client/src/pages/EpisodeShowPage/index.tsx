@@ -181,7 +181,7 @@ function visibleBlockIds(workspace: any) {
 function mapStateToProps(state: any, { workspace }: any) {
     const _visibleBlockIds = visibleBlockIds(workspace.workspace);
     const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(state);
-    const { blocks, blockEditor } = state;
+    const { blocks } = state;
     return { blocks, exportingPointers };
 }
 

@@ -1,9 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
-import { DropdownButton, MenuItem } from "react-bootstrap";
 import { Inline } from "slate";
 import * as uuidv1 from "uuid/v1";
-import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
 import { Editor } from "slate-react";
 import { compose, withProps, withState } from "recompose";
 import gql from "graphql-tag";
@@ -39,6 +37,7 @@ interface BlockEditorEditingPresentationalProps {
     availablePointers: any[];
     value: any;
     mutationStatus: any;
+    blockEditor: any;
     plugins: any[];
     shouldAutosave: boolean;
     updateBlock(value: any): () => {};
@@ -76,6 +75,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         return (
             <BlockEditorStyle>
                 <MenuBar
+                    blockEditor={this.props.blockEditor}
                     onAddPointerImport={this.onAddPointerImport}
                     availablePointers={this.props.availablePointers}
                     mutationStatus={this.props.mutationStatus}
@@ -158,9 +158,14 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 }
 
+function mapStateToProps(state: any) {
+  const {  blockEditor } = state;
+  return { blockEditor };
+}
+
 export const BlockEditorEditing: any = compose(
     connect(
-        () => ({}), { updateBlock }
+        mapStateToProps, { updateBlock }
     ),
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer" }),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
