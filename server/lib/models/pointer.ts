@@ -1,6 +1,7 @@
 import Sequelize from 'sequelize';
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 import _ = require('lodash');
+const Op = Sequelize.Op;
 
 function getInlinesAsArray(node) {
   let array: any = [];
@@ -44,38 +45,36 @@ const PointerModel = (sequelize, DataTypes) => {
 
   Pointer.associate = function(models){
     Pointer.SourceBlock = Pointer.belongsTo(models.Block, {as: 'sourceBlock', foreignKey: 'sourceBlockId'})
-    Pointer.PointerImports = Pointer.hasMany(models.PointerImport, {as: 'pointerImport', foreignKey: 'pointerId'})
     addEventAssociations(Pointer, models)
   }
 
-  Pointer.prototype.importingWorkspaces = async function() {
-    let workspaces = []
-    const pointerImports = await this.getPointerImports()
-    for (const pointerImport of pointerImports) {
-      workspaces = [...workspaces, await pointerImport.getWorkspace()]
-    }
-    return workspaces
-  }
-
-  Pointer.prototype.containedPointerIds = async function(sequelize) {
-    const directIds = await this.directContainedPointerIds()
-    let importingIds = directIds
-    for (const id of importingIds){
-      const pointer = await sequelize.models.Pointer.findById(id);
-      const directImports = await pointer.directContainedPointerIds(sequelize);
-      directImports.filter(i => !_.includes(importingIds, i)).forEach(i => {
-        importingIds.push(i)
+  Pointer.prototype.containedPointers = async function(sequelize) {
+    const directPointers = await this.directContainedPointers(sequelize)
+    let allPointers:any = [...directPointers]
+    for (const pointer of allPointers) {
+      const directImports = await pointer.directContainedPointers(sequelize);
+      directImports.filter(p => !_.includes(allPointers.map(p => p.id), p.id)).forEach(p => {
+        allPointers.push(p)
       })
     }
-    return importingIds
+    return allPointers
   }
 
-  Pointer.prototype.directContainedPointerIds = async function(sequelize) {
+  Pointer.prototype.directContainedPointers = async function(sequelize) {
     const value = await this.value
+    if (!value) { return [] }
     const inlines =  getInlinesAsArray(value)
-    const pointers =  inlines.filter((l) => !!l.data.pointerId)
-    const pointerIds = pointers.map(p => p.data.pointerId)
-    return _.uniq(pointerIds)
+    const pointerInlines =  inlines.filter((l) => !!l.data.pointerId)
+    const pointerIds = pointerInlines.map(p => p.data.pointerId)
+    if (pointerIds.length === 0) { return [] }
+    const pointers = await sequelize.models.Pointer.findAll({
+      where: {
+        id: {
+          [Op.or]: _.uniq(pointerIds),
+        }
+      }
+    })
+    return pointers
   }
 
   return Pointer

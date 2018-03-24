@@ -51,12 +51,6 @@ const BlockModel = (sequelize, DataTypes) => {
           await item.ensureAllPointersAreInDatabase({ event: options.event })
         }
       },
-      getterMethods: {
-        async recentBlockVersion() {
-          const blockVersions = await this.getBlockVersion();
-          return blockVersions[0]
-        },
-      }
     });
 
   Block.associate = function (models) {
@@ -76,14 +70,15 @@ const BlockModel = (sequelize, DataTypes) => {
     }
   }
 
-  Block.prototype.connectedPointerIds = async function () {
+  Block.prototype.connectedPointers = async function () {
     const pointers = await this.topLevelPointers()
-    let pointerIds = pointers.map(p => p.id);
+
+    let allPointers = [...pointers];
     for (const pointer of pointers) {
-      const subPointerIds = await pointer.containedPointerIds(sequelize);
-      pointerIds = [...pointerIds, ...subPointerIds]
+      const subPointers = await pointer.containedPointers(sequelize);
+      allPointers = [...allPointers, ...subPointers]
     }
-    return _.uniq(pointerIds)
+    return allPointers
   }
 
   //private
@@ -92,10 +87,8 @@ const BlockModel = (sequelize, DataTypes) => {
     let pointers: any = []
     for (const id of topLevelPointerIds) {
       const pointer = await sequelize.models.Pointer.findById(id)
-      console.log("FOUND POINTER?", pointer)
       pointers.push(pointer)
     }
-    console.log(topLevelPointerIds, pointers)
     return pointers
   }
 
