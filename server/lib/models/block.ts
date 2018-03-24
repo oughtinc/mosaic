@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
-import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
-import {Value} from "slate"
+import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
+import { Value } from "slate"
 import _ = require('lodash');
 
 function getInlinesAsArray(node) {
@@ -19,47 +19,6 @@ function getInlinesAsArray(node) {
   return array;
 }
 
-function exportingNodes(node: any) {
-    const _getInlinesAsArray = getInlinesAsArray(node).map((n) => n.toJSON());
-    const pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerExport");
-    return pointers;
-}
-
-function importingNodes(node: any) {
-    const _getInlinesAsArray = getInlinesAsArray(node).map((n) => n.toJSON());
-    const pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerImport");
-    return pointers;
-}
-
-async function importingPointerIds(item, sequelize){
-  if (!item.dataValues.value) { return [] }
-  const value = Value.fromJSON(item.dataValues.value)
-  const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
-  let pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
-  let pointerIds = pointers.map(p => p.data.pointerId);
-  for (const p of pointers){
-    const _pointer = await sequelize.models.Pointer.findById(p.data.pointerId)
-    const subPointerIds = await _pointer.containedPointerIds(sequelize);
-    pointerIds = [...pointerIds, ...subPointerIds]
-  }
-  return pointerIds
-}
-
-async function exportingPointerValues(item){
-  if (!item.dataValues.value) {
-    return {}
-  }
-  const value = Value.fromJSON(item.dataValues.value)
-  const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
-  const pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerExport");
-
-  let results = {}
-  for (const pointer of pointers){
-    results[pointer.data.pointerId] = pointer;
-  }
-  return results
-}
-
 const BlockModel = (sequelize, DataTypes) => {
   var Block = sequelize.define('Block', {
     id: {
@@ -76,48 +35,95 @@ const BlockModel = (sequelize, DataTypes) => {
     value: {
       type: DataTypes.JSON
     },
-    cachedImportPointerIds: {
-      type: Sequelize.ARRAY(Sequelize.STRING)
-    },
     cachedExportPointerValues: {
       type: DataTypes.JSON
     },
   }, {
-    hooks: {
-      beforeValidate: async (item, options) => {
-        eventHooks.beforeValidate(item, options);
-        item.cachedExportPointerValues = await exportingPointerValues(item)
-        item.cachedImportPointerIds = await importingPointerIds(item, sequelize)
-      },
-      beforeUpdate: (item, options) => {
-        options.fields = item.changed();
-      },
-      afterSave: async (item, options) => {
-        const exportingPointers = await item.getExportingPointers();
-        const {cachedExportPointerValues, cachedImportPointerIds} = item;
-
-        for (const pointerId of Object.keys(cachedExportPointerValues)) {
-          if (!_.includes(exportingPointers.map(p => p.id), pointerId)){
-            await item.createExportingPointer({id: pointerId}, {event: options.event})
-          }
-        }
-
-        const workspace = await item.getWorkspace()
-        workspace.updatePointerImports(cachedImportPointerIds, {event: options.event})
-      }
-    },
-    getterMethods: {
-        async recentBlockVersion() {
-            const blockVersions = await this.getBlockVersion();
-            return blockVersions[0]
+      hooks: {
+        beforeValidate: async (item, options) => {
+          eventHooks.beforeValidate(item, options);
+          item.cachedExportPointerValues = await item.exportingPointerValues()
         },
-    }
-  });
+        beforeUpdate: (item, options) => {
+          options.fields = item.changed();
+        },
+        afterSave: async (item, options) => {
+          await item.ensureAllPointersAreInDatabase({ event: options.event })
+        }
+      },
+      getterMethods: {
+        async recentBlockVersion() {
+          const blockVersions = await this.getBlockVersion();
+          return blockVersions[0]
+        },
+      }
+    });
+
   Block.associate = function (models) {
-    Block.Workspace = Block.belongsTo(models.Workspace, {foreignKey: 'workspaceId'})
-    Block.ExportingPointers = Block.hasMany(models.Pointer, {as: 'exportingPointers', foreignKey: 'sourceBlockId'})
+    Block.Workspace = Block.belongsTo(models.Workspace, { foreignKey: 'workspaceId' })
+    Block.ExportingPointers = Block.hasMany(models.Pointer, { as: 'exportingPointers', foreignKey: 'sourceBlockId' })
     addEventAssociations(Block, models)
   }
+
+  Block.prototype.ensureAllPointersAreInDatabase = async function ({ event }) {
+    const exportingPointers = await this.getExportingPointers();
+    const { cachedExportPointerValues } = this;
+
+    for (const pointerId of Object.keys(cachedExportPointerValues)) {
+      if (!_.includes(exportingPointers.map(p => p.id), pointerId)) {
+        await this.createExportingPointer({ id: pointerId }, { event })
+      }
+    }
+  }
+
+  Block.prototype.connectedPointerIds = async function () {
+    const pointers = await this.topLevelPointers()
+    let pointerIds = pointers.map(p => p.id);
+    for (const pointer of pointers) {
+      const subPointerIds = await pointer.containedPointerIds(sequelize);
+      pointerIds = [...pointerIds, ...subPointerIds]
+    }
+    return _.uniq(pointerIds)
+  }
+
+  //private
+  Block.prototype.topLevelPointers = async function () {
+    const topLevelPointerIds = await this.topLevelPointersIds()
+    let pointers: any = []
+    for (const id of topLevelPointerIds) {
+      const pointer = await sequelize.models.Pointer.findById(id)
+      console.log("FOUND POINTER?", pointer)
+      pointers.push(pointer)
+    }
+    console.log(topLevelPointerIds, pointers)
+    return pointers
+  }
+
+  //private
+  Block.prototype.topLevelPointersIds = async function () {
+    if (!this.dataValues.value) { return [] }
+    const value = Value.fromJSON(this.dataValues.value)
+    const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
+    let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
+    return pointers.map(p => p.data.pointerId)
+  }
+
+  //private
+  Block.prototype.exportingPointerValues = async function () {
+    if (!this.dataValues.value) {
+      return {}
+    }
+    const value = Value.fromJSON(this.dataValues.value)
+    const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
+    const pointers = _getInlinesAsArray.filter((l) => l.type === "pointerExport");
+
+    let results = {}
+    for (const pointer of pointers) {
+      results[pointer.data.pointerId] = pointer;
+    }
+    return results
+  }
+
   return Block;
 };
 

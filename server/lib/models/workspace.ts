@@ -21,6 +21,19 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       defaultValue: false,
       allowNull: false
     },
+    connectedPointers: {
+      type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']), 
+      get: async function() {
+        const pointerIds = await this.connectedPointerIds();
+        let pointers:any = []
+        for (const id of pointerIds){
+          const _pointer = await sequelize.models.Pointer.findById(id);
+          const value = await _pointer.value
+          pointers.push(value)
+        }
+        return pointers
+      }
+    },
   }, {
       hooks: {
         ...eventHooks.beforeValidate,
@@ -47,6 +60,27 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   Workspace.createAsChild = async function ({parentId, question}, {event}) {
     const _workspace = await sequelize.models.Workspace.create({parentId}, {event, questionValue:question})
     return _workspace
+  }
+
+  Workspace.prototype.connectedPointerIds = async function () {
+    const blocks = await this.connectingBlocks()
+    let pointerIds:any = []
+    for (const block of blocks){
+      const blockPointerIds = await block.connectedPointerIds()
+      pointerIds = [...pointerIds, ...blockPointerIds]
+    }
+
+    return _.uniq(pointerIds)
+  }
+
+  Workspace.prototype.connectingBlocks = async function () {
+    let blocks = await this.getBlocks();
+    let children = await this.getChildWorkspaces()
+    for (const child of children){
+      const childBlocks = await child.getBlocks()
+      blocks = [...blocks, ...childBlocks]
+    }
+    return blocks
   }
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {

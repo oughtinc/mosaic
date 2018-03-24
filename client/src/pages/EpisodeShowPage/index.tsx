@@ -24,22 +24,9 @@ const WORKSPACE_QUERY = gql`
           id
           parentId
           childWorkspaceOrder
-          pointerImports{
-            id
-            pointer {
-                id
-                value
-            }
-          }
+          connectedPointers
           childWorkspaces{
             id
-            pointerImports{
-                id
-                pointer {
-                    id
-                    value
-                }
-            }
             blocks{
               id
               value
@@ -111,8 +98,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             return <div> Loading </div>;
         }
 
-        const importingWorkspaces = [workspace, ...workspace.childWorkspaces];
-        let importedPointers = _.flatten(importingWorkspaces.map((w) => w.pointerImports.map((p) => p.pointer.value).filter((v) => !!v)));
+        let importedPointers = workspace.connectedPointers;
         const allReadOnlyBlocks = (new WorkspaceWithRelations(workspace)).allReadOnlyBlocks();
         const readOnlyExportedPointers = _.flatten(allReadOnlyBlocks.map((b) => findPointers(b.value)));
         const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers, ...readOnlyExportedPointers], (p) => p.data.pointerId);
