@@ -2,6 +2,7 @@
 const Sequelize = require('sequelize')
 var _ = require('lodash');
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
+const Op = Sequelize.Op;
 
 const WorkspaceModel = (sequelize, DataTypes) => {
   var Workspace = sequelize.define('Workspace', {
@@ -24,14 +25,13 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     connectedPointers: {
       type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']), 
       get: async function() {
-        const pointerIds = await this.connectedPointerIds();
-        let pointers:any = []
-        for (const id of pointerIds){
-          const _pointer = await sequelize.models.Pointer.findById(id);
-          const value = await _pointer.value
-          pointers.push(value)
+        const _connectedPointers = await this.getConnectedPointers();
+        let values:any = []
+        for (const pointer of _connectedPointers){
+          const value = await pointer.value
+          values.push(value)
         }
-        return pointers
+        return values.filter(v => !!v)
       }
     },
   }, {
@@ -62,27 +62,6 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return _workspace
   }
 
-  Workspace.prototype.connectedPointerIds = async function () {
-    const blocks = await this.connectingBlocks()
-    let pointerIds:any = []
-    for (const block of blocks){
-      const blockPointerIds = await block.connectedPointerIds()
-      pointerIds = [...pointerIds, ...blockPointerIds]
-    }
-
-    return _.uniq(pointerIds)
-  }
-
-  Workspace.prototype.connectingBlocks = async function () {
-    let blocks = await this.getBlocks();
-    let children = await this.getChildWorkspaces()
-    for (const child of children){
-      const childBlocks = await child.getBlocks()
-      blocks = [...blocks, ...childBlocks]
-    }
-    return blocks
-  }
-
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceOrder, element]
   }
@@ -109,6 +88,36 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return child
   }
 
+  //private
+  Workspace.prototype.getConnectedPointers = async function () {
+    const blocks = await this.visibleBlocks()
+    let _connectedPointers: string[] = []
+    for (const block of blocks){
+      const blockPointerIds = await block.connectedPointers()
+      _connectedPointers = [..._connectedPointers, ...blockPointerIds]
+    }
+
+    return _connectedPointers
+  }
+
+  //private
+  Workspace.prototype.visibleBlocks = async function () {
+    let blocks = await this.getBlocks();
+    if (!this.childWorkspaceOrder.length){ return blocks}
+    const connectingChildBlocks = await sequelize.models.Block.findAll({
+      where: {
+        workspaceId: {
+          [Op.or]: this.childWorkspaceOrder,
+        },
+        type: {
+          [Op.or]: ["QUESTION", "ANSWER"],
+        }
+      }
+    })
+    blocks = [...blocks, ...connectingChildBlocks]
+    console.log("VISIBLE BLOCKS", blocks.length)
+    return blocks
+  }
   return Workspace;
 };
 
