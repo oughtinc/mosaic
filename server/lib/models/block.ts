@@ -75,10 +75,10 @@ const BlockModel = (sequelize, DataTypes) => {
 
     let allPointers = [...pointers];
     for (const pointer of pointers) {
-      const subPointers = await pointer.containedPointers(sequelize);
+      const subPointers = await pointer.containedPointers();
       allPointers = [...allPointers, ...subPointers]
     }
-    return allPointers
+    return _.uniqBy(pointers, 'id')
   }
 
   //private
@@ -89,7 +89,7 @@ const BlockModel = (sequelize, DataTypes) => {
       const pointer = await sequelize.models.Pointer.findById(id)
       pointers.push(pointer)
     }
-    return pointers
+    return _.uniqBy(pointers, 'id')
   }
 
   //private

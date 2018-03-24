@@ -103,21 +103,20 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   //private
   Workspace.prototype.visibleBlocks = async function () {
     let blocks = await this.getBlocks();
-    if (!this.childWorkspaceOrder.length){ return blocks}
     const connectingChildBlocks = await sequelize.models.Block.findAll({
       where: {
         workspaceId: {
-          [Op.or]: this.childWorkspaceOrder,
+          [Op.in]: this.childWorkspaceOrder,
         },
         type: {
-          [Op.or]: ["QUESTION", "ANSWER"],
+          [Op.in]: ["QUESTION", "ANSWER"],
         }
       }
     })
     blocks = [...blocks, ...connectingChildBlocks]
-    console.log("VISIBLE BLOCKS", blocks.length)
     return blocks
   }
+
   return Workspace;
 };
 
