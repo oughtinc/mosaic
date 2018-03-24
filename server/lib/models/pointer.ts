@@ -58,7 +58,7 @@ const PointerModel = (sequelize, DataTypes) => {
   }
 
   Pointer.prototype.containedPointerIds = async function(sequelize) {
-    const directIds = await this.directImportingPointerIds()
+    const directIds = await this.directContainedPointerIds()
     let importingIds = directIds
     for (const id of importingIds){
       const pointer = await sequelize.models.Pointer.findById(id);
@@ -75,7 +75,7 @@ const PointerModel = (sequelize, DataTypes) => {
     const inlines =  getInlinesAsArray(value)
     const pointers =  inlines.filter((l) => !!l.data.pointerId)
     const pointerIds = pointers.map(p => p.data.pointerId)
-    return pointerIds
+    return _.uniq(pointerIds)
   }
 
   return Pointer
