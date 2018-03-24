@@ -12,12 +12,13 @@ export const addBlocks = (blocks) => {
   };
 };
 
-export const updateBlock = ({id, value}) => {
+export const updateBlock = ({ id, value, pointerChanged }) => {
   return (dispatch, getState) => {
     dispatch({
       type: UPDATE_BLOCK,
       id, 
       value,
+      pointerChanged,
     });
   };
 };

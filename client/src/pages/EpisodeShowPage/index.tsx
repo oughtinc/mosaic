@@ -11,7 +11,7 @@ import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
-import { exportingPointersSelector, exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
+import { exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
 import _ = require("lodash");
 
 const WORKSPACE_QUERY = gql`
@@ -86,10 +86,9 @@ const ParentLink = (props) => (
 export class FormPagePresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.updateBlocks = this.updateBlocks.bind(this);
     }
 
-    public updateBlocks(blocks: any) {
+    public updateBlocks = (blocks: any) => {
         const variables = { blocks };
         this.props.updateBlocks({
             variables,
@@ -135,6 +134,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={scratchpad.id}
                                 initialValue={scratchpad.value}
                                 availablePointers={availablePointers}
+                                shouldAutosave={true}
                                 canExport={true}
                             />
                             <h3>Answer</h3>
@@ -143,9 +143,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 blockId={answer.id}
                                 initialValue={answer.value}
                                 availablePointers={availablePointers}
+                                shouldAutosave={true}
                                 canExport={false}
                             />
-                            <Button onClick={() => { this.props.saveBlocks({ ids: [scratchpad.id, answer.id], updateBlocksFn: this.updateBlocks }); }}> Save </Button>
                         </Col>
                         <Col sm={2}>
                             <h3>Pointers</h3>
@@ -183,7 +183,7 @@ function visibleBlockIds(workspace: any) {
 function mapStateToProps(state: any, { workspace }: any) {
     const _visibleBlockIds = visibleBlockIds(workspace.workspace);
     const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(state);
-    const { blocks, blockEditor } = state;
+    const { blocks } = state;
     return { blocks, exportingPointers };
 }
 
