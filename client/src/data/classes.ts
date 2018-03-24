@@ -1,53 +1,95 @@
+import * as _ from "lodash";
 import * as uuidv1 from "uuid/v1";
-import { HyperTextValue, Serializable, Row } from "./types";
+import { HyperTextValue, Serializable, Identifiable, Row } from "./types";
 
-// import { LinkKind } from "./types";
-//
-// function makeRootWorkspace(question: string): Workspace {
-//   const questionNode = Node.fromString(question);
-//   const notesNode = Node.fromString("No notes yet.");
-//   const answerNode = Node.fromString("No answer yet.");
-//   const workspaceNode = Node.fromObject({
-//     question: questionNode,
-//     notes: notesNode,
-//     answer: answerNode,
-//     children: []
-//   });
-//   return Workspace.fromNode(workspaceNode);
-// }
-//
-// // --------------------------------------------------------------------
-//
-// class Workspace {
-//   static fromNode(node: Node): Workspace {}
-//   constructor(
-//     public head: WorkspaceVersion,
-//     public consistent: WorkspaceVersion
-//   ) {
-//     null;
-//   }
-// }
-//
-// class WorkspaceVersion {
-//   constructor(public links: Array<Link>) {
-//     null;
-//   }
-// }
-//
-// class Link {
-//   constructor(
-//     public nodeVersion: NodeVersion,
-//     public kind: LinkKind,
-//     public isExpanded: boolean,
-//     public isRoot: boolean
-//   ) {
-//     null;
-//   }
-// }
-//
-// // --------------------------------------------------------------------
+export class Workspace implements Identifiable, Serializable {
+  public id: string;
 
-export class Node implements Serializable {
+  constructor(
+    public head: WorkspaceVersion,
+    public consistent: WorkspaceVersion
+  ) {
+    this.id = uuidv1();
+  }
+
+  serialize(): Row[] {
+    return [
+      {
+        type: "Workspace",
+        id: this.id,
+        value: {
+          headId: this.head.id,
+          consistentId: this.consistent.id
+        }
+      }
+    ]
+      .concat(this.head.serialize())
+      .concat(this.consistent.serialize());
+  }
+}
+
+export class WorkspaceVersion implements Identifiable, Serializable {
+  public id: string;
+
+  constructor(private links: Array<Link>) {
+    this.id = uuidv1();
+  }
+
+  serialize(): Row[] {
+    return [
+      {
+        type: "WorkspaceVersion",
+        id: this.id,
+        value: {
+          linkIds: this.links.map(link => link.id)
+        }
+      }
+    ].concat(_.flatten(this.links.map(link => link.serialize())));
+  }
+}
+
+export class Link implements Identifiable, Serializable {
+  public id: string;
+  private access: LinkAccess;
+  private isExpanded: boolean;
+  private isRoot: boolean;
+
+  constructor(
+    private nodeVersion: NodeVersion,
+    options: {
+      access: LinkAccess;
+      isExpanded: boolean;
+      isRoot: boolean;
+    }
+  ) {
+    this.id = uuidv1();
+    this.access = options.access;
+    this.isExpanded = options.isExpanded;
+    this.isRoot = options.isRoot;
+  }
+
+  serialize(): Row[] {
+    return [
+      {
+        type: "Link",
+        id: this.id,
+        value: {
+          nodeVersionId: this.nodeVersion.id,
+          access: this.access,
+          isExpanded: this.isExpanded,
+          isRoot: this.isRoot
+        }
+      }
+    ].concat(this.nodeVersion.serialize());
+  }
+}
+
+export enum LinkAccess {
+  Read,
+  Write
+}
+
+export class Node implements Identifiable, Serializable {
   public id: string;
 
   constructor(public head: NodeVersion) {
@@ -67,7 +109,7 @@ export class Node implements Serializable {
   }
 }
 
-export class NodeVersion implements Serializable {
+export class NodeVersion implements Identifiable, Serializable {
   public id: string;
 
   constructor(
@@ -85,8 +127,8 @@ export class NodeVersion implements Serializable {
         value: {
           hyperTextId: this.hyperText.id,
           previousVersionId: this.previousVersion
-                           ? this.previousVersion.id
-                           : null
+            ? this.previousVersion.id
+            : null
         }
       }
     ]
@@ -95,7 +137,7 @@ export class NodeVersion implements Serializable {
   }
 }
 
-export class HyperText implements Serializable {
+export class HyperText implements Identifiable, Serializable {
   public id: string;
 
   constructor(private value: HyperTextValue) {

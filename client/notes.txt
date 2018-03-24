@@ -29,11 +29,10 @@
                     - (then, we do one big query at the top, and little cached queries while rendering)
             [x] extract classes from fixtures
         [ ] Workspace + WorkspaceVersion + Link
-            [ ] add basic workspace / workspace version / link fixtures
-            [ ] write corresponding classes
+            [x] add basic workspace / workspace version / link fixtures
+            [x] write corresponding classes
             [ ] write components that render these classes
                 [ ] HyperText should take prop that determines how included nodes are rendered
-        [ ] makeRootWorkspace
     [ ] Try workspace with sub-workspace
         - children
     [ ] Exports    

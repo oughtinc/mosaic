@@ -8,6 +8,10 @@ export interface Serializable {
   serialize: () => Row[]
 }
 
+export interface Identifiable {
+  id: string
+}
+
 
 // HyperText
 
@@ -37,23 +41,11 @@ export interface NodeVersionRow extends Row {
 }
 
 
+// export interface Link {
+//   node: Node;
+//   kind: LinkKind;
+//   expanded: boolean;
+// }
 
-export enum LinkKind {
-  Import,
-  Export
-}
-
-export interface Link {
-  node: Node;
-  kind: LinkKind;
-  expanded: boolean;
-}
-
-export interface Node {
-  id: string;
-  content: HyperTextValue;
-  links: Link[];
-  previousVersion: Node | null;
-}
 
 
