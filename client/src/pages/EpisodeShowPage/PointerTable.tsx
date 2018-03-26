@@ -41,6 +41,7 @@ export const PointerTable = ({ availablePointers }) => (
             </Reference>
             <Text>
                 <ShowExpandedPointerOutsideSlate
+                    availablePointers={availablePointers}
                     exportingPointer={pointer}
                     isHoverable={true}
                 />

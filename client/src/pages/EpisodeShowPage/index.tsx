@@ -11,8 +11,12 @@ import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
-import { exportingBlocksPointersSelector } from "../../modules/blocks/exportingPointers";
+import { exportingPointersSelector, exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
+import Plain from "slate-plain-serializer";
 import _ = require("lodash");
+import { Value } from "slate";
+import * as uuidv1 from "uuid/v1";
+import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
 
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
@@ -20,22 +24,9 @@ const WORKSPACE_QUERY = gql`
           id
           parentId
           childWorkspaceOrder
-          pointerImports{
-            id
-            pointer {
-                id
-                value
-            }
-          }
+          connectedPointers
           childWorkspaces{
             id
-            pointerImports{
-                id
-                pointer {
-                    id
-                    value
-                }
-            }
             blocks{
               id
               value
@@ -83,6 +74,12 @@ const ParentLink = (props) => (
     </Link>
 );
 
+function findPointers(value) {
+    const _value = value ? Value.fromJSON(value) : Plain.deserialize("");
+    const pointers = exportingNodes(_value.document);
+    return pointers;
+}
+
 export class FormPagePresentational extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
@@ -100,12 +97,11 @@ export class FormPagePresentational extends React.Component<any, any> {
         if (!workspace) {
             return <div> Loading </div>;
         }
-        const importingWorkspaces = [workspace, ...workspace.childWorkspaces];
-        let importedPointers = _.flatten(importingWorkspaces.map((w) => w.pointerImports.map((p) => p.pointer.value).filter((v) => !!v)));
-        const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers], (p) => p.data.pointerId);
-        const question = workspace.blocks.find((b) => b.type === "QUESTION");
-        const answer = workspace.blocks.find((b) => b.type === "ANSWER");
-        const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
+
+        let importedPointers = workspace.connectedPointers;
+        const allReadOnlyBlocks = (new WorkspaceWithRelations(workspace)).allReadOnlyBlocks();
+        const readOnlyExportedPointers = _.flatten(allReadOnlyBlocks.map((b) => findPointers(b.value)));
+        const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers, ...readOnlyExportedPointers], (p) => p.data.pointerId);
         return (
             <div key={workspace.id}>
                 <BlockHoverMenu>
@@ -116,12 +112,8 @@ export class FormPagePresentational extends React.Component<any, any> {
                             }
                             <h1>
                                 <BlockEditor
-                                    name={question.id}
-                                    blockId={question.id}
-                                    initialValue={question.value}
-                                    readOnly={true}
-                                    canExport={false}
                                     availablePointers={availablePointers}
+                                    {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceQuestion, workspace).blockEditorAttributes())}
                                 />
                             </h1>
                         </Col>
@@ -130,21 +122,13 @@ export class FormPagePresentational extends React.Component<any, any> {
                         <Col sm={4}>
                             <h3>Scratchpad</h3>
                             <BlockEditor
-                                name={question.id}
-                                blockId={scratchpad.id}
-                                initialValue={scratchpad.value}
                                 availablePointers={availablePointers}
-                                shouldAutosave={true}
-                                canExport={true}
+                                {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceScratchpad, workspace).blockEditorAttributes())}
                             />
                             <h3>Answer</h3>
                             <BlockEditor
-                                name={answer.id}
-                                blockId={answer.id}
-                                initialValue={answer.value}
                                 availablePointers={availablePointers}
-                                shouldAutosave={true}
-                                canExport={false}
+                                {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
                             />
                         </Col>
                         <Col sm={2}>

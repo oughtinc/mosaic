@@ -19,7 +19,7 @@ function getInlinesAsArray(node: any) {
   return array;
 }
 
-function exportingNodes(node: any) {
+export function exportingNodes(node: any) {
     const _getInlinesAsArray = getInlinesAsArray(node).map((n) => n.toJSON());
     const pointers =  _getInlinesAsArray.filter((l) => l.type === "pointerExport");
     return pointers;

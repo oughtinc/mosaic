@@ -53,11 +53,11 @@ class App extends React.Component {
     return (
       <ApolloProvider client={client}>
         <Provider store={store}>
-        <BrowserRouter>
-          <Layout>
-            <Routes />
-          </Layout>
-        </BrowserRouter>
+          <BrowserRouter>
+            <Layout>
+              <Routes />
+            </Layout>
+          </BrowserRouter>
         </Provider>
       </ApolloProvider>
     );
