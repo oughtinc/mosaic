@@ -2,7 +2,7 @@ import * as React from "react";
 import Plain from "slate-plain-serializer";
 import styled from "styled-components";
 import { Editor } from "slate-react";
-import { addBlocks, updateBlock, removeBlocks } from "../../modules/blocks/actions";
+import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
 import { changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
