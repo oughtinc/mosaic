@@ -19,10 +19,12 @@ const App: React.SFC<AppProps> = props => {
         <div key={key}>
           <h3>{key}</h3>
           {_.values(objects).map(object => (
-            <div style={{ margin: "1em" }}><Dispatch key={object.id} object={object} store={props.store} /></div>
+            <div key={object.id} style={{ margin: "1em" }}>
+              <Dispatch object={object} store={props.store} />
+            </div>
           ))}
         </div>
-      ))}      
+      ))}
       <h2>The store</h2>
       <pre>{JSON.stringify(db, null, 2)}</pre>
     </div>

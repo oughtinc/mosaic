@@ -1,23 +1,31 @@
+import { LinkAccess } from "./classes";
+import Store from "../store";
+
 export interface Row {
-  id: string,
-  type: string,
-  value: any
+  id: string;
+  type: string;
+  value: any;
 }
 
 export interface Serializable {
-  serialize: () => Row[]
+  serialize: () => Row[];
 }
 
 export interface Identifiable {
-  id: string
+  id: string;
 }
-
 
 // HyperText
 
-export type HyperTextValue = string | HyperTextNode | HyperTextArray | HyperTextObject;
+export type HyperTextValue =
+  | string
+  | HyperTextNode
+  | HyperTextArray
+  | HyperTextObject;
 
-export interface HyperTextNode { nodeId: number };
+export interface HyperTextNode {
+  nodeId: string;
+}
 
 export interface HyperTextArray extends Array<HyperTextValue> {}
 
@@ -26,26 +34,66 @@ export interface HyperTextObject {
 }
 
 export interface HyperTextRow extends Row {
-  value: HyperTextValue
+  value: HyperTextValue;
 }
 
 // Node version
 
 export interface NodeVersionValue {
-  hyperTextId: string,
-  previousVersionId: string | null
+  nodeId: string | null;
+  hyperTextId: string;
+  previousVersionId: string | null;
 }
 
 export interface NodeVersionRow extends Row {
-  value: NodeVersionValue
+  value: NodeVersionValue;
 }
 
+// Workspace version
 
-// export interface Link {
-//   node: Node;
-//   kind: LinkKind;
-//   expanded: boolean;
-// }
+export interface WorkspaceVersionValue {
+  linkIds: Array<string>;
+}
 
+export interface WorkspaceVersionRow {
+  value: WorkspaceVersionValue;
+}
 
+// Workspace
 
+export interface WorkspaceValue {
+  headId: string;
+  consistentId: string;
+}
+
+export interface WorkspaceRow {
+  value: WorkspaceValue;
+}
+
+// Link
+
+export interface LinkValue {
+  nodeVersionId: string;
+  access: LinkAccess;
+  isExpanded: boolean;
+  isRoot: boolean;
+}
+
+export interface LinkRow {
+  value: LinkValue;
+}
+
+// Node
+
+export interface NodeValue {
+  headId: string;
+}
+
+export interface NodeRow {
+  value: NodeValue;
+}
+
+export type RenderNode = React.StatelessComponent<{
+  value: HyperTextNode;
+  store: Store;
+}>;

@@ -1,44 +1,82 @@
 # Next steps
 
-[ ] Write more complete fixtures
-    [ ] Fill in class definitions + serialize, create instances for single workspace data
-        [x] HyperText
-            [x] also implement serialize, make app print stringified store
-            [x] create HyperJSON interface
-            [x] create an object-based instance of HyperText
-            [x] render hypertext
-                [x] clarify types for serialized objects
-                [x] factor out dispatch and hypertext components
-                [x] add to fixtures for cases below
-                [x] implement hypertext rendering
-                    [x] strings
-                    [x] arrays
-                    [x] nodes
-                    [x] arrays with nodes
-                    [x] workspace template object
-                [x] split hypertext.tsx into multiple files
-        [x] Clean up, commit
-        [x] Node + NodeVersion
-            [x] add simple fixtures
-            [x] add classes
-            [x] render node version, making use of hypertext render
-                - don't render included nodes (since we don't know what version to render)
-                - but we do need to render hypertext
-                  - this mean that we need to retrieve it
-                  - this can be analogous to how graphql works later
-                    - (then, we do one big query at the top, and little cached queries while rendering)
-            [x] extract classes from fixtures
-        [ ] Workspace + WorkspaceVersion + Link
-            [x] add basic workspace / workspace version / link fixtures
-            [x] write corresponding classes
-            [ ] write components that render these classes
-                [ ] HyperText should take prop that determines how included nodes are rendered
-    [ ] Try workspace with sub-workspace
-        - children
-    [ ] Exports    
-    [ ] think about what cases will be tricky, implement them
-        [ ] Showing whether things are stale
-        [ ] Recursive fetching for latest state    
+[x] Fill in class definitions + serialize, create instances for single workspace data
+    [x] HyperText
+        [x] also implement serialize, make app print stringified store
+        [x] create HyperJSON interface
+        [x] create an object-based instance of HyperText
+        [x] render hypertext
+            [x] clarify types for serialized objects
+            [x] factor out dispatch and hypertext components
+            [x] add to fixtures for cases below
+            [x] implement hypertext rendering
+                [x] strings
+                [x] arrays
+                [x] nodes
+                [x] arrays with nodes
+                [x] workspace template object
+            [x] split hypertext.tsx into multiple files
+    [x] Clean up, commit
+    [x] Node + NodeVersion
+        [x] add simple fixtures
+        [x] add classes
+        [x] render node version, making use of hypertext render
+            - don't render included nodes (since we don't know what version to render)
+            - but we do need to render hypertext
+              - this mean that we need to retrieve it
+              - this can be analogous to how graphql works later
+                - (then, we do one big query at the top, and little cached queries while rendering)
+        [x] extract classes from fixtures
+    [x] Workspace + WorkspaceVersion + Link
+        [x] add basic workspace / workspace version / link fixtures
+        [x] write corresponding classes
+        [x] write components that render these classes
+            [x] Render workspace version
+                [x] Render link
+                [x] HyperText should take prop that determines how included nodes are rendered
+                [x] Build renderNode function
+            [x] Render links without context
+            [x] Render workspace
+            [x] Render node
+            [x] Clean up
+                [-] fixme: renderNode returns a Link...
+                    - This may be fine for now
+                [x] Clean up WorkspaceVersion code
+                [x] Should renderNode be curried so that we don't have to pass store everywhere?
+                    - both NodeVersion and Link need access to the store, so I don't think that would owrk
+                [x] Should renderNode take renderNode as an argument?
+                    - no, since WorkspaceVersion can't be used recursively within itself
+                [x] if one "workspace" is included in another workspace, which renderNode
+                    should we use?
+                    - we want outer workspace's expansion status
+                    - but for versions, it's less clear
+                      - i think there is a coherent version where we only look at outer
+                        workspace's versions (and latest version)
+                      - in this case, outer workspace's renderNode should be used
+                    - This will happen automatically, since inclusion doesn't work by
+                      including the "Workspace" component
+                [x] Fix overlapping names: workspace (the template) vs workspace (the data model and wrapper)
+                    - we will never include the data model component within itself                          
+[ ] Rendering the latest version of everything in a workspace
+    [x] think about how to do this correctly
+        - options
+          - make a version of renderNode that just gets the latest version?
+          - retrieve the latest version for every link ahead of time
+            - this requires recursion, since pointed-to nodes might include further nodes
+            - but should be only one step (in addition to first step required for snapshot/consistent), since
+              things can't be expanded if we haven't seen them
+            - this seems better - we create a version of renderNode by first loading the
+              latest version ahead of time
+            - we'll need to assert that we actually don't need to do recursive fetching;
+              there's a runtime assumption here that included nodes will never be expanded
+              by default
+    [ ] create fixtures that test this
+    [ ] make renderer indicate which version is being rendered
+[ ] Try workspace with sub-workspaces (via child q&a)
+    - children
+[ ] Exports
+[ ] Showing whether things are stale
+[ ] A workspace template included in another workspace template
 
 [ ] (Think about caching node ids for hypertext)
     - probably fine to delay until this is moved to server

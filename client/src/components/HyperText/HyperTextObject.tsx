@@ -1,38 +1,15 @@
 import * as _ from "lodash";
 import * as React from "react";
 
-import HyperText from "./HyperText";
+import Store from "../../store";
+import QuestionAnswerTemplate from "../QuestionAnswerTemplate/QuestionAnswerTemplate";
 import {
   HyperTextObject as HyperTextObjectT,
-  HyperTextValue
+  RenderNode
 } from "../../data/types";
 
-interface WorkspaceProps {
-  question: HyperTextValue;
-  answer: HyperTextValue;
-}
-
-const Workspace: React.SFC<WorkspaceProps> = ({ question, answer }) => {
-  // TODO: move elsewhere
-  return (
-    <div
-      className="Workspace"
-      style={{ border: "1px solid #ccc", padding: ".5em" }}
-    >
-      <div className="Workspace-Question">
-        <div>Question:</div>
-        <HyperText value={question} />
-      </div>
-      <div className="Workspace-Answer">
-        <div>Answer:</div>
-        <HyperText value={answer} />
-      </div>
-    </div>
-  );
-};
-
 const templates = {
-  workspace: Workspace
+  "question-answer": QuestionAnswerTemplate
 };
 
 function isTemplatedObject(object: HyperTextObjectT) {
@@ -43,12 +20,18 @@ function isTemplatedObject(object: HyperTextObjectT) {
 
 interface HyperTextObjectProps {
   value: HyperTextObjectT;
+  store: Store;
+  renderNode: RenderNode;
 }
 
-const HyperTextObject: React.SFC<HyperTextObjectProps> = ({ value }) => {
+const HyperTextObject: React.SFC<HyperTextObjectProps> = ({
+  value,
+  store,
+  renderNode
+}) => {
   if (isTemplatedObject(value)) {
     const Component = templates[value.template as string];
-    return <Component {...value} />;
+    return <Component {...value} renderNode={renderNode} store={store} />;
   }
   return (
     <div className="HyperText HyperText-Object">

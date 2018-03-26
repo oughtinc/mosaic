@@ -91,9 +91,15 @@ export enum LinkAccess {
 
 export class Node implements Identifiable, Serializable {
   public id: string;
+  public head: NodeVersion | null;
 
-  constructor(public head: NodeVersion) {
+  constructor() {
     this.id = uuidv1();
+    this.head = null;
+  }
+
+  setHead(nodeVersion: NodeVersion) {
+    this.head = nodeVersion;
   }
 
   serialize(): Row[] {
@@ -102,10 +108,10 @@ export class Node implements Identifiable, Serializable {
         type: "Node",
         id: this.id,
         value: {
-          headId: this.head.id
+          headId: this.head ? this.head.id : null
         }
       }
-    ].concat(this.head.serialize());
+    ].concat(this.head ? this.head.serialize() : []);
   }
 }
 
@@ -113,6 +119,7 @@ export class NodeVersion implements Identifiable, Serializable {
   public id: string;
 
   constructor(
+    private node: Node,
     private hyperText: HyperText,
     private previousVersion: NodeVersion | null
   ) {
@@ -125,6 +132,7 @@ export class NodeVersion implements Identifiable, Serializable {
         type: "NodeVersion",
         id: this.id,
         value: {
+          nodeId: this.node.id,
           hyperTextId: this.hyperText.id,
           previousVersionId: this.previousVersion
             ? this.previousVersion.id
