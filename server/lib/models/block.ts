@@ -78,7 +78,7 @@ const BlockModel = (sequelize, DataTypes) => {
       const subPointers = await pointer.containedPointers();
       allPointers = [...allPointers, ...subPointers]
     }
-    return _.uniqBy(pointers, 'id')
+    return _.uniqBy(allPointers, 'id')
   }
 
   //private
