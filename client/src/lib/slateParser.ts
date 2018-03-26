@@ -1,7 +1,7 @@
 import Plain from "slate-plain-serializer";
 
 export function valueToDatabaseJSON(value: any) {
-    return JSON.stringify(value.toJSON().document.nodes[0].nodes);
+    return JSON.stringify(value.toJSON().document.nodes[0]);
 }
 
 export function databaseJSONToValue(databaseJson: any) {
@@ -11,13 +11,9 @@ export function databaseJSONToValue(databaseJson: any) {
             document: {
                 object: "document",
                 data: {},
-                nodes: [{
-                    object: "block",
-                    type: "line",
-                    isVoid: false,
-                    data: {},
-                    nodes: databaseJson,
-                }],
+                nodes: [
+                    databaseJson,
+                ],
             },
         };
     } else {

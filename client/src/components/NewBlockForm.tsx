@@ -1,10 +1,7 @@
 import * as React from "react";
 import * as uuidv1 from "uuid/v1";
 import { BlockEditor } from "./BlockEditor";
-
-function valueToDatabaseJSON(value: any) {
-    return JSON.stringify(value.toJSON().document.nodes[0].nodes);
-}
+import { valueToDatabaseJSON } from "../lib/slateParser";
 
 export class NewBlockForm extends React.Component<any, any> {
     public constructor(props: any) {
