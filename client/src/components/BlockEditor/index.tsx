@@ -2,7 +2,7 @@ import * as React from "react";
 import Plain from "slate-plain-serializer";
 import styled from "styled-components";
 import { Editor } from "slate-react";
-import { addBlocks } from "../../modules/blocks/actions";
+import { addBlocks, updateBlock, removeBlocks } from "../../modules/blocks/actions";
 import { changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
@@ -72,7 +72,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
-      canExport: newProps.canExport || false,
     };
     this.setState({
       plugins: [
@@ -84,14 +83,29 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public componentDidMount() {
     const { name, blockId, initialValue } = this.props;
+    const value = initialValue || Plain.deserialize("");
+
     const blockForm = {
       id: blockId,
       name,
-      value: initialValue || Plain.deserialize(""),
+      value,
     };
+
     this.props.addBlocks([blockForm]);
     this.resetPlugins(this.props);
   }
+
+  public componentWillUnmount() {
+    const { blockId } = this.props;
+    this.props.removeBlocks([blockId]);
+  }
+
+  public onChange(value: any) {
+    if (this.props.onChange) {
+      this.props.onChange(value);
+    }
+  }
+
   public render() {
     const { readOnly } = this.props;
     const block = this.props.block;
@@ -134,6 +148,6 @@ function mapStateToProps(state: any, { blockId }: any) {
 
 export const BlockEditor: any = compose(
   connect(
-    mapStateToProps, { addBlocks, changeHoverItem, removeHoverItem }
+    mapStateToProps, { addBlocks, removeBlocks, changeHoverItem, removeHoverItem }
   ),
 )(BlockEditorPresentational);

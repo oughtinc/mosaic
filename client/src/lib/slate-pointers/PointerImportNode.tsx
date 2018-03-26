@@ -39,14 +39,14 @@ const OpenPointerImport: any = styled.div`
     }
 `;
 
-function translateProps({blockEditor, exportingPointers, nodeAsJson}: any) {
-      const { internalReferenceId, pointerId } = nodeAsJson.data;
-      const reference = blockEditor.pointerReferences[internalReferenceId];
-      const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
-      const isOpen = reference && reference.isOpen;
-      const importingPointer: any = exportingPointers.find((l: any) => l.data.pointerId === pointerId);
-      const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.data.pointerId === pointerId);
-      return ({importingPointer, isSelected, isOpen, pointerIndex});
+function translateProps({ blockEditor, exportingPointers, nodeAsJson }: any) {
+    const { internalReferenceId, pointerId } = nodeAsJson.data;
+    const reference = blockEditor.pointerReferences[internalReferenceId];
+    const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
+    const isOpen = reference && reference.isOpen;
+    const importingPointer: any = exportingPointers.find((l: any) => l.data.pointerId === pointerId);
+    const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.data.pointerId === pointerId);
+    return ({ importingPointer, isSelected, isOpen, pointerIndex });
 }
 
 export class PointerImportNode extends React.Component<any, any> {
@@ -54,22 +54,22 @@ export class PointerImportNode extends React.Component<any, any> {
         super(props);
     }
 
-    public getLocation = () =>  {
+    public getLocation = () => {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        return {top: `${rect.top - 40}px`, left: `${rect.left + 10}px`};
+        return { top: `${rect.top - 40}px`, left: `${rect.left + 10}px` };
     }
 
     public onMouseOver = () => {
         if (this.props.isHoverable) {
-            const {top, left} = this.getLocation();
-            this.props.onMouseOver({top, left, id: this.props.nodeAsJson.data.internalReferenceId});
+            const { top, left } = this.getLocation();
+            this.props.onMouseOver({ top, left, id: this.props.nodeAsJson.data.internalReferenceId });
         }
     }
 
     public render() {
-        const {blockEditor, exportingPointers, nodeAsJson} = this.props;
+        const { blockEditor, exportingPointers, nodeAsJson } = this.props;
 
-        const {importingPointer, isSelected, pointerIndex, isOpen} = translateProps({
+        const { importingPointer, isSelected, pointerIndex, isOpen } = translateProps({
             blockEditor,
             exportingPointers,
             nodeAsJson,

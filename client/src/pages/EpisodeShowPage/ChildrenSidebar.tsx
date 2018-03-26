@@ -4,6 +4,7 @@ import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
+import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
@@ -15,26 +16,21 @@ export class Child extends React.Component<any, any> {
     public render() {
         const workspace = this.props.workspace;
         const availablePointers = this.props.availablePointers;
-        const question = workspace.blocks.find((b) => (b.type === "QUESTION"));
-        const answer = workspace.blocks.find((b) => (b.type === "ANSWER"));
+        const questionRelationship = new WorkspaceBlockRelation(WorkspaceRelationTypes.SubworkspaceQuestion, workspace);
+        const answerRelationship = new WorkspaceBlockRelation(WorkspaceRelationTypes.SubworkspaceAnswer, workspace);
         return (
             <ChildStyle>
-                {question.value &&
+                {questionRelationship.findBlock().value &&
                     <BlockEditor
-                        readOnly={true}
-                        blockId={question.id}
-                        initialValue={question.value}
+                        {...questionRelationship.blockEditorAttributes()}
                         availablePointers={availablePointers}
-                        canExport={false}
                     />
                 }
-                {answer.value &&
+
+                {answerRelationship.findBlock().value &&
                     <BlockEditor
-                        readOnly={true}
-                        blockId={answer.id}
-                        initialValue={answer.value}
+                        {...answerRelationship.blockEditorAttributes()}
                         availablePointers={availablePointers}
-                        canExport={false}
                     />
                 }
 
