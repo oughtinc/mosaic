@@ -1,6 +1,7 @@
 import React = require("react");
 import styled from "styled-components";
 import { ShowExpandedPointerOutsideSlate } from "../../components/ShowExpandedPointerOutsideSlate";
+import _ = require("lodash");
 
 const Container = styled.div`
     border: 1px solid #eee;
@@ -24,7 +25,8 @@ const Row = styled.div`
     width: 100%;
     border-bottom: 1px solid #ddd;
     padding: .3em .5em;
-    overflow: scroll;
+    overflow: auto;
+    max-height: 120px;
 `;
 
 const Text = styled.div`
@@ -33,22 +35,38 @@ const Text = styled.div`
     float: left;
 `;
 
-export const PointerTable = ({ availablePointers }) => (
-    <Container> {availablePointers.map((pointer, index: number) => (
-        <Row key={index}>
-            <Reference>
-                {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
-            </Reference>
-            <Text>
-                <ShowExpandedPointerOutsideSlate
-                    availablePointers={availablePointers}
-                    exportingPointer={pointer}
-                    isHoverable={true}
-                />
-            </Text>
-        </Row>
+const HiddenPointer = styled.span`
+    margin-top: 2px;
+    color: #cac8c8;
+    float: left;
+`;
 
-    ))}
+export const PointerTable = ({ availablePointers, exportingPointerIds }) => (
+    <Container> {availablePointers.map((pointer, index: number) => {
+        const isFromThisWorkspace = _.includes(exportingPointerIds, pointer.data.pointerId);
+        return (
+            <Row key={index}>
+                <Reference>
+                    {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
+                </Reference>
+                {isFromThisWorkspace &&
+                    <Text>
+                        <ShowExpandedPointerOutsideSlate
+                            availablePointers={availablePointers}
+                            exportingPointer={pointer}
+                            isHoverable={true}
+                        />
+                    </Text>
+                }
+                {!isFromThisWorkspace &&
+                <HiddenPointer>
+                   (HIDDEN)
+                </HiddenPointer>
+                }
+            </Row>
+
+        );
+    }
+    )}
     </Container>
-
 );

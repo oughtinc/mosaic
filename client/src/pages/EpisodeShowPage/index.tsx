@@ -134,6 +134,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                             <h3>Pointers</h3>
                             <PointerTable
                                 availablePointers={availablePointers}
+                                exportingPointerIds={this.props.exportingPointers.map((p) => p.data.pointerId)}
                             />
                         </Col>
                         <Col sm={6}>
