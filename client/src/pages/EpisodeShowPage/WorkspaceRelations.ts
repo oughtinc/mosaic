@@ -1,5 +1,6 @@
 import _ = require("lodash");
 import * as uuidv1 from "uuid/v1";
+import { databaseJSONToValue } from "../../lib/slateParser";
 
 export enum WorkspaceRelationTypes {
     WorkspaceQuestion = 0,
@@ -89,7 +90,8 @@ export class WorkspaceBlockRelation {
         const {permission} = this.relationTypeAttributes();
         const block: any = this.findBlock();
         const isReadOnly = permission === Permissions.ReadOnly;
-        const { value, id } = block;
+        let { value, id } = block;
+        value = databaseJSONToValue(value);
         return {
             name: id,
             blockId: id,

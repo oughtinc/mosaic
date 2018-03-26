@@ -9,6 +9,7 @@ import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
 import { BlockEditorEditing } from "./BlockEditorEditing";
+import { databaseJSONToValue } from "../../lib/slateParser";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -83,12 +84,11 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public componentDidMount() {
     const { name, blockId, initialValue } = this.props;
-    const value = initialValue || Plain.deserialize("");
 
     const blockForm = {
       id: blockId,
       name,
-      value,
+      value: initialValue,
     };
 
     this.props.addBlocks([blockForm]);
@@ -113,7 +113,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return (<div> loading... </div>);
     }
     const value = block.value;
-    const {plugins} = this.state;
+    const { plugins } = this.state;
     if (readOnly) {
       return (
         <BlockReadOnlyStyle>
@@ -127,13 +127,13 @@ class BlockEditorPresentational extends React.Component<any, any> {
     } else {
       return (
         <BlockEditorEditing
-            value={value}
-            readOnly={true}
-            shouldAutosave={!!this.props.shouldAutosave}
-            block={this.props.block}
-            availablePointers={this.props.availablePointers}
-            plugins={plugins}
-            onChange={this.props.onChange}
+          value={value}
+          readOnly={true}
+          shouldAutosave={!!this.props.shouldAutosave}
+          block={this.props.block}
+          availablePointers={this.props.availablePointers}
+          plugins={plugins}
+          onChange={this.props.onChange}
         />
       );
     }

@@ -2,6 +2,10 @@ import * as React from "react";
 import * as uuidv1 from "uuid/v1";
 import { BlockEditor } from "./BlockEditor";
 
+function valueToDatabaseJSON(value: any) {
+    return JSON.stringify(value.toJSON().document.nodes[0].nodes);
+}
+
 export class NewBlockForm extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
@@ -9,7 +13,8 @@ export class NewBlockForm extends React.Component<any, any> {
     }
 
     public onSubmit = () => {
-        this.props.onMutate(JSON.stringify(this.state.value.toJSON()));
+        this.props.onMutate(valueToDatabaseJSON(this.state.value));
+        // this.props.onMutate(JSON.stringify(this.state.value.toJSON()));
         this.setState({id: uuidv1()});
     }
 
