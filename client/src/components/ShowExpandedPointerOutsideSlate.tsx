@@ -1,6 +1,5 @@
 import * as _ from "lodash";
 import * as React from "react";
-import { exportingPointersSelector } from "../modules/blocks/exportingPointers";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { ShowExpandedPointer } from "../lib/slate-pointers/ShowExpandedPointer";
@@ -10,7 +9,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
     public render() {
         return (
             <ShowExpandedPointer
-                exportingPointers={this.props.exportingPointers}
+                exportingPointers={this.props.availablePointers}
                 blockEditor={this.props.blockEditor}
                 exportingPointer={this.props.exportingPointer}
                 isHoverable={this.props.isHoverable}
@@ -30,8 +29,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
 }
 
 function mapStateToProps(state: any, { exportingPointer }: any) {
-    const exportingPointers = exportingPointersSelector(state);
-    return { exportingPointers, blockEditor: state.blockEditor, exportingPointer };
+    return { blockEditor: state.blockEditor, exportingPointer };
 }
 
 export const ShowExpandedPointerOutsideSlate: any = compose(

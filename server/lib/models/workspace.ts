@@ -2,6 +2,7 @@
 const Sequelize = require('sequelize')
 var _ = require('lodash');
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
+const Op = Sequelize.Op;
 
 const WorkspaceModel = (sequelize, DataTypes) => {
   var Workspace = sequelize.define('Workspace', {
@@ -20,6 +21,18 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN(),
       defaultValue: false,
       allowNull: false
+    },
+    connectedPointers: {
+      type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']), 
+      get: async function() {
+        const _connectedPointers = await this.getConnectedPointers();
+        let values:any = []
+        for (const pointer of _connectedPointers){
+          const value = await pointer.value
+          values.push(value)
+        }
+        return values.filter(v => !!v)
+      }
     },
   }, {
       hooks: {
@@ -73,6 +86,35 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
     }, {event})
     return child
+  }
+
+  //private
+  Workspace.prototype.getConnectedPointers = async function () {
+    const blocks = await this.visibleBlocks()
+    let _connectedPointers: string[] = []
+    for (const block of blocks){
+      const blockPointerIds = await block.connectedPointers()
+      _connectedPointers = [..._connectedPointers, ...blockPointerIds]
+    }
+
+    return _connectedPointers
+  }
+
+  //private
+  Workspace.prototype.visibleBlocks = async function () {
+    let blocks = await this.getBlocks();
+    const connectingChildBlocks = await sequelize.models.Block.findAll({
+      where: {
+        workspaceId: {
+          [Op.in]: this.childWorkspaceOrder,
+        },
+        type: {
+          [Op.in]: ["QUESTION", "ANSWER"],
+        }
+      }
+    })
+    blocks = [...blocks, ...connectingChildBlocks]
+    return blocks
   }
 
   return Workspace;
