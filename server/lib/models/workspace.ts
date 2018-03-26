@@ -66,6 +66,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return [...this.childWorkspaceOrder, element]
   }
 
+  //obsolete?
   Workspace.prototype.updatePointerImports = async function (pointerIds, {event}) {
     const pointerImports = await this.getPointerImports()
     for (const pointerId of _.uniq(pointerIds)){

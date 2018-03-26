@@ -2,22 +2,7 @@ import Sequelize from 'sequelize';
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
 import { Value } from "slate"
 import _ = require('lodash');
-
-function getInlinesAsArray(node) {
-  let array: any = [];
-
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
-    if (child.object === "inline") {
-      array.push(child);
-    }
-    if (!child.isLeafInline()) {
-      array = array.concat(getInlinesAsArray(child));
-    }
-  });
-
-  return array;
-}
+import { findInlinesFromDocument, SlateNode, POINTER_EXPORT } from '../helpers/slateParser';
 
 const BlockModel = (sequelize, DataTypes) => {
   var Block = sequelize.define('Block', {
@@ -94,27 +79,12 @@ const BlockModel = (sequelize, DataTypes) => {
 
   //private
   Block.prototype.topLevelPointersIds = async function () {
-    if (!this.dataValues.value) { return [] }
-    const value = Value.fromJSON(this.dataValues.value)
-    const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
-    let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
-    return pointers.map(p => p.data.pointerId)
+    return SlateNode.fromSlateValue(this.dataValues.value).pointerIds()
   }
 
   //private
   Block.prototype.exportingPointerValues = async function () {
-    if (!this.dataValues.value) {
-      return {}
-    }
-    const value = Value.fromJSON(this.dataValues.value)
-    const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
-    const pointers = _getInlinesAsArray.filter((l) => l.type === "pointerExport");
-
-    let results = {}
-    for (const pointer of pointers) {
-      results[pointer.data.pointerId] = pointer;
-    }
-    return results
+    return SlateNode.fromSlateValue(this.dataValues.value).pointersById([POINTER_EXPORT])
   }
 
   return Block;

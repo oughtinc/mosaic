@@ -1,22 +1,8 @@
 import Sequelize from 'sequelize';
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 import _ = require('lodash');
+import { SlateNode } from '../helpers/slateParser';
 const Op = Sequelize.Op;
-
-function getInlinesAsArray(node) {
-  let array: any = [];
-
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
-    if (child.object === "inline") {
-      array.push(child);
-    } else {
-      array = array.concat(getInlinesAsArray(child));
-    }
-  });
-
-  return array;
-}
 
 const PointerModel = (sequelize, DataTypes) => {
   var Pointer = sequelize.define('Pointer', {
@@ -74,12 +60,8 @@ const PointerModel = (sequelize, DataTypes) => {
 
   Pointer.prototype.directContainedPointerIds = async function() {
     const value = await this.value
-    if (!value) { return [] }
-
-    const inlines =  getInlinesAsArray(value)
-    const pointerInlines =  inlines.filter((l) => !!l.data.pointerId)
-    const pointerIds = pointerInlines.map(p => p.data.pointerId)
-    return pointerIds
+    console.log("EVALUATING FOR::::", this.id, value)
+    return SlateNode.fromSlateNode(value).pointerIds()
   }
 
   return Pointer
