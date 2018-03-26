@@ -11,7 +11,6 @@ export class NewBlockForm extends React.Component<any, any> {
 
     public onSubmit = () => {
         this.props.onMutate(valueToDatabaseJSON(this.state.value));
-        // this.props.onMutate(JSON.stringify(this.state.value.toJSON()));
         this.setState({id: uuidv1()});
     }
 
