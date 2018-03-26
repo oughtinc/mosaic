@@ -76,37 +76,6 @@ function outputsToInputs(value: any) {
     return newValue;
 }
 
-export class WorkspaceWithRelations {
-    public workspace;
-    public constructor(workspace: any) {
-        this.workspace = workspace;
-    }
-
-    public allReadOnlyBlocks() {
-        return this.allReadOnlyBlockRelationships().map((b) => b.findBlock());
-    }
-
-    private allReadOnlyBlockRelationships() {
-        const isReadOnly = (relationship) => (relationship.relationTypeAttributes().permission === Permissions.ReadOnly);
-        return this.allTouchingBlockRelationships().filter(isReadOnly);
-    }
-
-    private allTouchingBlockRelationships() {
-        const relations: any = [];
-        const inWorkspace = _.filter(RelationTypeAttributes, {source: WORKSPACE})
-            .forEach((RelationTypeAttribute) => relations.push(new WorkspaceBlockRelation(RelationTypeAttribute.name, this.workspace)) );
-
-        const outsideWorkspace = _.filter(RelationTypeAttributes, {source: SUBWORKSPACE})
-        .forEach((RelationTypeAttribute) => {
-            this.workspace.childWorkspaces.forEach((childWorkspace) => {
-                relations.push(new WorkspaceBlockRelation(RelationTypeAttribute.name, childWorkspace));
-            });
-        });
-
-        return relations;
-    }
-}
-
 export class WorkspaceBlockRelation {
     public workspace;
     public workspaceRelationType;
@@ -117,7 +86,7 @@ export class WorkspaceBlockRelation {
     }
 
     public blockEditorAttributes() {
-        const {blockType, permission} = this.relationTypeAttributes();
+        const {permission} = this.relationTypeAttributes();
         const block: any = this.findBlock();
         const isReadOnly = permission === Permissions.ReadOnly;
         const { value, id } = block;
@@ -137,5 +106,32 @@ export class WorkspaceBlockRelation {
 
     public relationTypeAttributes() {
         return _.keyBy(RelationTypeAttributes, "name")[this.workspaceRelationType];
+    }
+}
+export class WorkspaceWithRelations {
+    public workspace;
+    public constructor(workspace: any) {
+        this.workspace = workspace;
+    }
+
+    public allReadOnlyBlocks() {
+        return this.allReadOnlyBlockRelationships().map((b) => b.findBlock());
+    }
+
+    private allReadOnlyBlockRelationships() {
+        const isReadOnly = (relationship) => (relationship.relationTypeAttributes().permission === Permissions.ReadOnly);
+        return this.allTouchingBlockRelationships().filter(isReadOnly);
+    }
+
+    private allTouchingBlockRelationships() {
+        const relations: any = [];
+        _.filter(RelationTypeAttributes, {source: SUBWORKSPACE})
+        .forEach((RelationTypeAttribute) => {
+            this.workspace.childWorkspaces.forEach((childWorkspace) => {
+                relations.push(new WorkspaceBlockRelation(RelationTypeAttribute.name, childWorkspace));
+            });
+        });
+
+        return relations;
     }
 }

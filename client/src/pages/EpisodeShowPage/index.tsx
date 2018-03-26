@@ -11,11 +11,10 @@ import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
-import { exportingPointersSelector, exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
+import { exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
 import Plain from "slate-plain-serializer";
 import _ = require("lodash");
 import { Value } from "slate";
-import * as uuidv1 from "uuid/v1";
 import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
 
 const WORKSPACE_QUERY = gql`
@@ -74,7 +73,7 @@ const ParentLink = (props) => (
     </Link>
 );
 
-function findPointers(value) {
+function findPointers(value: any) {
     const _value = value ? Value.fromJSON(value) : Plain.deserialize("");
     const pointers = exportingNodes(_value.document);
     return pointers;
