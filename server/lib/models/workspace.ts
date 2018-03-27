@@ -29,7 +29,11 @@ const WorkspaceModel = (sequelize, DataTypes) => {
         let values:any = []
         for (const pointer of _connectedPointers){
           const value = await pointer.value
-          values.push(value)
+          if (value) {
+            values.push(value)
+          } else {
+            console.error(`Error: Value for pointer with id ${pointer.id} was not found in its respecting block.`)
+          }
         }
         return values.filter(v => !!v)
       }
