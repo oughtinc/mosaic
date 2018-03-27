@@ -8,11 +8,11 @@ import { changePointerReference, exportSelection, removeExportOfSelection, remov
 import * as _ from "lodash";
 
 const HoverMenu = styled.span`
-  background-color: #def4f757;
+  background-color: #b5b5b557;
   color: black;
-  padding: 3px 8px;
-  border-radius: 2px;
-  border: 1px solid #88d3eb;
+  padding: 2px 3px;
+  border-radius: 3px;
+  border: 1px solid #d5d5d5;
 `;
 
 export class ImportMenu extends React.Component<any, any> {
@@ -23,16 +23,16 @@ export class ImportMenu extends React.Component<any, any> {
     return (
       <div>
         {isOpen &&
-          <Button bsSize={"small"} onClick={() => onChangePointerReference({id, reference: {isOpen: false}})} >
+          <Button bsSize={"xsmall"} onClick={() => onChangePointerReference({id, reference: {isOpen: false}})} >
             Close 
           </Button>
         }
         {!isOpen &&
-          <Button bsSize={"small"} onClick={() => onChangePointerReference({id, reference: {isOpen: true}})} >
+          <Button bsSize={"xsmall"} onClick={() => onChangePointerReference({id, reference: {isOpen: true}})} >
             Expand
           </Button>
         }
-          <Button bsSize={"small"} onClick={() => {this.props.removeImportOfSelection(); }}>
+          <Button bsSize={"xsmall"} onClick={() => {this.props.removeImportOfSelection(); }}>
             Remove 
           </Button>
       </div>
@@ -44,7 +44,7 @@ export class ExportMenu extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <Button bsSize={"small"} onClick={() => {this.props.removeExportOfSelection(); }} >
+        <Button bsSize={"xsmall"} onClick={() => {this.props.removeExportOfSelection(); }} >
             Remove Pointer 
         </Button>
       </div>
@@ -66,7 +66,7 @@ export class MenuPresentational extends React.Component<any> {
       {blockEditor &&
         <HoverMenu>
           {(hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT) &&
-              <Button bsSize={"small"} onClick={() => {this.props.exportSelection(); }} >
+              <Button bsSize={"xsmall"} onClick={() => {this.props.exportSelection(); }} >
                   Export 
               </Button>
           }

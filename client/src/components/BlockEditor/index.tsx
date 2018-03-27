@@ -8,6 +8,7 @@ import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
 import { BlockEditorEditing } from "./BlockEditorEditing";
+import * as _ from "lodash";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -30,8 +31,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public componentWillReceiveProps(newProps: any) {
     if (
-      (JSON.stringify(newProps.blockEditor) !== JSON.stringify(this.props.blockEditor))
-      || (newProps.availablePointers.length !== this.props.availablePointers.length)
+      !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+      || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
     ) {
       this.resetPlugins(newProps);
     }
