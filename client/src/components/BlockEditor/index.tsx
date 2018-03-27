@@ -31,7 +31,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public componentWillReceiveProps(newProps: any) {
     if (
       (JSON.stringify(newProps.blockEditor) !== JSON.stringify(this.props.blockEditor))
-      || (newProps.availablePointers.length !== this.props.availablePointers.length)
+      || (JSON.stringify(newProps.availablePointers) !== JSON.stringify(this.props.availablePointers))
     ) {
       this.resetPlugins(newProps);
     }
