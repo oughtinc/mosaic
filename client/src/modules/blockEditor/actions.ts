@@ -55,7 +55,6 @@ export const exportSelection = () => {
     const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
     const uuid = uuidv1();
     if (block) {
-      // const change = block.value.change().addMark({ type: "pointerExport", object: "mark", data: { pointerId: uuid } });
       const change = block.value.change().wrapInline({type: "pointerExport", data: { pointerId: uuid }});
       dispatch({
         type: UPDATE_BLOCK,

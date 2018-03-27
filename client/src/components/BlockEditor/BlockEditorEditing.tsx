@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
+import { exportSelection } from "../../modules/blockEditor/actions";
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -43,6 +44,8 @@ interface BlockEditorEditingPresentationalProps {
     updateBlock(value: any): () => {};
     onChange(value: any): () => boolean;
     saveBlocksMutation(): () => {};
+    exportSelection(): () => {};
+    onKeyDown(event: any): () => {};
 }
 
 interface BlockEditorEditingPresentationalState {
@@ -87,9 +90,21 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                     plugins={this.props.plugins}
                     spellCheck={false}
                     onBlur={this.handleBlur}
+                    onKeyDown={this.onKeyDown}
                 />
             </BlockEditorStyle>
         );
+    }
+
+    private onKeyDown = (event) => {
+        const pressedControlAndE = (_event) => (_event.ctrlKey && _event.key === "e");
+        if (pressedControlAndE(event)) {
+            this.props.exportSelection();
+            event.preventDefault();
+        }
+        if (!!this.props.onKeyDown) {
+            this.props.onKeyDown(event);
+        }
     }
 
     private onValueChange = () => {
@@ -165,7 +180,7 @@ function mapStateToProps(state: any) {
 
 export const BlockEditorEditing: any = compose(
     connect(
-        mapStateToProps, { updateBlock }
+        mapStateToProps, { updateBlock, exportSelection }
     ),
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer" }),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
