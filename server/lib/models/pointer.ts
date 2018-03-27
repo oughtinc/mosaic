@@ -3,15 +3,16 @@ import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eve
 import * as _ from "lodash";
 const Op = Sequelize.Op;
 
-function getInlinesAsArray(node) {
+function getTopLevelInlinesAsArray(node) {
   let array: any = [];
 
   node.nodes.forEach((child) => {
     if (child.object === "text") { return; }
     if (child.object === "inline") {
       array.push(child);
-    } else {
-      array = array.concat(getInlinesAsArray(child));
+    }
+    if (_.has(child, 'nodes')) {
+      array = array.concat(getTopLevelInlinesAsArray(child))
     }
   });
 
@@ -76,7 +77,7 @@ const PointerModel = (sequelize, DataTypes) => {
     const value = await this.value
     if (!value) { return [] }
 
-    const inlines =  getInlinesAsArray(value)
+    const inlines =  getTopLevelInlinesAsArray(value)
     const pointerInlines =  inlines.filter((l) => !!l.data.pointerId)
     const pointerIds = pointerInlines.map(p => p.data.pointerId)
     return pointerIds

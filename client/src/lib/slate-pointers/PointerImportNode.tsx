@@ -56,13 +56,14 @@ export class PointerImportNode extends React.Component<any, any> {
 
     public getLocation = () => {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        return { top: `${rect.top - 40}px`, left: `${rect.left + 10}px` };
+        const {left, right, top, bottom} = rect;
+        return {left, right, top, bottom};
     }
 
     public onMouseOver = () => {
         if (this.props.isHoverable) {
-            const { top, left } = this.getLocation();
-            this.props.onMouseOver({ top, left, id: this.props.nodeAsJson.data.internalReferenceId });
+            const { left, right, top, bottom } = this.getLocation();
+            this.props.onMouseOver({ left, right, top, bottom, id: this.props.nodeAsJson.data.internalReferenceId });
         }
     }
 

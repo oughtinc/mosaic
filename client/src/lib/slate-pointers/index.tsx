@@ -23,11 +23,10 @@ function SlatePointers(options: any = {}) {
         return;
       }
 
-      const _top = `${(rect.top - 44).toFixed(2)}px`;
-      const _left = `${(rect.left.toFixed(2))}px`;
+      const {left, right, top, bottom} = rect;
       window.setTimeout(
         () => {
-          options.onSelect({ top: _top, left: _left });
+          options.onSelect({ left, right, top, bottom });
         },
         10
       );
@@ -44,8 +43,8 @@ function SlatePointers(options: any = {}) {
           <PointerExportMark
             blockEditor={options.blockEditor}
             nodeAsJson={node.toJSON()}
-            onMouseOver={({ top, left }) => {
-              options.onMouseOverPointerExport({ top, left, id: node.toJSON().data.pointerId });
+            onMouseOver={({ left, right, top, bottom }) => {
+              options.onMouseOverPointerExport({ left, right, top, bottom, id: node.toJSON().data.pointerId });
             }}
             children={children}
           />
@@ -62,8 +61,8 @@ function SlatePointers(options: any = {}) {
             nodeAsJson={node.toJSON()}
             blockEditor={options.blockEditor}
             exportingPointers={options.exportingPointers}
-            onMouseOver={({ top, left, id }) => {
-              options.onMouseOverPointerImport({ top, left, id });
+            onMouseOver={({ left, right, top, bottom, id }) => {
+              options.onMouseOverPointerImport({ left, right, top, bottom, id });
             }}
             isHoverable={true}
           />

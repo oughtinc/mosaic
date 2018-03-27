@@ -63,6 +63,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     public componentWillUnmount() {
+        this.considerSaveToDatabase();
         this.endAutosaveInterval();
     }
 
