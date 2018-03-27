@@ -43,6 +43,7 @@ interface BlockEditorEditingPresentationalProps {
     updateBlock(value: any): () => {};
     onChange(value: any): () => boolean;
     saveBlocksMutation(): () => {};
+    onKeyDown(): () => {};
 }
 
 interface BlockEditorEditingPresentationalState {
@@ -87,6 +88,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                     plugins={this.props.plugins}
                     spellCheck={false}
                     onBlur={this.handleBlur}
+                    onKeyDown={this.props.onKeyDown}
                 />
             </BlockEditorStyle>
         );
