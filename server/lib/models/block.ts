@@ -87,9 +87,14 @@ const BlockModel = (sequelize, DataTypes) => {
     let pointers: any = []
     for (const id of topLevelPointerIds) {
       const pointer = await sequelize.models.Pointer.findById(id)
-      pointers.push(pointer)
+      if (!!pointer) {
+        pointers.push(pointer)
+      } else {
+        console.error(`Referenced pointer with ID ${id} not found in database.`)
+      }
     }
-    return _.uniqBy(pointers, 'id').filter(p => !!p)
+
+    return _.uniqBy(pointers, 'id')
   }
 
   //private
