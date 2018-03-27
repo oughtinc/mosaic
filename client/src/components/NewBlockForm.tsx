@@ -34,6 +34,7 @@ export class NewBlockForm extends React.Component<any, any> {
         const pressedControlAndEnter = (_event) => (_event.ctrlKey && _event.key === "Enter");
 
         if (pressedControlAndEnter(event)) {
+            event.preventDefault();
             this.onSubmit();
         }
     }
