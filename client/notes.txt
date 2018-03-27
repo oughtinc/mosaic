@@ -85,9 +85,12 @@
 [x] Add a fixture that tests pointers that aren't expanded
 [x] Plan what to work on next
     [x] Look over operations for breaking down questions - for each, think about how I'd implement it
-[ ] Think about (but don't implement):
-    [ ] where and how we'd compute and indicate staleness
-    [ ] budgets
+[x] Think about (but don't implement):
+    [x] where and how we'd compute and indicate staleness
+    [x] budgets
+    [x] caching
+    [x] Look over notes, think about any implications for next steps
+        - Main implication is probably that immutable-js + redux should be more likely
 [ ] Add a workspace route/view
 [ ] Try workspace with sub-workspaces (via child q&a)
 [ ] Add functionality
@@ -104,10 +107,131 @@ Later:
 [ ] Caching node ids for hypertext (when we're using server)
 [ ] Make it easy to create root questions with data
 [ ] A workspace template included in another workspace template
+[ ] Caching
+[ ] Computing what's stale
+[ ] Budgets
+[ ] Choosing a workspace to show next
 
 Maybe:
 [ ] Rename head to snapshot
 [ ] Split hypertext into two representations, array-ref hypertext and associated node ids
+
+
+--------------------------------------------------------------------
+Future features
+
+# Indicating staleness
+
+Stale => we can't rely on it anymore
+Example: the answer to a question is stale if the question changed
+
+- For each node version that we're importing (reading):
+  - If there is a newer version of the node, it is stale
+  - If there is no newer version of this node:
+    - We find the workspace that exports (writes) it, and look at the nodes this workspace imports (which we can read off from the links)
+    - If any of them have changed (i.e. there are new node versions) since the last consistent version of the workspace, the node is stale as well
+      - So, a case where the node isn't stale is when other exports have changed in the source workspace,
+        including the scratchpad and sub-questions and values of other exported pointers
+
+Where does this computation happen?
+- Maybe in WorkspaceVersion (or wherever we factor out the WorkspaceVersion computations to)
+  - renderNode would render stale nodes differently, could show a diff
+
+
+# Budgets
+
+Should budgets be a property of node values?
+
+- One option is to simply store them as part of the question-answer-templated hypertext
+  - This would naturally mark nodes as stale when budgets change
+  - They could also be imported + expanded instead of stored directly
+  - In this case, we'd also associate the workspace node id with the list of children,
+    and the transfer would simultaneously make new versions of our workspace node and
+    the child
+
+- Another option would be to make budgets a property of WorkspaceVersion
+  - At a minimum, we'd create a new workspace version snapshot at the end of an episode
+  - Transferring part of the budget to another workspace version makes new versions of both,
+    and maybe creates a BalanceTransaction
+  - At the moment, we're not tracking parent/child workspaces though; this only implicitly
+    happens through included questions/answers
+  - This would require special code for tracking staleness due to budgets
+
+- Yet another option would be to store budgets with root node links
+  - When the budget changes, we make a new version of the link(s)
+  - This seems less intuitive
+
+We'll want to access budgets on the server, since this is part of what goes into the
+process for selecting which workspace to show next.
+
+On the other hand, we might want all kinds of information to go into that process, including
+the content of workspaces.
+
+My guess for now is that budgets should be part of hypertext (solution #2), but it doesn't seem
+quite right and if budgets are treated as imports, this would probably mark everything as stale,
+even when it shouldn't.
+- There are two kinds of budget we're talking about here:
+  1. The budget the parent assigned to us. If that increases, we *should* mark the answer as stale.
+  2. The budget we have left, which goes down as we use up more. If this changes, we *shouldn't* mark anything as stale.
+     - This is more like an export
+     - There could be a special link, "budgetUsed", which tracks how much budget we've used
+     - Or this could be a property of the workspace version (we make a new version at the end of every episode)
+       - This (together with the info from our parent) controls how much budget we can assign to children
+
+New guess:
+- The budget assigned to us can just be part of the question hypertext.
+  If it changes, the exports from our workspace are marked as stale.
+  We can use a particular template structure for the question hypertext.
+- The budget we have used up so far. This can be part of the workspace version.
+- When we create a child, we need to specify a budget, which requires us to look at our current workspace version and the question.
+- This doesn't feel very clean; feels like things should either happen entirely on a workspace version level or
+  on a hypertext level, but might still be the best local solution (since using up budgets is different from specifying budgets
+  with respect to implications for staleness)
+
+
+# Caching
+
+- For caching, we need a content-based hash of the state of a workspace, and we need to store pairs of (workspace-hash, action)
+- Caching should happen on the server
+- For the content-based hash of the workspace, we basically want the information computed in WorkspaceVersion, retrieve the
+  corresponding node versions, and normalize the visible pointer representation
+  - It could be desirable to do all of this computation in WorkspaceVersion / ahead of time, to store the state in redux, and
+    to just pass an immutable js object down the tree
+- Actions are more complex. But we'll have to encode those somehow anyway, maybe as redux store actions. The main additional
+  thing that's required for caching to work is to also normalize (and denormalize) the pointer representations here.
+  I.e. each action talks about operations on node 1, 2, ..., but that gets converted to operations on the underlying nodes.
+  It's possible that this will get tricky for operations that create new pointers.
+
+My guess:
+- Create an immutable-js(-like) representation of everything that's rendered on the current screen, so that we have a coherent
+  representation of the workspace state
+- Make sure that pointer references are normalized with respect to the current workspace, starting at 1
+  (possibly using names, in which case it would be city-1, city-2, etc)
+- Use redux actions for all changes, and express these changes in terms of the normalized pointer references
+- Record pairs of (immutable-workspace-state, redux-action)
+- When actions are executed, denormalize the pointer references
+
+If budgets are part of the state representation, we might need to use approximate caching pretty much immediately, since
+budgets will very infrequently be exactly the same.
+
+
+# Choosing a workspace to show next
+
+This is a server-side computation.
+
+Initially, we could just show a workspaced at random, and allow users to skip.
+
+A bit later, we might want a user-independent priority computation.
+
+Eventually, we want to compute user-specific predictions for what to show.
+
+We might also look into showing two workspace, and let the user choose which one to work on.
+
+The information that we'll want to use to compute what to show probably includes the state representation we want for caching.
+For deciding what to show, budgets matter a lot; for caching, budgets matter a little.
+Another diffference is that for deciding what to show, we might want to do more graph-based computation.
+For example, we might want to find the leaves, get those to be consistent, and then propagate up.
+(This might be like belief propagation in Bayesian networks. Maybe there are sub-trees or clusters of nodes that we can make consistent first, and then use the results in the remainder without worrying about the subtree again.)
 
 
 --------------------------------------------------------------------
