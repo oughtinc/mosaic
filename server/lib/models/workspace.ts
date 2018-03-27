@@ -1,8 +1,8 @@
 'use strict';
 const Sequelize = require('sequelize')
-var _ = require('lodash');
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
 const Op = Sequelize.Op;
+import * as _ from "lodash";
 
 const WorkspaceModel = (sequelize, DataTypes) => {
   var Workspace = sequelize.define('Workspace', {

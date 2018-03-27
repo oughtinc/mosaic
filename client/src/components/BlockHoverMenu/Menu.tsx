@@ -1,11 +1,11 @@
-import React = require("react");
-import ReactDOM = require("react-dom");
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { changePointerReference, exportSelection, removeExportOfSelection, removeImportOfSelection, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
-import _ = require("lodash");
+import * as _ from "lodash";
 
 const HoverMenu = styled.span`
   background-color: #def4f757;

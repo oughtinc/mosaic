@@ -1,4 +1,4 @@
-import React = require("react");
+import * as React from "react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportNode } from "./PointerImportNode";
 
