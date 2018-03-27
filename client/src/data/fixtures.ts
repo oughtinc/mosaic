@@ -80,6 +80,7 @@ w1.setHead(wv2);
 
 const h11 = new HyperText("What is 2 + 3, very roughly?");
 const nv11 = new NodeVersion(n7, h11, nv10);
+n7.setHead(nv11);
 
 const data = [h1, h2, h3, h4, h5, h6, h10, n1, n7, n8, n9, nv10, w1, nv11];
 

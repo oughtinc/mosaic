@@ -13,6 +13,7 @@ import Store from "../../store";
 import {
   WorkspaceVersionValue,
   NodeVersionRow,
+  NodeRow,
   LinkRow,
   LinkValue,
   RenderNode
@@ -23,13 +24,22 @@ function retrieveLinkValues(linkIds: Array<string>, store: Store) {
   return links.map(link => (link as LinkRow).value);
 }
 
-function fastForwardLinkValues(linkValues: Array<LinkValue>) {
+function fastForwardLinkValues(linkValues: Array<LinkValue>, store: Store) {
   // 1. For each link, retrieve node version, get node id
+  const nodeVersionIds = linkValues.map(linkValue => linkValue.nodeVersionId);
+  const nodeIds = nodeVersionIds.map(
+    nodeVersionId =>
+      (store.get("NodeVersion", nodeVersionId) as NodeVersionRow).value.nodeId
+  );
   // 2. For each node id, get latest version
-  // 3. For latest version of each node, get included node ids and their latest node versions
-  // 4. Create artificial link values, making sure links for any new nodes have isExpanded set to false
-  // (5. Drop link values that are no longer included?)
-  return linkValues;
+  const latestNodeVersionIds = nodeIds.map(
+    nodeId => (store.get("Node", nodeId as string) as NodeRow).value.headId
+  );
+  // 3. Create link values based on latest node versions
+  const newLinkValues = linkValues.map((linkValue, i) =>
+    _.assign({}, linkValue, { nodeVersionId: latestNodeVersionIds[i] })
+  );
+  return newLinkValues;
 }
 
 function buildNodeMap(linkValues: Array<LinkValue>, store: Store) {
@@ -69,7 +79,7 @@ const WorkspaceVersion: React.SFC<WorkspaceVersionProps> = ({
 }) => {
   let linkValues = retrieveLinkValues(value.linkIds, store);
   if (useLatestNodeVersions) {
-    linkValues = fastForwardLinkValues(linkValues);
+    linkValues = fastForwardLinkValues(linkValues, store);
   }
   const rootLinkValue = _.find(linkValues, linkValue => linkValue.isRoot);
   if (!rootLinkValue) {

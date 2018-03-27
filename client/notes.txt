@@ -77,15 +77,25 @@
             between workspace and workspace version
             - we need to know the latest expansion status, so we need to retrieve
               the latest set of links, which makes sense to do in WorkspaceVersion
-    [ ] take useLatestNodeVersions into account in WorkspaceVersion:
+    [x] take useLatestNodeVersions into account in WorkspaceVersion:
         implement fastForwardLinkValues
-    [ ] Think about (but don't implement) where and how we'd compute and indicate staleness
+        - Do we need to add links for new included nodes that are not expanded?
+          - Can we just assume that everythink that's linked is expanded, and expanding a pointer adds a link?
+    [ ] get rid of isExpanded status, track via presence/absence of link
+[ ] Add a fixture that tests pointers that aren't expanded
 [ ] Try workspace with sub-workspaces (via child q&a)
     - children
+[ ] Think about (but don't implement):
+    - where and how we'd compute and indicate staleness
+    - budgets
+    - deleting exported links    
 [ ] Exports
 [ ] Show whether things are stale
 [ ] A workspace template included in another workspace template
 [ ] Different stackings of exports and imports
+[ ] Test more functionality
+    - Expanding a pointer
+    - (see notes on operations)
 
 Later:
 [ ] Use redux or apollo

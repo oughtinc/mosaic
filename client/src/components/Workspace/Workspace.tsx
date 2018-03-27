@@ -94,14 +94,13 @@ class Workspace extends React.Component<WorkspaceProps, WorkspaceState> {
       <div className="Workspace">
         <div className="Workspace-Version-Selector">
           {versionTags.map(tag => (
-            <>
+            <span key={tag}>
               <WorkspaceVersionLink
-                key={tag}
                 versionName={tag}
                 selectVersion={this.selectVersion}
                 selectedVersion={this.state.selectedVersion}
               />{" "}
-            </>
+            </span>
           ))}
           - displaying {selectedVersionId}
           {useLatestNodeVersions && ", using latest node versions"}
