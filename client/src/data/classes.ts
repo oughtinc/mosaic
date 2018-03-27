@@ -55,20 +55,17 @@ export class WorkspaceVersion implements Identifiable, Serializable {
 export class Link implements Identifiable, Serializable {
   public id: string;
   private access: LinkAccess;
-  private isExpanded: boolean;
   private isRoot: boolean;
 
   constructor(
     private nodeVersion: NodeVersion,
     options: {
       access: LinkAccess;
-      isExpanded: boolean;
       isRoot: boolean;
     }
   ) {
     this.id = uuidv1();
     this.access = options.access;
-    this.isExpanded = options.isExpanded;
     this.isRoot = options.isRoot;
   }
 
@@ -80,7 +77,6 @@ export class Link implements Identifiable, Serializable {
         value: {
           nodeVersionId: this.nodeVersion.id,
           access: this.access,
-          isExpanded: this.isExpanded,
           isRoot: this.isRoot
         }
       }

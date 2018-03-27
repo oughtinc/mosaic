@@ -57,7 +57,7 @@
                       including the "Workspace" component
                 [x] Fix overlapping names: workspace (the template) vs workspace (the data model and wrapper)
                     - we will never include the data model component within itself                          
-[ ] Rendering the latest version of everything in a workspace
+[x] Rendering the latest version of everything in a workspace
     [x] think about how to do this correctly
         - options
           - make a version of renderNode that just gets the latest version?
@@ -81,7 +81,7 @@
         implement fastForwardLinkValues
         - Do we need to add links for new included nodes that are not expanded?
           - Can we just assume that everythink that's linked is expanded, and expanding a pointer adds a link?
-    [ ] get rid of isExpanded status, track via presence/absence of link
+    [x] get rid of isExpanded status, track via presence/absence of link
 [ ] Add a fixture that tests pointers that aren't expanded
 [ ] Try workspace with sub-workspaces (via child q&a)
     - children

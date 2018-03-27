@@ -75,7 +75,6 @@ export interface WorkspaceRow {
 export interface LinkValue {
   nodeVersionId: string;
   access: LinkAccess;
-  isExpanded: boolean;
   isRoot: boolean;
 }
 

@@ -14,22 +14,18 @@ interface LinkProps {
 }
 
 const Link: React.SFC<LinkProps> = ({ value, store, renderNode }) => {
-  const { nodeVersionId, access, isExpanded } = value;
+  const { nodeVersionId, access } = value;
   const nodeVersion = store.get("NodeVersion", nodeVersionId) as NodeVersionRow;
   return (
     <div className="Link">
       <div className="Link-Access">
         Access: {access === LinkAccess.Write ? "Write" : "Read"}
       </div>
-      {isExpanded ? (
-        <NodeVersion
-          value={nodeVersion.value}
-          store={store}
-          renderNode={renderNode}
-        />
-      ) : (
-        <div>Unexpanded link to node version {nodeVersionId}</div>
-      )}
+      <NodeVersion
+        value={nodeVersion.value}
+        store={store}
+        renderNode={renderNode}
+      />
     </div>
   );
 };

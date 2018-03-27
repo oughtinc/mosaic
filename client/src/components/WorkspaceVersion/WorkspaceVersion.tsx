@@ -44,7 +44,7 @@ function fastForwardLinkValues(linkValues: Array<LinkValue>, store: Store) {
 
 function buildNodeMap(linkValues: Array<LinkValue>, store: Store) {
   const nodeMap = {};
-  linkValues.forEach(({ nodeVersionId, access, isExpanded, isRoot }) => {
+  linkValues.forEach(({ nodeVersionId, access, isRoot }) => {
     // Retrieve node version information
     const nodeVersion = store.get(
       "NodeVersion",
@@ -59,8 +59,7 @@ function buildNodeMap(linkValues: Array<LinkValue>, store: Store) {
     }
     nodeMap[nodeId] = {
       nodeVersionId,
-      access,
-      isExpanded
+      access
     };
   });
   return nodeMap;
@@ -88,7 +87,11 @@ const WorkspaceVersion: React.SFC<WorkspaceVersionProps> = ({
   const nodeMap = buildNodeMap(linkValues, store);
   const renderNode: RenderNode = ({ value, store }) => {
     const linkValue = nodeMap[value.nodeId];
-    return <Link value={linkValue} store={store} renderNode={renderNode} />;
+    if (linkValue) {
+      return <Link value={linkValue} store={store} renderNode={renderNode} />;
+    } else {
+      return <span>Unexpanded link to node {value.nodeId}</span>;
+    }
   };
   return (
     <div className="WorkspaceVersion">
