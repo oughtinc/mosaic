@@ -82,6 +82,41 @@ const h11 = new HyperText("What is 2 + 3, very roughly?");
 const nv11 = new NodeVersion(n7, h11, nv10);
 n7.setHead(nv11);
 
-const data = [h1, h2, h3, h4, h5, h6, h10, n1, n7, n8, n9, nv10, w1, nv11];
+// Add an example of a (non-question-answer) workspace with an unexpanded pointer
+
+const h13 = new HyperText("This is invisible.");
+const n11 = new Node();
+const nv13 = new NodeVersion(n11, h13, null);
+n11.setHead(nv13);
+
+const h12 = new HyperText(["An unexpanded pointer:", { nodeId: n11.id }]);
+
+const n10 = new Node();
+const nv12 = new NodeVersion(n10, h12, null);
+n10.setHead(nv12);
+
+const ls3 = [new Link(nv12, { access: LinkAccess.Read, isRoot: true })];
+const wv3 = new WorkspaceVersion(ls3);
+const w2 = new Workspace(wv3, wv3);
+
+const data = [
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  h10,
+  n1,
+  n7,
+  n8,
+  n9,
+  nv10,
+  w1,
+  nv11,
+  n11,
+  n10,
+  w2
+];
 
 export default data;

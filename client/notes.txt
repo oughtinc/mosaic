@@ -82,7 +82,7 @@
         - Do we need to add links for new included nodes that are not expanded?
           - Can we just assume that everythink that's linked is expanded, and expanding a pointer adds a link?
     [x] get rid of isExpanded status, track via presence/absence of link
-[ ] Add a fixture that tests pointers that aren't expanded
+[x] Add a fixture that tests pointers that aren't expanded
 [ ] Try workspace with sub-workspaces (via child q&a)
     - children
 [ ] Think about (but don't implement):

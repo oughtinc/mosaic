@@ -90,7 +90,7 @@ const WorkspaceVersion: React.SFC<WorkspaceVersionProps> = ({
     if (linkValue) {
       return <Link value={linkValue} store={store} renderNode={renderNode} />;
     } else {
-      return <span>Unexpanded link to node {value.nodeId}</span>;
+      return <span>Node #{value.nodeId} (unexpanded)</span>;
     }
   };
   return (
