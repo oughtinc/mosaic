@@ -8,6 +8,7 @@ import styled from "styled-components";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
+import { databaseJSONToValue } from "../../lib/slateParser";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
@@ -56,7 +57,7 @@ const ParentWorkspace = ({ workspace }) => {
                 <BlockEditor
                     name={question.id}
                     blockId={question.id}
-                    initialValue={question.value}
+                    initialValue={databaseJSONToValue(question.value)}
                     readOnly={true}
                     availablePointers={[]}
                 />
@@ -67,7 +68,7 @@ const ParentWorkspace = ({ workspace }) => {
                 <BlockEditor
                     name={answer.id}
                     blockId={answer.id}
-                    initialValue={answer.value}
+                    initialValue={databaseJSONToValue(answer.value)}
                     readOnly={true}
                     availablePointers={[]}
                 />

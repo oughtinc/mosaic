@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
+import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 
 const BlockEditorStyle = styled.div`
@@ -188,7 +189,7 @@ export const BlockEditorEditing: any = compose(
         const saveBlocksMutation = () => {
             setMutationStatus({ status: MutationStatus.Loading });
             saveBlocksToServer({
-                variables: { blocks: { id: block.id, value: block.value.toJSON() } },
+                variables: { blocks: { id: block.id, value: valueToDatabaseJSON(block.value) } },
             }).then(() => {
                 setMutationStatus({ status: MutationStatus.Complete });
             }).catch((e) => {

@@ -11,7 +11,7 @@ function getInlinesAsArray(node) {
     if (child.object === "inline") {
       array.push(child);
     }
-    if (!child.isLeafInline()) {
+    else {
       array = array.concat(getInlinesAsArray(child));
     }
   });
@@ -87,16 +87,20 @@ const BlockModel = (sequelize, DataTypes) => {
     let pointers: any = []
     for (const id of topLevelPointerIds) {
       const pointer = await sequelize.models.Pointer.findById(id)
-      pointers.push(pointer)
+      if (!!pointer) {
+        pointers.push(pointer)
+      } else {
+        console.error(`Referenced pointer with ID ${id} not found in database.`)
+      }
     }
+
     return _.uniqBy(pointers, 'id')
   }
 
   //private
   Block.prototype.topLevelPointersIds = async function () {
     if (!this.dataValues.value) { return [] }
-    const value = Value.fromJSON(this.dataValues.value)
-    const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
+    const _getInlinesAsArray = getInlinesAsArray(this.dataValues.value);
     let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
     return pointers.map(p => p.data.pointerId)
   }
@@ -106,8 +110,7 @@ const BlockModel = (sequelize, DataTypes) => {
     if (!this.dataValues.value) {
       return {}
     }
-    const value = Value.fromJSON(this.dataValues.value)
-    const _getInlinesAsArray = getInlinesAsArray(value.document).map((n) => n.toJSON());
+    const _getInlinesAsArray = getInlinesAsArray(this.dataValues.value);
     const pointers = _getInlinesAsArray.filter((l) => l.type === "pointerExport");
 
     let results = {}
