@@ -1,5 +1,4 @@
 import * as React from "react";
-import Plain from "slate-plain-serializer";
 import styled from "styled-components";
 import { Editor } from "slate-react";
 import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
@@ -83,12 +82,11 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public componentDidMount() {
     const { name, blockId, initialValue } = this.props;
-    const value = initialValue || Plain.deserialize("");
 
     const blockForm = {
       id: blockId,
       name,
-      value,
+      value: initialValue,
     };
 
     this.props.addBlocks([blockForm]);
@@ -113,7 +111,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return (<div> loading... </div>);
     }
     const value = block.value;
-    const {plugins} = this.state;
+    const { plugins } = this.state;
     if (readOnly) {
       return (
         <BlockReadOnlyStyle>
@@ -127,14 +125,14 @@ class BlockEditorPresentational extends React.Component<any, any> {
     } else {
       return (
         <BlockEditorEditing
-            value={value}
-            readOnly={true}
-            shouldAutosave={!!this.props.shouldAutosave}
-            block={this.props.block}
-            availablePointers={this.props.availablePointers}
-            plugins={plugins}
-            onChange={this.props.onChange}
-            onKeyDown={this.props.onKeyDown}
+          value={value}
+          readOnly={true}
+          shouldAutosave={!!this.props.shouldAutosave}
+          block={this.props.block}
+          availablePointers={this.props.availablePointers}
+          plugins={plugins}
+          onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
         />
       );
     }
