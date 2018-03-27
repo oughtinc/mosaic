@@ -15,12 +15,13 @@ export class PointerExportMark extends React.Component<any, any> {
 
     public getLocation = () => {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        return { top: `${rect.top - 40}px`, left: `${rect.left + 10}px` };
+        const {left, top, right, bottom} = rect;
+        return {left, top, right, bottom};
     }
 
     public onMouseOver = () => {
-        const { top, left } = this.getLocation();
-        this.props.onMouseOver({top, left});
+        const {left, top, right, bottom} = this.getLocation();
+        this.props.onMouseOver({left, top, right, bottom});
     }
 
     public render() {
