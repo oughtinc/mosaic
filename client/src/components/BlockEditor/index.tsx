@@ -134,6 +134,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
             availablePointers={this.props.availablePointers}
             plugins={plugins}
             onChange={this.props.onChange}
+            onKeyDown={this.props.onKeyDown}
         />
       );
     }

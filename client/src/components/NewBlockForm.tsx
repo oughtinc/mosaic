@@ -5,12 +5,7 @@ import { BlockEditor } from "./BlockEditor";
 export class NewBlockForm extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.state = {value: {}, id: uuidv1()};
-    }
-
-    public onSubmit = () => {
-        this.props.onMutate(JSON.stringify(this.state.value.toJSON()));
-        this.setState({id: uuidv1()});
+        this.state = { value: {}, id: uuidv1() };
     }
 
     public render() {
@@ -22,8 +17,9 @@ export class NewBlockForm extends React.Component<any, any> {
                     blockId={this.state.id}
                     name={`new-block-${this.state.id}`}
                     initialValue={""}
-                    onChange={(value) => this.setState({value})}
+                    onChange={(value) => this.setState({ value })}
                     availablePointers={this.props.availablePointers || []}
+                    onKeyDown={this.onKeyDown}
                 />
                 <div className="buttons">
                     <button type="submit" onClick={this.onSubmit}>
@@ -33,4 +29,18 @@ export class NewBlockForm extends React.Component<any, any> {
             </div>
         );
     }
+
+    private onKeyDown = (event) => {
+        const pressedControlAndEnter = (_event) => (_event.ctrlKey && _event.key === "Enter");
+
+        if (pressedControlAndEnter(event)) {
+            this.onSubmit();
+        }
+    }
+
+    private onSubmit = () => {
+        this.props.onMutate(JSON.stringify(this.state.value.toJSON()));
+        this.setState({ id: uuidv1() });
+    }
+
 }
