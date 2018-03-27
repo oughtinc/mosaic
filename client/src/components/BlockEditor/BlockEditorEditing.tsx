@@ -100,10 +100,30 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     private onKeyDown = (event) => {
         const pressedControlAndE = (_event) => (_event.ctrlKey && _event.key === "e");
+        const pressedControlAndR = (_event) => (_event.ctrlKey && _event.key === "r");
         if (pressedControlAndE(event)) {
             this.props.exportSelection();
             event.preventDefault();
         }
+
+        // const pressedControlAndR = (_event) => (_event.ctrlKey && _event.key === "r");
+        // const {anchorOffset, focusNode: wholeText}: any = window.getSelection();
+        // if (wholeText && wholeText.length > 1) {
+        //     // debugger;
+        //     const previousChange = wholeText.textContent.slice(anchorOffset - 1, anchorOffset + 1);
+        //     console.log(previousChange, wholeText.textContent);
+        //     if (previousChange === "$1") {
+        //         console.log("MADE IT!");
+        //     }
+        // }
+        // if (pressedControlAndR(event)) {
+            // const {value} = this.props.value.change();
+            // debugger;
+            // .deleteBackward(2);
+            
+            // this.onChange(value, true);
+            // event.preventDefault();
+        // }
         if (!!this.props.onKeyDown) {
             this.props.onKeyDown(event);
         }
