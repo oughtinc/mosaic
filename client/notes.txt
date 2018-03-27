@@ -83,24 +83,123 @@
           - Can we just assume that everythink that's linked is expanded, and expanding a pointer adds a link?
     [x] get rid of isExpanded status, track via presence/absence of link
 [x] Add a fixture that tests pointers that aren't expanded
-[ ] Try workspace with sub-workspaces (via child q&a)
-    - children
+[x] Plan what to work on next
+    [x] Look over operations for breaking down questions - for each, think about how I'd implement it
 [ ] Think about (but don't implement):
-    - where and how we'd compute and indicate staleness
-    - budgets
-    - deleting exported links    
-[ ] Exports
-[ ] Show whether things are stale
-[ ] A workspace template included in another workspace template
-[ ] Different stackings of exports and imports
-[ ] Test more functionality
-    - Expanding a pointer
-    - (see notes on operations)
+    [ ] where and how we'd compute and indicate staleness
+    [ ] budgets
+[ ] Add a workspace route/view
+[ ] Try workspace with sub-workspaces (via child q&a)
+[ ] Add functionality
+    [ ] Basic export/edit functionality
+    [ ] Creating a child workspace
+    [ ] Creating a pointer
+    [ ] Expanding a pointer
+    [ ] Different stackings of exports and imports
+[ ] Clean up fixtures (bundle)
+[ ] Integration with slate editor
 
 Later:
 [ ] Use redux or apollo
 [ ] Caching node ids for hypertext (when we're using server)
 [ ] Make it easy to create root questions with data
+[ ] A workspace template included in another workspace template
 
 Maybe:
 [ ] Rename head to snapshot
+[ ] Split hypertext into two representations, array-ref hypertext and associated node ids
+
+
+--------------------------------------------------------------------
+Operations
+
+- Edit the answer, which will be visible to the parent.
+  * we make a new version of that node, and update head for that node
+  * optionally we save a new consistent workspace
+  * if the parent views the latest (fast-forwarded) version of the workspace, they will see our new answer
+
+- Edit the scratchpad text
+  * same as editing the answer
+
+- Add a sub-workspace (without pointers) with a question that you created
+  * create all the data structures
+  * add links for question (write) and answer (read)
+  * create new version of current workspace
+
+- Delete (archive) a sub-workspace
+  * set a field in the "children" hypertext structure
+    (we might want to introduce some abstractions, and do fromJSON and toJSON)
+
+- Edit the question for a sub-workspace
+  * same as editing the answer in a sub-workspace
+
+- Create a pointer
+  * create hypertext, node, nodeversion; update including node version / hypertext to refer to node; add write link to workspace
+  * // there are a bunch of operations here, might want to test this
+  
+- Add a pointer (that we created) to a sub-workspace question
+  * we simply add { nodeId: ... } to the question hypertext, make a new node version
+  
+- Remove a pointer (that we created) from a sub-workspace question
+  * we remove the { nodeId: ... } from question hypertext, make a new node version
+  * this doesn't automatically remove the corresponding link from the sub-workspace
+  * the sub-workspace might have used the link in their scratchpad
+  * for now i'd leave it up to workspace editors to remove those refs
+  * but eventually we might want a differnt solution
+
+- Delete a pointer (that we created) and didn't pass on
+  * things this could mean:
+    * delete the pointer use in a node/block. this is the same as making other edits to a node
+    * remove the exporting link. we can do this, and then we lose ability to make edits.
+      maybe there should be a sequence of operations (1) replace pointer content with "deleted", (2) remove link
+  
+- Delete a pointer (that we created) and did pass on
+  * same as above
+
+- Pass a pointer from our question to a sub-workspace question
+  * we just include { node: nodeId } in the hypertext for a sub-workspace question
+  * initially this won't be expanded for the sub-workspace
+  
+- Pass a pointer from an answer to a sub-workspace question in our reply to the parent
+  * we just include { node: nodeId } in the hypertext for the answer
+  * initially this won't be expanded for the parent workspace
+
+- Expand (unlock) a pointer passed in from the parent (without it being expanded in other workspaces that may use it)
+  * add a link for the pointer('s current node version)
+
+- Expand (unlock) a pointer passed in from an answer
+  * add a link for the pointer('s current node version)
+
+- Expand (unlock) a pointer within an already expanded pointer
+  * add a link for the pointer('s current node version)
+  
+- Close (lock) a previously purchased pointer
+  * remove a link
+
+- Edit the text behind a pointer we own / created
+  * make a new version of the node
+  * optionally, save workspace snapshot
+  
+- Create a nested pointer ourselves
+  * this is a sequence of operations
+  * creating the inner nested pointer works the same way as creating the first workspace-level pointer, only with respect to a different node
+  * in both cases, we add a link to the current workspace
+
+- Create a nested pointer from a plain-text list of items
+  * this would be a bunch of machinery to create a sequence of pointers
+  * if we can create a single pointer automatically, we can also do this
+
+- Edit the text in a nested pointer we created ourselves
+  * same as editing a non-nested block; the main (big) challenge here is to get the ui working
+
+- Create a nested pointer using a pointer we got from a parent
+  * we simply include { nodeId: x } for the right node id
+  
+- Expand multiple levels of a nested pointer we got from a parent or child
+  * same as expanding a single level step by step
+
+Probably:
+- Create a pointer directly when editing a sub-workspace question or the answer
+  * same as making pointers elsewhere
+- Directly point to the question/answer for each sub-workspace
+  * same as pointing to other nodes (but need ui)
