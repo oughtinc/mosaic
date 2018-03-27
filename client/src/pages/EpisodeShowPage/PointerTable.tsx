@@ -49,7 +49,7 @@ export const PointerTable = ({ availablePointers, exportingPointerIds }) => (
                 <Reference>
                     {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
                 </Reference>
-                {isFromThisWorkspace &&
+                {isFromThisWorkspace ?
                     <Text>
                         <ShowExpandedPointerOutsideSlate
                             availablePointers={availablePointers}
@@ -57,11 +57,10 @@ export const PointerTable = ({ availablePointers, exportingPointerIds }) => (
                             isHoverable={true}
                         />
                     </Text>
-                }
-                {!isFromThisWorkspace &&
-                <HiddenPointer>
-                   (HIDDEN)
-                </HiddenPointer>
+                    :
+                    <HiddenPointer>
+                        (HIDDEN)
+                    </HiddenPointer>
                 }
             </Row>
 
