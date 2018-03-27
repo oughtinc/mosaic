@@ -1,7 +1,7 @@
-import React = require("react");
+import * as React from "react";
 import styled from "styled-components";
 import { ShowExpandedPointerOutsideSlate } from "../../components/ShowExpandedPointerOutsideSlate";
-import _ = require("lodash");
+import * as _ from "lodash";
 
 const Container = styled.div`
     border: 1px solid #eee;
