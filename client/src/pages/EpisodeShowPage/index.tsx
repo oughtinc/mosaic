@@ -13,7 +13,7 @@ import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
 import { exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
 import Plain from "slate-plain-serializer";
-import _ = require("lodash");
+import * as _ from "lodash";
 import { Value } from "slate";
 import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
 
