@@ -1,7 +1,7 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import styled from "styled-components";
-import ReactDOM = require("react-dom");
-import _ = require("lodash");
+import * as _ from "lodash";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 
 const RemovedPointer = styled.span`

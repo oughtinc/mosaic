@@ -1,4 +1,4 @@
-import _ = require("lodash");
+import * as _ from "lodash";
 import * as uuidv1 from "uuid/v1";
 import { databaseJSONToValue } from "../../lib/slateParser";
 

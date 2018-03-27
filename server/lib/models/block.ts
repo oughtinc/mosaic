@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
 import { Value } from "slate"
-import _ = require('lodash');
+import * as _ from "lodash";
 
 function getInlinesAsArray(node) {
   let array: any = [];
