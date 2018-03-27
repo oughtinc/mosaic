@@ -9,11 +9,6 @@ export class NewBlockForm extends React.Component<any, any> {
         this.state = {value: {}, id: uuidv1()};
     }
 
-    public onSubmit = () => {
-        this.props.onMutate(valueToDatabaseJSON(this.state.value));
-        this.setState({id: uuidv1()});
-    }
-
     public render() {
         return (
             <div key={this.state.id}>
@@ -23,8 +18,9 @@ export class NewBlockForm extends React.Component<any, any> {
                     blockId={this.state.id}
                     name={`new-block-${this.state.id}`}
                     initialValue={""}
-                    onChange={(value) => this.setState({value})}
+                    onChange={(value) => this.setState({ value })}
                     availablePointers={this.props.availablePointers || []}
+                    onKeyDown={this.onKeyDown}
                 />
                 <div className="buttons">
                     <button type="submit" onClick={this.onSubmit}>
@@ -34,4 +30,19 @@ export class NewBlockForm extends React.Component<any, any> {
             </div>
         );
     }
+
+    private onKeyDown = (event) => {
+        const pressedControlAndEnter = (_event) => (_event.ctrlKey && _event.key === "Enter");
+
+        if (pressedControlAndEnter(event)) {
+            event.preventDefault();
+            this.onSubmit();
+        }
+    }
+
+    private onSubmit = () => {
+        this.props.onMutate(valueToDatabaseJSON(this.state.value));
+        this.setState({ id: uuidv1() });
+    }
+
 }

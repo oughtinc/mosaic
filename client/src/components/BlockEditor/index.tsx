@@ -1,5 +1,4 @@
 import * as React from "react";
-import Plain from "slate-plain-serializer";
 import styled from "styled-components";
 import { Editor } from "slate-react";
 import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
@@ -9,7 +8,6 @@ import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
 import { BlockEditorEditing } from "./BlockEditorEditing";
-import { databaseJSONToValue } from "../../lib/slateParser";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -134,6 +132,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           availablePointers={this.props.availablePointers}
           plugins={plugins}
           onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
         />
       );
     }
