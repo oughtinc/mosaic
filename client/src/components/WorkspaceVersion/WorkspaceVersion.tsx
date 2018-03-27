@@ -20,12 +20,16 @@ import {
 
 function retrieveLinkValues(linkIds: Array<string>, store: Store) {
   const links = linkIds.map(linkId => store.get("Link", linkId));
-  const linkValues = links.map(link => (link as LinkRow).value);
-  const rootLinkValue = _.find(linkValues, linkValue => linkValue.isRoot);
-  if (!rootLinkValue) {
-    throw new Error("Workspace version without root link!");
-  }
-  return { rootLinkValue, linkValues };
+  return links.map(link => (link as LinkRow).value);
+}
+
+function fastForwardLinkValues(linkValues: Array<LinkValue>) {
+  // 1. For each link, retrieve node version, get node id
+  // 2. For each node id, get latest version
+  // 3. For latest version of each node, get included node ids and their latest node versions
+  // 4. Create artificial link values, making sure links for any new nodes have isExpanded set to false
+  // (5. Drop link values that are no longer included?)
+  return linkValues;
 }
 
 function buildNodeMap(linkValues: Array<LinkValue>, store: Store) {
@@ -55,16 +59,22 @@ function buildNodeMap(linkValues: Array<LinkValue>, store: Store) {
 interface WorkspaceVersionProps {
   value: WorkspaceVersionValue;
   store: Store;
+  useLatestNodeVersions?: boolean;
 }
 
 const WorkspaceVersion: React.SFC<WorkspaceVersionProps> = ({
   value,
-  store
+  store,
+  useLatestNodeVersions
 }) => {
-  const { rootLinkValue, linkValues } = retrieveLinkValues(
-    value.linkIds,
-    store
-  );
+  let linkValues = retrieveLinkValues(value.linkIds, store);
+  if (useLatestNodeVersions) {
+    linkValues = fastForwardLinkValues(linkValues);
+  }
+  const rootLinkValue = _.find(linkValues, linkValue => linkValue.isRoot);
+  if (!rootLinkValue) {
+    throw new Error("Workspace version without root link!");
+  }
   const nodeMap = buildNodeMap(linkValues, store);
   const renderNode: RenderNode = ({ value, store }) => {
     const linkValue = nodeMap[value.nodeId];
@@ -75,6 +85,10 @@ const WorkspaceVersion: React.SFC<WorkspaceVersionProps> = ({
       <Link value={rootLinkValue} store={store} renderNode={renderNode} />
     </div>
   );
+};
+
+WorkspaceVersion.defaultProps = {
+  useLatestNodeVersions: false
 };
 
 export default WorkspaceVersion;

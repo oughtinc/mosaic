@@ -70,16 +70,27 @@
             - we'll need to assert that we actually don't need to do recursive fetching;
               there's a runtime assumption here that included nodes will never be expanded
               by default
-    [ ] create fixtures that test this
-    [ ] make renderer indicate which version is being rendered
+    [x] create fixtures that test rendering latest version vs current snapshot or consistent version
+        - I created a new version of the question node
+    [x] allow selecction in workspace renderer of which version is being rendered
+        [x] fixme: need to refactor - split up responsibility for retrieving latest nodes
+            between workspace and workspace version
+            - we need to know the latest expansion status, so we need to retrieve
+              the latest set of links, which makes sense to do in WorkspaceVersion
+    [ ] take useLatestNodeVersions into account in WorkspaceVersion:
+        implement fastForwardLinkValues
+    [ ] Think about (but don't implement) where and how we'd compute and indicate staleness
 [ ] Try workspace with sub-workspaces (via child q&a)
     - children
 [ ] Exports
-[ ] Showing whether things are stale
+[ ] Show whether things are stale
 [ ] A workspace template included in another workspace template
+[ ] Different stackings of exports and imports
 
-[ ] (Think about caching node ids for hypertext)
-    - probably fine to delay until this is moved to server
-
+Later:
 [ ] Use redux or apollo
-[ ] Allow root questions with data
+[ ] Caching node ids for hypertext (when we're using server)
+[ ] Make it easy to create root questions with data
+
+Maybe:
+[ ] Rename head to snapshot

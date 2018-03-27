@@ -51,14 +51,36 @@ const n9 = new Node();
 const nv9 = new NodeVersion(n9, h9, null);
 n9.setHead(nv9);
 
+// A workspace
+
 const ls1 = [
   new Link(nv7, { access: LinkAccess.Read, isExpanded: true, isRoot: false }),
   new Link(nv8, { access: LinkAccess.Write, isExpanded: true, isRoot: false }),
   new Link(nv9, { access: LinkAccess.Read, isExpanded: true, isRoot: true })
 ];
-const wv = new WorkspaceVersion(ls1);
-const w1 = new Workspace(wv, wv);
+const wv1 = new WorkspaceVersion(ls1);
+const w1 = new Workspace(wv1, wv1);
 
-const data = [h1, h2, h3, h4, h5, h6, n1, n7, n8, n9, w1];
+// Now let's create two new version of the question node,
+
+// One with an update to links and workspace:
+
+const h10 = new HyperText("What is 2 + 3, approximately?");
+const nv10 = new NodeVersion(n7, h10, nv7);
+
+const ls2 = [
+  new Link(nv10, { access: LinkAccess.Read, isExpanded: true, isRoot: false }),
+  new Link(nv8, { access: LinkAccess.Write, isExpanded: true, isRoot: false }),
+  new Link(nv9, { access: LinkAccess.Read, isExpanded: true, isRoot: true })
+];
+const wv2 = new WorkspaceVersion(ls2);
+w1.setHead(wv2);
+
+// And one without:
+
+const h11 = new HyperText("What is 2 + 3, very roughly?");
+const nv11 = new NodeVersion(n7, h11, nv10);
+
+const data = [h1, h2, h3, h4, h5, h6, h10, n1, n7, n8, n9, nv10, w1, nv11];
 
 export default data;

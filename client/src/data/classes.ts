@@ -12,6 +12,10 @@ export class Workspace implements Identifiable, Serializable {
     this.id = uuidv1();
   }
 
+  setHead(workspaceVersion: WorkspaceVersion) {
+    this.head = workspaceVersion;
+  }
+
   serialize(): Row[] {
     return [
       {
