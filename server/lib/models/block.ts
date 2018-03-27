@@ -3,7 +3,7 @@ import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../e
 import { Value } from "slate"
 import _ = require('lodash');
 
-function getInlinesAsArray(node) {
+function getTopLevelInlinesAsArray(node) {
   let array: any = [];
 
   node.nodes.forEach((child) => {
@@ -11,8 +11,24 @@ function getInlinesAsArray(node) {
     if (child.object === "inline") {
       array.push(child);
     }
-    else {
-      array = array.concat(getInlinesAsArray(child));
+    if (_.has(child, 'nodes')) {
+      array = array.concat(getTopLevelInlinesAsArray(child))
+    }
+  });
+
+  return array;
+}
+
+function getAllInlinesAsArray(node) {
+  let array: any = [];
+
+  node.nodes.forEach((child) => {
+    if (child.object === "text") { return; }
+    if (child.object === "inline") {
+      array.push(child);
+    }
+    if (_.has(child, 'nodes')) {
+      array = array.concat(getAllInlinesAsArray(child))
     }
   });
 
@@ -93,14 +109,13 @@ const BlockModel = (sequelize, DataTypes) => {
         console.error(`Referenced pointer with ID ${id} not found in database.`)
       }
     }
-
     return _.uniqBy(pointers, 'id')
   }
 
   //private
   Block.prototype.topLevelPointersIds = async function () {
     if (!this.dataValues.value) { return [] }
-    const _getInlinesAsArray = getInlinesAsArray(this.dataValues.value);
+    const _getInlinesAsArray = getTopLevelInlinesAsArray(this.dataValues.value);
     let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
     return pointers.map(p => p.data.pointerId)
   }
@@ -110,7 +125,7 @@ const BlockModel = (sequelize, DataTypes) => {
     if (!this.dataValues.value) {
       return {}
     }
-    const _getInlinesAsArray = getInlinesAsArray(this.dataValues.value);
+    const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
     const pointers = _getInlinesAsArray.filter((l) => l.type === "pointerExport");
 
     let results = {}
