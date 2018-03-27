@@ -13,7 +13,7 @@ import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { PointerTable } from "./PointerTable";
 import { exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
 import Plain from "slate-plain-serializer";
-import _ = require("lodash");
+import * as _ from "lodash";
 import { Value } from "slate";
 import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
 
@@ -134,6 +134,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                             <h3>Pointers</h3>
                             <PointerTable
                                 availablePointers={availablePointers}
+                                exportingPointerIds={this.props.exportingPointers.map((p) => p.data.pointerId)}
                             />
                         </Col>
                         <Col sm={6}>

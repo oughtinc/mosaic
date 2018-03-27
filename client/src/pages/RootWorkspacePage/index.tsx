@@ -1,7 +1,6 @@
 import gql from "graphql-tag";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
-import React = require("react");
 import { Link } from "react-router-dom";
 import { Button, Col, Row } from "react-bootstrap";
 import styled from "styled-components";
@@ -9,6 +8,7 @@ import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
+import * as React from "react";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
@@ -52,33 +52,33 @@ const ParentWorkspace = ({ workspace }) => {
     return (
         <WorkspaceStyle>
             <Row>
-            <Col sm={5}> 
-            {question && question.value &&
-                <BlockEditor
-                    name={question.id}
-                    blockId={question.id}
-                    initialValue={databaseJSONToValue(question.value)}
-                    readOnly={true}
-                    availablePointers={[]}
-                />
-            }
-            </Col> 
-            <Col sm={5}> 
-            {answer && answer.value &&
-                <BlockEditor
-                    name={answer.id}
-                    blockId={answer.id}
-                    initialValue={databaseJSONToValue(answer.value)}
-                    readOnly={true}
-                    availablePointers={[]}
-                />
-            }
-            </Col> 
-            <Col sm={2}> 
-            <Link to={`/workspaces/${workspace.id}`}>
-                <Button> Open </Button>
-            </Link>
-            </Col> 
+                <Col sm={5}>
+                    {question && question.value &&
+                        <BlockEditor
+                            name={question.id}
+                            blockId={question.id}
+                            initialValue={databaseJSONToValue(question.value)}
+                            readOnly={true}
+                            availablePointers={[]}
+                        />
+                    }
+                </Col>
+                <Col sm={5}>
+                    {answer && answer.value &&
+                        <BlockEditor
+                            name={answer.id}
+                            blockId={answer.id}
+                            initialValue={databaseJSONToValue(answer.value)}
+                            readOnly={true}
+                            availablePointers={[]}
+                        />
+                    }
+                </Col>
+                <Col sm={2}>
+                    <Link to={`/workspaces/${workspace.id}`}>
+                        <Button> Open </Button>
+                    </Link>
+                </Col>
             </Row>
         </WorkspaceStyle>
     );
@@ -89,7 +89,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
         return (
             <div>
                 <h3> New Root Workspace </h3>
-                <NewBlockForm onMutate={this.props.onCreateWorkspace}/>
+                <NewBlockForm onMutate={this.props.onCreateWorkspace} />
             </div>
         );
     }
@@ -121,4 +121,4 @@ export const RootWorkspacePage = compose(
             ],
         },
     }),
- )(RootWorkspacePagePresentational);
+)(RootWorkspacePagePresentational);
