@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
-import _ = require('lodash');
+import * as _ from "lodash";
 const Op = Sequelize.Op;
 
 function getTopLevelInlinesAsArray(node) {
