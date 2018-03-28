@@ -116,48 +116,48 @@ export class FormPagePresentational extends React.Component<any, any> {
                                     {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceQuestion, workspace).blockEditorAttributes())}
                                 />
                             </h3>
-                            <div style={{marginBottom: "3em"}}/>
+                            <div style={{ marginBottom: "3em" }} />
                         </Col>
                         <Col sm={12}>
                             <Row>
-                                <Col sm={9}>
-                                    <Row>
-                                        <Col sm={12}>
-                                            <h3>Private Information</h3>
-                                            <div style={{padding: "11px", border: "1px solid #d2d2d2", borderRadius: "3px" }}>
-                                                <h4>Scratchpad</h4>
-                                                <BlockEditorStyle>
-                                                    <BlockEditor
-                                                        availablePointers={availablePointers}
-                                                        {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceScratchpad, workspace).blockEditorAttributes())}
-                                                    />
-                                                </BlockEditorStyle>
-                                                <div style={{marginBottom: "3em"}}/>
-                                                <ChildrenSidebar
-                                                    workspaces={workspace.childWorkspaces}
-                                                    availablePointers={availablePointers}
-                                                    workspaceOrder={workspace.childWorkspaceOrder}
-                                                    onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
-                                                    changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                                                />
-                                            </div>
-                                            <div style={{marginBottom: "3em"}}/>
-                                            <h3>Answer</h3>
-                                            <BlockEditorStyle>
-                                                <BlockEditor
-                                                    availablePointers={availablePointers}
-                                                    {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
-                                                />
-                                            </BlockEditorStyle>
-                                        </Col>
-                                    </Row>
+                                <Col sm={4}>
+                                    <h4>Scratchpad</h4>
+                                    <BlockEditorStyle>
+                                        <BlockEditor
+                                            availablePointers={availablePointers}
+                                            {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceScratchpad, workspace).blockEditorAttributes())}
+                                        />
+                                    </BlockEditorStyle>
+                                    <div style={{ marginBottom: "3em" }} />
+                                    <div style={{ marginBottom: "3em" }} />
+                                    <h4>Answer</h4>
+                                    <BlockEditorStyle>
+                                        <BlockEditor
+                                            availablePointers={availablePointers}
+                                            {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
+                                        />
+                                    </BlockEditorStyle>
                                 </Col>
-                                <Col sm={3}>
-                                    <h3>Available Pointers</h3>
+                                <Col sm={2}>
+                                    <h4>Available Pointers</h4>
+                                    <div  style={{background: "#f7f7f7", borderRadius: "3px", float: "left"}}>
                                     <PointerTable
                                         availablePointers={availablePointers}
                                         exportingPointerIds={this.props.exportingPointers.map((p) => p.data.pointerId)}
                                     />
+                                    </div>
+                                </Col>
+                                <Col sm={6}>
+                                    <h4> Subquestions </h4>
+                                    <div  style={{background: "#f7f7f7", borderRadius: "3px", float: "left", width: "100%", padding: "8px"}}>
+                                    <ChildrenSidebar
+                                        workspaces={workspace.childWorkspaces}
+                                        availablePointers={availablePointers}
+                                        workspaceOrder={workspace.childWorkspaceOrder}
+                                        onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
+                                        changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
+                                    />
+                                    </div>
                                 </Col>
                             </Row>
                         </Col>
