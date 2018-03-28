@@ -37,7 +37,8 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
         }
 
         menu.style.opacity = 1;
-        menu.style.top = `${hoveredItem.top  + window.scrollY - 29}px`;
+        const scrollY: number = window.scrollY;
+        menu.style.top = `${parseInt(hoveredItem.top, 10) + scrollY - 29}px`;
         menu.style.left = `${hoveredItem.left}px`;
     }
 
