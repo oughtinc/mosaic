@@ -54,31 +54,30 @@ interface BlockEditorEditingPresentationalState {
 }
 
 function lastCharactersAfterEvent(event: any, n: any) {
-    const {anchorOffset, focusNode: wholeText}: any = window.getSelection();
+    const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
     if (!wholeText) { return ""; }
-    const text = wholeText.textContent.slice(anchorOffset - n + 1, anchorOffset);
-    return text +  event.key;
+    const text = wholeText.textContent.slice(Math.max(anchorOffset - n + 1, 0), anchorOffset);
+    return text + event.key;
 }
 
 function inlinePointerImportJSON(pointerId: string) {
     return Inline.fromJSON({
-                object: "inline",
-                type: "pointerImport",
-                isVoid: true,
-                data: {
-                    pointerId: pointerId,
-                    internalReferenceId: uuidv1(),
-                },
+        object: "inline",
+        type: "pointerImport",
+        isVoid: true,
+        data: {
+            pointerId: pointerId,
+            internalReferenceId: uuidv1(),
+        },
     });
 }
 
 export class BlockEditorEditingPresentational extends React.Component<BlockEditorEditingPresentationalProps, BlockEditorEditingPresentationalState> {
-
     private autosaveInterval: any;
 
     public constructor(props: any) {
         super(props);
-        this.state = {hasChangedSinceDatabaseSave: false};
+        this.state = { hasChangedSinceDatabaseSave: false };
     }
 
     public componentWillUnmount() {
@@ -119,20 +118,27 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     private considerCompletion = (event) => {
         const lastCharacters = lastCharactersAfterEvent(event, 4);
-        const match = lastCharacters.match(/\$[0-9]+\s/);
-        if (match) {
-            const matchNumber = Number(match[0].substring(1, match[0].length - 1));
-            const offsetIndex = match.index;
-            const pointer = this.props.availablePointers[matchNumber - 1];
+        const DOLLAR_NUMBER_SPACE = /\$[0-9]+\s/;
+        const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBER_SPACE);
+        if (pointerNameMatch) {
+            this.handlePointerNameMatch(lastCharacters, pointerNameMatch, event);
+        }
+    }
 
-            if (!!pointer) {
-                event.preventDefault();
-                const {value} = this.props.value.change()
+    private handlePointerNameMatch = (characters, match, event) => {
+        const matchNumber = Number(match[0].substring(1, match[0].length - 1));
+        const offsetIndex = match.index;
+        const pointer = this.props.availablePointers[matchNumber - 1];
+
+        if (!!pointer) {
+            const { value } = this.props.value.change()
                 .deleteBackward(matchNumber.toString().length + 1)
-                .insertInline(inlinePointerImportJSON(pointer.data.pointerId));
+                .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
+                .collapseToStartOfNextText()
+                .focus();
 
-                this.onChange(value, true);
-            }
+            this.onChange(value, true);
+            event.preventDefault();
         }
     }
 
@@ -170,7 +176,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     private onAddPointerImport = (pointerId: string) => {
-        const {value} = this.props.value.change()
+        const { value } = this.props.value.change()
             .insertInline(inlinePointerImportJSON(pointerId));
         this.onChange(value, true);
     }
@@ -183,7 +189,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     private saveToDatabase = () => {
         this.props.saveBlocksMutation();
-        this.setState({hasChangedSinceDatabaseSave: false});
+        this.setState({ hasChangedSinceDatabaseSave: false });
     }
 
     private beginAutosaveInterval = () => {
@@ -208,8 +214,8 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 }
 
 function mapStateToProps(state: any) {
-  const {  blockEditor } = state;
-  return { blockEditor };
+    const { blockEditor } = state;
+    return { blockEditor };
 }
 
 export const BlockEditorEditing: any = compose(
