@@ -13,12 +13,11 @@ import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 
-const BlockEditorStyle = styled.div`
+export const BlockEditorStyle = styled.div`
     background: #f4f4f4;
     border-radius: 2px;
     border: 1px solid #d5d5d5;
-    margin-bottom: 1em;
-    padding: .3em;
+    padding: .2em;
 `;
 
 const UPDATE_BLOCKS = gql`
@@ -78,7 +77,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     public render() {
         return (
-            <BlockEditorStyle>
+            <div>
                 <MenuBar
                     blockEditor={this.props.blockEditor}
                     onAddPointerImport={this.onAddPointerImport}
@@ -94,7 +93,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                     onBlur={this.handleBlur}
                     onKeyDown={this.onKeyDown}
                 />
-            </BlockEditorStyle>
+            </div>
         );
     }
 

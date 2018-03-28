@@ -16,6 +16,7 @@ import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 import { Value } from "slate";
 import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
+import { BlockEditorStyle } from "../../components/BlockEditor/BlockEditorEditing";
 
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
@@ -120,15 +121,19 @@ export class FormPagePresentational extends React.Component<any, any> {
                     <Row>
                         <Col sm={4}>
                             <h3>Scratchpad</h3>
-                            <BlockEditor
-                                availablePointers={availablePointers}
-                                {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceScratchpad, workspace).blockEditorAttributes())}
-                            />
+                            <BlockEditorStyle>
+                                <BlockEditor
+                                    availablePointers={availablePointers}
+                                    {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceScratchpad, workspace).blockEditorAttributes())}
+                                />
+                            </BlockEditorStyle>
                             <h3>Answer</h3>
-                            <BlockEditor
-                                availablePointers={availablePointers}
-                                {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
-                            />
+                            <BlockEditorStyle>
+                                <BlockEditor
+                                    availablePointers={availablePointers}
+                                    {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
+                                />
+                            </BlockEditorStyle>
                         </Col>
                         <Col sm={2}>
                             <h3>Pointers</h3>

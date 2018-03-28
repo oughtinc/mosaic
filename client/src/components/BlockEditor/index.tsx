@@ -115,13 +115,11 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const { plugins } = this.state;
     if (readOnly) {
       return (
-        <BlockReadOnlyStyle>
-          <Editor
-            value={value}
-            readOnly={true}
-            plugins={plugins}
-          />
-        </BlockReadOnlyStyle>
+        <Editor
+          value={value}
+          readOnly={true}
+          plugins={plugins}
+        />
       );
     } else {
       return (
