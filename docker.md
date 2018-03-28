@@ -1,6 +1,15 @@
 # Docker
 
-This will be replaced later with `docker-compose`.
+## New Approach
+With Docker running on your computer, run at the root mosaic directory:
+
+```
+docker-compose up
+```
+
+You can access the server at localhost:3000, and graphiql at localhost:8080/graphiql
+
+## Old approach (outdated)
 
 Before running this, make sure you have the latest node image:
 
