@@ -91,13 +91,18 @@
     [x] caching
     [x] Look over notes, think about any implications for next steps
         - Main implication is probably that immutable-js + redux should be more likely
-[ ] Add a workspace route/view
+        - (Maybe not immutable, maybe just redux?)
+[x] Add a workspace route/view
+    [x] Add react-router
+    [x] Link to workspace page from front page
+    [x] Display workspace on workspace page
 [ ] Try workspace with sub-workspaces (via child q&a)
+[ ] Look into switching store to redux (maybe +immutable-js)
 [ ] Add functionality
+    [ ] Expanding a pointer
     [ ] Basic export/edit functionality
     [ ] Creating a child workspace
     [ ] Creating a pointer
-    [ ] Expanding a pointer
     [ ] Different stackings of exports and imports
 [ ] Clean up fixtures (bundle)
 [ ] Integration with slate editor

@@ -3,6 +3,7 @@
 // final app.
 
 import * as React from "react";
+import { Link as RouterLink } from "react-router-dom";
 
 import HyperText from "../HyperText/HyperText";
 import Link from "../Link/Link";
@@ -21,6 +22,8 @@ import {
   WorkspaceVersionRow,
   LinkRow
 } from "../../data/types";
+
+import "./Dispatch.css";
 
 interface DispatchProps {
   object: Row;
@@ -74,7 +77,17 @@ const Dispatch: React.SFC<DispatchProps> = ({ object, store }) => {
     );
   }
   if (object.type === "Workspace") {
-    return <Workspace value={(object as WorkspaceRow).value} store={store} />;
+    return (
+      <div>
+        <Workspace value={(object as WorkspaceRow).value} store={store} />
+        <RouterLink
+          to={`/workspaces/${object.id}`}
+          className="Dispatch-Workspace-Link"
+        >
+          →
+        </RouterLink>
+      </div>
+    );
   }
   if (object.type === "Link") {
     return (

@@ -1,32 +1,41 @@
 import * as React from "react";
-import * as _ from "lodash";
+import { BrowserRouter, Route } from "react-router-dom";
 
-import Dispatch from "../Dispatch/Dispatch";
 import Store from "../../store";
+import IndexPage from "../../pages/IndexPage/IndexPage";
+import WorkspacePage from "../../pages/WorkspacePage/WorkspacePage";
 
 import "./App.css";
+
+interface RoutesProps {
+  store: Store;
+}
+
+const Routes: React.SFC<RoutesProps> = routeProps => (
+  <>
+    <Route
+      exact={true}
+      path="/"
+      render={props => <IndexPage {...props} store={routeProps.store} />}
+    />
+    <Route
+      exact={true}
+      path="/workspaces/:workspaceId"
+      render={props => <WorkspacePage {...props} store={routeProps.store} />}
+    />
+  </>
+);
 
 interface AppProps {
   store: Store;
 }
 
 const App: React.SFC<AppProps> = props => {
-  const db = props.store.dump();
   return (
     <div className="App">
-      <h2>Rendered</h2>
-      {_.map(db, (objects, key) => (
-        <div key={key}>
-          <h3>{key}</h3>
-          {_.values(objects).map(object => (
-            <div key={object.id} style={{ margin: "1em" }}>
-              <Dispatch object={object} store={props.store} />
-            </div>
-          ))}
-        </div>
-      ))}
-      <h2>The store</h2>
-      <pre>{JSON.stringify(db, null, 2)}</pre>
+      <BrowserRouter>
+        <Routes store={props.store} />
+      </BrowserRouter>
     </div>
   );
 };

@@ -1,6 +1,12 @@
 import * as _ from "lodash";
-import * as uuidv1 from "uuid/v1";
 import { HyperTextValue, Serializable, Identifiable, Row } from "./types";
+
+let id = 0;
+
+function getId() {
+  id += 1;
+  return id.toString();
+}
 
 export class Workspace implements Identifiable, Serializable {
   public id: string;
@@ -9,7 +15,7 @@ export class Workspace implements Identifiable, Serializable {
     public head: WorkspaceVersion,
     public consistent: WorkspaceVersion
   ) {
-    this.id = uuidv1();
+    this.id = getId();
   }
 
   setHead(workspaceVersion: WorkspaceVersion) {
@@ -36,7 +42,7 @@ export class WorkspaceVersion implements Identifiable, Serializable {
   public id: string;
 
   constructor(private links: Array<Link>) {
-    this.id = uuidv1();
+    this.id = getId();
   }
 
   serialize(): Row[] {
@@ -64,7 +70,7 @@ export class Link implements Identifiable, Serializable {
       isRoot: boolean;
     }
   ) {
-    this.id = uuidv1();
+    this.id = getId();
     this.access = options.access;
     this.isRoot = options.isRoot;
   }
@@ -94,7 +100,7 @@ export class Node implements Identifiable, Serializable {
   public head: NodeVersion | null;
 
   constructor() {
-    this.id = uuidv1();
+    this.id = getId();
     this.head = null;
   }
 
@@ -123,7 +129,7 @@ export class NodeVersion implements Identifiable, Serializable {
     private hyperText: HyperText,
     private previousVersion: NodeVersion | null
   ) {
-    this.id = uuidv1();
+    this.id = getId();
   }
 
   serialize(): Row[] {
@@ -151,7 +157,7 @@ export class HyperText implements Identifiable, Serializable {
   constructor(private value: HyperTextValue) {
     // TODO (eventually): compute a hash, retrieve existing hypertext element
     // if available instead of creating new identical one
-    this.id = uuidv1();
+    this.id = getId();
   }
 
   serialize(): Row[] {
