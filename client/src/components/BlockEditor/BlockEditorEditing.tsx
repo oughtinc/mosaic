@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Inline, Range } from "slate";
+import { Inline } from "slate";
 import * as uuidv1 from "uuid/v1";
 import { Editor } from "slate-react";
 import { compose, withProps, withState } from "recompose";
@@ -37,8 +37,9 @@ const DOLLAR_NUMBER_SPACE = /\$[0-9]+\s/;
 function lastCharactersAfterEvent(event: any, n: any) {
     const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
     if (!wholeText) { return ""; }
-    const text = wholeText.textContent.slice(Math.max(anchorOffset - n + 1, 0), anchorOffset);
-    return text + event.key;
+    const text: string = wholeText.textContent.slice(Math.max(anchorOffset - n + 1, 0), anchorOffset);
+    const key: string = event.key;
+    return text + key;
 }
 
 function inlinePointerImportJSON(pointerId: string) {
@@ -126,7 +127,6 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     private handlePointerNameAutocomplete = (characters, match, event) => {
         const matchNumber = Number(match[0].substring(1, match[0].length - 1));
-        const offsetIndex = match.index;
         const pointer = this.props.availablePointers[matchNumber - 1];
 
         if (!!pointer) {
@@ -134,7 +134,8 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                 .deleteBackward(matchNumber.toString().length + 1)
                 .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
                 .collapseToStartOfNextText()
-                .focus();
+                .focus()
+                .insertText(" ");
 
             this.onChange(value, true);
             event.preventDefault();
@@ -143,7 +144,6 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     private onKeyDown = (event) => {
         const pressedControlAndE = (_event) => (_event.ctrlKey && _event.key === "e");
-        const pressedControlAndR = (_event) => (_event.ctrlKey && _event.key === "r");
         if (pressedControlAndE(event)) {
             this.props.exportSelection();
             event.preventDefault();
