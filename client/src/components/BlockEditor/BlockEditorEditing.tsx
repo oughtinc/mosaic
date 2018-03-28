@@ -32,26 +32,7 @@ const UPDATE_BLOCKS = gql`
 `;
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
-
-// Eventually we'll type out many of these items more spefically, but that's a future refactor.
-interface BlockEditorEditingPresentationalProps {
-    block: any;
-    availablePointers: any[];
-    value: any;
-    mutationStatus: any;
-    blockEditor: any;
-    plugins: any[];
-    shouldAutosave: boolean;
-    updateBlock(value: any): () => {};
-    onChange(value: any): () => boolean;
-    saveBlocksMutation(): () => {};
-    exportSelection(): () => {};
-    onKeyDown(event: any): () => {};
-}
-
-interface BlockEditorEditingPresentationalState {
-    hasChangedSinceDatabaseSave: boolean;
-}
+const DOLLAR_NUMBER_SPACE = /\$[0-9]+\s/;
 
 function lastCharactersAfterEvent(event: any, n: any) {
     const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
@@ -72,6 +53,25 @@ function inlinePointerImportJSON(pointerId: string) {
     });
 }
 
+// Eventually we'll type out many of these items more spefically, but that's a future refactor.
+interface BlockEditorEditingPresentationalProps {
+    block: any;
+    availablePointers: any[];
+    value: any;
+    mutationStatus: any;
+    blockEditor: any;
+    plugins: any[];
+    shouldAutosave: boolean;
+    updateBlock(value: any): () => {};
+    onChange(value: any): () => boolean;
+    saveBlocksMutation(): () => {};
+    exportSelection(): () => {};
+    onKeyDown(event: any): () => {};
+}
+
+interface BlockEditorEditingPresentationalState {
+    hasChangedSinceDatabaseSave: boolean;
+}
 export class BlockEditorEditingPresentational extends React.Component<BlockEditorEditingPresentationalProps, BlockEditorEditingPresentationalState> {
     private autosaveInterval: any;
 
@@ -116,16 +116,15 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         );
     }
 
-    private considerCompletion = (event) => {
+    private checkAutocomplete = (event) => {
         const lastCharacters = lastCharactersAfterEvent(event, 4);
-        const DOLLAR_NUMBER_SPACE = /\$[0-9]+\s/;
         const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBER_SPACE);
         if (pointerNameMatch) {
-            this.handlePointerNameMatch(lastCharacters, pointerNameMatch, event);
+            this.handlePointerNameAutocomplete(lastCharacters, pointerNameMatch, event);
         }
     }
 
-    private handlePointerNameMatch = (characters, match, event) => {
+    private handlePointerNameAutocomplete = (characters, match, event) => {
         const matchNumber = Number(match[0].substring(1, match[0].length - 1));
         const offsetIndex = match.index;
         const pointer = this.props.availablePointers[matchNumber - 1];
@@ -149,7 +148,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
             this.props.exportSelection();
             event.preventDefault();
         }
-        this.considerCompletion(event);
+        this.checkAutocomplete(event);
         if (!!this.props.onKeyDown) {
             this.props.onKeyDown(event);
         }
