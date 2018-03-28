@@ -16,7 +16,6 @@ import { exportSelection } from "../../modules/blockEditor/actions";
 export const BlockEditorStyle = styled.div`
     background: #f4f4f4;
     border-radius: 2px;
-    border: 1px solid #d5d5d5;
     padding: .2em;
 `;
 

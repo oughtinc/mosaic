@@ -12,12 +12,12 @@ const RemovedPointer = styled.span`
     color: #7f0a0a;
 `;
 
-const ClosedPointerImport: any = styled.span`
-    background-color: rgba(86, 214, 252, 0.66);
-    padding: 0 7px;
+export const ClosedPointerImport: any = styled.span`
+    background-color: rgba(179, 218, 230, 0.66);
+    padding: 0 4px;
     border-radius: 2px;
     font-weight: 800;
-    color: #0a6e7f;
+    color: #178da1;
     transition: background-color color 0.8s; 
     &:hover {
         transition: background-color color 0.8s; 
@@ -28,7 +28,7 @@ const ClosedPointerImport: any = styled.span`
 `;
 
 const OpenPointerImport: any = styled.div`
-    background: ${(props: any) => props.isSelected ? "rgba(111, 186, 209, 0.66)" : "rgba(158, 224, 244, 0.66)"};
+    background: ${(props: any) => props.isSelected ? "rgba(111, 186, 209, 0.66)" : "rgba(179, 218, 230, 0.66)"};
     padding: 0px 5px;
     border-radius: 2px;
     font-weight: 500;

@@ -2,12 +2,9 @@ import * as React from "react";
 import styled from "styled-components";
 import { ShowExpandedPointerOutsideSlate } from "../../components/ShowExpandedPointerOutsideSlate";
 import * as _ from "lodash";
+import { ClosedPointerImport } from "../../lib/slate-pointers/PointerImportNode";
 
 const Container = styled.div`
-    border: 1px solid #eee;
-    border-radius: 2px;
-    background: #f4f4f4;
-    border: 1px solid #ddd;
     float: left;
     width: 100%;
 `;
@@ -23,14 +20,13 @@ const Reference = styled.div`
 const Row = styled.div`
     float: left;
     width: 100%;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px dashed #ddd;
     padding: .3em .5em;
     overflow: auto;
     max-height: 120px;
 `;
 
 const Text = styled.div`
-    border-radius: 2px;
     padding: .15em .3em;
     float: left;
 `;
@@ -46,9 +42,11 @@ export const PointerTable = ({ availablePointers, exportingPointerIds }) => (
         const isFromThisWorkspace = _.includes(exportingPointerIds, pointer.data.pointerId);
         return (
             <Row key={index}>
-                <Reference>
-                    {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
-                </Reference>
+                <div style={{float: "left", marginRight: "5px"}}>
+                    <ClosedPointerImport>
+                        {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
+                    </ClosedPointerImport>
+                </div>
                 {isFromThisWorkspace ?
                     <Text>
                         <ShowExpandedPointerOutsideSlate
