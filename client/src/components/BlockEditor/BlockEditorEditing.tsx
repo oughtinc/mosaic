@@ -32,6 +32,27 @@ const UPDATE_BLOCKS = gql`
 `;
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
+const DOLLAR_NUMBER_SPACE = /\$[0-9]+\s/;
+
+function lastCharactersAfterEvent(event: any, n: any) {
+    const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
+    if (!wholeText) { return ""; }
+    const text: string = wholeText.textContent.slice(Math.max(anchorOffset - n + 1, 0), anchorOffset);
+    const key: string = event.key;
+    return text + key;
+}
+
+function inlinePointerImportJSON(pointerId: string) {
+    return Inline.fromJSON({
+        object: "inline",
+        type: "pointerImport",
+        isVoid: true,
+        data: {
+            pointerId: pointerId,
+            internalReferenceId: uuidv1(),
+        },
+    });
+}
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
@@ -52,14 +73,12 @@ interface BlockEditorEditingPresentationalProps {
 interface BlockEditorEditingPresentationalState {
     hasChangedSinceDatabaseSave: boolean;
 }
-
 export class BlockEditorEditingPresentational extends React.Component<BlockEditorEditingPresentationalProps, BlockEditorEditingPresentationalState> {
-
     private autosaveInterval: any;
 
     public constructor(props: any) {
         super(props);
-        this.state = {hasChangedSinceDatabaseSave: false};
+        this.state = { hasChangedSinceDatabaseSave: false };
     }
 
     public componentWillUnmount() {
@@ -98,12 +117,38 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         );
     }
 
+    private checkAutocomplete = (event) => {
+        const lastCharacters = lastCharactersAfterEvent(event, 4);
+        const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBER_SPACE);
+        if (pointerNameMatch) {
+            this.handlePointerNameAutocomplete(lastCharacters, pointerNameMatch, event);
+        }
+    }
+
+    private handlePointerNameAutocomplete = (characters, match, event) => {
+        const matchNumber = Number(match[0].substring(1, match[0].length - 1));
+        const pointer = this.props.availablePointers[matchNumber - 1];
+
+        if (!!pointer) {
+            const { value } = this.props.value.change()
+                .deleteBackward(matchNumber.toString().length + 1)
+                .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
+                .collapseToStartOfNextText()
+                .focus()
+                .insertText(" ");
+
+            this.onChange(value, true);
+            event.preventDefault();
+        }
+    }
+
     private onKeyDown = (event) => {
         const pressedControlAndE = (_event) => (_event.ctrlKey && _event.key === "e");
         if (pressedControlAndE(event)) {
             this.props.exportSelection();
             event.preventDefault();
         }
+        this.checkAutocomplete(event);
         if (!!this.props.onKeyDown) {
             this.props.onKeyDown(event);
         }
@@ -130,16 +175,8 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     private onAddPointerImport = (pointerId: string) => {
-        const {value} = this.props.value.change()
-            .insertInline(Inline.fromJSON({
-                object: "inline",
-                type: "pointerImport",
-                isVoid: true,
-                data: {
-                    pointerId: pointerId,
-                    internalReferenceId: uuidv1(),
-                },
-            }));
+        const { value } = this.props.value.change()
+            .insertInline(inlinePointerImportJSON(pointerId));
         this.onChange(value, true);
     }
 
@@ -151,7 +188,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     private saveToDatabase = () => {
         this.props.saveBlocksMutation();
-        this.setState({hasChangedSinceDatabaseSave: false});
+        this.setState({ hasChangedSinceDatabaseSave: false });
     }
 
     private beginAutosaveInterval = () => {
@@ -176,8 +213,8 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 }
 
 function mapStateToProps(state: any) {
-  const {  blockEditor } = state;
-  return { blockEditor };
+    const { blockEditor } = state;
+    return { blockEditor };
 }
 
 export const BlockEditorEditing: any = compose(
