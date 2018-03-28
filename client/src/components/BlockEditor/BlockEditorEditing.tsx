@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Inline } from "slate";
+import { Inline, Range } from "slate";
 import * as uuidv1 from "uuid/v1";
 import { Editor } from "slate-react";
 import { compose, withProps, withState } from "recompose";
@@ -53,6 +53,25 @@ interface BlockEditorEditingPresentationalState {
     hasChangedSinceDatabaseSave: boolean;
 }
 
+function lastCharactersAfterEvent(event: any, n: any) {
+    const {anchorOffset, focusNode: wholeText}: any = window.getSelection();
+    if (!wholeText) { return ""; }
+    const text = wholeText.textContent.slice(anchorOffset - n + 1, anchorOffset);
+    return text +  event.key;
+}
+
+function inlinePointerImportJSON(pointerId: string) {
+    return Inline.fromJSON({
+                object: "inline",
+                type: "pointerImport",
+                isVoid: true,
+                data: {
+                    pointerId: pointerId,
+                    internalReferenceId: uuidv1(),
+                },
+    });
+}
+
 export class BlockEditorEditingPresentational extends React.Component<BlockEditorEditingPresentationalProps, BlockEditorEditingPresentationalState> {
 
     private autosaveInterval: any;
@@ -98,6 +117,25 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         );
     }
 
+    private considerCompletion = (event) => {
+        const lastCharacters = lastCharactersAfterEvent(event, 4);
+        const match = lastCharacters.match(/\$[0-9]+\s/);
+        if (match) {
+            const matchNumber = Number(match[0].substring(1, match[0].length - 1));
+            const offsetIndex = match.index;
+            const pointer = this.props.availablePointers[matchNumber - 1];
+
+            if (!!pointer) {
+                event.preventDefault();
+                const {value} = this.props.value.change()
+                .deleteBackward(matchNumber.toString().length + 1)
+                .insertInline(inlinePointerImportJSON(pointer.data.pointerId));
+
+                this.onChange(value, true);
+            }
+        }
+    }
+
     private onKeyDown = (event) => {
         const pressedControlAndE = (_event) => (_event.ctrlKey && _event.key === "e");
         const pressedControlAndR = (_event) => (_event.ctrlKey && _event.key === "r");
@@ -105,25 +143,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
             this.props.exportSelection();
             event.preventDefault();
         }
-
-        // const pressedControlAndR = (_event) => (_event.ctrlKey && _event.key === "r");
-        // const {anchorOffset, focusNode: wholeText}: any = window.getSelection();
-        // if (wholeText && wholeText.length > 1) {
-        //     // debugger;
-        //     const previousChange = wholeText.textContent.slice(anchorOffset - 1, anchorOffset + 1);
-        //     console.log(previousChange, wholeText.textContent);
-        //     if (previousChange === "$1") {
-        //         console.log("MADE IT!");
-        //     }
-        // }
-        // if (pressedControlAndR(event)) {
-            // const {value} = this.props.value.change();
-            // debugger;
-            // .deleteBackward(2);
-            
-            // this.onChange(value, true);
-            // event.preventDefault();
-        // }
+        this.considerCompletion(event);
         if (!!this.props.onKeyDown) {
             this.props.onKeyDown(event);
         }
@@ -151,15 +171,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
 
     private onAddPointerImport = (pointerId: string) => {
         const {value} = this.props.value.change()
-            .insertInline(Inline.fromJSON({
-                object: "inline",
-                type: "pointerImport",
-                isVoid: true,
-                data: {
-                    pointerId: pointerId,
-                    internalReferenceId: uuidv1(),
-                },
-            }));
+            .insertInline(inlinePointerImportJSON(pointerId));
         this.onChange(value, true);
     }
 
