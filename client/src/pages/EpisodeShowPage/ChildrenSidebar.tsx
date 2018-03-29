@@ -46,10 +46,10 @@ export class Child extends React.Component<any, any> {
 }
 
 export class ChildrenSidebar extends React.Component<any, any> {
-    private newBlockForm;
+    private newChildField;
 
     public editor = () => {
-        return this.newBlockForm && this.newBlockForm.editor();
+        return this.newChildField && this.newChildField.editor();
     }
 
     public render() {
@@ -76,7 +76,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 <NewBlockForm
                     onMutate={this.props.onCreateChild}
                     availablePointers={this.props.availablePointers}
-                    ref={(input) => {this.newBlockForm = input; }}
+                    ref={(input) => {this.newChildField = input; }}
                 />
             </div>
         );
