@@ -85,7 +85,22 @@ let schema = new GraphQLSchema({
         type: workspaceType,
         args: {id: {type: GraphQLString}},
         resolve: resolver(models.Workspace)
-      }
+      },
+      blocks: {
+        type: new GraphQLList(blockType),
+        args: {where: {type: GraphQLJSON}},
+        resolve: resolver(models.Block)
+      },
+      pointers: {
+        type: new GraphQLList(pointerType),
+        args: {where: {type: GraphQLJSON}},
+        resolve: resolver(models.Pointer)
+      },
+      events: {
+        type: new GraphQLList(eventType),
+        args: {where: {type: GraphQLJSON}},
+        resolve: resolver(models.Event)
+      },
     }
   }),
   mutation: new GraphQLObjectType({
