@@ -140,7 +140,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           plugins={plugins}
           onChange={this.props.onChange}
           onKeyDown={this.props.onKeyDown}
-          onSetRef={(input) => { this.blockEditorEditing = input; }}
+          onMount={(input) => { this.blockEditorEditing = input; }}
         />
       );
     }
