@@ -63,7 +63,7 @@ interface BlockEditorEditingPresentationalProps {
     blockEditor: any;
     plugins: any[];
     shouldAutosave: boolean;
-    onSetRef: any;
+    onMount(value: any): () => {};
     updateBlock(value: any): () => {};
     onChange(value: any): () => boolean;
     saveBlocksMutation(): () => {};
@@ -84,7 +84,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     public componentWillMount() {
-        this.props.onSetRef(this);
+        this.props.onMount(this);
     }
 
     public componentWillUnmount() {
