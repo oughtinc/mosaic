@@ -19,7 +19,7 @@ const generateReferences = (model, references) => {
   return all
 }
 
-const makeObjectType = (model, references, extraFields={}) => (
+const makeObjectType = (model, references, extraFields = {}) => (
   new GraphQLObjectType({
     name: model.name,
     description: model.name,
@@ -49,7 +49,7 @@ let workspaceType = makeObjectType(models.Workspace,
   ]
 )
 
-let eventType = makeObjectType(models.Event,[])
+let eventType = makeObjectType(models.Event, [])
 
 let pointerType = makeObjectType(models.Pointer,
   [
@@ -72,11 +72,11 @@ const BlockInput = new GraphQLInputObjectType({
   fields: _.pick(attributeFields(models.Block), 'value', 'id'),
 })
 
-function modelGraphQLFields(type, model){
+function modelGraphQLFields(type, model) {
   return ({
-        type,
-        args: {where: {type: GraphQLJSON}},
-        resolve: resolver(model)
+    type,
+    args: { where: { type: GraphQLJSON } },
+    resolve: resolver(model)
   })
 }
 
@@ -85,7 +85,11 @@ let schema = new GraphQLSchema({
     name: 'RootQueryType',
     fields: {
       workspaces: modelGraphQLFields(new GraphQLList(workspaceType), models.Workspace),
-      workspace: modelGraphQLFields(workspaceType, models.Workspace),
+      workspace: {
+        type: workspaceType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(models.Workspace)
+      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(new GraphQLList(pointerType), models.Pointer),
       events: modelGraphQLFields(new GraphQLList(eventType), models.Event),
@@ -93,16 +97,16 @@ let schema = new GraphQLSchema({
   }),
   mutation: new GraphQLObjectType({
     name: 'RootMutationType',
-    fields : {
+    fields: {
       updateBlocks: {
         type: new GraphQLList(blockType),
-        args: {workspaceId: {type: GraphQLString}, blocks: {type: new GraphQLList(BlockInput)}},
-        resolve: async (_, {workspaceId, blocks}) => {
+        args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
+        resolve: async (_, { workspaceId, blocks }) => {
           const event = await models.Event.create()
           let newBlocks: any = []
-          for (const _block of blocks){
+          for (const _block of blocks) {
             const block = await models.Block.findById(_block.id)
-            await block.update({..._block}, {event})
+            await block.update({ ..._block }, { event })
             newBlocks = [...newBlocks, block]
           }
           return newBlocks
@@ -110,29 +114,29 @@ let schema = new GraphQLSchema({
       },
       updateWorkspace: {
         type: workspaceType,
-        args: {id: {type: GraphQLString}, childWorkspaceOrder: {type: new GraphQLList(GraphQLString)}},
-        resolve: async (_, {id, childWorkspaceOrder}) => {
+        args: { id: { type: GraphQLString }, childWorkspaceOrder: { type: new GraphQLList(GraphQLString) } },
+        resolve: async (_, { id, childWorkspaceOrder }) => {
           const workspace = await models.Workspace.findById(id)
           const event = await models.Event.create()
-          return workspace.update({childWorkspaceOrder}, {event})
+          return workspace.update({ childWorkspaceOrder }, { event })
         }
       },
       createWorkspace: {
         type: workspaceType,
-        args: {question: {type: GraphQLJSON}},
-        resolve: async(_, {question}) => {
+        args: { question: { type: GraphQLJSON } },
+        resolve: async (_, { question }) => {
           const event = await models.Event.create()
-          const workspace = await models.Workspace.create({},{event, questionValue: JSON.parse(question)})
+          const workspace = await models.Workspace.create({}, { event, questionValue: JSON.parse(question) })
           return workspace
         }
       },
       createChildWorkspace: {
         type: workspaceType,
-        args: {workspaceId: {type: GraphQLString}, question: {type: GraphQLJSON}},
-        resolve: async(_, {workspaceId, question}) => {
+        args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON } },
+        resolve: async (_, { workspaceId, question }) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const event = await models.Event.create()
-          const child = await workspace.createChild({event, question: JSON.parse(question)})
+          const child = await workspace.createChild({ event, question: JSON.parse(question) })
           return child
         }
       },
