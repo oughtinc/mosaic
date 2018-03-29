@@ -72,20 +72,23 @@ const BlockInput = new GraphQLInputObjectType({
   fields: _.pick(attributeFields(models.Block), 'value', 'id'),
 })
 
+function modelGraphQLFields(type, model){
+  return ({
+        type,
+        args: {where: {type: GraphQLJSON}},
+        resolve: resolver(model)
+  })
+}
+
 let schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-      workspaces: {
-        type: new GraphQLList(workspaceType),
-        args: {where: {type: GraphQLJSON}},
-        resolve: resolver(models.Workspace)
-      },
-      workspace: {
-        type: workspaceType,
-        args: {id: {type: GraphQLString}},
-        resolve: resolver(models.Workspace)
-      }
+      workspaces: modelGraphQLFields(new GraphQLList(workspaceType), models.Workspace),
+      workspace: modelGraphQLFields(workspaceType, models.Workspace),
+      blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
+      pointers: modelGraphQLFields(new GraphQLList(pointerType), models.Pointer),
+      events: modelGraphQLFields(new GraphQLList(eventType), models.Event),
     }
   }),
   mutation: new GraphQLObjectType({
