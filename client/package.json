@@ -14,6 +14,7 @@
     "final-form": "^4.2.1",
     "graphql": "^0.11.3",
     "graphql-tag": "^2.8.0",
+    "keyboardjs": "^2.4.1",
     "lodash": "^4.17.5",
     "moment": "^2.21.0",
     "query-string": "^5.1.0",

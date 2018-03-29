@@ -16,7 +16,7 @@ const SavingIconStyle = styled.span`
 `;
 
 const PointerDropdownMenu = ({ availablePointers, onAddPointerImport, blockEditor }) => (
-    <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px", marginRight: "5px" }}>
+    <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px", marginRight: "5px" }} tabIndex={-1}>
         {availablePointers.map((e: any, index: number) => (
             <MenuItem
                 eventKey="1"
