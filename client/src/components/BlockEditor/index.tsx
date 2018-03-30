@@ -18,6 +18,8 @@ const BlockReadOnlyStyle = styled.div`
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
+  public blockEditorEditing;
+
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -38,6 +40,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return true;
     }
     return false;
+  }
+
+  public editor = () => {
+    return this.blockEditorEditing && this.blockEditorEditing.editor;
   }
 
   public componentWillReceiveProps(newProps: any) {
@@ -146,6 +152,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           plugins={plugins}
           onChange={this.props.onChange}
           onKeyDown={this.props.onKeyDown}
+          onMount={(input) => { this.blockEditorEditing = input; }}
         />
       );
     }
@@ -160,6 +167,6 @@ function mapStateToProps(state: any, { blockId }: any) {
 
 export const BlockEditor: any = compose(
   connect(
-    mapStateToProps, { addBlocks, removeBlocks, changeHoverItem, removeHoverItem }
+    mapStateToProps, { addBlocks, removeBlocks, changeHoverItem, removeHoverItem }, null, { withRef: true }
   ),
 )(BlockEditorPresentational);
