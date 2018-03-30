@@ -38,7 +38,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return true;
     }
     return false;
-
   }
 
   public componentWillReceiveProps(newProps: any) {
@@ -51,6 +50,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public resetPlugins(newProps: any) {
+
     const SlatePointerInputs = {
       onSelectNull: () => {
         newProps.removeHoverItem();

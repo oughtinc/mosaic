@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
+import * as _ from "lodash";
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
@@ -13,6 +14,7 @@ const ChildStyle = styled.div`
 `;
 
 export class Child extends React.Component<any, any> {
+
     public render() {
         const workspace = this.props.workspace;
         const availablePointers = this.props.availablePointers;
@@ -46,6 +48,17 @@ export class Child extends React.Component<any, any> {
 }
 
 export class ChildrenSidebar extends React.Component<any, any> {
+    public shouldComponentUpdate(newProps: any) {
+        if (
+            !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+            || !_.isEqual(newProps.block, this.props.block)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     public render() {
         return (
             <div>
