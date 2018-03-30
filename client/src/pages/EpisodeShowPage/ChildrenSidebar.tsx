@@ -48,6 +48,12 @@ export class Child extends React.Component<any, any> {
 }
 
 export class ChildrenSidebar extends React.Component<any, any> {
+    private newChildField;
+
+    public editor = () => {
+        return this.newChildField && this.newChildField.editor();
+    }
+
     public shouldComponentUpdate(newProps: any) {
         if (
             !_.isEqual(newProps.blockEditor, this.props.blockEditor)
@@ -83,6 +89,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 <NewBlockForm
                     onMutate={this.props.onCreateChild}
                     availablePointers={this.props.availablePointers}
+                    ref={(input) => { this.newChildField = input; }}
                 />
             </div>
         );

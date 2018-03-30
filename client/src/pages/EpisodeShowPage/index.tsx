@@ -16,6 +16,7 @@ import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 import { Value } from "slate";
 import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
+import * as keyboardJS from "keyboardjs";
 
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
@@ -80,8 +81,18 @@ function findPointers(value: any) {
 }
 
 export class FormPagePresentational extends React.Component<any, any> {
+    private scratchpadField;
+    private answerField;
+    private newChildField;
+
     public constructor(props: any) {
         super(props);
+    }
+
+    public componentDidMount() {
+        keyboardJS.bind("ctrl+s", (e) => { e.preventDefault(); this.scratchpadField.focus(); });
+        keyboardJS.bind("ctrl+a", (e) => { e.preventDefault(); this.answerField.focus(); });
+        keyboardJS.bind("ctrl+n", (e) => { e.preventDefault(); this.newChildField.focus(); });
     }
 
     public updateBlocks = (blocks: any) => {
@@ -123,11 +134,13 @@ export class FormPagePresentational extends React.Component<any, any> {
                             <BlockEditor
                                 availablePointers={availablePointers}
                                 {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceScratchpad, workspace).blockEditorAttributes())}
+                                ref={this.registerEditorRef("scratchpadField")}
                             />
                             <h3>Answer</h3>
                             <BlockEditor
                                 availablePointers={availablePointers}
                                 {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
+                                ref={this.registerEditorRef("answerField")}
                             />
                         </Col>
                         <Col sm={2}>
@@ -144,13 +157,22 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 workspaceOrder={workspace.childWorkspaceOrder}
                                 onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
+                                ref={(input) => {if (input && input.editor()) { this.newChildField = input.editor(); }}}
                             />
                         </Col>
                     </Row>
                 </BlockHoverMenu>
-            </div>
+            </div >
         );
     }
+
+    private registerEditorRef = (editorName) => (input) => {
+        const editor = _.get(input, "wrappedInstance.editor");
+        if (!!editor) {
+            this[editorName] = editor();
+        }
+    }
+
 }
 
 const options: any = ({ match }) => ({
@@ -190,5 +212,5 @@ export const EpisodeShowPage = compose(
     }),
     connect(
         mapStateToProps, { addBlocks, saveBlocks }
-    )
+    ),
 )(FormPagePresentational);

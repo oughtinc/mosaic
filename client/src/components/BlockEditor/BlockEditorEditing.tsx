@@ -64,6 +64,7 @@ interface BlockEditorEditingPresentationalProps {
     blockEditor: any;
     plugins: any[];
     shouldAutosave: boolean;
+    onMount(value: any): () => {};
     updateBlock(value: any): () => {};
     onChange(value: any): () => boolean;
     saveBlocksMutation(): () => {};
@@ -75,6 +76,7 @@ interface BlockEditorEditingPresentationalState {
     hasChangedSinceDatabaseSave: boolean;
 }
 export class BlockEditorEditingPresentational extends React.Component<BlockEditorEditingPresentationalProps, BlockEditorEditingPresentationalState> {
+    public editor;
     private autosaveInterval: any;
 
     public constructor(props: any) {
@@ -91,6 +93,10 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
             return true;
         }
         return false;
+    }
+
+    public componentWillMount() {
+        this.props.onMount(this);
     }
 
     public componentWillUnmount() {
@@ -124,6 +130,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                     spellCheck={false}
                     onBlur={this.handleBlur}
                     onKeyDown={this.onKeyDown}
+                    ref={(input) => { this.editor = input; }}
                 />
             </BlockEditorStyle>
         );
@@ -231,9 +238,9 @@ function mapStateToProps(state: any) {
 
 export const BlockEditorEditing: any = compose(
     connect(
-        mapStateToProps, { updateBlock, exportSelection }
+        mapStateToProps, { updateBlock, exportSelection }, null, { withRef: true }
     ),
-    graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer" }),
+    graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer", withRef: true }),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
     withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
         const saveBlocksMutation = () => {
@@ -248,5 +255,5 @@ export const BlockEditorEditing: any = compose(
         };
 
         return { saveBlocksMutation, status };
-    })
+    }),
 )(BlockEditorEditingPresentational);
