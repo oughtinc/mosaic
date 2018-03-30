@@ -29,6 +29,18 @@ class BlockEditorPresentational extends React.Component<any, any> {
     this.resetPlugins(this.props);
   }
 
+  public shouldComponentUpdate(newProps: any) {
+    if (
+      !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+      || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+      || !_.isEqual(newProps.block, this.props.block)
+    ) {
+      return true;
+    }
+    return false;
+
+  }
+
   public componentWillReceiveProps(newProps: any) {
     if (
       !_.isEqual(newProps.blockEditor, this.props.blockEditor)
