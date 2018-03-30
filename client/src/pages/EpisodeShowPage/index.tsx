@@ -74,6 +74,12 @@ const ParentLink = (props) => (
     </Link>
 );
 
+const SubtreeLink = ({workspace}) => (
+    <Link to={`/workspaces/${workspace.id}/subtree`}>
+        <Button>To Subtree</Button>
+    </Link>
+);
+
 function findPointers(value: any) {
     const _value = value ? Value.fromJSON(value) : Plain.deserialize("");
     const pointers = exportingNodes(_value.document);
@@ -119,6 +125,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                         <Col sm={12}>
                             {workspace.parentId &&
                                 <ParentLink parentId={workspace.parentId} />
+                            }
+                            {workspace && 
+                                <SubtreeLink workspace={workspace} />
                             }
                             <h1>
                                 <BlockEditor

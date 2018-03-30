@@ -92,9 +92,9 @@ let schema = new GraphQLSchema({
       },
       subtreeWorkspaces: {
         type: new GraphQLList(workspaceType),
-        args: { where: { type: GraphQLJSON }, rootWorkspaceId: { type: GraphQLString } },
-        resolve: async (_, { rootWorkspaceId }) => {
-          const rootWorkspace = await models.Workspace.findById(rootWorkspaceId)
+        args: { workspaceId: { type: GraphQLString } },
+        resolve: async (_, { workspaceId }) => {
+          const rootWorkspace = await models.Workspace.findById(workspaceId)
           const children = await rootWorkspace.subtreeWorkspaces();
           return [rootWorkspace, ...children]
         },
