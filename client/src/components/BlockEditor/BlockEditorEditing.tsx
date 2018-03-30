@@ -12,6 +12,7 @@ import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
+import * as _ from "lodash";
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -79,6 +80,17 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     public constructor(props: any) {
         super(props);
         this.state = { hasChangedSinceDatabaseSave: false };
+    }
+
+    public shouldComponentUpdate(newProps: any) {
+        if (
+            !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+            || !_.isEqual(newProps.block, this.props.block)
+        ) {
+            return true;
+        }
+        return false;
     }
 
     public componentWillUnmount() {

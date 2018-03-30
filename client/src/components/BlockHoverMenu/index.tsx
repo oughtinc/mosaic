@@ -3,6 +3,7 @@ import { Menu } from "./Menu";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { removeHoverItem } from "../../modules/blockEditor/actions";
+import * as _ from "lodash";
 
 class BlockHoverMenuPresentational extends React.Component<any, any> {
     public menu;
@@ -17,6 +18,17 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
 
     public componentWillUnmount() {
         this.props.removeHoverItem();
+    }
+
+    public shouldComponentUpdate(newProps: any) {
+        if (
+            !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+            || !_.isEqual(newProps.exportingPointers, this.props.exportingPointers)
+        ) {
+            return true;
+        }
+        return false;
     }
 
     public componentDidUpdate() {
@@ -47,21 +59,21 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
     }
 
     public render() {
-            return (
-                <div>
-                    <Menu
-                        menuRef={this.menuRef}
-                        blockEditor={this.props.blockEditor}
-                    />
-                    {this.props.children}
-                </div>
-            );
-        }
+        return (
+            <div>
+                <Menu
+                    menuRef={this.menuRef}
+                    blockEditor={this.props.blockEditor}
+                />
+                {this.props.children}
+            </div>
+        );
+    }
 }
 
 export const BlockHoverMenu: any = compose(
     connect(
         ({ blockEditor }) => ({ blockEditor }),
-        {removeHoverItem}
+        { removeHoverItem }
     )
 )(BlockHoverMenuPresentational);
