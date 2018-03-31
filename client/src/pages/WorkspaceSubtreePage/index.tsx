@@ -63,6 +63,28 @@ const ChildrenContainer = styled.div`
     width: 100%;
 `;
 
+const BlockBullet = styled.a`
+    float: left;
+    border-radius: 2px;
+    color: #d0cccc;
+    padding: 0px 4px;
+    margin: 4px 4px 4px 9px;
+    font-weight: 500;
+`;
+
+const BlockContainer = styled.div`
+    flex: 1;
+`;
+
+const BlockEditorContainer = styled.div`
+    float: left;
+`;
+
+const BlocksContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
 const ChildrenBullet = styled.a`
     float: left;
     margin-left: 26px;
@@ -78,74 +100,132 @@ const ChildrenBullet = styled.a`
 const ChildrenCollection = styled.div`
     float: left;
     width: calc(100% - 100px);
+    display: flex;
+    flex-direction: column;
 `;
+
+const ChildContainer = styled.div`
+    flex: 1;
+`;
+
+const Block = ({ character, block, availablePointers, toggle, onChangeToggle }) => {
+    if (!!block.value) {
+        return (
+            <BlockContainer>
+                <BlockBullet href="#!">
+                    {character}
+                </BlockBullet>
+                {toggle &&
+                    <BlockEditorContainer>
+                        <BlockEditor
+                            name={block.id}
+                            blockId={block.id}
+                            readOnly={true}
+                            initialValue={databaseJSONToValue(block.value)}
+                            shouldAutosave={false}
+                            availablePointers={availablePointers}
+                        />
+                    </BlockEditorContainer>
+                }
+            </BlockContainer>
+        );
+    } else {
+        return (<div />);
+    }
+};
+
+export enum toggleTypes {
+    FULL,
+    QUESTION = 0,
+    ANSWER,
+    SCRATCHPAD,
+    CHILDREN,
+}
+
+const Blocks = ({ workspace, availablePointers, toggles, onChangeToggle }) => {
+    const question = workspace.blocks.find((b) => b.type === "QUESTION");
+    const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
+    const answer = workspace.blocks.find((b) => b.type === "ANSWER");
+    return (
+        <div style={{ display: "flexbox" }}>
+            <BlocksContainer>
+                <Block block={question} character={"Q"} availablePointers={availablePointers} toggle={toggles[toggleTypes.QUESTION]} onChangeToggle={onChangeToggle} />
+                <Block block={scratchpad} character={"S"} availablePointers={availablePointers} toggle={toggles[toggleTypes.SCRATCHPAD]} onChangeToggle={onChangeToggle} />
+                <Block block={answer} character={"A"} availablePointers={availablePointers} toggle={toggles[toggleTypes.ANSWER]} onChangeToggle={onChangeToggle} />
+            </BlocksContainer>
+        </div>
+    );
+};
 
 export class Child extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.state = {isOpen: true, isWorkspaceOpen: false, isAnswerOpen: true, isChildrenOpen: true};
+        this.state = {
+            toggles: {
+                [toggleTypes.QUESTION]: true,
+                [toggleTypes.ANSWER]: true,
+                [toggleTypes.SCRATCHPAD]: false,
+                [toggleTypes.CHILDREN]: true,
+            },
+        };
     }
+
+    public handleChangeToggle = (name: toggleTypes, value: boolean) => {
+        const newToggles = { ...this.state.toggles };
+        newToggles[name] = value;
+        this.setState({ toggles: newToggles });
+    }
+
+    public toggleAll = () => {
+        if (this.state.toggles[toggleTypes.QUESTION]) {
+            this.setState({
+                toggles: {
+                    [toggleTypes.QUESTION]: false,
+                    [toggleTypes.ANSWER]: false,
+                    [toggleTypes.SCRATCHPAD]: false,
+                    [toggleTypes.CHILDREN]: false,
+                },
+            });
+        } else {
+            this.setState({
+                toggles: {
+                    [toggleTypes.QUESTION]: true,
+                    [toggleTypes.ANSWER]: true,
+                    [toggleTypes.SCRATCHPAD]: true,
+                    [toggleTypes.CHILDREN]: true,
+                },
+            });
+        }
+    }
+
     public render() {
         const { workspace, availablePointers, workspaces } = this.props;
-        const question = workspace.blocks.find((b) => b.type === "QUESTION");
-        const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
-        const answer = workspace.blocks.find((b) => b.type === "ANSWER");
         const children = workspace.childWorkspaceOrder.map((id) => workspaces.find((w) => w.id === id));
         return (
             <Container>
                 <LeftBulletArea>
-                    <a onClick={(event) => {this.setState({isOpen: !this.state.isOpen}); event.preventDefault(); }} href="#">
-                        <FontAwesomeIcon icon={faCircle}/>
+                    <a onClick={this.toggleAll} href="#!">
+                        <FontAwesomeIcon icon={faCircle} />
                     </a>
                 </LeftBulletArea>
                 <CardBody>
-                    {question.value &&
-                        < BlockEditor
-                            name={question.id}
-                            blockId={question.id}
-                            readOnly={true}
-                            initialValue={databaseJSONToValue(question.value)}
-                            shouldAutosave={false}
-                            availablePointers={this.props.availablePointers}
-                        />
-                    }
-
-                    {this.state.isOpen && scratchpad.value &&
-                        < BlockEditor
-                            name={scratchpad.id}
-                            blockId={scratchpad.id}
-                            readOnly={true}
-                            initialValue={databaseJSONToValue(scratchpad.value)}
-                            shouldAutosave={false}
-                            availablePointers={this.props.availablePointers}
-                        />
-                    }
-
-                    {this.state.isOpen && answer.value &&
-                        < BlockEditor
-                            name={answer.id}
-                            blockId={answer.id}
-                            readOnly={true}
-                            initialValue={databaseJSONToValue(answer.value)}
-                            shouldAutosave={false}
-                            availablePointers={this.props.availablePointers}
-                        />
-                    }
-
-                    <Link to={`/workspaces/${workspace.id}`}>
+                    <Blocks workspace={workspace} availablePointers={availablePointers} toggles={this.state.toggles} onChangeToggle={this.handleChangeToggle} />
+                    {/* <Link to={`/workspaces/${workspace.id}`}>
                         <Button bsSize="xsmall"> Open </Button>
-                    </Link>
+                    </Link> */}
                 </CardBody>
-                {!!children.length && this.state.isOpen && 
+                {!!children.length &&
                     <ChildrenContainer>
-                        <ChildrenBullet href="#" onClick={() => this.setState({isChildrenOpen: !this.state.isChildrenOpen})}>
-                            <FontAwesomeIcon icon={faLongArrowAltRight}/>
+                        <ChildrenBullet href="#!" onClick={() => this.handleChangeToggle(toggleTypes.CHILDREN, !this.state.toggles[toggleTypes.CHILDREN])}>
+                            <FontAwesomeIcon icon={faLongArrowAltRight} />
                         </ChildrenBullet>
-                        {this.state.isChildrenOpen &&
+                        {this.state.toggles[toggleTypes.CHILDREN] &&
                             <ChildrenCollection>
-                            {children.map((child) => (
-                                <Child key={child.id} workspace={child} availablePointers={availablePointers} workspaces={workspaces} />
-                            ))}
+                                {children.map((child) => (
+                                    <ChildContainer key={child.id}>
+                                    <Child workspace={child} availablePointers={availablePointers} workspaces={workspaces} />
+                                    </ChildContainer>
+                                ))}
                             </ChildrenCollection>
                         }
                     </ChildrenContainer>
@@ -172,10 +252,10 @@ export class WorkspaceSubtreePagePresentational extends React.Component<any, any
     }
 }
 
-const options: any = ({ match}) => ({
-    variables: {workspaceId: match.params.workspaceId },
+const options: any = ({ match }) => ({
+    variables: { workspaceId: match.params.workspaceId },
 });
 
 export const WorkspaceSubtreePage = compose(
-    graphql(WORKSPACES_QUERY, {name: "workspaceSubtreeWorkspaces", options }),
+    graphql(WORKSPACES_QUERY, { name: "workspaceSubtreeWorkspaces", options }),
 )(WorkspaceSubtreePagePresentational);
