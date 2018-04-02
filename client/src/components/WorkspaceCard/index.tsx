@@ -36,7 +36,36 @@ const CardBody = styled.div`
     border-radius: 0 2px 2px 2px;
 `;
 
-export class WorkspaceCard extends React.Component<any, any> {
+// TODO: Eventually these should be used in a common file for many cases that use them.
+interface ConnectedPointerType {
+    data: any;
+    isVoid: boolean;
+    object: string;
+    type: string;
+    nodes: any[];
+} 
+
+interface WorkspaceType {
+    blocks: any[];
+    childWorkspaceOrder: string[];
+    connectedPointers: any;
+} 
+
+// Eventually we'll type out many of these items more spefically, but that's a future refactor.
+interface WorkspaceCardProps {
+    workspace: WorkspaceType;
+    workspaces: WorkspaceType[];
+    availablePointers: ConnectedPointerType;
+}
+
+interface WorkspaceCardState {
+    toggles: {
+        [toggleTypes.SCRATCHPAD]: boolean,
+        [toggleTypes.CHILDREN]: boolean,
+    };
+}
+
+export class WorkspaceCard extends React.Component<WorkspaceCardProps, WorkspaceCardState> {
     public constructor(props: any) {
         super(props);
         this.state = {
@@ -58,7 +87,7 @@ export class WorkspaceCard extends React.Component<any, any> {
         return (
             <Container>
                 <CardBody>
-                    <BlockSection workspace={workspace} availablePointers={availablePointers}/>
+                    <BlockSection workspace={workspace} availablePointers={availablePointers} />
                 </CardBody>
                 <ChildrenSection
                     workspace={workspace}
