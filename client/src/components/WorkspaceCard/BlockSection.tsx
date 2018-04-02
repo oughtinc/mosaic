@@ -3,6 +3,9 @@ import * as React from "react";
 import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { toggleTypes } from "./index";
+import Plain from "slate-plain-serializer";
+import Base64 from "slate-base64-serializer";
+import { Value } from "slate";
 
 const BlockBullet = styled.a`
     float: left;
@@ -26,42 +29,44 @@ const BlockSectionContainer = styled.div`
     flex-direction: column;
 `;
 
-const Block = ({ character, block, availablePointers, toggle }) => {
-    if (!!block.value) {
-        return (
+const Block = ({ character, block, availablePointers}) => {
+    if (!block.value) {
+        return (<div/>);
+    }
+    const value = databaseJSONToValue(block.value);
+    const serializedValue =  Plain.serialize(Value.fromJSON(value));
+    if (!serializedValue) {
+        return (<div/>);
+    }
+    return (
             <BlockContainer>
                 <BlockBullet href="#!">
                     {character}
                 </BlockBullet>
-                {toggle &&
-                    <BlockEditorContainer>
-                        <BlockEditor
-                            name={block.id}
-                            blockId={block.id}
-                            readOnly={true}
-                            initialValue={databaseJSONToValue(block.value)}
-                            shouldAutosave={false}
-                            availablePointers={availablePointers}
-                        />
-                    </BlockEditorContainer>
-                }
+                <BlockEditorContainer>
+                    <BlockEditor
+                        name={block.id}
+                        blockId={block.id}
+                        readOnly={true}
+                        initialValue={databaseJSONToValue(block.value)}
+                        shouldAutosave={false}
+                        availablePointers={availablePointers}
+                    />
+                </BlockEditorContainer>
             </BlockContainer>
         );
-    } else {
-        return (<div />);
-    }
 };
 
-export const BlockSection = ({ workspace, availablePointers, toggles }) => {
+export const BlockSection = ({ workspace, availablePointers }) => {
     const question = workspace.blocks.find((b) => b.type === "QUESTION");
     const scratchpad = workspace.blocks.find((b) => b.type === "SCRATCHPAD");
     const answer = workspace.blocks.find((b) => b.type === "ANSWER");
     return (
         <div style={{ display: "flexbox" }}>
             <BlockSectionContainer>
-                <Block block={question} character={"Q"} availablePointers={availablePointers} toggle={toggles[toggleTypes.QUESTION]} />
-                <Block block={scratchpad} character={"S"} availablePointers={availablePointers} toggle={toggles[toggleTypes.SCRATCHPAD]} />
-                <Block block={answer} character={"A"} availablePointers={availablePointers} toggle={toggles[toggleTypes.ANSWER]} />
+                <Block block={question} character={"Q"} availablePointers={availablePointers} />
+                <Block block={scratchpad} character={"S"} availablePointers={availablePointers} />
+                <Block block={answer} character={"A"} availablePointers={availablePointers} />
             </BlockSectionContainer>
         </div>
     );

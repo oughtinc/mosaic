@@ -41,9 +41,7 @@ export class WorkspaceCard extends React.Component<any, any> {
         super(props);
         this.state = {
             toggles: {
-                [toggleTypes.QUESTION]: true,
-                [toggleTypes.ANSWER]: true,
-                [toggleTypes.SCRATCHPAD]: false,
+                [toggleTypes.SCRATCHPAD]: true,
                 [toggleTypes.CHILDREN]: true,
             },
         };
@@ -55,39 +53,12 @@ export class WorkspaceCard extends React.Component<any, any> {
         this.setState({ toggles: newToggles });
     }
 
-    public toggleAll = () => {
-        if (this.state.toggles[toggleTypes.QUESTION]) {
-            this.setState({
-                toggles: {
-                    [toggleTypes.QUESTION]: false,
-                    [toggleTypes.ANSWER]: false,
-                    [toggleTypes.SCRATCHPAD]: false,
-                    [toggleTypes.CHILDREN]: false,
-                },
-            });
-        } else {
-            this.setState({
-                toggles: {
-                    [toggleTypes.QUESTION]: true,
-                    [toggleTypes.ANSWER]: true,
-                    [toggleTypes.SCRATCHPAD]: true,
-                    [toggleTypes.CHILDREN]: true,
-                },
-            });
-        }
-    }
-
     public render() {
         const { workspace, availablePointers, workspaces } = this.props;
         return (
             <Container>
-                <PrimaryBullet>
-                    <a onClick={this.toggleAll} href="#!">
-                        <FontAwesomeIcon icon={faCircle} />
-                    </a>
-                </PrimaryBullet>
                 <CardBody>
-                    <BlockSection workspace={workspace} availablePointers={availablePointers} toggles={this.state.toggles} />
+                    <BlockSection workspace={workspace} availablePointers={availablePointers}/>
                 </CardBody>
                 <ChildrenSection
                     workspace={workspace}
