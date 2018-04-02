@@ -12,7 +12,6 @@ const ChildrenContainer = styled.div`
 
 const Bullet = styled.a`
     float: left;
-    margin-left: 26px;
     background: #f2f2f2;
     border-radius: 2px;
     margin-right: 13px;
