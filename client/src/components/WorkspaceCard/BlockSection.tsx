@@ -2,9 +2,7 @@ import styled from "styled-components";
 import * as React from "react";
 import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
-import { toggleTypes } from "./index";
 import Plain from "slate-plain-serializer";
-import Base64 from "slate-base64-serializer";
 import { Value } from "slate";
 
 const BlockBullet = styled.a`
