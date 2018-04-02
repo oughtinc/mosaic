@@ -38,7 +38,6 @@ interface WorkspaceType {
     connectedPointers: any;
 } 
 
-// Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface WorkspaceCardProps {
     workspace: WorkspaceType;
     workspaces: WorkspaceType[];
