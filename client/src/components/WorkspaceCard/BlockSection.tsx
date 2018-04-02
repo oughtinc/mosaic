@@ -14,14 +14,18 @@ const BlockBullet = styled.a`
     padding: 0px 4px;
     margin: 4px 4px 4px 9px;
     font-weight: 500;
+    flex: 1;
 `;
 
 const BlockContainer = styled.div`
+    display: flex;
+    flex-direction: row;
     flex: 1;
 `;
 
 const BlockEditorContainer = styled.div`
     float: left;
+    flex: 40;
 `;
 
 const BlockSectionContainer = styled.div`
