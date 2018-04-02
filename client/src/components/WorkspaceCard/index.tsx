@@ -1,7 +1,5 @@
 import styled from "styled-components";
 import * as React from "react";
-import FontAwesomeIcon = require("@fortawesome/react-fontawesome");
-import faCircle = require("@fortawesome/fontawesome-free-solid/faCircle");
 import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
 
@@ -15,17 +13,6 @@ export enum toggleTypes {
 
 const Container = styled.div`
     float: left;
-`;
-
-const PrimaryBullet = styled.div`
-    float: left;
-    background: #f2f2f2;
-    border-radius: 2px 0 0 2px;
-    svg {
-        color: #c3c3c3;
-        margin: 5px 5px 2px 5px;
-        cursor: pointer;
-    }
 `;
 
 const CardBody = styled.div`
