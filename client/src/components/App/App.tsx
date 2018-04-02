@@ -3,7 +3,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 
 import Store from "../../store";
 import IndexPage from "../../pages/IndexPage/IndexPage";
-import WorkspacePage from "../../pages/WorkspacePage/WorkspacePage";
+import NodePage from "../../pages/NodePage/NodePage";
 
 import "./App.css";
 
@@ -20,8 +20,8 @@ const Routes: React.SFC<RoutesProps> = routeProps => (
     />
     <Route
       exact={true}
-      path="/workspaces/:workspaceId"
-      render={props => <WorkspacePage {...props} store={routeProps.store} />}
+      path="/nodes/:nodeId"
+      render={props => <NodePage {...props} store={routeProps.store} />}
     />
   </>
 );

@@ -43,31 +43,17 @@ export interface NodeVersionValue {
   nodeId: string | null;
   hyperTextId: string;
   previousVersionId: string | null;
+  linkIds: Array<string>;
 }
 
 export interface NodeVersionRow extends Row {
   value: NodeVersionValue;
 }
 
-// Workspace version
-
-export interface WorkspaceVersionValue {
-  linkIds: Array<string>;
-}
-
-export interface WorkspaceVersionRow {
-  value: WorkspaceVersionValue;
-}
-
-// Workspace
-
-export interface WorkspaceValue {
-  headId: string;
-  consistentId: string;
-}
-
-export interface WorkspaceRow {
-  value: WorkspaceValue;
+export enum NodeVersionTag {
+  Head = "Head",
+  Consistent = "Consistent",
+  Latest = "Latest"
 }
 
 // Link
@@ -85,7 +71,8 @@ export interface LinkRow {
 // Node
 
 export interface NodeValue {
-  headId: string;
+  headId: string | null;
+  consistentId: string | null;
 }
 
 export interface NodeRow {

@@ -96,11 +96,45 @@
     [x] Add react-router
     [x] Link to workspace page from front page
     [x] Display workspace on workspace page
-[ ] Try workspace with sub-workspaces (via child q&a)
+
+[x] try using just nodes and links based on chat with jeff
+    [-] list pros and cons of the two approachess
+        [x] review chat with jeff
+    [x] try to make node-only view work again
+        [x] update fixtures
+            [x] make node version take links as argument
+                - When we make a new workspace node version, we also need to store a new version of all links
+                - that's ok; the same applied when we made a new workspace version
+            [x] make node version take isConsistent argument
+                - could be a property of node versions
+                - this seems better than by having a pointer to the consistent version,
+                  since we can recover history
+            [x] make node version take arguments as object
+        [x] update rendering
+            [x] maybe it's easiest if I mostly start over with a fresh app on the rendering side,
+                copying over previous code where it's useful
+            [x] we'll need to dispatch on node contents to render the workspace page
+                - one drawback of storing consistent on a nodeversion level is that it's more effort to find
+                  the latest consistent version; maybe i should store it for the node after all
+                  [x] in Node, if renderNode isn't specified, display version selector
+                  [x] in Node, only display version selector for available versions
+                  [x] in NodeVersion, if renderNode isn't specified, build node map and pass on renderNode
+                      - replace mock renderer
+                  [x] in Node, only display version selector if renderNode isn't specified
+                  [x] in Dispatch, don't pass mock renderNode to Node from Dispatch
+        [x] remove isRoot from links
+    [x] add workspace route + view back in        
+
+[ ] Clean up code
+    [ ] Rename consistentId -> consistentVersionId, headId -> headVersionId
+    [ ] Untangle responsibilities of NodeVersion component
+
+[ ] Point to child nodes, and expand those + their questions and maybe answers instead of directly pointing to child q+a
 [ ] Look into switching store to redux (maybe +immutable-js)
 [ ] Add functionality
     [ ] Expanding a pointer
     [ ] Basic export/edit functionality
+    [ ] Try workspace with fixed sub-workspaces (via child q&a)    
     [ ] Creating a child workspace
     [ ] Creating a pointer
     [ ] Different stackings of exports and imports
@@ -116,10 +150,18 @@ Later:
 [ ] Computing what's stale
 [ ] Budgets
 [ ] Choosing a workspace to show next
+[ ] Hide childrens' answers by default?
+[ ] consider approaches that avoid infinite cyclic propagation
+    - if you can edit prompts or pointers and you can add new pointers to them, you can create cycles
 
 Maybe:
 [ ] Rename head to snapshot
 [ ] Split hypertext into two representations, array-ref hypertext and associated node ids
+
+
+--------------------------------------------------------------------
+Workspaces+nodes vs just nodes
+
 
 
 --------------------------------------------------------------------

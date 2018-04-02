@@ -9,17 +9,13 @@ import HyperText from "../HyperText/HyperText";
 import Link from "../Link/Link";
 import Node from "../Node/Node";
 import NodeVersion from "../NodeVersion/NodeVersion";
-import WorkspaceVersion from "../WorkspaceVersion/WorkspaceVersion";
-import Workspace from "../Workspace/Workspace";
 import Store from "../../store";
 import {
   Row,
   HyperTextRow,
   HyperTextNode,
   NodeVersionRow,
-  WorkspaceRow,
   NodeRow,
-  WorkspaceVersionRow,
   LinkRow
 } from "../../data/types";
 
@@ -59,33 +55,19 @@ const Dispatch: React.SFC<DispatchProps> = ({ object, store }) => {
       />
     );
   }
-  if (object.type === "WorkspaceVersion") {
-    return (
-      <WorkspaceVersion
-        value={(object as WorkspaceVersionRow).value}
-        store={store}
-      />
-    );
-  }
   if (object.type === "Node") {
     return (
+      <div>
       <Node
         value={(object as NodeRow).value}
         store={store}
-        renderNode={mockRenderNode}
       />
-    );
-  }
-  if (object.type === "Workspace") {
-    return (
-      <div>
-        <Workspace value={(object as WorkspaceRow).value} store={store} />
-        <RouterLink
-          to={`/workspaces/${object.id}`}
-          className="Dispatch-Workspace-Link"
-        >
-          →
-        </RouterLink>
+    <RouterLink
+      to={`/nodes/${object.id}`}
+      className="Dispatch-Node-Link"
+    >
+      →
+    </RouterLink>      
       </div>
     );
   }

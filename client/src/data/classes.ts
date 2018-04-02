@@ -8,71 +8,15 @@ function getId() {
   return id.toString();
 }
 
-export class Workspace implements Identifiable, Serializable {
-  public id: string;
-
-  constructor(
-    public head: WorkspaceVersion,
-    public consistent: WorkspaceVersion
-  ) {
-    this.id = getId();
-  }
-
-  setHead(workspaceVersion: WorkspaceVersion) {
-    this.head = workspaceVersion;
-  }
-
-  serialize(): Row[] {
-    return [
-      {
-        type: "Workspace",
-        id: this.id,
-        value: {
-          headId: this.head.id,
-          consistentId: this.consistent.id
-        }
-      }
-    ]
-      .concat(this.head.serialize())
-      .concat(this.consistent.serialize());
-  }
-}
-
-export class WorkspaceVersion implements Identifiable, Serializable {
-  public id: string;
-
-  constructor(private links: Array<Link>) {
-    this.id = getId();
-  }
-
-  serialize(): Row[] {
-    return [
-      {
-        type: "WorkspaceVersion",
-        id: this.id,
-        value: {
-          linkIds: this.links.map(link => link.id)
-        }
-      }
-    ].concat(_.flatten(this.links.map(link => link.serialize())));
-  }
-}
-
 export class Link implements Identifiable, Serializable {
   public id: string;
+  private nodeVersion: NodeVersion;
   private access: LinkAccess;
-  private isRoot: boolean;
 
-  constructor(
-    private nodeVersion: NodeVersion,
-    options: {
-      access: LinkAccess;
-      isRoot: boolean;
-    }
-  ) {
+  constructor(options: { nodeVersion: NodeVersion; access: LinkAccess }) {
     this.id = getId();
+    this.nodeVersion = options.nodeVersion;
     this.access = options.access;
-    this.isRoot = options.isRoot;
   }
 
   serialize(): Row[] {
@@ -82,8 +26,7 @@ export class Link implements Identifiable, Serializable {
         id: this.id,
         value: {
           nodeVersionId: this.nodeVersion.id,
-          access: this.access,
-          isRoot: this.isRoot
+          access: this.access
         }
       }
     ].concat(this.nodeVersion.serialize());
@@ -98,14 +41,20 @@ export enum LinkAccess {
 export class Node implements Identifiable, Serializable {
   public id: string;
   public head: NodeVersion | null;
+  public consistent: NodeVersion | null;
 
   constructor() {
     this.id = getId();
     this.head = null;
+    this.consistent = null;
   }
 
   setHead(nodeVersion: NodeVersion) {
     this.head = nodeVersion;
+  }
+
+  setConsistent(nodeVersion: NodeVersion) {
+    this.consistent = nodeVersion;
   }
 
   serialize(): Row[] {
@@ -114,22 +63,34 @@ export class Node implements Identifiable, Serializable {
         type: "Node",
         id: this.id,
         value: {
-          headId: this.head ? this.head.id : null
+          headId: this.head ? this.head.id : null,
+          consistentId: this.consistent ? this.consistent.id : null
         }
       }
-    ].concat(this.head ? this.head.serialize() : []);
+    ]
+      .concat(this.head ? this.head.serialize() : [])
+      .concat(this.consistent ? this.consistent.serialize() : []);
   }
 }
 
 export class NodeVersion implements Identifiable, Serializable {
   public id: string;
+  private node: Node;
+  private hyperText: HyperText;
+  private previousVersion: NodeVersion | null;
+  private links: Array<Link>;
 
-  constructor(
-    private node: Node,
-    private hyperText: HyperText,
-    private previousVersion: NodeVersion | null
-  ) {
+  constructor(options: {
+    node: Node;
+    hyperText: HyperText;
+    previousVersion?: NodeVersion;
+    links?: Array<Link>;
+  }) {
     this.id = getId();
+    this.node = options.node;
+    this.hyperText = options.hyperText;
+    this.previousVersion = options.previousVersion || null;
+    this.links = options.links || [];
   }
 
   serialize(): Row[] {
@@ -142,12 +103,14 @@ export class NodeVersion implements Identifiable, Serializable {
           hyperTextId: this.hyperText.id,
           previousVersionId: this.previousVersion
             ? this.previousVersion.id
-            : null
+            : null,
+          linkIds: this.links.map(link => link.id)
         }
       }
     ]
       .concat(this.hyperText.serialize())
-      .concat(this.previousVersion ? this.previousVersion.serialize() : []);
+      .concat(this.previousVersion ? this.previousVersion.serialize() : [])
+      .concat(_.flatten(this.links.map(link => link.serialize())));
   }
 }
 
