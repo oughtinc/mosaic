@@ -24,7 +24,12 @@ query workspaceSubtree($workspaceId: String!){
 export class WorkspaceSubtreePagePresentational extends React.Component<any, any> {
     public render() {
         const workspaces = _.get(this.props, "workspaceSubtreeWorkspaces.subtreeWorkspaces") || [];
-        const availablePointers: any = _.flatten(workspaces.map((w) => w.connectedPointers));
+        const availablePointers: any = _
+          .chain(workspaces)
+          .map((w: any) => w.connectedPointers)
+          .flatten()
+          .uniqBy((p: any) => p.data.pointerId)
+          .value();
         const rootWorkspace = workspaces.find((w) => w.id === this.props.match.params.workspaceId);
         return (
             <div>
