@@ -132,20 +132,20 @@ let schema = new GraphQLSchema({
       },
       createWorkspace: {
         type: workspaceType,
-        args: { question: { type: GraphQLJSON } },
-        resolve: async (_, { question }) => {
+        args: { question: { type: GraphQLJSON }, budget: {type: GraphQLInt} },
+        resolve: async (_, { question, budget }) => {
           const event = await models.Event.create()
-          const workspace = await models.Workspace.create({}, { event, questionValue: JSON.parse(question) })
+          const workspace = await models.Workspace.create({budget}, { event, questionValue: JSON.parse(question) })
           return workspace
         }
       },
       createChildWorkspace: {
         type: workspaceType,
-        args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON } },
-        resolve: async (_, { workspaceId, question }) => {
+        args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, budget: {type: GraphQLInt} },
+        resolve: async (_, { workspaceId, question, budget }) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const event = await models.Event.create()
-          const child = await workspace.createChild({ event, question: JSON.parse(question) })
+          const child = await workspace.createChild({ event, question: JSON.parse(question), budget })
           return child
         }
       },

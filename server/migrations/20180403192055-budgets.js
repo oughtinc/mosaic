@@ -8,7 +8,7 @@ module.exports = {
       {
         type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 0
+        defaultValue: 1
       }
     );
   },
