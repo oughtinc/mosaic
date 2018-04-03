@@ -1,6 +1,6 @@
 'use strict';
 const Sequelize = require('sequelize')
-import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
+import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
 const Op = Sequelize.Op;
 import * as _ from "lodash";
 
@@ -23,11 +23,11 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       allowNull: false
     },
     connectedPointers: {
-      type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']), 
-      get: async function() {
+      type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']),
+      get: async function () {
         const _connectedPointers = await this.getConnectedPointers();
-        let values:any = []
-        for (const pointer of _connectedPointers){
+        let values: any = []
+        for (const pointer of _connectedPointers) {
           const value = await pointer.value
           if (value) {
             values.push(value)
@@ -41,15 +41,15 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   }, {
       hooks: {
         ...eventHooks.beforeValidate,
-        afterCreate: async (workspace, {event, questionValue}) => {
+        afterCreate: async (workspace, { event, questionValue }) => {
           const blocks = await workspace.getBlocks();
           if (questionValue) {
-            await workspace.createBlock({type: "QUESTION", value: questionValue}, {event})
+            await workspace.createBlock({ type: "QUESTION", value: questionValue }, { event })
           } else {
-            await workspace.createBlock({type: "QUESTION"}, {event})
+            await workspace.createBlock({ type: "QUESTION" }, { event })
           }
-          await workspace.createBlock({type: "SCRATCHPAD"}, {event})
-          await workspace.createBlock({type: "ANSWER"}, {event})
+          await workspace.createBlock({ type: "SCRATCHPAD" }, { event })
+          await workspace.createBlock({ type: "ANSWER" }, { event })
         },
       }
     });
@@ -61,34 +61,45 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     addEventAssociations(Workspace, models)
   }
 
-  Workspace.createAsChild = async function ({parentId, question}, {event}) {
-    const _workspace = await sequelize.models.Workspace.create({parentId}, {event, questionValue:question})
+  Workspace.createAsChild = async function ({ parentId, question }, { event }) {
+    const _workspace = await sequelize.models.Workspace.create({ parentId }, { event, questionValue: question })
     return _workspace
   }
+
+  Workspace.prototype.subtreeWorkspaces = async function () {
+    const directChildren = await this.getChildWorkspaces();
+    let allChildren = [...directChildren];
+    for (const child of directChildren) {
+      const subchildren = await child.subtreeWorkspaces();
+      allChildren = [...allChildren, ...subchildren]
+    }
+    return allChildren
+  }
+
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceOrder, element]
   }
 
-  Workspace.prototype.updatePointerImports = async function (pointerIds, {event}) {
+  Workspace.prototype.updatePointerImports = async function (pointerIds, { event }) {
     const pointerImports = await this.getPointerImports()
-    for (const pointerId of _.uniq(pointerIds)){
-      if (!_.includes(pointerImports.map(p => p.pointerId), pointerId)){
+    for (const pointerId of _.uniq(pointerIds)) {
+      if (!_.includes(pointerImports.map(p => p.pointerId), pointerId)) {
         const pointer = await sequelize.models.Pointer.findById(pointerId);
         if (!pointer) {
-          console.error ("The relevant pointer for pointer import ", pointerId, " does not exist.")
+          console.error("The relevant pointer for pointer import ", pointerId, " does not exist.")
         } else {
-          await this.createPointerImport({pointerId}, {event})
+          await this.createPointerImport({ pointerId }, { event })
         }
       }
     }
   }
 
-  Workspace.prototype.createChild = async function ({event, question}) {
-    const child = await sequelize.models.Workspace.createAsChild({parentId: this.id, question}, {event})
+  Workspace.prototype.createChild = async function ({ event, question }) {
+    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question }, { event })
     await this.update({
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
-    }, {event})
+    }, { event })
     return child
   }
 
@@ -96,7 +107,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   Workspace.prototype.getConnectedPointers = async function () {
     const blocks = await this.visibleBlocks()
     let _connectedPointers: string[] = []
-    for (const block of blocks){
+    for (const block of blocks) {
       const blockPointerIds = await block.connectedPointers()
       _connectedPointers = [..._connectedPointers, ...blockPointerIds]
     }

@@ -13,6 +13,7 @@ import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
+import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
 const { SERVER_URL } = process.env;
 
@@ -35,6 +36,7 @@ const Routes = () => (
   <div>
     <Route exact={true} path="/" component={RootWorkspacePage} />
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
+    <Route exact={true} path="/workspaces/:workspaceId/subtree" component={WorkspaceSubtreePage} />
   </div>
 );
 
