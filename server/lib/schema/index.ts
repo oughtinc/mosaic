@@ -90,6 +90,15 @@ let schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(models.Workspace)
       },
+      subtreeWorkspaces: {
+        type: new GraphQLList(workspaceType),
+        args: { workspaceId: { type: GraphQLString } },
+        resolve: async (_, { workspaceId }) => {
+          const rootWorkspace = await models.Workspace.findById(workspaceId)
+          const children = await rootWorkspace.subtreeWorkspaces();
+          return [rootWorkspace, ...children]
+        },
+      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(new GraphQLList(pointerType), models.Pointer),
       events: modelGraphQLFields(new GraphQLList(eventType), models.Event),
