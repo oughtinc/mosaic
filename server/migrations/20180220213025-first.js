@@ -41,7 +41,7 @@ module.exports = {
           key: "id"
         }
       }
-    }
+    };
 
     await queryInterface.createTable('Events', {
       id: {
@@ -63,7 +63,7 @@ module.exports = {
           key: "id"
         }
       }
-    })
+    });
 
     await queryInterface.createTable('Workspaces', {
       ...standardColumns,
