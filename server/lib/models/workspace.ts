@@ -22,6 +22,11 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       defaultValue: false,
       allowNull: false
     },
+    budget: {
+      type: DataTypes.INTEGER(),
+      defaultValue: 1,
+      allowNull: false
+    },
     connectedPointers: {
       type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']),
       get: async function () {
@@ -61,8 +66,8 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     addEventAssociations(Workspace, models)
   }
 
-  Workspace.createAsChild = async function ({ parentId, question }, { event }) {
-    const _workspace = await sequelize.models.Workspace.create({ parentId }, { event, questionValue: question })
+  Workspace.createAsChild = async function ({ parentId, question, budget}, { event }) {
+    const _workspace = await sequelize.models.Workspace.create({ parentId, budget }, { event, questionValue: question })
     return _workspace
   }
 
@@ -95,9 +100,14 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     }
   }
 
-  Workspace.prototype.createChild = async function ({ event, question }) {
-    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question }, { event })
+  Workspace.prototype.createChild = async function ({ event, question, budget }) {
+    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, budget }, { event })
+    const newBudget = this.budget - child.budget;
+    if (newBudget < 0){
+      throw new Error(`Parent workspace does not have enough budget. Has: ${this.budget}. Needs: ${child.budget}.`)
+    }
     await this.update({
+      budget: newBudget,
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
     }, { event })
     return child

@@ -32,8 +32,8 @@ const WORKSPACES_QUERY = gql`
  `;
 
 const CREATE_ROOT_WORKSPACE = gql`
-  mutation createWorkspace($question:JSON){
-    createWorkspace(question:$question ){
+  mutation createWorkspace($question:JSON, $budget: Int){
+    createWorkspace(question:$question, budget:$budget ){
         id
         parentId
         childWorkspaceOrder
@@ -89,7 +89,10 @@ class NewWorkspaceForm extends React.Component<any, any> {
         return (
             <div>
                 <h3> New Root Workspace </h3>
-                <NewBlockForm onMutate={this.props.onCreateWorkspace} />
+                <NewBlockForm
+                    maxBudget={10000}
+                    onMutate={this.props.onCreateWorkspace}
+                />
             </div>
         );
     }
@@ -105,7 +108,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                     <ParentWorkspace workspace={w} key={w.id} />
                 ))}
                 <NewWorkspaceForm
-                    onCreateWorkspace={(question) => { this.props.createWorkspace({ variables: { question } }); }}
+                    onCreateWorkspace={({ question, budget }) => { this.props.createWorkspace({ variables: { question, budget } }); }}
                 />
             </BlockHoverMenu>
         );
