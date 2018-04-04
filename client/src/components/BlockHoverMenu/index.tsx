@@ -20,17 +20,6 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
         this.props.removeHoverItem();
     }
 
-    public shouldComponentUpdate(newProps: any) {
-        if (
-            !_.isEqual(newProps.blockEditor, this.props.blockEditor)
-            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
-            || !_.isEqual(newProps.exportingPointers, this.props.exportingPointers)
-        ) {
-            return true;
-        }
-        return false;
-    }
-
     public componentDidUpdate() {
         this.updateMenu();
     }

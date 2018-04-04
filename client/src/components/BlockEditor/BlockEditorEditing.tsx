@@ -84,16 +84,16 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         this.state = { hasChangedSinceDatabaseSave: false };
     }
 
-    public shouldComponentUpdate(newProps: any) {
-        if (
-            !_.isEqual(newProps.blockEditor, this.props.blockEditor)
-            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
-            || !_.isEqual(newProps.block, this.props.block)
-        ) {
-            return true;
-        }
-        return false;
-    }
+    // public shouldComponentUpdate(newProps: any) {
+    //     if (
+    //         !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+    //         || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+    //         || !_.isEqual(newProps.block, this.props.block)
+    //     ) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     public componentWillMount() {
         this.props.onMount(this);

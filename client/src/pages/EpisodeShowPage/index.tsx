@@ -132,7 +132,7 @@ export class FormPagePresentational extends React.Component<any, any> {
         const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers, ...readOnlyExportedPointers], (p) => p.data.pointerId);
         return (
             <div key={workspace.id}>
-                <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
+                <BlockHoverMenu>
                     <Row>
                         <Col sm={10}>
                             {workspace.parentId &&
