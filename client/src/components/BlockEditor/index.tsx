@@ -171,10 +171,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
             onKeyDown={this.props.onKeyDown}
             onMount={(input) => { this.blockEditorEditing = input; }}
           />
-          <Menu
+          {/* <Menu
             menuRef={this.menuRef}
             blockEditor={this.props.blockEditor}
-          />
+          /> */}
         </div>
       );
     }
