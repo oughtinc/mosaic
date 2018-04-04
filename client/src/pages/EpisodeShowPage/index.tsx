@@ -193,7 +193,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                             />
                         </Col>
                     </Row>
-                </BlockHoverMenu>;
+                </BlockHoverMenu>
             </div >
         );
     }

@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Button, Badge, FormControl } from "react-bootstrap";
+import { Button, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
