@@ -1,11 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Button, Badge, ProgressBar, FormControl, Col, Row } from "react-bootstrap";
+import { Button, Badge, FormControl } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
-import _ = require("lodash");
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
@@ -23,7 +22,6 @@ const FormStyle = styled.div`
   border-radius: 2px;
 `;
 
-// const TransferForm = 
 export class TransferForm extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
@@ -33,38 +31,38 @@ export class TransferForm extends React.Component<any, any> {
     public render() {
         return (
             <FormStyle>
-            <div style={{width: "100px", float: "left"}}>
-                <FormControl
-                    type="number"
-                    autoFocus={true}
-                    value={this.state.value}
-                    placeholder="0"
-                    min={this.props.min}
-                    max={this.props.max}
-                    onChange={(e: any) => {
-                        const { value } = e.target;
-                        this.setState({ value: value });
-                    }}
-                />
-            </div>
-            {`${this.props.min} to ${this.props.max}`}
+                <div style={{ width: "100px", float: "left" }}>
+                    <FormControl
+                        type="number"
+                        autoFocus={true}
+                        value={this.state.value}
+                        placeholder="0"
+                        min={this.props.min}
+                        max={this.props.max}
+                        onChange={(e: any) => {
+                            const { value } = e.target;
+                            this.setState({ value: value });
+                        }}
+                    />
+                </div>
+                {`${this.props.min} to ${this.props.max}`}
 
-            <div style={{float: "left"}}>
-            <Button
-                onClick={() => {
-                    this.props.onSubmit(parseInt(this.state.value, 10));
-                    this.props.onClose();
-                }}
-                disabled={!this.isValid()}
-            >
-                Submit
-            </Button>
-            <Button
-                onClick={this.props.onClose}
-            >
-               Close 
-            </Button>
-            </div>
+                <div style={{ float: "left" }}>
+                    <Button
+                        onClick={() => {
+                            this.props.onSubmit(parseInt(this.state.value, 10));
+                            this.props.onClose();
+                        }}
+                        disabled={!this.isValid()}
+                    >
+                        Submit
+                    </Button>
+                    <Button
+                        onClick={this.props.onClose}
+                    >
+                        Close
+                    </Button>
+                </div>
             </FormStyle>
         );
     }
@@ -112,7 +110,7 @@ export class Child extends React.Component<any, any> {
                 </Button>
                     {!this.state.showTransferForm &&
                         <Button onClick={() => { this.setState({ showTransferForm: true }); }}>
-                           Edit Allocation 
+                            Edit Allocation
                     </Button>
                     }
                     <div style={{ float: "right" }}>
@@ -123,9 +121,9 @@ export class Child extends React.Component<any, any> {
                     <TransferForm
                         initialValue={workspace.totalBudget}
                         min={workspace.allocatedBudget}
-                        max={workspace.totalBudget + this.props.parentAvailableBudget}
+                        max={parseInt(workspace.totalBudget, 10) + parseInt(this.props.parentAvailableBudget, 10)}
                         onSubmit={(totalBudget) => { this.props.onUpdateChildTotalBudget({ childId: workspace.id, totalBudget }); }}
-                        onClose={() => this.setState({showTransferForm: false})}
+                        onClose={() => this.setState({ showTransferForm: false })}
                     />
                 }
             </ChildStyle>

@@ -2,7 +2,7 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { Row, Col, Button, Badge, ProgressBar } from "react-bootstrap";
+import { Row, Col, Button, Badge } from "react-bootstrap";
 import { connect } from "react-redux";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
