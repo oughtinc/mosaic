@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
+import { ChildBudgetForm } from "./ChildBudgetForm";
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
@@ -14,70 +15,10 @@ const ChildStyle = styled.div`
     width: 100%;
 `;
 
-const FormStyle = styled.div`
-  margin-top: 10px;
-  background: #eee;
-  padding: 10px;
-  float: left;
-  border-radius: 2px;
-`;
-
-export class TransferForm extends React.Component<any, any> {
-    public constructor(props: any) {
-        super(props);
-        this.state = { value: this.props.initialValue };
-    }
-
-    public render() {
-        return (
-            <FormStyle>
-                <div style={{ width: "100px", float: "left" }}>
-                    <FormControl
-                        type="number"
-                        autoFocus={true}
-                        value={this.state.value}
-                        placeholder="0"
-                        min={this.props.min}
-                        max={this.props.max}
-                        onChange={(e: any) => {
-                            const { value } = e.target;
-                            this.setState({ value: value });
-                        }}
-                    />
-                </div>
-                {`${this.props.min} to ${this.props.max}`}
-
-                <div style={{ float: "left" }}>
-                    <Button
-                        onClick={() => {
-                            this.props.onSubmit(parseInt(this.state.value, 10));
-                            this.props.onClose();
-                        }}
-                        disabled={!this.isValid()}
-                    >
-                        Submit
-                    </Button>
-                    <Button
-                        onClick={this.props.onClose}
-                    >
-                        Close
-                    </Button>
-                </div>
-            </FormStyle>
-        );
-    }
-
-    private isValid() {
-        const valueAsInt = parseInt(this.state.value, 10);
-        const inRange = (valueAsInt >= this.props.min && valueAsInt <= this.props.max);
-        return !!valueAsInt && inRange;
-    }
-}
-
 export class Child extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.state = { showTransferForm: false };
+        this.state = { showChildBudgetForm: false };
     }
 
     public render() {
@@ -108,8 +49,8 @@ export class Child extends React.Component<any, any> {
                     <Button onClick={this.props.onDelete}>
                         Archive
                 </Button>
-                    {!this.state.showTransferForm &&
-                        <Button onClick={() => { this.setState({ showTransferForm: true }); }}>
+                    {!this.state.showChildBudgetForm &&
+                        <Button onClick={() => { this.setState({ showChildBudgetForm: true }); }}>
                             Edit Allocation
                     </Button>
                     }
@@ -117,13 +58,13 @@ export class Child extends React.Component<any, any> {
                         <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
                     </div>
                 </div>
-                {this.state.showTransferForm &&
-                    <TransferForm
+                {this.state.showChildBudgetForm &&
+                    <ChildBudgetForm
                         initialValue={workspace.totalBudget}
                         min={workspace.allocatedBudget}
                         max={parseInt(workspace.totalBudget, 10) + parseInt(this.props.parentAvailableBudget, 10)}
                         onSubmit={(totalBudget) => { this.props.onUpdateChildTotalBudget({ childId: workspace.id, totalBudget }); }}
-                        onClose={() => this.setState({ showTransferForm: false })}
+                        onClose={() => this.setState({ showChildBudgetForm: false })}
                     />
                 }
             </ChildStyle>
