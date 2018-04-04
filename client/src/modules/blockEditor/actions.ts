@@ -116,33 +116,3 @@ export const removeExportOfSelection = () => {
     }
   };
 };
-
-export const removeImportOfSelection = () => {
-  return async (dispatch, getState) => {
-    const {blocks, blockEditor} = await getState();
-    const {hoveredItem} = blockEditor;
-
-    const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
-    if (block) {
-      const inline = block.value.document.getInlinesAsArray().find((i) => i.data.internalReferenceId === hoveredItem.internalReferenceId);
-      if (!inline) {
-        console.error("inline not found");
-        return;
-      }
-      const change = block.value.change().removeNodeByKey(inline.key);
-
-      dispatch({
-        type: UPDATE_BLOCK,
-        id: block.id,
-        value: change.value,
-      });
-
-      dispatch({
-        type: CHANGE_HOVERED_ITEM,
-        hoverItemType: "NONE",
-      });
-    } else {
-      console.error("Block was not found from action");
-    }
-  };
-};
