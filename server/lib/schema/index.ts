@@ -156,7 +156,6 @@ let schema = new GraphQLSchema({
           const event = await models.Event.create()
           const workspace = await models.Workspace.findById(workspaceId)
           const child = await models.Workspace.findById(childId)
-          console.log("FOUND CHILD", child)
           await workspace.changeAllocationToChild(child, totalBudget, {event})
         }
       },
