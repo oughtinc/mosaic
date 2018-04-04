@@ -103,25 +103,24 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return [...this.childWorkspaceOrder, element]
   }
 
-  Workspace.prototype.changeAllocationToChild = async function (otherWorkspace: any, amount: number, { event }) {
-    if ((amount > 0) && (this.remainingBudget < amount)) {
-      throw new Error(`Parent workspace does not have enough remainingBudget for allocation. Has: ${this.remainingBudget}. Needs: ${amount}.`)
+  Workspace.prototype.changeAllocationToChild = async function (childWorkspace: any, newTotalBudget: number, { event }) {
+    const budgetToAddToChild = newTotalBudget - childWorkspace.totalBudget
+    
+    const childHasNecessaryBudget = newTotalBudget >= childWorkspace.allocatedBudget
+    if (!childHasNecessaryBudget){
+      throw new Error(`Child workspace allocated budget ${childWorkspace.allocatedBudget} exceeds new totalBudget ${newTotalBudget}`)
     }
 
-    if ((amount < 0) && (otherWorkspace.totalBudget + amount < 0 )) {
-      throw new Error(`Child workspace does not have enough totalBudget for negative allocation. Has: ${otherWorkspace.totalBudget}. Needs: ${amount * -1}.`)
+    const parentHasNeccessaryRemainingBudget = this.remainingBudget - budgetToAddToChild >= 0
+    if (!parentHasNeccessaryRemainingBudget) {
+      throw new Error(`This workspace does not have the allocated budget necessary for child to get ${budgetToAddToChild} difference`)
     }
 
-    const newAllocatedBudget = this.allocatedBudget + amount;
+    await childWorkspace.update({totalBudget: newTotalBudget}, {event})
 
     await this.update({
-      allocatedBudget: newAllocatedBudget,
+      allocatedBudget: this.allocatedBudget + budgetToAddToChild,
     }, { event })
-
-    const newOtherWorkspaceTotalBudget = otherWorkspace.totalBudget + amount;
-    await otherWorkspace.update({
-      totalBudget: newOtherWorkspaceTotalBudget
-    }, {event})
   }
 
   Workspace.prototype.updatePointerImports = async function (pointerIds, { event }) {
