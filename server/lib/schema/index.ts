@@ -149,6 +149,19 @@ let schema = new GraphQLSchema({
           return child
         }
       },
+      transferBudget: {
+        type: workspaceType,
+        args: { workspaceId: { type: GraphQLString }, toWorkspaceId: { type: GraphQLString }, amount: { type: GraphQLInt } },
+        resolve: async (_, { workspaceId, toWorkspaceId, amount }) => {
+          if (amount === 0){
+            throw new Error('Cannot transfer 0 amount.')
+          }
+          const event = await models.Event.create()
+          const workspace = await models.Workspace.findById(workspaceId)
+          const toWorkspace = await models.Workspace.findById(toWorkspaceId)
+          await workspace.changeAllocationToChild(toWorkspace, amount, {event})
+        }
+      },
     }
   })
 });
