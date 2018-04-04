@@ -90,6 +90,15 @@ let schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(models.Workspace)
       },
+      subtreeWorkspaces: {
+        type: new GraphQLList(workspaceType),
+        args: { workspaceId: { type: GraphQLString } },
+        resolve: async (_, { workspaceId }) => {
+          const rootWorkspace = await models.Workspace.findById(workspaceId)
+          const children = await rootWorkspace.subtreeWorkspaces();
+          return [rootWorkspace, ...children]
+        },
+      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(new GraphQLList(pointerType), models.Pointer),
       events: modelGraphQLFields(new GraphQLList(eventType), models.Event),
@@ -123,21 +132,31 @@ let schema = new GraphQLSchema({
       },
       createWorkspace: {
         type: workspaceType,
-        args: { question: { type: GraphQLJSON } },
-        resolve: async (_, { question }) => {
+        args: { question: { type: GraphQLJSON }, totalBudget: {type: GraphQLInt} },
+        resolve: async (_, { question, totalBudget }) => {
           const event = await models.Event.create()
-          const workspace = await models.Workspace.create({}, { event, questionValue: JSON.parse(question) })
+          const workspace = await models.Workspace.create({totalBudget}, { event, questionValue: JSON.parse(question) })
           return workspace
         }
       },
       createChildWorkspace: {
         type: workspaceType,
-        args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON } },
-        resolve: async (_, { workspaceId, question }) => {
+        args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, totalBudget: {type: GraphQLInt} },
+        resolve: async (_, { workspaceId, question, totalBudget }) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const event = await models.Event.create()
-          const child = await workspace.createChild({ event, question: JSON.parse(question) })
+          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget })
           return child
+        }
+      },
+      updateChildTotalBudget: {
+        type: workspaceType,
+        args: { workspaceId: { type: GraphQLString }, childId: { type: GraphQLString }, totalBudget: { type: GraphQLInt } },
+        resolve: async (_, { workspaceId, childId, totalBudget }) => {
+          const event = await models.Event.create()
+          const workspace = await models.Workspace.findById(workspaceId)
+          const child = await models.Workspace.findById(childId)
+          await workspace.changeAllocationToChild(child, totalBudget, {event})
         }
       },
     }
