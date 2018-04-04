@@ -2,7 +2,7 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { Row, Col, Button } from "react-bootstrap";
+import { Row, Col, Button, Badge } from "react-bootstrap";
 import { connect } from "react-redux";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
@@ -25,8 +25,12 @@ const WORKSPACE_QUERY = gql`
           parentId
           childWorkspaceOrder
           connectedPointers
+          totalBudget
+          allocatedBudget
           childWorkspaces{
             id
+            totalBudget
+            allocatedBudget
             blocks{
               id
               value
@@ -61,8 +65,16 @@ const UPDATE_WORKSPACE = gql`
 `;
 
 const NEW_CHILD = gql`
-  mutation createChildWorkspace($workspaceId:String, $question:JSON){
-    createChildWorkspace(workspaceId:$workspaceId, question:$question ){
+  mutation createChildWorkspace($workspaceId:String, $question:JSON, $totalBudget: Int){
+    createChildWorkspace(workspaceId:$workspaceId, question:$question, totalBudget: $totalBudget ){
+        id
+    }
+  }
+`;
+
+const UPDATE_CHILD_TOTAL_BUDGET = gql`
+  mutation updateChildTotalBudget($workspaceId:String!, $childId:String!, $totalBudget: Int){
+    updateChildTotalBudget(workspaceId:$workspaceId, childId:$childId, totalBudget: $totalBudget ){
         id
     }
   }
@@ -71,6 +83,12 @@ const NEW_CHILD = gql`
 const ParentLink = (props) => (
     <Link to={`/workspaces/${props.parentId}`}>
         <Button>To Parent</Button>
+    </Link>
+);
+
+const SubtreeLink = ({workspace}) => (
+    <Link to={`/workspaces/${workspace.id}/subtree`}>
+        <Button>To Subtree</Button>
     </Link>
 );
 
@@ -116,10 +134,22 @@ export class FormPagePresentational extends React.Component<any, any> {
             <div key={workspace.id}>
                 <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
                     <Row>
-                        <Col sm={12}>
+                        <Col sm={10}>
                             {workspace.parentId &&
                                 <ParentLink parentId={workspace.parentId} />
                             }
+                            {workspace && 
+                                <SubtreeLink workspace={workspace} />
+                            }
+                        </Col>
+                        <Col sm={2}>
+                            {workspace &&
+                            <div style={{float: "right"}}>
+                                Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
+                            </div>
+                            }
+                        </Col>
+                        <Col sm={12}>
                             <h1>
                                 <BlockEditor
                                     availablePointers={availablePointers}
@@ -155,7 +185,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
-                                onCreateChild={(question) => { this.props.createChild({ variables: { workspaceId: workspace.id, question } }); }}
+                                onCreateChild={({question, totalBudget}) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
+                                onUpdateChildTotalBudget={({childId, totalBudget}) => {this.props.updateChildTotalBudget({variables: {workspaceId: workspace.id, childId, totalBudget}}); }}
+                                availableBudget={workspace.totalBudget - workspace.allocatedBudget}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
                                 ref={(input) => {if (input && input.editor()) { this.newChildField = input.editor(); }}}
                             />
@@ -205,6 +237,13 @@ export const EpisodeShowPage = compose(
     }),
     graphql(NEW_CHILD, {
         name: "createChild", options: {
+            refetchQueries: [
+                "workspace",
+            ],
+        },
+    }),
+    graphql(UPDATE_CHILD_TOTAL_BUDGET, {
+        name: "updateChildTotalBudget", options: {
             refetchQueries: [
                 "workspace",
             ],
