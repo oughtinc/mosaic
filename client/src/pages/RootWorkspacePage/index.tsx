@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
-import { Button, Col, Row } from "react-bootstrap";
+import { Button, Col, Row, ProgressBar, Badge } from "react-bootstrap";
 import styled from "styled-components";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
@@ -22,6 +22,8 @@ const WORKSPACES_QUERY = gql`
           id
           parentId
           childWorkspaceOrder
+          totalBudget 
+          allocatedBudget 
           blocks{
               id
               value
@@ -32,11 +34,13 @@ const WORKSPACES_QUERY = gql`
  `;
 
 const CREATE_ROOT_WORKSPACE = gql`
-  mutation createWorkspace($question:JSON, $budget: Int){
-    createWorkspace(question:$question, budget:$budget ){
+  mutation createWorkspace($question:JSON, $totalBudget: Int){
+    createWorkspace(question:$question, totalBudget:$totalBudget ){
         id
         parentId
         childWorkspaceOrder
+        totalBudget 
+        allocatedBudget 
         blocks{
             id
             value
@@ -52,7 +56,7 @@ const ParentWorkspace = ({ workspace }) => {
     return (
         <WorkspaceStyle>
             <Row>
-                <Col sm={5}>
+                <Col sm={4}>
                     {question && question.value &&
                         <BlockEditor
                             name={question.id}
@@ -63,7 +67,7 @@ const ParentWorkspace = ({ workspace }) => {
                         />
                     }
                 </Col>
-                <Col sm={5}>
+                <Col sm={4}>
                     {answer && answer.value &&
                         <BlockEditor
                             name={answer.id}
@@ -75,6 +79,18 @@ const ParentWorkspace = ({ workspace }) => {
                     }
                 </Col>
                 <Col sm={2}>
+                    {workspace &&
+                        <div style={{ float: "right" }}>
+                            <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
+                        </div>
+                    }
+                </Col>
+                <Col sm={1}>
+                    {workspace &&
+                        <ProgressBar now={100 * ((workspace.totalBudget - workspace.allocatedBudget) / workspace.totalBudget)} />
+                    }
+                </Col>
+                <Col sm={1}>
                     <Link to={`/workspaces/${workspace.id}`}>
                         <Button> Open </Button>
                     </Link>
@@ -90,7 +106,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
             <div>
                 <h3> New Root Workspace </h3>
                 <NewBlockForm
-                    maxBudget={10000}
+                    maxTotalBudget={10000}
                     onMutate={this.props.onCreateWorkspace}
                 />
             </div>
@@ -108,7 +124,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                     <ParentWorkspace workspace={w} key={w.id} />
                 ))}
                 <NewWorkspaceForm
-                    onCreateWorkspace={({ question, budget }) => { this.props.createWorkspace({ variables: { question, budget } }); }}
+                    onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
                 />
             </BlockHoverMenu>
         );

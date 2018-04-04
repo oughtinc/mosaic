@@ -22,10 +22,27 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       defaultValue: false,
       allowNull: false
     },
-    budget: {
+    totalBudget: {
       type: DataTypes.INTEGER(),
       defaultValue: 1,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        min: 0
+      }
+    },
+    allocatedBudget: {
+      type: DataTypes.INTEGER(),
+      defaultValue: 1,
+      allowNull: false,
+      validate: {
+        min: 0
+      }
+    },
+    remainingBudget: {
+      type: Sequelize.VIRTUAL(Sequelize.INTEGER, ['totalBudget', 'allocatedBudget']),
+      get: function() {
+        return this.get('totalBudget') - this.get('allocatedBudget');
+      }
     },
     connectedPointers: {
       type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']),
@@ -66,8 +83,8 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     addEventAssociations(Workspace, models)
   }
 
-  Workspace.createAsChild = async function ({ parentId, question, budget}, { event }) {
-    const _workspace = await sequelize.models.Workspace.create({ parentId, budget }, { event, questionValue: question })
+  Workspace.createAsChild = async function ({ parentId, question, totalBudget}, { event }) {
+    const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget }, { event, questionValue: question })
     return _workspace
   }
 
@@ -100,14 +117,14 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     }
   }
 
-  Workspace.prototype.createChild = async function ({ event, question, budget }) {
-    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, budget }, { event })
-    const newBudget = this.budget - child.budget;
-    if (newBudget < 0){
-      throw new Error(`Parent workspace does not have enough budget. Has: ${this.budget}. Needs: ${child.budget}.`)
+  Workspace.prototype.createChild = async function ({ event, question, totalBudget }) {
+    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget }, { event })
+    if (this.remainingBudget < child.totalBudget){
+      throw new Error(`Parent workspace does not have enough remainingBudget. Has: ${this.remainingBudget}. Needs: ${child.totalBudget}.`)
     }
+    const newAllocatedBudget = this.allocatedBudget + child.totalBudget;
     await this.update({
-      budget: newBudget,
+      allocatedBudget: newAllocatedBudget,
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
     }, { event })
     return child
