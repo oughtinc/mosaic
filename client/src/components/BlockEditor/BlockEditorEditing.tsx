@@ -84,11 +84,13 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         this.state = { hasChangedSinceDatabaseSave: false };
     }
 
-    public shouldComponentUpdate(newProps: any) {
+    public shouldComponentUpdate(newProps: any, newState: any) {
         if (
             !_.isEqual(newProps.blockEditor, this.props.blockEditor)
             || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
             || !_.isEqual(newProps.block, this.props.block)
+            || !_.isEqual(newProps.mutationStatus, this.props.mutationStatus)
+            || !_.isEqual(newState.hasChangedSinceDatabaseSave, this.state.hasChangedSinceDatabaseSave)
         ) {
             return true;
         }

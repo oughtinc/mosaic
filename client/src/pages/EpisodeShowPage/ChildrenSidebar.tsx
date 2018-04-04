@@ -85,6 +85,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
             !_.isEqual(newProps.blockEditor, this.props.blockEditor)
             || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
             || !_.isEqual(newProps.block, this.props.block)
+            || !_.isEqual(newProps.workspaceOrder, this.props.workspaceOrder)
+            || !_.isEqual(newProps.workspaces, this.props.workspaces)
         ) {
             return true;
         }
