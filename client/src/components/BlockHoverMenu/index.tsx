@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Menu } from "./Menu";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { removeHoverItem } from "../../modules/blockEditor/actions";
@@ -42,17 +41,9 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
         menu.style.left = `${hoveredItem.left}px`;
     }
 
-    public menuRef = (menu: any) => {
-        this.menu = menu;
-    }
-
     public render() {
             return (
                 <div>
-                    <Menu
-                        menuRef={this.menuRef}
-                        blockEditor={this.props.blockEditor}
-                    />
                     {this.props.children}
                 </div>
             );
