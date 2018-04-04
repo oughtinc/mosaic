@@ -149,17 +149,15 @@ let schema = new GraphQLSchema({
           return child
         }
       },
-      transferBudget: {
+      updateChildTotalBudget: {
         type: workspaceType,
-        args: { workspaceId: { type: GraphQLString }, toWorkspaceId: { type: GraphQLString }, amount: { type: GraphQLInt } },
-        resolve: async (_, { workspaceId, toWorkspaceId, amount }) => {
-          if (amount === 0){
-            throw new Error('Cannot transfer 0 amount.')
-          }
+        args: { workspaceId: { type: GraphQLString }, childId: { type: GraphQLString }, totalBudget: { type: GraphQLInt } },
+        resolve: async (_, { workspaceId, childId, totalBudget }) => {
           const event = await models.Event.create()
           const workspace = await models.Workspace.findById(workspaceId)
-          const toWorkspace = await models.Workspace.findById(toWorkspaceId)
-          await workspace.changeAllocationToChild(toWorkspace, amount, {event})
+          const child = await models.Workspace.findById(childId)
+          console.log("FOUND CHILD", child)
+          await workspace.changeAllocationToChild(child, totalBudget, {event})
         }
       },
     }

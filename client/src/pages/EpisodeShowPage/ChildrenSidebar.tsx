@@ -27,7 +27,7 @@ const FormStyle = styled.div`
 export class TransferForm extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
-        this.state = { value: "" };
+        this.state = { value: this.props.initialValue };
     }
 
     public render() {
@@ -39,16 +39,17 @@ export class TransferForm extends React.Component<any, any> {
                     autoFocus={true}
                     value={this.state.value}
                     placeholder="0"
-                    min={this.props.minValue}
-                    max={this.props.maxValue}
+                    min={this.props.min}
+                    max={this.props.max}
                     onChange={(e: any) => {
                         const { value } = e.target;
                         this.setState({ value: value });
                     }}
                 />
             </div>
+            {`${this.props.min} to ${this.props.max}`}
 
-<div style={{float: "left"}}>
+            <div style={{float: "left"}}>
             <Button
                 onClick={() => {
                     this.props.onSubmit(parseInt(this.state.value, 10));
@@ -70,7 +71,7 @@ export class TransferForm extends React.Component<any, any> {
 
     private isValid() {
         const valueAsInt = parseInt(this.state.value, 10);
-        const inRange = (valueAsInt >= this.props.minValue && valueAsInt <= this.props.maxValue);
+        const inRange = (valueAsInt >= this.props.min && valueAsInt <= this.props.max);
         return !!valueAsInt && inRange;
     }
 }
@@ -111,7 +112,7 @@ export class Child extends React.Component<any, any> {
                 </Button>
                     {!this.state.showTransferForm &&
                         <Button onClick={() => { this.setState({ showTransferForm: true }); }}>
-                           Deposit 
+                           Edit Allocation 
                     </Button>
                     }
                     <div style={{ float: "right" }}>
@@ -120,9 +121,10 @@ export class Child extends React.Component<any, any> {
                 </div>
                 {this.state.showTransferForm &&
                     <TransferForm
-                        minValue={-1 * (workspace.totalBudget - workspace.allocatedBudget - 1)}
-                        maxValue={this.props.parentAvailableBudget}
-                        onSubmit={(amount) => { this.props.onTransferBudget({ toWorkspaceId: workspace.id, amount }); }}
+                        initialValue={workspace.totalBudget}
+                        min={workspace.allocatedBudget}
+                        max={workspace.totalBudget + this.props.parentAvailableBudget}
+                        onSubmit={(totalBudget) => { this.props.onUpdateChildTotalBudget({ childId: workspace.id, totalBudget }); }}
                         onClose={() => this.setState({showTransferForm: false})}
                     />
                 }
@@ -153,7 +155,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                                     onDelete={() => { this.props.changeOrder(this.props.workspaceOrder.filter((w) => w !== workspace.id)); }}
                                     availablePointers={this.props.availablePointers}
                                     parentAvailableBudget={this.props.availableBudget}
-                                    onTransferBudget={this.props.onTransferBudget}
+                                    onUpdateChildTotalBudget={this.props.onUpdateChildTotalBudget}
                                 />
                             );
                         }
