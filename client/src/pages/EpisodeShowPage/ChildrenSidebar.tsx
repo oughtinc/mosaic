@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Button, Badge } from "react-bootstrap";
+import { Button, Badge, ProgressBar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
@@ -41,7 +41,7 @@ export class Child extends React.Component<any, any> {
                     Archive
                 </Button>
                 <div style={{float: "right"}}>
-                    <Badge>budget: {workspace.budget}</Badge>
+                    <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
                 </div>
             </ChildStyle>
         );
@@ -77,7 +77,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     }
                     <h3> Add a new Child Question </h3>
                     <NewBlockForm
-                        maxBudget={this.props.maxChildBudget}
+                        maxTotalBudget={this.props.maxChildTotalBudget}
                         onMutate={this.props.onCreateChild}
                         availablePointers={this.props.availablePointers}
                         ref={(input) => {this.newChildField = input; }}

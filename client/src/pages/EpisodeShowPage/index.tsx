@@ -2,7 +2,7 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { Row, Col, Button, Badge } from "react-bootstrap";
+import { Row, Col, Button, Badge, ProgressBar } from "react-bootstrap";
 import { connect } from "react-redux";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
@@ -25,10 +25,12 @@ const WORKSPACE_QUERY = gql`
           parentId
           childWorkspaceOrder
           connectedPointers
-          budget
+          totalBudget
+          allocatedBudget
           childWorkspaces{
             id
-            budget
+            totalBudget
+            allocatedBudget
             blocks{
               id
               value
@@ -63,8 +65,8 @@ const UPDATE_WORKSPACE = gql`
 `;
 
 const NEW_CHILD = gql`
-  mutation createChildWorkspace($workspaceId:String, $question:JSON, $budget: Int){
-    createChildWorkspace(workspaceId:$workspaceId, question:$question, budget: $budget ){
+  mutation createChildWorkspace($workspaceId:String, $question:JSON, $totalBudget: Int){
+    createChildWorkspace(workspaceId:$workspaceId, question:$question, totalBudget: $totalBudget ){
         id
     }
   }
@@ -124,18 +126,20 @@ export class FormPagePresentational extends React.Component<any, any> {
             <div key={workspace.id}>
                 <BlockHoverMenu>
                     <Row>
-                        <Col sm={12}>
-                            {workspace &&
-                                <Badge>budget: {workspace.budget}</Badge>
-                            }
-                            <div style={{float: "right"}}>
+                        <Col sm={10}>
                             {workspace.parentId &&
                                 <ParentLink parentId={workspace.parentId} />
                             }
                             {workspace && 
                                 <SubtreeLink workspace={workspace} />
                             }
+                        </Col>
+                        <Col sm={2}>
+                            {workspace &&
+                            <div style={{float: "right"}}>
+                                Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
                             </div>
+                            }
                         </Col>
                         <Col sm={12}>
                             <h1>
@@ -173,14 +177,14 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
-                                onCreateChild={({question, budget}) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, budget } }); }}
-                                maxChildBudget={workspace.budget}
+                                onCreateChild={({question, totalBudget}) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
+                                maxChildTotalBudget={workspace.totalBudget - workspace.allocatedBudget}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
                                 ref={(input) => {if (input && input.editor()) { this.newChildField = input.editor(); }}}
                             />
                         </Col>
                     </Row>
-                </BlockHoverMenu>
+                </BlockHoverMenu>;
             </div >
         );
     }
