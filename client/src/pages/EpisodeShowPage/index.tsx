@@ -72,6 +72,14 @@ const NEW_CHILD = gql`
   }
 `;
 
+const TRANSFER_BUDGET = gql`
+  mutation transferBudget($workspaceId:String!, $toWorkspaceId:String!, $amount: Int){
+    transferBudget(workspaceId:$workspaceId, toWorkspaceId:$toWorkspaceId, amount: $amount ){
+        id
+    }
+  }
+`;
+
 const ParentLink = (props) => (
     <Link to={`/workspaces/${props.parentId}`}>
         <Button>To Parent</Button>
@@ -178,7 +186,8 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
                                 onCreateChild={({question, totalBudget}) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
-                                maxChildTotalBudget={workspace.totalBudget - workspace.allocatedBudget}
+                                onTransferBudget={({toWorkspaceId, amount}) => {this.props.transferBudget({variables: {workspaceId: workspace.id, toWorkspaceId, amount}}); }}
+                                availableBudget={workspace.totalBudget - workspace.allocatedBudget}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
                                 ref={(input) => {if (input && input.editor()) { this.newChildField = input.editor(); }}}
                             />
@@ -228,6 +237,13 @@ export const EpisodeShowPage = compose(
     }),
     graphql(NEW_CHILD, {
         name: "createChild", options: {
+            refetchQueries: [
+                "workspace",
+            ],
+        },
+    }),
+    graphql(TRANSFER_BUDGET, {
+        name: "transferBudget", options: {
             refetchQueries: [
                 "workspace",
             ],

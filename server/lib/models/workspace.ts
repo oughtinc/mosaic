@@ -103,6 +103,27 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return [...this.childWorkspaceOrder, element]
   }
 
+  Workspace.prototype.changeAllocationToChild = async function (otherWorkspace: any, amount: number, { event }) {
+    if ((amount > 0) && (this.remainingBudget < amount)) {
+      throw new Error(`Parent workspace does not have enough remainingBudget for allocation. Has: ${this.remainingBudget}. Needs: ${amount}.`)
+    }
+
+    if ((amount < 0) && (otherWorkspace.totalBudget + amount < 0 )) {
+      throw new Error(`Child workspace does not have enough totalBudget for negative allocation. Has: ${otherWorkspace.totalBudget}. Needs: ${amount * -1}.`)
+    }
+
+    const newAllocatedBudget = this.allocatedBudget + amount;
+
+    await this.update({
+      allocatedBudget: newAllocatedBudget,
+    }, { event })
+
+    const newOtherWorkspaceTotalBudget = otherWorkspace.totalBudget + amount;
+    await otherWorkspace.update({
+      totalBudget: newOtherWorkspaceTotalBudget
+    }, {event})
+  }
+
   Workspace.prototype.updatePointerImports = async function (pointerIds, { event }) {
     const pointerImports = await this.getPointerImports()
     for (const pointerId of _.uniq(pointerIds)) {
