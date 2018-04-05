@@ -108,9 +108,9 @@ export class FormPagePresentational extends React.Component<any, any> {
     }
 
     public componentDidMount() {
-        keyboardJS.bind("ctrl+s", (e) => { e.preventDefault(); this.scratchpadField.focus(); });
-        keyboardJS.bind("ctrl+a", (e) => { e.preventDefault(); this.answerField.focus(); });
-        keyboardJS.bind("ctrl+n", (e) => { e.preventDefault(); this.newChildField.focus(); });
+        keyboardJS.bind("alt+s", (e) => { e.preventDefault(); this.scratchpadField.focus(); });
+        keyboardJS.bind("alt+a", (e) => { e.preventDefault(); this.answerField.focus(); });
+        keyboardJS.bind("alt+c", (e) => { e.preventDefault(); this.newChildField.focus(); });
     }
 
     public updateBlocks = (blocks: any) => {
