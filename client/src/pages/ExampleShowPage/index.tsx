@@ -7,10 +7,10 @@ import _ = require("lodash");
 import { WorkspaceCard } from "../../components/WorkspaceCard";
 import { examples } from "./examples";
 
-export class ExamplePage extends React.Component<any, any> {
+export class ExampleShowPage extends React.Component<any, any> {
     public render() {
         const {exampleName} = this.props.match.params;
-        const example: any = examples.find((e:any) => e.url === exampleName);
+        const example: any = examples.find((e: any) => e.url === exampleName);
         const workspaces = example.data.subtreeWorkspaces;
         const availablePointers: any = _
           .chain(workspaces)

@@ -14,7 +14,7 @@ import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
-import { ExamplePage } from "./pages/ExamplePage";
+import { ExampleShowPage } from "./pages/ExampleShowPage";
 
 const { SERVER_URL } = process.env;
 
@@ -46,7 +46,7 @@ export class Home extends React.Component {
 const Routes = () => (
   <div>
     <Route exact={true} path="/" component={Home} />
-    <Route exact={true} path="/examples/:exampleName" component={ExamplePage} />
+    <Route exact={true} path="/examples/:exampleName" component={ExampleShowPage} />
     <Route exact={true} path="/workspaces" component={RootWorkspacePage} />
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
     <Route exact={true} path="/workspaces/:workspaceId/subtree" component={WorkspaceSubtreePage} />
