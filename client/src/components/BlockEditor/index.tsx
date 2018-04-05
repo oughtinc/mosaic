@@ -112,33 +112,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
   }
 
-  public menuRef = (menu: any) => {
-    this.menu = menu;
-  }
-
-  public componentDidUpdate() {
-    this.updateMenu();
-  }
-
-  public updateMenu = () => {
-    const { hoveredItem } = this.props.blockEditor;
-    const menu = this.menu;
-
-    if (!menu) {
-      return;
-    }
-
-    if (hoveredItem.hoverItemType === "NONE") {
-      menu.style.opacity = 0;
-      return;
-    }
-
-    menu.style.opacity = 1;
-    const scrollY: number = window.scrollY;
-    menu.style.top = `${parseInt(hoveredItem.top, 10) + scrollY - 29}px`;
-    menu.style.left = `${hoveredItem.left}px`;
-  }
-
   public render() {
     const { readOnly } = this.props;
     const block = this.props.block;
@@ -171,10 +144,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
             onKeyDown={this.props.onKeyDown}
             onMount={(input) => { this.blockEditorEditing = input; }}
           />
-          {/* <Menu
-            menuRef={this.menuRef}
-            blockEditor={this.props.blockEditor}
-          /> */}
         </div>
       );
     }

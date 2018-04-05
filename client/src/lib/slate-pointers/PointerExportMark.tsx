@@ -19,6 +19,10 @@ export class PointerExportMark extends React.Component<any, any> {
       this.updateMenu();
     }
 
+    public componentWillUnmount() {
+      this.props.removeHoverItem();
+    }
+
     public getLocation = () => {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
         const {left, top, right, bottom} = rect;
