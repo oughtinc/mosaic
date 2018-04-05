@@ -84,12 +84,12 @@ function getInlinesAsArray(node: any) {
   return array;
 }
 
-export const removeExportOfSelection = () => {
+export const removeExportOfSelection = (block) => {
   return async (dispatch, getState) => {
     const {blocks, blockEditor} = await getState();
     const {hoveredItem} = blockEditor;
 
-    const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
+    const block = blocks.blocks.find((b) => b.id === block.blockId);
 
     if (block) {
       const inlines = getInlinesAsArray(block.value.document);

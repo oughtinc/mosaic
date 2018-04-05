@@ -41,7 +41,7 @@ export class ExportMenu extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <Button bsSize={"xsmall"} onClick={() => {this.props.removeExportOfSelection(); }} >
+        <Button bsSize={"xsmall"} onClick={() => {this.props.removeExportOfSelection(this.props.block); }} >
             Remove Pointer 
         </Button>
       </div>
@@ -57,7 +57,7 @@ export class MenuPresentational extends React.Component<any> {
   public render() {
     const root: any = window.document.getElementById("root");
     const {blockEditor} = this.props;
-    const hoverItemType = _.get(blockEditor, "hoveredItem.hoverItemType");
+    const hoverItemType = this.props.menuType;
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef}>
       {blockEditor &&

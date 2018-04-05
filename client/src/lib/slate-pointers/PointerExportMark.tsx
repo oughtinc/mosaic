@@ -2,6 +2,7 @@ import styled from "styled-components";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Menu } from "../../components/BlockHoverMenu/Menu";
+import { HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 
 const PointerExportStyle: any = styled.span`
     background: ${(props: any) => props.isSelected ? "rgba(85, 228, 38, 0.9)" : "rgba(162, 238, 156, 0.5)"};
@@ -25,7 +26,7 @@ export class PointerExportMark extends React.Component<any, any> {
         // this.props.onMouseOver({left, top, right, bottom});
     }
 
-    public onMouseOut = () => {
+    public onMouseLeave = () => {
       const menu = this.menu;
       menu.style.opacity = 0;
     }
@@ -53,10 +54,9 @@ export class PointerExportMark extends React.Component<any, any> {
         const isSelected = this.props.blockEditor.hoveredItem.id === this.props.nodeAsJson.data.pointerId;
         const children: any = this.props.children;
         return (
-            <div>
+          <div onMouseLeave={this.onMouseLeave}>
               <PointerExportStyle
                   isSelected={isSelected}
-                  onMouseOut={this.onMouseOut}
               >
               {children.map((child, index) => {
                   const isNestedPointer = (child.props.node.object === "inline");
@@ -76,8 +76,10 @@ export class PointerExportMark extends React.Component<any, any> {
               })}
               </PointerExportStyle>
               <Menu
+                menuType={HOVER_ITEM_TYPES.POINTER_EXPORT}
                 menuRef={this.menuRef}
                 blockEditor={this.props.blockEditor}
+                block={this.props.block}
               />
             </div>
         );
