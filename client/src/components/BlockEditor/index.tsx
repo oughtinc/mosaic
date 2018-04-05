@@ -111,8 +111,11 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
   }
 
-  public handleMouseLeave = (event: any) => {
-    const hoverMenu = document.getElementById('hover-menu') as HTMLElement;
+  public handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
+    const hoverMenu = document.getElementById("hover-menu");
+    if (!hoverMenu) {
+        return;
+    }
     if (hoverMenu === event.relatedTarget || hoverMenu.contains(event.relatedTarget as Node)) {
         return;
     }
