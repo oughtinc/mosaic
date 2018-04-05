@@ -27,8 +27,8 @@ export class PointerExportMark extends React.Component<any, any> {
     }
 
     public onMouseLeave = () => {
-      const menu = this.menu;
-      menu.style.opacity = 0;
+      // const menu = this.menu;
+      // menu.style.opacity = 0;
     }
 
     public updateMenu = () => {
@@ -79,7 +79,7 @@ export class PointerExportMark extends React.Component<any, any> {
                 menuType={HOVER_ITEM_TYPES.POINTER_EXPORT}
                 menuRef={this.menuRef}
                 blockEditor={this.props.blockEditor}
-                block={this.props.block}
+                blockId={this.props.blockId}
               />
             </div>
         );

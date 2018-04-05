@@ -41,7 +41,7 @@ export class ExportMenu extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <Button bsSize={"xsmall"} onClick={() => {this.props.removeExportOfSelection(this.props.block); }} >
+        <Button bsSize={"xsmall"} onClick={() => {this.props.removeExportOfSelection(this.props.blockId); }} >
             Remove Pointer 
         </Button>
       </div>
@@ -77,6 +77,7 @@ export class MenuPresentational extends React.Component<any> {
             <ExportMenu
               blockEditor={this.props.blockEditor}
               removeExportOfSelection={this.props.removeExportOfSelection}
+              blockId={this.props.blockId}
             />
           }
         </HoverMenu>
