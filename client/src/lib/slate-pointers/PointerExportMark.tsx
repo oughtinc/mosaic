@@ -15,19 +15,9 @@ export class PointerExportMark extends React.Component<any, any> {
         super(props);
     }
 
-    public componentDidUpdate() {
-      this.updateMenu();
-    }
-
     public componentWillUnmount() {
       this.props.removeHoverItem();
     }
-
-    // public getLocation = () => {
-    //     const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-    //     const {left, top, right, bottom} = rect;
-    //     return {left, top, right, bottom};
-    // }
 
     public onMouseOver = () => {
       this.updateMenu();
@@ -35,8 +25,14 @@ export class PointerExportMark extends React.Component<any, any> {
         // this.props.onMouseOver({left, top, right, bottom});
     }
 
+    public onMouseOut = () => {
+      const menu = this.menu;
+      menu.style.opacity = 0;
+    }
+
     public updateMenu = () => {
-      const hoveredItem = this;
+      const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
+      const { left, top, right, bottom } = rect;
       const menu = this.menu;
 
       if (!menu) {
@@ -45,8 +41,8 @@ export class PointerExportMark extends React.Component<any, any> {
 
       menu.style.opacity = 1;
       const scrollY: number = window.scrollY;
-      menu.style.top = `${parseInt(hoveredItem.top, 10) + scrollY - 29}px`;
-      menu.style.left = `${hoveredItem.left}px`;
+      menu.style.top = `${top + scrollY - 29}px`;
+      menu.style.left = `${left}px`;
     }
 
     public menuRef = (menu: any) => {
@@ -60,7 +56,7 @@ export class PointerExportMark extends React.Component<any, any> {
             <div>
               <PointerExportStyle
                   isSelected={isSelected}
-                  onMouseOut={this.props.onMouseOut}
+                  onMouseOut={this.onMouseOut}
               >
               {children.map((child, index) => {
                   const isNestedPointer = (child.props.node.object === "inline");
