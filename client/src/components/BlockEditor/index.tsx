@@ -111,39 +111,43 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
   }
 
-  public render() {
+  public renderEditor(block: any) {
     const { readOnly } = this.props;
+    const value = block.value;
+    const { plugins } = this.state;
+    return readOnly ? (
+        <BlockReadOnlyStyle>
+            <Editor
+                value={value}
+                readOnly={true}
+                plugins={plugins}
+            />
+        </BlockReadOnlyStyle>
+    ) : (
+        <BlockEditorEditing
+            value={value}
+            readOnly={true}
+            shouldAutosave={!!this.props.shouldAutosave}
+            block={this.props.block}
+            availablePointers={this.props.availablePointers}
+            plugins={plugins}
+            onChange={this.props.onChange}
+            onKeyDown={this.props.onKeyDown}
+            onMount={(input) => { this.blockEditorEditing = input; }}
+        />
+    );
+  } 
+
+  public render() {
     const block = this.props.block;
     if (!block) {
       return (<div> loading... </div>);
     }
-    const value = block.value;
-    const { plugins } = this.state;
-    if (readOnly) {
-      return (
-        <BlockReadOnlyStyle>
-          <Editor
-            value={value}
-            readOnly={true}
-            plugins={plugins}
-          />
-        </BlockReadOnlyStyle>
-      );
-    } else {
-      return (
-        <BlockEditorEditing
-          value={value}
-          readOnly={true}
-          shouldAutosave={!!this.props.shouldAutosave}
-          block={this.props.block}
-          availablePointers={this.props.availablePointers}
-          plugins={plugins}
-          onChange={this.props.onChange}
-          onKeyDown={this.props.onKeyDown}
-          onMount={(input) => { this.blockEditorEditing = input; }}
-        />
-      );
-    }
+    return (
+        <div onMouseLeave={this.props.removeHoverItem}>
+            {this.renderEditor(block)}
+        </div>
+    );
   }
 }
 
