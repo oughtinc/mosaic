@@ -111,6 +111,14 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
   }
 
+  public handleMouseLeave = (event: any) => {
+    const hoverMenu = document.getElementById('hover-menu') as HTMLElement;
+    if (hoverMenu === event.relatedTarget || hoverMenu.contains(event.relatedTarget as Node)) {
+        return;
+    }
+    this.props.removeHoverItem();
+  }
+
   public renderEditor(block: any) {
     const { readOnly } = this.props;
     const value = block.value;
@@ -144,7 +152,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return (<div> loading... </div>);
     }
     return (
-        <div onMouseLeave={this.props.removeHoverItem}>
+        <div onMouseLeave={this.handleMouseLeave}>
             {this.renderEditor(block)}
         </div>
     );
