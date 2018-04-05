@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 import { Button, Col, Row, ProgressBar, Badge } from "react-bootstrap";
 import styled from "styled-components";
 import { BlockEditor } from "../../components/BlockEditor";
-import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import * as React from "react";
@@ -118,7 +117,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     public render() {
         const workspaces = this.props.originWorkspaces.workspaces;
         return (
-            <BlockHoverMenu>
+            <div>
                 <h1> Root Workspaces </h1>
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
@@ -126,7 +125,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                 <NewWorkspaceForm
                     onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
                 />
-            </BlockHoverMenu>
+            </div>
         );
     }
 }

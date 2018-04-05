@@ -1,7 +1,6 @@
 import gql from "graphql-tag";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
-import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import * as React from "react";
 import _ = require("lodash");
 import { WorkspaceCard } from "../../components/WorkspaceCard";
@@ -31,15 +30,9 @@ export class WorkspaceSubtreePagePresentational extends React.Component<any, any
           .uniqBy((p: any) => p.data.pointerId)
           .value();
         const rootWorkspace = workspaces.find((w) => w.id === this.props.match.params.workspaceId);
-        return (
-            <div>
-                <BlockHoverMenu>
-                    {rootWorkspace &&
-                        <WorkspaceCard workspace={rootWorkspace} availablePointers={availablePointers} workspaces={workspaces} />
-                    }
-                </BlockHoverMenu>
-            </div>
-        );
+        return rootWorkspace ?
+            <WorkspaceCard workspace={rootWorkspace} availablePointers={availablePointers} workspaces={workspaces} />
+            : null;
     }
 }
 
