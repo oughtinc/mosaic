@@ -23,27 +23,23 @@ export class PointerExportMark extends React.Component<any, any> {
       this.props.removeHoverItem();
     }
 
-    public getLocation = () => {
-        const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        const {left, top, right, bottom} = rect;
-        return {left, top, right, bottom};
-    }
+    // public getLocation = () => {
+    //     const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
+    //     const {left, top, right, bottom} = rect;
+    //     return {left, top, right, bottom};
+    // }
 
     public onMouseOver = () => {
-        const {left, top, right, bottom} = this.getLocation();
-        this.props.onMouseOver({left, top, right, bottom});
+      this.updateMenu();
+        // const {left, top, right, bottom} = this.getLocation();
+        // this.props.onMouseOver({left, top, right, bottom});
     }
 
     public updateMenu = () => {
-      const { hoveredItem } = this.props.blockEditor;
+      const hoveredItem = this;
       const menu = this.menu;
 
       if (!menu) {
-        return;
-      }
-
-      if (hoveredItem.hoverItemType === "NONE") {
-        menu.style.opacity = 0;
         return;
       }
 
