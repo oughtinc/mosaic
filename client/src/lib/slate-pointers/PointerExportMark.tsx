@@ -27,8 +27,8 @@ export class PointerExportMark extends React.Component<any, any> {
     }
 
     public onMouseLeave = () => {
-      // const menu = this.menu;
-      // menu.style.opacity = 0;
+      const menu = this.menu;
+      menu.style.opacity = 0;
     }
 
     public updateMenu = () => {
@@ -54,7 +54,7 @@ export class PointerExportMark extends React.Component<any, any> {
         const isSelected = this.props.blockEditor.hoveredItem.id === this.props.nodeAsJson.data.pointerId;
         const children: any = this.props.children;
         return (
-          <div onMouseLeave={this.onMouseLeave}>
+          <span onMouseLeave={this.onMouseLeave}>
               <PointerExportStyle
                   isSelected={isSelected}
               >
@@ -81,7 +81,7 @@ export class PointerExportMark extends React.Component<any, any> {
                 blockEditor={this.props.blockEditor}
                 nodeInfo={this.props.nodeInfo}
               />
-            </div>
+            </span>
         );
     }
 }

@@ -9,7 +9,6 @@ import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
 import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
-import { Menu } from "../BlockHoverMenu/Menu";
 
 const BlockReadOnlyStyle = styled.div`
     border: 1px solid #eee;
@@ -133,19 +132,17 @@ class BlockEditorPresentational extends React.Component<any, any> {
       );
     } else {
       return (
-        <div>
-          <BlockEditorEditing
-            value={value}
-            readOnly={true}
-            shouldAutosave={!!this.props.shouldAutosave}
-            block={this.props.block}
-            availablePointers={this.props.availablePointers}
-            plugins={plugins}
-            onChange={this.props.onChange}
-            onKeyDown={this.props.onKeyDown}
-            onMount={(input) => { this.blockEditorEditing = input; }}
-          />
-        </div>
+        <BlockEditorEditing
+          value={value}
+          readOnly={true}
+          shouldAutosave={!!this.props.shouldAutosave}
+          block={this.props.block}
+          availablePointers={this.props.availablePointers}
+          plugins={plugins}
+          onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
+          onMount={(input) => { this.blockEditorEditing = input; }}
+        />
       );
     }
   }
