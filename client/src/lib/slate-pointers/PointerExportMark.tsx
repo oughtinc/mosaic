@@ -79,8 +79,7 @@ export class PointerExportMark extends React.Component<any, any> {
                 menuType={HOVER_ITEM_TYPES.POINTER_EXPORT}
                 menuRef={this.menuRef}
                 blockEditor={this.props.blockEditor}
-                blockId={this.props.blockId}
-                nodeId={this.props.nodeAsJson.data.pointerId}
+                nodeInfo={this.props.nodeInfo}
               />
             </div>
         );

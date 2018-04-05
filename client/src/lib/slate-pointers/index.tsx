@@ -46,7 +46,7 @@ function SlatePointers(options: any = {}) {
             onMouseOver={({ left, right, top, bottom }) => {
               options.onMouseOverPointerExport({ left, right, top, bottom, id: node.toJSON().data.pointerId });
             }}
-            blockId={options.blockId}
+            nodeInfo={{blockId: options.blockId, nodeId: node.toJSON().data.pointerId}}
             children={children}
           />
         );
