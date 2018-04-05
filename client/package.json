@@ -30,6 +30,7 @@
     "react-router": "^4.2.0",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.2.2",
+    "react-scripts-ts": "^2.13.0",
     "react-select": "^1.2.1",
     "react-table": "^6.8.0",
     "recompose": "^0.26.0",
@@ -64,7 +65,6 @@
     "@types/recompose": "^0.24.5",
     "immutable": "^3.8.2",
     "prop-types": "^15.6.1",
-    "react-scripts-ts": "^2.13.0",
     "typescript": "^2.6.2"
   }
 }
