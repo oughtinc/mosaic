@@ -17,7 +17,7 @@ export class PointerExportMark extends React.Component<any, any> {
     }
 
     public componentWillUnmount() {
-      this.props.removeHoverItem();
+      // this.props.removeHoverItem();
     }
 
     public onMouseOver = () => {
@@ -80,6 +80,7 @@ export class PointerExportMark extends React.Component<any, any> {
                 menuRef={this.menuRef}
                 blockEditor={this.props.blockEditor}
                 blockId={this.props.blockId}
+                nodeId={this.props.nodeAsJson.data.pointerId}
               />
             </div>
         );

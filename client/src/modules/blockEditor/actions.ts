@@ -84,7 +84,7 @@ function getInlinesAsArray(node: any) {
   return array;
 }
 
-export const removeExportOfSelection = (blockId) => {
+export const removeExportOfSelection = (blockId, nodeId) => {
   return async (dispatch, getState) => {
     const {blocks, blockEditor} = await getState();
     const {hoveredItem} = blockEditor;
@@ -93,13 +93,13 @@ export const removeExportOfSelection = (blockId) => {
 
     if (block) {
       const inlines = getInlinesAsArray(block.value.document);
-      const matchingNodes = inlines.filter((i) => i.toJSON().data.pointerId === hoveredItem.id);
+      const matchingNodes = inlines.filter((i) => i.toJSON().data.pointerId === nodeId);
       if (!matchingNodes.length) {
         console.error("Exporting node not found in Redux store");
         return;
       }
 
-      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key, {data: {pointerId: hoveredItem.id}});
+      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key, {data: {pointerId: nodeId}});
 
       dispatch({
         type: UPDATE_BLOCK,
