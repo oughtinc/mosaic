@@ -1,16 +1,20 @@
 export class UpdateWorkspace {
-    public mutationName = "UpdateWorkspace";
+    public static mutationName = "UpdateWorkspace";
     public childWorkspaceOrder;
 
+    public initFromNonnormalized({childWorkspaceOrder}) {
+        this.init({childWorkspaceOrder})
+    }
+
     public init({childWorkspaceOrder}) {
-        this.childWorkspaceOrder = childWorkspaceOrder;
+        this.childWorkspaceOrder = childWorkspaceOrder
     }
 
     public async run(workspace, event){
         const _workspace =  await workspace.update({
             childWorkspaceOrder: this.childWorkspaceOrder
         }, { event })
-        return workspace;
+        return {impactedWorkspaces: [workspace]}
     }
 
     public toJSON(){

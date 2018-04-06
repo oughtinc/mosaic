@@ -8,9 +8,10 @@ import * as pluralize from "pluralize";
 import * as Case from "Case";
 import * as GraphQLJSON from 'graphql-type-json';
 import { UpdateWorkspace } from "../workspaceConcerns/updateWorkspace";
-import { UpdateWorkspaceBlocks } from "../workspaceConcerns/updateBlocks";
+import { UpdateWorkspaceBlocks } from "../workspaceConcerns/updateWorkspaceBlocks";
 import { CreateChildWorkspace } from "../workspaceConcerns/createChildWorkspace";
 import { UpdateChildTotalBudget } from "../workspaceConcerns/updateChildTotalBudget";
+import { concernFromJSON, WorkspaceEvent } from "../workspaceConcerns";
 
 const generateReferences = (model, references) => {
   let all = {};
@@ -84,16 +85,39 @@ function modelGraphQLFields(type, model) {
   })
 }
 
+async function fastForwardMutations(workspace, event){
+    const hash = await workspace.toHash();
+    const otherMutation = await models.WorkspaceMutation.findAll({
+        where: {
+            beginningHash: hash
+        }
+    })
+    if (otherMutation.length){
+        const other = otherMutation[0];
+        const mutation = other.mutation;
+        const _mutation = concernFromJSON(mutation);
+        await _mutation.init(mutation, workspace)
+        const result = _mutation.run(workspace, event)
+    }
+}
+
 async function workspaceEvent({workspaceId, mutationClass, params}){
     const event = await models.Event.create()
-    const workspace = await models.Workspace.findById(workspaceId)
+    let workspace = await models.Workspace.findById(workspaceId)
     const beginningHash = await workspace.toHash()
+
     const _mutation = new mutationClass()
-    await _mutation.init(params, workspace)
-    const result = await _mutation.run(workspace, event)
+    await _mutation.initFromNonnormalized(params, workspace)
+
+    const {impactedWorkspaces} = await _mutation.run(workspace, event)
     const endingHash = await workspace.toHash()
     await models.WorkspaceMutation.create({beginningHash, endingHash, budget: 3, mutation: _mutation.toJSON()})
-    return result
+
+    for (const w of impactedWorkspaces){
+      fastForwardMutations(w, event)
+    }
+
+    return workspace 
 }
 
 let schema = new GraphQLSchema({
@@ -133,47 +157,51 @@ let schema = new GraphQLSchema({
         }
       },
       updateBlocks: {
-        type: new GraphQLList(blockType),
+        type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
         resolve: async (_, { workspaceId, blocks }) => {
-          return await workspaceEvent({
+          const workspaceEvent = new WorkspaceEvent({
             workspaceId: workspaceId,
             mutationClass: UpdateWorkspaceBlocks, 
             params: {blocks}
           })
+          return await workspaceEvent.run();
         }
       },
       updateWorkspace: {
         type: workspaceType,
         args: { id: { type: GraphQLString }, childWorkspaceOrder: { type: new GraphQLList(GraphQLString) } },
         resolve: async (_, { id, childWorkspaceOrder }) => {
-          return await workspaceEvent({
+          const workspaceEvent = new WorkspaceEvent({
             workspaceId: id,
             mutationClass: UpdateWorkspace, 
             params: {childWorkspaceOrder}
           })
+          return await workspaceEvent.run();
         }
       },
       createChildWorkspace: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, totalBudget: {type: GraphQLInt} },
         resolve: async (_, { workspaceId, question, totalBudget }) => {
-          return await workspaceEvent({
+          const workspaceEvent = new WorkspaceEvent({
             workspaceId,
             mutationClass: CreateChildWorkspace, 
             params: {question, totalBudget}
           })
+          return await workspaceEvent.run();
         }
       },
       updateChildTotalBudget: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, childId: { type: GraphQLString }, totalBudget: { type: GraphQLInt } },
         resolve: async (_, { workspaceId, childId, totalBudget }) => {
-          return await workspaceEvent({
+          const workspaceEvent = new WorkspaceEvent({
             workspaceId,
             mutationClass: UpdateChildTotalBudget, 
             params: {childId, totalBudget}
           })
+          return await workspaceEvent.run();
         }
       },
     }

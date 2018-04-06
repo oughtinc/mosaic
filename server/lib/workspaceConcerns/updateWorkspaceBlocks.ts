@@ -1,10 +1,10 @@
 import models from "../models";
 
 export class UpdateWorkspaceBlocks {
-    public mutationName = "UpdateWorkspaceBlocks";
+    public static mutationName = "UpdateWorkspaceBlocks";
     public blocks;
 
-    public async init({ blocks }, workspace) {
+    public async initFromNonnormalized({ blocks }, workspace) {
         let _blocks:any = [];
 
         for (const block of blocks) {
@@ -14,10 +14,10 @@ export class UpdateWorkspaceBlocks {
                 relationship
             })
         }
-        this.blocks = _blocks;
+        this.init({blocks:_blocks}, workspace)
     }
 
-    public async normalized({ blocks }, workspace) {
+    public async init({ blocks }, workspace) {
         this.blocks = blocks;
     }
 
@@ -28,7 +28,8 @@ export class UpdateWorkspaceBlocks {
             await block.update({ value: _block.value }, { event })
             newBlocks = [...newBlocks, block]
         }
-        return newBlocks
+        //TODO: Adjust for important children, and parent if that could be the case.
+        return {impactedWorkspaces: [workspace]}
     }
 
     public toJSON() {

@@ -25,7 +25,6 @@ const UPDATE_BLOCKS = gql`
     mutation updateBlocks($workspaceId: String!,  $blocks:[blockInput]){
         updateBlocks(workspaceId: $workspaceId, blocks:$blocks){
             id
-            value
             updatedAtEventId
         }
     }

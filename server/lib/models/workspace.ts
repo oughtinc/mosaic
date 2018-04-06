@@ -191,7 +191,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   }
 
   Workspace.prototype.relationshipToBlock = async function (relationship) {
-    if (_.isNaN(relationship.childIndex) || !relationship.childIndex){
+    if (!_.isNumber(relationship.childIndex)){
       const directBlocks = await this.getBlocks();
       return directBlocks.find(b => b.type === relationship.type)
     } else {
