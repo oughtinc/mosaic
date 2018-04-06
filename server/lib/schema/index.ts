@@ -11,7 +11,8 @@ import { UpdateWorkspace } from "../workspaceConcerns/updateWorkspace";
 import { UpdateWorkspaceBlocks } from "../workspaceConcerns/updateWorkspaceBlocks";
 import { CreateChildWorkspace } from "../workspaceConcerns/createChildWorkspace";
 import { UpdateChildTotalBudget } from "../workspaceConcerns/updateChildTotalBudget";
-import { concernFromJSON, WorkspaceMutation } from "../workspaceConcerns";
+import { concernFromJSON } from "../workspaceConcerns";
+import { WorkspaceMutation } from "../workspaceConcerns/WorkspaceMutation";
 
 const generateReferences = (model, references) => {
   let all = {};

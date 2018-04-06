@@ -192,6 +192,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   }
 
   Workspace.prototype.relationshipToBlock = async function (relationship) {
+    console.log("YO", relationship)
     if (!_.isFinite(relationship.childIndex)){
       const directBlocks = await this.getBlocks();
       return directBlocks.find(b => b.type === relationship.type)
@@ -232,14 +233,13 @@ const WorkspaceModel = (sequelize, DataTypes) => {
 
   Workspace.prototype.fastForwardMutations = async function (event) {
     const hash = await this.toHash();
-    const otherMutation = await this.WorkspaceMutation.findAll({
+    const otherMutation = await this.WorkspaceMutation.findOne({
         where: {
             beginningHash: hash
         }
     })
-    if (otherMutation.length){
-        const other = otherMutation[0];
-        const mutation = other.mutation;
+    if (otherMutation){
+        const mutation = otherMutation.mutation;
         const _mutation = concernFromJSON(mutation);
         await _mutation.init(mutation, this)
         const result = _mutation.run(this, event)

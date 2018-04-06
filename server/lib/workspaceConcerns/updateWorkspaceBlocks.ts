@@ -1,20 +1,26 @@
 import models from "../models";
 
+export async function normalizeBlock(block, workspace){
+    const relationship = await workspace.blockIdToRelationship(block.id);
+    return ({
+        value: block.value,
+        relationship
+    })
+}
+
 export class UpdateWorkspaceBlocks {
     public static mutationName = "UpdateWorkspaceBlocks";
     public blocks;
 
     public async initFromNonnormalized({ blocks }, workspace) {
-        let _blocks:any = [];
+        let normalizedBlocks:any = [];
 
         for (const block of blocks) {
-            const relationship = await workspace.blockIdToRelationship(block.id);
-            _blocks.push({
-                value: block.value,
-                relationship
-            })
+            const normalizedBlock = await normalizeBlock(block, workspace)
+            normalizedBlocks.push(normalizedBlock)
         }
-        this.init({blocks:_blocks}, workspace)
+
+        this.init({blocks: normalizedBlocks}, workspace)
     }
 
     public async init({ blocks }, workspace) {
