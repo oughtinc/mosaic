@@ -3,6 +3,7 @@ const Sequelize = require('sequelize')
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
 const Op = Sequelize.Op;
 import * as _ from "lodash";
+import { concernFromJSON } from '../workspaceConcerns';
 
 const WorkspaceModel = (sequelize, DataTypes) => {
   var Workspace = sequelize.define('Workspace', {
@@ -191,7 +192,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   }
 
   Workspace.prototype.relationshipToBlock = async function (relationship) {
-    if (!_.isNumber(relationship.childIndex)){
+    if (!_.isFinite(relationship.childIndex)){
       const directBlocks = await this.getBlocks();
       return directBlocks.find(b => b.type === relationship.type)
     } else {
@@ -227,6 +228,22 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     let directBlocks = await this.getBlocks();
     let childBlocks = await this.getVisibleChildBlocks();
     return [...directBlocks, ...childBlocks]
+  }
+
+  Workspace.prototype.fastForwardMutations = async function (event) {
+    const hash = await this.toHash();
+    const otherMutation = await this.WorkspaceMutation.findAll({
+        where: {
+            beginningHash: hash
+        }
+    })
+    if (otherMutation.length){
+        const other = otherMutation[0];
+        const mutation = other.mutation;
+        const _mutation = concernFromJSON(mutation);
+        await _mutation.init(mutation, this)
+        const result = _mutation.run(this, event)
+    }
   }
 
   return Workspace;

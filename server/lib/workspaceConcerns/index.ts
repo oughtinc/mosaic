@@ -16,10 +16,11 @@ export function concernFromJSON(mutationJson:any){
     return new concern();
 }
 
-export class WorkspaceEvent {
+export class WorkspaceMutation {
     private workspaceId;
     private mutation;
     private mutationParams;
+    private beginningRemainingBudget;
     private event;
     private workspace;
     private beginningHash;
@@ -34,7 +35,7 @@ export class WorkspaceEvent {
     public async run(){
         await this.step1BeforeMutation()
         await this.step2Mutation()
-        await this.step3ConsiderAddToache()
+        await this.step3ConsiderAddToCache()
         await this.step4FastForward()
         return this.workspace
     }
@@ -43,6 +44,7 @@ export class WorkspaceEvent {
         this.event = await models.Event.create()
         this.workspace = await models.Workspace.findById(this.workspaceId)
         this.beginningHash = await this.workspace.toHash()
+        this.beginningRemainingBudget = this.workspace.remainingBudget;
     }
 
     private async step2Mutation(){
@@ -50,12 +52,12 @@ export class WorkspaceEvent {
         this.impactedWorkspaces = await this.mutation.run(this.workspace, this.event)
     }
 
-    private async step3ConsiderAddToache(){
+    private async step3ConsiderAddToCache(){
         const endingHash = await this.workspace.toHash()
-        await models.WorkspaceMutation.create({
+        await models.CachedWorkspaceMutation.create({
             beginningHash: this.beginningHash,
+            beginningRemainingBudget: this.workspace.remainingBudget,
             endingHash,
-            budget: 3,
             mutation: this.mutation.toJSON()
         })
     }

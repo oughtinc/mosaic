@@ -1,8 +1,7 @@
-
 'use strict';
 
-const WorkspaceMutationModel = (sequelize, DataTypes) => {
-    var WorkspaceMutation = sequelize.define('WorkspaceMutation', {
+const CachedWorkspaceMutationModel = (sequelize, DataTypes) => {
+    var CachedWorkspaceMutation = sequelize.define('CachedWorkspaceMutation', {
         id: {
             type: DataTypes.UUID(),
             primaryKey: true,
@@ -12,11 +11,11 @@ const WorkspaceMutationModel = (sequelize, DataTypes) => {
         beginningHash: {
             type: DataTypes.TEXT,
         },
+        beginningRemainingBudget: {
+            type: DataTypes.INTEGER,
+        },
         endingHash: {
             type: DataTypes.TEXT,
-        },
-        budget: {
-            type: DataTypes.INTEGER,
         },
         usageCount: {
             type: DataTypes.INTEGER,
@@ -26,7 +25,7 @@ const WorkspaceMutationModel = (sequelize, DataTypes) => {
         }
     })
 
-    return WorkspaceMutation
+    return CachedWorkspaceMutation
 }
 
-export default WorkspaceMutationModel;
+export default CachedWorkspaceMutationModel;

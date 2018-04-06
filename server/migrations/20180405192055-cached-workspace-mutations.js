@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async function (queryInterface, Sequelize) {
-    await queryInterface.createTable('WorkspaceMutations', {
+    await queryInterface.createTable('CachedWorkspaceMutations', {
       id: {
           allowNull: false,
           primaryKey: true,
@@ -24,11 +24,11 @@ module.exports = {
       beginningHash: {
         type: Sequelize.TEXT,
       },
+      beginningRemainingBudget: {
+        type: Sequelize.INTEGER,
+      },
       endingHash: {
         type: Sequelize.TEXT,
-      },
-      budget: {
-        type: Sequelize.INTEGER,
       },
       usageCount: {
         type: Sequelize.INTEGER,
@@ -40,6 +40,6 @@ module.exports = {
   },
 
   down: async function (queryInterface, Sequelize) {
-    await queryInterface.dropTable('WorkspaceMutations')
+    await queryInterface.dropTable('CachedWorkspaceMutations')
   },
 };
