@@ -99,6 +99,15 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   }
 
 
+  Workspace.prototype.toHash = async function () {
+    const blocks = await this.visibleBlocks()
+    const _blocks = blocks.map(b => ({
+      value: b.value,
+      relationship: this.blockToRelationship(b)
+    }))
+    return JSON.stringify(_blocks)
+  }
+
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceOrder, element]
   }
@@ -167,7 +176,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return this.blockToRelationship(block);
   }
 
-  Workspace.prototype.blockToRelationship = async function (block) {
+  Workspace.prototype.blockToRelationship = function (block) {
     if (block.workspaceId === this.id){
       return {type: block.type, childIndex: NaN}
     } else {
@@ -182,7 +191,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
   }
 
   Workspace.prototype.relationshipToBlock = async function (relationship) {
-    if (_.isNaN(relationship.childIndex)){
+    if (_.isNaN(relationship.childIndex) || !relationship.childIndex){
       const directBlocks = await this.getBlocks();
       return directBlocks.find(b => b.type === relationship.type)
     } else {

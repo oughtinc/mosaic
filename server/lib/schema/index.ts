@@ -87,9 +87,13 @@ function modelGraphQLFields(type, model) {
 async function workspaceEvent({workspaceId, mutationClass, params}){
     const event = await models.Event.create()
     const workspace = await models.Workspace.findById(workspaceId)
+    const beginningHash = await workspace.toHash()
     const _mutation = new mutationClass()
     await _mutation.init(params, workspace)
-    return await _mutation.run(workspace, event)
+    const result = await _mutation.run(workspace, event)
+    const endingHash = await workspace.toHash()
+    await models.WorkspaceMutation.create({beginningHash, endingHash, budget: 3, mutation: _mutation.toJSON()})
+    return result
 }
 
 let schema = new GraphQLSchema({
@@ -132,7 +136,6 @@ let schema = new GraphQLSchema({
         type: new GraphQLList(blockType),
         args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
         resolve: async (_, { workspaceId, blocks }) => {
-          console.log("HI", workspaceId, blocks)
           return await workspaceEvent({
             workspaceId: workspaceId,
             mutationClass: UpdateWorkspaceBlocks, 

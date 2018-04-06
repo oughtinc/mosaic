@@ -11,6 +11,7 @@ import EventModel from './event'
 import PointerModel from './pointer'
 import PointerImportModel from './pointerImport'
 import WorkspaceModel from './workspace'
+import WorkspaceMutationModel from './workspaceMutations'
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -23,7 +24,8 @@ const models = [
   ['block', BlockModel],
   ['pointer', PointerModel],
   ['pointerImport', PointerImportModel],
-  ['workspace', WorkspaceModel]
+  ['workspace', WorkspaceModel],
+  ['workspaceMutation', WorkspaceMutationModel]
 ]
 
 const db = {};

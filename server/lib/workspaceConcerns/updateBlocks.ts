@@ -17,6 +17,10 @@ export class UpdateWorkspaceBlocks {
         this.blocks = _blocks;
     }
 
+    public async normalized({ blocks }, workspace) {
+        this.blocks = blocks;
+    }
+
     public async run(workspace, event) {
         let newBlocks: any = []
         for (const _block of this.blocks) {
