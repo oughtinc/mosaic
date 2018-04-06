@@ -32,8 +32,10 @@ export class WorkspaceMutation {
     }
 
     private async step2Mutation(){
-        await this.mutation.initFromNonnormalized(this.mutationParams, this.workspace)
-        this.impactedWorkspaces = await this.mutation.run(this.workspace, this.event)
+        const mutation = await this.mutation
+            .initFromNonnormalized(this.mutationParams, {workspace: this.workspace, event: this.event})
+        await mutation.run()
+        this.impactedWorkspaces = mutation.impactedWorkspaces;
     }
 
     private async step3ConsiderAddToCache(){

@@ -11,8 +11,11 @@ export async function normalizeBlock(block, workspace){
 export class UpdateWorkspaceBlocks {
     public static mutationName = "UpdateWorkspaceBlocks";
     public blocks;
+    public workspace;
+    public event;
+    public impactedWorkspaces;
 
-    public async initFromNonnormalized({ blocks }, workspace) {
+    public async initFromNonnormalized({ blocks }, {workspace, event}) {
         let normalizedBlocks:any = [];
 
         for (const block of blocks) {
@@ -20,28 +23,34 @@ export class UpdateWorkspaceBlocks {
             normalizedBlocks.push(normalizedBlock)
         }
 
-        this.init({blocks: normalizedBlocks}, workspace)
+        return this.init({blocks: normalizedBlocks}, {workspace, event})
     }
 
-    public async init({ blocks }, workspace) {
+    public async init({ blocks }, {workspace, event}) {
         this.blocks = blocks;
+        this.workspace = workspace;
+        this.event = event;
+        return this;
     }
 
-    public async run(workspace, event) {
+    public async run() {
         let newBlocks: any = []
         for (const _block of this.blocks) {
-            const block = await workspace.relationshipToBlock(_block.relationship)
-            await block.update({ value: _block.value }, { event })
+            const block = await this.workspace.relationshipToBlock(_block.relationship)
+            await block.update({ value: _block.value }, { event: this.event })
             newBlocks = [...newBlocks, block]
         }
         //TODO: Adjust for important children, and parent if that could be the case.
-        return {impactedWorkspaces: [workspace]}
+        this.impactedWorkspaces = [this.workspace];
+        return this;
     }
 
     public toJSON() {
         return {
             mutationName: this.constructor.name,
-            blocks: this.blocks,
+            initInputs: {
+                blocks: this.blocks,
+            }
         }
     }
 }
