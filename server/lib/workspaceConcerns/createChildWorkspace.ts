@@ -3,7 +3,7 @@ export class CreateChildWorkspace {
     public question;
     public totalBudget;
 
-    constructor({question, totalBudget}) {
+    public init({question, totalBudget}) {
         this.question = question;
         this.totalBudget = totalBudget;
     }

@@ -4,15 +4,24 @@ export class UpdateWorkspaceBlocks {
     public mutationName = "UpdateWorkspaceBlocks";
     public blocks;
 
-    constructor({ blocks }) {
-        this.blocks = blocks;
+    public async init({ blocks }, workspace) {
+        let _blocks:any = [];
+
+        for (const block of blocks) {
+            const relationship = await workspace.blockIdToRelationship(block.id);
+            _blocks.push({
+                value: block.value,
+                relationship
+            })
+        }
+        this.blocks = _blocks;
     }
 
     public async run(workspace, event) {
         let newBlocks: any = []
         for (const _block of this.blocks) {
-            const block = await models.Block.findById(_block.id)
-            await block.update({ ..._block }, { event })
+            const block = await workspace.relationshipToBlock(_block.relationship)
+            await block.update({ value: _block.value }, { event })
             newBlocks = [...newBlocks, block]
         }
         return newBlocks

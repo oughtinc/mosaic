@@ -141,6 +141,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           onChange={this.props.onChange}
           onKeyDown={this.props.onKeyDown}
           onMount={(input) => { this.blockEditorEditing = input; }}
+          editingWorkspaceId={this.props.editingWorkspaceId}
         />
       );
     }

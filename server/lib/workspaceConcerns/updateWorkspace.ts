@@ -2,7 +2,7 @@ export class UpdateWorkspace {
     public mutationName = "UpdateWorkspace";
     public childWorkspaceOrder;
 
-    constructor({childWorkspaceOrder}) {
+    public init({childWorkspaceOrder}) {
         this.childWorkspaceOrder = childWorkspaceOrder;
     }
 
@@ -10,7 +10,6 @@ export class UpdateWorkspace {
         const _workspace =  await workspace.update({
             childWorkspaceOrder: this.childWorkspaceOrder
         }, { event })
-        console.log("SHOULD HAVE JUST UPDATED???")
         return workspace;
     }
 

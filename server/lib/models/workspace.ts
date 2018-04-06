@@ -162,10 +162,46 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return _connectedPointers
   }
 
-  //private
-  Workspace.prototype.visibleBlocks = async function () {
-    let blocks = await this.getBlocks();
-    const connectingChildBlocks = await sequelize.models.Block.findAll({
+  Workspace.prototype.blockIdToRelationship = async function (blockId) {
+    const block = await sequelize.models.Block.findById(blockId)
+    return this.blockToRelationship(block);
+  }
+
+  Workspace.prototype.blockToRelationship = async function (block) {
+    if (block.workspaceId === this.id){
+      return {type: block.type, childIndex: NaN}
+    } else {
+      const childIndex = _.findIndex(this.childWorkspaceOrder, e => e === block.workspaceId)
+      if (childIndex !== -1) {
+        return {type: block.type, childIndex}
+      }
+      else {
+        throw new Error(`Relationship between block ${block.id} and workspace ${this.id} not found.`)
+      }
+    }
+  }
+
+  Workspace.prototype.relationshipToBlock = async function (relationship) {
+    if (_.isNaN(relationship.childIndex)){
+      const directBlocks = await this.getBlocks();
+      return directBlocks.find(b => b.type === relationship.type)
+    } else {
+      const results = await sequelize.models.Block.findAll({
+        where: {
+          workspaceId: {
+            [Op.in]: [this.childWorkspaceOrder[relationship.childIndex]],
+          },
+          type: {
+            [Op.in]: [relationship.type],
+          }
+        }
+      });
+      return results[0];
+    }
+  }
+
+  Workspace.prototype.getVisibleChildBlocks = async function () {
+    return await sequelize.models.Block.findAll({
       where: {
         workspaceId: {
           [Op.in]: this.childWorkspaceOrder,
@@ -175,8 +211,13 @@ const WorkspaceModel = (sequelize, DataTypes) => {
         }
       }
     })
-    blocks = [...blocks, ...connectingChildBlocks]
-    return blocks
+  }
+
+  //private
+  Workspace.prototype.visibleBlocks = async function () {
+    let directBlocks = await this.getBlocks();
+    let childBlocks = await this.getVisibleChildBlocks();
+    return [...directBlocks, ...childBlocks]
   }
 
   return Workspace;

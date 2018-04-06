@@ -31,6 +31,7 @@ export class Child extends React.Component<any, any> {
                 {questionRelationship.findBlock().value &&
                     <BlockEditor
                         {...questionRelationship.blockEditorAttributes()}
+                        editingWorkspaceId={this.props.editingWorkspaceId}
                         availablePointers={availablePointers}
                     />
                 }
@@ -38,6 +39,7 @@ export class Child extends React.Component<any, any> {
                 {answerRelationship.findBlock().value &&
                     <BlockEditor
                         {...answerRelationship.blockEditorAttributes()}
+                        editingWorkspaceId={this.props.editingWorkspaceId}
                         availablePointers={availablePointers}
                     />
                 }
@@ -89,6 +91,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                             const workspace = this.props.workspaces.find((w) => w.id === workspaceId);
                             return (
                                 <Child
+                                    editingWorkspaceId={this.props.editingWorkspaceId}
                                     workspace={workspace}
                                     key={workspace.id}
                                     onDelete={() => { this.props.changeOrder(this.props.workspaceOrder.filter((w) => w !== workspace.id)); }}

@@ -5,7 +5,7 @@ export class UpdateChildTotalBudget {
     public childId;
     public totalBudget;
 
-    constructor({ childId, totalBudget }) {
+    public init({ childId, totalBudget }) {
         this.childId = childId;
         this.totalBudget = totalBudget;
     }
