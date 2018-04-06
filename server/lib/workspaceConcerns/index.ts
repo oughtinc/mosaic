@@ -18,7 +18,7 @@ export function concernFromJSON(mutationJson:any){
 export async function runMutationFromJson(mutationJson:any, {workspace, event}){
     const mutation:any = concernFromJSON(mutationJson);
     await mutation
-        .initFromNonnormalized(mutationJson.initInputs, {workspace, event})
+        .init(mutationJson.initInputs, {workspace, event})
     await mutation.run()
     return mutation
 }

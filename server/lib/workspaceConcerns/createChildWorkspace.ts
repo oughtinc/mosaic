@@ -1,5 +1,4 @@
 import models from "../models";
-import { UpdateWorkspaceBlocks } from "./updateWorkspaceBlocks";
 import { AbstractConcern } from "./AbstractConcern";
 
 export class CreateChildWorkspace extends AbstractConcern {

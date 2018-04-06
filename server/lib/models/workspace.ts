@@ -181,7 +181,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     if (block.workspaceId === this.id) {
       return { type: block.type, childIndex: NaN }
     } else {
-      const childIndex = _.findIndex(this.childWorkspaceOrder, e => e === block.workspaceId)
+      const childIndex = this.childIdToChildIndex(block.workspaceId)
       if (childIndex !== -1) {
         return { type: block.type, childIndex }
       }
@@ -189,6 +189,14 @@ const WorkspaceModel = (sequelize, DataTypes) => {
         throw new Error(`Relationship between block ${block.id} and workspace ${this.id} not found.`)
       }
     }
+  }
+
+  Workspace.prototype.childIdToChildIndex = function (childId) {
+    return _.findIndex(this.childWorkspaceOrder, e => e === childId)
+  }
+
+  Workspace.prototype.childIndexToChildId = function (childIndex) {
+    return this.childWorkspaceOrder[childIndex]
   }
 
   Workspace.prototype.relationshipToBlock = async function (relationship) {
@@ -233,10 +241,12 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     const hash = await this.toHash();
     const cachedForwardWorkspaceMutation = await sequelize.models.CachedWorkspaceMutation.findOne({
       where: {
-        beginningHash: hash
+        beginningHash: hash,
+        beginningRemainingBudget: {
+          [Op.lte]: this.remainingBudget
+        }
       }
     })
-    //TODO: This only applies the next ForwardMutation, not subsequent ones.
     if (cachedForwardWorkspaceMutation) {
       await this.applyCachedWorkspaceMutation(cachedForwardWorkspaceMutation, event)
     }
