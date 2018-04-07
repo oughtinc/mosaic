@@ -117,12 +117,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
         return;
     }
 
-    // if the relatedTarget is the window, we want to go ahead and close the hoverMenu.
-    // the hoverMenu.contains check will error in this case, so add an additional check here.
-    if (!(event.relatedTarget === window)) {
-        if (hoverMenu === event.relatedTarget || hoverMenu.contains(event.relatedTarget as Node)) {
-            return;
-        }
+    if ((_.isElement(event.relatedTarget) && hoverMenu.contains(event.relatedTarget as Node))) {
+        return;
     }
 
     this.props.removeHoverItem();
