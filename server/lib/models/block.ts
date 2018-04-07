@@ -19,7 +19,7 @@ function getTopLevelInlinesAsArray(node) {
   return array;
 }
 
-function getAllInlinesAsArray(node) {
+export function getAllInlinesAsArray(node) {
   let array: any = [];
 
   node.nodes.forEach((child) => {
