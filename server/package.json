@@ -14,7 +14,7 @@
     "db:seed": "node_modules/.bin/sequelize db:seed:all",
     "db:reset": "npm run db:drop; npm run db:create; npm run db:migrate",
     "serve": "node ./dist/index.js",
-    "test": "mocha --compilers js:babel-register"
+    "test": "mocha -r ts-node/register test/**/*.spec.ts"
   },
   "author": "Ozzie Gooen",
   "license": "MIT",
@@ -58,6 +58,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "babel-preset-typescript": "^7.0.0-alpha.19",
     "babel-register": "^6.11.6",
+    "chai": "^4.1.2",
     "immutable": "^3.8.2",
     "mocha": "^3.0.1",
     "nodemon": "^1.12.1",
