@@ -239,16 +239,12 @@ const WorkspaceModel = (sequelize, DataTypes) => {
 
   Workspace.prototype.fastForwardMutations = async function (event) {
     const hash = await this.toHash();
-    const cachedForwardWorkspaceMutation = await sequelize.models.CachedWorkspaceMutation.findOne({
-      where: {
-        beginningHash: hash,
-        beginningRemainingBudget: {
-          [Op.lte]: this.remainingBudget
-        }
-      }
-    })
+    const cachedForwardWorkspaceMutation = await sequelize.models.CachedWorkspaceMutation.findCacheHit(hash, this.remainingBudget)
     if (cachedForwardWorkspaceMutation) {
-      await this.applyCachedWorkspaceMutation(cachedForwardWorkspaceMutation, event)
+      const futureMutations = await cachedForwardWorkspaceMutation.allFollowing();
+      for (const mutation of futureMutations) {
+        await this.applyCachedWorkspaceMutation(mutation, event)
+      }
     }
   }
 

@@ -40,7 +40,7 @@ export class WorkspaceMutation {
 
     private async step3ConsiderAddToCache(){
         const endingHash = await this.workspace.toHash()
-        await models.CachedWorkspaceMutation.create({
+        await models.CachedWorkspaceMutation.registerNewEntry({
             beginningHash: this.beginningHash,
             beginningRemainingBudget: this.workspace.remainingBudget,
             endingHash,
