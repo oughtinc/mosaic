@@ -102,6 +102,12 @@ let schema = new GraphQLSchema({
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(new GraphQLList(pointerType), models.Pointer),
       events: modelGraphQLFields(new GraphQLList(eventType), models.Event),
+        hello: {
+            type: GraphQLString,
+            resolve() {
+                return 'world';
+            }
+        }
     }
   }),
   mutation: new GraphQLObjectType({
