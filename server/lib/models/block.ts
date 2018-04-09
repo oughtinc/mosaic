@@ -84,7 +84,7 @@ const BlockModel = (sequelize, DataTypes) => {
   //private
   Block.prototype.topLevelPointersIds = async function () {
     if (!this.dataValues.value) { return [] }
-    const _getInlinesAsArray = getTopLevelInlinesAsArray(this.dataValues.value);
+    const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
     let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
     return pointers.map(p => p.data.pointerId)
   }
