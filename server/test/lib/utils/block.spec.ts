@@ -1,7 +1,7 @@
 import * as chai from "chai";
 const { expect } = chai;
 
-import { getAllInlinesAsArray } from "../../../lib/models/block"
+import { getAllInlinesAsArray } from "../../../lib/utils/slateUtils"
 
 const textNode = { object: 'text' };
 
