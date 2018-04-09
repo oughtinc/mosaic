@@ -14,7 +14,8 @@
     "db:seed": "node_modules/.bin/sequelize db:seed:all",
     "db:reset": "npm run db:drop; npm run db:create; npm run db:migrate",
     "serve": "node ./dist/index.js",
-    "test": "mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts"
+    "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
+    "pretest": "NODE_ENV=test npm run db:reset"
   },
   "author": "Ozzie Gooen",
   "license": "MIT",
