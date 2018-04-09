@@ -1,39 +1,8 @@
 import Sequelize from 'sequelize';
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
+import { getAllInlinesAsArray } from "../utils/slateUtils";
 import { Value } from "slate"
 import * as _ from "lodash";
-
-function getTopLevelInlinesAsArray(node) {
-  let array: any = [];
-
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
-    if (child.object === "inline") {
-      array.push(child);
-    }
-    if (_.has(child, 'nodes')) {
-      array = array.concat(getTopLevelInlinesAsArray(child))
-    }
-  });
-
-  return array;
-}
-
-export function getAllInlinesAsArray(node) {
-  let array: any = [];
-
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
-    if (child.object === "inline") {
-      array.push(child);
-    }
-    if (_.has(child, 'nodes')) {
-      array = array.concat(getAllInlinesAsArray(child))
-    }
-  });
-
-  return array;
-}
 
 const BlockModel = (sequelize, DataTypes) => {
   var Block = sequelize.define('Block', {
