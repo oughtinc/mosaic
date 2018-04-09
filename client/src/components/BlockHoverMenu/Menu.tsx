@@ -59,7 +59,7 @@ export class MenuPresentational extends React.Component<any> {
     const {blockEditor} = this.props;
     const hoverItemType = _.get(blockEditor, "hoveredItem.hoverItemType");
     return ReactDOM.createPortal(
-      <div className="menu hover-menu" ref={this.props.menuRef}>
+      <div className="menu hover-menu" ref={this.props.menuRef} id="hover-menu">
       {blockEditor &&
         <HoverMenu>
           {(hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT) &&
