@@ -24,9 +24,13 @@ const mockTree = {
 }
 
 describe('getAllInlinesAsArray', () => {
+    const inlines = getAllInlinesAsArray(mockTree);
     it('should get all inline nodes', () => {
-        const inlines = getAllInlinesAsArray(mockTree);
         expect(inlines).to.include(outerInlineNode);
         expect(inlines).to.include(innerInlineNode);
+    })
+    it('should not get any non-inline nodes', () => {
+        expect(inlines).to.not.include(mockTree);
+        expect(inlines).to.not.include(textNode);
     })
 })
