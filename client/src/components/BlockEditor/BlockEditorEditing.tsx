@@ -162,7 +162,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     private onKeyDown = (event) => {
-        const pressedControlAndE = (_event) => (_event.ctrlKey && _event.key === "e");
+        const pressedControlAndE = (_event) => (_event.metaKey && _event.key === "e");
         if (pressedControlAndE(event)) {
             this.props.exportSelection();
             event.preventDefault();
