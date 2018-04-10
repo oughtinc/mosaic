@@ -1,19 +1,32 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Button } from "react-bootstrap";
+import { Button, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
+<<<<<<< HEAD
 import * as _ from "lodash";
+=======
+import { ChildBudgetForm } from "./ChildBudgetForm";
+>>>>>>> master
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
     padding: 1em;
     margin-bottom: 1em;
+    float: left;
+    width: 100%;
 `;
 
 export class Child extends React.Component<any, any> {
+<<<<<<< HEAD
+=======
+    public constructor(props: any) {
+        super(props);
+        this.state = { showChildBudgetForm: false };
+    }
+>>>>>>> master
 
     public render() {
         const workspace = this.props.workspace;
@@ -36,12 +49,31 @@ export class Child extends React.Component<any, any> {
                     />
                 }
 
-                <Link to={`/workspaces/${workspace.id}`}>
-                    <Button> Open </Button>
-                </Link>
-                <Button onClick={this.props.onDelete}>
-                    Archive
+                <div>
+                    <Link to={`/workspaces/${workspace.id}`}>
+                        <Button> Open </Button>
+                    </Link>
+                    <Button onClick={this.props.onDelete}>
+                        Archive
                 </Button>
+                    {!this.state.showChildBudgetForm &&
+                        <Button onClick={() => { this.setState({ showChildBudgetForm: true }); }}>
+                            Edit Allocation
+                    </Button>
+                    }
+                    <div style={{ float: "right" }}>
+                        <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
+                    </div>
+                </div>
+                {this.state.showChildBudgetForm &&
+                    <ChildBudgetForm
+                        initialValue={workspace.totalBudget}
+                        min={workspace.allocatedBudget}
+                        max={parseInt(workspace.totalBudget, 10) + parseInt(this.props.parentAvailableBudget, 10)}
+                        onSubmit={(totalBudget) => { this.props.onUpdateChildTotalBudget({ childId: workspace.id, totalBudget }); }}
+                        onClose={() => this.setState({ showChildBudgetForm: false })}
+                    />
+                }
             </ChildStyle>
         );
     }
@@ -79,6 +111,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
                                     key={workspace.id}
                                     onDelete={() => { this.props.changeOrder(this.props.workspaceOrder.filter((w) => w !== workspace.id)); }}
                                     availablePointers={this.props.availablePointers}
+                                    parentAvailableBudget={this.props.availableBudget}
+                                    onUpdateChildTotalBudget={this.props.onUpdateChildTotalBudget}
                                 />
                             );
                         }
@@ -87,6 +121,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 }
                 <h3> Add a new Child Question </h3>
                 <NewBlockForm
+                    maxTotalBudget={this.props.availableBudget}
                     onMutate={this.props.onCreateChild}
                     availablePointers={this.props.availablePointers}
                     ref={(input) => { this.newChildField = input; }}
