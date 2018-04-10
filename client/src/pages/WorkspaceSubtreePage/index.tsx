@@ -1,25 +1,10 @@
-import gql from "graphql-tag";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import * as React from "react";
 import _ = require("lodash");
 import { WorkspaceCard } from "../../components/WorkspaceCard";
-
-const WORKSPACES_QUERY = gql`
-query workspaceSubtree($workspaceId: String!){
-    subtreeWorkspaces(workspaceId:$workspaceId){
-       id
-       childWorkspaceOrder
-       connectedPointers
-       blocks{
-         id
-         value
-         type
-       }
-     }
-  }
-`;
+import { WORKSPACES_QUERY } from "../../graphqlQueries";
 
 export class WorkspaceSubtreePagePresentational extends React.Component<any, any> {
     public render() {
