@@ -5,11 +5,8 @@ import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
-<<<<<<< HEAD
 import * as _ from "lodash";
-=======
 import { ChildBudgetForm } from "./ChildBudgetForm";
->>>>>>> master
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
@@ -20,13 +17,10 @@ const ChildStyle = styled.div`
 `;
 
 export class Child extends React.Component<any, any> {
-<<<<<<< HEAD
-=======
     public constructor(props: any) {
         super(props);
         this.state = { showChildBudgetForm: false };
     }
->>>>>>> master
 
     public render() {
         const workspace = this.props.workspace;
@@ -91,6 +85,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
             !_.isEqual(newProps.blockEditor, this.props.blockEditor)
             || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
             || !_.isEqual(newProps.block, this.props.block)
+            || !_.isEqual(newProps.workspaceOrder, this.props.workspaceOrder)
+            || !_.isEqual(newProps.workspaces, this.props.workspaces)
         ) {
             return true;
         }
