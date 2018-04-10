@@ -11,4 +11,4 @@ export const truncate = () => Promise.all(Object.keys(models).map((key) => {
         return;
     }
     return models[key].destroy({ where: {}, force: true });
-}))
+}));
