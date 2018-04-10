@@ -4,7 +4,7 @@ import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import * as React from "react";
 import _ = require("lodash");
 import { WorkspaceCard } from "../../components/WorkspaceCard";
-import { WORKSPACES_QUERY } from "../../graphqlQueries";
+import { WORKSPACE_SUBTREE_QUERY } from "../../graphqlQueries";
 
 export class WorkspaceSubtreePagePresentational extends React.Component<any, any> {
     public render() {
@@ -33,5 +33,5 @@ const options: any = ({ match }) => ({
 });
 
 export const WorkspaceSubtreePage = compose(
-    graphql(WORKSPACES_QUERY, { name: "workspaceSubtreeWorkspaces", options }),
+    graphql(WORKSPACE_SUBTREE_QUERY, { name: "workspaceSubtreeWorkspaces", options }),
 )(WorkspaceSubtreePagePresentational);

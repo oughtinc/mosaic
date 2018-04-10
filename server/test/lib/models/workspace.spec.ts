@@ -11,7 +11,7 @@ describe('WorkspaceModel', () => {
         
         // a lame test, but just wanted to get something working quickly
         // to show the testing pattern.
-        it('does not return anything if there are no subtree workspaces', async () => {
+        it('should not return anything if there are no subtree workspaces', async () => {
             const rootWorkspace = await createRootWorkspace();
             const workspace = await models.Workspace.findById(rootWorkspace.data.createWorkspace.id);
             const subtreeWorkspaces = await workspace.subtreeWorkspaces();

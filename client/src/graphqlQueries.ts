@@ -43,3 +43,18 @@ export const WORKSPACES_QUERY = gql`
         }
     }
  `;
+
+export const WORKSPACE_SUBTREE_QUERY = gql`
+    query workspaceSubtree($workspaceId: String!){
+        subtreeWorkspaces(workspaceId:$workspaceId){
+            id
+            childWorkspaceOrder
+            connectedPointers
+            blocks{
+                id
+                value
+                type
+            }
+        }
+    }
+`;

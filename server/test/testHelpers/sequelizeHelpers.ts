@@ -1,6 +1,6 @@
 import * as models from "../../lib/models";
 
-// sequelize is in here b/c it's not actually one of our tables.
+// sequelize and Sequelize are in here b/c they're not actually tables.
 // Event is in here b/c clearing the events table
 // creates all sorts of weird foreign key problems, and isn't necessary,
 // at least for our current tests.
