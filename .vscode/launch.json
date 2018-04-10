@@ -8,6 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Mocha Tests",
+            "env": { "NODE_ENV": "test" },
             "program": "${workspaceFolder}/server/node_modules/mocha/bin/_mocha",
             "args": [
                 "-u",

@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-export function getAllInlinesAsArray(node) {
+export const getAllInlinesAsArray = (node) => {
     let array: any = [];
 
     node.nodes.forEach((child) => {
