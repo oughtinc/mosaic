@@ -3,6 +3,7 @@ import { graphql } from 'graphql';
 import * as chai from "chai";
 const { expect } = chai;
 import { print } from "graphql";
+import { truncate } from "./testHelpers/sequelizeHelpers";
 import { CREATE_ROOT_WORKSPACE } from "../../client/src/graphqlQueries"
 
 const totalBudget = "1000"
@@ -18,7 +19,12 @@ const createRootWorkspace = () => {
 }
 
 describe('createWorkspace for a root workspace', () => {
+    beforeEach(() => {
+        truncate();
+    })
+    
     it('creates a root workspace', () => {
         return createRootWorkspace();
     })
+
 })
