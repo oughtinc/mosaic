@@ -21,3 +21,19 @@ npm run start
 cd client 
 npm run start
 ```
+
+## Testing
+
+- Backend:
+
+To run the tests:
+
+```
+cd server
+npm run test
+```
+
+To use Visual Studio Code to debug while running the tests:
+1. Click on the debug menu
+2. Select "Mocha Tests"
+3. Click the run button
