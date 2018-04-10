@@ -4,7 +4,6 @@ import { Inline } from "slate";
 import * as uuidv1 from "uuid/v1";
 import { Editor } from "slate-react";
 import { compose, withProps, withState } from "recompose";
-import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
@@ -12,6 +11,7 @@ import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
+import { UPDATE_BLOCKS } from "../../graphqlQueries";
 
 const BlockEditorStyle = styled.div`
     background: #f4f4f4;
@@ -19,16 +19,6 @@ const BlockEditorStyle = styled.div`
     border: 1px solid #d5d5d5;
     margin-bottom: 1em;
     padding: .3em;
-`;
-
-const UPDATE_BLOCKS = gql`
-    mutation updateBlocks($blocks:[blockInput]){
-        updateBlocks(blocks:$blocks){
-            id
-            value
-            updatedAtEventId
-        }
-    }
 `;
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;

@@ -16,6 +16,7 @@ import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 import { Value } from "slate";
 import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
+import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
 
 const WORKSPACE_QUERY = gql`
@@ -45,16 +46,6 @@ const WORKSPACE_QUERY = gql`
         }
     }
  `;
-
-const UPDATE_BLOCKS = gql`
-    mutation updateBlocks($blocks:[blockInput]){
-        updateBlocks(blocks:$blocks){
-            id
-            value
-            updatedAtEventId
-        }
-    }
-`;
 
 const UPDATE_WORKSPACE = gql`
     mutation updateWorkspace($id: String!, $childWorkspaceOrder: [String]){
