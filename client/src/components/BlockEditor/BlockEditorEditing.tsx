@@ -22,10 +22,9 @@ const BlockEditorStyle = styled.div`
 `;
 
 const UPDATE_BLOCKS = gql`
-    mutation updateBlocks($blocks:[blockInput]){
-        updateBlocks(blocks:$blocks){
+    mutation updateBlocks($workspaceId: String!,  $blocks:[blockInput]){
+        updateBlocks(workspaceId: $workspaceId, blocks:$blocks){
             id
-            value
             updatedAtEventId
         }
     }
@@ -230,11 +229,14 @@ export const BlockEditorEditing: any = compose(
     ),
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer", withRef: true}),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
-    withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
+    withProps(({ saveBlocksToServer, block, setMutationStatus, editingWorkspaceId }) => {
         const saveBlocksMutation = () => {
             setMutationStatus({ status: MutationStatus.Loading });
             saveBlocksToServer({
-                variables: { blocks: { id: block.id, value: valueToDatabaseJSON(block.value) } },
+                variables: {
+                    workspaceId: editingWorkspaceId,
+                    blocks: { id: block.id, value: valueToDatabaseJSON(block.value) },
+                },
             }).then(() => {
                 setMutationStatus({ status: MutationStatus.Complete });
             }).catch((e) => {

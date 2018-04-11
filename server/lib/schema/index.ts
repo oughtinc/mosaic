@@ -7,6 +7,11 @@ import * as aasync from "async";
 import * as pluralize from "pluralize";
 import * as Case from "Case";
 import * as GraphQLJSON from 'graphql-type-json';
+import { UpdateWorkspace } from "../workspaceConcerns/updateWorkspace";
+import { UpdateWorkspaceBlocks } from "../workspaceConcerns/updateWorkspaceBlocks";
+import { CreateChildWorkspace } from "../workspaceConcerns/createChildWorkspace";
+import { UpdateChildTotalBudget } from "../workspaceConcerns/updateChildTotalBudget";
+import { WorkspaceMutation } from "../workspaceConcerns/WorkspaceMutation";
 
 const generateReferences = (model, references) => {
   let all = {};
@@ -107,29 +112,6 @@ let schema = new GraphQLSchema({
   mutation: new GraphQLObjectType({
     name: 'RootMutationType',
     fields: {
-      updateBlocks: {
-        type: new GraphQLList(blockType),
-        args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
-        resolve: async (_, { workspaceId, blocks }) => {
-          const event = await models.Event.create()
-          let newBlocks: any = []
-          for (const _block of blocks) {
-            const block = await models.Block.findById(_block.id)
-            await block.update({ ..._block }, { event })
-            newBlocks = [...newBlocks, block]
-          }
-          return newBlocks
-        }
-      },
-      updateWorkspace: {
-        type: workspaceType,
-        args: { id: { type: GraphQLString }, childWorkspaceOrder: { type: new GraphQLList(GraphQLString) } },
-        resolve: async (_, { id, childWorkspaceOrder }) => {
-          const workspace = await models.Workspace.findById(id)
-          const event = await models.Event.create()
-          return workspace.update({ childWorkspaceOrder }, { event })
-        }
-      },
       createWorkspace: {
         type: workspaceType,
         args: { question: { type: GraphQLJSON }, totalBudget: {type: GraphQLInt} },
@@ -139,24 +121,52 @@ let schema = new GraphQLSchema({
           return workspace
         }
       },
+      updateBlocks: {
+        type: workspaceType,
+        args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
+        resolve: async (_, { workspaceId, blocks }) => {
+          const workspaceMutation = new WorkspaceMutation({
+            workspaceId: workspaceId,
+            mutationClass: UpdateWorkspaceBlocks, 
+            params: {blocks}
+          })
+          return await workspaceMutation.run();
+        }
+      },
+      updateWorkspace: {
+        type: workspaceType,
+        args: { id: { type: GraphQLString }, childWorkspaceOrder: { type: new GraphQLList(GraphQLString) } },
+        resolve: async (_, { id, childWorkspaceOrder }) => {
+          const workspaceMutation = new  WorkspaceMutation({
+            workspaceId: id,
+            mutationClass: UpdateWorkspace, 
+            params: {childWorkspaceOrder}
+          })
+          return await workspaceMutation.run();
+        }
+      },
       createChildWorkspace: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, totalBudget: {type: GraphQLInt} },
         resolve: async (_, { workspaceId, question, totalBudget }) => {
-          const workspace = await models.Workspace.findById(workspaceId)
-          const event = await models.Event.create()
-          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget })
-          return child
+          const workspaceMutation = new WorkspaceMutation({
+            workspaceId,
+            mutationClass: CreateChildWorkspace, 
+            params: {question, totalBudget}
+          })
+          return await workspaceMutation.run();
         }
       },
       updateChildTotalBudget: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, childId: { type: GraphQLString }, totalBudget: { type: GraphQLInt } },
         resolve: async (_, { workspaceId, childId, totalBudget }) => {
-          const event = await models.Event.create()
-          const workspace = await models.Workspace.findById(workspaceId)
-          const child = await models.Workspace.findById(childId)
-          await workspace.changeAllocationToChild(child, totalBudget, {event})
+          const workspaceMutation = new WorkspaceMutation({
+            workspaceId,
+            mutationClass: UpdateChildTotalBudget, 
+            params: {childId, totalBudget}
+          })
+          return await workspaceMutation.run();
         }
       },
     }

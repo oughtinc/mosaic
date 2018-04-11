@@ -47,8 +47,8 @@ const WORKSPACE_QUERY = gql`
  `;
 
 const UPDATE_BLOCKS = gql`
-    mutation updateBlocks($blocks:[blockInput]){
-        updateBlocks(blocks:$blocks){
+    mutation updateBlocks($workspaceId:String!, $blocks:[blockInput]){
+        updateBlocks(workspaceId:$workspaceId, blocks:$blocks){
             id
             value
             updatedAtEventId
@@ -113,13 +113,6 @@ export class FormPagePresentational extends React.Component<any, any> {
         keyboardJS.bind("alt+c", (e) => { e.preventDefault(); this.newChildField.focus(); });
     }
 
-    public updateBlocks = (blocks: any) => {
-        const variables = { blocks };
-        this.props.updateBlocks({
-            variables,
-        });
-    }
-
     public render() {
         const workspace = this.props.workspace.workspace;
         if (!workspace) {
@@ -153,6 +146,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                             <h1>
                                 <BlockEditor
                                     availablePointers={availablePointers}
+                                    editingWorkspaceId={workspace.id}
                                     {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceQuestion, workspace).blockEditorAttributes())}
                                 />
                             </h1>
@@ -164,12 +158,14 @@ export class FormPagePresentational extends React.Component<any, any> {
                             <BlockEditor
                                 availablePointers={availablePointers}
                                 {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceScratchpad, workspace).blockEditorAttributes())}
+                                editingWorkspaceId={workspace.id}
                                 ref={this.registerEditorRef("scratchpadField")}
                             />
                             <h3>Answer</h3>
                             <BlockEditor
                                 availablePointers={availablePointers}
                                 {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
+                                editingWorkspaceId={workspace.id}
                                 ref={this.registerEditorRef("answerField")}
                             />
                         </Col>
@@ -182,6 +178,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         </Col>
                         <Col sm={6}>
                             <ChildrenSidebar
+                                editingWorkspaceId={workspace.id}
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
