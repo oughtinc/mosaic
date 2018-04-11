@@ -1,13 +1,13 @@
 import * as chai from "chai";
 const { expect } = chai;
-import { truncate } from "../../testHelpers/sequelizeHelpers";
+import { truncateDb } from "../../testHelpers/sequelizeHelpers";
 import { createRootWorkspace } from "../../testHelpers/graphQLCalls";
 import WorkspaceModel from "../../../lib/models/workspace";
 import * as models from "../../../lib/models";
 
 describe('WorkspaceModel', () => {
     describe('subtreeWorkspaces', () => {
-        beforeEach(() => truncate());
+        beforeEach(() => truncateDb());
         
         // a lame test, but just wanted to get something working quickly
         // to show the testing pattern.

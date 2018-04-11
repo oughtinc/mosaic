@@ -22,6 +22,7 @@
   "dependencies": {
     "apollo-server-express": "^1.1.7",
     "async": "^2.6.0",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "case": "^1.5.4",
     "cookie-parser": "~1.4.3",
