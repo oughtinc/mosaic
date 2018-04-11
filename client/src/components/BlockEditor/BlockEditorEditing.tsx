@@ -127,10 +127,10 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                 />
                 <Editor
                     value={this.props.value}
-                    onChange={(c) => this.onChange(c.value)}
+                    onChange={_.debounce((c) => this.onChange(c.value), 1)}
                     plugins={this.props.plugins}
                     spellCheck={false}
-                    onBlur={this.handleBlur}
+                    onBlur={_.debounce(this.handleBlur, 1)}
                     onKeyDown={this.onKeyDown}
                     ref={(input) => { this.editor = input; }}
                 />
