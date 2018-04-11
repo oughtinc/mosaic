@@ -127,10 +127,10 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                 />
                 <Editor
                     value={this.props.value}
-                    onChange={_.debounce((c) => this.onChange(c.value), 1)}
+                    onChange={this.onChangeCallback}
                     plugins={this.props.plugins}
                     spellCheck={false}
-                    onBlur={_.debounce(this.handleBlur, 1)}
+                    onBlur={this.handleBlur}
                     onKeyDown={this.onKeyDown}
                     ref={(input) => { this.editor = input; }}
                 />
@@ -188,6 +188,10 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         }
     }
 
+    private onChangeCallback = (c: any) => {
+        this.onChange(c.value);
+    }
+
     private onChange = (value: any, pointerChanged: boolean = false) => {
         this.props.updateBlock({ id: this.props.block.id, value, pointerChanged });
         if (this.props.onChange) {
@@ -226,10 +230,12 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     private handleBlur = () => {
-        if (this.props.shouldAutosave) {
-            this.considerSaveToDatabase();
-            this.endAutosaveInterval();
-        }
+        _.debounce(() => {
+            if (this.props.shouldAutosave) {
+                this.considerSaveToDatabase();
+                this.endAutosaveInterval();
+            }
+        });
     }
 }
 
