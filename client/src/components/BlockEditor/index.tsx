@@ -56,7 +56,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public resetPlugins(newProps: any) {
-
     const SlatePointerInputs = {
       onSelectNull: () => {
         newProps.removeHoverItem();
@@ -126,11 +125,11 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
     const hoverMenu = document.getElementById("hover-menu");
     if (!hoverMenu) {
-        return;
+      return;
     }
 
     if ((_.isElement(event.relatedTarget) && hoverMenu.contains(event.relatedTarget as Node))) {
-        return;
+      return;
     }
 
     this.props.removeHoverItem();
@@ -141,27 +140,27 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const value = block.value;
     const { plugins } = this.state;
     return readOnly ? (
-        <BlockReadOnlyStyle>
-            <Editor
-                value={value}
-                readOnly={true}
-                plugins={plugins}
-            />
-        </BlockReadOnlyStyle>
+      <BlockReadOnlyStyle>
+        <Editor
+          value={value}
+          readOnly={true}
+          plugins={plugins}
+        />
+      </BlockReadOnlyStyle>
     ) : (
         <BlockEditorEditing
-            value={value}
-            readOnly={true}
-            shouldAutosave={!!this.props.shouldAutosave}
-            block={this.props.block}
-            availablePointers={this.props.availablePointers}
-            plugins={plugins}
-            onChange={this.props.onChange}
-            onKeyDown={this.props.onKeyDown}
-            onMount={(input) => { this.blockEditorEditing = input; }}
+          value={value}
+          readOnly={true}
+          shouldAutosave={!!this.props.shouldAutosave}
+          block={this.props.block}
+          availablePointers={this.props.availablePointers}
+          plugins={plugins}
+          onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
+          onMount={(input) => { this.blockEditorEditing = input; }}
         />
-    );
-  } 
+      );
+  }
 
   public render() {
     const block = this.props.block;
@@ -169,9 +168,9 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return (<div> loading... </div>);
     }
     return (
-        <div onMouseLeave={this.handleMouseLeave}>
-            {this.renderEditor(block)}
-        </div>
+      <div onMouseLeave={this.handleMouseLeave}>
+        {this.renderEditor(block)}
+      </div>
     );
   }
 }
