@@ -1,13 +1,11 @@
-import { graphql } from 'graphql';
+import { graphql, ExecutionResult } from 'graphql';
 import { print } from "graphql";
 import { schema } from '../../lib/schema/index';
 import { CREATE_ROOT_WORKSPACE } from "../../../client/src/graphqlQueries"
 
-const runGraphQLQuery = (queryAST: any, queryArgs: any) => graphql(schema, print(queryAST), null, null, queryArgs);
+const runGraphQLQuery = (queryAST: any, queryArgs: any): Promise<ExecutionResult> => graphql(schema, print(queryAST), null, null, queryArgs);
 
-export const createRootWorkspace = () => {
-    const totalBudget = "1000";
-    const createRootWorkspaceQuestion = "{\"object\":\"block\",\"type\":\"line\",\"isVoid\":false,\"data\":{},\"nodes\":[{\"object\":\"text\",\"leaves\":[{\"object\":\"leaf\",\"text\":\"Fake root workspace\",\"marks\":[]}]}]}";
-    const createRootWorkspaceArgs = { question: createRootWorkspaceQuestion, totalBudget };
+export const createRootWorkspace = (totalBudget: number, question: string): Promise<ExecutionResult> => {
+    const createRootWorkspaceArgs = { question: question, totalBudget };
     return runGraphQLQuery(CREATE_ROOT_WORKSPACE, createRootWorkspaceArgs);
 }
