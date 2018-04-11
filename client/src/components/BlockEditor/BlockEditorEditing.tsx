@@ -79,6 +79,14 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     public editor;
     private autosaveInterval: any;
 
+    private handleBlur = _.debounce(() => {
+        console.log("Handle blur");
+        if (this.props.shouldAutosave) {
+            this.considerSaveToDatabase();
+            this.endAutosaveInterval();
+        }
+    });
+
     public constructor(props: any) {
         super(props);
         this.state = { hasChangedSinceDatabaseSave: false };
@@ -132,7 +140,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                     spellCheck={false}
                     onBlur={this.handleBlur}
                     onKeyDown={this.onKeyDown}
-                    ref={(input) => { this.editor = input; }}
+                    ref={this.updateEditor}
                 />
             </BlockEditorStyle>
         );
@@ -199,6 +207,10 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         }
     }
 
+    private updateEditor = (input: any) => {
+        this.editor = input
+    }
+
     private onAddPointerImport = (pointerId: string) => {
         const { value } = this.props.value.change()
             .insertInline(inlinePointerImportJSON(pointerId));
@@ -229,14 +241,6 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         }
     }
 
-    private handleBlur = () => {
-        _.debounce(() => {
-            if (this.props.shouldAutosave) {
-                this.considerSaveToDatabase();
-                this.endAutosaveInterval();
-            }
-        });
-    }
 }
 
 function mapStateToProps(state: any) {
