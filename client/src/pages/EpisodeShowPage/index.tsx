@@ -86,7 +86,7 @@ const ParentLink = (props) => (
     </Link>
 );
 
-const SubtreeLink = ({workspace}) => (
+const SubtreeLink = ({ workspace }) => (
     <Link to={`/workspaces/${workspace.id}/subtree`}>
         <Button>To Subtree</Button>
     </Link>
@@ -138,15 +138,15 @@ export class FormPagePresentational extends React.Component<any, any> {
                             {workspace.parentId &&
                                 <ParentLink parentId={workspace.parentId} />
                             }
-                            {workspace && 
+                            {workspace &&
                                 <SubtreeLink workspace={workspace} />
                             }
                         </Col>
                         <Col sm={2}>
                             {workspace &&
-                            <div style={{float: "right"}}>
-                                Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
-                            </div>
+                                <div style={{ float: "right" }}>
+                                    Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
+                                </div>
                             }
                         </Col>
                         <Col sm={12}>
@@ -185,11 +185,11 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
-                                onCreateChild={({question, totalBudget}) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
-                                onUpdateChildTotalBudget={({childId, totalBudget}) => {this.props.updateChildTotalBudget({variables: {workspaceId: workspace.id, childId, totalBudget}}); }}
+                                onCreateChild={({ question, totalBudget }) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
+                                onUpdateChildTotalBudget={({ childId, totalBudget }) => { this.props.updateChildTotalBudget({ variables: { workspaceId: workspace.id, childId, totalBudget } }); }}
                                 availableBudget={workspace.totalBudget - workspace.allocatedBudget}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                                ref={(input) => {if (input && input.editor()) { this.newChildField = input.editor(); }}}
+                                ref={(input) => { if (input && input.editor()) { this.newChildField = input.editor(); } }}
                             />
                         </Col>
                     </Row>

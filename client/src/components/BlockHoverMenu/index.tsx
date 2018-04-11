@@ -3,7 +3,6 @@ import { Menu } from "./Menu";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import { removeHoverItem } from "../../modules/blockEditor/actions";
-import * as _ from "lodash";
 
 class BlockHoverMenuPresentational extends React.Component<any, any> {
     public menu;
