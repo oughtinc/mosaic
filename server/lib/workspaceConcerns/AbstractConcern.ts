@@ -5,7 +5,7 @@ export class AbstractConcern {
     public impactedWorkspaces;
     public initInputs;
 
-    public async initFromNonnormalized(params, {workspace, event}) {
+    public async initFromUnnormalized(params, {workspace, event}) {
         return this.init(params, {workspace, event})
     }
 

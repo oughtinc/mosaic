@@ -27,8 +27,12 @@ const CachedWorkspaceMutationModel = (sequelize, DataTypes) => {
         }
     })
 
+    //todo: this hasn't really been tested yet.
     CachedWorkspaceMutation.findCacheHit = async function (hash, remainingBudget) {
         const hits = await sequelize.models.CachedWorkspaceMutation.findAll({
+            order: [
+                "beginningRemainingBudget", "DESC"
+            ],
             where: {
                 beginningHash: hash,
                 beginningRemainingBudget: {
@@ -61,6 +65,7 @@ const CachedWorkspaceMutationModel = (sequelize, DataTypes) => {
         return await CachedWorkspaceMutation.findCacheHit(this.endingHash, this.beginningRemainingBudget)
     }
 
+    //TODO: Make sure this keeps order.
     CachedWorkspaceMutation.prototype.allFollowing = async function () {
         if (this.beginningHash === this.endingHash){
             return [this]

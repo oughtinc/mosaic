@@ -2,6 +2,7 @@ import { UpdateWorkspaceBlocks } from "./UpdateWorkspaceBlocks";
 import { UpdateChildTotalBudget } from "./UpdateChildTotalBudget";
 import { UpdateWorkspace } from "./UpdateWorkspace";
 import { CreateChildWorkspace } from "./CreateChildWorkspace";
+import _ = require("lodash");
 
 export const concerns = [
     UpdateWorkspaceBlocks,
@@ -11,8 +12,8 @@ export const concerns = [
 ]
 
 export function concernFromJSON(mutationJson:any){
-    const concern:any = concerns.find((c:any) => c.mutationName === mutationJson.mutationName)
-    return new concern();
+    const concern:any = _.keyBy(concerns, 'mutationName')[mutationJson.mutationName]
+    return new concern()
 }
 
 export async function runMutationFromJson(mutationJson:any, {workspace, event}){

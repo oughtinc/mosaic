@@ -230,11 +230,16 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     })
   }
 
+
   //private
   Workspace.prototype.visibleBlocks = async function () {
     let directBlocks = await this.getBlocks();
+    let question = directBlocks.find(d => d.type === "QUESTION")
+    let scratchpad = directBlocks.find(d => d.type === "SCRATCHPAD")
+    let answer = directBlocks.find(d => d.type === "ANSWER")
+
     let childBlocks = await this.getVisibleChildBlocks();
-    return [...directBlocks, ...childBlocks]
+    return [question, scratchpad, answer, ..._.orderBy(childBlocks, (b => b.createdAtEventId))]
   }
 
   Workspace.prototype.fastForwardMutations = async function (event) {
