@@ -80,7 +80,6 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     private autosaveInterval: any;
 
     private handleBlur = _.debounce(() => {
-        console.log("Handle blur");
         if (this.props.shouldAutosave) {
             this.considerSaveToDatabase();
             this.endAutosaveInterval();
@@ -208,7 +207,7 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     }
 
     private updateEditor = (input: any) => {
-        this.editor = input
+        this.editor = input;
     }
 
     private onAddPointerImport = (pointerId: string) => {
