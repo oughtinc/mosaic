@@ -3,9 +3,7 @@ import { print } from "graphql";
 import { schema } from '../../lib/schema/index';
 import { CREATE_ROOT_WORKSPACE } from "../../../client/src/graphqlQueries"
 
-const runGraphQLQuery = (queryAST: any, queryArgs: any) => {
-    return graphql(schema, print(queryAST), null, null, queryArgs);
-}
+const runGraphQLQuery = (queryAST: any, queryArgs: any) => graphql(schema, print(queryAST), null, null, queryArgs);
 
 export const createRootWorkspace = () => {
     const totalBudget = "1000";

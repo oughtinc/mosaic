@@ -9,17 +9,17 @@ A platform for individuals to complete small tasks
   
 ```
 cd server;
-npm run db:create
-npm run db:migrate
-npm run db:seed
-npm run start
+yarn run db:create
+yarn run db:migrate
+yarn run db:seed
+yarn start
 ```
 
 2. Start the react-create-app client
 
 ```
 cd client 
-npm run start
+yarn start
 ```
 
 ## Testing
@@ -30,7 +30,7 @@ To run the tests:
 
 ```
 cd server
-npm run test
+yarn test
 ```
 
 To use Visual Studio Code to debug while running the tests:
