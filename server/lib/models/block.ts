@@ -1,39 +1,8 @@
 import Sequelize from 'sequelize';
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
+import { getAllInlinesAsArray } from "../utils/slateUtils";
 import { Value } from "slate"
 import * as _ from "lodash";
-
-function getTopLevelInlinesAsArray(node) {
-  let array: any = [];
-
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
-    if (child.object === "inline") {
-      array.push(child);
-    }
-    if (_.has(child, 'nodes')) {
-      array = array.concat(getTopLevelInlinesAsArray(child))
-    }
-  });
-
-  return array;
-}
-
-function getAllInlinesAsArray(node) {
-  let array: any = [];
-
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
-    if (child.object === "inline") {
-      array.push(child);
-    }
-    if (_.has(child, 'nodes')) {
-      array = array.concat(getAllInlinesAsArray(child))
-    }
-  });
-
-  return array;
-}
 
 const BlockModel = (sequelize, DataTypes) => {
   var Block = sequelize.define('Block', {
@@ -115,7 +84,7 @@ const BlockModel = (sequelize, DataTypes) => {
   //private
   Block.prototype.topLevelPointersIds = async function () {
     if (!this.dataValues.value) { return [] }
-    const _getInlinesAsArray = getTopLevelInlinesAsArray(this.dataValues.value);
+    const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
     let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
     return pointers.map(p => p.data.pointerId)
   }
