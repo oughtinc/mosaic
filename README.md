@@ -51,7 +51,7 @@ To use Visual Studio Code to debug while running the tests:
 
 ### Save
 0. If the app is not running, run it (`docker-compose up`)
-0. Use psql or pgadmin to create a sql dump of the db. E.g. see these instructions: https://www.pgadmin.org/docs/pgadmin4/1.x/backup_dialog.html
+0. Run `yarn run dump-db` with a name for your dump, e.g. `yarn run dump-db myDump`
 
 ### Restore
 
@@ -63,10 +63,14 @@ fish shell:
 bash:
 `export CONNECTION_STRING_DEV=postgres://mosaic:MDaUA2P4ZbkJPCKEM@localhost:5432/mosaic_dev`
 
+Also, make sure that you have the Postgres command line tools in your shell PATH. You should have the command `psql`.
+
+If you don't have it, and you installed Postgres via the Postgres app, you probably just need to add something like this to your PATH: `/Applications/Postgres.app/Contents/Versions/10/bin`
+
+0. If the app is not running, run it (`docker-compose up`)
 0. Close all external connections to the database (e.g. from pgadmin)
-0. `yarn run erase-db`. JTBC, this will erase the current contents of your database -- be careful!
-0. Use psql or pgadmin to restore the db from a backup. E.g. see these instructions: https://www.pgadmin.org/docs/pgadmin4/dev/restore_dialog.html
-0. `yarn run unpause-app`. You can now use the app w/ the restored db
+0. Place the dump file in `dbDumps/` if it's not there already 
+0. Run `yarn run restore-db` with the name of the dump you're restoring, e.g. `yarn run restore-db myDump`
 
 ### Troubleshooting
 - One error case is that the scripts attempt to connect to the db w/ your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're accidentally running the mosaic app itself, or maybe you're running a tool like pgadmin. Obviously the fix is to kill those other connections and try again.
