@@ -2,21 +2,17 @@ import * as chai from "chai";
 const { expect } = chai;
 import { truncateDb } from "../../testHelpers/sequelizeHelpers";
 import { createRootWorkspace } from "../../testHelpers/graphQLCalls";
+import { rootWorkspaceQuestion } from "../../testHelpers/slateHelpers";
 
 describe('graphQL schema', () => {
-    describe('createWorkspace for a root workspace', () => {
+    describe('createWorkspace', () => {
         beforeEach(() => truncateDb());
     
-        it('should create a root workspace', async () => {
+        it('should create a workspace', async () => {
             const totalBudget = 1000;
-            const question = "{\"object\":\"block\",\"type\":\"line\",\"isVoid\":false,\"data\":{},\"nodes\":[{\"object\":\"text\",\"leaves\":[{\"object\":\"leaf\",\"text\":\"Fake root workspace\",\"marks\":[]}]}]}";
+            const question = rootWorkspaceQuestion('Mock workspace name');
             const rootWorkspace = await createRootWorkspace(totalBudget, question);
             const workspaceInfo = rootWorkspace.data && rootWorkspace.data.createWorkspace;
-            expect(workspaceInfo.totalBudget === 1000);
-    
-            // this is kind of a lame expect,
-            // but I didn't really want to add more specificity that would make this more brittle
-            expect(workspaceInfo.blocks).to.not.be.empty;
         });
     });
 })
