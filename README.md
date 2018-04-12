@@ -4,6 +4,15 @@ A platform for individuals to complete small tasks
 
 ## Setup
 
+### (Recommended) Using Docker
+
+0. Make sure Docker is downloaded and running on your computer. You can get it get it here: https://www.docker.com/community-edition#/download
+0. Run `docker-compose up`
+
+### (Deprecated) Using yarn scripts directly
+
+Note: this method is deprecated and is likely to be incompatible w/ testing and w/ backing up and restoring the database.
+
 1. Set up the node server.
   First, change the config/config.json file to use your local db creds.
   
@@ -41,11 +50,12 @@ To use Visual Studio Code to debug while running the tests:
 ## Save and restore db states
 
 ### Save
-- Use psql or pgadmin to create a sql dump of the db. E.g. see these instructions: https://www.pgadmin.org/docs/pgadmin4/1.x/backup_dialog.html
+0. Run the app (`docker-compose up`), or run just the db using `docker-compose up -d postgres`
+0. Use psql or pgadmin to create a sql dump of the db. E.g. see these instructions: https://www.pgadmin.org/docs/pgadmin4/1.x/backup_dialog.html
 
 ### Restore
 
-First, make sure that you Postgress connection string is set properly:
+First, make sure that you Postgress connection string is set properly in your shell profile:
 
 fish shell:
 `set -x CONNECTION_STRING_DEV postgres://mosaic:MDaUA2P4ZbkJPCKEM@localhost:5432/mosaic_dev`
@@ -53,8 +63,12 @@ fish shell:
 bash:
 `export CONNECTION_STRING_DEV=postgres://mosaic:MDaUA2P4ZbkJPCKEM@localhost:5432/mosaic_dev`
 
-JTBC, this will clear the current contents of your database -- be careful!
-0. Kill the app and close all connections to the database
+JTBC, the following steps will clear the current contents of your database -- be careful!
+0. Kill the app and close all connections to the database (e.g. from pgadmin)
 0. Run `scripts/prepRestoreDB.sh`
 0. Use psql or pgadmin to restore the db from a backup. E.g. see these instructions: https://www.pgadmin.org/docs/pgadmin4/dev/restore_dialog.html
 0. Run the app normally
+
+### Troubleshooting
+- One error case is that the scripts attempt to connect to the db w/ your system username, which should not work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're accidentally running the app itself, or maybe you're running a tool like pgadmin. Obviously the fix is to kill those other connections and try again.
+- In general, I'd recommend keeping as few connections to the db open as possible (e.g. be reasonably aggressive about closing connections in PGAdmin when not in use), since connections seem to tend to interfere w/ each other.
