@@ -9,7 +9,9 @@
     "server/serve": "cd server && npm run serve && cd ..",
     "server/db:reset": "cd server && npm run db:reset && cd ..",
     "server/db:seed": "cd server && npm run db:seed && cd ..",
-    "postinstall": "npm run server/install"
+    "postinstall": "npm run server/install",
+    "erase-db": "docker pause mosaic_web_1 mosaic_api_1 && cd server/ && yarn run db:clear",
+    "unpause-app": "docker unpause mosaic_web_1 mosaic_api_1"
   },
   "author": "",
   "license": "MIT",
