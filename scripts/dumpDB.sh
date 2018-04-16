@@ -5,4 +5,4 @@ if [ $# -eq 0 ]
     exit 1
 fi
 [ -d dbDumps ] || mkdir dbDumps
-pg_dump --host=localhost --username=mosaic mosaic_dev > dbDumps/$1.db
+docker exec mosaic_postgres_1 pg_dump --host=localhost --username=mosaic mosaic_dev > dbDumps/$1.db
