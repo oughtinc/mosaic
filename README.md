@@ -51,26 +51,16 @@ To use Visual Studio Code to debug while running the tests:
 
 ### Save
 0. If the app is not running, run it (`docker-compose up`)
-0. Run `yarn run dump-db` with a name for your dump, e.g. `yarn run dump-db myDump`
+0. `cd server`
+0. `scripts/dumpDB.sh` with a name for your dump, e.g. `scripts/dumpDB.sh myDump`
 
 ### Restore
 
-First, make sure that your Postgress connection string is set properly in your shell profile:
-
-fish shell:
-`set -x CONNECTION_STRING_DEV postgres://mosaic:MDaUA2P4ZbkJPCKEM@localhost:5432/mosaic_dev`
-
-bash:
-`export CONNECTION_STRING_DEV=postgres://mosaic:MDaUA2P4ZbkJPCKEM@localhost:5432/mosaic_dev`
-
-Also, make sure that you have the Postgres command line tools in your shell PATH. You should have the command `psql`.
-
-If you don't have it, and you installed Postgres via the Postgres app, you probably just need to add something like this to your PATH: `/Applications/Postgres.app/Contents/Versions/10/bin`
-
 0. If the app is not running, run it (`docker-compose up`)
 0. Close all external connections to the database (e.g. from pgadmin)
-0. Place the dump file in `dbDumps/` if it's not there already 
-0. Run `yarn run restore-db` with the name of the dump you're restoring, e.g. `yarn run restore-db myDump`
+0. `cd server`
+0. Place the dump file in `server/dbDumps/` if it's not there already 
+0. Run `scripts/restoreDB.sh` with the name of the dump you're restoring, e.g. `scripts/restoreDB.sh myDump`
 
 ### Troubleshooting
 - One error case is that the scripts attempt to connect to the db w/ your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
