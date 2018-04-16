@@ -9,8 +9,6 @@
     "server/serve": "cd server && npm run serve && cd ..",
     "server/db:reset": "cd server && npm run db:reset && cd ..",
     "server/db:seed": "cd server && npm run db:seed && cd ..",
-    "dump-db": "scripts/dumpDB.sh",
-    "restore-db": "scripts/restoreDB.sh",
     "postinstall": "npm run server/install"
   },
   "author": "",
