@@ -1,16 +1,16 @@
 'use strict';
 
-import fs from 'fs';
-import path from 'path';
-import Sequelize from 'sequelize';
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
 var env       = process.env.NODE_ENV || 'development';
 var config    = require(__dirname + '/../../config/config.json')[env];
 
-import BlockModel from './block'
-import EventModel from './event'
-import PointerModel from './pointer'
-import PointerImportModel from './pointerImport'
-import WorkspaceModel from './workspace'
+const BlockModel = require('./block');
+const EventModel = require('./event');
+const PointerModel = require('./pointer');
+const PointerImportModel = require('./pointerImport');
+const WorkspaceModel = require('./workspace');
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable], config);
@@ -42,4 +42,4 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-export default db;
+module.exports = db;

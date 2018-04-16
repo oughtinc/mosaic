@@ -9,15 +9,31 @@ A platform for individuals to complete small tasks
   
 ```
 cd server;
-npm run db:create
-npm run db:migrate
-npm run db:seed
-npm run start
+yarn run db:create
+yarn run db:migrate
+yarn run db:seed
+yarn start
 ```
 
 2. Start the react-create-app client
 
 ```
 cd client 
-npm run start
+yarn start
 ```
+
+## Testing
+
+- Backend:
+
+To run the tests:
+
+```
+cd server
+yarn test
+```
+
+To use Visual Studio Code to debug while running the tests:
+1. Click on the debug menu
+2. Select "Mocha Tests"
+3. Click the run button
