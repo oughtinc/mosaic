@@ -2,7 +2,7 @@
 save () {
     scripts/dumpDB.sh autosave`date +%s`
     echo "Autosave complete!"
-    sleep 30
+    sleep 5
     save
 }
 
