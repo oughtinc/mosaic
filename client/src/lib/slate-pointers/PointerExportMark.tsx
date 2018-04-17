@@ -11,8 +11,8 @@ import { propsToPointerDetails } from "./helpers";
 // }
 
 const PointerExportStyle: any = styled.span`
-    background: ${(props: any) => props.isSelected ? "rgba(85, 228, 38, 0.9)" : "rgba(200, 243, 197, 0.5)"};
-    margin-left: 3px;
+    background: ${({ isSelected }: any) => isSelected ? "rgba(85, 228, 38, 0.9)" : "rgba(200, 243, 197, 0.5)"};
+    margin-left: ${({ isDisplayMode }: any) => isDisplayMode ? "3px" : "0"};
     transition: background .2s;
     color: #000000;
 `;
@@ -35,6 +35,35 @@ const Tag: any = styled.span`
     margin-left: 0px;
 `;
 
+const DisplayModeSurround = ({ isDisplayMode, children, pointerIndex, onMouseOver }: any) => {
+    if (!isDisplayMode) {
+        return (children);
+    } else {
+        return (
+            <span>
+                <Tag
+                    onMouseOver={onMouseOver}
+                >
+                    {`$${parseInt(pointerIndex, 10) + 1}`}
+                </Tag>
+                <Bracket
+                    isStart={true}
+                    onMouseOver={onMouseOver}
+                >
+                    {"["}
+                </Bracket>
+                {children}
+                <Bracket
+                    isStart={true}
+                    onMouseOver={onMouseOver}
+                >
+                    {"]"}
+                </Bracket>
+            </span>
+        );
+    }
+};
+
 export class PointerExportMark extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
@@ -53,9 +82,9 @@ export class PointerExportMark extends React.Component<any, any> {
 
     public render() {
         const isSelected = this.props.blockEditor.hoveredItem.id === this.props.nodeAsJson.data.pointerId;
-        const { blockEditor, exportingPointers, nodeAsJson, children }: any = this.props;
+        const { blockEditor, exportingPointers, nodeAsJson, children, isDisplayMode }: any = this.props;
 
-        const { pointerIndex } = propsToPointerDetails({
+        const { pointerIndex }: any = propsToPointerDetails({
             blockEditor,
             exportingPointers,
             nodeAsJson,
@@ -64,21 +93,13 @@ export class PointerExportMark extends React.Component<any, any> {
             <PointerExportStyle
                 isSelected={isSelected}
                 onMouseOut={this.props.onMouseOut}
+                isDisplayMode={isDisplayMode}
             >
-
-                <Tag
+                <DisplayModeSurround
+                    isDisplayMode={isDisplayMode}
+                    pointerIndex={pointerIndex}
                     onMouseOver={this.onMouseOver}
                 >
-                    {`$${pointerIndex + 1}`}
-                </Tag>
-
-                <Bracket
-                    isStart={true}
-                    onMouseOver={this.onMouseOver}
-                >
-                    {"["}
-                </Bracket>
-
                 {children.map((child, index) => {
                     const isNestedPointer = (child.props.node.object === "inline");
 
@@ -95,12 +116,7 @@ export class PointerExportMark extends React.Component<any, any> {
                         return (child);
                     }
                 })}
-                <Bracket
-                    isStart={true}
-                    onMouseOver={this.onMouseOver}
-                >
-                    {"]"}
-                </Bracket>
+                </DisplayModeSurround>
             </PointerExportStyle>
         );
     }
