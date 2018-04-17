@@ -12,7 +12,8 @@
     "db:migrate": "node_modules/.bin/sequelize db:migrate",
     "db:migrate:undo": "node_modules/.bin/sequelize db:migrate:undo",
     "db:seed": "node_modules/.bin/sequelize db:seed:all",
-    "db:reset": "npm run db:drop; npm run db:create; npm run db:migrate",
+    "db:reset": "yarn run db:clear; yarn run db:migrate",
+    "db:clear": "yarn run db:drop; yarn run db:create",
     "serve": "node ./dist/index.js",
     "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
     "pretest": "NODE_ENV=test npm run db:reset"
