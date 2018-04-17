@@ -10,14 +10,24 @@ import { propsToPointerDetails } from "./helpers";
 //     return _.max(possibilities.map((p) => (getMaxNesting(p) + 1))) || 0;
 // }
 
+const pointerExportBackground: any = ({ isSelected, isDisplayMode }: any) => {
+    if (isSelected) {
+        return "rgba(85, 228, 38, 0.9)";
+    } else if (isDisplayMode) {
+        return "rgba(200, 243, 197, 0.5)";
+    } else {
+        return "rgba(200, 243, 197, 0.8)";
+    }
+};
+
 const PointerExportStyle: any = styled.span`
-    background: ${({ isSelected }: any) => isSelected ? "rgba(85, 228, 38, 0.9)" : "rgba(200, 243, 197, 0.5)"};
+    background: ${pointerExportBackground};
     margin-left: ${({ isDisplayMode }: any) => isDisplayMode ? "3px" : "0"};
     transition: background .2s;
     color: #000000;
 `;
 
-const darkGreen = "rgba(12, 162, 0, 0.41)";
+const darkGreen = "rgba(12, 165, 0, 0.63)";
 
 const Bracket: any = styled.span`
     color: ${darkGreen};
@@ -100,22 +110,22 @@ export class PointerExportMark extends React.Component<any, any> {
                     pointerIndex={pointerIndex}
                     onMouseOver={this.onMouseOver}
                 >
-                {children.map((child, index) => {
-                    const isNestedPointer = (child.props.node.object === "inline");
+                    {children.map((child, index) => {
+                        const isNestedPointer = (child.props.node.object === "inline");
 
-                    if (!isNestedPointer) {
-                        return (
-                            <span
-                                key={index}
-                                onMouseOver={this.onMouseOver}
-                            >
-                                {child}
-                            </span>
-                        );
-                    } else {
-                        return (child);
-                    }
-                })}
+                        if (!isNestedPointer) {
+                            return (
+                                <span
+                                    key={index}
+                                    onMouseOver={this.onMouseOver}
+                                >
+                                    {child}
+                                </span>
+                            );
+                        } else {
+                            return (child);
+                        }
+                    })}
                 </DisplayModeSurround>
             </PointerExportStyle>
         );
