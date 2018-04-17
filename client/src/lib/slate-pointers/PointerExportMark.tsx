@@ -1,13 +1,14 @@
 import styled from "styled-components";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import _ = require("lodash");
+import { propsToPointerDetails } from "./helpers";
 
-function getMaxNesting(node: any): number {
-    if (!node.nodes) { return 0; }
-    const possibilities = node.nodes.filter((c) => c.object === "inline");
-    return _.max(possibilities.map((p) => (getMaxNesting(p) + 1))) || 0;
-}
+// We don't use this function but it's here if we need it later.
+// function getMaxNesting(node: any): number {
+//     if (!node.nodes) { return 0; }
+//     const possibilities = node.nodes.filter((c) => c.object === "inline");
+//     return _.max(possibilities.map((p) => (getMaxNesting(p) + 1))) || 0;
+// }
 
 const PointerExportStyle: any = styled.span`
     background: ${(props: any) => props.isSelected ? "rgba(85, 228, 38, 0.9)" : "rgba(200, 243, 197, 0.5)"};
@@ -41,43 +42,65 @@ export class PointerExportMark extends React.Component<any, any> {
 
     public getLocation = () => {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        const {left, top, right, bottom} = rect;
-        return {left, top, right, bottom};
+        const { left, top, right, bottom } = rect;
+        return { left, top, right, bottom };
     }
 
     public onMouseOver = () => {
-        const {left, top, right, bottom} = this.getLocation();
-        this.props.onMouseOver({left, top, right, bottom});
+        const { left, top, right, bottom } = this.getLocation();
+        this.props.onMouseOver({ left, top, right, bottom });
     }
 
     public render() {
         const isSelected = this.props.blockEditor.hoveredItem.id === this.props.nodeAsJson.data.pointerId;
-        const nesting = getMaxNesting(this.props.nodeAsJson);
-        const children: any = this.props.children;
+        const { blockEditor, exportingPointers, nodeAsJson, children }: any = this.props;
+
+        const { pointerIndex } = propsToPointerDetails({
+            blockEditor,
+            exportingPointers,
+            nodeAsJson,
+        });
         return (
             <PointerExportStyle
                 isSelected={isSelected}
                 onMouseOut={this.props.onMouseOut}
             >
-            <Tag>$1</Tag>
-            <Bracket isStart={true}>{"["}</Bracket>
-            {children.map((child, index) => {
-                const isNestedPointer = (child.props.node.object === "inline");
-                
-                if (!isNestedPointer) {
-                    return (
-                        <span
-                          key={index}
-                          onMouseOver={this.onMouseOver}
-                        >
-                            {child}
-                        </span>
-                    );
-                } else {
-                    return ( child );
-                }
-            })}
-            <Bracket isStart={true}>{"]"}</Bracket>
+
+                <Tag
+                    onMouseOver={this.onMouseOver}
+                >
+                    {`$${pointerIndex + 1}`}
+                </Tag>
+
+                <Bracket
+                    isStart={true}
+                    onMouseOver={this.onMouseOver}
+                >
+                    {"["}
+                </Bracket>
+
+                {children.map((child, index) => {
+                    const isNestedPointer = (child.props.node.object === "inline");
+
+                    if (!isNestedPointer) {
+                        return (
+                            <span
+                                key={index}
+                                onMouseOver={this.onMouseOver}
+                            >
+                                {child}
+                            </span>
+                        );
+                    } else {
+                        return (child);
+                    }
+                })}
+                <Bracket
+                    isStart={true}
+                    onMouseOver={this.onMouseOver}
+                >
+                    {"]"}
+                </Bracket>
             </PointerExportStyle>
         );
     }

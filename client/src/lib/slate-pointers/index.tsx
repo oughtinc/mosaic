@@ -43,6 +43,7 @@ function SlatePointers(options: any = {}) {
           <PointerExportMark
             blockEditor={options.blockEditor}
             nodeAsJson={node.toJSON()}
+            exportingPointers={options.exportingPointers}
             onMouseOver={({ left, right, top, bottom }) => {
               options.onMouseOverPointerExport({ left, right, top, bottom, id: node.toJSON().data.pointerId });
             }}
