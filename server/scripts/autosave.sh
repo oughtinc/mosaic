@@ -1,7 +1,7 @@
 #!/bin/bash
 
 autosave () {
-    previous_autosave_path=$(ls -1 dbDumps/autosave* | tail -n 1)
+    previous_autosave_path=$(ls dbDumps/autosave* | tail -n 1)
     
     # create current autosave
     current_autosave_name=autosave`date +%s`
