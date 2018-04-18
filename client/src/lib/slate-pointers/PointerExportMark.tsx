@@ -29,14 +29,14 @@ const PointerExportStyle: any = styled.span`
 
 const darkGreen = "rgba(12, 165, 0, 0.63)";
 
-const Bracket: any = styled.span`
+const Bracket = styled.span`
     color: ${darkGreen};
     font-size: 1.2em;
     font-weight: 800;
     line-height: 1em;
 `;
 
-const Tag: any = styled.span`
+const Tag = styled.span`
     padding: 0 3px;
     background: ${darkGreen};
     color: #e9efe9;
@@ -57,14 +57,12 @@ const DisplayModeSurround = ({ isDisplayMode, children, pointerIndex, onMouseOve
                     {`$${parseInt(pointerIndex, 10) + 1}`}
                 </Tag>
                 <Bracket
-                    isStart={true}
                     onMouseOver={onMouseOver}
                 >
                     {"["}
                 </Bracket>
                 {children}
                 <Bracket
-                    isStart={true}
                     onMouseOver={onMouseOver}
                 >
                     {"]"}
