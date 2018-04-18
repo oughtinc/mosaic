@@ -41,7 +41,7 @@ const Tag: any = styled.span`
     background: ${darkGreen};
     color: #e9efe9;
     margin-right: 1px;
-    border-radius: 2px 0 0 2px;
+    border-radius: 4px 0 0 4px;
     margin-left: 0px;
 `;
 
