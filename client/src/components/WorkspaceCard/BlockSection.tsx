@@ -4,8 +4,9 @@ import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import Plain from "slate-plain-serializer";
 import { Value } from "slate";
+import { Link } from "react-router-dom";
 
-const BlockBullet = styled.a`
+const BlockBullet = styled(Link)`
     float: left;
     border-radius: 2px;
     color: #d0cccc;
@@ -13,6 +14,10 @@ const BlockBullet = styled.a`
     margin: 4px 4px 4px 9px;
     font-weight: 500;
     flex: 1;
+    &:hover {
+        background: #ccc;
+        text-decoration: none;
+    }
 `;
 
 const BlockContainer = styled.div`
@@ -31,7 +36,7 @@ const BlockSectionContainer = styled.div`
     flex-direction: column;
 `;
 
-const Block = ({ character, block, availablePointers}) => {
+const Block = ({ character, block, availablePointers, workspace}) => {
     if (!block.value) {
         return (<div/>);
     }
@@ -42,7 +47,7 @@ const Block = ({ character, block, availablePointers}) => {
     }
     return (
             <BlockContainer>
-                <BlockBullet href="#!">
+                <BlockBullet to={`/workspaces/${workspace.id}`}>
                     {character}
                 </BlockBullet>
                 <BlockEditorContainer>
@@ -66,9 +71,9 @@ export const BlockSection = ({ workspace, availablePointers }) => {
     return (
         <div style={{ display: "flexbox" }}>
             <BlockSectionContainer>
-                <Block block={question} character={"Q"} availablePointers={availablePointers} />
-                <Block block={scratchpad} character={"S"} availablePointers={availablePointers} />
-                <Block block={answer} character={"A"} availablePointers={availablePointers} />
+                <Block block={question} character={"Q"} availablePointers={availablePointers} workspace={workspace}/>
+                <Block block={scratchpad} character={"S"} availablePointers={availablePointers} workspace={workspace}/>
+                <Block block={answer} character={"A"} availablePointers={availablePointers} workspace={workspace}/>
             </BlockSectionContainer>
         </div>
     );
