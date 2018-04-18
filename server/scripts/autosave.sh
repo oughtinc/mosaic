@@ -5,7 +5,8 @@ autosave () {
     
     # create current autosave
     current_autosave_name=autosave`date +%s`
-    scripts/dumpDB.sh $current_autosave_name
+    [ -d dbDumps ] || mkdir dbDumps
+    pg_dump --host=localhost --username=mosaic mosaic_dev > dbDumps/$current_autosave_name.db
 
     # if contents of the current autosave are the same as contents of the previous autosave, delete the current autosave
     if [ $previous_autosave_path ]
