@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as LogRocket from "logrocket";
 import { BrowserRouter, Route } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
@@ -40,6 +41,8 @@ const Routes = () => (
   </div>
 );
 
+LogRocket.init("i58gnp/mosaic");
+
 const store = createStore(
   combineReducers(
     {
@@ -47,10 +50,11 @@ const store = createStore(
       blockEditor: blockEditorReducer,
     } as any
   ),
-  composeWithDevTools(applyMiddleware(thunk))
+  composeWithDevTools(applyMiddleware(thunk, LogRocket.reduxMiddleware()))
 );
 
 class App extends React.Component {
+
   public render() {
     return (
       <ApolloProvider client={client}>
