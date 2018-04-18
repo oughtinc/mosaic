@@ -54,13 +54,17 @@ To use Visual Studio Code to debug while running the tests:
 0. `cd server`
 0. `scripts/dumpDB.sh` with a name for your dump, e.g. `scripts/dumpDB.sh myDump`
 
+Note that `docker-compose up` automatically runs `server/scripts/autodumps.sh`, which stores auto db dumps in `server/autodumps`
+
 ### Restore
 
 0. If the app is not running, run it (`docker-compose up`)
 0. Close all external connections to the database (e.g. from pgadmin)
 0. `cd server`
-0. Place the dump file in `server/dbDumps/` if it's not there already 
+0. Place the dump file in `server/dbDumps` if it's not there already 
 0. Run `scripts/restoreDB.sh` with the name of the dump you're restoring, e.g. `scripts/restoreDB.sh myDump`
+
+To restore an autodump, move it `server/dbDumps` and follow the steps above
 
 ### Troubleshooting
 - One error case is that the scripts attempt to connect to the db w/ your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
