@@ -23,7 +23,7 @@ services:
   web:
     image: node:9.7  
     depends_on:
-       - api
+      - api
     volumes:
       - ./client:/data
     ports:
