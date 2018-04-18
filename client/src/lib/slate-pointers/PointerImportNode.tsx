@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import styled from "styled-components";
-import * as _ from "lodash";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
+import { propsToPointerDetails } from "./helpers";
 
 const RemovedPointer = styled.span`
     background-color: rgba(252, 86, 86, 0.66);
@@ -39,16 +39,6 @@ const OpenPointerImport: any = styled.div`
     }
 `;
 
-function translateProps({ blockEditor, exportingPointers, nodeAsJson }: any) {
-    const { internalReferenceId, pointerId } = nodeAsJson.data;
-    const reference = blockEditor.pointerReferences[internalReferenceId];
-    const isSelected = blockEditor.hoveredItem.id === internalReferenceId;
-    const isOpen = reference && reference.isOpen;
-    const importingPointer: any = exportingPointers.find((l: any) => l.data.pointerId === pointerId);
-    const pointerIndex = _.findIndex(exportingPointers, (l: any) => l.data.pointerId === pointerId);
-    return ({ importingPointer, isSelected, isOpen, pointerIndex });
-}
-
 export class PointerImportNode extends React.Component<any, any> {
     public constructor(props: any) {
         super(props);
@@ -70,7 +60,7 @@ export class PointerImportNode extends React.Component<any, any> {
     public render() {
         const { blockEditor, exportingPointers, nodeAsJson } = this.props;
 
-        const { importingPointer, isSelected, pointerIndex, isOpen } = translateProps({
+        const { importingPointer, isSelected, pointerIndex, isOpen } = propsToPointerDetails({
             blockEditor,
             exportingPointers,
             nodeAsJson,

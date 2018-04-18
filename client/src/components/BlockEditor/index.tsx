@@ -78,6 +78,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
+      isDisplayMode: newProps.isDisplayMode,
     };
     this.setState({
       plugins: [
