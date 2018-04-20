@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Note: this script is run automatically by `docker compose-up`
-# You can find the autodumps in server/autodumps,
-# and you can copy one to server/dbDumps in order to restore ir
+# Note: You can find the autodumps in server/autodumps,
+# and you can copy one to server/dbDumps in order to restore it
 
 autodump () {
     previous_autodump_path=$(ls autodumps/autodump* | tail -n 1)
