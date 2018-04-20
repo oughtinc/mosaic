@@ -7,11 +7,8 @@ services:
       POSTGRES_DB: mosaic_dev 
       POSTGRES_USER: mosaic 
       POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM
-    volumes:
-      - ./server:/data
     ports:
       - "5432:5432"
-    command: "bash -c 'cd /data && scripts/autodump.sh 30'"
   api:
     image: node:9.7
     environment: 
