@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as LogRocket from "logrocket";
+
 import { BrowserRouter, Route } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
@@ -16,6 +17,7 @@ import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
+import { appConfig } from "./config.js";
 const { SERVER_URL } = process.env;
 
 const client: any = new ApolloClient({
@@ -41,7 +43,7 @@ const Routes = () => (
   </div>
 );
 
-LogRocket.init("i58gnp/mosaic");
+LogRocket.init(appConfig.logrocket_id);
 
 const store = createStore(
   combineReducers(
