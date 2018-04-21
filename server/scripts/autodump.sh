@@ -28,9 +28,9 @@ fi
 if [ $db_unchanged ]
     then
         rm $current_autodump_path
-        echo db has not changed since last autodump, skipping autodump
+        echo "db has not changed since last autodump, skipping autodump"
 else
-    echo created new autodump $current_autodump_name
+    echo "created new autodump" $current_autodump_name
 fi
 
 # repeat after waiting the specified amount
