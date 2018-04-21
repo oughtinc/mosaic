@@ -5,7 +5,7 @@
 
 if [ $# -eq 0 ]
     then
-        echo "ERROR: Please specify how many seconds to sleep for."
+        echo "ERROR: Please specify how many seconds to wait between dumps."
         exit 1
 fi
 
