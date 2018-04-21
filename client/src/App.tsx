@@ -44,6 +44,8 @@ const Routes = () => (
 );
 
 LogRocket.init(appConfig.logrocket_id);
+const environment = process.env.NODE_ENV || ""; // "development" or "production"
+LogRocket.track(environment);
 
 const store = createStore(
   combineReducers(
