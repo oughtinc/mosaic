@@ -54,10 +54,7 @@ To use Visual Studio Code to debug while running the tests:
 0. `cd server`
 0. `scripts/dumpDB.sh` with a name for your dump, e.g. `scripts/dumpDB.sh myDump`
 
-Note that `docker-compose up` automatically runs `server/scripts/autodumps.sh`, which stores auto db dumps in `server/autodumps`
-
 To automatically check for db changes every 30 seconds and create a dump if there are any, `cd server` and run `scripts/autodump.sh`
-
 ### Restore
 
 0. If the app is not running, run it (`docker-compose up`)
