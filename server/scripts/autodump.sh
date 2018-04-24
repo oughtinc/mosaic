@@ -12,14 +12,13 @@ fi
 previous_autodump_path=$(ls autodumps/autodump* | tail -n 1)
 
 # create current autodump
-current_autodump_name=autodump`date +%s`
+current_autodump_path=autodumps/autodump`date +%s`.db
 [ -d autodumps ] || mkdir autodumps
-pg_dump --host=localhost --username=mosaic mosaic_dev > autodumps/$current_autodump_name.db
+pg_dump --host=localhost --username=mosaic mosaic_dev > $current_autodump_path
 
 # if contents of the current autodump are the same as contents of the previous autodump, delete the current autodump
 if [ $previous_autodump_path ]
     then
-        current_autodump_path=autodumps/${current_autodump_name}.db
         if cmp --silent "$previous_autodump_path" "$current_autodump_path"
             then db_unchanged=true
         fi
@@ -30,7 +29,7 @@ if [ $db_unchanged ]
         rm $current_autodump_path
         echo "db has not changed since last autodump, skipping autodump"
 else
-    echo "created new autodump" $current_autodump_name
+    echo "created new autodump" $current_autodump_path
 fi
 
 # repeat after waiting the specified amount
