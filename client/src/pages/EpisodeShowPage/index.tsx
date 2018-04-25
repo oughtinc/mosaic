@@ -162,7 +162,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         </Col>
                     </Row>
                     <Row>
-                        <Col sm={4}>
+                        <Col sm={6}>
                             <h3>Scratchpad</h3>
                             <BlockEditor
                                 availablePointers={availablePointers}
@@ -174,13 +174,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 availablePointers={availablePointers}
                                 {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
                                 ref={this.registerEditorRef("answerField")}
-                            />
-                        </Col>
-                        <Col sm={2}>
-                            <h3>Pointers</h3>
-                            <PointerTable
-                                availablePointers={availablePointers}
-                                exportingPointerIds={this.props.exportingPointers.map((p) => p.data.pointerId)}
                             />
                         </Col>
                         <Col sm={6}>
