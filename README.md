@@ -47,6 +47,12 @@ To use Visual Studio Code to debug while running the tests:
 2. Select "Mocha Tests"
 3. Click the run button
 
+## LogRocket
+
+We have a LogRocket integration for monitoring sessions, including Redux store. Ask Andrew Schreiber for the login information.
+
+URL: https://app.logrocket.com/i58gnp/mosaic/
+
 ## Save and restore db states
 
 ### Save
@@ -60,12 +66,6 @@ To use Visual Studio Code to debug while running the tests:
 0. Close all external connections to the database (e.g. from pgadmin)
 0. `cd server`
 0. `scripts/restoreDB.sh` with a filepath for the dump you're restoring, e.g. `scripts/restoreDB.sh ./dbDumps/myDump.db`
-
-## LogRocket
-
-We have a LogRocket integration for monitoring sessions, including Redux store. Ask Andrew Schreiber for the login information.
-
-URL: https://app.logrocket.com/i58gnp/mosaic/
 
 ### Troubleshooting
 - One error case is that the scripts attempt to connect to the db w/ your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
