@@ -1,4 +1,6 @@
 import * as React from "react";
+import * as LogRocket from "logrocket";
+
 import { BrowserRouter, Route } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
@@ -15,6 +17,7 @@ import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
+import { appConfig } from "./config.js";
 const { SERVER_URL } = process.env;
 
 const client: any = new ApolloClient({
@@ -40,6 +43,10 @@ const Routes = () => (
   </div>
 );
 
+LogRocket.init(appConfig.logrocket_id);
+const environment = process.env.NODE_ENV || ""; // "development" or "production"
+LogRocket.track(environment);
+
 const store = createStore(
   combineReducers(
     {
@@ -47,10 +54,11 @@ const store = createStore(
       blockEditor: blockEditorReducer,
     } as any
   ),
-  composeWithDevTools(applyMiddleware(thunk))
+  composeWithDevTools(applyMiddleware(thunk, LogRocket.reduxMiddleware()))
 );
 
 class App extends React.Component {
+
   public render() {
     return (
       <ApolloProvider client={client}>
