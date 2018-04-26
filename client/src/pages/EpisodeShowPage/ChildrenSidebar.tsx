@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
+import * as _ from "lodash";
 import { ChildBudgetForm } from "./ChildBudgetForm";
 
 const ChildStyle = styled.div`
@@ -77,6 +78,19 @@ export class ChildrenSidebar extends React.Component<any, any> {
 
     public editor = () => {
         return this.newChildField && this.newChildField.editor();
+    }
+
+    public shouldComponentUpdate(newProps: any) {
+        if (
+            !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+            || !_.isEqual(newProps.block, this.props.block)
+            || !_.isEqual(newProps.workspaceOrder, this.props.workspaceOrder)
+            || !_.isEqual(newProps.workspaces, this.props.workspaces)
+        ) {
+            return true;
+        }
+        return false;
     }
 
     public render() {

@@ -65,7 +65,7 @@
     "@types/recompose": "^0.24.5",
     "immutable": "^3.8.2",
     "prop-types": "^15.6.1",
-    "react-scripts-ts": "^2.13.0",
+    "react-scripts-ts": "^2.14.0",
     "typescript": "^2.6.2"
   }
 }
