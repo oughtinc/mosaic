@@ -72,23 +72,23 @@ const UPDATE_CHILD_TOTAL_BUDGET = gql`
   }
 `;
 
-const NavLink = styled(Link)`
+const NavLink = styled(Link) `
   margin-right: 5px;
-`
+`;
 
 const HomeLink = () => (
-  <NavLink to="/">
-    <Button>Home</Button>
-  </NavLink>
+    <NavLink to="/">
+        <Button>Home</Button>
+    </NavLink>
 );
 
 const ParentLink = (props) => (
-  <NavLink to={`/workspaces/${props.parentId}`}>
-    <Button>Parent</Button>
-  </NavLink>
+    <NavLink to={`/workspaces/${props.parentId}`}>
+        <Button>Parent</Button>
+    </NavLink>
 );
 
-const SubtreeLink = ({workspace}) => (
+const SubtreeLink = ({ workspace }) => (
     <NavLink to={`/workspaces/${workspace.id}/subtree`}>
         <Button>Subtree</Button>
     </NavLink>
@@ -134,22 +134,22 @@ export class FormPagePresentational extends React.Component<any, any> {
         const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers, ...readOnlyExportedPointers], (p) => p.data.pointerId);
         return (
             <div key={workspace.id}>
-                <BlockHoverMenu>
+                <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
                     <Row>
-                      <Col sm={10}>
+                        <Col sm={10}>
                             <HomeLink />
                             {workspace.parentId &&
                                 <ParentLink parentId={workspace.parentId} />
                             }
-                            {workspace && 
+                            {workspace &&
                                 <SubtreeLink workspace={workspace} />
                             }
                         </Col>
                         <Col sm={2}>
                             {workspace &&
-                            <div style={{float: "right"}}>
-                                Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
-                            </div>
+                                <div style={{ float: "right" }}>
+                                    Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
+                                </div>
                             }
                         </Col>
                         <Col sm={12}>
@@ -181,11 +181,11 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
-                                onCreateChild={({question, totalBudget}) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
-                                onUpdateChildTotalBudget={({childId, totalBudget}) => {this.props.updateChildTotalBudget({variables: {workspaceId: workspace.id, childId, totalBudget}}); }}
+                                onCreateChild={({ question, totalBudget }) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
+                                onUpdateChildTotalBudget={({ childId, totalBudget }) => { this.props.updateChildTotalBudget({ variables: { workspaceId: workspace.id, childId, totalBudget } }); }}
                                 availableBudget={workspace.totalBudget - workspace.allocatedBudget}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                                ref={(input) => {if (input && input.editor()) { this.newChildField = input.editor(); }}}
+                                ref={(input) => { if (input && input.editor()) { this.newChildField = input.editor(); } }}
                             />
                         </Col>
                     </Row>

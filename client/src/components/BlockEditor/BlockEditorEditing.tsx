@@ -11,6 +11,7 @@ import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
+import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 
 const BlockEditorStyle = styled.div`
@@ -68,9 +69,29 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
     public editor;
     private autosaveInterval: any;
 
+    private handleBlur = _.debounce(() => {
+        if (this.props.shouldAutosave) {
+            this.considerSaveToDatabase();
+            this.endAutosaveInterval();
+        }
+    });
+
     public constructor(props: any) {
         super(props);
         this.state = { hasChangedSinceDatabaseSave: false };
+    }
+
+    public shouldComponentUpdate(newProps: any, newState: any) {
+        if (
+            !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+            || !_.isEqual(newProps.block, this.props.block)
+            || !_.isEqual(newProps.mutationStatus, this.props.mutationStatus)
+            || !_.isEqual(newState.hasChangedSinceDatabaseSave, this.state.hasChangedSinceDatabaseSave)
+        ) {
+            return true;
+        }
+        return false;
     }
 
     public componentWillMount() {
@@ -103,12 +124,12 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
                 />
                 <Editor
                     value={this.props.value}
-                    onChange={(c) => this.onChange(c.value)}
+                    onChange={this.onChangeCallback}
                     plugins={this.props.plugins}
                     spellCheck={false}
                     onBlur={this.handleBlur}
                     onKeyDown={this.onKeyDown}
-                    ref={(input) => { this.editor = input; }}
+                    ref={this.updateEditor}
                 />
             </BlockEditorStyle>
         );
@@ -164,11 +185,19 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         }
     }
 
+    private onChangeCallback = (c: any) => {
+        this.onChange(c.value);
+    }
+
     private onChange = (value: any, pointerChanged: boolean = false) => {
         this.props.updateBlock({ id: this.props.block.id, value, pointerChanged });
         if (this.props.onChange) {
             this.props.onChange(value);
         }
+    }
+
+    private updateEditor = (input: any) => {
+        this.editor = input;
     }
 
     private onAddPointerImport = (pointerId: string) => {
@@ -201,12 +230,6 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         }
     }
 
-    private handleBlur = () => {
-        if (this.props.shouldAutosave) {
-            this.considerSaveToDatabase();
-            this.endAutosaveInterval();
-        }
-    }
 }
 
 function mapStateToProps(state: any) {
@@ -216,9 +239,9 @@ function mapStateToProps(state: any) {
 
 export const BlockEditorEditing: any = compose(
     connect(
-        mapStateToProps, { updateBlock, exportSelection }, null, {withRef: true}
+        mapStateToProps, { updateBlock, exportSelection }, null, { withRef: true }
     ),
-    graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer", withRef: true}),
+    graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer", withRef: true }),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
     withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
         const saveBlocksMutation = () => {

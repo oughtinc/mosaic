@@ -41,31 +41,49 @@ const HiddenPointer = styled.span`
     float: left;
 `;
 
-export const PointerTable = ({ availablePointers, exportingPointerIds }) => (
-    <Container> {availablePointers.map((pointer, index: number) => {
-        const isFromThisWorkspace = _.includes(exportingPointerIds, pointer.data.pointerId);
-        return (
-            <Row key={index}>
-                <Reference>
-                    {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
-                </Reference>
-                {isFromThisWorkspace ?
-                    <Text>
-                        <ShowExpandedPointerOutsideSlate
-                            availablePointers={availablePointers}
-                            exportingPointer={pointer}
-                            isHoverable={true}
-                        />
-                    </Text>
-                    :
-                    <HiddenPointer>
-                        (HIDDEN)
-                    </HiddenPointer>
-                }
-            </Row>
+interface PointerTableProps {
+    availablePointers: any[];
+    exportingPointerIds: any[];
+}
 
+export class PointerTable extends React.Component<PointerTableProps> {
+    public shouldComponentUpdate(newProps: any, newState: any) {
+        if (
+            !_.isEqual(newProps.exportingPointerIds, this.props.exportingPointerIds)
+            || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public render() {
+        return (
+            <Container> {this.props.availablePointers.map((pointer, index: number) => {
+                const isFromThisWorkspace = _.includes(this.props.exportingPointerIds, pointer.data.pointerId);
+                return (
+                    <Row key={index}>
+                        <Reference>
+                            {`$${index + 1} - ${pointer.data.pointerId.slice(0, 5)}`}
+                        </Reference>
+                        {isFromThisWorkspace ?
+                            <Text>
+                                <ShowExpandedPointerOutsideSlate
+                                    availablePointers={this.props.availablePointers}
+                                    exportingPointer={pointer}
+                                    isHoverable={true}
+                                />
+                            </Text>
+                            :
+                            <HiddenPointer>
+                                (HIDDEN)
+                    </HiddenPointer>
+                        }
+                    </Row>
+                );
+            }
+            )}
+            </Container>
         );
     }
-    )}
-    </Container>
-);
+}
