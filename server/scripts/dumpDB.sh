@@ -3,7 +3,7 @@
 # Usage: pass the path to save the dump
 # e.g. scripts/dumpDB.sh dbDumps/dbmyDump.db
 
-# pass false as the 2nd param to supress success message
+# pass false as the 2nd param to suppress success message
 
 set -e
 

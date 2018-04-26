@@ -8,7 +8,7 @@
 
 set -e
 
-if [ ! $2 ]
+if [ $# -lt 2 ]
     then
         echo "ERROR: Please pass filepath to dump directory (1st arg) and seconds to wait between dumps (2nd arg)."
         exit 1
