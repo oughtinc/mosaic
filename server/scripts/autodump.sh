@@ -6,6 +6,8 @@
 
 # You can restore these dumps using scripts/restoreDB.sh
 
+set -e
+
 if [ ! $2 ]
     then
         echo "ERROR: Please pass filepath to dump directory (1st arg) and seconds to wait between dumps (2nd arg)."
@@ -18,7 +20,7 @@ previous_autodump_path=$(ls $1/autodump* | tail -n 1)
 
 # create current autodump
 current_autodump_path=$1/autodump`date +%s`.db
-pg_dump --host=localhost --username=mosaic mosaic_dev > $current_autodump_path
+scripts/dumpDB.sh $current_autodump_path false
 
 # if contents of the current autodump are the same as contents of the previous autodump, delete the current autodump
 if [ $previous_autodump_path ]
