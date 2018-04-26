@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Usage: pass the path to the dump to restore
+# e.g. scripts/restoreDB.sh dbDumps/dbmyDump.db
+
 # WARNING: this will overwrite the current state of the db.
 if [ $# -eq 0 ]
   then

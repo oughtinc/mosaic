@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# Usage: pass the path to save the dump
+# e.g. scripts/dumpDB.sh dbDumps/dbmyDump.db
+
 if [ $# -eq 0 ]
   then
     echo "ERROR: Please supply a filepath for this dump."
