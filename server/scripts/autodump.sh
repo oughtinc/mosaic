@@ -1,19 +1,23 @@
 #!/bin/bash
 
-# Note: You can find the autodumps in server/autodumps,
-# and you can copy one to server/dbDumps in order to restore it
+# Usage: 1st argument is filepath to dump directory,
+# 2nd argument is seconds to wait between dumps
+# e.g. scripts/autodump.sh autodumps 30
 
-if [ $# -eq 0 ]
+# You can restore these dumps using scripts/restoreDB.sh
+
+if [ ! $2 ]
     then
-        echo "ERROR: Please specify how many seconds to wait between dumps."
+        echo "ERROR: Please pass filepath to dump directory (1st arg) and seconds to wait between dumps (2nd arg)."
         exit 1
 fi
 
-previous_autodump_path=$(ls autodumps/autodump* | tail -n 1)
+[ -d $1 ] || mkdir -p $1
+
+previous_autodump_path=$(ls $1/autodump* | tail -n 1)
 
 # create current autodump
-current_autodump_path=autodumps/autodump`date +%s`.db
-[ -d autodumps ] || mkdir autodumps
+current_autodump_path=$1/autodump`date +%s`.db
 pg_dump --host=localhost --username=mosaic mosaic_dev > $current_autodump_path
 
 # if contents of the current autodump are the same as contents of the previous autodump, delete the current autodump
@@ -33,8 +37,8 @@ else
 fi
 
 # repeat after waiting the specified amount
-sleep $1
-$0 $1
+sleep $2
+$0 $1 $2
 
 
 
