@@ -20,7 +20,7 @@ previous_autodump_path=$(ls $1/autodump* | tail -n 1)
 
 # create current autodump
 current_autodump_path=$1/autodump`date +%s`.db
-scripts/dumpDB.sh $current_autodump_path false
+scripts/dumpDB.sh $current_autodump_path true
 
 # if contents of the current autodump are the same as contents of the previous autodump, delete the current autodump
 if [ $previous_autodump_path ]
