@@ -1,5 +1,6 @@
 import * as React from "react";
 import gql from "graphql-tag";
+import styled from "styled-components";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
 import { Row, Col, Button, Badge } from "react-bootstrap";
@@ -71,16 +72,26 @@ const UPDATE_CHILD_TOTAL_BUDGET = gql`
   }
 `;
 
+const NavLink = styled(Link) `
+  margin-right: 5px;
+`;
+
+const HomeLink = () => (
+    <NavLink to="/">
+        <Button>Home</Button>
+    </NavLink>
+);
+
 const ParentLink = (props) => (
-    <Link to={`/workspaces/${props.parentId}`}>
-        <Button>To Parent</Button>
-    </Link>
+    <NavLink to={`/workspaces/${props.parentId}`}>
+        <Button>Parent</Button>
+    </NavLink>
 );
 
 const SubtreeLink = ({ workspace }) => (
-    <Link to={`/workspaces/${workspace.id}/subtree`}>
-        <Button>To Subtree</Button>
-    </Link>
+    <NavLink to={`/workspaces/${workspace.id}/subtree`}>
+        <Button>Subtree</Button>
+    </NavLink>
 );
 
 function findPointers(value: any) {
@@ -126,6 +137,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                 <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
                     <Row>
                         <Col sm={10}>
+                            <HomeLink />
                             {workspace.parentId &&
                                 <ParentLink parentId={workspace.parentId} />
                             }
@@ -150,7 +162,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         </Col>
                     </Row>
                     <Row>
-                        <Col sm={4}>
+                        <Col sm={6}>
                             <h3>Scratchpad</h3>
                             <BlockEditor
                                 availablePointers={availablePointers}
@@ -162,13 +174,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 availablePointers={availablePointers}
                                 {...(new WorkspaceBlockRelation(WorkspaceRelationTypes.WorkspaceAnswer, workspace).blockEditorAttributes())}
                                 ref={this.registerEditorRef("answerField")}
-                            />
-                        </Col>
-                        <Col sm={2}>
-                            <h3>Pointers</h3>
-                            <PointerTable
-                                availablePointers={availablePointers}
-                                exportingPointerIds={this.props.exportingPointers.map((p) => p.data.pointerId)}
                             />
                         </Col>
                         <Col sm={6}>
