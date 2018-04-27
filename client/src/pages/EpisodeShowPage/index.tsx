@@ -11,7 +11,6 @@ import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
-import { PointerTable } from "./PointerTable";
 import { exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
 import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
