@@ -5,8 +5,8 @@ import { data as sampleData } from "./sample";
 
 export const examples = [
     {
-        url: "sample",
-        name: "Sample",
+        url: "1",
+        name: "Example 1 (For testing)",
         rootWorkspaceId: "77e83b98-c228-43c2-9b96-16c48dbd1a85",
         data: sampleData,
     },
