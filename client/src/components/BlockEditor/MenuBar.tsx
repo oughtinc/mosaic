@@ -7,6 +7,7 @@ import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
 import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
 import { MutationStatus } from "./types";
 import { ShowExpandedPointer } from "../../lib/slate-pointers/ShowExpandedPointer";
+import * as _ from "lodash";
 
 const SavingIconStyle = styled.span`
     float: right;
@@ -15,29 +16,49 @@ const SavingIconStyle = styled.span`
     margin-top: 1px;
 `;
 
-const PointerDropdownMenu = ({ availablePointers, onAddPointerImport, blockEditor }) => (
-    <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px", marginRight: "5px" }} tabIndex={-1}>
-        {availablePointers.map((e: any, index: number) => (
-            <MenuItem
-                eventKey="1"
-                key={index}
-                onClick={(event) => {
-                    onAddPointerImport(e.data.pointerId);
-                }}
-            >
-                <span>
-                    {`$${index + 1} - ${e.data.pointerId.slice(0, 5)}`}
-                    <ShowExpandedPointer
-                        exportingPointer={e}
-                        exportingPointers={availablePointers}
-                        blockEditor={blockEditor}
-                        isHoverable={false}
-                    />
-                </span>
-            </MenuItem>
-        ))}
-    </DropdownButton>
-);
+interface PointerDropdownMenuProps {
+    availablePointers: any[];
+    blockEditor: any;
+    onAddPointerImport(pointerId: string): () => {};
+}
+
+export class PointerDropdownMenu extends React.Component<PointerDropdownMenuProps> {
+
+    public shouldComponentUpdate(newProps: any, newState: any) {
+        if (
+            !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public render() {
+        return (
+            <DropdownButton title="Import" id="bg-nested-dropdown" bsSize={"xsmall"} style={{ marginBottom: "5px", marginRight: "5px" }} tabIndex={-1}>
+                {this.props.availablePointers.map((e: any, index: number) => (
+                    <MenuItem
+                        eventKey="1"
+                        key={index}
+                        onClick={(event) => {
+                            this.props.onAddPointerImport(e.data.pointerId);
+                        }}
+                    >
+                        <span>
+                            {`$${index + 1} - ${e.data.pointerId.slice(0, 5)}`}
+                            <ShowExpandedPointer
+                                exportingPointer={e}
+                                exportingPointers={this.props.availablePointers}
+                                blockEditor={this.props.blockEditor}
+                                isHoverable={false}
+                            />
+                        </span>
+                    </MenuItem>
+                ))}
+            </DropdownButton>
+        );
+    }
+}
 
 const Icons = {
     [MutationStatus.NotStarted]: null,
@@ -65,16 +86,16 @@ const SavingIcon = ({ mutationStatus, hasChangedSinceDatabaseSave, blockEditor }
 };
 
 export const MenuBar = ({ onAddPointerImport, availablePointers, mutationStatus, hasChangedSinceDatabaseSave, blockEditor }) => (
-        <div>
-            <PointerDropdownMenu
-                onAddPointerImport={onAddPointerImport}
-                availablePointers={availablePointers}
-                blockEditor={blockEditor}
-            />
-            <SavingIcon
-                hasChangedSinceDatabaseSave={hasChangedSinceDatabaseSave}
-                mutationStatus={mutationStatus}
-                blockEditor={blockEditor}
-            />
-        </div>
+    <div>
+        <PointerDropdownMenu
+            onAddPointerImport={onAddPointerImport}
+            availablePointers={availablePointers}
+            blockEditor={blockEditor}
+        />
+        <SavingIcon
+            hasChangedSinceDatabaseSave={hasChangedSinceDatabaseSave}
+            mutationStatus={mutationStatus}
+            blockEditor={blockEditor}
+        />
+    </div>
 );

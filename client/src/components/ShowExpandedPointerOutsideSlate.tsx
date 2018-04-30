@@ -6,6 +6,16 @@ import { ShowExpandedPointer } from "../lib/slate-pointers/ShowExpandedPointer";
 import { HOVER_ITEM_TYPES, changeHoverItem } from "../modules/blockEditor/actions";
 
 export class ShowExpandedPointerOutsideSlatePresentational extends React.Component<any, any> {
+
+    public shouldComponentUpdate(newProps: any) {
+        if (
+            !_.isEqual(newProps.exportingPointer.nodes, this.props.exportingPointer.nodes)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     public render() {
         return (
             <ShowExpandedPointer
@@ -22,7 +32,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
                         blockId: false,
                     });
                 }}
-                onMouseOverExpandedPointer={_.noop} 
+                onMouseOverExpandedPointer={_.noop}
             />
         );
     }
@@ -34,6 +44,6 @@ function mapStateToProps(state: any, { exportingPointer }: any) {
 
 export const ShowExpandedPointerOutsideSlate: any = compose(
     connect(
-        mapStateToProps, {changeHoverItem}
+        mapStateToProps, { changeHoverItem }
     )
 )(ShowExpandedPointerOutsideSlatePresentational);

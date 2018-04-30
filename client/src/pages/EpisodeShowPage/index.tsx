@@ -1,5 +1,6 @@
 import * as React from "react";
 import gql from "graphql-tag";
+import styled from "styled-components";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
 import { Row, Col, Button, Badge } from "react-bootstrap";
@@ -10,12 +11,12 @@ import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
-import { PointerTable } from "./PointerTable";
 import { exportingBlocksPointersSelector, exportingNodes } from "../../modules/blocks/exportingPointers";
 import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 import { Value } from "slate";
 import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations } from "./WorkspaceRelations";
+import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
 
 const WORKSPACE_QUERY = gql`
@@ -46,16 +47,6 @@ const WORKSPACE_QUERY = gql`
     }
  `;
 
-const UPDATE_BLOCKS = gql`
-    mutation updateBlocks($blocks:[blockInput]){
-        updateBlocks(blocks:$blocks){
-            id
-            value
-            updatedAtEventId
-        }
-    }
-`;
-
 const UPDATE_WORKSPACE = gql`
     mutation updateWorkspace($id: String!, $childWorkspaceOrder: [String]){
         updateWorkspace(id: $id, childWorkspaceOrder: $childWorkspaceOrder){
@@ -80,16 +71,26 @@ const UPDATE_CHILD_TOTAL_BUDGET = gql`
   }
 `;
 
-const ParentLink = (props) => (
-    <Link to={`/workspaces/${props.parentId}`}>
-        <Button>To Parent</Button>
-    </Link>
+const NavLink = styled(Link) `
+  margin-right: 5px;
+`;
+
+const HomeLink = () => (
+    <NavLink to="/">
+        <Button>Home</Button>
+    </NavLink>
 );
 
-const SubtreeLink = ({workspace}) => (
-    <Link to={`/workspaces/${workspace.id}/subtree`}>
-        <Button>To Subtree</Button>
-    </Link>
+const ParentLink = (props) => (
+    <NavLink to={`/workspaces/${props.parentId}`}>
+        <Button>Parent</Button>
+    </NavLink>
+);
+
+const SubtreeLink = ({ workspace }) => (
+    <NavLink to={`/workspaces/${workspace.id}/subtree`}>
+        <Button>Subtree</Button>
+    </NavLink>
 );
 
 function findPointers(value: any) {
@@ -108,9 +109,9 @@ export class FormPagePresentational extends React.Component<any, any> {
     }
 
     public componentDidMount() {
-        keyboardJS.bind("ctrl+s", (e) => { e.preventDefault(); this.scratchpadField.focus(); });
-        keyboardJS.bind("ctrl+a", (e) => { e.preventDefault(); this.answerField.focus(); });
-        keyboardJS.bind("ctrl+n", (e) => { e.preventDefault(); this.newChildField.focus(); });
+        keyboardJS.bind("alt+s", (e) => { e.preventDefault(); this.scratchpadField.focus(); });
+        keyboardJS.bind("alt+a", (e) => { e.preventDefault(); this.answerField.focus(); });
+        keyboardJS.bind("alt+c", (e) => { e.preventDefault(); this.newChildField.focus(); });
     }
 
     public updateBlocks = (blocks: any) => {
@@ -132,21 +133,22 @@ export class FormPagePresentational extends React.Component<any, any> {
         const availablePointers = _.uniqBy([...this.props.exportingPointers, ...importedPointers, ...readOnlyExportedPointers], (p) => p.data.pointerId);
         return (
             <div key={workspace.id}>
-                <BlockHoverMenu>
+                <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
                     <Row>
                         <Col sm={10}>
+                            <HomeLink />
                             {workspace.parentId &&
                                 <ParentLink parentId={workspace.parentId} />
                             }
-                            {workspace && 
+                            {workspace &&
                                 <SubtreeLink workspace={workspace} />
                             }
                         </Col>
                         <Col sm={2}>
                             {workspace &&
-                            <div style={{float: "right"}}>
-                                Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
-                            </div>
+                                <div style={{ float: "right" }}>
+                                    Available Budget: <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
+                                </div>
                             }
                         </Col>
                         <Col sm={12}>
@@ -159,7 +161,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                         </Col>
                     </Row>
                     <Row>
-                        <Col sm={4}>
+                        <Col sm={6}>
                             <h3>Scratchpad</h3>
                             <BlockEditor
                                 availablePointers={availablePointers}
@@ -173,23 +175,16 @@ export class FormPagePresentational extends React.Component<any, any> {
                                 ref={this.registerEditorRef("answerField")}
                             />
                         </Col>
-                        <Col sm={2}>
-                            <h3>Pointers</h3>
-                            <PointerTable
-                                availablePointers={availablePointers}
-                                exportingPointerIds={this.props.exportingPointers.map((p) => p.data.pointerId)}
-                            />
-                        </Col>
                         <Col sm={6}>
                             <ChildrenSidebar
                                 workspaces={workspace.childWorkspaces}
                                 availablePointers={availablePointers}
                                 workspaceOrder={workspace.childWorkspaceOrder}
-                                onCreateChild={({question, totalBudget}) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
-                                onUpdateChildTotalBudget={({childId, totalBudget}) => {this.props.updateChildTotalBudget({variables: {workspaceId: workspace.id, childId, totalBudget}}); }}
+                                onCreateChild={({ question, totalBudget }) => { this.props.createChild({ variables: { workspaceId: workspace.id, question, totalBudget } }); }}
+                                onUpdateChildTotalBudget={({ childId, totalBudget }) => { this.props.updateChildTotalBudget({ variables: { workspaceId: workspace.id, childId, totalBudget } }); }}
                                 availableBudget={workspace.totalBudget - workspace.allocatedBudget}
                                 changeOrder={(newOrder) => { this.props.updateWorkspace({ variables: { id: workspace.id, childWorkspaceOrder: newOrder } }); }}
-                                ref={(input) => {if (input && input.editor()) { this.newChildField = input.editor(); }}}
+                                ref={(input) => { if (input && input.editor()) { this.newChildField = input.editor(); } }}
                             />
                         </Col>
                     </Row>

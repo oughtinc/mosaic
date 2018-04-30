@@ -1,27 +1,20 @@
 {
-  "development": {
-    "use_env_variable": "CONNECTION_STRING_DEV",
-    "dialect": "postgres"
-  },
-  "development2": {
-    "username": "ozziegooen",
-    "password": null,
-    "database": "mosaic_dev",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
-  },
-  "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
-  },
-  "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
-  }
+    "development": {
+        "use_env_variable": "CONNECTION_STRING_DEV",
+        "dialect": "postgres"
+    },
+    "development2": {
+        "username": "ozziegooen",
+        "password": null,
+        "database": "mosaic_dev",
+        "host": "127.0.0.1",
+        "dialect": "postgres"
+    },
+    "test": {
+        "username": "mosaic",
+        "password": "MDaUA2P4ZbkJPCKEM",
+        "database": "database_test",
+        "host": "127.0.0.1",
+        "dialect": "postgres"
+    }
 }

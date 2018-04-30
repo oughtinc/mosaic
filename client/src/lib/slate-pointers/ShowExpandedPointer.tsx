@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as uuidv1 from "uuid/v1";
 import { PointerImportNode } from "./PointerImportNode";
+import * as _ from "lodash";
 
 export class LeafNode extends React.Component<any, any> {
     public render() {
@@ -41,6 +42,18 @@ export class InlineNode extends React.Component<any, any> {
 }
 
 export class ShowExpandedPointer extends React.Component<any, any> {
+
+    public shouldComponentUpdate(newProps: any) {
+        // Try filtering down to just the node.object==="leaf", and then node.leaves[0].
+
+        if (
+            !_.isEqual(newProps.exportingPointer.nodes, this.props.exportingPointers)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     public render() {
         return (
             <div>

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { compose } from "recompose";
 import { connect } from "react-redux";
-import { changePointerReference, exportSelection, removeExportOfSelection, removeImportOfSelection, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
+import { changePointerReference, exportSelection, removeExportOfSelection, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 
 const HoverMenu = styled.span`
@@ -32,9 +32,6 @@ export class ImportMenu extends React.Component<any, any> {
             Expand
           </Button>
         }
-          <Button bsSize={"xsmall"} onClick={() => {this.props.removeImportOfSelection(); }}>
-            Remove 
-          </Button>
       </div>
     );
   }
@@ -62,7 +59,7 @@ export class MenuPresentational extends React.Component<any> {
     const {blockEditor} = this.props;
     const hoverItemType = _.get(blockEditor, "hoveredItem.hoverItemType");
     return ReactDOM.createPortal(
-      <div className="menu hover-menu" ref={this.props.menuRef}>
+      <div className="menu hover-menu" ref={this.props.menuRef} id="hover-menu">
       {blockEditor &&
         <HoverMenu>
           {(hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT) &&
@@ -73,7 +70,6 @@ export class MenuPresentational extends React.Component<any> {
           {(hoverItemType === HOVER_ITEM_TYPES.POINTER_IMPORT) &&
             <ImportMenu
               blockEditor={this.props.blockEditor}
-              removeImportOfSelection={this.props.removeImportOfSelection}
               onChangePointerReference={this.props.changePointerReference}
             />
           }
@@ -93,6 +89,6 @@ export class MenuPresentational extends React.Component<any> {
 
 export const Menu: any = compose(
     connect(
-        ({ blockEditor }) => ({ blockEditor }), { changePointerReference, exportSelection, removeExportOfSelection, removeImportOfSelection }
+        ({ blockEditor }) => ({ blockEditor }), { changePointerReference, exportSelection, removeExportOfSelection }
     )
 )(MenuPresentational);

@@ -47,21 +47,21 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
     }
 
     public render() {
-            return (
-                <div>
-                    <Menu
-                        menuRef={this.menuRef}
-                        blockEditor={this.props.blockEditor}
-                    />
-                    {this.props.children}
-                </div>
-            );
-        }
+        return (
+            <div>
+                <Menu
+                    menuRef={this.menuRef}
+                    blockEditor={this.props.blockEditor}
+                />
+                {this.props.children}
+            </div>
+        );
+    }
 }
 
 export const BlockHoverMenu: any = compose(
     connect(
         ({ blockEditor }) => ({ blockEditor }),
-        {removeHoverItem}
+        { removeHoverItem }
     )
 )(BlockHoverMenuPresentational);

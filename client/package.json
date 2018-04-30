@@ -16,6 +16,7 @@
     "graphql-tag": "^2.8.0",
     "keyboardjs": "^2.4.1",
     "lodash": "^4.17.5",
+    "logrocket": "^0.6.10",
     "moment": "^2.21.0",
     "query-string": "^5.1.0",
     "react": "^16.2.0",
@@ -64,7 +65,7 @@
     "@types/recompose": "^0.24.5",
     "immutable": "^3.8.2",
     "prop-types": "^15.6.1",
-    "react-scripts-ts": "^2.13.0",
+    "react-scripts-ts": "^2.14.0",
     "typescript": "^2.6.2"
   }
 }
