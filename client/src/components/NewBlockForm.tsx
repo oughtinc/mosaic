@@ -56,7 +56,7 @@ export class NewBlockForm extends React.Component<any, any> {
     }
 
     private onKeyDown = (event) => {
-        const pressedControlAndEnter = (_event) => (_event.ctrlKey && _event.key === "Enter");
+        const pressedControlAndEnter = (_event) => (_event.metaKey && _event.key === "Enter");
 
         if (pressedControlAndEnter(event)) {
             event.preventDefault();

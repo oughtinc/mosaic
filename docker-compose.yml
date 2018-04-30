@@ -6,7 +6,7 @@ services:
     environment: 
       POSTGRES_DB: mosaic_dev 
       POSTGRES_USER: mosaic 
-      POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM 
+      POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM
     ports:
       - "5432:5432"
   api:
@@ -23,7 +23,7 @@ services:
   web:
     image: node:9.7  
     depends_on:
-       - api
+      - api
     volumes:
       - ./client:/data
     ports:

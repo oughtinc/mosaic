@@ -1,23 +1,8 @@
 import Sequelize from 'sequelize';
-import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
+import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
+import { getAllInlinesAsArray } from "../utils/slateUtils";
 import * as _ from "lodash";
 const Op = Sequelize.Op;
-
-function getTopLevelInlinesAsArray(node) {
-  let array: any = [];
-
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
-    if (child.object === "inline") {
-      array.push(child);
-    }
-    if (_.has(child, 'nodes')) {
-      array = array.concat(getTopLevelInlinesAsArray(child))
-    }
-  });
-
-  return array;
-}
 
 const PointerModel = (sequelize, DataTypes) => {
   var Pointer = sequelize.define('Pointer', {
@@ -77,7 +62,7 @@ const PointerModel = (sequelize, DataTypes) => {
     const value = await this.value
     if (!value) { return [] }
 
-    const inlines =  getTopLevelInlinesAsArray(value)
+    const inlines = getAllInlinesAsArray(value)
     const pointerInlines =  inlines.filter((l) => !!l.data.pointerId)
     const pointerIds = pointerInlines.map(p => p.data.pointerId)
     return pointerIds

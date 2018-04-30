@@ -31,6 +31,17 @@ class BlockEditorPresentational extends React.Component<any, any> {
     this.resetPlugins(this.props);
   }
 
+  public shouldComponentUpdate(newProps: any) {
+    if (
+      !_.isEqual(newProps.blockEditor, this.props.blockEditor)
+      || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+      || !_.isEqual(newProps.block, this.props.block)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   public editor = () => {
     return this.blockEditorEditing && this.blockEditorEditing.editor;
   }
@@ -78,6 +89,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
+      isDisplayMode: newProps.isDisplayMode,
     };
     this.setState({
       plugins: [
@@ -111,26 +123,32 @@ class BlockEditorPresentational extends React.Component<any, any> {
     }
   }
 
-  public render() {
-    const { readOnly } = this.props;
-    const block = this.props.block;
-    if (!block) {
-      return (<div> loading... </div>);
+  public handleMouseLeave = (event: React.MouseEvent<HTMLDivElement>) => {
+    const hoverMenu = document.getElementById("hover-menu");
+    if (!hoverMenu) {
+      return;
     }
+
+    if ((_.isElement(event.relatedTarget) && hoverMenu.contains(event.relatedTarget as Node))) {
+      return;
+    }
+
+    this.props.removeHoverItem();
+  }
+
+  public renderEditor(block: any) {
+    const { readOnly } = this.props;
     const value = block.value;
     const { plugins } = this.state;
-    if (readOnly) {
-      return (
-        <BlockReadOnlyStyle>
-          <Editor
-            value={value}
-            readOnly={true}
-            plugins={plugins}
-          />
-        </BlockReadOnlyStyle>
-      );
-    } else {
-      return (
+    return readOnly ? (
+      <BlockReadOnlyStyle>
+        <Editor
+          value={value}
+          readOnly={true}
+          plugins={plugins}
+        />
+      </BlockReadOnlyStyle>
+    ) : (
         <BlockEditorEditing
           value={value}
           readOnly={true}
@@ -143,7 +161,18 @@ class BlockEditorPresentational extends React.Component<any, any> {
           onMount={(input) => { this.blockEditorEditing = input; }}
         />
       );
+  }
+
+  public render() {
+    const block = this.props.block;
+    if (!block) {
+      return (<div> loading... </div>);
     }
+    return (
+      <div onMouseLeave={this.handleMouseLeave}>
+        {this.renderEditor(block)}
+      </div>
+    );
   }
 }
 
@@ -155,6 +184,6 @@ function mapStateToProps(state: any, { blockId }: any) {
 
 export const BlockEditor: any = compose(
   connect(
-    mapStateToProps, { addBlocks, removeBlocks, changeHoverItem, removeHoverItem }, null, {withRef: true}
+    mapStateToProps, { addBlocks, removeBlocks, changeHoverItem, removeHoverItem }, null, { withRef: true }
   ),
 )(BlockEditorPresentational);

@@ -1,4 +1,3 @@
-import gql from "graphql-tag";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
@@ -8,46 +7,14 @@ import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
+import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
+
 import * as React from "react";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
   padding: 3px;
   margin-bottom: 3px;
-`;
-
-const WORKSPACES_QUERY = gql`
-    query OriginWorkspaces{
-        workspaces(where:{parentId:null}){
-          id
-          parentId
-          childWorkspaceOrder
-          totalBudget 
-          allocatedBudget 
-          blocks{
-              id
-              value
-              type
-          }
-        }
-    }
- `;
-
-const CREATE_ROOT_WORKSPACE = gql`
-  mutation createWorkspace($question:JSON, $totalBudget: Int){
-    createWorkspace(question:$question, totalBudget:$totalBudget ){
-        id
-        parentId
-        childWorkspaceOrder
-        totalBudget 
-        allocatedBudget 
-        blocks{
-            id
-            value
-            type
-        }
-    }
-  }
 `;
 
 const ParentWorkspace = ({ workspace }) => {
