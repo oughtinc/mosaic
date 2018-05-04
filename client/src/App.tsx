@@ -19,9 +19,10 @@ import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
 import { appConfig } from "./config.js";
 const { SERVER_URL } = process.env;
+// uri: SERVER_URL || "http://localhost:8080/graphql"
 
 const client: any = new ApolloClient({
-  link: new HttpLink({ uri: SERVER_URL || "http://localhost:8080/graphql" }),
+  link: new HttpLink({ uri: "https://radiant-depths-64163.herokuapp.com/:" + process.env.PORT }),
   cache: new InMemoryCache(),
 });
 
