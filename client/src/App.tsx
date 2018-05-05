@@ -18,11 +18,16 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
 import { appConfig } from "./config.js";
-const { SERVER_URL } = process.env;
+// const { SERVER_URL } = process.env;
 // uri: SERVER_URL || "http://localhost:8080/graphql"
+const uri = process.env.PORT ?
+  `https://radiant-depths-64163.herokuapp.com:${process.env.PORT}/graphql` :
+  "http://localhost:8080/graphql";
+
+console.log("Process.env: ", process.env);
 
 const client: any = new ApolloClient({
-  link: new HttpLink({ uri: "https://radiant-depths-64163.herokuapp.com/:" + process.env.PORT }),
+  link: new HttpLink({ uri }),
   cache: new InMemoryCache(),
 });
 
@@ -45,7 +50,8 @@ const Routes = () => (
 );
 
 LogRocket.init(appConfig.logrocket_id);
-const environment = process.env.NODE_ENV || ""; // "development" or "production"
+const environment = process.env.NODE_ENV || "development"; // "development" or "production"
+console.log("Client environment: ", process.env.NODE_ENV);
 LogRocket.track(environment);
 
 const store = createStore(

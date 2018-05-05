@@ -3,9 +3,10 @@ import 'babel-polyfill';
 import * as express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import * as bodyParser from 'body-parser';
-import {schema} from './schema/index';
+import { schema } from './schema/index';
 var cors = require('cors');
 
+console.log("Server process.env: ", process.env);
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
 const graphQLServer = express();

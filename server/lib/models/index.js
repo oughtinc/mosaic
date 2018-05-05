@@ -3,14 +3,15 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-var env       = process.env.NODE_ENV || 'development';
-var config    = require(__dirname + '/../../config/config.json')[env];
+var env = process.env.NODE_ENV || 'development';
+var config = require(__dirname + '/../../config/config.json')[env];
 
 const BlockModel = require('./block');
 const EventModel = require('./event');
 const PointerModel = require('./pointer');
 const PointerImportModel = require('./pointerImport');
 const WorkspaceModel = require('./workspace');
+console.log("Server environment: ", env);
 
 if (config.use_env_variable) {
   var sequelize = new Sequelize(process.env[config.use_env_variable], config);
