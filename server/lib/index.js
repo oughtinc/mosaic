@@ -10,7 +10,9 @@ console.log("Server process.env: ", process.env);
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
 const graphQLServer = express();
+
 graphQLServer.use(cors())
+
 
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));

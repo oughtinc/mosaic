@@ -18,13 +18,11 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
 import { appConfig } from "./config.js";
-// const { SERVER_URL } = process.env;
-// uri: SERVER_URL || "http://localhost:8080/graphql"
-const uri = process.env.PORT ?
-  `https://radiant-depths-64163.herokuapp.com:${process.env.PORT}/graphql` :
-  "http://localhost:8080/graphql";
+// const uri = process.env.PORT ?
+const uri = `https://radiant-depths-64163.herokuapp.com/graphql`
+// "http://localhost:8080/graphql";
 
-console.log("Process.env: ", process.env);
+console.log("Client process.env: ", process.env);
 
 const client: any = new ApolloClient({
   link: new HttpLink({ uri }),

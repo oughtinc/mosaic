@@ -1,5 +1,0 @@
-FROM node:9.7.0
-COPY ./server /data
-WORKDIR /data
-RUN yarn install
-CMD ["yarn", "run", "start"]
