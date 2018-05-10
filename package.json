@@ -6,7 +6,7 @@
     "heroku-prebuild": "cd client && yarn install && yarn run build && cd ../server && yarn --production=false",
     "start": "cd server && yarn run start"
   },
-  "author": "",
+  "author": "Andrew Schreiber",
   "engines": {
     "yarn": "1.5.1",
     "node": "9.7.1",
