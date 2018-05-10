@@ -17,6 +17,6 @@ services:
       - "8080:8080"
     volumes:
       - ./:/data
-    command: "bash -c 'cd /data/client && yarn install && yarn run build && cd ../server && yarn && yarn run db:migrate && yarn run start'"
+    command: "bash -c 'node -v && cd /data/client && yarn install && yarn run build && cd ../server && yarn && yarn run db:migrate && yarn run start'"
     depends_on:
       - postgres
