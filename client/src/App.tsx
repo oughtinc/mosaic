@@ -19,6 +19,7 @@ import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
 import { appConfig } from "./config.js";
 
+console.log("HEROKU_BUILD", process.env.HEROKU_BUILD);
 const SERVER_URL = process.env.HEROKU_BUILD ? "https://radiant-depths-64163.herokuapp.com/graphql" : null;
 
 const client: any = new ApolloClient({
