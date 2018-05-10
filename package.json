@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Simple prediction service",
   "scripts": {
-    "preinstall": "echo 'preBuild' && cd server && yarn --production=false && yarn run build",
+    "preinstall": "echo 'preBuild' && ls && cd server && ls && yarn --production=false && yarn run build",
     "start": "node server/dist/lib/index.js",
     "postinstall": "cd client && yarn --production=false && yarn run build"
   },
