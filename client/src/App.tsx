@@ -16,14 +16,14 @@ import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
-
 import { appConfig } from "./config.js";
 
-console.log("HEROKU_BUILD", process.env.HEROKU_BUILD);
-const SERVER_URL = process.env.HEROKU_BUILD ? "https://radiant-depths-64163.herokuapp.com/graphql" : null;
+const SERVER_URL = window.location.hostname === "localhost" ?
+  "http://localhost:8080/graphql" :
+  `${window.location.protocol}//${window.location.hostname}/graphql`;
 
 const client: any = new ApolloClient({
-  link: new HttpLink({ uri: "https://radiant-depths-64163.herokuapp.com/graphql" || "http://localhost:8080/graphql" }),
+  link: new HttpLink({ uri: SERVER_URL }),
   cache: new InMemoryCache(),
 });
 
