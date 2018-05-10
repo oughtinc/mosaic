@@ -22,8 +22,6 @@ graphQLServer.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/../../client/build/public/index.html'));
 });
 
-
-
 graphQLServer.listen(GRAPHQL_PORT, () => console.log(
   `GraphiQL is now running on http://localhost:${GRAPHQL_PORT}/graphiql. \nReact is now running on http://localhost:${GRAPHQL_PORT}`
 ));
