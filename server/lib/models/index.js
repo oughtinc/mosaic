@@ -13,8 +13,7 @@ const PointerImportModel = require('./pointerImport');
 const WorkspaceModel = require('./workspace');
 
 if (config.use_env_variable) {
-  const dbURL = process.env["DATABASE_URL"] || process.env[config.use_env_variable];
-  console.log("Found DB URL", dbURL, process.env.DATABASE_URL)
+  const dbURL = process.env.DATABASE_URL || process.env[config.use_env_variable];
   var sequelize = new Sequelize(dbURL, config);
 } else {
   console.log("No env variable used, using config.")
