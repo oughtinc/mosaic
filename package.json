@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "description": "Simple prediction service",
   "scripts": {
-    "heroku-prebuild": "cd server && yarn --production=false && yarn run build",
-    "start": "cd server && yarn run start",
-    "heroku-postbuild": "cd client && yarn install && yarn run build"
+    "heroku-prebuild": "cd client && yarn install && yarn run build && cd ../server && yarn --production=false && yarn run build",
+    "start": "cd server && yarn run start"
   },
-  "author": "",
   "license":"",
+  "author": "",
   "engines": {
     "yarn": "1.5.1",
     "node": "9.7.1"
