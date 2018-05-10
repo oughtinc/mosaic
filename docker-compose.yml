@@ -12,7 +12,7 @@ services:
   api:
     image: node:9.7
     environment: 
-        CONNECTION_STRING_DEV: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
+        DATABASE_URL: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
     ports:
       - "8080:8080"
     volumes:

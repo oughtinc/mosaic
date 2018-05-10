@@ -1,6 +1,6 @@
 {
     "development": {
-        "use_env_variable": "CONNECTION_STRING_DEV",
+        "use_env_variable": "DATABASE_URL",
         "dialect": "postgres"
     },
     "development2": {
