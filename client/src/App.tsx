@@ -23,7 +23,7 @@ console.log("HEROKU_BUILD", process.env.HEROKU_BUILD);
 const SERVER_URL = process.env.HEROKU_BUILD ? "https://radiant-depths-64163.herokuapp.com/graphql" : null;
 
 const client: any = new ApolloClient({
-  link: new HttpLink({ uri: SERVER_URL || "http://localhost:8080/graphql" }),
+  link: new HttpLink({ uri: "https://radiant-depths-64163.herokuapp.com/graphql" || "http://localhost:8080/graphql" }),
   cache: new InMemoryCache(),
 });
 
