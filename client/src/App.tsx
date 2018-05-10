@@ -19,7 +19,7 @@ import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
 import { appConfig } from "./config.js";
 
-const { SERVER_URL } = process.env;
+const SERVER_URL = process.env.DATABASE_URL ? "https://radiant-depths-64163.herokuapp.com/graphql" : null;
 
 const client: any = new ApolloClient({
   link: new HttpLink({ uri: SERVER_URL || "http://localhost:8080/graphql" }),
