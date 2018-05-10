@@ -18,6 +18,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 
 import { appConfig } from "./config.js";
+
 const { SERVER_URL } = process.env;
 
 const client: any = new ApolloClient({
