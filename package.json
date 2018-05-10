@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Simple prediction service",
   "scripts": {
-    "preinstall": "echo 'preBuild' && ls && cd server && ls && yarn --production=false && yarn run build",
+    "heroku-prebuild": "echo 'preBuild' && ls && cd server && ls && yarn && yarn install && yarn run build",
     "start": "node server/dist/lib/index.js",
-    "postinstall": "cd client && yarn --production=false && yarn run build"
+    "heroku-postbuild": "cd client && yarn install && yarn run build"
   },
   "author": "",
   "engines": {
