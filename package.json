@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Simple prediction service",
   "scripts": {
-    "heroku-prebuild": "cd client && yarn install && yarn run build && cd ../server && yarn --production=false && yarn run build",
-    "start": "cd server/dist && nodemon lib/index.js --exec ts-node --extensions '.ts,.js' --presets es2015,stage-2"
+    "heroku-prebuild": "cd client && yarn install && yarn run build && cd ../server && yarn --production=false",
+    "start": "cd server/dist && yarn run start"
   },
   "author": "",
   "engines": {
