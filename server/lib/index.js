@@ -14,20 +14,19 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
 
 const graphQLServer = express();
 
-graphQLServer.use(express.static(path.join(__dirname, '/../../client/build')));
 graphQLServer.use(cors())
 
 if (!process.env.USING_DOCKER) {
   graphQLServer.use(enforce.HTTPS({ trustProtoHeader: true }));
-  graphQLServer.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(`https://${req.header('host')}${req.url}`)
-    } else {
-      next()
-    }
-  });
+  // graphQLServer.use((req, res, next) => {
+  //   if (req.header('x-forwarded-proto') !== 'https') {
+  //     res.redirect(`https://${req.header('host')}${req.url}`)
+  //   } else {
+  //     next()
+  //   }
+  // });
 }
-
+graphQLServer.use(express.static(path.join(__dirname, '/../../client/build')));
 
 
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
