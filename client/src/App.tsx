@@ -16,12 +16,14 @@ import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
-
 import { appConfig } from "./config.js";
-const { SERVER_URL } = process.env;
+
+const SERVER_URL = window.location.hostname === "localhost" ?
+  "http://localhost:8080/graphql" :
+  `${window.location.protocol}//${window.location.hostname}/graphql`;
 
 const client: any = new ApolloClient({
-  link: new HttpLink({ uri: SERVER_URL || "http://localhost:8080/graphql" }),
+  link: new HttpLink({ uri: SERVER_URL }),
   cache: new InMemoryCache(),
 });
 
