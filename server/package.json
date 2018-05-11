@@ -3,7 +3,7 @@
   "author": "Ought",
   "license": "MIT",
   "version": "1.0.0",
-  "description": "SPS server",
+  "description": "Mosaic server",
   "main": "lib/index.js",
   "scripts": {
     "start": "nodemon lib/index.js --exec ts-node --extensions '.ts,.js' --presets es2015,stage-2",
