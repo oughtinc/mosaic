@@ -17,7 +17,7 @@ const graphQLServer = express();
 graphQLServer.use(express.static(path.join(__dirname, '/../../client/build')));
 graphQLServer.use(cors())
 if (!process.env.USING_DOCKER) {
-  graphQLServer.use(enforce.HTTPS());
+  graphQLServer.use(enforce.HTTPS({ trustProtoHeader: true }));
 }
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
@@ -26,6 +26,10 @@ graphQLServer.get('*', (req, res) => {
   res.sendFile(path.join(__dirname + '/../../client/build/public/index.html'));
 });
 
-graphQLServer.listen(GRAPHQL_PORT, () => console.log(
-  `GraphiQL is now running on http://localhost:${GRAPHQL_PORT}/graphiql. \nReact is now running on http://localhost:${GRAPHQL_PORT}`
-));
+graphQLServer.listen(GRAPHQL_PORT, () => {
+  console.log("Express/GraphQL server now listening.");
+  if (process.env.USING_DOCKER) {
+    console.log(
+      `GraphiQL: http://localhost:${GRAPHQL_PORT}/graphiql \nReact: http://localhost:${GRAPHQL_PORT}`);
+  }
+});
