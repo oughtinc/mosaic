@@ -3,8 +3,8 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-var env       = process.env.NODE_ENV || 'development';
-var config    = require(__dirname + '/../../config/config.json')[env];
+var env = process.env.NODE_ENV || 'development';
+var config = require(__dirname + '/../../config/config.json')[env];
 
 const BlockModel = require('./block');
 const EventModel = require('./event');
@@ -13,8 +13,11 @@ const PointerImportModel = require('./pointerImport');
 const WorkspaceModel = require('./workspace');
 
 if (config.use_env_variable) {
-  var sequelize = new Sequelize(process.env[config.use_env_variable], config);
+  const dbURL = process.env[config.use_env_variable] + "?ssl=true";
+  console.log("Using DB URL:", dbURL);
+  var sequelize = new Sequelize(dbURL, config);
 } else {
+  console.log("No env variable used, using config.")
   var sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 

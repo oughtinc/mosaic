@@ -1,7 +1,9 @@
 {
-  "name": "example-node-server",
+  "name": "mosaic_server",
+  "author": "Ought",
+  "license": "MIT",
   "version": "1.0.0",
-  "description": "SPS server",
+  "description": "Mosaic server",
   "main": "lib/index.js",
   "scripts": {
     "start": "nodemon lib/index.js --exec ts-node --extensions '.ts,.js' --presets es2015,stage-2",
@@ -18,8 +20,6 @@
     "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
     "pretest": "NODE_ENV=test npm run db:reset"
   },
-  "author": "Ozzie Gooen",
-  "license": "MIT",
   "dependencies": {
     "apollo-server-express": "^1.1.7",
     "async": "^2.6.0",
@@ -33,6 +33,7 @@
     "es6-promise": "^4.1.1",
     "express": "^4.16.3",
     "express-graphql": "^0.6.11",
+    "express-sslify": "^1.2.0",
     "graphql": "^0.13.1",
     "graphql-client": "^2.0.0",
     "graphql-relay": "^0.5.4",
