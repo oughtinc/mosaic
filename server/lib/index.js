@@ -1,6 +1,8 @@
 import 'babel-polyfill';
 
 import * as express from 'express';
+import * as enforce from 'express-sslify';
+
 import * as path from 'path';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import * as bodyParser from 'body-parser';
@@ -14,7 +16,9 @@ const graphQLServer = express();
 
 graphQLServer.use(express.static(path.join(__dirname, '/../../client/build')));
 graphQLServer.use(cors())
-
+if (!process.env.USING_DOCKER) {
+  graphQLServer.use(enforce.HTTPS());
+}
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 

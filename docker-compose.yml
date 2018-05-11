@@ -13,6 +13,7 @@ services:
     image: node:9.7
     environment: 
         DATABASE_URL: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
+        USING_DOCKER: "true"
     ports:
       - "8080:8080"
     volumes:
