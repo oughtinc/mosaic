@@ -1,17 +1,17 @@
 {
   "name": "mosaic",
+  "author": "Ought",
+  "license": "MIT",
   "version": "1.0.0",
   "description": "Simple prediction service",
-  "main": "index.js",
   "scripts": {
-    "server/install": "cd server && npm install && cd ..",
-    "server/build": "cd server && npm run build && cd ..",
-    "server/serve": "cd server && npm run serve && cd ..",
-    "server/db:reset": "cd server && npm run db:reset && cd ..",
-    "server/db:seed": "cd server && npm run db:seed && cd ..",
-    "postinstall": "npm run server/install"
+    "heroku-prebuild": "HEROKU_BUILD=true && cd client && yarn install && yarn run build && cd ../server && yarn --production=false",
+    "start": "cd server && yarn run db:migrate && yarn run start"
   },
-  "author": "",
-  "license": "MIT",
+  "engines": {
+    "yarn": "1.5.1",
+    "node": "9.7.1",
+    "npm": "5.6.0"
+  },
   "dependencies": {}
 }

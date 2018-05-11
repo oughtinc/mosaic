@@ -1,6 +1,6 @@
 {
     "development": {
-        "use_env_variable": "CONNECTION_STRING_DEV",
+        "use_env_variable": "DATABASE_URL",
         "dialect": "postgres"
     },
     "development2": {
@@ -8,6 +8,10 @@
         "password": null,
         "database": "mosaic_dev",
         "host": "127.0.0.1",
+        "dialect": "postgres"
+    },
+    "production": {
+        "use_env_variable": "DATABASE_URL",
         "dialect": "postgres"
     },
     "test": {
