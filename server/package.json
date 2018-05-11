@@ -33,6 +33,7 @@
     "es6-promise": "^4.1.1",
     "express": "^4.16.3",
     "express-graphql": "^0.6.11",
+    "express-sslify": "^1.2.0",
     "graphql": "^0.13.1",
     "graphql-client": "^2.0.0",
     "graphql-relay": "^0.5.4",
