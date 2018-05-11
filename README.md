@@ -79,3 +79,12 @@ To automatically create new dumps when the db changes:
 1. If the app is not running, run it (`docker-compose up`)
 1. `cd server`
 1. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
+
+## Deployment
+We deploy the app on Heroku: https://dashboard.heroku.com/apps/mosaic-prod
+
+To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page.
+
+When a branch is merged to master, it is automatically pushed to Heroku.
+
+`docker-compose.yml` and `package.json` at the root level must be kept in sync.
