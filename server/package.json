@@ -1,5 +1,7 @@
 {
-  "name": "example-node-server",
+  "name": "mosaic_server",
+  "author": "Ought",
+  "license": "MIT",
   "version": "1.0.0",
   "description": "SPS server",
   "main": "lib/index.js",
@@ -18,8 +20,6 @@
     "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
     "pretest": "NODE_ENV=test npm run db:reset"
   },
-  "author": "Ozzie Gooen",
-  "license": "MIT",
   "dependencies": {
     "apollo-server-express": "^1.1.7",
     "async": "^2.6.0",
