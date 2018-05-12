@@ -26,7 +26,7 @@ graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 graphQLServer.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/../../client/build/public/index.html'));
+  res.sendFile(path.join(__dirname + '/../../client/build/index.html'));
 });
 
 graphQLServer.listen(GRAPHQL_PORT, () => {
