@@ -12,20 +12,12 @@ services:
   api:
     image: node:9.7
     environment: 
-        CONNECTION_STRING_DEV: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
+        DATABASE_URL: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
+        USING_DOCKER: "true"
     ports:
       - "8080:8080"
     volumes:
-      - ./server:/data      
-    command: "bash -c 'sleep 3 && cd /data && yarn && yarn install && yarn run db:migrate && yarn run start'"
+      - ./:/data
+    command: "bash -c 'cd /data/client && yarn install && yarn run build && cd ../server && yarn --production=false && yarn run db:migrate && yarn run start'"
     depends_on:
       - postgres
-  web:
-    image: node:9.7  
-    depends_on:
-      - api
-    volumes:
-      - ./client:/data
-    ports:
-      - "3000:3000"
-    command: "bash -c 'cd /data && yarn install && yarn run start'"
