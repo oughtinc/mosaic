@@ -3,7 +3,6 @@ import { data as example1 } from "./example1";
 // It's suggested to use this tool to transform graphql responses into examples:
 // https://json-to-js.com/
 
-console.log(example1);
 export const examples = [
     {
         url: "1",
