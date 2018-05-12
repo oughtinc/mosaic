@@ -16,6 +16,7 @@ import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
+import { ExampleShowPage } from "./pages/ExampleShowPage";
 import { appConfig } from "./config.js";
 
 const SERVER_URL = window.location.hostname === "localhost" ?
@@ -37,9 +38,21 @@ export class Layout extends React.Component {
   }
 }
 
+export class Home extends React.Component {
+  public render() {
+    return (
+      <div className="container-fluid">
+        <h2> Mosaic App </h2>
+      </div>
+    );
+  }
+}
+
 const Routes = () => (
   <div>
-    <Route exact={true} path="/" component={RootWorkspacePage} />
+    <Route exact={true} path="/" component={Home} />
+    <Route exact={true} path="/examples/:exampleName" component={ExampleShowPage} />
+    <Route exact={true} path="/workspaces" component={RootWorkspacePage} />
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
     <Route exact={true} path="/workspaces/:workspaceId/subtree" component={WorkspaceSubtreePage} />
   </div>
