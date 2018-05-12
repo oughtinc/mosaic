@@ -91,10 +91,10 @@ When a branch is merged to master, it is automatically pushed to Heroku.
 ## Publishing Example subtrees
 In order to make an example subtrees, do the following steps:
 
-1. Open the ``/subtree/ view for the selected subtree.
+1. Open the application for a specific subtree. Go to the ``/subtree/`` url for that subtree.
 1. Open the graphQl explorer. Click on "queries." There should be a query called "workspaceQuery" in the "Watched Queries" view. Run it. If you can't find it, the following code may work:
 
-``` json
+``` js
 query workspaceSubtree($workspaceId: String!) {
   subtreeWorkspaces(workspaceId: $workspaceId) {
     id
@@ -111,12 +111,12 @@ query workspaceSubtree($workspaceId: String!) {
 }
 //Query Variables
 {
-  "workspaceId": "#{YOUR VARIABLE HERE}"
+  "workspaceId": "YOUR ROOT TREE WORKSPACE ID HERE"
 }
 ```
 
 1. Copy the response from the graphQL workSpaceSubtree query.
-1. Use the website ``https://json-to-js.com/`` to convert this json object into a javascript object.
-1. Create a new file in the ``/client/src/pages/ExampelShowPage/examples`` directory. Add this json object in it, exported as ``data.`` You can follow the same format as other items (like ``example1.ts``) in that directory. 
-1. In ``/client/src/pages/ExampelShowPage/examples/index.ts``, add an object for this example, with it's name, rootWorkspaceId (the first one you want to show), and url extension (this will go after /examples/${url}.)
+1. Use the website https://json-to-js.com/ to convert this json object into a javascript object.
+1. Create a new file in the ``/client/src/pages/ExampelShowPage/examples`` directory. Add this javascript object in it, exported as the variable ``data.`` For guidance, you can check out other items (like ``example1.ts``) in that directory. 
+1. Edit the file ``/client/src/pages/ExampelShowPage/examples/index.ts``: add an object (in the ``examples`` hash) for your new example, with it's name, rootWorkspaceId (the first one you want to show), and url extension (this will go after /examples/${url}.)
 1. Now you should be able to visit this example at ``/client/src/pages/ExampelShowPage/examples/{#example-url}``
