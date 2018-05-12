@@ -75,5 +75,38 @@ URL: https://app.logrocket.com/i58gnp/mosaic/
 
 To automatically create new dumps when the db changes:
 0. If the app is not running, run it (`docker-compose up`)
-0. `cd server`
+0. `cd server
 0. `scripts/dumpDB.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
+
+### Publishing Example subtrees
+In order to make an example subtrees, do the following steps:
+
+0. Open the ``/subtree/ view for the selected subtree.
+0. Open the graphQl explorer. Click on "queries." There should be a query called "workspaceQuery" in the "Watched Queries" view. Run it. If you can't find it, the following code may work:
+
+``` json
+query workspaceSubtree($workspaceId: String!) {
+  subtreeWorkspaces(workspaceId: $workspaceId) {
+    id
+    childWorkspaceOrder
+    connectedPointers
+    blocks {
+      id
+      value
+      type
+      __typename
+    }
+    __typename
+  }
+}
+//Query Variables
+{
+  "workspaceId": "#{YOUR VARIABLE HERE}"
+}
+```
+
+0. Copy the response from the graphQL workSpaceSubtree query.
+0. Use the website ``https://json-to-js.com/`` to convert this json object into a javascript object.
+0. Create a new file in the ``/client/src/pages/ExampelShowPage/examples`` directory. Add this json object in it, exported as ``data.`` You can follow the same format as other items (like ``example1.ts``) in that directory. 
+0. In ``/client/src/pages/ExampelShowPage/examples/index.ts``, add an object for this example, with it's name, rootWorkspaceId (the first one you want to show), and url extension (this will go after /examples/${url}.)
+0. Now you should be able to visit this example at ``/client/src/pages/ExampelShowPage/examples/{#example-url}``
