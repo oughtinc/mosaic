@@ -6,8 +6,8 @@ A platform for individuals to complete small tasks
 
 ### (Recommended) Using Docker
 
-0. Make sure Docker is downloaded and running on your computer. You can get it here: https://www.docker.com/community-edition#/download
-0. Run `docker-compose up`
+1. Make sure Docker is downloaded and running on your computer. You can get it here: https://www.docker.com/community-edition#/download
+2. Run `docker-compose up`
 
 ### (Deprecated) Using yarn scripts directly
 
@@ -56,16 +56,17 @@ URL: https://app.logrocket.com/i58gnp/mosaic/
 ## Save and restore db states
 
 ### Save
-0. If the app is not running, run it (`docker-compose up`)
-0. `cd server`
-0. `scripts/dumpDB.sh` with a filepath for your dump, e.g. `scripts/dumpDB.sh ./dbDumps/myDump.db`
+
+1. If the app is not running, run it (`docker-compose up`)
+1. `cd server`
+1. `scripts/dumpDB.sh` with a filepath for your dump, e.g. `scripts/dumpDB.sh ./dbDumps/myDump.db`
 
 ### Restore
 
-0. If the app is not running, run it (`docker-compose up`)
-0. Close all external connections to the database (e.g. from pgadmin)
-0. `cd server`
-0. `scripts/restoreDB.sh` with a filepath for the dump you're restoring, e.g. `scripts/restoreDB.sh ./dbDumps/myDump.db`
+1. If the app is not running, run it (`docker-compose up`)
+1. Close all external connections to the database (e.g. from pgadmin)
+1. `cd server`
+1. `scripts/restoreDB.sh` with a filepath for the dump you're restoring, e.g. `scripts/restoreDB.sh ./dbDumps/myDump.db`
 
 ### Troubleshooting
 - One error case is that the scripts attempt to connect to the db w/ your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
@@ -74,15 +75,24 @@ URL: https://app.logrocket.com/i58gnp/mosaic/
 ### Autodump
 
 To automatically create new dumps when the db changes:
-0. If the app is not running, run it (`docker-compose up`)
-0. `cd server
-0. `scripts/dumpDB.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
+1. If the app is not running, run it (`docker-compose up`)
+1. `cd server`
+1. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
 
-### Publishing Example subtrees
+## Deployment
+We deploy the app on Heroku: https://dashboard.heroku.com/apps/mosaic-prod
+
+To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page.
+
+When a branch is merged to master, it is automatically pushed to Heroku.
+
+`docker-compose.yml` and `package.json` at the root level must be kept in sync.
+
+## Publishing Example subtrees
 In order to make an example subtrees, do the following steps:
 
-0. Open the ``/subtree/ view for the selected subtree.
-0. Open the graphQl explorer. Click on "queries." There should be a query called "workspaceQuery" in the "Watched Queries" view. Run it. If you can't find it, the following code may work:
+1. Open the ``/subtree/ view for the selected subtree.
+1. Open the graphQl explorer. Click on "queries." There should be a query called "workspaceQuery" in the "Watched Queries" view. Run it. If you can't find it, the following code may work:
 
 ``` json
 query workspaceSubtree($workspaceId: String!) {
@@ -105,8 +115,8 @@ query workspaceSubtree($workspaceId: String!) {
 }
 ```
 
-0. Copy the response from the graphQL workSpaceSubtree query.
-0. Use the website ``https://json-to-js.com/`` to convert this json object into a javascript object.
-0. Create a new file in the ``/client/src/pages/ExampelShowPage/examples`` directory. Add this json object in it, exported as ``data.`` You can follow the same format as other items (like ``example1.ts``) in that directory. 
-0. In ``/client/src/pages/ExampelShowPage/examples/index.ts``, add an object for this example, with it's name, rootWorkspaceId (the first one you want to show), and url extension (this will go after /examples/${url}.)
-0. Now you should be able to visit this example at ``/client/src/pages/ExampelShowPage/examples/{#example-url}``
+1. Copy the response from the graphQL workSpaceSubtree query.
+1. Use the website ``https://json-to-js.com/`` to convert this json object into a javascript object.
+1. Create a new file in the ``/client/src/pages/ExampelShowPage/examples`` directory. Add this json object in it, exported as ``data.`` You can follow the same format as other items (like ``example1.ts``) in that directory. 
+1. In ``/client/src/pages/ExampelShowPage/examples/index.ts``, add an object for this example, with it's name, rootWorkspaceId (the first one you want to show), and url extension (this will go after /examples/${url}.)
+1. Now you should be able to visit this example at ``/client/src/pages/ExampelShowPage/examples/{#example-url}``
