@@ -87,6 +87,7 @@ const BlockModel = (sequelize, DataTypes) => {
     const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
     let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
     return pointers.map(p => p.data.pointerId)
+
   }
 
   //private
@@ -94,6 +95,7 @@ const BlockModel = (sequelize, DataTypes) => {
     if (!this.dataValues.value) {
       return {}
     }
+
     const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
     const pointers = _getInlinesAsArray.filter((l) => l.type === "pointerExport");
 

@@ -2,7 +2,7 @@ function addEventAssociations(model, models) {
     model.CreatedAtEvent = model.belongsTo(models.Event, { as: 'createdAtEvent', foreignKey: 'createdAtEventId' });
     model.UpdatedAtEvent = model.belongsTo(models.Event, { as: 'updatedAtEvent', foreignKey: 'updatedAtEventId' });
 };
-export {addEventAssociations}
+export { addEventAssociations }
 
 export const eventRelationshipColumns = (DataTypes) => ({
     createdAtEventId: {
