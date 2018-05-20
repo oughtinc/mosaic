@@ -18,21 +18,19 @@ graphQLServer.use(cors())
 
 if (!process.env.USING_DOCKER) {
   graphQLServer.use(enforce.HTTPS({ trustProtoHeader: true }));
+  graphQLServer.use(express.static(path.join(__dirname, '/../../client/build')));
+  graphQLServer.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/../../client/build/index.html'));
+  });
 }
-graphQLServer.use(express.static(path.join(__dirname, '/../../client/build')));
-
 
 graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
-graphQLServer.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/../../client/build/index.html'));
-});
-
 graphQLServer.listen(GRAPHQL_PORT, () => {
-  console.log("Express/GraphQL server now listening.");
+  console.log("Express/GraphQL server now listening. React server (web) may still be loading.");
   if (process.env.USING_DOCKER) {
     console.log(
-      `GraphiQL: http://localhost:${GRAPHQL_PORT}/graphiql \nReact: http://localhost:${GRAPHQL_PORT}`);
+      `GraphiQL: http://localhost:${GRAPHQL_PORT}/graphiql \nReact: http://localhost:3000`);
   }
 });
