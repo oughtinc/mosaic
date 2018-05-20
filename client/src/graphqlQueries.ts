@@ -29,7 +29,7 @@ export const UPDATE_BLOCKS = gql`
 
 export const WORKSPACES_QUERY = gql`
     query OriginWorkspaces{
-        workspaces(where:{parentId:null}){
+        workspaces(where:{parentId:null, hasBeenDeletedByAncestor:false}){
           id
           parentId
           childWorkspaceOrder
