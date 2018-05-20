@@ -28,7 +28,7 @@ graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 graphQLServer.listen(GRAPHQL_PORT, () => {
-  console.log("Express/GraphQL server now listening.");
+  console.log("Express/GraphQL server now listening. React server (web) may still be loading.");
   if (process.env.USING_DOCKER) {
     console.log(
       `GraphiQL: http://localhost:${GRAPHQL_PORT}/graphiql \nReact: http://localhost:3000`);
