@@ -8,7 +8,7 @@ export const data = {
                 "1278190f-53b1-4ab7-b3e3-a1f69c26dc0f",
                 "aa007e52-7e0f-46b7-b70e-f510a979fb26",
                 "49bf8ee7-4101-410a-8bbc-29fa9b29b18e",
-                "e5c78033-8c0d-4a9f-8ccc-cce1597b08cb"
+                "e5c78033-8c0d-4a9f-8ccc-cce1597b08cb",
             ],
             connectedPointers: [
                 {
@@ -16,7 +16,7 @@ export const data = {
                     type: "pointerExport",
                     isVoid: false,
                     data: {
-                        pointerId: "d0da3b40-37a3-11e8-91cb-c7556e9a0cf2"
+                        pointerId: "d0da3b40-37a3-11e8-91cb-c7556e9a0cf2",
                     },
                     nodes: [
                         {
@@ -25,16 +25,16 @@ export const data = {
                                 {
                                     object: "leaf",
                                     text: "sd",
-                                    marks: []
-                                }
-                            ]
+                                    marks: [],
+                                },
+                            ],
                         },
                         {
                             object: "inline",
                             type: "pointerExport",
                             isVoid: false,
                             data: {
-                                pointerId: "cf23b1a0-37a3-11e8-91cb-c7556e9a0cf2"
+                                pointerId: "cf23b1a0-37a3-11e8-91cb-c7556e9a0cf2",
                             },
                             nodes: [
                                 {
@@ -43,9 +43,9 @@ export const data = {
                                         {
                                             object: "leaf",
                                             text: "fsl",
-                                            marks: []
+                                            marks: [],
                                         },
-                                    ]
+                                    ],
                                 },
                             ],
                         },
