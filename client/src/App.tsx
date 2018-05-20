@@ -73,7 +73,6 @@ const store = createStore(
 );
 
 class App extends React.Component {
-
   public render() {
     return (
       <ApolloProvider client={client}>
