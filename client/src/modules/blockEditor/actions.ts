@@ -68,13 +68,17 @@ export const exportSelection = () => {
   };
 };
 
-export const exportValue = () => {
+export const exportRange = (startIndex, length) => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();
+    const uuid = uuidv1();
+
+    // Convert text to a block OR change a doc range to an inline
+    // Upgrade block to wrapInline
 
 
-  }
-}
+  };
+};
 
 function getInlinesAsArray(node: any) {
   let array: any = [];
