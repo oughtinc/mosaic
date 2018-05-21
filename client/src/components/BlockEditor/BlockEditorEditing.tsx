@@ -194,6 +194,28 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         if (this.props.onChange) {
             this.props.onChange(value);
         }
+        console.log(value.document.text);
+        const newText = value.document.text;
+        const bracketRegex = /\[(.*?)\]/g;
+        const match = newText.match(bracketRegex);
+        if (match !== null) {
+            const startIndex = newText.indexOf(match[0]);
+            const length = match[0].length;
+            console.log(startIndex, length);
+        }
+        console.log(match);
+
+        // Get the text +
+        // Check the text to see if there is CREATEPOINTERCONDITION +
+        //    Which is a regex that scans the text to see if there is a open and closed bracket+
+        //        Create the regex in an online regex maker+
+        //    Returns the range of the text+
+        // If so, start the CPC logic with the range
+        //      Pass the range to the block editor action.ts
+        //      Convert the range into a new block
+        //      Dispatch an update block event.
+        //      Delete the brackets from the text,
+        // else do nothing
     }
 
     private updateEditor = (input: any) => {
