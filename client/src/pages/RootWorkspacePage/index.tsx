@@ -9,6 +9,7 @@ import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 
+import * as _ from "lodash";
 import * as React from "react";
 
 const WorkspaceStyle = styled.div`
@@ -83,7 +84,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
 
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
     public render() {
-        const workspaces = this.props.originWorkspaces.workspaces;
+        const workspaces = _.sortBy(this.props.originWorkspaces.workspaces, "createdAt");
         return (
             <BlockHoverMenu>
                 <h1> Root Workspaces </h1>
