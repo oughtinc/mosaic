@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as LogRocket from "logrocket";
 
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
@@ -50,7 +50,8 @@ export class Home extends React.Component {
 
 const Routes = () => (
   <div>
-    <Route exact={true} path="/" component={Home} />
+
+    <Route exact={true} path="/" render={() => <Redirect to="/workspaces" />} />
     <Route exact={true} path="/examples/:exampleName" component={ExampleShowPage} />
     <Route exact={true} path="/workspaces" component={RootWorkspacePage} />
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
