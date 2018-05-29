@@ -82,7 +82,7 @@ To automatically create new dumps when the db changes:
 ## Deployment
 We deploy the app on Heroku: https://dashboard.heroku.com/apps/mosaic-prod
 
-To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page.
+To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page. If your deployed branch - Review App in Heroku terminology - expires you must go to the [pipeline](https://dashboard.heroku.com/pipelines/00d7422d-a5ee-4b56-ae40-76c0ade1a023) and click `Create Review App` to redeploy it.
 
 When a branch is merged to master, it is automatically pushed to Heroku.
 

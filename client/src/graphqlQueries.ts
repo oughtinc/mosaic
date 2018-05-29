@@ -34,6 +34,7 @@ export const WORKSPACES_QUERY = gql`
           parentId
           childWorkspaceOrder
           totalBudget 
+          createdAt
           allocatedBudget 
           blocks{
               id
