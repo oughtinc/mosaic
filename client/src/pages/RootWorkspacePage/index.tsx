@@ -1,7 +1,7 @@
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
-import { Button, Col, Row, ProgressBar, Badge } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import styled from "styled-components";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
@@ -46,6 +46,7 @@ const ParentWorkspace = ({ workspace }) => {
                         />
                     }
                 </Col>
+                <Col sm={3} />
                 <Col sm={1}>
                     <Link to={`/workspaces/${workspace.id}`}>
                         <Button> Open </Button>
