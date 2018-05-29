@@ -45,18 +45,6 @@ const ParentWorkspace = ({ workspace }) => {
                         />
                     }
                 </Col>
-                <Col sm={2}>
-                    {/* {workspace &&
-                        <div style={{ float: "right" }}>
-                            <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
-                        </div>
-                    } */}
-                </Col>
-                <Col sm={1}>
-                    {/* {workspace &&
-                        <ProgressBar now={100 * ((workspace.totalBudget - workspace.allocatedBudget) / workspace.totalBudget)} />
-                    } */}
-                </Col>
                 <Col sm={1}>
                     <Link to={`/workspaces/${workspace.id}`}>
                         <Button> Open </Button>
