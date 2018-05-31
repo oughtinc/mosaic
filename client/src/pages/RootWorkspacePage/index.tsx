@@ -21,6 +21,7 @@ const WorkspaceStyle = styled.div`
 const ParentWorkspace = ({ workspace }) => {
     const question = workspace.blocks && workspace.blocks.find((b) => b.type === "QUESTION");
     const answer = workspace.blocks && workspace.blocks.find((b) => b.type === "ANSWER");
+    const scratch = workspace.blocks && workspace.blocks.find((b) => b.type === "SCRATCHPAD");
     return (
         <WorkspaceStyle>
             <Row>
@@ -46,7 +47,17 @@ const ParentWorkspace = ({ workspace }) => {
                         />
                     }
                 </Col>
-                <Col sm={3} />
+                <Col sm={3}>
+                    {scratch && scratch.value &&
+                        <BlockEditor
+                            name={scratch.id}
+                            blockId={scratch.id}
+                            initialValue={databaseJSONToValue(scratch.value)}
+                            readOnly={true}
+                            availablePointers={[]}
+                        />
+                    }
+                </Col>
                 <Col sm={1}>
                     <Link to={`/workspaces/${workspace.id}`}>
                         <Button> Open </Button>
