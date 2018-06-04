@@ -30,13 +30,13 @@ interface ConnectedPointerType {
     object: string;
     type: string;
     nodes: any[];
-} 
+}
 
 interface WorkspaceType {
     blocks: any[];
     childWorkspaceOrder: string[];
     connectedPointers: any;
-} 
+}
 
 interface WorkspaceCardProps {
     workspace: WorkspaceType;
@@ -73,15 +73,19 @@ export class WorkspaceCard extends React.Component<WorkspaceCardProps, Workspace
         return (
             <Container>
                 <CardBody>
-                    <BlockSection workspace={workspace} availablePointers={availablePointers} />
+                    <BlockSection
+                        workspace={workspace}
+                        availablePointers={availablePointers}
+                    />
                 </CardBody>
                 <ChildrenSection
                     workspace={workspace}
                     workspaces={workspaces}
                     availablePointers={availablePointers}
                     childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
-                    onChangeToggle={
-                        () => this.handleChangeToggle(toggleTypes.CHILDREN, !this.state.toggles[toggleTypes.CHILDREN])
+                    onChangeToggle={() => this.handleChangeToggle(
+                        toggleTypes.CHILDREN,
+                        !this.state.toggles[toggleTypes.CHILDREN])
                     }
                 />
             </Container>
