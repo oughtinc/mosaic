@@ -88,11 +88,6 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     return _workspace
   }
 
-  Workspace.prototype.subtreeWorkspaces = async function () {
-    const directChildren = await this.getChildWorkspaces();
-    return directChildren;
-  }
-
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceOrder, element]
   }
