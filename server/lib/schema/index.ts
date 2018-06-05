@@ -95,7 +95,7 @@ let schema = new GraphQLSchema({
         args: { workspaceId: { type: GraphQLString } },
         resolve: async (_, { workspaceId }) => {
           const rootWorkspace = await models.Workspace.findById(workspaceId)
-          const children = await rootWorkspace.subtreeWorkspaces();
+          const children = await rootWorkspace.getChildWorkspaces();
           return [rootWorkspace, ...children]
         },
       },
@@ -132,16 +132,16 @@ let schema = new GraphQLSchema({
       },
       createWorkspace: {
         type: workspaceType,
-        args: { question: { type: GraphQLJSON }, totalBudget: {type: GraphQLInt} },
+        args: { question: { type: GraphQLJSON }, totalBudget: { type: GraphQLInt } },
         resolve: async (_, { question, totalBudget }) => {
           const event = await models.Event.create()
-          const workspace = await models.Workspace.create({totalBudget}, { event, questionValue: JSON.parse(question) })
+          const workspace = await models.Workspace.create({ totalBudget }, { event, questionValue: JSON.parse(question) })
           return workspace
         }
       },
       createChildWorkspace: {
         type: workspaceType,
-        args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, totalBudget: {type: GraphQLInt} },
+        args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, totalBudget: { type: GraphQLInt } },
         resolve: async (_, { workspaceId, question, totalBudget }) => {
           const workspace = await models.Workspace.findById(workspaceId)
           const event = await models.Event.create()
@@ -156,11 +156,11 @@ let schema = new GraphQLSchema({
           const event = await models.Event.create()
           const workspace = await models.Workspace.findById(workspaceId)
           const child = await models.Workspace.findById(childId)
-          await workspace.changeAllocationToChild(child, totalBudget, {event})
+          await workspace.changeAllocationToChild(child, totalBudget, { event })
         }
       },
     }
   })
 });
 
-export {schema};
+export { schema };
