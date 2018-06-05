@@ -2,6 +2,10 @@ import styled from "styled-components";
 import * as React from "react";
 import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
+import { compose } from "recompose";
+import { graphql } from "react-apollo";
+import _ = require("lodash");
+import { WORKSPACE_SUBTREE_QUERY } from "../../graphqlQueries";
 
 export enum toggleTypes {
     FULL,
@@ -36,12 +40,11 @@ interface WorkspaceType {
     blocks: any[];
     childWorkspaceOrder: string[];
     connectedPointers: any;
+    id: string;
 }
 
 interface WorkspaceCardProps {
-    workspace: WorkspaceType;
-    workspaces: WorkspaceType[];
-    availablePointers: ConnectedPointerType;
+    workspaceId: string;
 }
 
 interface WorkspaceCardState {
@@ -51,7 +54,7 @@ interface WorkspaceCardState {
     };
 }
 
-export class WorkspaceCard extends React.Component<WorkspaceCardProps, WorkspaceCardState> {
+export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCardProps, WorkspaceCardState> {
     public constructor(props: any) {
         super(props);
         this.state = {
@@ -69,7 +72,21 @@ export class WorkspaceCard extends React.Component<WorkspaceCardProps, Workspace
     }
 
     public render() {
-        const { workspace, availablePointers, workspaces } = this.props;
+        const workspaces: WorkspaceType[] = _.get(
+            this.props, "workspaceSubtreeWorkspaces.subtreeWorkspaces"
+        ) || [];
+        const availablePointers: ConnectedPointerType[] = _
+            .chain(workspaces)
+            .map((w: any) => w.connectedPointers)
+            .flatten()
+            .uniqBy((p: any) => p.data.pointerId)
+            .value();
+        const workspace: WorkspaceType | undefined = workspaces.find((w) =>
+            w.id === this.props.workspaceId);
+
+        if (!workspace) {
+            return (<div> Loading </div>);
+        }
         return (
             <Container>
                 <CardBody>
@@ -81,7 +98,6 @@ export class WorkspaceCard extends React.Component<WorkspaceCardProps, Workspace
                 <ChildrenSection
                     workspace={workspace}
                     workspaces={workspaces}
-                    availablePointers={availablePointers}
                     childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
                     onChangeToggle={() => this.handleChangeToggle(
                         toggleTypes.CHILDREN,
@@ -92,3 +108,13 @@ export class WorkspaceCard extends React.Component<WorkspaceCardProps, Workspace
         );
     }
 }
+const options = ({ workspaceId }) => ({
+    variables: { workspaceId },
+});
+
+export const WorkspaceCard: any = compose(
+    graphql(
+        WORKSPACE_SUBTREE_QUERY,
+        { name: "workspaceSubtreeWorkspaces", options }
+    ),
+)(WorkspaceCardPresentational);
