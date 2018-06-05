@@ -40,7 +40,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     },
     remainingBudget: {
       type: Sequelize.VIRTUAL(Sequelize.INTEGER, ['totalBudget', 'allocatedBudget']),
-      get: function() {
+      get: function () {
         return this.get('totalBudget') - this.get('allocatedBudget');
       }
     },
@@ -83,21 +83,15 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     addEventAssociations(Workspace, models)
   }
 
-  Workspace.createAsChild = async function ({ parentId, question, totalBudget}, { event }) {
+  Workspace.createAsChild = async function ({ parentId, question, totalBudget }, { event }) {
     const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget }, { event, questionValue: question })
     return _workspace
   }
 
   Workspace.prototype.subtreeWorkspaces = async function () {
     const directChildren = await this.getChildWorkspaces();
-    let allChildren = [...directChildren];
-    for (const child of directChildren) {
-      const subchildren = await child.subtreeWorkspaces();
-      allChildren = [...allChildren, ...subchildren]
-    }
-    return allChildren
+    return directChildren;
   }
-
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {
     return [...this.childWorkspaceOrder, element]
@@ -105,9 +99,9 @@ const WorkspaceModel = (sequelize, DataTypes) => {
 
   Workspace.prototype.changeAllocationToChild = async function (childWorkspace: any, newTotalBudget: number, { event }) {
     const budgetToAddToChild = newTotalBudget - childWorkspace.totalBudget
-    
+
     const childHasNecessaryBudget = newTotalBudget >= childWorkspace.allocatedBudget
-    if (!childHasNecessaryBudget){
+    if (!childHasNecessaryBudget) {
       throw new Error(`Child workspace allocated budget ${childWorkspace.allocatedBudget} exceeds new totalBudget ${newTotalBudget}`)
     }
 
@@ -116,7 +110,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       throw new Error(`This workspace does not have the allocated budget necessary for child to get ${budgetToAddToChild} difference`)
     }
 
-    await childWorkspace.update({totalBudget: newTotalBudget}, {event})
+    await childWorkspace.update({ totalBudget: newTotalBudget }, { event })
 
     await this.update({
       allocatedBudget: this.allocatedBudget + budgetToAddToChild,
@@ -139,7 +133,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
 
   Workspace.prototype.createChild = async function ({ event, question, totalBudget }) {
     const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget }, { event })
-    if (this.remainingBudget < child.totalBudget){
+    if (this.remainingBudget < child.totalBudget) {
       throw new Error(`Parent workspace does not have enough remainingBudget. Has: ${this.remainingBudget}. Needs: ${child.totalBudget}.`)
     }
     const newAllocatedBudget = this.allocatedBudget + child.totalBudget;

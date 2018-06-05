@@ -38,7 +38,7 @@ const ChildContainer = styled.div`
 `;
 
 export const ChildrenSection = ({
-    workspace, workspaces, availablePointers, childrenToggle, onChangeToggle,
+    workspace, workspaces, childrenToggle, onChangeToggle,
 }) => {
     const children = workspace.childWorkspaceOrder.map((id) =>
         workspaces.find((w) => w.id === id));
@@ -57,9 +57,7 @@ export const ChildrenSection = ({
                         {children.map((child) => (
                             <ChildContainer key={child.id}>
                                 <WorkspaceCard
-                                    workspace={child}
-                                    availablePointers={availablePointers}
-                                    workspaces={workspaces}
+                                    workspaceId={child.id}
                                 />
                             </ChildContainer>
                         ))}
