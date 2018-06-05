@@ -37,19 +37,28 @@ const ChildContainer = styled.div`
     flex: 1;
 `;
 
-export const ChildrenSection = ({ workspace, workspaces, availablePointers, childrenToggle, onChangeToggle }) => {
-    const children = workspace.childWorkspaceOrder.map((id) => workspaces.find((w) => w.id === id));
+export const ChildrenSection = ({
+    workspace, workspaces, childrenToggle, onChangeToggle,
+}) => {
+    const children = workspace.childWorkspaceOrder.map((id) =>
+        workspaces.find((w) => w.id === id));
     if (!!children.length) {
         return (
             <ChildrenContainer>
-                <Bullet href="#!" isActive={childrenToggle} onClick={onChangeToggle} >
+                <Bullet
+                    href="#!"
+                    isActive={childrenToggle}
+                    onClick={onChangeToggle}
+                >
                     <FontAwesomeIcon icon={faLongArrowAltRight} />
                 </Bullet>
                 {childrenToggle &&
                     <Collection>
                         {children.map((child) => (
                             <ChildContainer key={child.id}>
-                                <WorkspaceCard workspace={child} availablePointers={availablePointers} workspaces={workspaces} />
+                                <WorkspaceCard
+                                    workspaceId={child.id}
+                                />
                             </ChildContainer>
                         ))}
                     </Collection>
@@ -57,6 +66,6 @@ export const ChildrenSection = ({ workspace, workspaces, availablePointers, chil
             </ChildrenContainer>
         );
     } else {
-        return <div/> ;
+        return <div />;
     }
 };
