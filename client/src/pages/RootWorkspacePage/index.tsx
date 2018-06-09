@@ -12,6 +12,10 @@ import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import * as _ from "lodash";
 import * as React from "react";
 
+import { Auth } from "../../components/Auth";
+
+const auth = new Auth();
+
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
   padding: 3px;
@@ -76,6 +80,29 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
         const workspaces = _.sortBy(this.props.originWorkspaces.workspaces, "createdAt");
         return (
             <BlockHoverMenu>
+                {
+                    !auth.isAuthenticated() && (
+                        <Button
+                            bsStyle="primary"
+                            className="btn-margin"
+                            onClick={auth.login}
+                        >
+                            Log In
+                        </Button>
+                    )
+                }
+                {
+                    auth.isAuthenticated() && (
+                        <Button
+                            bsStyle="primary"
+                            className="btn-margin"
+                            onClick={auth.logout}
+                        >
+                            Log Out
+                        </Button>
+                    )
+                }
+
                 <h1> Root Workspaces </h1>
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
