@@ -21,6 +21,16 @@ import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 import { ExampleShowPage } from "./pages/ExampleShowPage";
 import { appConfig } from "./config.js";
 
+import { Auth } from "./components/Auth";
+
+const auth = new Auth();
+
+const handleAuthentication = (nextState) => {
+  if (/access_token|id_token|error/.test(nextState.location.hash)) {
+    auth.handleAuthentication();
+  }
+};
+
 const SERVER_URL = window.location.hostname === "localhost" ?
   "http://localhost:8080/graphql" :
   `${window.location.protocol}//${window.location.hostname}/graphql`;
@@ -76,6 +86,14 @@ const Routes = () => (
     <Route exact={true} path="/workspaces" component={RootWorkspacePage} />
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
     <Route exact={true} path="/workspaces/:workspaceId/subtree" component={WorkspaceSubtreePage} />
+    <Route
+      path="/callback"
+      render={(props) => {
+        handleAuthentication(props);
+        return <Redirect to="/workspaces" />;
+      }}
+    />
+
   </div>
 );
 
