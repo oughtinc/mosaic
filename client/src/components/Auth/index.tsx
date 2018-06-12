@@ -23,10 +23,18 @@ export class Auth {
     this.auth0.authorize();
   }
 
+  public logout() {
+    // Clear Access Token and ID Token from local storage
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("id_token");
+    localStorage.removeItem("expires_at");
+  }
+
   public handleAuthentication() {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult);
+        console.log("Successfully authorized");
       } else if (err) {
         console.log(err);
       }
@@ -39,14 +47,6 @@ export class Auth {
     localStorage.setItem("access_token", authResult.accessToken);
     localStorage.setItem("id_token", authResult.idToken);
     localStorage.setItem("expires_at", expiresAt);
-    // navigate to the home route
-  }
-
-  public logout() {
-    // Clear Access Token and ID Token from local storage
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("id_token");
-    localStorage.removeItem("expires_at");
   }
 
   public isAuthenticated() {
