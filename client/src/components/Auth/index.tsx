@@ -2,7 +2,6 @@
 import * as auth0 from "auth0-js";
 
 export class Auth {
-
   public static auth0 = new auth0.WebAuth({
     domain: "mosaicapp.auth0.com",
     clientID: "wxJ6gaMkuuoSvLpQpBUZlsbwzDlVjjAu",
@@ -11,13 +10,6 @@ export class Auth {
     responseType: "token id_token",
     scope: "openid",
   });
-
-  public constructor() {
-    // this.login = this.login.bind(this);
-    // this.logout = this.logout.bind(this);
-    // this.handleAuthentication = this.handleAuthentication.bind(this);
-    // this.isAuthenticated = this.isAuthenticated.bind(this);
-  }
 
   public static login() {
     Auth.auth0.authorize();
@@ -58,6 +50,10 @@ export class Auth {
     }
     let expiresAt = JSON.parse(expiresJson);
     return new Date().getTime() < Number(expiresAt);
+  }
+
+  public static accessToken() {
+    return localStorage.getItem("access_token");
   }
 
 }

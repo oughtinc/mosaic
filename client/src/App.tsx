@@ -46,7 +46,17 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
+const authLink = new ApolloLink((operation, forward) => {
+  operation.setContext(({ headers }) => ({
+    headers: {
+      authorization: `Bearer ${Auth.accessToken()}`,
+    },
+  }));
+  return forward ? forward(operation) : null;
+});
+
 const link = ApolloLink.from([
+  authLink,
   errorLink,
   new HttpLink({ uri: SERVER_URL }),
 ]);
