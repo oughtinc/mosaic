@@ -14,8 +14,6 @@ import * as React from "react";
 
 import { Auth } from "../../components/Auth";
 
-const auth = new Auth();
-
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
   padding: 3px;
@@ -81,22 +79,22 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
         return (
             <BlockHoverMenu>
                 {
-                    !auth.isAuthenticated() && (
+                    !Auth.isAuthenticated() && (
                         <Button
                             bsStyle="primary"
                             className="btn-margin"
-                            onClick={auth.login}
+                            onClick={Auth.login}
                         >
                             Log In
                         </Button>
                     )
                 }
                 {
-                    auth.isAuthenticated() && (
+                    Auth.isAuthenticated() && (
                         <Button
                             bsStyle="primary"
                             className="btn-margin"
-                            onClick={auth.logout}
+                            onClick={Auth.logout}
                         >
                             Log Out
                         </Button>

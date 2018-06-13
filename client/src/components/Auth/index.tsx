@@ -3,7 +3,7 @@ import * as auth0 from "auth0-js";
 
 export class Auth {
 
-  public auth0 = new auth0.WebAuth({
+  public static auth0 = new auth0.WebAuth({
     domain: "mosaicapp.auth0.com",
     clientID: "wxJ6gaMkuuoSvLpQpBUZlsbwzDlVjjAu",
     redirectUri: "http://localhost:3000/callback",
@@ -13,27 +13,27 @@ export class Auth {
   });
 
   public constructor() {
-    this.login = this.login.bind(this);
-    this.logout = this.logout.bind(this);
-    this.handleAuthentication = this.handleAuthentication.bind(this);
-    this.isAuthenticated = this.isAuthenticated.bind(this);
+    // this.login = this.login.bind(this);
+    // this.logout = this.logout.bind(this);
+    // this.handleAuthentication = this.handleAuthentication.bind(this);
+    // this.isAuthenticated = this.isAuthenticated.bind(this);
   }
 
-  public login() {
-    this.auth0.authorize();
+  public static login() {
+    Auth.auth0.authorize();
   }
 
-  public logout() {
+  public static logout() {
     // Clear Access Token and ID Token from local storage
     localStorage.removeItem("access_token");
     localStorage.removeItem("id_token");
     localStorage.removeItem("expires_at");
   }
 
-  public handleAuthentication() {
-    this.auth0.parseHash((err, authResult) => {
+  public static handleAuthentication() {
+    Auth.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
-        this.setSession(authResult);
+        Auth.setSession(authResult);
         console.log("Successfully authorized");
       } else if (err) {
         console.log(err);
@@ -41,7 +41,7 @@ export class Auth {
     });
   }
 
-  public setSession(authResult: any) {
+  public static setSession(authResult: any) {
     // Set the time that the Access Token will expire at
     const expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
     localStorage.setItem("access_token", authResult.accessToken);
@@ -49,7 +49,7 @@ export class Auth {
     localStorage.setItem("expires_at", expiresAt);
   }
 
-  public isAuthenticated() {
+  public static isAuthenticated() {
     // Check whether the current time is past the 
     // Access Token's expiry time
     const expiresJson = localStorage.getItem("expires_at");
