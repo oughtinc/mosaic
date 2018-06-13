@@ -23,11 +23,9 @@ import { appConfig } from "./config.js";
 
 import { Auth } from "./components/Auth";
 
-const auth = new Auth();
-
 const handleAuthentication = (nextState) => {
   if (/access_token|id_token|error/.test(nextState.location.hash)) {
-    auth.handleAuthentication();
+    Auth.handleAuthentication();
   }
 };
 
