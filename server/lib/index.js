@@ -32,5 +32,5 @@ graphQLServer.listen(GRAPHQL_PORT, () => {
     console.log(
       `GraphiQL: http://localhost:${GRAPHQL_PORT}/graphiql \nReact: http://localhost:3000`);
   }
-  console.log("Express/GraphQL server now listening. React server (web) may still be loading.");
+  console.log("Express/GraphQL server now listening. React server (web_1) may still be loading.");
 });

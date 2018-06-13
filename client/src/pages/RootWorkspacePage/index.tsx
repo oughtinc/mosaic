@@ -78,36 +78,31 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
         const workspaces = _.sortBy(this.props.originWorkspaces.workspaces, "createdAt");
         return (
             <BlockHoverMenu>
-                {
-                    !Auth.isAuthenticated() && (
-                        <Button
-                            bsStyle="primary"
-                            className="btn-margin"
-                            onClick={Auth.login}
-                        >
-                            Log In
-                        </Button>
-                    )
-                }
-                {
-                    Auth.isAuthenticated() && (
-                        <Button
-                            bsStyle="primary"
-                            className="btn-margin"
-                            onClick={Auth.logout}
-                        >
-                            Log Out
-                        </Button>
-                    )
-                }
+                {Auth.isAuthenticated() ?
+                    (<Button
+                        bsStyle="primary"
+                        className="btn-margin"
+                        onClick={Auth.logout}
+                    >
+                        Log Out
+                    </Button>)
+                    :
+                    (<Button
+                        bsStyle="primary"
+                        className="btn-margin"
+                        onClick={Auth.login}
+                    >
+                        Log In
+                    </Button>)}
 
                 <h1> Root Workspaces </h1>
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
                 ))}
-                <NewWorkspaceForm
-                    onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
-                />
+                {Auth.isAuthenticated() &&
+                    <NewWorkspaceForm
+                        onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
+                    />}
             </BlockHoverMenu>
         );
     }
