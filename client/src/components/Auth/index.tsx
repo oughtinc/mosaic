@@ -11,11 +11,11 @@ export class Auth {
     scope: "openid user_metadata app_metadata",
   });
 
-  public static login() {
+  public static login(): void {
     Auth.auth0.authorize();
   }
 
-  public static logout() {
+  public static logout(): void {
     // Clear Access Token and ID Token from local storage
     localStorage.removeItem("access_token");
     localStorage.removeItem("id_token");
@@ -23,7 +23,7 @@ export class Auth {
     localStorage.removeItem("is_admin");
   }
 
-  public static handleAuthentication() {
+  public static handleAuthentication(): void {
     Auth.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         Auth.setSession(authResult);
@@ -35,7 +35,7 @@ export class Auth {
     });
   }
 
-  public static setSession(authResult: any) {
+  public static setSession(authResult: any): void {
     // Set the time that the Access Token will expire at
     const expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
     localStorage.setItem("access_token", authResult.accessToken);
@@ -44,7 +44,7 @@ export class Auth {
     Auth.getProfile();
   }
 
-  public static isAuthenticated() {
+  public static isAuthenticated(): boolean {
     // Check whether the current time is past the 
     // Access Token's expiry time
     const expiresJson = localStorage.getItem("expires_at");
@@ -56,17 +56,18 @@ export class Auth {
   }
 
   // TODO: Replace with permission based logic
-  public static isAuthorizedToEdit(workspace: any) {
+  public static isAuthorizedToEdit(workspace: any): boolean {
     return Auth.isAuthenticated();
   }
 
-  public static isAdmin() {
+  public static isAdmin(): boolean {
     return localStorage.getItem("is_admin") === "true";
   }
 
-  public static accessToken() {
+  public static accessToken(): string | null {
     return localStorage.getItem("access_token");
   }
+
   public static getProfile(): void {
     const root = "https://mosaic:auth0:com/";
 
