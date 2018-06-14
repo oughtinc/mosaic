@@ -82,7 +82,10 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                     (<Button
                         bsStyle="primary"
                         className="btn-margin"
-                        onClick={Auth.logout}
+                        onClick={() => {
+                            Auth.logout();
+                            this.forceUpdate();
+                        }}
                     >
                         Log Out
                     </Button>)
@@ -90,7 +93,10 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                     (<Button
                         bsStyle="primary"
                         className="btn-margin"
-                        onClick={Auth.login}
+                        onClick={() => {
+                            Auth.login();
+                            this.forceUpdate();
+                        }}
                     >
                         Log In
                     </Button>)}
@@ -99,7 +105,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
                 ))}
-                {Auth.isAuthenticated() &&
+                {Auth.isAdmin() &&
                     <NewWorkspaceForm
                         onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
                     />}

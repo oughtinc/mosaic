@@ -19,6 +19,8 @@ import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations 
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
 
+import { Auth } from "../../components/Auth";
+
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
         workspace(id: $id){
@@ -71,7 +73,7 @@ const UPDATE_CHILD_TOTAL_BUDGET = gql`
   }
 `;
 
-const NavLink = styled(Link) `
+const NavLink = styled(Link)`
   margin-right: 5px;
 `;
 

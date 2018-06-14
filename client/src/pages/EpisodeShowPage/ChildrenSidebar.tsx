@@ -8,6 +8,8 @@ import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelat
 import * as _ from "lodash";
 import { ChildBudgetForm } from "./ChildBudgetForm";
 
+import { Auth } from "../../components/Auth";
+
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
     padding: 1em;
@@ -47,13 +49,15 @@ export class Child extends React.Component<any, any> {
                     <Link to={`/workspaces/${workspace.id}`}>
                         <Button> Open </Button>
                     </Link>
-                    <Button onClick={this.props.onDelete}>
-                        Archive
-                </Button>
-                    {!this.state.showChildBudgetForm &&
+                    {Auth.isAuthorizedToEdit(this.props.workspace) &&
+                        <Button onClick={this.props.onDelete}>
+                            Archive
+                        </Button>
+                    }
+                    {!this.state.showChildBudgetForm && Auth.isAuthorizedToEdit(this.props.workspace) &&
                         <Button onClick={() => { this.setState({ showChildBudgetForm: true }); }}>
                             Edit Allocation
-                    </Button>
+                        </Button>
                     }
                     <div style={{ float: "right" }}>
                         <Badge>{workspace.totalBudget - workspace.allocatedBudget} / {workspace.totalBudget}</Badge>
@@ -115,13 +119,17 @@ export class ChildrenSidebar extends React.Component<any, any> {
                         )}
                     </div>
                 }
-                <h3> Add a new Child Question </h3>
-                <NewBlockForm
-                    maxTotalBudget={this.props.availableBudget}
-                    onMutate={this.props.onCreateChild}
-                    availablePointers={this.props.availablePointers}
-                    ref={(input) => { this.newChildField = input; }}
-                />
+                {Auth.isAuthorizedToEdit(this.props.workspace) && (
+                    <div>
+                        <h3> Add a new Child Question </h3>
+                        <NewBlockForm
+                            maxTotalBudget={this.props.availableBudget}
+                            onMutate={this.props.onCreateChild}
+                            availablePointers={this.props.availablePointers}
+                            ref={(input) => { this.newChildField = input; }}
+                        />
+                    </div>)
+                }
             </div>
         );
     }
