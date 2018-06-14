@@ -19,8 +19,6 @@ import { WorkspaceRelationTypes, WorkspaceBlockRelation, WorkspaceWithRelations 
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
 
-import { Auth } from "../../components/Auth";
-
 const WORKSPACE_QUERY = gql`
     query workspace($id: String!){
         workspace(id: $id){

@@ -93,16 +93,15 @@ export class WorkspaceBlockRelation {
     public blockEditorAttributes() {
         const { permission } = this.relationTypeAttributes();
         const block: any = this.findBlock();
-        const isReadOnly = !Auth.isAuthorizedToEdit(this.workspace);
-        // const isReadOnly = permission === Permissions.ReadOnly;
+        const editable = Auth.isAuthorizedToEdit(this.workspace) && permission === Permissions.Editable;
         let { value, id } = block;
         value = databaseJSONToValue(value);
         return {
             name: id,
             blockId: id,
-            readOnly: isReadOnly,
+            readOnly: !editable,
             initialValue: outputsToInputs(value),
-            shouldAutosave: !isReadOnly,
+            shouldAutosave: editable,
         };
     }
 
