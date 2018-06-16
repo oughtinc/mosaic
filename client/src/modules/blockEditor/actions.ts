@@ -1,6 +1,8 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
 
+import { Auth } from "../../components/Auth";
+
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
 
@@ -12,6 +14,7 @@ export const HOVER_ITEM_TYPES = {
 };
 
 export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
+  if (!Auth.isAdmin()) { return function () { return; }; }
   return (dispatch, getState) => {
     dispatch({
       type: CHANGE_HOVERED_ITEM,
@@ -49,13 +52,13 @@ export const changePointerReference = ({ id, reference }) => {
 
 export const exportSelection = () => {
   return async (dispatch, getState) => {
-    const {blocks, blockEditor} = await getState();
-    const {hoveredItem} = blockEditor;
+    const { blocks, blockEditor } = await getState();
+    const { hoveredItem } = blockEditor;
 
     const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
     const uuid = uuidv1();
     if (block) {
-      const change = block.value.change().wrapInline({type: "pointerExport", data: { pointerId: uuid }});
+      const change = block.value.change().wrapInline({ type: "pointerExport", data: { pointerId: uuid } });
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
@@ -86,8 +89,8 @@ function getInlinesAsArray(node: any) {
 
 export const removeExportOfSelection = () => {
   return async (dispatch, getState) => {
-    const {blocks, blockEditor} = await getState();
-    const {hoveredItem} = blockEditor;
+    const { blocks, blockEditor } = await getState();
+    const { hoveredItem } = blockEditor;
 
     const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
 
@@ -99,7 +102,7 @@ export const removeExportOfSelection = () => {
         return;
       }
 
-      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key, {data: {pointerId: hoveredItem.id}});
+      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key, { data: { pointerId: hoveredItem.id } });
 
       dispatch({
         type: UPDATE_BLOCK,
