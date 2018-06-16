@@ -1,5 +1,6 @@
-
 import * as auth0 from "auth0-js";
+// Note: uses local storage instead of redux to persist across sessions
+// May consider alternate architecture ie through the redux-localstorage package
 
 export class Auth {
   public static auth0 = new auth0.WebAuth({
@@ -29,6 +30,7 @@ export class Auth {
         Auth.setSession(authResult);
         console.log(authResult);
         console.log("Successfully authorized");
+
       } else if (err) {
         console.log(err);
       }
@@ -52,7 +54,13 @@ export class Auth {
       return false;
     }
     let expiresAt = JSON.parse(expiresJson);
-    return new Date().getTime() < Number(expiresAt);
+    const isExpired = new Date().getTime() > Number(expiresAt);
+    if (isExpired) {
+      Auth.logout();
+      return false;
+    }
+
+    return true;
   }
 
   // TODO: Replace with permission based logic
@@ -61,6 +69,7 @@ export class Auth {
       return false;
     }
 
+    // TODO:
     // Check - is this an admin workspace & is this user an admin
     // Normal workspaces can be edited by anyone with the link & authed
     // Need to upgrade workspace schema with a "public_workspace" bool column

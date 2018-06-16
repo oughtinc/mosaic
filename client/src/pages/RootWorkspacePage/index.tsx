@@ -110,7 +110,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
                 ))}
-                {Auth.isAuthenticated() &&
+                {Auth.isAdmin() &&
                     <NewWorkspaceForm
                         onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
                     />}
