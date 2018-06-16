@@ -63,8 +63,13 @@ class NewWorkspaceForm extends React.Component<any, any> {
     public render() {
         return (
             <div>
-                <h3> New Root Workspace </h3>
-                <NewBlockForm
+                {Auth.isAdmin() ? (
+                    <h3> New Root Workspace </h3>
+                ) : (
+                        <h3> New Personal Workspace </h3>
+                    )
+                }
+                < NewBlockForm
                     maxTotalBudget={10000}
                     onMutate={this.props.onCreateWorkspace}
                 />
@@ -105,7 +110,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
                 ))}
-                {Auth.isAdmin() &&
+                {Auth.isAuthenticated() &&
                     <NewWorkspaceForm
                         onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
                     />}

@@ -57,7 +57,17 @@ export class Auth {
 
   // TODO: Replace with permission based logic
   public static isAuthorizedToEdit(workspace: any): boolean {
-    return Auth.isAuthenticated();
+    if (!Auth.isAuthenticated()) {
+      return false;
+    }
+
+    // Check - is this an admin workspace & is this user an admin
+    // Normal workspaces can be edited by anyone with the link & authed
+    // Need to upgrade workspace schema with a "public_workspace" bool column
+    //    and "creator_id" string column
+
+    return true;
+
   }
 
   public static isAdmin(): boolean {
@@ -68,6 +78,7 @@ export class Auth {
     return localStorage.getItem("access_token");
   }
 
+  // TODO: Need to trigger a rerender
   public static getProfile(): void {
     const root = "https://mosaic:auth0:com/";
 
