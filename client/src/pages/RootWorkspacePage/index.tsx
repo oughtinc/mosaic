@@ -64,7 +64,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
         return (
             <div>
                 {Auth.isAdmin() ? (
-                    <h3> New Root Workspace </h3>
+                    <h3> New Public Workspace </h3>
                 ) : (
                         <h3> New Personal Workspace </h3>
                     )
@@ -106,7 +106,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                         Log In
                     </Button>)}
 
-                <h1> Root Workspaces </h1>
+                <h1> Public Workspaces </h1>
                 {workspaces && workspaces.map((w) => (
                     <ParentWorkspace workspace={w} key={w.id} />
                 ))}
