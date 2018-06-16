@@ -3,10 +3,11 @@ import * as auth0 from "auth0-js";
 // May consider alternate architecture ie through the redux-localstorage package
 
 export class Auth {
+
   public static auth0 = new auth0.WebAuth({
     domain: "mosaicapp.auth0.com",
     clientID: "wxJ6gaMkuuoSvLpQpBUZlsbwzDlVjjAu",
-    redirectUri: "http://localhost:3000/authCallback",
+    redirectUri: Auth.redirectUri(),
     audience: "https://mosaicapp.auth0.com/userinfo",
     responseType: "token id_token",
     scope: "openid user_metadata app_metadata",
@@ -109,4 +110,18 @@ export class Auth {
     });
   }
 
+  private static redirectUri(): string {
+    if (process.env.USING_DOCKER) { "http://localhost:3000/authCallback"; }
+
+    // TODO: Need to see what these are on prod
+    console.log(process.env.HEROKU_APP_NAME);
+    console.log(process.env.HEROKU_PARENT_APP_NAME);
+
+    if (process.env.HEROKU_APP_NAME !== process.env.HEROKU_PARENT_APP_NAME &&
+      process.env.HEROKU_PARENT_APP_NAME != null) {
+      return `https://${process.env.HEROKU_APP_NAME}.herokuapp/authCallback`;
+    } else {
+      return "https://mosaic.ought.org/authCallback";
+    }
+  }
 }
