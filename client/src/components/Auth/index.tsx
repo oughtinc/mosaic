@@ -116,7 +116,7 @@ export class Auth {
     if (subdomain === "mosaic") {
       return "https://mosaic.ought.org/authCallback";
     } else {
-      return `https://${subdomain}.herokuapp/authCallback`;
+      return `https://${subdomain}.herokuapp.com/authCallback`;
     }
   }
 }
