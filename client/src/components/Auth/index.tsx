@@ -1,12 +1,13 @@
 import * as auth0 from "auth0-js";
 // Note: uses local storage instead of redux to persist across sessions
 // May consider alternate architecture ie through the redux-localstorage package
+import { appConfig } from "../../config.js";
 
 export class Auth {
 
   public static auth0 = new auth0.WebAuth({
     domain: "mosaicapp.auth0.com",
-    clientID: "wxJ6gaMkuuoSvLpQpBUZlsbwzDlVjjAu",
+    clientID: appConfig.auth0_client_id,
     redirectUri: Auth.redirectUri(),
     audience: "https://mosaicapp.auth0.com/userinfo",
     responseType: "token id_token",
@@ -111,7 +112,7 @@ export class Auth {
   }
 
   private static redirectUri(): string {
-    if (process.env.USING_DOCKER) { "http://localhost:3000/authCallback"; }
+    if (process.env.USING_DOCKER) { return "http://localhost:3000/authCallback"; }
     const subdomain = window.location.host.split(".")[0];
     if (subdomain === "mosaic") {
       return "https://mosaic.ought.org/authCallback";
