@@ -21,60 +21,56 @@ const HoverMenu = styled.span`
   border: 1px solid #d5d5d5;
 `;
 
-export class ImportMenu extends React.Component<any, any> {
-  public render() {
-    const {
-      blockEditor: {
-        hoveredItem: { id },
-        pointerReferences
-      },
-      onChangePointerReference
-    } = this.props;
-    const reference = pointerReferences[id];
-    const isOpen = reference && reference.isOpen;
-    return (
-      <div>
-        {isOpen && (
-          <Button
-            bsSize={"xsmall"}
-            onClick={() =>
-              onChangePointerReference({ id, reference: { isOpen: false } })
-            }
-          >
-            Close
-          </Button>
-        )}
-        {!isOpen && (
-          <Button
-            bsSize={"xsmall"}
-            onClick={() =>
-              onChangePointerReference({ id, reference: { isOpen: true } })
-            }
-          >
-            Expand
-          </Button>
-        )}
-      </div>
-    );
-  }
-}
-
-export class ExportMenu extends React.Component<any, any> {
-  public render() {
-    return (
-      <div>
+const ImportMenu = props => {
+  const {
+    blockEditor: {
+      hoveredItem: { id },
+      pointerReferences
+    },
+    onChangePointerReference
+  } = props;
+  const reference = pointerReferences[id];
+  const isOpen = reference && reference.isOpen;
+  return (
+    <div>
+      {isOpen && (
         <Button
           bsSize={"xsmall"}
-          onClick={() => {
-            this.props.removeExportOfSelection();
-          }}
+          onClick={() =>
+            onChangePointerReference({ id, reference: { isOpen: false } })
+          }
         >
-          Remove Pointer
+          Close
         </Button>
-      </div>
-    );
-  }
-}
+      )}
+      {!isOpen && (
+        <Button
+          bsSize={"xsmall"}
+          onClick={() =>
+            onChangePointerReference({ id, reference: { isOpen: true } })
+          }
+        >
+          Expand
+        </Button>
+      )}
+    </div>
+  );
+};
+
+const ExportMenu = ({ removeExportOfSelection }) => {
+  return (
+    <div>
+      <Button
+        bsSize={"xsmall"}
+        onClick={() => {
+          removeExportOfSelection();
+        }}
+      >
+        Remove Pointer
+      </Button>
+    </div>
+  );
+};
 
 export class MenuPresentational extends React.Component<any> {
   public constructor(props: any) {
@@ -107,7 +103,6 @@ export class MenuPresentational extends React.Component<any> {
             )}
             {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT && (
               <ExportMenu
-                blockEditor={this.props.blockEditor}
                 removeExportOfSelection={this.props.removeExportOfSelection}
               />
             )}
