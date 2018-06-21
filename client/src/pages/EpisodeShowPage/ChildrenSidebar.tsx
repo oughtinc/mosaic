@@ -1,14 +1,14 @@
 import * as React from "react";
+import * as _ from "lodash";
 import styled from "styled-components";
+
 import { Button, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { WorkspaceBlockRelation, WorkspaceRelationTypes } from "./WorkspaceRelations";
-import * as _ from "lodash";
 import { ChildBudgetForm } from "./ChildBudgetForm";
-
-import { Auth } from "../../components/Auth";
+import { Auth } from "../../auth";
 
 const ChildStyle = styled.div`
     border: 2px solid #ddd;
