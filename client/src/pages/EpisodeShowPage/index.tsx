@@ -71,7 +71,7 @@ const UPDATE_CHILD_TOTAL_BUDGET = gql`
   }
 `;
 
-const NavLink = styled(Link) `
+const NavLink = styled(Link)`
   margin-right: 5px;
 `;
 

@@ -1,7 +1,6 @@
 {
   "name": "mosaic",
-  "scripts": {
-  },
+  "scripts": {},
   "env": {
     "NODE_ENV": {
       "required": true
