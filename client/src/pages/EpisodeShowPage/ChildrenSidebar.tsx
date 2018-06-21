@@ -49,12 +49,12 @@ export class Child extends React.Component<any, any> {
                     <Link to={`/workspaces/${workspace.id}`}>
                         <Button> Open </Button>
                     </Link>
-                    {Auth.isAuthorizedToEdit(this.props.workspace) &&
+                    {Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
                         <Button onClick={this.props.onDelete}>
                             Archive
                         </Button>
                     }
-                    {!this.state.showChildBudgetForm && Auth.isAuthorizedToEdit(this.props.workspace) &&
+                    {!this.state.showChildBudgetForm && Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
                         <Button onClick={() => { this.setState({ showChildBudgetForm: true }); }}>
                             Edit Allocation
                         </Button>
@@ -119,7 +119,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                         )}
                     </div>
                 }
-                {Auth.isAuthorizedToEdit(this.props.workspace) && (
+                {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
                     <div>
                         <h3> Add a new Child Question </h3>
                         <NewBlockForm

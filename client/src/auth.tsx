@@ -66,7 +66,7 @@ export class Auth {
   }
 
   // TODO: Replace with permission based logic
-  public static isAuthorizedToEdit(workspace: any): boolean {
+  public static isAuthorizedToEditWorkspace(workspace: any): boolean {
     if (!Auth.isAuthenticated()) {
       return false;
     }
@@ -78,9 +78,16 @@ export class Auth {
     //    and "creator_id" string column
 
     return true;
-
   }
 
+  // TODO: Replace with permission based logic
+  public static isAuthorizedToEditBlock(blockId?: string): boolean {
+    if (!Auth.isAuthenticated() || !blockId) {
+      return false;
+    }
+    return true;
+  }
+  
   public static isAdmin(): boolean {
     return localStorage.getItem("is_admin") === "true";
   }
