@@ -1,13 +1,13 @@
 import * as auth0 from "auth0-js";
 // Note: uses local storage instead of redux to persist across sessions
 // May consider alternate architecture ie through the redux-localstorage package
-import { appConfig } from "./config";
+import { Config } from "./config";
 
 export class Auth {
 
   public static auth0 = new auth0.WebAuth({
     domain: "mosaicapp.auth0.com",
-    clientID: appConfig.auth0_client_id,
+    clientID: Config.auth0_client_id,
     redirectUri: Auth.redirectUri(),
     audience: "https://mosaicapp.auth0.com/userinfo",
     responseType: "token id_token",
