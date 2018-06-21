@@ -14,13 +14,21 @@ import {
 } from "../../modules/blockEditor/actions";
 import { Auth } from "../../auth";
 
-const HoverMenu = styled.span`
+const HoverBackground = styled.span`
   background-color: #b5b5b557;
   color: black;
   padding: 2px 3px;
   border-radius: 3px;
   border: 1px solid #d5d5d5;
 `;
+
+const HoverButton = ({ children, onClick }) => (
+  <HoverBackground>
+    <Button bsSize={"xsmall"} onClick={onClick}>
+      {children}
+    </Button>
+  </HoverBackground>
+);
 
 const ImportedPointerMenu = props => {
   const {
@@ -33,45 +41,22 @@ const ImportedPointerMenu = props => {
   const reference = pointerReferences[id];
   const isOpen = reference && reference.isOpen;
   return (
-    <HoverMenu>
-      <Button
-        bsSize={"xsmall"}
-        onClick={() =>
-          onChangePointerReference({ id, reference: { isOpen: !isOpen } })
-        }
-      >
-        {isOpen ? "Close" : "Expand"}
-      </Button>
-    </HoverMenu>
+    <HoverButton
+      onClick={() =>
+        onChangePointerReference({ id, reference: { isOpen: !isOpen } })
+      }
+    >
+      {isOpen ? "Close" : "Expand"}
+    </HoverButton>
   );
 };
 
-const ExportedPointerMenu = ({ removeExportOfSelection }) => {
-  return (
-    <HoverMenu>
-      <Button
-        bsSize={"xsmall"}
-        onClick={() => {
-          removeExportOfSelection();
-        }}
-      >
-        Remove Pointer
-      </Button>
-    </HoverMenu>
-  );
-};
+const ExportedPointerMenu = ({ removeExportOfSelection }) => (
+  <HoverButton onClick={removeExportOfSelection}>Remove Pointer</HoverButton>
+);
 
 const ExportSelectionMenu = ({ exportSelection }) => (
-  <HoverMenu>
-    <Button
-      bsSize={"xsmall"}
-      onClick={() => {
-        exportSelection();
-      }}
-    >
-      Export
-    </Button>
-  </HoverMenu>
+  <HoverButton onClick={exportSelection}>Export</HoverButton>
 );
 
 export class MenuPresentational extends React.Component<any> {
