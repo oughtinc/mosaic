@@ -78,14 +78,10 @@ class NewWorkspaceForm extends React.Component<any, any> {
   }
 }
 
-const AlertParagraph = styled.p`
-  margin-bottom: 5px;
-`;
-
 const AuthMessage = () => {
   return (
     <Alert>
-      <AlertParagraph>
+      <p>
         <strong>Welcome!</strong> Right now, Mosaic supports editing only for{" "}
         <a
           href="#"
@@ -96,7 +92,12 @@ const AuthMessage = () => {
         >
           authorized users
         </a>, but you can browse the existing question-answer trees below.
-      </AlertParagraph>
+      </p>
+      <p>
+        If you want to play with recursive question-answering yourself, we
+        currently recommend the command-line app{" "}
+        <a href="https://github.com/oughtinc/patchwork">Patchwork</a>.
+      </p>
     </Alert>
   );
 };
