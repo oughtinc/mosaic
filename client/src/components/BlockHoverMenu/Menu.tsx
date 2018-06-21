@@ -33,39 +33,45 @@ const ImportedPointerMenu = props => {
   const reference = pointerReferences[id];
   const isOpen = reference && reference.isOpen;
   return (
-    <Button
-      bsSize={"xsmall"}
-      onClick={() =>
-        onChangePointerReference({ id, reference: { isOpen: !isOpen } })
-      }
-    >
-      {isOpen ? "Close" : "Expand"}
-    </Button>
+    <HoverMenu>
+      <Button
+        bsSize={"xsmall"}
+        onClick={() =>
+          onChangePointerReference({ id, reference: { isOpen: !isOpen } })
+        }
+      >
+        {isOpen ? "Close" : "Expand"}
+      </Button>
+    </HoverMenu>
   );
 };
 
 const ExportedPointerMenu = ({ removeExportOfSelection }) => {
   return (
-    <Button
-      bsSize={"xsmall"}
-      onClick={() => {
-        removeExportOfSelection();
-      }}
-    >
-      Remove Pointer
-    </Button>
+    <HoverMenu>
+      <Button
+        bsSize={"xsmall"}
+        onClick={() => {
+          removeExportOfSelection();
+        }}
+      >
+        Remove Pointer
+      </Button>
+    </HoverMenu>
   );
 };
 
 const ExportSelectionMenu = ({ exportSelection }) => (
-  <Button
-    bsSize={"xsmall"}
-    onClick={() => {
-      exportSelection();
-    }}
-  >
-    Export
-  </Button>
+  <HoverMenu>
+    <Button
+      bsSize={"xsmall"}
+      onClick={() => {
+        exportSelection();
+      }}
+    >
+      Export
+    </Button>
+  </HoverMenu>
 );
 
 export class MenuPresentational extends React.Component<any> {
@@ -80,7 +86,7 @@ export class MenuPresentational extends React.Component<any> {
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef} id="hover-menu">
         {blockEditor && (
-          <HoverMenu>
+          <div>
             {hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT && (
               <ExportSelectionMenu
                 exportSelection={this.props.exportSelection}
@@ -100,7 +106,7 @@ export class MenuPresentational extends React.Component<any> {
                   removeExportOfSelection={this.props.removeExportOfSelection}
                 />
               )}
-          </HoverMenu>
+          </div>
         )}
       </div>,
       root
