@@ -21,7 +21,7 @@ const HoverMenu = styled.span`
   border: 1px solid #d5d5d5;
 `;
 
-const ImportMenu = props => {
+const ImportedPointerMenu = props => {
   const {
     blockEditor: {
       hoveredItem: { id },
@@ -43,7 +43,7 @@ const ImportMenu = props => {
   );
 };
 
-const ExportMenu = ({ removeExportOfSelection }) => {
+const ExportedPointerMenuu = ({ removeExportOfSelection }) => {
   return (
     <Button
       bsSize={"xsmall"}
@@ -80,13 +80,13 @@ export class MenuPresentational extends React.Component<any> {
               </Button>
             )}
             {hoverItemType === HOVER_ITEM_TYPES.POINTER_IMPORT && (
-              <ImportMenu
+              <ImportedPointerMenu
                 blockEditor={this.props.blockEditor}
                 onChangePointerReference={this.props.changePointerReference}
               />
             )}
             {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT && (
-              <ExportMenu
+              <ExportedPointerMenuu
                 removeExportOfSelection={this.props.removeExportOfSelection}
               />
             )}
