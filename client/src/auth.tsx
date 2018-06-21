@@ -1,7 +1,7 @@
 import * as auth0 from "auth0-js";
 // Note: uses local storage instead of redux to persist across sessions
 // May consider alternate architecture ie through the redux-localstorage package
-import { appConfig } from "../../config.js";
+import { appConfig } from "./config";
 
 export class Auth {
 

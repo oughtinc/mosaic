@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import * as uuidv1 from "uuid/v1";
 import { databaseJSONToValue } from "../../lib/slateParser";
-import { Auth } from "../../components/Auth";
+import { Auth } from "../../auth";
 
 export enum WorkspaceRelationTypes {
     WorkspaceQuestion = 0,

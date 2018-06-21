@@ -1,3 +1,6 @@
+import * as _ from "lodash";
+import * as React from "react";
+
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
@@ -8,11 +11,7 @@ import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
-
-import * as _ from "lodash";
-import * as React from "react";
-
-import { Auth } from "../../components/Auth";
+import { Auth } from "../../auth";
 
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
