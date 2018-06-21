@@ -30,11 +30,9 @@ export class Auth {
     Auth.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         Auth.setSession(authResult);
-        console.log(authResult);
-        console.log("Successfully authorized");
-
+        console.log("Successfully authenticated.");
       } else if (err) {
-        console.log(err);
+        console.error("Authentication error: ", err);
       }
     });
   }
@@ -70,13 +68,11 @@ export class Auth {
     if (!Auth.isAuthenticated()) {
       return false;
     }
-
     // TODO:
     // Check - is this an admin workspace & is this user an admin
     // Normal workspaces can be edited by anyone with the link & authed
     // Need to upgrade workspace schema with a "public_workspace" bool column
     //    and "creator_id" string column
-
     return Auth.isAdmin();
   }
 
@@ -107,13 +103,12 @@ export class Auth {
 
     Auth.auth0.client.userInfo(accessToken, (err, profile) => {
       if (err) {
-        console.log(err);
+        console.error("Error retrieving user info: ", err);
         return;
       }
       const appMetadata = profile[root + "app_metadata"];
       if (appMetadata != null && appMetadata.is_admin != null) {
         localStorage.setItem("is_admin", appMetadata.is_admin);
-        console.log(appMetadata.is_admin);
       }
     });
   }
