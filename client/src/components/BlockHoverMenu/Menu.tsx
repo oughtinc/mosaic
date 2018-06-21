@@ -32,43 +32,27 @@ const ImportMenu = props => {
   const reference = pointerReferences[id];
   const isOpen = reference && reference.isOpen;
   return (
-    <div>
-      {isOpen && (
-        <Button
-          bsSize={"xsmall"}
-          onClick={() =>
-            onChangePointerReference({ id, reference: { isOpen: false } })
-          }
-        >
-          Close
-        </Button>
-      )}
-      {!isOpen && (
-        <Button
-          bsSize={"xsmall"}
-          onClick={() =>
-            onChangePointerReference({ id, reference: { isOpen: true } })
-          }
-        >
-          Expand
-        </Button>
-      )}
-    </div>
+    <Button
+      bsSize={"xsmall"}
+      onClick={() =>
+        onChangePointerReference({ id, reference: { isOpen: !isOpen } })
+      }
+    >
+      {isOpen ? "Close" : "Expand"}
+    </Button>
   );
 };
 
 const ExportMenu = ({ removeExportOfSelection }) => {
   return (
-    <div>
-      <Button
-        bsSize={"xsmall"}
-        onClick={() => {
-          removeExportOfSelection();
-        }}
-      >
-        Remove Pointer
-      </Button>
-    </div>
+    <Button
+      bsSize={"xsmall"}
+      onClick={() => {
+        removeExportOfSelection();
+      }}
+    >
+      Remove Pointer
+    </Button>
   );
 };
 
