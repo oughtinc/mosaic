@@ -56,6 +56,17 @@ const ExportedPointerMenuu = ({ removeExportOfSelection }) => {
   );
 };
 
+const ExportSelectionMenu = ({ exportSelection }) => (
+  <Button
+    bsSize={"xsmall"}
+    onClick={() => {
+      exportSelection();
+    }}
+  >
+    Export
+  </Button>
+);
+
 export class MenuPresentational extends React.Component<any> {
   public constructor(props: any) {
     super(props);
@@ -70,14 +81,9 @@ export class MenuPresentational extends React.Component<any> {
         {blockEditor && (
           <HoverMenu>
             {hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT && (
-              <Button
-                bsSize={"xsmall"}
-                onClick={() => {
-                  this.props.exportSelection();
-                }}
-              >
-                Export
-              </Button>
+              <ExportSelectionMenu
+                exportSelection={this.props.exportSelection}
+              />
             )}
             {hoverItemType === HOVER_ITEM_TYPES.POINTER_IMPORT && (
               <ImportedPointerMenu
