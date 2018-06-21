@@ -112,12 +112,6 @@ export class Auth {
   }
 
   private static redirectUri(): string {
-    if (process.env.USING_DOCKER) { return "http://localhost:3000/authCallback"; }
-    const subdomain = window.location.host.split(".")[0];
-    if (subdomain === "mosaic") {
-      return "https://mosaic.ought.org/authCallback";
-    } else {
-      return `https://${subdomain}.herokuapp.com/authCallback`;
-    }
+    return `${window.location.origin}/authCallback`;
   }
 }
