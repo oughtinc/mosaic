@@ -4,7 +4,7 @@ import * as React from "react";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
-import { Button, Col, Row } from "react-bootstrap";
+import { Alert, Button, Col, Row } from "react-bootstrap";
 import styled from "styled-components";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
@@ -66,9 +66,9 @@ class NewWorkspaceForm extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <h3>
-          {Auth.isAdmin() ? "New Public Workspace" : "New Personal Workspace"}
-        </h3>
+        <h2>
+          {Auth.isAdmin() ? "New Public Question" : "New Personal Question"}
+        </h2>
         <NewBlockForm
           maxTotalBudget={10000}
           onMutate={this.props.onCreateWorkspace}
@@ -78,33 +78,60 @@ class NewWorkspaceForm extends React.Component<any, any> {
   }
 }
 
+const AlertParagraph = styled.p`
+  margin-bottom: 5px;
+`;
+
+const AuthMessage = () => {
+  return (
+    <Alert>
+      <AlertParagraph>
+        <strong>Welcome!</strong> Right now, Mosaic supports editing only for{" "}
+        <a
+          href="#"
+          onClick={e => {
+            Auth.login();
+            e.preventDefault();
+          }}
+        >
+          authorized users
+        </a>, but you can browse the existing question-answer trees below.
+      </AlertParagraph>
+    </Alert>
+  );
+};
+
+const LogoutButton = ({ onAuthAction }) => (
+  <Button
+    bsStyle="primary"
+    className="btn-margin"
+    onClick={() => {
+      Auth.logout();
+      onAuthAction();
+    }}
+  >
+    Log out
+  </Button>
+);
+
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
     const workspaces = _.sortBy(
       this.props.originWorkspaces.workspaces,
       "createdAt"
     );
-    const isAuthenticated = Auth.isAuthenticated();
-    const authButton = {
-      label: isAuthenticated ? "Log out" : "Log in",
-      action: () => {
-        isAuthenticated ? Auth.logout() : Auth.login();
-      }
-    };
     return (
       <BlockHoverMenu>
-        <Button
-          bsStyle="primary"
-          className="btn-margin"
-          onClick={() => {
-            authButton.action();
-            this.forceUpdate();
-          }}
-        >
-          {authButton.label}
-        </Button>
-
-        <h1> Public Workspaces </h1>
+        {Auth.isAuthenticated() ? (
+          <LogoutButton
+            onAuthAction={() => {
+              this.forceUpdate();
+            }}
+          />
+        ) : (
+          <AuthMessage />
+        )}
+        <h2>Questions</h2>
         {workspaces &&
           workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
         {Auth.isAdmin() && (
