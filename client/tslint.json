@@ -11,7 +11,7 @@
       "await-promise": true,
       "restrict-plus-operands": true,
       "deprecation": true,
-      "arrow-parens": true,
+      "arrow-parens": false,
       "callable-types": true,
       "no-irregular-whitespace": true,
       "no-unused-variable": true,
@@ -118,18 +118,7 @@
         "always"
       ],
       "switch-default": true,
-      "trailing-comma": [
-        true,
-        {
-          "multiline": {
-            "objects": "always",
-            "arrays": "always",
-            "functions": "ignore",
-            "typeLiterals": "ignore"
-          },
-          "singleline": "never"
-        }
-      ],
+      "trailing-comma": false,
       "triple-equals": [
         true,
         "allow-null-check"

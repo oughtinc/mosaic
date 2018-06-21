@@ -20,111 +20,113 @@ const WorkspaceStyle = styled.div`
 `;
 
 const ParentWorkspace = ({ workspace }) => {
-    const question = workspace.blocks && workspace.blocks.find((b) => b.type === "QUESTION");
-    const answer = workspace.blocks && workspace.blocks.find((b) => b.type === "ANSWER");
-    return (
-        <WorkspaceStyle>
-            <Row>
-                <Col sm={4}>
-                    {question && question.value &&
-                        <BlockEditor
-                            name={question.id}
-                            blockId={question.id}
-                            initialValue={databaseJSONToValue(question.value)}
-                            readOnly={true}
-                            availablePointers={[]}
-                        />
-                    }
-                </Col>
-                <Col sm={4}>
-                    {answer && answer.value &&
-                        <BlockEditor
-                            name={answer.id}
-                            blockId={answer.id}
-                            initialValue={databaseJSONToValue(answer.value)}
-                            readOnly={true}
-                            availablePointers={[]}
-                        />
-                    }
-                </Col>
-                <Col sm={3} />
-                <Col sm={1}>
-                    <Link to={`/workspaces/${workspace.id}`}>
-                        <Button> Open </Button>
-                    </Link>
-                </Col>
-            </Row>
-        </WorkspaceStyle>
-    );
+  const question =
+    workspace.blocks && workspace.blocks.find(b => b.type === "QUESTION");
+  const answer =
+    workspace.blocks && workspace.blocks.find(b => b.type === "ANSWER");
+  return (
+    <WorkspaceStyle>
+      <Row>
+        <Col sm={4}>
+          {question &&
+            question.value && (
+              <BlockEditor
+                name={question.id}
+                blockId={question.id}
+                initialValue={databaseJSONToValue(question.value)}
+                readOnly={true}
+                availablePointers={[]}
+              />
+            )}
+        </Col>
+        <Col sm={4}>
+          {answer &&
+            answer.value && (
+              <BlockEditor
+                name={answer.id}
+                blockId={answer.id}
+                initialValue={databaseJSONToValue(answer.value)}
+                readOnly={true}
+                availablePointers={[]}
+              />
+            )}
+        </Col>
+        <Col sm={3} />
+        <Col sm={1}>
+          <Link to={`/workspaces/${workspace.id}`}>
+            <Button> Open </Button>
+          </Link>
+        </Col>
+      </Row>
+    </WorkspaceStyle>
+  );
 };
 
 class NewWorkspaceForm extends React.Component<any, any> {
-    public render() {
-        return (
-            <div>
-                {Auth.isAdmin() ? (
-                    <h3> New Public Workspace </h3>
-                ) : (
-                        <h3> New Personal Workspace </h3>
-                    )
-                }
-                < NewBlockForm
-                    maxTotalBudget={10000}
-                    onMutate={this.props.onCreateWorkspace}
-                />
-            </div>
-        );
-    }
+  public render() {
+    return (
+      <div>
+        <h3>
+          {Auth.isAdmin() ? "New Public Workspace" : "New Personal Workspace"}
+        </h3>
+        <NewBlockForm
+          maxTotalBudget={10000}
+          onMutate={this.props.onCreateWorkspace}
+        />
+      </div>
+    );
+  }
 }
 
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
-    public render() {
-        const workspaces = _.sortBy(this.props.originWorkspaces.workspaces, "createdAt");
-        return (
-            <BlockHoverMenu>
-                {Auth.isAuthenticated() ?
-                    (<Button
-                        bsStyle="primary"
-                        className="btn-margin"
-                        onClick={() => {
-                            Auth.logout();
-                            this.forceUpdate();
-                        }}
-                    >
-                        Log Out
-                    </Button>)
-                    :
-                    (<Button
-                        bsStyle="primary"
-                        className="btn-margin"
-                        onClick={() => {
-                            Auth.login();
-                            this.forceUpdate();
-                        }}
-                    >
-                        Log In
-                    </Button>)}
+  public render() {
+    const workspaces = _.sortBy(
+      this.props.originWorkspaces.workspaces,
+      "createdAt"
+    );
+    const isAuthenticated = Auth.isAuthenticated();
+    const authButton = {
+      label: isAuthenticated ? "Log out" : "Log in",
+      action: () => {
+        isAuthenticated ? Auth.logout() : Auth.login();
+      }
+    };
+    return (
+      <BlockHoverMenu>
+        <Button
+          bsStyle="primary"
+          className="btn-margin"
+          onClick={() => {
+            authButton.action();
+            this.forceUpdate();
+          }}
+        >
+          {authButton.label}
+        </Button>
 
-                <h1> Public Workspaces </h1>
-                {workspaces && workspaces.map((w) => (
-                    <ParentWorkspace workspace={w} key={w.id} />
-                ))}
-                {Auth.isAdmin() &&
-                    <NewWorkspaceForm
-                        onCreateWorkspace={({ question, totalBudget }) => { this.props.createWorkspace({ variables: { question, totalBudget } }); }}
-                    />}
-            </BlockHoverMenu>
-        );
-    }
+        <h1> Public Workspaces </h1>
+        {workspaces &&
+          workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
+        {Auth.isAdmin() && (
+          <NewWorkspaceForm
+            onCreateWorkspace={({ question, totalBudget }) => {
+              this.props.createWorkspace({
+                variables: { question, totalBudget }
+              });
+            }}
+          />
+        )}
+      </BlockHoverMenu>
+    );
+  }
 }
 
 export const RootWorkspacePage = compose(
-    graphql(WORKSPACES_QUERY, { name: "originWorkspaces" }),
-    graphql(CREATE_ROOT_WORKSPACE, {
-        name: "createWorkspace", options: {
-            refetchQueries: [
-                "OriginWorkspaces",
-            ],
-        },
-    }),
+  graphql(WORKSPACES_QUERY, { name: "originWorkspaces" }),
+  graphql(CREATE_ROOT_WORKSPACE, {
+    name: "createWorkspace",
+    options: {
+      refetchQueries: ["OriginWorkspaces"]
+    }
+  })
 )(RootWorkspacePagePresentational);
