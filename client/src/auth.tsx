@@ -77,7 +77,7 @@ export class Auth {
     // Need to upgrade workspace schema with a "public_workspace" bool column
     //    and "creator_id" string column
 
-    return true;
+    return Auth.isAdmin();
   }
 
   // TODO: Replace with permission based logic
@@ -85,7 +85,7 @@ export class Auth {
     if (!Auth.isAuthenticated() || !blockId) {
       return false;
     }
-    return true;
+    return Auth.isAdmin();
   }
   
   public static isAdmin(): boolean {
