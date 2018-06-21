@@ -15,7 +15,7 @@ export const HOVER_ITEM_TYPES = {
 
 export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
   const isImportExport = hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT || HOVER_ITEM_TYPES.POINTER_IMPORT;
-  if (!Auth.isAdmin() && isImportExport) { return function () { return; }; }
+  if (!Auth.isAdmin() && !isImportExport) { return function () { return; }; }
   return (dispatch, getState) => {
     dispatch({
       type: CHANGE_HOVERED_ITEM,
