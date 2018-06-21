@@ -19,7 +19,9 @@ import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 import { ExampleShowPage } from "./pages/ExampleShowPage";
-import { appConfig } from "./config.js";
+
+import { Config } from "./config";
+import { Auth } from "./auth";
 
 const SERVER_URL = window.location.hostname === "localhost" ?
   "http://localhost:8080/graphql" :
@@ -38,7 +40,18 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
+const authLink = new ApolloLink((operation, forward) => {
+  operation.setContext(({ headers }) => ({
+    headers: {
+      ...headers,
+      authorization: Auth.accessToken() ? `Bearer ${Auth.accessToken()}` : null,
+    },
+  }));
+  return forward ? forward(operation) : null;
+});
+
 const link = ApolloLink.from([
+  authLink,
   errorLink,
   new HttpLink({ uri: SERVER_URL }),
 ]);
@@ -76,10 +89,20 @@ const Routes = () => (
     <Route exact={true} path="/workspaces" component={RootWorkspacePage} />
     <Route exact={true} path="/workspaces/:workspaceId" component={EpisodeShowPage} />
     <Route exact={true} path="/workspaces/:workspaceId/subtree" component={WorkspaceSubtreePage} />
+    <Route
+      path="/authCallback"
+      render={(props) => {
+        if (/access_token|id_token|error/.test(props.location.hash)) {
+          Auth.handleAuthentication();
+        }
+        return <Redirect to="/workspaces" />;
+      }}
+    />
+
   </div>
 );
 
-LogRocket.init(appConfig.logrocket_id);
+LogRocket.init(Config.logrocket_id);
 const environment = process.env.NODE_ENV || ""; // "development" or "production"
 LogRocket.track(environment);
 

@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 import * as uuidv1 from "uuid/v1";
 import { databaseJSONToValue } from "../../lib/slateParser";
+import { Auth } from "../../auth";
 
 export enum WorkspaceRelationTypes {
     WorkspaceQuestion = 0,
@@ -23,7 +24,7 @@ const WORKSPACE = "WORKSPACE";
 const SUBWORKSPACE = "SUBWORKSPACE";
 
 const RelationTypeAttributes = [
-     {
+    {
         name: WorkspaceRelationTypes.WorkspaceQuestion,
         source: WORKSPACE,
         blockType: QUESTION,
@@ -41,7 +42,7 @@ const RelationTypeAttributes = [
         blockType: ANSWER,
         permission: Permissions.Editable,
     },
-     {
+    {
         name: WorkspaceRelationTypes.SubworkspaceQuestion,
         source: SUBWORKSPACE,
         blockType: QUESTION,
@@ -56,8 +57,11 @@ const RelationTypeAttributes = [
 ];
 
 function outputsToInputs(value: any) {
-    const nodes = value.document.nodes[0].nodes;
-    const newNodes = nodes.map((n) => {
+    const node = value.document.nodes[0];
+    if (node == null || node.nodes == null) {
+        return value;
+    }
+    const newNodes = node.nodes.map((n) => {
         if (n.type && n.type === "pointerExport") {
             return ({
                 object: "inline",
@@ -87,22 +91,22 @@ export class WorkspaceBlockRelation {
     }
 
     public blockEditorAttributes() {
-        const {permission} = this.relationTypeAttributes();
+        const { permission } = this.relationTypeAttributes();
         const block: any = this.findBlock();
-        const isReadOnly = permission === Permissions.ReadOnly;
+        const editable = Auth.isAuthorizedToEditWorkspace(this.workspace) && permission === Permissions.Editable;
         let { value, id } = block;
         value = databaseJSONToValue(value);
         return {
             name: id,
             blockId: id,
-            readOnly: isReadOnly,
-            initialValue: isReadOnly ? outputsToInputs(value) : value,
-            shouldAutosave: !isReadOnly,
+            readOnly: !editable,
+            initialValue: editable ? value : outputsToInputs(value),
+            shouldAutosave: editable,
         };
     }
 
     public findBlock() {
-        const {blockType} = this.relationTypeAttributes();
+        const { blockType } = this.relationTypeAttributes();
         return this.workspace.blocks.find((b) => b.type === blockType);
     }
 
@@ -127,12 +131,12 @@ export class WorkspaceWithRelations {
 
     private allTouchingBlockRelationships() {
         const relations: any = [];
-        _.filter(RelationTypeAttributes, {source: SUBWORKSPACE})
-        .forEach((RelationTypeAttribute) => {
-            this.workspace.childWorkspaces.forEach((childWorkspace) => {
-                relations.push(new WorkspaceBlockRelation(RelationTypeAttribute.name, childWorkspace));
+        _.filter(RelationTypeAttributes, { source: SUBWORKSPACE })
+            .forEach((RelationTypeAttribute) => {
+                this.workspace.childWorkspaces.forEach((childWorkspace) => {
+                    relations.push(new WorkspaceBlockRelation(RelationTypeAttribute.name, childWorkspace));
+                });
             });
-        });
 
         return relations;
     }
