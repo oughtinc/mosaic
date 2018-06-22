@@ -52,54 +52,35 @@ const Description = styled.div`
 const workspaceToBlock = (workspace: any, blockType: string) =>
   workspace.blocks && workspace.blocks.find(b => b.type === blockType);
 
+const RootBlock = ({ block }) =>
+  block &&
+  block.value && (
+    <TextBlock>
+      <BlockEditor
+        name={block.id}
+        blockId={block.id}
+        initialValue={databaseJSONToValue(block.value)}
+        readOnly={true}
+        availablePointers={[]}
+      />
+    </TextBlock>
+  );
+
 const RootWorkspace = ({ workspace }) => {
   const question = workspaceToBlock(workspace, "QUESTION");
   const answer = workspaceToBlock(workspace, "ANSWER");
   const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
   return (
     <WorkspaceStyle>
-      {question &&
-        question.value && (
-          <Link to={`/workspaces/${workspace.id}`}>
-            <TextBlock>
-              <BlockEditor
-                name={question.id}
-                blockId={question.id}
-                initialValue={databaseJSONToValue(question.value)}
-                readOnly={true}
-                availablePointers={[]}
-              />
-            </TextBlock>
-          </Link>
-        )}
-      {answer &&
-        answer.value && (
-          <TextBlock>
-            <BlockEditor
-              name={answer.id}
-              blockId={answer.id}
-              initialValue={databaseJSONToValue(answer.value)}
-              readOnly={true}
-              availablePointers={[]}
-            />
-          </TextBlock>
-        )}
+      <Link to={`/workspaces/${workspace.id}`}>
+        <RootBlock block={question} />
+      </Link>
+      <RootBlock block={answer} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <TreeButton className="pull-right">Tree</TreeButton>
       </Link>
       <Description>
-        {scratchpad &&
-          scratchpad.value && (
-            <TextBlock>
-              <BlockEditor
-                name={scratchpad.id}
-                blockId={scratchpad.id}
-                initialValue={databaseJSONToValue(scratchpad.value)}
-                readOnly={true}
-                availablePointers={[]}
-              />
-            </TextBlock>
-          )}
+        <RootBlock block={scratchpad} />
       </Description>
     </WorkspaceStyle>
   );
