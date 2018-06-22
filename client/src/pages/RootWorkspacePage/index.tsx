@@ -16,7 +16,7 @@ import { Auth } from "../../auth";
 const WorkspaceStyle = styled.div`
   border: 1px solid #ddd;
   padding: 3px;
-  margin-bottom: 3px;
+  margin-bottom: 15px;
 `;
 
 const ParentWorkspace = ({ workspace }) => {
