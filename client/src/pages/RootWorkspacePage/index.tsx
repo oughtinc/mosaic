@@ -44,17 +44,24 @@ const TreeButton = styled(Button)`
   margin: 2px 0;
 `;
 
-const ParentWorkspace = ({ workspace }) => {
-  const question =
-    workspace.blocks && workspace.blocks.find(b => b.type === "QUESTION");
-  const answer =
-    workspace.blocks && workspace.blocks.find(b => b.type === "ANSWER");
+const Description = styled.div`
+  display: block;
+  color: #bbb;
+`;
+
+const workspaceToBlock = (workspace: any, blockType: string) =>
+  workspace.blocks && workspace.blocks.find(b => b.type === blockType);
+
+const RootWorkspace = ({ workspace }) => {
+  const question = workspaceToBlock(workspace, "QUESTION");
+  const answer = workspaceToBlock(workspace, "ANSWER");
+  const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
   return (
     <WorkspaceStyle>
       {question &&
         question.value && (
-          <TextBlock>
-            <Link to={`/workspaces/${workspace.id}`}>
+          <Link to={`/workspaces/${workspace.id}`}>
+            <TextBlock>
               <BlockEditor
                 name={question.id}
                 blockId={question.id}
@@ -62,8 +69,8 @@ const ParentWorkspace = ({ workspace }) => {
                 readOnly={true}
                 availablePointers={[]}
               />
-            </Link>
-          </TextBlock>
+            </TextBlock>
+          </Link>
         )}
       {answer &&
         answer.value && (
@@ -80,6 +87,20 @@ const ParentWorkspace = ({ workspace }) => {
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <TreeButton className="pull-right">Tree</TreeButton>
       </Link>
+      <Description>
+        {scratchpad &&
+          scratchpad.value && (
+            <TextBlock>
+              <BlockEditor
+                name={scratchpad.id}
+                blockId={scratchpad.id}
+                initialValue={databaseJSONToValue(scratchpad.value)}
+                readOnly={true}
+                availablePointers={[]}
+              />
+            </TextBlock>
+          )}
+      </Description>
     </WorkspaceStyle>
   );
 };
@@ -130,7 +151,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
           <WorkspaceList>
             {workspaces &&
-              workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
+              workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAdmin() && (
