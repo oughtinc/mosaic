@@ -55,8 +55,8 @@ const ParentWorkspace = ({ workspace }) => {
         </Col>
         <Col sm={3} />
         <Col sm={1}>
-          <Link to={`/workspaces/${workspace.id}`}>
-            <Button> Open </Button>
+          <Link to={`/workspaces/${workspace.id}/subtree`}>
+            <Button>Tree</Button>
           </Link>
         </Col>
       </Row>
