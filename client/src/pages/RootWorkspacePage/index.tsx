@@ -107,7 +107,7 @@ const AuthMessage = () => {
     <Alert>
       <p>
         <strong>Welcome!</strong> Right now, Mosaic supports editing only for
-        authorized users, but you can browse the existing question-answer trees
+        administrators, but you can browse the existing question-answer trees
         below.
       </p>
       <p>
