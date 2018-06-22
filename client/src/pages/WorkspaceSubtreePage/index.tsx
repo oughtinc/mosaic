@@ -9,7 +9,9 @@ export class WorkspaceSubtreePage extends React.PureComponent<any, any> {
     return (
       <div>
         <BlockHoverMenu>
-          {workspaceId && <WorkspaceCard workspaceId={workspaceId} />}
+          {workspaceId && (
+            <WorkspaceCard parentPointers={[]} workspaceId={workspaceId} />
+          )}
         </BlockHoverMenu>
       </div>
     );

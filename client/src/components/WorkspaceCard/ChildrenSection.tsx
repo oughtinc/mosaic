@@ -41,7 +41,8 @@ export const ChildrenSection = ({
   workspace,
   workspaces,
   childrenToggle,
-  onChangeToggle
+  onChangeToggle,
+  parentPointers
 }) => {
   const children = workspace.childWorkspaceOrder.map(id =>
     workspaces.find(w => w.id === id)
@@ -56,7 +57,10 @@ export const ChildrenSection = ({
           <Collection>
             {children.map(child => (
               <ChildContainer key={child.id}>
-                <WorkspaceCard workspaceId={child.id} />
+                <WorkspaceCard
+                  workspaceId={child.id}
+                  parentPointers={parentPointers}
+                />
               </ChildContainer>
             ))}
           </Collection>
