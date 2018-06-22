@@ -14,6 +14,7 @@ import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
 const RootWorkspacePageSection = styled.div`
+  margin-top: 35px;
   margin-bottom: 50px;
 `;
 
