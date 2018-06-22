@@ -15,8 +15,6 @@ import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
 
 const BlockReadOnlyStyle = styled.div`
-  border: 1px solid #eee;
-  border-radius: 2px;
   padding: 0.3em;
 `;
 
