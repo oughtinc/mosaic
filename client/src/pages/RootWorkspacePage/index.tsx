@@ -124,7 +124,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     );
     return (
       <BlockHoverMenu>
-        {!Auth.isAuthenticated() && <AuthMessage />}
+        {!Auth.isAdmin() && <AuthMessage />}
         <RootWorkspacePageSection>
           <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
           <WorkspaceList>
