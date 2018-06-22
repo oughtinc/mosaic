@@ -14,6 +14,7 @@ import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
 const RootWorkspacePageSection = styled.div`
+  margin-top: 35px;
   margin-bottom: 50px;
 `;
 
@@ -43,42 +44,44 @@ const TreeButton = styled(Button)`
   margin: 2px 0;
 `;
 
-const ParentWorkspace = ({ workspace }) => {
-  const question =
-    workspace.blocks && workspace.blocks.find(b => b.type === "QUESTION");
-  const answer =
-    workspace.blocks && workspace.blocks.find(b => b.type === "ANSWER");
+const Description = styled.div`
+  display: block;
+  color: #bbb;
+`;
+
+const workspaceToBlock = (workspace: any, blockType: string) =>
+  workspace.blocks && workspace.blocks.find(b => b.type === blockType);
+
+const RootBlock = ({ block }) =>
+  block &&
+  block.value && (
+    <TextBlock>
+      <BlockEditor
+        name={block.id}
+        blockId={block.id}
+        initialValue={databaseJSONToValue(block.value)}
+        readOnly={true}
+        availablePointers={[]}
+      />
+    </TextBlock>
+  );
+
+const RootWorkspace = ({ workspace }) => {
+  const question = workspaceToBlock(workspace, "QUESTION");
+  const answer = workspaceToBlock(workspace, "ANSWER");
+  const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
   return (
     <WorkspaceStyle>
-      {question &&
-        question.value && (
-          <TextBlock>
-            <Link to={`/workspaces/${workspace.id}`}>
-              <BlockEditor
-                name={question.id}
-                blockId={question.id}
-                initialValue={databaseJSONToValue(question.value)}
-                readOnly={true}
-                availablePointers={[]}
-              />
-            </Link>
-          </TextBlock>
-        )}
-      {answer &&
-        answer.value && (
-          <TextBlock>
-            <BlockEditor
-              name={answer.id}
-              blockId={answer.id}
-              initialValue={databaseJSONToValue(answer.value)}
-              readOnly={true}
-              availablePointers={[]}
-            />
-          </TextBlock>
-        )}
+      <Link to={`/workspaces/${workspace.id}`}>
+        <RootBlock block={question} />
+      </Link>
+      <RootBlock block={answer} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <TreeButton className="pull-right">Tree</TreeButton>
       </Link>
+      <Description>
+        <RootBlock block={scratchpad} />
+      </Description>
     </WorkspaceStyle>
   );
 };
@@ -104,7 +107,7 @@ const AuthMessage = () => {
     <Alert>
       <p>
         <strong>Welcome!</strong> Right now, Mosaic supports editing only for
-        authorized users, but you can browse the existing question-answer trees
+        administrators, but you can browse the existing question-answer trees
         below.
       </p>
       <p>
@@ -118,18 +121,20 @@ const AuthMessage = () => {
 
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
+    const isLoading = this.props.originWorkspaces.loading;
     const workspaces = _.sortBy(
       this.props.originWorkspaces.workspaces,
       "createdAt"
     );
     return (
       <BlockHoverMenu>
-        {!Auth.isAuthenticated() && <AuthMessage />}
+        {!Auth.isAdmin() && <AuthMessage />}
         <RootWorkspacePageSection>
           <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
           <WorkspaceList>
-            {workspaces &&
-              workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
+            {isLoading
+              ? "Loading..."
+              : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAdmin() && (

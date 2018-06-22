@@ -98,6 +98,13 @@ const NavLink = styled(Link)`
   margin-right: 5px;
 `;
 
+const BlockContainer = styled.div`
+  border: 2px solid
+    ${(props: { readOnly: boolean }) => (props.readOnly ? "#ddd" : "#fff")};
+  padding: ${(props: { readOnly: boolean }) =>
+    props.readOnly ? "1em" : "0em"};
+`;
+
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
     <Button>Parent</Button>
@@ -168,6 +175,18 @@ export class FormPagePresentational extends React.Component<any, any> {
       ],
       p => p.data.pointerId
     );
+    const questionProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceQuestion,
+      workspace
+    ).blockEditorAttributes();
+    const scratchpadProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceScratchpad,
+      workspace
+    ).blockEditorAttributes();
+    const answerProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceAnswer,
+      workspace
+    ).blockEditorAttributes();
     return (
       <div key={workspace.id}>
         <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
@@ -193,10 +212,7 @@ export class FormPagePresentational extends React.Component<any, any> {
               <h1>
                 <BlockEditor
                   availablePointers={availablePointers}
-                  {...new WorkspaceBlockRelation(
-                    WorkspaceRelationTypes.WorkspaceQuestion,
-                    workspace
-                  ).blockEditorAttributes()}
+                  {...questionProps}
                 />
               </h1>
             </Col>
@@ -204,23 +220,21 @@ export class FormPagePresentational extends React.Component<any, any> {
           <Row>
             <Col sm={6}>
               <h3>Scratchpad</h3>
-              <BlockEditor
-                availablePointers={availablePointers}
-                {...new WorkspaceBlockRelation(
-                  WorkspaceRelationTypes.WorkspaceScratchpad,
-                  workspace
-                ).blockEditorAttributes()}
-                ref={this.registerEditorRef("scratchpadField")}
-              />
+              <BlockContainer readOnly={scratchpadProps.readOnly}>
+                <BlockEditor
+                  availablePointers={availablePointers}
+                  ref={this.registerEditorRef("scratchpadField")}
+                  {...scratchpadProps}
+                />
+              </BlockContainer>
               <h3>Answer</h3>
-              <BlockEditor
-                availablePointers={availablePointers}
-                {...new WorkspaceBlockRelation(
-                  WorkspaceRelationTypes.WorkspaceAnswer,
-                  workspace
-                ).blockEditorAttributes()}
-                ref={this.registerEditorRef("answerField")}
-              />
+              <BlockContainer readOnly={scratchpadProps.readOnly}>
+                <BlockEditor
+                  availablePointers={availablePointers}
+                  ref={this.registerEditorRef("answerField")}
+                  {...answerProps}
+                />
+              </BlockContainer>
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
