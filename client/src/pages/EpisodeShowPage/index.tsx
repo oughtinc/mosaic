@@ -98,12 +98,6 @@ const NavLink = styled(Link)`
   margin-right: 5px;
 `;
 
-const HomeLink = () => (
-  <NavLink to="/">
-    <Button>Home</Button>
-  </NavLink>
-);
-
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
     <Button>Parent</Button>
@@ -179,7 +173,6 @@ export class FormPagePresentational extends React.Component<any, any> {
         <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
           <Row>
             <Col sm={10}>
-              <HomeLink />
               {workspace.parentId && (
                 <ParentLink parentId={workspace.parentId} />
               )}
