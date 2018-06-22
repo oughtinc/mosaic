@@ -44,6 +44,7 @@ interface WorkspaceType {
 }
 
 interface WorkspaceCardProps {
+  parentPointers: ConnectedPointerType[];
   workspaceId: string;
 }
 
@@ -53,6 +54,8 @@ interface WorkspaceCardState {
     [toggleTypes.CHILDREN]: boolean;
   };
 }
+
+const getPointerId = (p: any) => p.data.pointerId;
 
 export class WorkspaceCardPresentational extends React.PureComponent<
   WorkspaceCardProps,
@@ -77,17 +80,26 @@ export class WorkspaceCardPresentational extends React.PureComponent<
   public render() {
     const workspaces: WorkspaceType[] =
       _.get(this.props, "workspaceSubtreeWorkspaces.subtreeWorkspaces") || [];
-    const availablePointers: ConnectedPointerType[] = _.chain(workspaces)
-      .map((w: any) => w.connectedPointers)
-      .flatten()
-      .uniqBy((p: any) => p.data.pointerId)
-      .value();
+
     const workspace: WorkspaceType | undefined = workspaces.find(
       w => w.id === this.props.workspaceId
     );
 
+    const newPointers: ConnectedPointerType[] = _.chain(workspaces)
+      .map((w: any) => w.connectedPointers)
+      .flatten()
+      .uniqBy(getPointerId)
+      .value();
+
+    const availablePointers: ConnectedPointerType[] = _.chain(
+      this.props.parentPointers
+    )
+      .concat(newPointers)
+      .uniqBy(getPointerId)
+      .value();
+
     if (!workspace) {
-      return <div> Loading </div>;
+      return <div>Loading...</div>;
     }
     return (
       <Container>
@@ -98,6 +110,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
           />
         </CardBody>
         <ChildrenSection
+          parentPointers={availablePointers}
           workspace={workspace}
           workspaces={workspaces}
           childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
