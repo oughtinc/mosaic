@@ -83,8 +83,8 @@ export class Home extends React.Component {
 
 const Routes = () => (
   <div>
-    <Route exact={true} path="/" render={() => <Redirect to="/workspaces" />} />
-    <Route exact={true} path="/workspaces" component={RootWorkspacePage} />
+    <Route exact={true} path="/workspaces" render={() => <Redirect to="/" />} />
+    <Route exact={true} path="/" component={RootWorkspacePage} />
     <Route
       exact={true}
       path="/workspaces/:workspaceId"
