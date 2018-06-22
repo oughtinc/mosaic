@@ -13,10 +13,34 @@ import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
-const WorkspaceStyle = styled.div`
+const RootWorkspacePageSection = styled.div`
+  margin-bottom: 50px;
+`;
+
+const RootWorkspacePageHeading = styled.h2`
+  font-size: 25px;
+`;
+
+const WorkspaceList = styled.div`
+  background-color: #f6f8fa;
+  padding: 1px;
   border: 1px solid #ddd;
-  padding: 3px;
-  margin-bottom: 15px;
+`;
+
+const WorkspaceStyle = styled.div`
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 1px 4px;
+  margin: 3px;
+`;
+
+const TextBlock = styled.div`
+  display: inline-block;
+`;
+
+const TreeButton = styled(Button)`
+  padding: 1px 4px;
+  margin: 2px 0;
 `;
 
 const ParentWorkspace = ({ workspace }) => {
@@ -26,40 +50,35 @@ const ParentWorkspace = ({ workspace }) => {
     workspace.blocks && workspace.blocks.find(b => b.type === "ANSWER");
   return (
     <WorkspaceStyle>
-      <Row>
-        <Col sm={4}>
-          {question &&
-            question.value && (
-              <Link to={`/workspaces/${workspace.id}`}>
-                <BlockEditor
-                  name={question.id}
-                  blockId={question.id}
-                  initialValue={databaseJSONToValue(question.value)}
-                  readOnly={true}
-                  availablePointers={[]}
-                />
-              </Link>
-            )}
-        </Col>
-        <Col sm={4}>
-          {answer &&
-            answer.value && (
+      {question &&
+        question.value && (
+          <TextBlock>
+            <Link to={`/workspaces/${workspace.id}`}>
               <BlockEditor
-                name={answer.id}
-                blockId={answer.id}
-                initialValue={databaseJSONToValue(answer.value)}
+                name={question.id}
+                blockId={question.id}
+                initialValue={databaseJSONToValue(question.value)}
                 readOnly={true}
                 availablePointers={[]}
               />
-            )}
-        </Col>
-        <Col sm={3} />
-        <Col sm={1}>
-          <Link to={`/workspaces/${workspace.id}/subtree`}>
-            <Button>Tree</Button>
-          </Link>
-        </Col>
-      </Row>
+            </Link>
+          </TextBlock>
+        )}
+      {answer &&
+        answer.value && (
+          <TextBlock>
+            <BlockEditor
+              name={answer.id}
+              blockId={answer.id}
+              initialValue={databaseJSONToValue(answer.value)}
+              readOnly={true}
+              availablePointers={[]}
+            />
+          </TextBlock>
+        )}
+      <Link to={`/workspaces/${workspace.id}/subtree`}>
+        <TreeButton className="pull-right">Tree</TreeButton>
+      </Link>
     </WorkspaceStyle>
   );
 };
@@ -68,9 +87,9 @@ class NewWorkspaceForm extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <h2>
-          {Auth.isAdmin() ? "New Public Question" : "New Personal Question"}
-        </h2>
+        <RootWorkspacePageHeading>
+          {Auth.isAdmin() ? "New Question (public)" : "New Question (private)"}
+        </RootWorkspacePageHeading>
         <NewBlockForm
           maxTotalBudget={10000}
           onMutate={this.props.onCreateWorkspace}
@@ -106,17 +125,23 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     return (
       <BlockHoverMenu>
         {!Auth.isAuthenticated() && <AuthMessage />}
-        <h2>Questions</h2>
-        {workspaces &&
-          workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
+        <RootWorkspacePageSection>
+          <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
+          <WorkspaceList>
+            {workspaces &&
+              workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
+          </WorkspaceList>
+        </RootWorkspacePageSection>
         {Auth.isAdmin() && (
-          <NewWorkspaceForm
-            onCreateWorkspace={({ question, totalBudget }) => {
-              this.props.createWorkspace({
-                variables: { question, totalBudget }
-              });
-            }}
-          />
+          <RootWorkspacePageSection>
+            <NewWorkspaceForm
+              onCreateWorkspace={({ question, totalBudget }) => {
+                this.props.createWorkspace({
+                  variables: { question, totalBudget }
+                });
+              }}
+            />
+          </RootWorkspacePageSection>
         )}
       </BlockHoverMenu>
     );
