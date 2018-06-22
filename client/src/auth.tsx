@@ -4,14 +4,13 @@ import * as auth0 from "auth0-js";
 import { Config } from "./config";
 
 export class Auth {
-
   public static auth0 = new auth0.WebAuth({
     domain: "mosaicapp.auth0.com",
     clientID: Config.auth0_client_id,
     redirectUri: Auth.redirectUri(),
     audience: "https://mosaicapp.auth0.com/userinfo",
     responseType: "token id_token",
-    scope: "openid user_metadata app_metadata",
+    scope: "openid user_metadata app_metadata"
   });
 
   public static login(): void {
@@ -39,7 +38,9 @@ export class Auth {
 
   public static setSession(authResult: any): void {
     // Set the time that the Access Token will expire at
-    const expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
+    const expiresAt = JSON.stringify(
+      authResult.expiresIn * 1000 + new Date().getTime()
+    );
     localStorage.setItem("access_token", authResult.accessToken);
     localStorage.setItem("id_token", authResult.idToken);
     localStorage.setItem("expires_at", expiresAt);
@@ -47,7 +48,7 @@ export class Auth {
   }
 
   public static isAuthenticated(): boolean {
-    // Check whether the current time is past the 
+    // Check whether the current time is past the
     // Access Token's expiry time
     const expiresJson = localStorage.getItem("expires_at");
     if (expiresJson === null) {
@@ -65,9 +66,6 @@ export class Auth {
 
   // TODO: Replace with permission based logic
   public static isAuthorizedToEditWorkspace(workspace: any): boolean {
-    if (!Auth.isAuthenticated()) {
-      return false;
-    }
     // TODO:
     // Check - is this an admin workspace & is this user an admin
     // Normal workspaces can be edited by anyone with the link & authed
@@ -78,13 +76,16 @@ export class Auth {
 
   // TODO: Replace with permission based logic
   public static isAuthorizedToEditBlock(blockId?: string): boolean {
-    if (!Auth.isAuthenticated() || !blockId) {
+    if (!blockId) {
       return false;
     }
     return Auth.isAdmin();
   }
-  
+
   public static isAdmin(): boolean {
+    if (!Auth.isAuthenticated()) {
+      return false;
+    }
     return localStorage.getItem("is_admin") === "true";
   }
 
