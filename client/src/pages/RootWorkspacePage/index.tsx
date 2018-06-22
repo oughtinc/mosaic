@@ -13,10 +13,34 @@ import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
-const WorkspaceStyle = styled.div`
+const RootWorkspacePageSection = styled.div`
+  margin-bottom: 50px;
+`;
+
+const RootWorkspacePageHeading = styled.h2`
+  font-size: 25px;
+`;
+
+const WorkspaceList = styled.div`
+  background-color: #f6f8fa;
+  padding: 1px;
   border: 1px solid #ddd;
-  padding: 3px;
-  margin-bottom: 3px;
+`;
+
+const WorkspaceStyle = styled.div`
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 1px 4px;
+  margin: 3px;
+`;
+
+const TextBlock = styled.div`
+  display: inline-block;
+`;
+
+const TreeButton = styled(Button)`
+  padding: 1px 4px;
+  margin: 2px 0;
 `;
 
 const ParentWorkspace = ({ workspace }) => {
@@ -26,10 +50,10 @@ const ParentWorkspace = ({ workspace }) => {
     workspace.blocks && workspace.blocks.find(b => b.type === "ANSWER");
   return (
     <WorkspaceStyle>
-      <Row>
-        <Col sm={4}>
-          {question &&
-            question.value && (
+      {question &&
+        question.value && (
+          <TextBlock>
+            <Link to={`/workspaces/${workspace.id}`}>
               <BlockEditor
                 name={question.id}
                 blockId={question.id}
@@ -37,27 +61,24 @@ const ParentWorkspace = ({ workspace }) => {
                 readOnly={true}
                 availablePointers={[]}
               />
-            )}
-        </Col>
-        <Col sm={4}>
-          {answer &&
-            answer.value && (
-              <BlockEditor
-                name={answer.id}
-                blockId={answer.id}
-                initialValue={databaseJSONToValue(answer.value)}
-                readOnly={true}
-                availablePointers={[]}
-              />
-            )}
-        </Col>
-        <Col sm={3} />
-        <Col sm={1}>
-          <Link to={`/workspaces/${workspace.id}`}>
-            <Button> Open </Button>
-          </Link>
-        </Col>
-      </Row>
+            </Link>
+          </TextBlock>
+        )}
+      {answer &&
+        answer.value && (
+          <TextBlock>
+            <BlockEditor
+              name={answer.id}
+              blockId={answer.id}
+              initialValue={databaseJSONToValue(answer.value)}
+              readOnly={true}
+              availablePointers={[]}
+            />
+          </TextBlock>
+        )}
+      <Link to={`/workspaces/${workspace.id}/subtree`}>
+        <TreeButton className="pull-right">Tree</TreeButton>
+      </Link>
     </WorkspaceStyle>
   );
 };
@@ -66,9 +87,9 @@ class NewWorkspaceForm extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <h2>
-          {Auth.isAdmin() ? "New Public Question" : "New Personal Question"}
-        </h2>
+        <RootWorkspacePageHeading>
+          {Auth.isAdmin() ? "New Question (public)" : "New Question (private)"}
+        </RootWorkspacePageHeading>
         <NewBlockForm
           maxTotalBudget={10000}
           onMutate={this.props.onCreateWorkspace}
@@ -82,38 +103,18 @@ const AuthMessage = () => {
   return (
     <Alert>
       <p>
-        <strong>Welcome!</strong> Right now, Mosaic supports editing only for{" "}
-        <a
-          href="#"
-          onClick={e => {
-            Auth.login();
-            e.preventDefault();
-          }}
-        >
-          authorized users
-        </a>, but you can browse the existing question-answer trees below.
+        <strong>Welcome!</strong> Right now, Mosaic supports editing only for
+        authorized users, but you can browse the existing question-answer trees
+        below.
       </p>
       <p>
         If you want to play with recursive question-answering yourself, we
-        currently recommend the command-line app{" "}
+        recommend the command-line app{" "}
         <a href="https://github.com/oughtinc/patchwork">Patchwork</a>.
       </p>
     </Alert>
   );
 };
-
-const LogoutButton = ({ onAuthAction }) => (
-  <Button
-    bsStyle="primary"
-    className="btn-margin"
-    onClick={() => {
-      Auth.logout();
-      onAuthAction();
-    }}
-  >
-    Log out
-  </Button>
-);
 
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
@@ -123,26 +124,24 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     );
     return (
       <BlockHoverMenu>
-        {Auth.isAuthenticated() ? (
-          <LogoutButton
-            onAuthAction={() => {
-              this.forceUpdate();
-            }}
-          />
-        ) : (
-          <AuthMessage />
-        )}
-        <h2>Questions</h2>
-        {workspaces &&
-          workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
+        {!Auth.isAuthenticated() && <AuthMessage />}
+        <RootWorkspacePageSection>
+          <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
+          <WorkspaceList>
+            {workspaces &&
+              workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
+          </WorkspaceList>
+        </RootWorkspacePageSection>
         {Auth.isAdmin() && (
-          <NewWorkspaceForm
-            onCreateWorkspace={({ question, totalBudget }) => {
-              this.props.createWorkspace({
-                variables: { question, totalBudget }
-              });
-            }}
-          />
+          <RootWorkspacePageSection>
+            <NewWorkspaceForm
+              onCreateWorkspace={({ question, totalBudget }) => {
+                this.props.createWorkspace({
+                  variables: { question, totalBudget }
+                });
+              }}
+            />
+          </RootWorkspacePageSection>
         )}
       </BlockHoverMenu>
     );

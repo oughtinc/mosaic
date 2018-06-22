@@ -2,7 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 import { Editor } from "slate-react";
 import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
-import { changeHoverItem, removeHoverItem, HOVER_ITEM_TYPES } from "../../modules/blockEditor/actions";
+import {
+  changeHoverItem,
+  removeHoverItem,
+  HOVER_ITEM_TYPES
+} from "../../modules/blockEditor/actions";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
@@ -11,9 +15,7 @@ import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
 
 const BlockReadOnlyStyle = styled.div`
-    border: 1px solid #eee;
-    border-radius: 2px;
-    padding: .3em;
+  padding: 0.3em;
 `;
 
 class BlockEditorPresentational extends React.Component<any, any> {
@@ -23,7 +25,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
-      plugins: [],
+      plugins: []
     };
   }
 
@@ -33,9 +35,9 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public shouldComponentUpdate(newProps: any) {
     if (
-      !_.isEqual(newProps.blockEditor, this.props.blockEditor)
-      || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
-      || !_.isEqual(newProps.block, this.props.block)
+      !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
+      !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
+      !_.isEqual(newProps.block, this.props.block)
     ) {
       return true;
     }
@@ -44,12 +46,12 @@ class BlockEditorPresentational extends React.Component<any, any> {
 
   public editor = () => {
     return this.blockEditorEditing && this.blockEditorEditing.editor;
-  }
+  };
 
   public componentWillReceiveProps(newProps: any) {
     if (
-      !_.isEqual(newProps.blockEditor, this.props.blockEditor)
-      || !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+      !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
+      !_.isEqual(newProps.availablePointers, this.props.availablePointers)
     ) {
       this.resetPlugins(newProps);
     }
@@ -66,7 +68,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           id: false,
           top,
           left,
-          blockId: newProps.blockId,
+          blockId: newProps.blockId
         });
       },
       onMouseOverPointerExport: ({ top, left, id }) => {
@@ -75,7 +77,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           id,
           top,
           left,
-          blockId: newProps.blockId,
+          blockId: newProps.blockId
         });
       },
       onMouseOverPointerImport: ({ top, left, id }) => {
@@ -84,18 +86,15 @@ class BlockEditorPresentational extends React.Component<any, any> {
           id,
           top,
           left,
-          blockId: false,
+          blockId: false
         });
       },
       blockEditor: newProps.blockEditor,
       exportingPointers: newProps.availablePointers,
-      isDisplayMode: newProps.isDisplayMode,
+      isDisplayMode: newProps.isDisplayMode
     };
     this.setState({
-      plugins: [
-        SoftBreak({}),
-        SlatePointers(SlatePointerInputs),
-      ],
+      plugins: [SoftBreak({}), SlatePointers(SlatePointerInputs)]
     });
   }
 
@@ -105,7 +104,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const blockForm = {
       id: blockId,
       name,
-      value: initialValue,
+      value: initialValue
     };
 
     this.props.addBlocks([blockForm]);
@@ -129,12 +128,15 @@ class BlockEditorPresentational extends React.Component<any, any> {
       return;
     }
 
-    if ((_.isElement(event.relatedTarget) && hoverMenu.contains(event.relatedTarget as Node))) {
+    if (
+      _.isElement(event.relatedTarget) &&
+      hoverMenu.contains(event.relatedTarget as Node)
+    ) {
       return;
     }
 
     this.props.removeHoverItem();
-  }
+  };
 
   public renderEditor(block: any) {
     const { readOnly } = this.props;
@@ -142,48 +144,47 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const { plugins } = this.state;
     return readOnly ? (
       <BlockReadOnlyStyle>
-        <Editor
-          value={value}
-          readOnly={true}
-          plugins={plugins}
-        />
+        <Editor value={value} readOnly={true} plugins={plugins} />
       </BlockReadOnlyStyle>
     ) : (
-        <BlockEditorEditing
-          value={value}
-          readOnly={true}
-          shouldAutosave={!!this.props.shouldAutosave}
-          block={this.props.block}
-          availablePointers={this.props.availablePointers}
-          plugins={plugins}
-          onChange={this.props.onChange}
-          onKeyDown={this.props.onKeyDown}
-          onMount={(input) => { this.blockEditorEditing = input; }}
-        />
-      );
+      <BlockEditorEditing
+        value={value}
+        readOnly={true}
+        shouldAutosave={!!this.props.shouldAutosave}
+        block={this.props.block}
+        availablePointers={this.props.availablePointers}
+        plugins={plugins}
+        onChange={this.props.onChange}
+        onKeyDown={this.props.onKeyDown}
+        onMount={input => {
+          this.blockEditorEditing = input;
+        }}
+      />
+    );
   }
 
   public render() {
     const block = this.props.block;
     if (!block) {
-      return (<div> loading... </div>);
+      return <div> loading... </div>;
     }
     return (
-      <div onMouseLeave={this.handleMouseLeave}>
-        {this.renderEditor(block)}
-      </div>
+      <div onMouseLeave={this.handleMouseLeave}>{this.renderEditor(block)}</div>
     );
   }
 }
 
 function mapStateToProps(state: any, { blockId }: any) {
   const { blocks, blockEditor } = state;
-  const block = blocks.blocks.find((b) => b.id === blockId);
+  const block = blocks.blocks.find(b => b.id === blockId);
   return { block, blockEditor };
 }
 
 export const BlockEditor: any = compose(
   connect(
-    mapStateToProps, { addBlocks, removeBlocks, changeHoverItem, removeHoverItem }, null, { withRef: true }
-  ),
+    mapStateToProps,
+    { addBlocks, removeBlocks, changeHoverItem, removeHoverItem },
+    null,
+    { withRef: true }
+  )
 )(BlockEditorPresentational);
