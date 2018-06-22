@@ -1,11 +1,11 @@
 import * as _ from "lodash";
 import * as React from "react";
-
+import styled from "styled-components";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
-import { Alert, Button, Col, Row } from "react-bootstrap";
-import styled from "styled-components";
+import { Alert, Button } from "react-bootstrap";
+
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
