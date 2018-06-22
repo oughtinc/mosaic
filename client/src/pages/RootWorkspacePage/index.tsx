@@ -95,7 +95,7 @@ const AuthMessage = () => {
       </p>
       <p>
         If you want to play with recursive question-answering yourself, we
-        currently recommend the command-line app{" "}
+        recommend the command-line app{" "}
         <a href="https://github.com/oughtinc/patchwork">Patchwork</a>.
       </p>
     </Alert>
