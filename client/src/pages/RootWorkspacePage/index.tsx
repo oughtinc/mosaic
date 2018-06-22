@@ -121,6 +121,7 @@ const AuthMessage = () => {
 
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
+    const isLoading = this.props.originWorkspaces.loading;
     const workspaces = _.sortBy(
       this.props.originWorkspaces.workspaces,
       "createdAt"
@@ -131,9 +132,9 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
         <RootWorkspacePageSection>
           <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
           <WorkspaceList>
-            {workspaces && workspaces.length > 0
-              ? workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)
-              : "Loading..."}
+            {isLoading
+              ? "Loading..."
+              : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAdmin() && (
