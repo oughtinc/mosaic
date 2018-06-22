@@ -131,8 +131,9 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
         <RootWorkspacePageSection>
           <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
           <WorkspaceList>
-            {workspaces &&
-              workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
+            {workspaces && workspaces.length > 0
+              ? workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)
+              : "Loading..."}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAdmin() && (
