@@ -21,6 +21,10 @@ const ChildStyle = styled.div`
   width: 100%;
 `;
 
+const ChildControls = styled.div`
+  margin-top: 0.5em;
+`;
+
 export class Child extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
@@ -54,7 +58,7 @@ export class Child extends React.Component<any, any> {
           />
         )}
 
-        <div>
+        <ChildControls>
           <Link to={`/workspaces/${workspace.id}`}>
             <Button> Open </Button>
           </Link>
@@ -77,7 +81,7 @@ export class Child extends React.Component<any, any> {
               {workspace.totalBudget}
             </Badge>
           </div>
-        </div>
+        </ChildControls>
         {this.state.showChildBudgetForm && (
           <ChildBudgetForm
             initialValue={workspace.totalBudget}
