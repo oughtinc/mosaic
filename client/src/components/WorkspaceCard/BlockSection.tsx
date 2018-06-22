@@ -54,7 +54,7 @@ const Block = ({ character, block, availablePointers, workspace }) => {
           blockId={block.id}
           readOnly={true}
           isDisplayMode={true}
-          initialValue={databaseJSONToValue(block.value)}
+          initialValue={value}
           shouldAutosave={false}
           availablePointers={availablePointers}
         />
