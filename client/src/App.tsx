@@ -18,7 +18,6 @@ import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import thunk from "redux-thunk";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
-import { ExampleShowPage } from "./pages/ExampleShowPage";
 
 import { Config } from "./config";
 import { Auth } from "./auth";
@@ -85,11 +84,6 @@ export class Home extends React.Component {
 const Routes = () => (
   <div>
     <Route exact={true} path="/" render={() => <Redirect to="/workspaces" />} />
-    <Route
-      exact={true}
-      path="/examples/:exampleName"
-      component={ExampleShowPage}
-    />
     <Route exact={true} path="/workspaces" component={RootWorkspacePage} />
     <Route
       exact={true}
