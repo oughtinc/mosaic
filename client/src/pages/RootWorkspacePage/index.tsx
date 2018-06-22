@@ -82,16 +82,9 @@ const AuthMessage = () => {
   return (
     <Alert>
       <p>
-        <strong>Welcome!</strong> Right now, Mosaic supports editing only for{" "}
-        <a
-          href="#"
-          onClick={e => {
-            Auth.login();
-            e.preventDefault();
-          }}
-        >
-          authorized users
-        </a>, but you can browse the existing question-answer trees below.
+        <strong>Welcome!</strong> Right now, Mosaic supports editing only for
+        authorized users, but you can browse the existing question-answer trees
+        below.
       </p>
       <p>
         If you want to play with recursive question-answering yourself, we
@@ -102,19 +95,6 @@ const AuthMessage = () => {
   );
 };
 
-const LogoutButton = ({ onAuthAction }) => (
-  <Button
-    bsStyle="primary"
-    className="btn-margin"
-    onClick={() => {
-      Auth.logout();
-      onAuthAction();
-    }}
-  >
-    Log out
-  </Button>
-);
-
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
     const workspaces = _.sortBy(
@@ -123,15 +103,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     );
     return (
       <BlockHoverMenu>
-        {Auth.isAuthenticated() ? (
-          <LogoutButton
-            onAuthAction={() => {
-              this.forceUpdate();
-            }}
-          />
-        ) : (
-          <AuthMessage />
-        )}
+        {!Auth.isAuthenticated() && <AuthMessage />}
         <h2>Questions</h2>
         {workspaces &&
           workspaces.map(w => <ParentWorkspace workspace={w} key={w.id} />)}
