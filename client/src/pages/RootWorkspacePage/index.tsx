@@ -30,13 +30,15 @@ const ParentWorkspace = ({ workspace }) => {
         <Col sm={4}>
           {question &&
             question.value && (
-              <BlockEditor
-                name={question.id}
-                blockId={question.id}
-                initialValue={databaseJSONToValue(question.value)}
-                readOnly={true}
-                availablePointers={[]}
-              />
+              <Link to={`/workspaces/${workspace.id}`}>
+                <BlockEditor
+                  name={question.id}
+                  blockId={question.id}
+                  initialValue={databaseJSONToValue(question.value)}
+                  readOnly={true}
+                  availablePointers={[]}
+                />
+              </Link>
             )}
         </Col>
         <Col sm={4}>
