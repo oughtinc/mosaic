@@ -8,113 +8,117 @@ import _ = require("lodash");
 import { WORKSPACE_SUBTREE_QUERY } from "../../graphqlQueries";
 
 export enum toggleTypes {
-    FULL,
-    QUESTION = 0,
-    ANSWER,
-    SCRATCHPAD,
-    CHILDREN,
+  FULL,
+  QUESTION = 0,
+  ANSWER,
+  SCRATCHPAD,
+  CHILDREN
 }
 
 const Container = styled.div`
-    float: left;
+  float: left;
 `;
 
 const CardBody = styled.div`
-    float: left;
-    margin-bottom: 1em;
-    width: 40em;
-    background: #f2f2f2;
-    border-radius: 0 2px 2px 2px;
+  float: left;
+  margin-bottom: 1em;
+  width: 40em;
+  background: #f2f2f2;
+  border-radius: 0 2px 2px 2px;
 `;
 
 // TODO: Eventually these should be used in a common file for many cases that use them.
 interface ConnectedPointerType {
-    data: any;
-    isVoid: boolean;
-    object: string;
-    type: string;
-    nodes: any[];
+  data: any;
+  isVoid: boolean;
+  object: string;
+  type: string;
+  nodes: any[];
 }
 
 interface WorkspaceType {
-    blocks: any[];
-    childWorkspaceOrder: string[];
-    connectedPointers: any;
-    id: string;
+  blocks: any[];
+  childWorkspaceOrder: string[];
+  connectedPointers: any;
+  id: string;
 }
 
 interface WorkspaceCardProps {
-    workspaceId: string;
+  workspaceId: string;
 }
 
 interface WorkspaceCardState {
-    toggles: {
-        [toggleTypes.SCRATCHPAD]: boolean,
-        [toggleTypes.CHILDREN]: boolean,
-    };
+  toggles: {
+    [toggleTypes.SCRATCHPAD]: boolean;
+    [toggleTypes.CHILDREN]: boolean;
+  };
 }
 
-export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCardProps, WorkspaceCardState> {
-    public constructor(props: any) {
-        super(props);
-        this.state = {
-            toggles: {
-                [toggleTypes.SCRATCHPAD]: true,
-                [toggleTypes.CHILDREN]: true,
-            },
-        };
-    }
+export class WorkspaceCardPresentational extends React.PureComponent<
+  WorkspaceCardProps,
+  WorkspaceCardState
+> {
+  public constructor(props: any) {
+    super(props);
+    this.state = {
+      toggles: {
+        [toggleTypes.SCRATCHPAD]: true,
+        [toggleTypes.CHILDREN]: true
+      }
+    };
+  }
 
-    public handleChangeToggle = (name: toggleTypes, value: boolean) => {
-        const newToggles = { ...this.state.toggles };
-        newToggles[name] = value;
-        this.setState({ toggles: newToggles });
-    }
+  public handleChangeToggle = (name: toggleTypes, value: boolean) => {
+    const newToggles = { ...this.state.toggles };
+    newToggles[name] = value;
+    this.setState({ toggles: newToggles });
+  };
 
-    public render() {
-        const workspaces: WorkspaceType[] = _.get(
-            this.props, "workspaceSubtreeWorkspaces.subtreeWorkspaces"
-        ) || [];
-        const availablePointers: ConnectedPointerType[] = _
-            .chain(workspaces)
-            .map((w: any) => w.connectedPointers)
-            .flatten()
-            .uniqBy((p: any) => p.data.pointerId)
-            .value();
-        const workspace: WorkspaceType | undefined = workspaces.find((w) =>
-            w.id === this.props.workspaceId);
+  public render() {
+    const workspaces: WorkspaceType[] =
+      _.get(this.props, "workspaceSubtreeWorkspaces.subtreeWorkspaces") || [];
+    const availablePointers: ConnectedPointerType[] = _.chain(workspaces)
+      .map((w: any) => w.connectedPointers)
+      .flatten()
+      .uniqBy((p: any) => p.data.pointerId)
+      .value();
+    const workspace: WorkspaceType | undefined = workspaces.find(
+      w => w.id === this.props.workspaceId
+    );
 
-        if (!workspace) {
-            return (<div> Loading </div>);
-        }
-        return (
-            <Container>
-                <CardBody>
-                    <BlockSection
-                        workspace={workspace}
-                        availablePointers={availablePointers}
-                    />
-                </CardBody>
-                <ChildrenSection
-                    workspace={workspace}
-                    workspaces={workspaces}
-                    childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
-                    onChangeToggle={() => this.handleChangeToggle(
-                        toggleTypes.CHILDREN,
-                        !this.state.toggles[toggleTypes.CHILDREN])
-                    }
-                />
-            </Container>
-        );
+    if (!workspace) {
+      return <div> Loading </div>;
     }
+    return (
+      <Container>
+        <CardBody>
+          <BlockSection
+            workspace={workspace}
+            availablePointers={availablePointers}
+          />
+        </CardBody>
+        <ChildrenSection
+          workspace={workspace}
+          workspaces={workspaces}
+          childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
+          onChangeToggle={() =>
+            this.handleChangeToggle(
+              toggleTypes.CHILDREN,
+              !this.state.toggles[toggleTypes.CHILDREN]
+            )
+          }
+        />
+      </Container>
+    );
+  }
 }
 const options = ({ workspaceId }) => ({
-    variables: { workspaceId },
+  variables: { workspaceId }
 });
 
 export const WorkspaceCard: any = compose(
-    graphql(
-        WORKSPACE_SUBTREE_QUERY,
-        { name: "workspaceSubtreeWorkspaces", options }
-    ),
+  graphql(WORKSPACE_SUBTREE_QUERY, {
+    name: "workspaceSubtreeWorkspaces",
+    options
+  })
 )(WorkspaceCardPresentational);

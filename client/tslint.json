@@ -113,10 +113,10 @@
         "jsx-double"
       ],
       "radix": true,
-      "no-extra-semi": false,
       "semicolon": [
         true,
-        "always"
+        "always",
+        "ignore-bound-class-methods"
       ],
       "switch-default": true,
       "trailing-comma": false,
