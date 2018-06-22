@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as LogRocket from "logrocket";
-
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
@@ -8,16 +7,18 @@ import { HttpLink } from "apollo-link-http";
 import { ApolloLink } from "apollo-link";
 import { onError } from "apollo-link-error";
 import { InMemoryCache } from "apollo-cache-inmemory";
+import { Provider } from "react-redux";
+import { composeWithDevTools } from "redux-devtools-extension";
+import thunk from "redux-thunk";
 import "bootstrap/dist/css/bootstrap.min.css";
+
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 import { applyMiddleware, combineReducers, createStore } from "redux";
-import { Provider } from "react-redux";
 import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
-import thunk from "redux-thunk";
-import { composeWithDevTools } from "redux-devtools-extension";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
+import { Header } from "./components/Header";
 
 import { Config } from "./config";
 import { Auth } from "./auth";
@@ -64,8 +65,11 @@ const client: any = new ApolloClient({
 export class Layout extends React.Component {
   public render() {
     return (
-      <div className="container-fluid">
-        <div className="app-content">{this.props.children}</div>
+      <div className="Layout">
+        <Header />
+        <div className="container-fluid">
+          <div className="app-content">{this.props.children}</div>
+        </div>
       </div>
     );
   }
