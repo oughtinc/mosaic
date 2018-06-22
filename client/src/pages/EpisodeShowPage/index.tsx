@@ -98,6 +98,13 @@ const NavLink = styled(Link)`
   margin-right: 5px;
 `;
 
+const BlockContainer = styled.div`
+  border: 2px solid
+    ${(props: { readOnly: boolean }) => (props.readOnly ? "#ddd" : "#fff")};
+  padding: ${(props: { readOnly: boolean }) =>
+    props.readOnly ? "1em" : "0em"};
+`;
+
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
     <Button>Parent</Button>
@@ -213,17 +220,21 @@ export class FormPagePresentational extends React.Component<any, any> {
           <Row>
             <Col sm={6}>
               <h3>Scratchpad</h3>
-              <BlockEditor
-                availablePointers={availablePointers}
-                ref={this.registerEditorRef("scratchpadField")}
-                {...scratchpadProps}
-              />
+              <BlockContainer readOnly={scratchpadProps.readOnly}>
+                <BlockEditor
+                  availablePointers={availablePointers}
+                  ref={this.registerEditorRef("scratchpadField")}
+                  {...scratchpadProps}
+                />
+              </BlockContainer>
               <h3>Answer</h3>
-              <BlockEditor
-                availablePointers={availablePointers}
-                ref={this.registerEditorRef("answerField")}
-                {...answerProps}
-              />
+              <BlockContainer readOnly={scratchpadProps.readOnly}>
+                <BlockEditor
+                  availablePointers={availablePointers}
+                  ref={this.registerEditorRef("answerField")}
+                  {...answerProps}
+                />
+              </BlockContainer>
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
