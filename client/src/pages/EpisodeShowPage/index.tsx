@@ -168,6 +168,18 @@ export class FormPagePresentational extends React.Component<any, any> {
       ],
       p => p.data.pointerId
     );
+    const questionProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceQuestion,
+      workspace
+    ).blockEditorAttributes();
+    const scratchpadProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceScratchpad,
+      workspace
+    ).blockEditorAttributes();
+    const answerProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceAnswer,
+      workspace
+    ).blockEditorAttributes();
     return (
       <div key={workspace.id}>
         <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
@@ -193,10 +205,7 @@ export class FormPagePresentational extends React.Component<any, any> {
               <h1>
                 <BlockEditor
                   availablePointers={availablePointers}
-                  {...new WorkspaceBlockRelation(
-                    WorkspaceRelationTypes.WorkspaceQuestion,
-                    workspace
-                  ).blockEditorAttributes()}
+                  {...questionProps}
                 />
               </h1>
             </Col>
@@ -206,20 +215,14 @@ export class FormPagePresentational extends React.Component<any, any> {
               <h3>Scratchpad</h3>
               <BlockEditor
                 availablePointers={availablePointers}
-                {...new WorkspaceBlockRelation(
-                  WorkspaceRelationTypes.WorkspaceScratchpad,
-                  workspace
-                ).blockEditorAttributes()}
                 ref={this.registerEditorRef("scratchpadField")}
+                {...scratchpadProps}
               />
               <h3>Answer</h3>
               <BlockEditor
                 availablePointers={availablePointers}
-                {...new WorkspaceBlockRelation(
-                  WorkspaceRelationTypes.WorkspaceAnswer,
-                  workspace
-                ).blockEditorAttributes()}
                 ref={this.registerEditorRef("answerField")}
+                {...answerProps}
               />
             </Col>
             <Col sm={6}>
