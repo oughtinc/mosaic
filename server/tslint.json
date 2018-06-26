@@ -1,7 +1,7 @@
 {
   "defaultSeverity": "warning",
   "rules": {
-    "no-default-export": true,
+    "no-default-export": false,
     "adjacent-overload-signatures": true,
     "no-var-requires": true,
     "prefer-const": true,
