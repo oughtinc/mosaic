@@ -1,11 +1,11 @@
-'use strict';
-const Sequelize = require('sequelize')
-import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
+"use strict";
+const Sequelize = require("sequelize")
+import { eventRelationshipColumns, eventHooks, addEventAssociations } from "../eventIntegration";
 const Op = Sequelize.Op;
 import * as _ from "lodash";
 
 const WorkspaceModel = (sequelize, DataTypes) => {
-  var Workspace = sequelize.define('Workspace', {
+  const Workspace = sequelize.define("Workspace", {
     id: {
       type: DataTypes.UUID(),
       primaryKey: true,
@@ -39,119 +39,119 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       }
     },
     remainingBudget: {
-      type: Sequelize.VIRTUAL(Sequelize.INTEGER, ['totalBudget', 'allocatedBudget']),
+      type: Sequelize.VIRTUAL(Sequelize.INTEGER, ["totalBudget", "allocatedBudget"]),
       get: function () {
-        return this.get('totalBudget') - this.get('allocatedBudget');
+        return this.get("totalBudget") - this.get("allocatedBudget");
       }
     },
     connectedPointers: {
-      type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ['id']),
+      type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
       get: async function () {
         const _connectedPointers = await this.getConnectedPointers();
-        let values: any = []
+        const values: any = [];
         for (const pointer of _connectedPointers) {
-          const value = await pointer.value
+          const value = await pointer.value;
           if (value) {
-            values.push(value)
+            values.push(value);
           } else {
-            console.error(`Error: Value for pointer with id ${pointer.id} was not found in its respecting block.`)
+            console.error(`Error: Value for pointer with id ${pointer.id} was not found in its respecting block.`);
           }
         }
-        return values.filter(v => !!v)
+        return values.filter(v => !!v);
       }
     },
-  }, {
+  },                                 {
       hooks: {
         ...eventHooks.beforeValidate,
         afterCreate: async (workspace, { event, questionValue }) => {
           const blocks = await workspace.getBlocks();
           if (questionValue) {
-            await workspace.createBlock({ type: "QUESTION", value: questionValue }, { event })
+            await workspace.createBlock({ type: "QUESTION", value: questionValue }, { event });
           } else {
-            await workspace.createBlock({ type: "QUESTION" }, { event })
+            await workspace.createBlock({ type: "QUESTION" }, { event });
           }
-          await workspace.createBlock({ type: "SCRATCHPAD" }, { event })
-          await workspace.createBlock({ type: "ANSWER" }, { event })
+          await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
+          await workspace.createBlock({ type: "ANSWER" }, { event });
         },
       }
     });
   Workspace.associate = function (models) {
-    Workspace.ChildWorkspaces = Workspace.hasMany(models.Workspace, { as: 'childWorkspaces', foreignKey: 'parentId' })
-    Workspace.PointerImports = Workspace.hasMany(models.PointerImport, { as: 'pointerImports', foreignKey: 'workspaceId' })
-    Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: 'parentWorkspace', foreignKey: 'parentId' })
-    Workspace.Blocks = Workspace.hasMany(models.Block, { as: 'blocks', foreignKey: 'workspaceId' })
-    addEventAssociations(Workspace, models)
-  }
+    Workspace.ChildWorkspaces = Workspace.hasMany(models.Workspace, { as: "childWorkspaces", foreignKey: "parentId" });
+    Workspace.PointerImports = Workspace.hasMany(models.PointerImport, { as: "pointerImports", foreignKey: "workspaceId" });
+    Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, { as: "parentWorkspace", foreignKey: "parentId" });
+    Workspace.Blocks = Workspace.hasMany(models.Block, { as: "blocks", foreignKey: "workspaceId" });
+    addEventAssociations(Workspace, models);
+  };
 
   Workspace.createAsChild = async function ({ parentId, question, totalBudget }, { event }) {
-    const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget }, { event, questionValue: question })
-    return _workspace
-  }
+    const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget }, { event, questionValue: question });
+    return _workspace;
+  };
 
   Workspace.prototype.workSpaceOrderAppend = function (element) {
-    return [...this.childWorkspaceOrder, element]
-  }
+    return [...this.childWorkspaceOrder, element];
+  };
 
   Workspace.prototype.changeAllocationToChild = async function (childWorkspace: any, newTotalBudget: number, { event }) {
-    const budgetToAddToChild = newTotalBudget - childWorkspace.totalBudget
+    const budgetToAddToChild = newTotalBudget - childWorkspace.totalBudget;
 
-    const childHasNecessaryBudget = newTotalBudget >= childWorkspace.allocatedBudget
+    const childHasNecessaryBudget = newTotalBudget >= childWorkspace.allocatedBudget;
     if (!childHasNecessaryBudget) {
-      throw new Error(`Child workspace allocated budget ${childWorkspace.allocatedBudget} exceeds new totalBudget ${newTotalBudget}`)
+      throw new Error(`Child workspace allocated budget ${childWorkspace.allocatedBudget} exceeds new totalBudget ${newTotalBudget}`);
     }
 
-    const parentHasNeccessaryRemainingBudget = this.remainingBudget - budgetToAddToChild >= 0
+    const parentHasNeccessaryRemainingBudget = this.remainingBudget - budgetToAddToChild >= 0;
     if (!parentHasNeccessaryRemainingBudget) {
-      throw new Error(`This workspace does not have the allocated budget necessary for child to get ${budgetToAddToChild} difference`)
+      throw new Error(`This workspace does not have the allocated budget necessary for child to get ${budgetToAddToChild} difference`);
     }
 
-    await childWorkspace.update({ totalBudget: newTotalBudget }, { event })
+    await childWorkspace.update({ totalBudget: newTotalBudget }, { event });
 
     await this.update({
       allocatedBudget: this.allocatedBudget + budgetToAddToChild,
-    }, { event })
-  }
+    },                { event });
+  };
 
   Workspace.prototype.updatePointerImports = async function (pointerIds, { event }) {
-    const pointerImports = await this.getPointerImports()
+    const pointerImports = await this.getPointerImports();
     for (const pointerId of _.uniq(pointerIds)) {
       if (!_.includes(pointerImports.map(p => p.pointerId), pointerId)) {
         const pointer = await sequelize.models.Pointer.findById(pointerId);
         if (!pointer) {
-          console.error("The relevant pointer for pointer import ", pointerId, " does not exist.")
+          console.error("The relevant pointer for pointer import ", pointerId, " does not exist.");
         } else {
-          await this.createPointerImport({ pointerId }, { event })
+          await this.createPointerImport({ pointerId }, { event });
         }
       }
     }
-  }
+  };
 
   Workspace.prototype.createChild = async function ({ event, question, totalBudget }) {
-    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget }, { event })
+    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget }, { event });
     if (this.remainingBudget < child.totalBudget) {
-      throw new Error(`Parent workspace does not have enough remainingBudget. Has: ${this.remainingBudget}. Needs: ${child.totalBudget}.`)
+      throw new Error(`Parent workspace does not have enough remainingBudget. Has: ${this.remainingBudget}. Needs: ${child.totalBudget}.`);
     }
     const newAllocatedBudget = this.allocatedBudget + child.totalBudget;
     await this.update({
       allocatedBudget: newAllocatedBudget,
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
-    }, { event })
-    return child
-  }
+    },                { event });
+    return child;
+  };
 
-  //private
+  // private
   Workspace.prototype.getConnectedPointers = async function () {
-    const blocks = await this.visibleBlocks()
-    let _connectedPointers: string[] = []
+    const blocks = await this.visibleBlocks();
+    let _connectedPointers: string[] = [];
     for (const block of blocks) {
-      const blockPointerIds = await block.connectedPointers()
-      _connectedPointers = [..._connectedPointers, ...blockPointerIds]
+      const blockPointerIds = await block.connectedPointers();
+      _connectedPointers = [..._connectedPointers, ...blockPointerIds];
     }
 
-    return _connectedPointers
-  }
+    return _connectedPointers;
+  };
 
-  //private
+  // private
   Workspace.prototype.visibleBlocks = async function () {
     let blocks = await this.getBlocks();
     const connectingChildBlocks = await sequelize.models.Block.findAll({
@@ -163,10 +163,10 @@ const WorkspaceModel = (sequelize, DataTypes) => {
           [Op.in]: ["QUESTION", "ANSWER"],
         }
       }
-    })
-    blocks = [...blocks, ...connectingChildBlocks]
-    return blocks
-  }
+    });
+    blocks = [...blocks, ...connectingChildBlocks];
+    return blocks;
+  };
 
   return Workspace;
 };
