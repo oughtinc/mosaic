@@ -1,7 +1,4 @@
 {
-  "extends": [
-    "tslint-react"
-  ],
   "defaultSeverity": "warning",
   "rules": {
     "no-default-export": true,
