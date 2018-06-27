@@ -24,9 +24,7 @@ if (!process.env.USING_DOCKER) {
   });
 }
 
-graphQLServer.use('/graphql', bodyParser.json(), (req, res, next) => {
-  return graphqlExpress({ schema, context: { authorization: req.headers.authorization, user_id: req.headers.user_id } })(req, res, next)
-});
+graphQLServer.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 graphQLServer.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 graphQLServer.listen(GRAPHQL_PORT, () => {

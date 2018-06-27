@@ -43,12 +43,10 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 const authLink = new ApolloLink((operation, forward) => {
-  operation.setContext(context => ({
-    ...context,
+  operation.setContext(({ headers }) => ({
     headers: {
-      ...context.headers,
-      authorization: Auth.accessToken() ? `Bearer ${Auth.accessToken()}` : null,
-      user_id: Auth.idToken()
+      ...headers,
+      authorization: Auth.accessToken() ? `Bearer ${Auth.accessToken()}` : null
     }
   }));
   return forward ? forward(operation) : null;

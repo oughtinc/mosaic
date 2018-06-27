@@ -54,7 +54,7 @@ export class Auth {
     if (expiresJson === null) {
       return false;
     }
-    const expiresAt = JSON.parse(expiresJson);
+    let expiresAt = JSON.parse(expiresJson);
     const isExpired = new Date().getTime() > Number(expiresAt);
     if (isExpired) {
       Auth.logout();
@@ -91,10 +91,6 @@ export class Auth {
 
   public static accessToken(): string | null {
     return localStorage.getItem("access_token");
-  }
-
-  public static idToken(): string | null {
-    return localStorage.getItem("id_token");
   }
 
   // TODO: Need to trigger a rerender
