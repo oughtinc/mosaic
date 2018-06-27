@@ -160,7 +160,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       return <div> Loading </div>;
     }
 
-    let importedPointers = workspace.connectedPointers;
+    const importedPointers = workspace.connectedPointers;
     const allReadOnlyBlocks = new WorkspaceWithRelations(
       workspace
     ).allReadOnlyBlocks();
