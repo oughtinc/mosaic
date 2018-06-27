@@ -93,6 +93,10 @@ export class Auth {
     return localStorage.getItem("access_token");
   }
 
+  public static idToken(): string | null {
+    return localStorage.getItem("id_token");
+  }
+
   // TODO: Need to trigger a rerender
   public static getProfile(): void {
     const root = "https://mosaic:auth0:com/";
