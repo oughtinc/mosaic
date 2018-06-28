@@ -5,9 +5,12 @@ import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSc
 import * as GraphQLJSON from "graphql-type-json";
 import * as auth0 from "auth0-js";
 
+const { auth0_client_id } = require(__dirname + "/../../config/config.json");
+
 const webAuth = new auth0.WebAuth({
   domain: "mosaicapp.auth0.com",
-  clientID: "EZ-0m1RSRMHwrY_iBZshi7-G4rfyPAOY"
+  clientID: auth0_client_id,
+  scope: "openid user_metadata app_metadata"
 });
 
 const generateReferences = (model, references) => {
@@ -74,7 +77,7 @@ const BlockInput = new GraphQLInputObjectType({
   fields: _.pick(attributeFields(models.Block), "value", "id"),
 });
 
-function modelGraphQLFields(type, model) {
+function modelGraphQLFields(type: any, model: any) {
   return ({
     type,
     args: { where: { type: GraphQLJSON } },
@@ -82,19 +85,18 @@ function modelGraphQLFields(type, model) {
   });
 }
 
-function userIDFromAuthToken(accessToken: string): Promise<string | null> {
-  console.log(accessToken);
-  if (accessToken == null) {
+function userFromAuthToken(accessToken: string | null): Promise<any | null> {
+  if (accessToken == null || accessToken === "null") {
     return Promise.resolve(null);
   }
 
   return new Promise(resolve => {
-    webAuth.client.userInfo(accessToken, function (err, user) {
+    webAuth.client.userInfo(accessToken, function (err: any, user: any) {
       if (err != null) {
         console.log("UserInfo error:", err);
         return resolve(null);
       }
-      return resolve(user.sub);
+      return resolve({ user_id: user.sub, is_admin: user["https://mosaic:auth0:com/app_metadata"].is_admin });
     });
   });
 }
@@ -113,8 +115,8 @@ const schema = new GraphQLSchema({
         type: new GraphQLList(workspaceType),
         args: { workspaceId: { type: GraphQLString } },
         resolve: async (_, { workspaceId }, context, info) => {
-          const userID = await userIDFromAuthToken(context.authorization);
-          console.log("Got userID", userID);
+          const user = await userFromAuthToken(context.authorization);
+          console.log("Got user", user);
 
           const rootWorkspace = await models.Workspace.findById(workspaceId);
           const children = await rootWorkspace.getChildWorkspaces();
