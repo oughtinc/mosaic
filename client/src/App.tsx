@@ -47,7 +47,7 @@ const authLink = new ApolloLink((operation, forward) => {
     ...context,
     headers: {
       ...context.headers,
-      authorization: Auth.accessToken() ? `Bearer ${Auth.accessToken()}` : null,
+      authorization: Auth.accessToken(),
       user_id: Auth.idToken()
     }
   }));

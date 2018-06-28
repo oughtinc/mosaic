@@ -3,6 +3,12 @@ import * as _ from "lodash";
 import { resolver, attributeFields } from "graphql-sequelize";
 import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLInputObjectType } from "graphql";
 import * as GraphQLJSON from "graphql-type-json";
+import * as auth0 from "auth0-js";
+
+const webAuth = new auth0.WebAuth({
+  domain: "mosaicapp.auth0.com",
+  clientID: "EZ-0m1RSRMHwrY_iBZshi7-G4rfyPAOY"
+});
 
 const generateReferences = (model, references) => {
   const all = {};
@@ -76,6 +82,23 @@ function modelGraphQLFields(type, model) {
   });
 }
 
+function userIDFromAuthToken(accessToken: string): Promise<string | null> {
+  console.log(accessToken);
+  if (accessToken == null) {
+    return Promise.resolve(null);
+  }
+
+  return new Promise(resolve => {
+    webAuth.client.userInfo(accessToken, function (err, user) {
+      if (err != null) {
+        console.log("UserInfo error:", err);
+        return resolve(null);
+      }
+      return resolve(user.sub);
+    });
+  });
+}
+
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
@@ -90,7 +113,8 @@ const schema = new GraphQLSchema({
         type: new GraphQLList(workspaceType),
         args: { workspaceId: { type: GraphQLString } },
         resolve: async (_, { workspaceId }, context, info) => {
-          console.log(context);
+          const userID = await userIDFromAuthToken(context.authorization);
+          console.log("Got userID", userID);
 
           const rootWorkspace = await models.Workspace.findById(workspaceId);
           const children = await rootWorkspace.getChildWorkspaces();
