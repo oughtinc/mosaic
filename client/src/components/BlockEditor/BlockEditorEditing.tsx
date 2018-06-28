@@ -10,7 +10,7 @@ import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
-import { exportSelection } from "../../modules/blockEditor/actions";
+import { exportSelection, exportRange } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 
@@ -194,6 +194,35 @@ export class BlockEditorEditingPresentational extends React.Component<BlockEdito
         if (this.props.onChange) {
             this.props.onChange(value);
         }
+        console.log(value.document.text);
+        const newText = value.document.text;
+        const bracketRegex = /\[(.*?)\]/g;
+        const match = newText.match(bracketRegex);
+        if (match !== null) {
+            const startIndex = newText.indexOf(match[0]);
+            const length = match[0].length;
+            console.log(startIndex, length);
+            const range = new Range();
+            // range.set
+
+            // this.props.exportRange(range);
+            console.log(match);
+            console.log(value.document.getTextAtOffset(startIndex).text); //, value.document.getLastText);
+        }
+
+
+
+        // Get the text +
+        // Check the text to see if there is CREATEPOINTERCONDITION +
+        //    Which is a regex that scans the text to see if there is a open and closed bracket+
+        //        Create the regex in an online regex maker+
+        //    Returns the range of the text+
+        // If so, start the CPC logic with the range
+        //      Pass the range to the block editor action.ts
+        //      Convert the range into a new block
+        //      Dispatch an update block event.
+        //      Delete the brackets from the text,
+        // else do nothing
     }
 
     private updateEditor = (input: any) => {
@@ -239,7 +268,7 @@ function mapStateToProps(state: any) {
 
 export const BlockEditorEditing: any = compose(
     connect(
-        mapStateToProps, { updateBlock, exportSelection }, null, { withRef: true }
+        mapStateToProps, { updateBlock, exportSelection, exportRange }, null, { withRef: true }
     ),
     graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer", withRef: true }),
     withState("mutationStatus", "setMutationStatus", { status: MutationStatus.NotStarted }),
