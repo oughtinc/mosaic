@@ -1,4 +1,5 @@
 {
+    "auth0_client_id": "EZ-0m1RSRMHwrY_iBZshi7-G4rfyPAOY",
     "development": {
         "use_env_variable": "DATABASE_URL",
         "dialect": "postgres"
