@@ -24,7 +24,7 @@ const BlockModel = (sequelize, DataTypes) => {
       type: DataTypes.JSON
     },
   },
-                                 {
+    {
       hooks: {
         beforeValidate: async (item, options) => {
           eventHooks.beforeValidate(item, options);

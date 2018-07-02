@@ -81,7 +81,18 @@ function modelGraphQLFields(type: any, model: any) {
   return ({
     type,
     args: { where: { type: GraphQLJSON } },
-    resolve: resolver(model)
+    resolve: resolver(model, {
+      before: async function (findOptions, args, context, info) {
+        // const user = await userFromAuthToken(context.authorization);
+        // if (!user) {
+        //   throw new Error("No current user!");
+        // }
+        // findOptions.where = {
+        //   id: context.user.id
+        // };
+        return findOptions;
+      }
+    })
   });
 }
 

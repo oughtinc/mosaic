@@ -8,7 +8,7 @@ const EventModel = (sequelize, DataTypes) => {
       autoIncrement: true,
       allowNull: false,
     },
-  },                             {
+  }, {
       hooks: {
         beforeCreate: async (event, options) => {
           const recentEvents = await Event.findAll({

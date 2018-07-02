@@ -1,10 +1,10 @@
 "use strict";
-const Sequelize = require("sequelize")
+import * as Sequelize from "sequelize";
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from "../eventIntegration";
 const Op = Sequelize.Op;
 import * as _ from "lodash";
 
-const WorkspaceModel = (sequelize, DataTypes) => {
+const WorkspaceModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) => {
   const Workspace = sequelize.define("Workspace", {
     id: {
       type: DataTypes.UUID(),
@@ -12,18 +12,23 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
+    creatorId: {
+      type: DataTypes.STRING,
+      defaultValue: null,
+      allowNull: true,
+    },
     ...eventRelationshipColumns(DataTypes),
     childWorkspaceOrder: {
       type: DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue: []
     },
     hasBeenDeletedByAncestor: {
-      type: DataTypes.BOOLEAN(),
+      type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false
     },
     totalBudget: {
-      type: DataTypes.INTEGER(),
+      type: DataTypes.INTEGER,
       defaultValue: 1,
       allowNull: false,
       validate: {
@@ -31,7 +36,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       }
     },
     allocatedBudget: {
-      type: DataTypes.INTEGER(),
+      type: DataTypes.INTEGER,
       defaultValue: 1,
       allowNull: false,
       validate: {
