@@ -31,6 +31,8 @@ const WORKSPACE_QUERY = gql`
     workspace(id: $id) {
       id
       parentId
+      creatorId
+      public
       childWorkspaceOrder
       connectedPointers
       totalBudget

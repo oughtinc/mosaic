@@ -33,7 +33,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.map(({ message, locations, path }) =>
       console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        `[GraphQL error]: Message: ${message}. Path: ${path}`, locations
       )
     );
   }
@@ -47,8 +47,7 @@ const authLink = new ApolloLink((operation, forward) => {
     ...context,
     headers: {
       ...context.headers,
-      authorization: Auth.accessToken(),
-      user_id: Auth.idToken()
+      authorization: Auth.accessToken()
     }
   }));
   return forward ? forward(operation) : null;

@@ -5,6 +5,8 @@ export const CREATE_ROOT_WORKSPACE = gql`
     createWorkspace(question:$question, totalBudget:$totalBudget ){
         id
         parentId
+        creatorId
+        public
         childWorkspaceOrder
         totalBudget 
         allocatedBudget 
@@ -32,6 +34,8 @@ export const WORKSPACES_QUERY = gql`
         workspaces(where:{parentId:null, hasBeenDeletedByAncestor:false}){
           id
           parentId
+          creatorId
+          public
           childWorkspaceOrder
           totalBudget 
           createdAt
