@@ -166,28 +166,25 @@ const schema = new GraphQLSchema({
     fields: {
       updateBlocks: {
         type: new GraphQLList(blockType),
-        args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
-        resolve: async (_, { workspaceId, blocks }, context) => {
+        args: { blocks: { type: new GraphQLList(BlockInput) } },
+        resolve: async (_, { blocks }, context) => {
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error("Got null user while attempting to update blocks");
           }
 
-          console.log(workspaceId);
-
-          const workspace = await models.Workspace.findById(workspaceId);
-          if (workspace == null) {
-            throw new Error("Got null workspace while attempting to update blocks");
-          }
-
-          // TODO: Not getting workspace here. Fix.
-          if (!user.is_admin && workspace.creatorId !== user.user_id) {
-            throw new Error("Non-admin, non-creator user attempted to edit block on workspace");
-          }
           const event = await models.Event.create();
           let newBlocks: any = [];
           for (const _block of blocks) {
             const block = await models.Block.findById(_block.id);
+
+            const workspace = await models.Workspace.findById(block.workspaceId);
+            if (workspace == null) {
+              throw new Error("Got null workspace while attempting to update blocks");
+            }
+            if (!user.is_admin && workspace.publicSpace) {
+              throw new Error("Non-admin user attempted to edit block on public workspace");
+            }
             await block.update({ ..._block }, { event });
             newBlocks = [...newBlocks, block];
           }

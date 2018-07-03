@@ -32,8 +32,7 @@ export class Child extends React.Component<any, any> {
   }
 
   public render() {
-    const workspace = this.props.workspace;
-    const availablePointers = this.props.availablePointers;
+    const { workspace, availablePointers } = this.props;
     const questionRelationship = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.SubworkspaceQuestion,
       workspace
