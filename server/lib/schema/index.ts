@@ -169,7 +169,15 @@ const schema = new GraphQLSchema({
         args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
         resolve: async (_, { workspaceId, blocks }, context) => {
           const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error("Got null user while attempting to update blocks");
+          }
           const workspace = await models.Workspace.findById(workspaceId);
+          if (workspace == null) {
+            throw new Error("Got null workspace while attempting to update blocks");
+          }
+
+          // TODO: Not getting workspace here. Fix.
           if (!user.is_admin && workspace.creatorId !== user.user_id) {
             throw new Error("Non-admin, non-creator user attempted to edit block on workspace");
           }

@@ -67,7 +67,7 @@ export class Auth {
   }
 
   // TODO: Replace with permission based logic
-  public static isAuthorizedToEditWorkspace(workspace: any | null): boolean {
+  public static isAuthorizedToEditWorkspace(workspace?: any): boolean {
     if (workspace == null) {
       return false;
     }
@@ -79,14 +79,16 @@ export class Auth {
     if (workspace.public) {
       return Auth.isAdmin();
     } else {
-      return Auth.userId() !== null;
+      return Auth.isAuthenticated();
     }
 
   }
 
   // TODO: Replace with permission based logic
   public static isAuthorizedToEditBlock(blockId?: string): boolean {
-    if (!blockId) {
+    if (blockId == null) {
+      console.log("No blockid");
+
       return false;
     }
     return Auth.isAdmin();
