@@ -89,7 +89,7 @@ function modelGraphQLFields(type: any, model: any) {
         //   console.log("User:", user);
         // }
         // findOptions.where = {
-        //   [Sequelize.Op.or]: [{ creatorId: user.user_id }, { public: true }]
+        //   [Sequelize.Op.or]: [{ creatorId: user.user_id }, { publicSpace: true }]
         // };
         return findOptions;
       }
@@ -128,14 +128,14 @@ const schema = new GraphQLSchema({
             if (user == null) {
               console.log("no user");
               findOptions.where = {
-                public: true
+                publicSpace: true
               };
             } else if (user.is_admin) {
               console.log("admin");
             } else {
               console.log("user");
               findOptions.where = {
-                [Sequelize.Op.or]: [{ creatorId: user.user_id }, { public: true }]
+                [Sequelize.Op.or]: [{ creatorId: user.user_id }, { publicSpace: true }]
               };
             }
             return findOptions;
@@ -172,6 +172,9 @@ const schema = new GraphQLSchema({
           if (user == null) {
             throw new Error("Got null user while attempting to update blocks");
           }
+
+          console.log(workspaceId);
+
           const workspace = await models.Workspace.findById(workspaceId);
           if (workspace == null) {
             throw new Error("Got null workspace while attempting to update blocks");
@@ -209,8 +212,11 @@ const schema = new GraphQLSchema({
             throw new Error("No user found when attempting to create workspace.");
           }
           const event = await models.Event.create();
-          console.log("Creating workspace - is user admin?", user.is_admin);
-          const workspace = await models.Workspace.create({ totalBudget, creatorId: user.user_id, public: user.is_admin }, { event, questionValue: JSON.parse(question) });
+
+          // TODO: Replace with an argument that allows an admin to set private/public
+          const publicSpace = user.is_admin;
+
+          const workspace = await models.Workspace.create({ totalBudget, creatorId: user.user_id, publicSpace }, { event, questionValue: JSON.parse(question) });
           return workspace;
         }
       },
@@ -227,7 +233,7 @@ const schema = new GraphQLSchema({
             throw new Error("Non-admin, non-creator user attempted to create child workspace");
           }
           const event = await models.Event.create();
-          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget, creatorId: user.user_id, public: user.is_admin });
+          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget, creatorId: user.user_id, publicSpace: user.is_admin });
           return child;
         }
       },
