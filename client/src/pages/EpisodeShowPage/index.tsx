@@ -240,6 +240,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
+                workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}
                 workspaceOrder={workspace.childWorkspaceOrder}

@@ -137,7 +137,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
               : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
-        {Auth.userId() && (
+        {Auth.isAuthenticated() && (
           <RootWorkspacePageSection>
             <NewWorkspaceForm
               onCreateWorkspace={({ question, totalBudget }) => {
