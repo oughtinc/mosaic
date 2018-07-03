@@ -88,7 +88,6 @@ export class Auth {
   public static isAuthorizedToEditBlock(blockId?: string): boolean {
     if (blockId == null) {
       console.log("No blockid");
-
       return false;
     }
     return Auth.isAdmin();
