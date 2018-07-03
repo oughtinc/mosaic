@@ -19,7 +19,7 @@ export class NewBlockForm extends React.Component<any, any> {
     }
 
     public render() {
-        if (!this.state.id) { return (<div/>); }
+        if (!this.state.id) { return (<div />); }
         return (
             <div key={this.state.id}>
                 <BlockEditor
@@ -38,11 +38,11 @@ export class NewBlockForm extends React.Component<any, any> {
                     value={this.state.totalBudget}
                     placeholder="budget"
                     onChange={(e: any) => {
-                        const {value} = e.target;
-                        if (value === "") { this.setState({totalBudget: value}); }
+                        const { value } = e.target;
+                        if (value === "") { this.setState({ totalBudget: value }); }
                         const valueAsInt = parseInt(value, 10);
                         if (!!valueAsInt && valueAsInt > 0 && valueAsInt <= this.props.maxTotalBudget) {
-                            this.setState({totalBudget: valueAsInt});
+                            this.setState({ totalBudget: valueAsInt });
                         }
                     }}
                 />
@@ -65,13 +65,13 @@ export class NewBlockForm extends React.Component<any, any> {
     }
 
     private blankState = () => ({
-            id: uuidv1(),
-            blockValue: {},
-            totalBudget: this.props.totalBudget || "",
+        id: uuidv1(),
+        blockValue: {},
+        totalBudget: this.props.totalBudget || "",
     })
 
     private onSubmit = () => {
-        this.props.onMutate({question: valueToDatabaseJSON(this.state.blockValue), totalBudget: this.state.totalBudget});
+        this.props.onMutate({ question: valueToDatabaseJSON(this.state.blockValue), totalBudget: this.state.totalBudget });
         // This isn't the most elegant way to reset the component. If we want to go the full redux route,
         // the state should probably eventually be moved into Redux.
         this.setState(this.blankState());

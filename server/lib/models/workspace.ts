@@ -13,9 +13,14 @@ const WorkspaceModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.Dat
       allowNull: false,
     },
     creatorId: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       defaultValue: null,
       allowNull: true,
+    },
+    public: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
     },
     ...eventRelationshipColumns(DataTypes),
     childWorkspaceOrder: {
@@ -88,8 +93,8 @@ const WorkspaceModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.Dat
     addEventAssociations(Workspace, models);
   };
 
-  Workspace.createAsChild = async function ({ parentId, question, totalBudget }, { event }) {
-    const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget }, { event, questionValue: question });
+  Workspace.createAsChild = async function ({ parentId, question, totalBudget, creatorId }, { event }) {
+    const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget, creatorId }, { event, questionValue: question });
     return _workspace;
   };
 
@@ -131,8 +136,8 @@ const WorkspaceModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.Dat
     }
   };
 
-  Workspace.prototype.createChild = async function ({ event, question, totalBudget }) {
-    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget }, { event });
+  Workspace.prototype.createChild = async function ({ event, question, totalBudget, creatorId }) {
+    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget, creatorId }, { event });
     if (this.remainingBudget < child.totalBudget) {
       throw new Error(`Parent workspace does not have enough remainingBudget. Has: ${this.remainingBudget}. Needs: ${child.totalBudget}.`);
     }

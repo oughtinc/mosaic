@@ -4,6 +4,7 @@ import { resolver, attributeFields } from "graphql-sequelize";
 import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLInputObjectType } from "graphql";
 import * as GraphQLJSON from "graphql-type-json";
 import * as auth0 from "auth0-js";
+import * as Sequelize from "sequelize";
 
 const { auth0_client_id } = require(__dirname + "/../../config/config.json");
 
@@ -84,11 +85,11 @@ function modelGraphQLFields(type: any, model: any) {
     resolve: resolver(model, {
       before: async function (findOptions, args, context, info) {
         // const user = await userFromAuthToken(context.authorization);
-        // if (!user) {
-        //   throw new Error("No current user!");
+        // if (user) {
+        //   console.log("User:", user);
         // }
         // findOptions.where = {
-        //   id: context.user.id
+        //   [Sequelize.Op.or]: [{ creatorId: user.user_id }, { public: true }]
         // };
         return findOptions;
       }
@@ -107,7 +108,9 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
         console.log("UserInfo error:", err);
         return resolve(null);
       }
-      return resolve({ user_id: user.sub, is_admin: user["https://mosaic:auth0:com/app_metadata"].is_admin });
+      const metadataKey = "https://mosaic:auth0:com/app_metadata";
+      const isAdmin = user[metadataKey] ? user[metadataKey].is_admin : false;
+      return resolve({ user_id: user.sub, is_admin: isAdmin });
     });
   });
 }
@@ -116,7 +119,29 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
-      workspaces: modelGraphQLFields(new GraphQLList(workspaceType), models.Workspace),
+      workspaces: {
+        type: new GraphQLList(workspaceType),
+        args: { where: { type: GraphQLJSON } },
+        resolve: resolver(models.Workspace, {
+          before: async function (findOptions, args, context, info) {
+            const user = await userFromAuthToken(context.authorization);
+            if (user == null) {
+              console.log("no user");
+              findOptions.where = {
+                public: true
+              };
+            } else if (user.is_admin) {
+              console.log("admin");
+            } else {
+              console.log("user");
+              findOptions.where = {
+                [Sequelize.Op.or]: [{ creatorId: user.user_id }, { public: true }]
+              };
+            }
+            return findOptions;
+          }
+        })
+      },
       workspace: {
         type: workspaceType,
         args: { id: { type: GraphQLString } },
@@ -126,9 +151,6 @@ const schema = new GraphQLSchema({
         type: new GraphQLList(workspaceType),
         args: { workspaceId: { type: GraphQLString } },
         resolve: async (_, { workspaceId }, context, info) => {
-          const user = await userFromAuthToken(context.authorization);
-          console.log("Got user", user);
-
           const rootWorkspace = await models.Workspace.findById(workspaceId);
           const children = await rootWorkspace.getChildWorkspaces();
           return [rootWorkspace, ...children];
@@ -145,7 +167,12 @@ const schema = new GraphQLSchema({
       updateBlocks: {
         type: new GraphQLList(blockType),
         args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
-        resolve: async (_, { workspaceId, blocks }) => {
+        resolve: async (_, { workspaceId, blocks }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          const workspace = await models.Workspace.findById(workspaceId);
+          if (!user.is_admin && workspace.creatorId !== user.user_id) {
+            throw new Error("Non-admin, non-creator user attempted to edit block on workspace");
+          }
           const event = await models.Event.create();
           let newBlocks: any = [];
           for (const _block of blocks) {
@@ -168,28 +195,48 @@ const schema = new GraphQLSchema({
       createWorkspace: {
         type: workspaceType,
         args: { question: { type: GraphQLJSON }, totalBudget: { type: GraphQLInt } },
-        resolve: async (_, { question, totalBudget }) => {
+        resolve: async (_, { question, totalBudget }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error("No user found when attempting to create workspace.");
+          }
           const event = await models.Event.create();
-          const workspace = await models.Workspace.create({ totalBudget }, { event, questionValue: JSON.parse(question) });
+          console.log("Creating workspace - is user admin?", user.is_admin);
+          const workspace = await models.Workspace.create({ totalBudget, creatorId: user.user_id, public: user.is_admin }, { event, questionValue: JSON.parse(question) });
           return workspace;
         }
       },
       createChildWorkspace: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, totalBudget: { type: GraphQLInt } },
-        resolve: async (_, { workspaceId, question, totalBudget }) => {
+        resolve: async (_, { workspaceId, question, totalBudget }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error("No user found when attempting to create child workspace.");
+          }
           const workspace = await models.Workspace.findById(workspaceId);
+          if (!user.is_admin && workspace.creatorId !== user.user_id) {
+            throw new Error("Non-admin, non-creator user attempted to create child workspace");
+          }
           const event = await models.Event.create();
-          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget });
+          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget, creatorId: user.user_id, public: user.is_admin });
           return child;
         }
       },
       updateChildTotalBudget: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, childId: { type: GraphQLString }, totalBudget: { type: GraphQLInt } },
-        resolve: async (_, { workspaceId, childId, totalBudget }) => {
+        resolve: async (_, { workspaceId, childId, totalBudget }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error("No user found when attempting to update child workspace.");
+          }
+
           const event = await models.Event.create();
           const workspace = await models.Workspace.findById(workspaceId);
+          if (!user.is_admin && workspace.creatorId !== user.user_id) {
+            throw new Error("Non-admin, non-creator user attempted to update child workspace");
+          }
           const child = await models.Workspace.findById(childId);
           await workspace.changeAllocationToChild(child, totalBudget, { event });
         }

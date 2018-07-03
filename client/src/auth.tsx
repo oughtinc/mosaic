@@ -23,6 +23,7 @@ export class Auth {
     localStorage.removeItem("id_token");
     localStorage.removeItem("expires_at");
     localStorage.removeItem("is_admin");
+    localStorage.removeItem("user_id");
   }
 
   public static handleAuthentication(): void {
@@ -44,6 +45,7 @@ export class Auth {
     localStorage.setItem("access_token", authResult.accessToken);
     localStorage.setItem("id_token", authResult.idToken);
     localStorage.setItem("expires_at", expiresAt);
+
     Auth.getProfile();
   }
 
@@ -65,13 +67,21 @@ export class Auth {
   }
 
   // TODO: Replace with permission based logic
-  public static isAuthorizedToEditWorkspace(workspace: any): boolean {
+  public static isAuthorizedToEditWorkspace(workspace: any | null): boolean {
+    if (workspace == null) {
+      return false;
+    }
     // TODO:
     // Check - is this an admin workspace & is this user an admin
     // Normal workspaces can be edited by anyone with the link & authed
     // Need to upgrade workspace schema with a "public_workspace" bool column
     //    and "creator_id" string column
-    return Auth.isAdmin();
+    if (workspace.public) {
+      return Auth.isAdmin();
+    } else {
+      return Auth.userId() !== null;
+    }
+
   }
 
   // TODO: Replace with permission based logic
@@ -93,8 +103,8 @@ export class Auth {
     return localStorage.getItem("access_token");
   }
 
-  public static idToken(): string | null {
-    return localStorage.getItem("id_token");
+  public static userId(): string | null {
+    return localStorage.getItem("user_id");
   }
 
   // TODO: Need to trigger a rerender
@@ -115,6 +125,7 @@ export class Auth {
       if (appMetadata != null && appMetadata.is_admin != null) {
         localStorage.setItem("is_admin", appMetadata.is_admin);
       }
+      localStorage.setItem("user_id", profile.sub);
     });
   }
 
