@@ -76,7 +76,7 @@ export class Auth {
     // Normal workspaces can be edited by anyone with the link & authed
     // Need to upgrade workspace schema with a "public_workspace" bool column
     //    and "creator_id" string column
-    if (workspace.public) {
+    if (workspace.publicSpace) {
       return Auth.isAdmin();
     } else {
       return Auth.isAuthenticated();
