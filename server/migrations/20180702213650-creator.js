@@ -12,7 +12,7 @@ module.exports = {
     );
     await queryInterface.addColumn(
       'Workspaces',
-      'public', {
+      'publicSpace', {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
@@ -21,6 +21,6 @@ module.exports = {
   },
   down: async function (queryInterface, Sequelize) {
     await queryInterface.removeColumn('Workspaces', 'creatorId');
-    await queryInterface.removeColumn('Workspaces', 'public');
+    await queryInterface.removeColumn('Workspaces', 'publicSpace');
   }
 }

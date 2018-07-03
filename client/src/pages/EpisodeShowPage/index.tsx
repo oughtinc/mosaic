@@ -32,7 +32,7 @@ const WORKSPACE_QUERY = gql`
       id
       parentId
       creatorId
-      public
+      publicSpace
       childWorkspaceOrder
       connectedPointers
       totalBudget
