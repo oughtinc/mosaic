@@ -38,6 +38,7 @@ export class Auth {
         Auth.getProfile(callback);
       } else if (err) {
         console.error("Authentication error: ", err);
+        callback();
       }
     });
   }
