@@ -116,11 +116,11 @@ const schema = new GraphQLSchema({
             const user = await userFromAuthToken(context.authorization);
             if (user == null) {
               findOptions.where = {
-                publicSpace: true
+                isPublic: true
               };
             } else if (!user.is_admin) {
               findOptions.where = {
-                [Sequelize.Op.or]: [{ creatorId: user.user_id }, { publicSpace: true }]
+                [Sequelize.Op.or]: [{ creatorId: user.user_id }, { isPublic: true }]
               };
             }
             return findOptions;
@@ -167,7 +167,7 @@ const schema = new GraphQLSchema({
             if (workspace == null) {
               throw new Error("Got null workspace while attempting to update blocks");
             }
-            if (!user.is_admin && workspace.publicSpace) {
+            if (!user.is_admin && workspace.isPublic) {
               throw new Error("Non-admin user attempted to edit block on public workspace");
             }
             await block.update({ ..._block }, { event });
@@ -196,9 +196,9 @@ const schema = new GraphQLSchema({
           const event = await models.Event.create();
 
           // TODO: Replace with an argument that allows an admin to set private/public
-          const publicSpace = user.is_admin;
+          const isPublic = user.is_admin;
 
-          const workspace = await models.Workspace.create({ totalBudget, creatorId: user.user_id, publicSpace }, { event, questionValue: JSON.parse(question) });
+          const workspace = await models.Workspace.create({ totalBudget, creatorId: user.user_id, isPublic }, { event, questionValue: JSON.parse(question) });
           return workspace;
         }
       },
@@ -215,7 +215,7 @@ const schema = new GraphQLSchema({
             throw new Error("Non-admin, non-creator user attempted to create child workspace");
           }
           const event = await models.Event.create();
-          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget, creatorId: user.user_id, publicSpace: user.is_admin });
+          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget, creatorId: user.user_id, isPublic: user.is_admin });
           return child;
         }
       },

@@ -6,7 +6,7 @@ export const CREATE_ROOT_WORKSPACE = gql`
         id
         parentId
         creatorId
-        publicSpace
+        isPublic
         childWorkspaceOrder
         totalBudget 
         allocatedBudget 
@@ -35,7 +35,7 @@ export const WORKSPACES_QUERY = gql`
           id
           parentId
           creatorId
-          publicSpace
+          isPublic
           childWorkspaceOrder
           totalBudget 
           createdAt
