@@ -8,10 +8,10 @@ export const getAllInlinesAsArray = (node) => {
         if (child.object === "inline") {
             array.push(child);
         }
-        if (_.has(child, 'nodes')) {
-            array = array.concat(getAllInlinesAsArray(child))
+        if (_.has(child, "nodes")) {
+            array = array.concat(getAllInlinesAsArray(child));
         }
     });
 
     return array;
-}
+};

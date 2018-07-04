@@ -1,9 +1,9 @@
-'use strict';
-import Sequelize from 'sequelize';
-import {eventRelationshipColumns, eventHooks, addEventAssociations} from '../eventIntegration';
+"use strict";
+import Sequelize from "sequelize";
+import { eventRelationshipColumns, eventHooks, addEventAssociations } from "../eventIntegration";
 
 const PointerImportModel = (sequelize, DataTypes) => {
-  var PointerImport = sequelize.define('PointerImport', {
+  const PointerImport = sequelize.define("PointerImport", {
     id: {
       type: DataTypes.UUID(),
       primaryKey: true,
@@ -14,19 +14,19 @@ const PointerImportModel = (sequelize, DataTypes) => {
     isLocked: {
       type: DataTypes.BOOLEAN,
     },
-  }, {
-    hooks: {
+  },                                     {
+      hooks: {
         beforeValidate: eventHooks.beforeValidate,
-    },
-  })
+      },
+    });
 
-  PointerImport.associate = function(models){
-    PointerImport.Pointer = PointerImport.belongsTo(models.Pointer, {as: 'pointer', foreignKey: 'pointerId'})
-    PointerImport.Workspace = PointerImport.belongsTo(models.Workspace, {as: 'workspace', foreignKey: 'workspaceId'})
-    addEventAssociations(PointerImport, models)
-  }
+  PointerImport.associate = function (models: any) {
+    PointerImport.Pointer = PointerImport.belongsTo(models.Pointer, { as: "pointer", foreignKey: "pointerId" });
+    PointerImport.Workspace = PointerImport.belongsTo(models.Workspace, { as: "workspace", foreignKey: "workspaceId" });
+    addEventAssociations(PointerImport, models);
+  };
 
-  return PointerImport
+  return PointerImport;
 };
 
-export default PointerImportModel
+export default PointerImportModel;

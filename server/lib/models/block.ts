@@ -1,11 +1,11 @@
-import Sequelize from 'sequelize';
-import { eventRelationshipColumns, eventHooks, addEventAssociations } from '../eventIntegration';
+import Sequelize from "sequelize";
+import { eventRelationshipColumns, eventHooks, addEventAssociations } from "../eventIntegration";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
-import { Value } from "slate"
+import { Value } from "slate";
 import * as _ from "lodash";
 
 const BlockModel = (sequelize, DataTypes) => {
-  var Block = sequelize.define('Block', {
+  const Block = sequelize.define("Block", {
     id: {
       type: DataTypes.UUID(),
       primaryKey: true,
@@ -14,7 +14,7 @@ const BlockModel = (sequelize, DataTypes) => {
     },
     ...eventRelationshipColumns(DataTypes),
     type: {
-      type: DataTypes.ENUM('QUESTION', 'ANSWER', 'SCRATCHPAD'),
+      type: DataTypes.ENUM("QUESTION", "ANSWER", "SCRATCHPAD"),
       allowNull: false
     },
     value: {
@@ -23,26 +23,27 @@ const BlockModel = (sequelize, DataTypes) => {
     cachedExportPointerValues: {
       type: DataTypes.JSON
     },
-  }, {
+  },
+                                 {
       hooks: {
         beforeValidate: async (item, options) => {
           eventHooks.beforeValidate(item, options);
-          item.cachedExportPointerValues = await item.exportingPointerValues()
+          item.cachedExportPointerValues = await item.exportingPointerValues();
         },
         beforeUpdate: (item, options) => {
           options.fields = item.changed();
         },
         afterSave: async (item, options) => {
-          await item.ensureAllPointersAreInDatabase({ event: options.event })
+          await item.ensureAllPointersAreInDatabase({ event: options.event });
         }
       },
     });
 
-  Block.associate = function (models) {
-    Block.Workspace = Block.belongsTo(models.Workspace, { foreignKey: 'workspaceId' })
-    Block.ExportingPointers = Block.hasMany(models.Pointer, { as: 'exportingPointers', foreignKey: 'sourceBlockId' })
-    addEventAssociations(Block, models)
-  }
+  Block.associate = function (models: any) {
+    Block.Workspace = Block.belongsTo(models.Workspace, { foreignKey: "workspaceId" });
+    Block.ExportingPointers = Block.hasMany(models.Pointer, { as: "exportingPointers", foreignKey: "sourceBlockId" });
+    addEventAssociations(Block, models);
+  };
 
   Block.prototype.ensureAllPointersAreInDatabase = async function ({ event }) {
     const exportingPointers = await this.getExportingPointers();
@@ -50,61 +51,61 @@ const BlockModel = (sequelize, DataTypes) => {
 
     for (const pointerId of Object.keys(cachedExportPointerValues)) {
       if (!_.includes(exportingPointers.map(p => p.id), pointerId)) {
-        await this.createExportingPointer({ id: pointerId }, { event })
+        await this.createExportingPointer({ id: pointerId }, { event });
       }
     }
-  }
+  };
 
   Block.prototype.connectedPointers = async function () {
-    const pointers = await this.topLevelPointers()
+    const pointers = await this.topLevelPointers();
 
     let allPointers = [...pointers];
     for (const pointer of pointers) {
       const subPointers = await pointer.containedPointers();
-      allPointers = [...allPointers, ...subPointers]
+      allPointers = [...allPointers, ...subPointers];
     }
-    return _.uniqBy(allPointers, 'id')
-  }
+    return _.uniqBy(allPointers, "id");
+  };
 
-  //private
+  // private
   Block.prototype.topLevelPointers = async function () {
-    const topLevelPointerIds = await this.topLevelPointersIds()
-    let pointers: any = []
+    const topLevelPointerIds = await this.topLevelPointersIds();
+    const pointers: any = [];
     for (const id of topLevelPointerIds) {
-      const pointer = await sequelize.models.Pointer.findById(id)
+      const pointer = await sequelize.models.Pointer.findById(id);
       if (!!pointer) {
-        pointers.push(pointer)
+        pointers.push(pointer);
       } else {
-        console.error(`Referenced pointer with ID ${id} not found in database.`)
+        console.error(`Referenced pointer with ID ${id} not found in database.`);
       }
     }
-    return _.uniqBy(pointers, 'id')
-  }
+    return _.uniqBy(pointers, "id");
+  };
 
-  //private
+  // private
   Block.prototype.topLevelPointersIds = async function () {
-    if (!this.dataValues.value) { return [] }
+    if (!this.dataValues.value) { return []; }
     const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
-    let pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
-    return pointers.map(p => p.data.pointerId)
+    const pointers = _getInlinesAsArray.filter((l) => l.type === "pointerImport" || l.type === "pointerExport");
+    return pointers.map(p => p.data.pointerId);
 
-  }
+  };
 
-  //private
+  // private
   Block.prototype.exportingPointerValues = async function () {
     if (!this.dataValues.value) {
-      return {}
+      return {};
     }
 
     const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
     const pointers = _getInlinesAsArray.filter((l) => l.type === "pointerExport");
 
-    let results = {}
+    const results = {};
     for (const pointer of pointers) {
       results[pointer.data.pointerId] = pointer;
     }
-    return results
-  }
+    return results;
+  };
 
   return Block;
 };
