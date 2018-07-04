@@ -82,18 +82,7 @@ function modelGraphQLFields(type: any, model: any) {
   return ({
     type,
     args: { where: { type: GraphQLJSON } },
-    resolve: resolver(model, {
-      before: async function (findOptions, args, context, info) {
-        // const user = await userFromAuthToken(context.authorization);
-        // if (user) {
-        //   console.log("User:", user);
-        // }
-        // findOptions.where = {
-        //   [Sequelize.Op.or]: [{ creatorId: user.user_id }, { publicSpace: true }]
-        // };
-        return findOptions;
-      }
-    })
+    resolve: resolver(model)
   });
 }
 
@@ -126,14 +115,10 @@ const schema = new GraphQLSchema({
           before: async function (findOptions, args, context, info) {
             const user = await userFromAuthToken(context.authorization);
             if (user == null) {
-              console.log("no user");
               findOptions.where = {
                 publicSpace: true
               };
-            } else if (user.is_admin) {
-              console.log("admin");
-            } else {
-              console.log("user");
+            } else if (!user.is_admin) {
               findOptions.where = {
                 [Sequelize.Op.or]: [{ creatorId: user.user_id }, { publicSpace: true }]
               };
