@@ -116,13 +116,15 @@ const schema = new GraphQLSchema({
             const user = await userFromAuthToken(context.authorization);
             if (user == null) {
               findOptions.where = {
-                isPublic: true
+                isPublic: true, ...findOptions.where
               };
             } else if (!user.is_admin) {
               findOptions.where = {
-                [Sequelize.Op.or]: [{ creatorId: user.user_id }, { isPublic: true }]
+                [Sequelize.Op.or]: [{ creatorId: user.user_id }, { isPublic: true }],
+                ...findOptions.where
               };
             }
+
             return findOptions;
           }
         })
