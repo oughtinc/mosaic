@@ -1,23 +1,19 @@
-// var models = require('../models');
 import * as models from "../models";
-import * as _ from 'lodash';
-import { resolver, attributeFields } from 'graphql-sequelize';
-import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLInputObjectType } from 'graphql';
-import * as aasync from "async";
-import * as pluralize from "pluralize";
-import * as Case from "Case";
-import * as GraphQLJSON from 'graphql-type-json';
+import * as _ from "lodash";
+import { resolver, attributeFields } from "graphql-sequelize";
+import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLInputObjectType } from "graphql";
+import * as GraphQLJSON from "graphql-type-json";
 
 const generateReferences = (model, references) => {
-  let all = {};
+  const all = {};
   references.map(r => {
     all[r[0]] = {
       type: r[1](),
       resolve: resolver(model[r[2]])
-    }
-  })
-  return all
-}
+    };
+  });
+  return all;
+};
 
 const makeObjectType = (model, references, extraFields = {}) => (
   new GraphQLObjectType({
@@ -25,64 +21,64 @@ const makeObjectType = (model, references, extraFields = {}) => (
     description: model.name,
     fields: () => _.assign(attributeFields(model), generateReferences(model, references), extraFields)
   })
-)
+);
 
-let standardReferences = [
-  ['createdAtEvent', () => eventType, 'CreatedAtEvent'],
-  ['updatedAtEvent', () => eventType, 'UpdatedAtEvent'],
-]
+const standardReferences = [
+  ["createdAtEvent", () => eventType, "CreatedAtEvent"],
+  ["updatedAtEvent", () => eventType, "UpdatedAtEvent"],
+];
 
-let blockType = makeObjectType(models.Block,
-  [
+const blockType = makeObjectType(models.Block,
+                                 [
     ...standardReferences,
-    ['workspace', () => workspaceType, 'Workspace'],
+    ["workspace", () => workspaceType, "Workspace"],
   ]
-)
+);
 
-let workspaceType = makeObjectType(models.Workspace,
-  [
+const workspaceType = makeObjectType(models.Workspace,
+                                     [
     ...standardReferences,
-    ['childWorkspaces', () => new GraphQLList(workspaceType), 'ChildWorkspaces'],
-    ['parentWorkspace', () => new GraphQLList(workspaceType), 'ParentWorkspace'],
-    ['blocks', () => new GraphQLList(blockType), 'Blocks'],
-    ['pointerImports', () => new GraphQLList(pointerImportType), 'PointerImports'],
+    ["childWorkspaces", () => new GraphQLList(workspaceType), "ChildWorkspaces"],
+    ["parentWorkspace", () => new GraphQLList(workspaceType), "ParentWorkspace"],
+    ["blocks", () => new GraphQLList(blockType), "Blocks"],
+    ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"],
   ]
-)
+);
 
-let eventType = makeObjectType(models.Event, [])
+const eventType = makeObjectType(models.Event, []);
 
-let pointerType = makeObjectType(models.Pointer,
-  [
+const pointerType = makeObjectType(models.Pointer,
+                                   [
     ...standardReferences,
-    ['pointerImport', () => pointerImportType, 'PointerImport'],
-    ['sourceBlock', () => blockType, 'SourceBlock'],
+    ["pointerImport", () => pointerImportType, "PointerImport"],
+    ["sourceBlock", () => blockType, "SourceBlock"],
   ],
-)
+);
 
-let pointerImportType = makeObjectType(models.PointerImport,
-  [
+const pointerImportType = makeObjectType(models.PointerImport,
+                                         [
     ...standardReferences,
-    ['workspace', () => blockType, 'Workspace'],
-    ['pointer', () => pointerType, 'Pointer'],
+    ["workspace", () => blockType, "Workspace"],
+    ["pointer", () => pointerType, "Pointer"],
   ]
-)
+);
 
 const BlockInput = new GraphQLInputObjectType({
   name: "blockInput",
-  fields: _.pick(attributeFields(models.Block), 'value', 'id'),
-})
+  fields: _.pick(attributeFields(models.Block), "value", "id"),
+});
 
 function modelGraphQLFields(type, model) {
   return ({
     type,
     args: { where: { type: GraphQLJSON } },
     resolve: resolver(model)
-  })
+  });
 }
 
-let schema = new GraphQLSchema({
+const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
-    name: 'RootQueryType',
+    name: "RootQueryType",
     fields: {
       workspaces: modelGraphQLFields(new GraphQLList(workspaceType), models.Workspace),
       workspace: {
@@ -94,9 +90,9 @@ let schema = new GraphQLSchema({
         type: new GraphQLList(workspaceType),
         args: { workspaceId: { type: GraphQLString } },
         resolve: async (_, { workspaceId }) => {
-          const rootWorkspace = await models.Workspace.findById(workspaceId)
+          const rootWorkspace = await models.Workspace.findById(workspaceId);
           const children = await rootWorkspace.getChildWorkspaces();
-          return [rootWorkspace, ...children]
+          return [rootWorkspace, ...children];
         },
       },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
@@ -105,58 +101,58 @@ let schema = new GraphQLSchema({
     }
   }),
   mutation: new GraphQLObjectType({
-    name: 'RootMutationType',
+    name: "RootMutationType",
     fields: {
       updateBlocks: {
         type: new GraphQLList(blockType),
         args: { workspaceId: { type: GraphQLString }, blocks: { type: new GraphQLList(BlockInput) } },
         resolve: async (_, { workspaceId, blocks }) => {
-          const event = await models.Event.create()
-          let newBlocks: any = []
+          const event = await models.Event.create();
+          let newBlocks: any = [];
           for (const _block of blocks) {
-            const block = await models.Block.findById(_block.id)
-            await block.update({ ..._block }, { event })
-            newBlocks = [...newBlocks, block]
+            const block = await models.Block.findById(_block.id);
+            await block.update({ ..._block }, { event });
+            newBlocks = [...newBlocks, block];
           }
-          return newBlocks
+          return newBlocks;
         }
       },
       updateWorkspace: {
         type: workspaceType,
         args: { id: { type: GraphQLString }, childWorkspaceOrder: { type: new GraphQLList(GraphQLString) } },
         resolve: async (_, { id, childWorkspaceOrder }) => {
-          const workspace = await models.Workspace.findById(id)
-          const event = await models.Event.create()
-          return workspace.update({ childWorkspaceOrder }, { event })
+          const workspace = await models.Workspace.findById(id);
+          const event = await models.Event.create();
+          return workspace.update({ childWorkspaceOrder }, { event });
         }
       },
       createWorkspace: {
         type: workspaceType,
         args: { question: { type: GraphQLJSON }, totalBudget: { type: GraphQLInt } },
         resolve: async (_, { question, totalBudget }) => {
-          const event = await models.Event.create()
-          const workspace = await models.Workspace.create({ totalBudget }, { event, questionValue: JSON.parse(question) })
-          return workspace
+          const event = await models.Event.create();
+          const workspace = await models.Workspace.create({ totalBudget }, { event, questionValue: JSON.parse(question) });
+          return workspace;
         }
       },
       createChildWorkspace: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, question: { type: GraphQLJSON }, totalBudget: { type: GraphQLInt } },
         resolve: async (_, { workspaceId, question, totalBudget }) => {
-          const workspace = await models.Workspace.findById(workspaceId)
-          const event = await models.Event.create()
-          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget })
-          return child
+          const workspace = await models.Workspace.findById(workspaceId);
+          const event = await models.Event.create();
+          const child = await workspace.createChild({ event, question: JSON.parse(question), totalBudget });
+          return child;
         }
       },
       updateChildTotalBudget: {
         type: workspaceType,
         args: { workspaceId: { type: GraphQLString }, childId: { type: GraphQLString }, totalBudget: { type: GraphQLInt } },
         resolve: async (_, { workspaceId, childId, totalBudget }) => {
-          const event = await models.Event.create()
-          const workspace = await models.Workspace.findById(workspaceId)
-          const child = await models.Workspace.findById(childId)
-          await workspace.changeAllocationToChild(child, totalBudget, { event })
+          const event = await models.Event.create();
+          const workspace = await models.Workspace.findById(workspaceId);
+          const child = await models.Workspace.findById(childId);
+          await workspace.changeAllocationToChild(child, totalBudget, { event });
         }
       },
     }

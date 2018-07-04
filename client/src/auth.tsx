@@ -54,7 +54,7 @@ export class Auth {
     if (expiresJson === null) {
       return false;
     }
-    let expiresAt = JSON.parse(expiresJson);
+    const expiresAt = JSON.parse(expiresJson);
     const isExpired = new Date().getTime() > Number(expiresAt);
     if (isExpired) {
       Auth.logout();
