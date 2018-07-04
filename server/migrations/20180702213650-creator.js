@@ -6,8 +6,8 @@ module.exports = {
       'Workspaces',
       'creatorId', {
         type: Sequelize.TEXT,
-        allowNull: true,
-        defaultValue: null
+        allowNull: false,
+        defaultValue: "auth0|5b3c1708f2e63b278002fc6c" // Mosaic-2
       }
     );
     await queryInterface.addColumn(
@@ -15,7 +15,7 @@ module.exports = {
       'isPublic', {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: true
       }
     );
   },
