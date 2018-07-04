@@ -88,7 +88,7 @@ export class Auth {
     if (workspace == null) {
       return false;
     }
-    if (workspace.publicSpace) {
+    if (workspace.isPublic) {
       return Auth.isAdmin();
     } else {
       return Auth.isAuthenticated();

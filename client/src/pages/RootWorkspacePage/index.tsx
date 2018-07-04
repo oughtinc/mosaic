@@ -91,7 +91,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
     return (
       <div>
         <RootWorkspacePageHeading>
-          {Auth.isAdmin() ? "New Question (public)" : "New Question (private)"}
+          {Auth.isAdmin() ? "New Question (public)" : "New Question (unlisted)"}
         </RootWorkspacePageHeading>
         <NewBlockForm
           maxTotalBudget={10000}
