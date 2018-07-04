@@ -6,10 +6,10 @@ export { addEventAssociations };
 
 export const eventRelationshipColumns = (DataTypes) => ({
     createdAtEventId: {
-        type: DataTypes.INTEGER(),
+        type: DataTypes.INTEGER,
     },
     updatedAtEventId: {
-        type: DataTypes.INTEGER(),
+        type: DataTypes.INTEGER,
     }
 });
 
