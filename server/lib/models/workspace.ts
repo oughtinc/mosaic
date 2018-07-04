@@ -7,7 +7,7 @@ import * as _ from "lodash";
 const WorkspaceModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) => {
   const Workspace = sequelize.define("Workspace", {
     id: {
-      type: DataTypes.UUID(),
+      type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,

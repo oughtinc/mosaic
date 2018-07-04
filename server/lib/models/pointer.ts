@@ -7,7 +7,7 @@ const Op = Sequelize.Op;
 const PointerModel = (sequelize, DataTypes) => {
   const Pointer = sequelize.define("Pointer", {
     id: {
-      type: DataTypes.UUID(),
+      type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,

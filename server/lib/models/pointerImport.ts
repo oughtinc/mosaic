@@ -5,7 +5,7 @@ import { eventRelationshipColumns, eventHooks, addEventAssociations } from "../e
 const PointerImportModel = (sequelize, DataTypes) => {
   const PointerImport = sequelize.define("PointerImport", {
     id: {
-      type: DataTypes.UUID(),
+      type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,

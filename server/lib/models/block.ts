@@ -7,7 +7,7 @@ import * as _ from "lodash";
 const BlockModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) => {
   const Block = sequelize.define("Block", {
     id: {
-      type: DataTypes.UUID(),
+      type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,

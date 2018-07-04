@@ -3,12 +3,12 @@
 const EventModel = (sequelize, DataTypes) => {
   const Event = sequelize.define("Event", {
     id: {
-      type: DataTypes.INTEGER(),
+      type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
     },
-  }, {
+  },                             {
       hooks: {
         beforeCreate: async (event, options) => {
           const recentEvents = await Event.findAll({
