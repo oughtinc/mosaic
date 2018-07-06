@@ -7,7 +7,7 @@ module.exports = {
       'creatorId', {
         type: Sequelize.TEXT,
         allowNull: false,
-        defaultValue: "auth0|5b3c1708f2e63b278002fc6c" // Mosaic-2
+        defaultValue: "auth0|5b3e6d23f3d20a5de662cf84" // andreas@ought
       }
     );
     await queryInterface.addColumn(

@@ -14,8 +14,7 @@ const WorkspaceModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.Dat
     },
     creatorId: {
       type: DataTypes.TEXT,
-      defaultValue: null,
-      allowNull: true,
+      allowNull: false,
     },
     isPublic: {
       type: DataTypes.BOOLEAN,

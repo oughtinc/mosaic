@@ -12,7 +12,6 @@ import {
   removeExportOfSelection,
   HOVER_ITEM_TYPES
 } from "../../modules/blockEditor/actions";
-import { Auth } from "../../auth";
 
 const HoverBackground = styled.span`
   background-color: #b5b5b557;
@@ -83,14 +82,11 @@ export class MenuPresentational extends React.Component<any> {
                 onChangePointerReference={this.props.changePointerReference}
               />
             )}
-            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT &&
-              Auth.isAuthorizedToEditBlock(
-                _.get(blockEditor, "hoveredItem.blockId")
-              ) && (
-                <ExportedPointerMenu
-                  removeExportOfSelection={this.props.removeExportOfSelection}
-                />
-              )}
+            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT && (
+              <ExportedPointerMenu
+                removeExportOfSelection={this.props.removeExportOfSelection}
+              />
+            )}
           </div>
         )}
       </div>,

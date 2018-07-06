@@ -89,18 +89,10 @@ export class Auth {
       return false;
     }
     if (workspace.isPublic) {
-      return Auth.isAdmin();
+      return Auth.isAdmin() || workspace.creatorId === Auth.userId();
     } else {
       return Auth.isAuthenticated();
     }
-  }
-
-  public static isAuthorizedToEditBlock(blockId?: string): boolean {
-    if (blockId == null) {
-      console.log("No blockid");
-      return false;
-    }
-    return Auth.isAdmin();
   }
 
   public static isAdmin(): boolean {

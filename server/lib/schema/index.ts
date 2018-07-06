@@ -124,7 +124,6 @@ const schema = new GraphQLSchema({
                 ...findOptions.where
               };
             }
-
             return findOptions;
           }
         })
@@ -169,7 +168,7 @@ const schema = new GraphQLSchema({
             if (workspace == null) {
               throw new Error("Got null workspace while attempting to update blocks");
             }
-            if (!user.is_admin && workspace.isPublic) {
+            if ((!user.is_admin && workspace.isPublic) || user.user_id === workspace.creatorId) {
               throw new Error("Non-admin user attempted to edit block on public workspace");
             }
             await block.update({ ..._block }, { event });
