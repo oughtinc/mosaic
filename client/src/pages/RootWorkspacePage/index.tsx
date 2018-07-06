@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import { Alert, Button } from "react-bootstrap";
 
 import { BlockEditor } from "../../components/BlockEditor";
-import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
@@ -61,6 +60,7 @@ const RootBlock = ({ block }) =>
         blockId={block.id}
         initialValue={databaseJSONToValue(block.value)}
         readOnly={true}
+        shouldAutosave={false}
         availablePointers={[]}
       />
     </TextBlock>
@@ -106,14 +106,7 @@ const AuthMessage = () => {
   return (
     <Alert>
       <p>
-        <strong>Welcome!</strong> Right now, Mosaic supports editing only for
-        administrators, but you can browse the existing question-answer trees
-        below.
-      </p>
-      <p>
-        If you want to play with recursive question-answering yourself, we
-        recommend the command-line app{" "}
-        <a href="https://github.com/oughtinc/patchwork">Patchwork</a>.
+        <strong>Welcome!</strong> Try browsing public question-answer trees or create your own by signing up.
       </p>
     </Alert>
   );
@@ -127,8 +120,8 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
       "createdAt"
     );
     return (
-      <BlockHoverMenu>
-        {!Auth.isAdmin() && <AuthMessage />}
+      <div>
+        {!Auth.isAuthenticated() && <AuthMessage />}
         <RootWorkspacePageSection>
           <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
           <WorkspaceList>
@@ -148,7 +141,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
             />
           </RootWorkspacePageSection>
         )}
-      </BlockHoverMenu>
+      </div>
     );
   }
 }
