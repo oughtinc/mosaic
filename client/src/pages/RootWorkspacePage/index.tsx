@@ -106,7 +106,13 @@ const AuthMessage = () => {
   return (
     <Alert>
       <p>
-        <strong>Welcome!</strong> Try browsing public question-answer trees or create your own by signing up.
+        <strong>Welcome!</strong> Mosaic is an app for recursive question-answering with pointers.
+      </p>
+      <p>
+        You can browse public question-answer trees below or create private ones by signing up.
+      </p>
+      <p>
+        <a href="https://ought.org/projects/factored-cognition">Learn more about the project</a>.
       </p>
     </Alert>
   );
