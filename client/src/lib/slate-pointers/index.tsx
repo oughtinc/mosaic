@@ -23,7 +23,7 @@ function SlatePointers(options: any = {}) {
         return;
       }
 
-      const {left, right, top, bottom} = rect;
+      const { left, right, top, bottom } = rect;
       window.setTimeout(
         () => {
           options.onSelect({ left, right, top, bottom });
@@ -39,14 +39,16 @@ function SlatePointers(options: any = {}) {
     renderNode(props: any) {
       const { children, node } = props;  // { attributes, isSelected }
       if (node.type === "pointerExport") {
+        const nodeAsJson = node.toJSON();
+        const pointer = options.availablePointers.find(p => p.data.pointerId === nodeAsJson.data.pointerId) || {};
         return (
           <PointerExportMark
             blockEditor={options.blockEditor}
             isDisplayMode={options.isDisplayMode}
-            nodeAsJson={node.toJSON()}
-            exportingPointers={options.exportingPointers}
+            nodeAsJson={nodeAsJson}
+            availablePointers={options.availablePointers}
             onMouseOver={({ left, right, top, bottom }) => {
-              options.onMouseOverPointerExport({ left, right, top, bottom, id: node.toJSON().data.pointerId });
+              options.onMouseOverPointerExport({ left, right, top, bottom, readOnly: pointer.readOnly, id: nodeAsJson.data.pointerId });
             }}
             children={children}
           />
@@ -62,7 +64,7 @@ function SlatePointers(options: any = {}) {
           <PointerImportNode
             nodeAsJson={node.toJSON()}
             blockEditor={options.blockEditor}
-            exportingPointers={options.exportingPointers}
+            availablePointers={options.availablePointers}
             onMouseOver={({ left, right, top, bottom, id }) => {
               options.onMouseOverPointerImport({ left, right, top, bottom, id });
             }}

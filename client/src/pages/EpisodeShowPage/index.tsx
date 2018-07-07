@@ -163,6 +163,7 @@ export class FormPagePresentational extends React.Component<any, any> {
     }
 
     const importedPointers = workspace.connectedPointers;
+
     const allReadOnlyBlocks = new WorkspaceWithRelations(
       workspace
     ).allReadOnlyBlocks();
@@ -177,6 +178,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       ],
       p => p.data.pointerId
     );
+
     const questionProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceQuestion,
       workspace
@@ -191,7 +193,7 @@ export class FormPagePresentational extends React.Component<any, any> {
     ).blockEditorAttributes();
     return (
       <div key={workspace.id}>
-        <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
+        <BlockHoverMenu >
           <Row>
             <Col sm={10}>
               {workspace.parentId && (
