@@ -46,8 +46,8 @@ export class PointerImportNode extends React.Component<any, any> {
 
     public getLocation = () => {
         const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-        const {left, right, top, bottom} = rect;
-        return {left, right, top, bottom};
+        const { left, right, top, bottom } = rect;
+        return { left, right, top, bottom };
     }
 
     public onMouseOver = () => {
@@ -58,11 +58,11 @@ export class PointerImportNode extends React.Component<any, any> {
     }
 
     public render() {
-        const { blockEditor, exportingPointers, nodeAsJson } = this.props;
+        const { blockEditor, availablePointers, nodeAsJson } = this.props;
 
         const { importingPointer, isSelected, pointerIndex, isOpen } = propsToPointerDetails({
             blockEditor,
-            exportingPointers,
+            availablePointers,
             nodeAsJson,
         });
 
@@ -95,7 +95,7 @@ export class PointerImportNode extends React.Component<any, any> {
                     <ShowExpandedPointer
                         blockEditor={blockEditor}
                         exportingPointer={importingPointer}
-                        exportingPointers={exportingPointers}
+                        availablePointers={availablePointers}
                         onMouseOverExpandedPointer={this.onMouseOver}
                         onMouseOverPointerImport={this.props.onMouseOver}
                         onMouseOut={this.props.onMouseOut}

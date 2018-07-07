@@ -67,6 +67,8 @@ export class MenuPresentational extends React.Component<any> {
     const root: any = window.document.getElementById("root");
     const { blockEditor } = this.props;
     const hoverItemType = _.get(blockEditor, "hoveredItem.hoverItemType");
+    const readOnly = _.get(blockEditor, "hoveredItem.readOnly");
+
     return ReactDOM.createPortal(
       <div className="menu hover-menu" ref={this.props.menuRef} id="hover-menu">
         {blockEditor && (
@@ -82,7 +84,7 @@ export class MenuPresentational extends React.Component<any> {
                 onChangePointerReference={this.props.changePointerReference}
               />
             )}
-            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT && (
+            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT && !readOnly && (
               <ExportedPointerMenu
                 removeExportOfSelection={this.props.removeExportOfSelection}
               />

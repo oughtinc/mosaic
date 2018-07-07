@@ -7,6 +7,8 @@ import { graphql } from "react-apollo";
 import _ = require("lodash");
 import { WORKSPACE_SUBTREE_QUERY } from "../../graphqlQueries";
 
+import { Auth } from "../../auth";
+
 export enum toggleTypes {
   FULL,
   QUESTION = 0,
@@ -60,7 +62,7 @@ const getPointerId = (p: any) => p.data.pointerId;
 export class WorkspaceCardPresentational extends React.PureComponent<
   WorkspaceCardProps,
   WorkspaceCardState
-> {
+  > {
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -85,10 +87,16 @@ export class WorkspaceCardPresentational extends React.PureComponent<
       w => w.id === this.props.workspaceId
     );
 
+    const editable = Auth.isAuthorizedToEditWorkspace(workspace);
+
     const newPointers: ConnectedPointerType[] = _.chain(workspaces)
       .map((w: any) => w.connectedPointers)
       .flatten()
       .uniqBy(getPointerId)
+      .map(node => {
+        return { ...node, readOnly: !editable };
+      })
+
       .value();
 
     const availablePointers: ConnectedPointerType[] = _.chain(
@@ -96,6 +104,9 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     )
       .concat(newPointers)
       .uniqBy(getPointerId)
+      .map(node => {
+        return { ...node, readOnly: !editable };
+      })
       .value();
 
     if (!workspace) {

@@ -12,9 +12,7 @@ export const HOVER_ITEM_TYPES = {
   POINTER_EXPORT: "POINTER_EXPORT",
 };
 
-export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
-  const isImportExport = hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT || HOVER_ITEM_TYPES.POINTER_IMPORT;
-  if (!Auth.isAuthenticated() && !isImportExport) { return function () { return; }; }
+export const changeHoverItem = ({ id, hoverItemType, top, left, readOnly, blockId }) => {
   return (dispatch, getState) => {
     dispatch({
       type: CHANGE_HOVERED_ITEM,
@@ -22,6 +20,7 @@ export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
       hoverItemType,
       top,
       left,
+      readOnly,
       blockId,
     });
   };
@@ -34,6 +33,7 @@ export const removeHoverItem = () => {
       id: false,
       top: false,
       left: false,
+      readOnly: null,
       blockId: false,
       hoverItemType: HOVER_ITEM_TYPES.NONE,
     });

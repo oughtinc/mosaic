@@ -68,16 +68,18 @@ class BlockEditorPresentational extends React.Component<any, any> {
           id: false,
           top,
           left,
+          readOnly: null,
           blockId: newProps.blockId
         });
       },
-      onMouseOverPointerExport: ({ top, left, id }) => {
+      onMouseOverPointerExport: ({ top, left, id, readOnly }) => {
         newProps.changeHoverItem({
           hoverItemType: HOVER_ITEM_TYPES.POINTER_EXPORT,
           id,
           top,
           left,
-          blockId: newProps.blockId
+          readOnly,
+          blockId: newProps.blockId,
         });
       },
       onMouseOverPointerImport: ({ top, left, id }) => {
@@ -86,11 +88,12 @@ class BlockEditorPresentational extends React.Component<any, any> {
           id,
           top,
           left,
+          readOnly: null,
           blockId: false
         });
       },
       blockEditor: newProps.blockEditor,
-      exportingPointers: newProps.availablePointers,
+      availablePointers: newProps.availablePointers,
       isDisplayMode: newProps.isDisplayMode
     };
     this.setState({
@@ -147,20 +150,20 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <Editor value={value} readOnly={true} plugins={plugins} />
       </BlockReadOnlyStyle>
     ) : (
-      <BlockEditorEditing
-        value={value}
-        readOnly={true}
-        shouldAutosave={!!this.props.shouldAutosave}
-        block={this.props.block}
-        availablePointers={this.props.availablePointers}
-        plugins={plugins}
-        onChange={this.props.onChange}
-        onKeyDown={this.props.onKeyDown}
-        onMount={input => {
-          this.blockEditorEditing = input;
-        }}
-      />
-    );
+        <BlockEditorEditing
+          value={value}
+          readOnly={true}
+          shouldAutosave={!!this.props.shouldAutosave}
+          block={this.props.block}
+          availablePointers={this.props.availablePointers}
+          plugins={plugins}
+          onChange={this.props.onChange}
+          onKeyDown={this.props.onKeyDown}
+          onMount={input => {
+            this.blockEditorEditing = input;
+          }}
+        />
+      );
   }
 
   public render() {

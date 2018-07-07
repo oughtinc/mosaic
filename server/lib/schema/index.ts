@@ -39,14 +39,14 @@ const standardReferences = [
 ];
 
 const blockType = makeObjectType(models.Block,
-                                 [
+  [
     ...standardReferences,
     ["workspace", () => workspaceType, "Workspace"],
   ]
 );
 
 const workspaceType = makeObjectType(models.Workspace,
-                                     [
+  [
     ...standardReferences,
     ["childWorkspaces", () => new GraphQLList(workspaceType), "ChildWorkspaces"],
     ["parentWorkspace", () => new GraphQLList(workspaceType), "ParentWorkspace"],
@@ -58,7 +58,7 @@ const workspaceType = makeObjectType(models.Workspace,
 const eventType = makeObjectType(models.Event, []);
 
 const pointerType = makeObjectType(models.Pointer,
-                                   [
+  [
     ...standardReferences,
     ["pointerImport", () => pointerImportType, "PointerImport"],
     ["sourceBlock", () => blockType, "SourceBlock"],
@@ -66,7 +66,7 @@ const pointerType = makeObjectType(models.Pointer,
 );
 
 const pointerImportType = makeObjectType(models.PointerImport,
-                                         [
+  [
     ...standardReferences,
     ["workspace", () => blockType, "Workspace"],
     ["pointer", () => pointerType, "Pointer"],
@@ -154,6 +154,7 @@ const schema = new GraphQLSchema({
         type: new GraphQLList(blockType),
         args: { blocks: { type: new GraphQLList(BlockInput) } },
         resolve: async (_, { blocks }, context) => {
+
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error("Got null user while attempting to update blocks");
@@ -168,7 +169,7 @@ const schema = new GraphQLSchema({
             if (workspace == null) {
               throw new Error("Got null workspace while attempting to update blocks");
             }
-            if ((!user.is_admin && workspace.isPublic) || user.user_id === workspace.creatorId) {
+            if (workspace.isPublic && !user.is_admin && user.user_id !== workspace.creatorId) {
               throw new Error("Non-admin user attempted to edit block on public workspace");
             }
             await block.update({ ..._block }, { event });
