@@ -1,6 +1,5 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
-import { Auth } from "../../auth";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
