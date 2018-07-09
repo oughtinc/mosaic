@@ -5,6 +5,8 @@ export const CREATE_ROOT_WORKSPACE = gql`
     createWorkspace(question:$question, totalBudget:$totalBudget ){
         id
         parentId
+        creatorId
+        isPublic
         childWorkspaceOrder
         totalBudget 
         allocatedBudget 
@@ -32,6 +34,8 @@ export const WORKSPACES_QUERY = gql`
         workspaces(where:{parentId:null, hasBeenDeletedByAncestor:false}){
           id
           parentId
+          creatorId
+          isPublic
           childWorkspaceOrder
           totalBudget 
           createdAt
@@ -49,6 +53,8 @@ export const WORKSPACE_SUBTREE_QUERY = gql`
     query workspaceSubtree($workspaceId: String!){
         subtreeWorkspaces(workspaceId:$workspaceId){
             id
+            isPublic
+            creatorId
             childWorkspaceOrder
             connectedPointers
             blocks{

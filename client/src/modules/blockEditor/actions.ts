@@ -1,6 +1,5 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
-import { Auth } from "../../auth";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -12,9 +11,7 @@ export const HOVER_ITEM_TYPES = {
   POINTER_EXPORT: "POINTER_EXPORT",
 };
 
-export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
-  const isImportExport = hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT || HOVER_ITEM_TYPES.POINTER_IMPORT;
-  if (!Auth.isAdmin() && !isImportExport) { return function () { return; }; }
+export const changeHoverItem = ({ id, hoverItemType, top, left, readOnly, blockId }) => {
   return (dispatch, getState) => {
     dispatch({
       type: CHANGE_HOVERED_ITEM,
@@ -22,6 +19,7 @@ export const changeHoverItem = ({ id, hoverItemType, top, left, blockId }) => {
       hoverItemType,
       top,
       left,
+      readOnly,
       blockId,
     });
   };
@@ -34,6 +32,7 @@ export const removeHoverItem = () => {
       id: false,
       top: false,
       left: false,
+      readOnly: null,
       blockId: false,
       hoverItemType: HOVER_ITEM_TYPES.NONE,
     });

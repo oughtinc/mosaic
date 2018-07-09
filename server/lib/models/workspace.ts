@@ -1,16 +1,25 @@
 "use strict";
-const Sequelize = require("sequelize")
+import * as Sequelize from "sequelize";
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from "../eventIntegration";
 const Op = Sequelize.Op;
 import * as _ from "lodash";
 
-const WorkspaceModel = (sequelize, DataTypes) => {
+const WorkspaceModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) => {
   const Workspace = sequelize.define("Workspace", {
     id: {
-      type: DataTypes.UUID(),
+      type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
+    },
+    creatorId: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    isPublic: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
     },
     ...eventRelationshipColumns(DataTypes),
     childWorkspaceOrder: {
@@ -18,12 +27,12 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       defaultValue: []
     },
     hasBeenDeletedByAncestor: {
-      type: DataTypes.BOOLEAN(),
+      type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false
     },
     totalBudget: {
-      type: DataTypes.INTEGER(),
+      type: DataTypes.INTEGER,
       defaultValue: 1,
       allowNull: false,
       validate: {
@@ -31,7 +40,7 @@ const WorkspaceModel = (sequelize, DataTypes) => {
       }
     },
     allocatedBudget: {
-      type: DataTypes.INTEGER(),
+      type: DataTypes.INTEGER,
       defaultValue: 1,
       allowNull: false,
       validate: {
@@ -83,8 +92,8 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     addEventAssociations(Workspace, models);
   };
 
-  Workspace.createAsChild = async function ({ parentId, question, totalBudget }, { event }) {
-    const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget }, { event, questionValue: question });
+  Workspace.createAsChild = async function ({ parentId, question, totalBudget, creatorId, isPublic }, { event }) {
+    const _workspace = await sequelize.models.Workspace.create({ parentId, totalBudget, creatorId, isPublic }, { event, questionValue: question });
     return _workspace;
   };
 
@@ -126,8 +135,8 @@ const WorkspaceModel = (sequelize, DataTypes) => {
     }
   };
 
-  Workspace.prototype.createChild = async function ({ event, question, totalBudget }) {
-    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget }, { event });
+  Workspace.prototype.createChild = async function ({ event, question, totalBudget, creatorId, isPublic }) {
+    const child = await sequelize.models.Workspace.createAsChild({ parentId: this.id, question, totalBudget, creatorId, isPublic }, { event });
     if (this.remainingBudget < child.totalBudget) {
       throw new Error(`Parent workspace does not have enough remainingBudget. Has: ${this.remainingBudget}. Needs: ${child.totalBudget}.`);
     }

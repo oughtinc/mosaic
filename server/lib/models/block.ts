@@ -1,13 +1,13 @@
-import Sequelize from "sequelize";
+import * as Sequelize from "sequelize";
 import { eventRelationshipColumns, eventHooks, addEventAssociations } from "../eventIntegration";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 import { Value } from "slate";
 import * as _ from "lodash";
 
-const BlockModel = (sequelize, DataTypes) => {
+const BlockModel = (sequelize: Sequelize.Sequelize, DataTypes: Sequelize.DataTypes) => {
   const Block = sequelize.define("Block", {
     id: {
-      type: DataTypes.UUID(),
+      type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
@@ -26,14 +26,14 @@ const BlockModel = (sequelize, DataTypes) => {
   },
                                  {
       hooks: {
-        beforeValidate: async (item, options) => {
+        beforeValidate: async (item: any, options: any) => {
           eventHooks.beforeValidate(item, options);
           item.cachedExportPointerValues = await item.exportingPointerValues();
         },
-        beforeUpdate: (item, options) => {
+        beforeUpdate: (item: any, options: any) => {
           options.fields = item.changed();
         },
-        afterSave: async (item, options) => {
+        afterSave: async (item: any, options: any) => {
           await item.ensureAllPointersAreInDatabase({ event: options.event });
         }
       },
