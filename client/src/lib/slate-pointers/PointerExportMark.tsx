@@ -90,11 +90,11 @@ export class PointerExportMark extends React.Component<any, any> {
 
     public render() {
         const isSelected = this.props.blockEditor.hoveredItem.id === this.props.nodeAsJson.data.pointerId;
-        const { blockEditor, exportingPointers, nodeAsJson, children, isDisplayMode }: any = this.props;
+        const { blockEditor, availablePointers, nodeAsJson, children, isDisplayMode }: any = this.props;
 
         const { pointerIndex }: any = propsToPointerDetails({
             blockEditor,
-            exportingPointers,
+            availablePointers,
             nodeAsJson,
         });
         return (

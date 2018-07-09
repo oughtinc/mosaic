@@ -17,6 +17,9 @@ export class ExampleShowPage extends React.Component<any, any> {
             .map((w: any) => w.connectedPointers)
             .flatten()
             .uniqBy((p: any) => p.data.pointerId)
+            .map(node => {
+                return { ...node, readOnly: true };
+            })
             .value();
         const rootWorkspace = workspaces.find((w) => w.id === example.rootWorkspaceId);
         return (

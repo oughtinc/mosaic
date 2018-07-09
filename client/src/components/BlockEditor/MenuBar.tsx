@@ -48,7 +48,7 @@ export class PointerDropdownMenu extends React.Component<PointerDropdownMenuProp
                             {`$${index + 1} - ${e.data.pointerId.slice(0, 5)}`}
                             <ShowExpandedPointer
                                 exportingPointer={e}
-                                exportingPointers={this.props.availablePointers}
+                                availablePointers={this.props.availablePointers}
                                 blockEditor={this.props.blockEditor}
                                 isHoverable={false}
                             />

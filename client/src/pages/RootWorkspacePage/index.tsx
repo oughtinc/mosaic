@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import { Alert, Button } from "react-bootstrap";
 
 import { BlockEditor } from "../../components/BlockEditor";
-import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
@@ -61,6 +60,7 @@ const RootBlock = ({ block }) =>
         blockId={block.id}
         initialValue={databaseJSONToValue(block.value)}
         readOnly={true}
+        shouldAutosave={false}
         availablePointers={[]}
       />
     </TextBlock>
@@ -91,7 +91,7 @@ class NewWorkspaceForm extends React.Component<any, any> {
     return (
       <div>
         <RootWorkspacePageHeading>
-          {Auth.isAdmin() ? "New Question (public)" : "New Question (private)"}
+          {Auth.isAdmin() ? "New Question (public)" : "New Question (unlisted)"}
         </RootWorkspacePageHeading>
         <NewBlockForm
           maxTotalBudget={10000}
@@ -106,14 +106,13 @@ const AuthMessage = () => {
   return (
     <Alert>
       <p>
-        <strong>Welcome!</strong> Right now, Mosaic supports editing only for
-        administrators, but you can browse the existing question-answer trees
-        below.
+        <strong>Welcome!</strong> Mosaic is an app for recursive question-answering with pointers.
       </p>
       <p>
-        If you want to play with recursive question-answering yourself, we
-        recommend the command-line app{" "}
-        <a href="https://github.com/oughtinc/patchwork">Patchwork</a>.
+        You can browse public question-answer trees below or create private ones by signing up.
+      </p>
+      <p>
+        <a href="https://ought.org/projects/factored-cognition">Learn more about the project</a>.
       </p>
     </Alert>
   );
@@ -127,8 +126,8 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
       "createdAt"
     );
     return (
-      <BlockHoverMenu>
-        {!Auth.isAdmin() && <AuthMessage />}
+      <div>
+        {!Auth.isAuthenticated() && <AuthMessage />}
         <RootWorkspacePageSection>
           <RootWorkspacePageHeading>Questions</RootWorkspacePageHeading>
           <WorkspaceList>
@@ -137,7 +136,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
               : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
-        {Auth.isAdmin() && (
+        {Auth.isAuthenticated() && (
           <RootWorkspacePageSection>
             <NewWorkspaceForm
               onCreateWorkspace={({ question, totalBudget }) => {
@@ -148,7 +147,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
             />
           </RootWorkspacePageSection>
         )}
-      </BlockHoverMenu>
+      </div>
     );
   }
 }

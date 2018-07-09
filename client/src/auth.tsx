@@ -9,7 +9,7 @@ export class Auth {
     clientID: Config.auth0_client_id,
     redirectUri: Auth.redirectUri(),
     audience: "https://mosaicapp.auth0.com/userinfo",
-    responseType: "token id_token",
+    responseType: "token",
     scope: "openid user_metadata app_metadata"
   });
 
@@ -20,31 +20,51 @@ export class Auth {
   public static logout(): void {
     // Clear Access Token and ID Token from local storage
     localStorage.removeItem("access_token");
-    localStorage.removeItem("id_token");
     localStorage.removeItem("expires_at");
     localStorage.removeItem("is_admin");
+    localStorage.removeItem("user_id");
   }
 
-  public static handleAuthentication(): void {
+  public static handleAuthentication(callback: () => void): void {
+    if (Auth.isAuthenticated()) { return; }
     Auth.auth0.parseHash((err, authResult) => {
-      if (authResult && authResult.accessToken && authResult.idToken) {
-        Auth.setSession(authResult);
-        console.log("Successfully authenticated.");
+      if (authResult && authResult.accessToken) {
+        const expiresAt = JSON.stringify(
+          authResult.expiresIn * 1000 + new Date().getTime()
+        );
+        localStorage.setItem("access_token", authResult.accessToken);
+        localStorage.setItem("expires_at", expiresAt);
+
+        Auth.getProfile(callback);
       } else if (err) {
         console.error("Authentication error: ", err);
+        callback();
       }
     });
   }
 
-  public static setSession(authResult: any): void {
-    // Set the time that the Access Token will expire at
-    const expiresAt = JSON.stringify(
-      authResult.expiresIn * 1000 + new Date().getTime()
-    );
-    localStorage.setItem("access_token", authResult.accessToken);
-    localStorage.setItem("id_token", authResult.idToken);
-    localStorage.setItem("expires_at", expiresAt);
-    Auth.getProfile();
+  public static getProfile(callback: () => void): void {
+    const root = "https://mosaic:auth0:com/";
+
+    const accessToken = localStorage.getItem("access_token");
+    if (!accessToken) {
+      callback();
+      throw new Error("Access token must exist to fetch profile");
+    }
+
+    Auth.auth0.client.userInfo(accessToken, (err, profile) => {
+      if (err) {
+        console.error("Error retrieving user info: ", err);
+        callback();
+        return;
+      }
+      const appMetadata = profile[root + "app_metadata"];
+      if (appMetadata != null && appMetadata.is_admin != null) {
+        localStorage.setItem("is_admin", appMetadata.is_admin);
+      }
+      localStorage.setItem("user_id", profile.sub);
+      callback();
+    });
   }
 
   public static isAuthenticated(): boolean {
@@ -64,22 +84,16 @@ export class Auth {
     return true;
   }
 
-  // TODO: Replace with permission based logic
-  public static isAuthorizedToEditWorkspace(workspace: any): boolean {
-    // TODO:
-    // Check - is this an admin workspace & is this user an admin
-    // Normal workspaces can be edited by anyone with the link & authed
-    // Need to upgrade workspace schema with a "public_workspace" bool column
-    //    and "creator_id" string column
-    return Auth.isAdmin();
-  }
-
-  // TODO: Replace with permission based logic
-  public static isAuthorizedToEditBlock(blockId?: string): boolean {
-    if (!blockId) {
+  public static isAuthorizedToEditWorkspace(workspace?: any): boolean {
+    if (workspace == null) {
       return false;
     }
-    return Auth.isAdmin();
+
+    if (workspace.isPublic) {
+      return Auth.isAdmin() || workspace.creatorId === Auth.userId();
+    } else {
+      return Auth.isAuthenticated();
+    }
   }
 
   public static isAdmin(): boolean {
@@ -93,25 +107,8 @@ export class Auth {
     return localStorage.getItem("access_token");
   }
 
-  // TODO: Need to trigger a rerender
-  public static getProfile(): void {
-    const root = "https://mosaic:auth0:com/";
-
-    const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) {
-      throw new Error("Access token must exist to fetch profile");
-    }
-
-    Auth.auth0.client.userInfo(accessToken, (err, profile) => {
-      if (err) {
-        console.error("Error retrieving user info: ", err);
-        return;
-      }
-      const appMetadata = profile[root + "app_metadata"];
-      if (appMetadata != null && appMetadata.is_admin != null) {
-        localStorage.setItem("is_admin", appMetadata.is_admin);
-      }
-    });
+  public static userId(): string | null {
+    return localStorage.getItem("user_id");
   }
 
   private static redirectUri(): string {

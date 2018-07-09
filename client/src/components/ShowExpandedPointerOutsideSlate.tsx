@@ -19,7 +19,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
     public render() {
         return (
             <ShowExpandedPointer
-                exportingPointers={this.props.availablePointers}
+                availablePointers={this.props.availablePointers}
                 blockEditor={this.props.blockEditor}
                 exportingPointer={this.props.exportingPointer}
                 isHoverable={this.props.isHoverable}
@@ -29,6 +29,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
                         id,
                         top,
                         left,
+                        readOnly: null,
                         blockId: false,
                     });
                 }}

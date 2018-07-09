@@ -33,7 +33,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.map(({ message, locations, path }) =>
       console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        `[GraphQL error]: Message: ${message}. Path: ${path}. Location: `, locations
       )
     );
   }
@@ -43,10 +43,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 const authLink = new ApolloLink((operation, forward) => {
-  operation.setContext(({ headers }) => ({
+  operation.setContext(context => ({
+    ...context,
     headers: {
-      ...headers,
-      authorization: Auth.accessToken() ? `Bearer ${Auth.accessToken()}` : null
+      ...context.headers,
+      authorization: Auth.accessToken()
     }
   }));
   return forward ? forward(operation) : null;
@@ -80,16 +81,6 @@ export class Layout extends React.Component {
   }
 }
 
-export class Home extends React.Component {
-  public render() {
-    return (
-      <div className="container-fluid">
-        <h2> Mosaic App </h2>
-      </div>
-    );
-  }
-}
-
 const Routes = () => (
   <div>
     <Route exact={true} path="/workspaces" render={() => <Redirect to="/" />} />
@@ -107,15 +98,16 @@ const Routes = () => (
     <Route
       path="/authCallback"
       render={props => {
-        if (/access_token|id_token|error/.test(props.location.hash)) {
-          Auth.handleAuthentication();
+        if (/access_token|error/.test(props.location.hash)) {
+          Auth.handleAuthentication(() => {
+            location.reload();
+          });
         }
-        return <Redirect to="/workspaces" />;
+        return <Redirect to="/" />;
       }}
     />
   </div>
 );
-
 LogRocket.init(Config.logrocket_id);
 const environment = process.env.NODE_ENV || ""; // "development" or "production"
 LogRocket.track(environment);

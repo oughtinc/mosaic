@@ -31,6 +31,8 @@ const WORKSPACE_QUERY = gql`
     workspace(id: $id) {
       id
       parentId
+      creatorId
+      isPublic
       childWorkspaceOrder
       connectedPointers
       totalBudget
@@ -38,6 +40,8 @@ const WORKSPACE_QUERY = gql`
       childWorkspaces {
         id
         totalBudget
+        creatorId
+        isPublic
         allocatedBudget
         blocks {
           id
@@ -161,6 +165,7 @@ export class FormPagePresentational extends React.Component<any, any> {
     }
 
     const importedPointers = workspace.connectedPointers;
+
     const allReadOnlyBlocks = new WorkspaceWithRelations(
       workspace
     ).allReadOnlyBlocks();
@@ -175,6 +180,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       ],
       p => p.data.pointerId
     );
+
     const questionProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceQuestion,
       workspace
@@ -189,7 +195,7 @@ export class FormPagePresentational extends React.Component<any, any> {
     ).blockEditorAttributes();
     return (
       <div key={workspace.id}>
-        <BlockHoverMenu exportingPointers={this.props.exportingPointers}>
+        <BlockHoverMenu >
           <Row>
             <Col sm={10}>
               {workspace.parentId && (
@@ -238,6 +244,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
+                workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}
                 workspaceOrder={workspace.childWorkspaceOrder}

@@ -4,26 +4,23 @@ module.exports = {
   up: async function (queryInterface, Sequelize) {
     await queryInterface.addColumn(
       'Workspaces',
-      'totalBudget',
-      {
-        type: Sequelize.INTEGER,
+      'creatorId', {
+        type: Sequelize.TEXT,
         allowNull: false,
-        defaultValue: 1
+        defaultValue: "auth0|5b3e6d23f3d20a5de662cf84" // andreas@ought
       }
     );
     await queryInterface.addColumn(
       'Workspaces',
-      'allocatedBudget',
-      {
-        type: Sequelize.INTEGER,
+      'isPublic', {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: 0
+        defaultValue: true
       }
     );
   },
-
   down: async function (queryInterface, Sequelize) {
-    await queryInterface.removeColumn('Workspaces', 'totalBudget');
-    await queryInterface.removeColumn('Workspaces', 'allocatedBudget');
+    await queryInterface.removeColumn('Workspaces', 'creatorId');
+    await queryInterface.removeColumn('Workspaces', 'isPublic');
   }
-};
+}

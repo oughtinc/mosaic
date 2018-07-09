@@ -31,7 +31,7 @@ export class InlineNode extends React.Component<any, any> {
             return (
                 <PointerImportNode
                     blockEditor={this.props.blockEditor}
-                    exportingPointers={this.props.exportingPointers}
+                    availablePointers={this.props.availablePointers}
                     nodeAsJson={{ data: { pointerId: this.props.node.data.pointerId, internalReferenceId: this.state.id } }}
                     isHoverable={this.props.isHoverable}
                     onMouseOver={this.props.onMouseOver}
@@ -47,7 +47,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
         // Try filtering down to just the node.object==="leaf", and then node.leaves[0].
 
         if (
-            !_.isEqual(newProps.exportingPointer.nodes, this.props.exportingPointers)
+            !_.isEqual(newProps.availablePointers.nodes, this.props.availablePointers)
         ) {
             return true;
         }
@@ -63,7 +63,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                             node={node}
                             key={index}
                             blockEditor={this.props.blockEditor}
-                            exportingPointers={this.props.exportingPointers}
+                            availablePointers={this.props.availablePointers}
                             pointerId={this.props.exportingPointer.pointerId}
                             onMouseOver={this.props.onMouseOverPointerImport}
                             isHoverable={this.props.isHoverable}
