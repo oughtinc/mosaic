@@ -53,6 +53,8 @@ export const WORKSPACE_SUBTREE_QUERY = gql`
     query workspaceSubtree($workspaceId: String!){
         subtreeWorkspaces(workspaceId:$workspaceId){
             id
+            isPublic
+            creatorId
             childWorkspaceOrder
             connectedPointers
             blocks{

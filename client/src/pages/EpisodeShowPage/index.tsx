@@ -40,6 +40,8 @@ const WORKSPACE_QUERY = gql`
       childWorkspaces {
         id
         totalBudget
+        creatorId
+        isPublic
         allocatedBudget
         blocks {
           id
