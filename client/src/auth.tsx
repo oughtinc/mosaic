@@ -88,6 +88,7 @@ export class Auth {
     if (workspace == null) {
       return false;
     }
+
     if (workspace.isPublic) {
       return Auth.isAdmin() || workspace.creatorId === Auth.userId();
     } else {
