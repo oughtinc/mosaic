@@ -1,0 +1,25 @@
+{
+    "auth0_client_id": "EZ-0m1RSRMHwrY_iBZshi7-G4rfyPAOY",
+    "development": {
+        "use_env_variable": "DATABASE_URL",
+        "dialect": "postgres"
+    },
+    "development2": {
+        "username": "ozziegooen",
+        "password": null,
+        "database": "mosaic_dev",
+        "host": "127.0.0.1",
+        "dialect": "postgres"
+    },
+    "production": {
+        "use_env_variable": "DATABASE_URL",
+        "dialect": "postgres"
+    },
+    "test": {
+        "username": "mosaic",
+        "password": "MDaUA2P4ZbkJPCKEM",
+        "database": "database_test",
+        "host": "127.0.0.1",
+        "dialect": "postgres"
+    }
+}

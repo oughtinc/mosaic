@@ -35,6 +35,31 @@ const Brand = () => (
   </div>
 );
 
+// Todo: replace with relative styling on horizontal
+// Replace userId with a username/email
+const UsernameContainer = styled.div`
+  position: absolute;
+  right: 20px;
+  top: 5px;
+`;
+
+function usernameTitle() {
+  if (Auth.userId() == null) {
+    return null;
+  }
+
+  if (Auth.isAdmin()) {
+    return `${Auth.userId()} (Admin)`;
+  }
+  return Auth.userId();
+}
+
+const Username = () => (
+  <UsernameContainer>
+    {usernameTitle()}
+  </UsernameContainer>
+);
+
 const ActionLink = ({ action, children }) => (
   <HeaderA
     href="#"
@@ -84,6 +109,7 @@ const Header = () => (
   <HeaderContainer>
     <Brand />
     <UserControls />
+    <Username />
   </HeaderContainer>
 );
 

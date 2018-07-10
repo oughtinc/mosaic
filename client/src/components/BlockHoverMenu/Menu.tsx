@@ -14,11 +14,11 @@ import {
 } from "../../modules/blockEditor/actions";
 
 const HoverBackground = styled.span`
-  background-color: #b5b5b557;
-  color: black;
-  padding: 2px 3px;
-  border-radius: 3px;
-  border: 1px solid #d5d5d5;
+  // background-color: #b5b5b557;
+  // color: black;
+  // padding: 1px 1px;
+  // border-radius: 2px;
+  // border: 1px solid #d5d5d5;
 `;
 
 const HoverButton = ({ children, onClick }) => (
