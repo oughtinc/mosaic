@@ -1,89 +1,64 @@
 # Mosaic 
 
-A web app for recursive question-answering with pointers
+Mosaic is a web app for recursive question-answering with pointers.
+
+This is an alpha version with bugs, missing features, and usability issues.
+
 
 ## Setup
 
-### (Recommended) Using Docker
+1. Install [Docker](https://www.docker.com/community-edition#/download)
+2. Run `docker-compose up` in the root folder
 
-1. Make sure Docker is downloaded and running on your computer. You can get it here: https://www.docker.com/community-edition#/download
-2. Run `docker-compose up`
-
-### (Deprecated) Using yarn scripts directly
-
-Note: this method is deprecated and is likely to be incompatible w/ testing and w/ backing up and restoring the database.
-
-1. Set up the node server.
-  First, change the config/config.json file to use your local db creds.
-  
-```
-cd server;
-yarn run db:create
-yarn run db:migrate
-yarn run db:seed
-yarn start
-```
-
-2. Start the react-create-app client
-
-```
-cd client 
-yarn start
-```
 
 ## Testing
 
-- Backend:
-
-To run the tests:
+To run the backend tests, attach a shell to the Docker `web` service and run:
 
 ```
 cd server
 yarn test
 ```
 
-To use Visual Studio Code to debug while running the tests:
-1. Click on the debug menu
-2. Select "Mocha Tests"
-3. Click the run button
 
-## LogRocket
+## Deployment
 
-We have a LogRocket integration for monitoring sessions, including Redux store. Ask Andrew Schreiber for the login information.
+The app is deployed on Heroku.
 
-URL: https://app.logrocket.com/i58gnp/mosaic/
+To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page. 
 
-## Save and restore db states
+When a branch is merged into master, the main deploy is updated automatically.
 
-### Save
+Note that `docker-compose.yml` and `package.json` at the root level must be kept in sync.
 
-1. If the app is not running, run it (`docker-compose up`)
-1. `cd server`
-1. `scripts/dumpDB.sh` with a filepath for your dump, e.g. `scripts/dumpDB.sh ./dbDumps/myDump.db`
 
-### Restore
+## Saving and restoring the database
+
+Since the app doesn't currently support import/export of individual question-answer trees, it can be helpful to save and restore the entire database.
+
+### Saving
 
 1. If the app is not running, run it (`docker-compose up`)
-1. Close all external connections to the database (e.g. from pgadmin)
-1. `cd server`
-1. `scripts/restoreDB.sh` with a filepath for the dump you're restoring, e.g. `scripts/restoreDB.sh ./dbDumps/myDump.db`
+2. `cd server`
+3. `scripts/dumpDB.sh` with a filepath for your dump, e.g. `scripts/dumpDB.sh ./dbDumps/myDump.db`
+
+### Restoring
+
+1. If the app is not running, run it (`docker-compose up`)
+2. Close all external connections to the database (e.g. from pgadmin)
+3. `cd server`
+4. `scripts/restoreDB.sh` with a filepath for the dump you're restoring, e.g. `scripts/restoreDB.sh ./dbDumps/myDump.db`
 
 ### Troubleshooting
-- One error case is that the scripts attempt to connect to the db w/ your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
-- relatedly, you may get this error if you try to restore the DB while the code is recompiling: `ERROR: database "mosaic_dev" is being accessed by other users`. If you do, wait until the code is done compiling and try again.
+
+- One error case is that the scripts attempt to connect to the db with your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
+- Relatedly, you may get this error if you try to restore the DB while the code is recompiling: `ERROR: database "mosaic_dev" is being accessed by other users`. If you do, wait until the code is done compiling and try again.
 
 ### Autodump
 
 To automatically create new dumps when the db changes:
 1. If the app is not running, run it (`docker-compose up`)
-1. `cd server`
-1. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
+2. `cd server`
+3. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
 
-## Deployment
-We deploy the app on Heroku: https://dashboard.heroku.com/apps/mosaic-prod
 
-To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page. If your deployed branch - Review App in Heroku terminology - expires you must go to the [pipeline](https://dashboard.heroku.com/pipelines/00d7422d-a5ee-4b56-ae40-76c0ade1a023) and click `Create Review App` to redeploy it.
-
-When a branch is merged to master, it is automatically pushed to Heroku.
-
-`docker-compose.yml` and `package.json` at the root level must be kept in sync.
