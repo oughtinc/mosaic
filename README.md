@@ -13,10 +13,11 @@ This is an alpha version with bugs, missing features, and usability issues.
 
 ## Testing
 
-To run the backend tests, attach a shell to the Docker `web` service and run:
+To run the backend tests, attach a shell to the Docker `web` service:
 
 ```
-cd server
+docker exec -it mosaic_web_1 bash
+cd /data/server
 yarn test
 ```
 

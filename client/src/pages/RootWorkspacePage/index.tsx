@@ -12,6 +12,8 @@ import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
+import "./RootWorkspacePage.css";
+
 const RootWorkspacePageSection = styled.div`
   margin-top: 35px;
   margin-bottom: 50px;
@@ -104,15 +106,12 @@ class NewWorkspaceForm extends React.Component<any, any> {
 
 const AuthMessage = () => {
   return (
-    <Alert>
+    <Alert className="AuthMessage">
       <p>
-        <strong>Welcome!</strong> Mosaic is an app for recursive question-answering with pointers.
+        <strong>Welcome!</strong> Mosaic is an app for recursive question-answering with pointers. You can browse public question-answer trees below or create private ones by signing up.
       </p>
       <p>
-        You can browse public question-answer trees below or create private ones by signing up.
-      </p>
-      <p>
-        <a href="https://ought.org/projects/factored-cognition">Learn more about the project</a>.
+        Mosaic is an alpha version with bugs, missing features, and usability issues. You can check out <a href="https://github.com/oughtinc/mosaic">the code</a> and <a href="https://ought.org/projects/factored-cognition">learn more about the project</a>.
       </p>
     </Alert>
   );

@@ -31,7 +31,7 @@ const HeaderA = styled.a`
 
 const Brand = () => (
   <div className="Brand">
-    <BrandLink to="/">Mosaic</BrandLink>
+    <BrandLink to="/">Mosaic v0.1</BrandLink>
   </div>
 );
 
