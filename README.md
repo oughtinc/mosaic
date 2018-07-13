@@ -2,8 +2,9 @@
 
 Mosaic is a web app for recursive question-answering with pointers.
 
-This is an alpha version with bugs, missing features, and usability issues.
+![](screencast.gif)
 
+This is an alpha version with bugs, missing features, and usability issues.
 
 ## Setup
 
