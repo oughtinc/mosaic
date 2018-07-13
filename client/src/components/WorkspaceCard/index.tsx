@@ -62,7 +62,7 @@ const getPointerId = (p: any) => p.data.pointerId;
 export class WorkspaceCardPresentational extends React.PureComponent<
   WorkspaceCardProps,
   WorkspaceCardState
-  > {
+> {
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -96,7 +96,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<
       .map(node => {
         return { ...node, readOnly: !editable };
       })
-
       .value();
 
     const availablePointers: ConnectedPointerType[] = _.chain(

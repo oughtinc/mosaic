@@ -1,17 +1,19 @@
 import * as _ from "lodash";
 
-export const getAllInlinesAsArray = (node) => {
-    let array: any = [];
+export const getAllInlinesAsArray = node => {
+  let array: any = [];
 
-    node.nodes.forEach((child) => {
-        if (child.object === "text") { return; }
-        if (child.object === "inline") {
-            array.push(child);
-        }
-        if (_.has(child, "nodes")) {
-            array = array.concat(getAllInlinesAsArray(child));
-        }
-    });
+  node.nodes.forEach(child => {
+    if (child.object === "text") {
+      return;
+    }
+    if (child.object === "inline") {
+      array.push(child);
+    }
+    if (_.has(child, "nodes")) {
+      array = array.concat(getAllInlinesAsArray(child));
+    }
+  });
 
-    return array;
+  return array;
 };

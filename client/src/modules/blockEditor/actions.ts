@@ -8,10 +8,17 @@ export const HOVER_ITEM_TYPES = {
   NONE: "NONE",
   SELECTED_TEXT: "SELECTED_TEXT",
   POINTER_IMPORT: "POINTER_IMPORT",
-  POINTER_EXPORT: "POINTER_EXPORT",
+  POINTER_EXPORT: "POINTER_EXPORT"
 };
 
-export const changeHoverItem = ({ id, hoverItemType, top, left, readOnly, blockId }) => {
+export const changeHoverItem = ({
+  id,
+  hoverItemType,
+  top,
+  left,
+  readOnly,
+  blockId
+}) => {
   return (dispatch, getState) => {
     dispatch({
       type: CHANGE_HOVERED_ITEM,
@@ -20,7 +27,7 @@ export const changeHoverItem = ({ id, hoverItemType, top, left, readOnly, blockI
       top,
       left,
       readOnly,
-      blockId,
+      blockId
     });
   };
 };
@@ -34,7 +41,7 @@ export const removeHoverItem = () => {
       left: false,
       readOnly: null,
       blockId: false,
-      hoverItemType: HOVER_ITEM_TYPES.NONE,
+      hoverItemType: HOVER_ITEM_TYPES.NONE
     });
   };
 };
@@ -44,7 +51,7 @@ export const changePointerReference = ({ id, reference }) => {
     dispatch({
       type: CHANGE_POINTER_REFERENCE,
       id,
-      reference,
+      reference
     });
   };
 };
@@ -54,15 +61,17 @@ export const exportSelection = () => {
     const { blocks, blockEditor } = await getState();
     const { hoveredItem } = blockEditor;
 
-    const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
+    const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
     const uuid = uuidv1();
     if (block) {
-      const change = block.value.change().wrapInline({ type: "pointerExport", data: { pointerId: uuid } });
+      const change = block.value
+        .change()
+        .wrapInline({ type: "pointerExport", data: { pointerId: uuid } });
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
         value: change.value,
-        pointerChanged: true,
+        pointerChanged: true
       });
     } else {
       console.error("Block was not found from action");
@@ -73,8 +82,10 @@ export const exportSelection = () => {
 function getInlinesAsArray(node: any) {
   let array: any = [];
 
-  node.nodes.forEach((child) => {
-    if (child.object === "text") { return; }
+  node.nodes.forEach(child => {
+    if (child.object === "text") {
+      return;
+    }
     if (child.object === "inline") {
       array.push(child);
     }
@@ -91,27 +102,33 @@ export const removeExportOfSelection = () => {
     const { blocks, blockEditor } = await getState();
     const { hoveredItem } = blockEditor;
 
-    const block = blocks.blocks.find((b) => b.id === hoveredItem.blockId);
+    const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
 
     if (block) {
       const inlines = getInlinesAsArray(block.value.document);
-      const matchingNodes = inlines.filter((i) => i.toJSON().data.pointerId === hoveredItem.id);
+      const matchingNodes = inlines.filter(
+        i => i.toJSON().data.pointerId === hoveredItem.id
+      );
       if (!matchingNodes.length) {
         console.error("Exporting node not found in Redux store");
         return;
       }
 
-      const change = block.value.change().unwrapInlineByKey(matchingNodes[0].key, { data: { pointerId: hoveredItem.id } });
+      const change = block.value
+        .change()
+        .unwrapInlineByKey(matchingNodes[0].key, {
+          data: { pointerId: hoveredItem.id }
+        });
 
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
-        value: change.value,
+        value: change.value
       });
 
       dispatch({
         type: CHANGE_HOVERED_ITEM,
-        hoverItemType: "NONE",
+        hoverItemType: "NONE"
       });
     } else {
       console.error("Block was not found from action");

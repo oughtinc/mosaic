@@ -15,21 +15,16 @@ function SlatePointers(options: any = {}) {
       const rect = range.getBoundingClientRect();
 
       if (rect.width === 0) {
-        window.setTimeout(
-          () => {
-            options.onSelectNull();
-          },
-          10);
+        window.setTimeout(() => {
+          options.onSelectNull();
+        }, 10);
         return;
       }
 
       const { left, right, top, bottom } = rect;
-      window.setTimeout(
-        () => {
-          options.onSelect({ left, right, top, bottom });
-        },
-        10
-      );
+      window.setTimeout(() => {
+        options.onSelect({ left, right, top, bottom });
+      }, 10);
     },
 
     shouldNodeComponentUpdate(a: object, b: object) {
@@ -37,10 +32,13 @@ function SlatePointers(options: any = {}) {
     },
 
     renderNode(props: any) {
-      const { children, node } = props;  // { attributes, isSelected }
+      const { children, node } = props; // { attributes, isSelected }
       if (node.type === "pointerExport") {
         const nodeAsJson = node.toJSON();
-        const pointer = options.availablePointers.find(p => p.data.pointerId === nodeAsJson.data.pointerId) || {};
+        const pointer =
+          options.availablePointers.find(
+            p => p.data.pointerId === nodeAsJson.data.pointerId
+          ) || {};
         return (
           <PointerExportMark
             blockEditor={options.blockEditor}
@@ -48,16 +46,21 @@ function SlatePointers(options: any = {}) {
             nodeAsJson={nodeAsJson}
             availablePointers={options.availablePointers}
             onMouseOver={({ left, right, top, bottom }) => {
-              options.onMouseOverPointerExport({ left, right, top, bottom, readOnly: pointer.readOnly, id: nodeAsJson.data.pointerId });
+              options.onMouseOverPointerExport({
+                left,
+                right,
+                top,
+                bottom,
+                readOnly: pointer.readOnly,
+                id: nodeAsJson.data.pointerId
+              });
             }}
             children={children}
           />
         );
       }
       if (node.type === "text") {
-        return (
-          <div>{children}</div>
-        );
+        return <div>{children}</div>;
       }
       if (node.type === "pointerImport") {
         return (
@@ -66,7 +69,13 @@ function SlatePointers(options: any = {}) {
             blockEditor={options.blockEditor}
             availablePointers={options.availablePointers}
             onMouseOver={({ left, right, top, bottom, id }) => {
-              options.onMouseOverPointerImport({ left, right, top, bottom, id });
+              options.onMouseOverPointerImport({
+                left,
+                right,
+                top,
+                bottom,
+                id
+              });
             }}
             isHoverable={true}
           />
@@ -74,7 +83,7 @@ function SlatePointers(options: any = {}) {
       } else {
         return;
       }
-    },
+    }
   };
 }
 

@@ -84,11 +84,12 @@ export class MenuPresentational extends React.Component<any> {
                 onChangePointerReference={this.props.changePointerReference}
               />
             )}
-            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT && !readOnly && (
-              <ExportedPointerMenu
-                removeExportOfSelection={this.props.removeExportOfSelection}
-              />
-            )}
+            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT &&
+              !readOnly && (
+                <ExportedPointerMenu
+                  removeExportOfSelection={this.props.removeExportOfSelection}
+                />
+              )}
           </div>
         )}
       </div>,

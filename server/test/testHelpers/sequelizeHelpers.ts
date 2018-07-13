@@ -6,8 +6,11 @@ import * as Promise from "bluebird";
 // Event is in here b/c clearing the events table
 // creates all sorts of weird foreign key problems, and isn't necessary,
 // at least for our current tests.
-const keysToExclude = ['sequelize', 'Sequelize', 'Event'];
+const keysToExclude = ["sequelize", "Sequelize", "Event"];
 
 const modelNamesToTruncate = _.pull(Object.keys(models), ...keysToExclude);
 
-export const truncateDb = () => Promise.each(modelNamesToTruncate, modelName => models[modelName].destroy({ where: {}, force: true }));
+export const truncateDb = () =>
+  Promise.each(modelNamesToTruncate, modelName =>
+    models[modelName].destroy({ where: {}, force: true })
+  );

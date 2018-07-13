@@ -108,10 +108,17 @@ const AuthMessage = () => {
   return (
     <Alert className="AuthMessage">
       <p>
-        <strong>Welcome!</strong> Mosaic is an app for recursive question-answering with pointers. You can browse public question-answer trees below or create private ones by signing up.
+        <strong>Welcome!</strong> Mosaic is an app for recursive
+        question-answering with pointers. You can browse public question-answer
+        trees below or create private ones by signing up.
       </p>
       <p>
-        Mosaic is an alpha version with bugs, missing features, and usability issues. You can check out <a href="https://github.com/oughtinc/mosaic">the code</a> and <a href="https://ought.org/projects/factored-cognition">learn more about the project</a>.
+        Mosaic is an alpha version with bugs, missing features, and usability
+        issues. You can check out{" "}
+        <a href="https://github.com/oughtinc/mosaic">the code</a> and{" "}
+        <a href="https://ought.org/projects/factored-cognition">
+          learn more about the project
+        </a>.
       </p>
     </Alert>
   );

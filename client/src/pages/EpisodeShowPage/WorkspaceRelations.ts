@@ -4,16 +4,16 @@ import { databaseJSONToValue } from "../../lib/slateParser";
 import { Auth } from "../../auth";
 
 export enum WorkspaceRelationTypes {
-    WorkspaceQuestion = 0,
-    WorkspaceScratchpad,
-    WorkspaceAnswer,
-    SubworkspaceQuestion,
-    SubworkspaceAnswer,
+  WorkspaceQuestion = 0,
+  WorkspaceScratchpad,
+  WorkspaceAnswer,
+  SubworkspaceQuestion,
+  SubworkspaceAnswer
 }
 
 enum Permissions {
-    ReadOnly = 0,
-    Editable,
+  ReadOnly = 0,
+  Editable
 }
 
 const QUESTION = "QUESTION";
@@ -24,121 +24,133 @@ const WORKSPACE = "WORKSPACE";
 const SUBWORKSPACE = "SUBWORKSPACE";
 
 const RelationTypeAttributes = [
-    {
-        name: WorkspaceRelationTypes.WorkspaceQuestion,
-        source: WORKSPACE,
-        blockType: QUESTION,
-        permission: Permissions.ReadOnly,
-    },
-    {
-        name: WorkspaceRelationTypes.WorkspaceScratchpad,
-        source: WORKSPACE,
-        blockType: SCRATCHPAD,
-        permission: Permissions.Editable,
-    },
-    {
-        name: WorkspaceRelationTypes.WorkspaceAnswer,
-        source: WORKSPACE,
-        blockType: ANSWER,
-        permission: Permissions.Editable,
-    },
-    {
-        name: WorkspaceRelationTypes.SubworkspaceQuestion,
-        source: SUBWORKSPACE,
-        blockType: QUESTION,
-        permission: Permissions.Editable,
-    },
-    {
-        name: WorkspaceRelationTypes.SubworkspaceAnswer,
-        source: SUBWORKSPACE,
-        blockType: ANSWER,
-        permission: Permissions.ReadOnly,
-    },
+  {
+    name: WorkspaceRelationTypes.WorkspaceQuestion,
+    source: WORKSPACE,
+    blockType: QUESTION,
+    permission: Permissions.ReadOnly
+  },
+  {
+    name: WorkspaceRelationTypes.WorkspaceScratchpad,
+    source: WORKSPACE,
+    blockType: SCRATCHPAD,
+    permission: Permissions.Editable
+  },
+  {
+    name: WorkspaceRelationTypes.WorkspaceAnswer,
+    source: WORKSPACE,
+    blockType: ANSWER,
+    permission: Permissions.Editable
+  },
+  {
+    name: WorkspaceRelationTypes.SubworkspaceQuestion,
+    source: SUBWORKSPACE,
+    blockType: QUESTION,
+    permission: Permissions.Editable
+  },
+  {
+    name: WorkspaceRelationTypes.SubworkspaceAnswer,
+    source: SUBWORKSPACE,
+    blockType: ANSWER,
+    permission: Permissions.ReadOnly
+  }
 ];
 
 function outputsToInputs(value: any) {
-    const node = value.document.nodes[0];
-    if (node == null || node.nodes == null) {
-        return value;
-    }
-    const newNodes = node.nodes.map((n) => {
-        if (n.type && n.type === "pointerExport") {
-            return ({
-                object: "inline",
-                type: "pointerImport",
-                isVoid: true,
-                data: {
-                    pointerId: n.data.pointerId,
-                    internalReferenceId: uuidv1(),
-                },
-            });
-        } else {
-            return n;
+  const node = value.document.nodes[0];
+  if (node == null || node.nodes == null) {
+    return value;
+  }
+  const newNodes = node.nodes.map(n => {
+    if (n.type && n.type === "pointerExport") {
+      return {
+        object: "inline",
+        type: "pointerImport",
+        isVoid: true,
+        data: {
+          pointerId: n.data.pointerId,
+          internalReferenceId: uuidv1()
         }
-    });
-    const newValue = _.cloneDeep(value);
-    newValue.document.nodes[0].nodes = newNodes;
-    return newValue;
+      };
+    } else {
+      return n;
+    }
+  });
+  const newValue = _.cloneDeep(value);
+  newValue.document.nodes[0].nodes = newNodes;
+  return newValue;
 }
 
 export class WorkspaceBlockRelation {
-    public workspace;
-    public workspaceRelationType;
+  public workspace;
+  public workspaceRelationType;
 
-    public constructor(workspaceRelationType: WorkspaceRelationTypes, workspace: any) {
-        this.workspace = workspace;
-        this.workspaceRelationType = workspaceRelationType;
-    }
+  public constructor(
+    workspaceRelationType: WorkspaceRelationTypes,
+    workspace: any
+  ) {
+    this.workspace = workspace;
+    this.workspaceRelationType = workspaceRelationType;
+  }
 
-    public blockEditorAttributes() {
-        const { permission } = this.relationTypeAttributes();
-        const block: any = this.findBlock();
-        const editable = Auth.isAuthorizedToEditWorkspace(this.workspace) && permission === Permissions.Editable;
-        let { value } = block;
-        const { id } = block;
-        value = databaseJSONToValue(value);
-        return {
-            name: id,
-            blockId: id,
-            readOnly: !editable,
-            initialValue: editable ? value : outputsToInputs(value),
-            shouldAutosave: editable,
-        };
-    }
+  public blockEditorAttributes() {
+    const { permission } = this.relationTypeAttributes();
+    const block: any = this.findBlock();
+    const editable =
+      Auth.isAuthorizedToEditWorkspace(this.workspace) &&
+      permission === Permissions.Editable;
+    let { value } = block;
+    const { id } = block;
+    value = databaseJSONToValue(value);
+    return {
+      name: id,
+      blockId: id,
+      readOnly: !editable,
+      initialValue: editable ? value : outputsToInputs(value),
+      shouldAutosave: editable
+    };
+  }
 
-    public findBlock() {
-        const { blockType } = this.relationTypeAttributes();
-        return this.workspace.blocks.find((b) => b.type === blockType);
-    }
+  public findBlock() {
+    const { blockType } = this.relationTypeAttributes();
+    return this.workspace.blocks.find(b => b.type === blockType);
+  }
 
-    public relationTypeAttributes() {
-        return _.keyBy(RelationTypeAttributes, "name")[this.workspaceRelationType];
-    }
+  public relationTypeAttributes() {
+    return _.keyBy(RelationTypeAttributes, "name")[this.workspaceRelationType];
+  }
 }
 export class WorkspaceWithRelations {
-    public workspace;
-    public constructor(workspace: any) {
-        this.workspace = workspace;
-    }
+  public workspace;
+  public constructor(workspace: any) {
+    this.workspace = workspace;
+  }
 
-    public allReadOnlyBlocks() {
-        return this.allReadOnlyBlockRelationships().map((b) => b.findBlock());
-    }
+  public allReadOnlyBlocks() {
+    return this.allReadOnlyBlockRelationships().map(b => b.findBlock());
+  }
 
-    private allReadOnlyBlockRelationships() {
-        const isReadOnly = (relationship) => (relationship.relationTypeAttributes().permission === Permissions.ReadOnly);
-        return this.allTouchingBlockRelationships().filter(isReadOnly);
-    }
+  private allReadOnlyBlockRelationships() {
+    const isReadOnly = relationship =>
+      relationship.relationTypeAttributes().permission === Permissions.ReadOnly;
+    return this.allTouchingBlockRelationships().filter(isReadOnly);
+  }
 
-    private allTouchingBlockRelationships() {
-        const relations: any = [];
-        _.filter(RelationTypeAttributes, { source: SUBWORKSPACE })
-            .forEach((RelationTypeAttribute) => {
-                this.workspace.childWorkspaces.forEach((childWorkspace) => {
-                    relations.push(new WorkspaceBlockRelation(RelationTypeAttribute.name, childWorkspace));
-                });
-            });
+  private allTouchingBlockRelationships() {
+    const relations: any = [];
+    _.filter(RelationTypeAttributes, { source: SUBWORKSPACE }).forEach(
+      RelationTypeAttribute => {
+        this.workspace.childWorkspaces.forEach(childWorkspace => {
+          relations.push(
+            new WorkspaceBlockRelation(
+              RelationTypeAttribute.name,
+              childWorkspace
+            )
+          );
+        });
+      }
+    );
 
-        return relations;
-    }
+    return relations;
+  }
 }

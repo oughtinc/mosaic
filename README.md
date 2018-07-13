@@ -22,6 +22,11 @@ yarn test
 ```
 
 
+## Development
+
+The code is written in [Typescript](https://www.typescriptlang.org/), but much of it is not correctly annotated. We use [Prettier](https://github.com/prettier/prettier) for code formatting.
+
+
 ## Deployment
 
 The app is deployed on Heroku.
