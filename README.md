@@ -2,14 +2,22 @@
 
 Mosaic is a web app for recursive question-answering with pointers.
 
-This is an alpha version with bugs, missing features, and usability issues.
+![](screencast.gif)
 
+This is an alpha version with bugs, missing features, and usability issues.
 
 ## Setup
 
 1. Install [Docker](https://www.docker.com/community-edition#/download)
 2. Run `docker-compose up` in the root folder
 
+On first run, you might have to call `migrate` to initialize the database:
+
+```
+docker exec -it mosaic_api_1 bash
+> cd /data
+> node_modules/.bin/sequelize db:migrate
+```
 
 ## Testing
 
