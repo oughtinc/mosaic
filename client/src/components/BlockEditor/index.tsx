@@ -79,7 +79,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           top,
           left,
           readOnly,
-          blockId: newProps.blockId,
+          blockId: newProps.blockId
         });
       },
       onMouseOverPointerImport: ({ top, left, id }) => {
@@ -150,20 +150,20 @@ class BlockEditorPresentational extends React.Component<any, any> {
         <Editor value={value} readOnly={true} plugins={plugins} />
       </BlockReadOnlyStyle>
     ) : (
-        <BlockEditorEditing
-          value={value}
-          readOnly={true}
-          shouldAutosave={!!this.props.shouldAutosave}
-          block={this.props.block}
-          availablePointers={this.props.availablePointers}
-          plugins={plugins}
-          onChange={this.props.onChange}
-          onKeyDown={this.props.onKeyDown}
-          onMount={input => {
-            this.blockEditorEditing = input;
-          }}
-        />
-      );
+      <BlockEditorEditing
+        value={value}
+        readOnly={true}
+        shouldAutosave={!!this.props.shouldAutosave}
+        block={this.props.block}
+        availablePointers={this.props.availablePointers}
+        plugins={plugins}
+        onChange={this.props.onChange}
+        onKeyDown={this.props.onKeyDown}
+        onMount={input => {
+          this.blockEditorEditing = input;
+        }}
+      />
+    );
   }
 
   public render() {

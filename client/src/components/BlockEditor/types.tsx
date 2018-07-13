@@ -1,6 +1,6 @@
 export enum MutationStatus {
-    NotStarted = 0,
-    Loading,
-    Complete,
-    Error,
+  NotStarted = 0,
+  Loading,
+  Complete,
+  Error
 }

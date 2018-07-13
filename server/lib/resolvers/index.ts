@@ -1,11 +1,9 @@
 import * as _ from "lodash";
 import { resolver } from "graphql-sequelize";
 
-const Query = {
-};
+const Query = {};
 
-const Mutation = {
-};
+const Mutation = {};
 
 const resolvers = { Query, Mutation };
 

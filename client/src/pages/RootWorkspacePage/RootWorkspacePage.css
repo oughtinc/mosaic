@@ -1,0 +1,7 @@
+.AuthMessage a {
+    text-decoration: underline;
+}
+
+.AuthMessage a:hover {
+    text-decoration: none;
+}

@@ -195,7 +195,7 @@ export class FormPagePresentational extends React.Component<any, any> {
     ).blockEditorAttributes();
     return (
       <div key={workspace.id}>
-        <BlockHoverMenu >
+        <BlockHoverMenu>
           <Row>
             <Col sm={10}>
               {workspace.parentId && (

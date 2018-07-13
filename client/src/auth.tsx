@@ -26,7 +26,9 @@ export class Auth {
   }
 
   public static handleAuthentication(callback: () => void): void {
-    if (Auth.isAuthenticated()) { return; }
+    if (Auth.isAuthenticated()) {
+      return;
+    }
     Auth.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken) {
         const expiresAt = JSON.stringify(
