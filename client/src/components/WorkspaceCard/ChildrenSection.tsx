@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import * as React from "react";
-import FontAwesomeIcon = require("@fortawesome/react-fontawesome");
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import faLongArrowAltRight = require("@fortawesome/fontawesome-free-solid/faLongArrowAltRight");
 
 import { WorkspaceCard } from "./index";
