@@ -10,6 +10,13 @@ This is an alpha version with bugs, missing features, and usability issues.
 1. Install [Docker](https://www.docker.com/community-edition#/download)
 2. Run `docker-compose up` in the root folder
 
+On first run, you might have to call `migrate` to initialize the database:
+
+```
+docker exec -it mosaic_api_1 bash
+> cd /data
+> node_modules/.bin/sequelize db:migrate
+```
 
 ## Testing
 
