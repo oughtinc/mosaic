@@ -113,7 +113,7 @@ const AuthMessage = () => {
         trees below or create private ones by signing up.
       </p>
       <p>
-        Mosaic is an alpha version with bugs, missing features, and usability
+        This is an alpha version with bugs, missing features, and usability
         issues. You can check out{" "}
         <a href="https://github.com/oughtinc/mosaic">the code</a> and{" "}
         <a href="https://ought.org/projects/factored-cognition">
