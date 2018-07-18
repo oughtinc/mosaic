@@ -1,7 +1,7 @@
 import { graphql, ExecutionResult } from "graphql";
 import { print } from "graphql";
 import { schema } from "../../lib/schema/index";
-import { CREATE_ROOT_WORKSPACE } from "../../../client/src/graphqlQueries";
+import { CREATE_ROOT_WORKSPACE } from "./graphqlQueries";
 
 const runGraphQLQuery = (
   queryAST: any,
