@@ -1,4 +1,4 @@
-# Mosaic 
+# Mosaic
 
 Mosaic is a web app for recursive question-answering with pointers.
 
@@ -21,11 +21,11 @@ docker exec -it mosaic_api_1 bash
 
 ## Testing
 
-To run the backend tests, attach a shell to the Docker `web` service:
+To run the backend tests, attach a shell to the Docker `api` service:
 
 ```
-docker exec -it mosaic_web_1 bash
-cd /data/server
+docker exec -it mosaic_api_1 bash
+cd /data
 yarn test
 ```
 
@@ -39,7 +39,7 @@ The code is written in [Typescript](https://www.typescriptlang.org/), but much o
 
 The app is deployed on Heroku.
 
-To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page. 
+To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page.
 
 When a branch is merged into master, the main deploy is updated automatically.
 
@@ -74,5 +74,3 @@ To automatically create new dumps when the db changes:
 1. If the app is not running, run it (`docker-compose up`)
 2. `cd server`
 3. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
-
-

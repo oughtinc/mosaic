@@ -11,14 +11,15 @@ describe("WorkspaceModel", () => {
       beforeEach(() => truncateDb());
       it("should not return anything", async () => {
         const totalBudget = 1000;
+        const creatorId = "testcreatorId";
         const question = rootWorkspaceQuestion("Mock workspace name");
         const event = await models.Event.create();
         const workspace = await models.Workspace.create(
-          { totalBudget },
+          { totalBudget, creatorId },
           { event, questionValue: JSON.parse(question) }
         );
-        const subtreeWorkspaces = await workspace.subtreeWorkspaces();
-        expect(subtreeWorkspaces).to.be.empty;
+        const childWorkspaces = await workspace.getChildWorkspaces();
+        expect(childWorkspaces).to.be.empty;
       });
     });
   });
