@@ -12,6 +12,8 @@ import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
+import sortWorkspacesByCreatedAt from '../../utils/sortWorkspacesByCreatedAt';
+
 import "./RootWorkspacePage.css";
 
 const RootWorkspacePageSection = styled.div`
@@ -127,10 +129,12 @@ const AuthMessage = () => {
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
     const isLoading = this.props.originWorkspaces.loading;
-    const workspaces = _.sortBy(
-      this.props.originWorkspaces.workspaces,
-      "createdAt"
-    );
+
+    let sortedWorkspaces : Array<any> = [];
+    if (!isLoading) {
+      sortedWorkspaces = sortWorkspacesByCreatedAt(this.props.originWorkspaces.workspaces);
+    }
+
     return (
       <div>
         {!Auth.isAuthenticated() && <AuthMessage />}
@@ -139,7 +143,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <WorkspaceList>
             {isLoading
               ? "Loading..."
-              : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
+              : sortedWorkspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAuthenticated() && (
