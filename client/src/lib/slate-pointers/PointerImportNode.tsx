@@ -1,8 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
+import { changePointerReference } from '../../modules/blockEditor/actions';
 
 const RemovedPointer = styled.span`
   background-color: rgba(252, 86, 86, 0.66);
@@ -42,7 +44,7 @@ const OpenPointerImport: any = styled.div`
   }
 `;
 
-export class PointerImportNode extends React.Component<any, any> {
+class PointerImportNodePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
   }
@@ -94,6 +96,7 @@ export class PointerImportNode extends React.Component<any, any> {
     if (!isOpen) {
       return (
         <ClosedPointerImport
+          onClick={() => this.props.handleClickingClosedPointer(this.props.nodeAsJson.data.internalReferenceId)}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.props.onMouseOut}
         >
@@ -102,7 +105,10 @@ export class PointerImportNode extends React.Component<any, any> {
       );
     } else {
       return (
-        <OpenPointerImport isSelected={isSelected}>
+        <OpenPointerImport
+          isSelected={isSelected}
+          onClick={() => this.props.handleClickingOpenPointer(this.props.nodeAsJson.data.internalReferenceId)}
+        >
           <ShowExpandedPointer
             blockEditor={blockEditor}
             exportingPointer={importingPointer}
@@ -117,3 +123,17 @@ export class PointerImportNode extends React.Component<any, any> {
     }
   }
 }
+
+const mapDispatchToProps = dispatch => ({
+  handleClickingClosedPointer: pointerId => dispatch(changePointerReference({
+    id: pointerId,
+    reference: { isOpen: true },
+  })),
+
+  handleClickingOpenPointer: pointerId => dispatch(changePointerReference({
+    id: pointerId,
+    reference: { isOpen: false },
+  })),
+});
+
+export const PointerImportNode = connect(null, mapDispatchToProps)(PointerImportNodePresentational);
