@@ -68,6 +68,16 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     }
   };
 
+  public handleClickingClosedPointer = (e, pointerId) => {
+    this.props.openClosedPointer(pointerId);
+    e.stopPropagation();
+  }
+
+  public handleClickingOpenPointer = (e, pointerId) => {
+    this.props.closeOpenPointer(pointerId);
+    e.stopPropagation();
+  }
+
   public render() {
     const { blockEditor, availablePointers, nodeAsJson } = this.props;
 
@@ -96,7 +106,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     if (!isOpen) {
       return (
         <ClosedPointerImport
-          onClick={() => this.props.handleClickingClosedPointer(this.props.nodeAsJson.data.internalReferenceId)}
+          onClick={e => this.handleClickingClosedPointer(e, this.props.nodeAsJson.data.internalReferenceId)}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.props.onMouseOut}
         >
@@ -107,7 +117,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       return (
         <OpenPointerImport
           isSelected={isSelected}
-          onClick={() => this.props.handleClickingOpenPointer(this.props.nodeAsJson.data.internalReferenceId)}
+          onClick={e => this.handleClickingOpenPointer(e, this.props.nodeAsJson.data.internalReferenceId)}
         >
           <ShowExpandedPointer
             blockEditor={blockEditor}
@@ -125,12 +135,12 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 }
 
 const mapDispatchToProps = dispatch => ({
-  handleClickingClosedPointer: pointerId => dispatch(changePointerReference({
+  openClosedPointer: pointerId => dispatch(changePointerReference({
     id: pointerId,
     reference: { isOpen: true },
   })),
 
-  handleClickingOpenPointer: pointerId => dispatch(changePointerReference({
+  closeOpenPointer: pointerId => dispatch(changePointerReference({
     id: pointerId,
     reference: { isOpen: false },
   })),
