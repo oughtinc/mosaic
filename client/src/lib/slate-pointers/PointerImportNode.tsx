@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
-import { changePointerReference } from '../../modules/blockEditor/actions';
+import { changePointerReference } from "../../modules/blockEditor/actions";
 
 const RemovedPointer = styled.span`
   background-color: rgba(252, 86, 86, 0.66);
