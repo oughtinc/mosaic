@@ -136,7 +136,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   }
 }
 
-const mapDispatchToProps = (dispatch: (any) => any) => ({
+const mapDispatchToProps = (dispatch: (actionObjectOrThunkFn: any) => any) => ({
   openClosedPointer: (pointerId: string) => dispatch(changePointerReference({
     id: pointerId,
     reference: { isOpen: true },
