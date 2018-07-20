@@ -127,10 +127,12 @@ const AuthMessage = () => {
 export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
     const isLoading = this.props.originWorkspaces.loading;
+
     const workspaces = _.sortBy(
       this.props.originWorkspaces.workspaces,
-      "createdAt"
+      workspace => Date.parse(workspace.createdAt)
     );
+
     return (
       <div>
         {!Auth.isAuthenticated() && <AuthMessage />}
