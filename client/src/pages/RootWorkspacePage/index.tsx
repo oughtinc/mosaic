@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
 import { compose } from "recompose";
@@ -10,8 +11,6 @@ import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
-
-import sortWorkspacesByCreatedAt from '../../utils/sortWorkspacesByCreatedAt';
 
 import "./RootWorkspacePage.css";
 
@@ -129,10 +128,10 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
   public render() {
     const isLoading = this.props.originWorkspaces.loading;
 
-    let sortedWorkspaces : Array<any> = [];
-    if (!isLoading) {
-      sortedWorkspaces = sortWorkspacesByCreatedAt(this.props.originWorkspaces.workspaces);
-    }
+    const workspaces = _.sortBy(
+      this.props.originWorkspaces.workspaces,
+      workspace => Date.parse(workspace.createdAt)
+    );
 
     return (
       <div>
@@ -142,7 +141,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <WorkspaceList>
             {isLoading
               ? "Loading..."
-              : sortedWorkspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
+              : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAuthenticated() && (
