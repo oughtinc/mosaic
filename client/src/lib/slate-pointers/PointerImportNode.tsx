@@ -1,8 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
+import { changePointerReference } from "../../modules/blockEditor/actions";
 
 const RemovedPointer = styled.span`
   background-color: rgba(252, 86, 86, 0.66);
@@ -42,7 +44,7 @@ const OpenPointerImport: any = styled.div`
   }
 `;
 
-export class PointerImportNode extends React.Component<any, any> {
+class PointerImportNodePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
   }
@@ -66,6 +68,16 @@ export class PointerImportNode extends React.Component<any, any> {
     }
   };
 
+  public handleClosedPointerClick = (e: Event, pointerId: string) => {
+    this.props.openClosedPointer(pointerId);
+    e.stopPropagation( );
+  }
+
+  public handleOpenPointerClick = (e: Event, pointerId: string) => {
+    this.props.closeOpenPointer(pointerId);
+    e.stopPropagation();
+  }
+
   public render() {
     const { blockEditor, availablePointers, nodeAsJson } = this.props;
 
@@ -79,6 +91,8 @@ export class PointerImportNode extends React.Component<any, any> {
       availablePointers,
       nodeAsJson
     });
+
+    const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
 
     if (!importingPointer) {
       return (
@@ -94,6 +108,7 @@ export class PointerImportNode extends React.Component<any, any> {
     if (!isOpen) {
       return (
         <ClosedPointerImport
+          onClick={e => this.handleClosedPointerClick(e, pointerId)}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.props.onMouseOut}
         >
@@ -102,7 +117,10 @@ export class PointerImportNode extends React.Component<any, any> {
       );
     } else {
       return (
-        <OpenPointerImport isSelected={isSelected}>
+        <OpenPointerImport
+          isSelected={isSelected}
+          onClick={e => this.handleOpenPointerClick(e, pointerId)}
+        >
           <ShowExpandedPointer
             blockEditor={blockEditor}
             exportingPointer={importingPointer}
@@ -117,3 +135,17 @@ export class PointerImportNode extends React.Component<any, any> {
     }
   }
 }
+
+const mapDispatchToProps = (dispatch: (actionObjectOrThunkFn: any) => any) => ({
+  openClosedPointer: (pointerId: string) => dispatch(changePointerReference({
+    id: pointerId,
+    reference: { isOpen: true },
+  })),
+
+  closeOpenPointer: (pointerId: string) => dispatch(changePointerReference({
+    id: pointerId,
+    reference: { isOpen: false },
+  })),
+});
+
+export const PointerImportNode = connect(null, mapDispatchToProps)(PointerImportNodePresentational);
