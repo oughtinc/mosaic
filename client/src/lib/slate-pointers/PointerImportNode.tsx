@@ -68,12 +68,12 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     }
   };
 
-  public handleClickingClosedPointer = (e, pointerId) => {
+  public handleClosedPointerClick = (e: Event, pointerId: string) => {
     this.props.openClosedPointer(pointerId);
-    e.stopPropagation();
+    e.stopPropagation( );
   }
 
-  public handleClickingOpenPointer = (e, pointerId) => {
+  public handleOpenPointerClick = (e: Event, pointerId: string) => {
     this.props.closeOpenPointer(pointerId);
     e.stopPropagation();
   }
@@ -92,6 +92,8 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       nodeAsJson
     });
 
+    const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
+
     if (!importingPointer) {
       return (
         <RemovedPointer
@@ -106,7 +108,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     if (!isOpen) {
       return (
         <ClosedPointerImport
-          onClick={e => this.handleClickingClosedPointer(e, this.props.nodeAsJson.data.internalReferenceId)}
+          onClick={e => this.handleClosedPointerClick(e, pointerId)}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.props.onMouseOut}
         >
@@ -117,7 +119,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       return (
         <OpenPointerImport
           isSelected={isSelected}
-          onClick={e => this.handleClickingOpenPointer(e, this.props.nodeAsJson.data.internalReferenceId)}
+          onClick={e => this.handleOpenPointerClick(e, pointerId)}
         >
           <ShowExpandedPointer
             blockEditor={blockEditor}
@@ -134,13 +136,13 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   }
 }
 
-const mapDispatchToProps = dispatch => ({
-  openClosedPointer: pointerId => dispatch(changePointerReference({
+const mapDispatchToProps = (dispatch: (any) => any) => ({
+  openClosedPointer: (pointerId: string) => dispatch(changePointerReference({
     id: pointerId,
     reference: { isOpen: true },
   })),
 
-  closeOpenPointer: pointerId => dispatch(changePointerReference({
+  closeOpenPointer: (pointerId: string) => dispatch(changePointerReference({
     id: pointerId,
     reference: { isOpen: false },
   })),
