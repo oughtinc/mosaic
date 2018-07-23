@@ -257,14 +257,14 @@ const WorkspaceModel = (
     return _connectedPointers;
   };
 
-  // Returns an array containingg the pointers connected to a workspace and
-  // all of its descendants. Passes "pointerSoFar" parameter to recursive
-  // subcalls in order to avoid duplicate SQL queries for pointers
+  // Returns an array containing the pointers connected to a workspace and all
+  // of its descendants. Passes "pointerSoFar" parameter to recursive
+  // subcalls in order to avoid duplicate SQL queries for pointers.
   Workspace.prototype.getConnectedPointersOfSubtree = async function(pointersSoFar = []) {
     const connectedPointersOfSubtree = [];
 
-    // can use this.getBlocks instead of this.getVisibleBlocks because later we
-    // will go on to iterate through all the children workspaces
+    // Can use this.getBlocks instead of this.getVisibleBlocks because later we
+    // will go on to iterate through all the children workspaces.
     const blocks = await this.getBlocks();
 
     for (const block of blocks) {
