@@ -148,7 +148,7 @@ const schema = new GraphQLSchema({
         resolve: async (_, { workspaceId }, context, info) => {
           const rootWorkspace = await models.Workspace.findById(workspaceId);
           const children = await rootWorkspace.getChildWorkspaces();
-          return [rootWorkspace, ...children];
+          return [rootWorkspace];
         }
       },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),

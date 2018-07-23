@@ -122,7 +122,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<
         <ChildrenSection
           parentPointers={availablePointers}
           workspace={workspace}
-          workspaces={workspaces}
           childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
           onChangeToggle={() =>
             this.handleChangeToggle(
