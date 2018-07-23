@@ -49,14 +49,34 @@ export const WORKSPACES_QUERY = gql`
   }
 `;
 
-export const WORKSPACE_SUBTREE_QUERY = gql`
+// The only current difference between ROOT_WORKSPACE_SUBTREE_QUERY and
+// CHILD_WORKSPACE_SUBTREE_QUERY is that the former asks for
+// connectedPointersOfSubtree, but the latter doesn't.
+
+export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
   query workspaceSubtree($workspaceId: String!) {
     subtreeWorkspaces(workspaceId: $workspaceId) {
       id
       isPublic
       creatorId
       childWorkspaceOrder
-      connectedPointers
+      connectedPointersOfSubtree
+      blocks {
+        id
+        value
+        type
+      }
+    }
+  }
+`;
+
+export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
+  query workspaceSubtree($workspaceId: String!) {
+    subtreeWorkspaces(workspaceId: $workspaceId) {
+      id
+      isPublic
+      creatorId
+      childWorkspaceOrder
       blocks {
         id
         value

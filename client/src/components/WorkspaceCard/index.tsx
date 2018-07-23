@@ -5,7 +5,10 @@ import { ChildrenSection } from "./ChildrenSection";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import _ = require("lodash");
-import { WORKSPACE_SUBTREE_QUERY } from "../../graphqlQueries";
+import {
+  ROOT_WORKSPACE_SUBTREE_QUERY,
+  CHILD_WORKSPACE_SUBTREE_QUERY,
+} from "../../graphqlQueries";
 
 import { Auth } from "../../auth";
 
@@ -41,11 +44,12 @@ interface ConnectedPointerType {
 interface WorkspaceType {
   blocks: any[];
   childWorkspaceOrder: string[];
-  connectedPointers: any;
+  connectedPointersOfSubtree: ConnectedPointerType[];
   id: string;
 }
 
 interface WorkspaceCardProps {
+  isChild: boolean;
   parentPointers: ConnectedPointerType[];
   workspaceId: string;
 }
@@ -89,24 +93,21 @@ export class WorkspaceCardPresentational extends React.PureComponent<
 
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
 
-    const newPointers: ConnectedPointerType[] = _.chain(workspaces)
-      .map((w: any) => w.connectedPointers)
-      .flatten()
-      .uniqBy(getPointerId)
-      .map(node => {
-        return { ...node, readOnly: !editable };
-      })
-      .value();
-
-    const availablePointers: ConnectedPointerType[] = _.chain(
+    const availablePointers: ConnectedPointerType[] =
+      this.props.isChild
+      ?
       this.props.parentPointers
-    )
-      .concat(newPointers)
-      .uniqBy(getPointerId)
-      .map(node => {
-        return { ...node, readOnly: !editable };
-      })
-      .value();
+      :
+        (
+          workspace
+          ?
+          _(workspace.connectedPointersOfSubtree)
+            .uniqBy(getPointerId)
+            .map(node => ({...node, readOnly: !editable }))
+            .value()
+          :
+          []
+        );
 
     if (!workspace) {
       return <div>Loading...</div>;
@@ -134,13 +135,24 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     );
   }
 }
-const options = ({ workspaceId }) => ({
-  variables: { workspaceId }
+
+const optionsForRoot = ({ workspaceId, isChild }) => ({
+  variables: { workspaceId },
+  skip: isChild
+});
+
+const optionsForChild = ({ workspaceId, isChild }) => ({
+  variables: { workspaceId },
+  skip: !isChild
 });
 
 export const WorkspaceCard: any = compose(
-  graphql(WORKSPACE_SUBTREE_QUERY, {
+  graphql(ROOT_WORKSPACE_SUBTREE_QUERY, {
     name: "workspaceSubtreeWorkspaces",
-    options
-  })
+    options: optionsForRoot,
+  }),
+  graphql(CHILD_WORKSPACE_SUBTREE_QUERY, {
+    name: "workspaceSubtreeWorkspaces",
+    options: optionsForChild,
+  }),
 )(WorkspaceCardPresentational);
