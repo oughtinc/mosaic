@@ -45,6 +45,7 @@ export const WORKSPACES_QUERY = gql`
         value
         type
       }
+      connectedPointers
     }
   }
 `;
