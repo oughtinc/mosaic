@@ -121,9 +121,9 @@ export class WorkspaceCardPresentational extends React.PureComponent<
           {
             !this.props.isChild
             ?
-            'Loading... This may take some time for complex trees.'
+            "Loading... This may take some time for complex trees."
             :
-            'Loading...'
+            "Loading..."
           }
         </div>
       );
