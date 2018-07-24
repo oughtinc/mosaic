@@ -116,7 +116,17 @@ export class WorkspaceCardPresentational extends React.PureComponent<
         );
 
     if (!workspace) {
-      return <div>Loading...</div>;
+      return (
+        <div>
+          {
+            !this.props.isChild
+            ?
+            'Loading... This may take some time for complex trees.'
+            :
+            'Loading...'
+          }
+        </div>
+      );
     }
     return (
       <Container>
