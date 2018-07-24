@@ -142,14 +142,6 @@ const schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(models.Workspace)
       },
-      workspaceInSubtree: {
-        type: workspaceType,
-        args: { workspaceId: { type: GraphQLString } },
-        resolve: async (_, { workspaceId }, context, info) => {
-          const rootWorkspace = await models.Workspace.findById(workspaceId);
-          return rootWorkspace;
-        }
-      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(
         new GraphQLList(pointerType),

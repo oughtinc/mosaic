@@ -55,7 +55,7 @@ export const WORKSPACES_QUERY = gql`
 
 export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
   query rootWorkspaceSubtree($workspaceId: String!) {
-    workspaceInSubtree(workspaceId: $workspaceId) {
+    workspace(id: $workspaceId) {
       id
       isPublic
       creatorId
@@ -72,7 +72,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
 
 export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
   query childWorkspaceSubtree($workspaceId: String!) {
-    workspaceInSubtree(workspaceId: $workspaceId) {
+    workspace(id: $workspaceId) {
       id
       isPublic
       creatorId

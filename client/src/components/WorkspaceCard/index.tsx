@@ -57,7 +57,7 @@ interface WorkspaceCardProps {
 
 interface SubtreeQuery {
   loading: boolean;
-  workspaceInSubtree: any;
+  workspace: any;
 }
 
 interface WorkspaceCardState {
@@ -95,7 +95,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
       ?
       undefined
       :
-      this.props.subtreeQuery.workspaceInSubtree;
+      this.props.subtreeQuery.workspace;
 
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
 
