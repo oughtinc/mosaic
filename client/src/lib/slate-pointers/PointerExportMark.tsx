@@ -10,19 +10,17 @@ import { propsToPointerDetails } from "./helpers";
 //     return _.max(possibilities.map((p) => (getMaxNesting(p) + 1))) || 0;
 // }
 
-const pointerExportBackground: any = ({ isSelected, isDisplayMode }: any) => {
+const pointerExportBackground: any = ({ isSelected }: any) => {
   if (isSelected) {
     return "rgba(85, 228, 38, 0.9)";
-  } else if (isDisplayMode) {
-    return "rgba(200, 243, 197, 0.5)";
   } else {
-    return "rgba(200, 243, 197, 0.8)";
+    return "rgba(200, 243, 197, 0.5)";
   }
 };
 
 const PointerExportStyle: any = styled.span`
   background: ${pointerExportBackground};
-  margin-left: ${({ isDisplayMode }: any) => (isDisplayMode ? "3px" : "0")};
+  margin-left: 3px;
   transition: background 0.2s;
   color: #000000;
 `;
@@ -44,28 +42,6 @@ const Tag = styled.span`
   border-radius: 4px 0 0 4px;
   margin-left: 0px;
 `;
-
-const DisplayModeSurround = ({
-  isDisplayMode,
-  children,
-  pointerIndex,
-  onMouseOver
-}: any) => {
-  if (!isDisplayMode) {
-    return children;
-  } else {
-    return (
-      <span>
-        <Tag onMouseOver={onMouseOver}>
-          {`$${parseInt(pointerIndex, 10) + 1}`}
-        </Tag>
-        <Bracket onMouseOver={onMouseOver}>{"["}</Bracket>
-        {children}
-        <Bracket onMouseOver={onMouseOver}>{"]"}</Bracket>
-      </span>
-    );
-  }
-};
 
 export class PointerExportMark extends React.Component<any, any> {
   public constructor(props: any) {
@@ -92,7 +68,6 @@ export class PointerExportMark extends React.Component<any, any> {
       availablePointers,
       nodeAsJson,
       children,
-      isDisplayMode
     }: any = this.props;
 
     const { pointerIndex }: any = propsToPointerDetails({
@@ -104,13 +79,11 @@ export class PointerExportMark extends React.Component<any, any> {
       <PointerExportStyle
         isSelected={isSelected}
         onMouseOut={this.props.onMouseOut}
-        isDisplayMode={isDisplayMode}
       >
-        <DisplayModeSurround
-          isDisplayMode={isDisplayMode}
-          pointerIndex={pointerIndex}
-          onMouseOver={this.onMouseOver}
-        >
+        <Tag onMouseOver={this.onMouseOver}>
+          {`$${parseInt(pointerIndex, 10) + 1}`}
+        </Tag>
+        <Bracket onMouseOver={this.onMouseOver}>{"["}</Bracket>
           {children.map((child, index) => {
             const isNestedPointer = child.props.node.object === "inline";
 
@@ -124,7 +97,7 @@ export class PointerExportMark extends React.Component<any, any> {
               return child;
             }
           })}
-        </DisplayModeSurround>
+        <Bracket onMouseOver={this.onMouseOver}>{"]"}</Bracket>
       </PointerExportStyle>
     );
   }

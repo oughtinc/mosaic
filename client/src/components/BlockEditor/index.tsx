@@ -94,7 +94,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       availablePointers: newProps.availablePointers,
-      isDisplayMode: newProps.isDisplayMode
     };
     this.setState({
       plugins: [SoftBreak({}), SlatePointers(SlatePointerInputs)]

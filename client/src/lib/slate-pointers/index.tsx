@@ -42,7 +42,6 @@ function SlatePointers(options: any = {}) {
         return (
           <PointerExportMark
             blockEditor={options.blockEditor}
-            isDisplayMode={options.isDisplayMode}
             nodeAsJson={nodeAsJson}
             availablePointers={options.availablePointers}
             onMouseOver={({ left, right, top, bottom }) => {
