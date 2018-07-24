@@ -142,12 +142,12 @@ const schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(models.Workspace)
       },
-      subtreeWorkspaces: {
-        type: new GraphQLList(workspaceType),
+      workspaceInSubtree: {
+        type: workspaceType,
         args: { workspaceId: { type: GraphQLString } },
         resolve: async (_, { workspaceId }, context, info) => {
           const rootWorkspace = await models.Workspace.findById(workspaceId);
-          return [rootWorkspace];
+          return rootWorkspace;
         }
       },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),

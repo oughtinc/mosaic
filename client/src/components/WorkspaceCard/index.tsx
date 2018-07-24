@@ -52,6 +52,12 @@ interface WorkspaceCardProps {
   isChild: boolean;
   parentPointers: ConnectedPointerType[];
   workspaceId: string;
+  subtreeQuery: SubtreeQuery;
+}
+
+interface SubtreeQuery {
+  loading: boolean;
+  workspaceInSubtree: any;
 }
 
 interface WorkspaceCardState {
@@ -84,12 +90,12 @@ export class WorkspaceCardPresentational extends React.PureComponent<
   };
 
   public render() {
-    const workspaces: WorkspaceType[] =
-      _.get(this.props, "workspaceSubtreeWorkspaces.subtreeWorkspaces") || [];
-
-    const workspace: WorkspaceType | undefined = workspaces.find(
-      w => w.id === this.props.workspaceId
-    );
+    const workspace: WorkspaceType | undefined =
+      this.props.subtreeQuery.loading
+      ?
+      undefined
+      :
+      this.props.subtreeQuery.workspaceInSubtree;
 
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
 
@@ -148,11 +154,11 @@ const optionsForChild = ({ workspaceId, isChild }) => ({
 
 export const WorkspaceCard: any = compose(
   graphql(ROOT_WORKSPACE_SUBTREE_QUERY, {
-    name: "workspaceSubtreeWorkspaces",
+    name: "subtreeQuery",
     options: optionsForRoot,
   }),
   graphql(CHILD_WORKSPACE_SUBTREE_QUERY, {
-    name: "workspaceSubtreeWorkspaces",
+    name: "subtreeQuery",
     options: optionsForChild,
   }),
 )(WorkspaceCardPresentational);

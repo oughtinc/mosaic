@@ -54,8 +54,8 @@ export const WORKSPACES_QUERY = gql`
 // connectedPointersOfSubtree, but the latter doesn't.
 
 export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
-  query workspaceSubtree($workspaceId: String!) {
-    subtreeWorkspaces(workspaceId: $workspaceId) {
+  query rootWorkspaceSubtree($workspaceId: String!) {
+    workspaceInSubtree(workspaceId: $workspaceId) {
       id
       isPublic
       creatorId
@@ -71,8 +71,8 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
 `;
 
 export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
-  query workspaceSubtree($workspaceId: String!) {
-    subtreeWorkspaces(workspaceId: $workspaceId) {
+  query childWorkspaceSubtree($workspaceId: String!) {
+    workspaceInSubtree(workspaceId: $workspaceId) {
       id
       isPublic
       creatorId
