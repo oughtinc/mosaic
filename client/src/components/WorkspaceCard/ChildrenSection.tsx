@@ -55,7 +55,7 @@ export const ChildrenSection = ({
             {childrenIds.map(childId => (
               <ChildContainer key={childId}>
                 <WorkspaceCard
-                  isChild={true}
+                  isTopLevelOfCurrentTree={false}
                   workspaceId={childId}
                   parentPointers={parentPointers}
                 />

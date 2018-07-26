@@ -32,11 +32,11 @@ const CardBody = styled.div`
   border-radius: 0 2px 2px 2px;
 `;
 
-const LoadingMsg = ({ isChild }) => {
+const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
   return (
     <div>
       {
-        !isChild
+        isTopLevelOfCurrentTree
         ?
         "Loading... This may take some time for complex trees."
         :
@@ -63,7 +63,7 @@ interface WorkspaceType {
 }
 
 interface WorkspaceCardProps {
-  isChild: boolean;
+  isTopLevelOfCurrentTree: boolean;
   parentPointers: ConnectedPointerType[];
   workspaceId: string;
   subtreeQuery: SubtreeQuery;
@@ -114,7 +114,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
 
     const availablePointers: ConnectedPointerType[] =
-      this.props.isChild
+      !this.props.isTopLevelOfCurrentTree
       ?
       this.props.parentPointers
       :
@@ -130,7 +130,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
         );
 
     if (!workspace) {
-      return <LoadingMsg isChild={this.props.isChild}/>;
+      return <LoadingMsg isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}/>;
     }
     return (
       <Container>
@@ -156,23 +156,23 @@ export class WorkspaceCardPresentational extends React.PureComponent<
   }
 }
 
-const optionsForRoot = ({ workspaceId, isChild }) => ({
+const optionsForTopLevel = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
   variables: { workspaceId },
-  skip: isChild
+  skip: !isTopLevelOfCurrentTree
 });
 
-const optionsForChild = ({ workspaceId, isChild }) => ({
+const optionsForNested = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
   variables: { workspaceId },
-  skip: !isChild
+  skip: isTopLevelOfCurrentTree
 });
 
 export const WorkspaceCard: any = compose(
   graphql(ROOT_WORKSPACE_SUBTREE_QUERY, {
     name: "subtreeQuery",
-    options: optionsForRoot,
+    options: optionsForTopLevel,
   }),
   graphql(CHILD_WORKSPACE_SUBTREE_QUERY, {
     name: "subtreeQuery",
-    options: optionsForChild,
+    options: optionsForNested,
   }),
 )(WorkspaceCardPresentational);
