@@ -32,6 +32,20 @@ const CardBody = styled.div`
   border-radius: 0 2px 2px 2px;
 `;
 
+const LoadingMsg = ({ isChild }) => {
+  return (
+    <div>
+      {
+        !isChild
+        ?
+        "Loading... This may take some time for complex trees."
+        :
+        "Loading..."
+      }
+    </div>
+  );
+};
+
 // TODO: Eventually these should be used in a common file for many cases that use them.
 interface ConnectedPointerType {
   data: any;
@@ -116,17 +130,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
         );
 
     if (!workspace) {
-      return (
-        <div>
-          {
-            !this.props.isChild
-            ?
-            "Loading... This may take some time for complex trees."
-            :
-            "Loading..."
-          }
-        </div>
-      );
+      return <LoadingMsg isChild={this.props.isChild}/>;
     }
     return (
       <Container>
