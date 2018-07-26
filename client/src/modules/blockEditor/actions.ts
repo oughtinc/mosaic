@@ -64,9 +64,46 @@ export const exportSelection = () => {
     const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
     const uuid = uuidv1();
     if (block) {
+      const fragment = block.value.fragment;
+      const topLevelNodes = fragment.nodes.toJSON()[0].nodes;
+
+      const onlyOneNodeThatIsPointerExport = nodes => {
+        return (
+          nodes.length === 1
+          &&
+          nodes[0].type === 'pointerExport'
+        );
+      }
+
+      const twoNodesFirstExportSecondEmptyString = nodes => {
+        return (
+          nodes.length === 2
+          &&
+          nodes[0].type === 'pointerExport'
+          &&
+          nodes[1].object === 'text'
+          && nodes[1].leaves[0].text === ''
+        );
+      }
+
+      let nodes = topLevelNodes;
+
+      while (
+        onlyOneNodeThatIsPointerExport(nodes)
+        ||
+        twoNodesFirstExportSecondEmptyString(nodes)
+      ) {
+          nodes = nodes[0].nodes
+        }
+
       const change = block.value
         .change()
-        .wrapInline({ type: "pointerExport", data: { pointerId: uuid } });
+        .insertInline({
+          type: "pointerExport",
+          data: { pointerId: uuid },
+          nodes: nodes,
+        });
+
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
