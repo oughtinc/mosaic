@@ -151,10 +151,22 @@ export const removeExportOfSelection = () => {
         return;
       }
 
-      const change = block.value
-        .change()
-        .unwrapInlineByKey(matchingNodes[0].key)
-        .removeNodeByKey(matchingNodes[0].key);
+
+      const ancestorNodes = block.value.document.getAncestors(matchingNodes[0].key);
+
+      const isNested = ancestorNodes.find(ancestor => ancestor.type === 'pointerExport');
+
+      let change;
+      if (isNested) {
+        change = block.value
+          .change()
+          .unwrapInlineByKey(matchingNodes[0].key)
+          .removeNodeByKey(matchingNodes[0].key);
+      } else {
+        change = block.value
+          .change()
+          .unwrapInlineByKey(matchingNodes[0].key);
+      }
 
       dispatch({
         type: UPDATE_BLOCK,
