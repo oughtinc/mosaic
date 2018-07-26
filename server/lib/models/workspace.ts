@@ -273,8 +273,7 @@ const WorkspaceModel = (
       pointersSoFar = pointersSoFar.concat(blockPointersToAdd);
     }
 
-    for (let i = 0; i < this.childWorkspaceOrder.length; i++) {
-      const childWorkspaceId = this.childWorkspaceOrder[i];
+    for (const childWorkspaceId of this.childWorkspaceOrder) {
       const currentWorkspace = await sequelize.models.Workspace.findById(childWorkspaceId);
       const workspacePointersToAdd = await currentWorkspace.getConnectedPointersOfSubtree(pointersSoFar);
       connectedPointersOfSubtree = connectedPointersOfSubtree.concat(workspacePointersToAdd);
