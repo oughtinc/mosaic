@@ -153,7 +153,8 @@ export const removeExportOfSelection = () => {
 
       const change = block.value
         .change()
-        .setNodeByKey(matchingNodes[0].key, {type: 'notExported'});
+        .unwrapInlineByKey(matchingNodes[0].key)
+        .removeNodeByKey(matchingNodes[0].key);
 
       dispatch({
         type: UPDATE_BLOCK,
