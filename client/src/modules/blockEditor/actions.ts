@@ -160,12 +160,12 @@ export const removeExportOfSelection = () => {
       if (isNested) {
         change = block.value
           .change()
-          .unwrapInlineByKey(matchingNodes[0].key)
+          .unwrapInlineByKey(matchingNodes[0].key,  { data: { pointerId: hoveredItem.id } })
           .removeNodeByKey(matchingNodes[0].key);
       } else {
         change = block.value
           .change()
-          .unwrapInlineByKey(matchingNodes[0].key);
+          .unwrapInlineByKey(matchingNodes[0].key,  { data: { pointerId: hoveredItem.id } });
       }
 
       dispatch({
