@@ -18,13 +18,6 @@ const pointerExportBackground: any = ({ isSelected }: any) => {
   }
 };
 
-const PointerExportStyle: any = styled.span`
-  background: ${pointerExportBackground};
-  margin-left: 3px;
-  transition: background 0.2s;
-  color: #000000;
-`;
-
 const darkGreen = "rgba(12, 165, 0, 0.63)";
 
 const Bracket = styled.span`
@@ -75,30 +68,74 @@ export class PointerExportMark extends React.Component<any, any> {
       availablePointers,
       nodeAsJson
     });
-    return (
-      <PointerExportStyle
-        isSelected={isSelected}
-        onMouseOut={this.props.onMouseOut}
-      >
-        <Tag onMouseOver={this.onMouseOver}>
-          {`$${parseInt(pointerIndex, 10) + 1}`}
-        </Tag>
-        <Bracket onMouseOver={this.onMouseOver}>{"["}</Bracket>
-          {children.map((child, index) => {
-            const isNestedPointer = child.props.node.object === "inline";
 
-            if (!isNestedPointer) {
-              return (
-                <span key={index} onMouseOver={this.onMouseOver}>
-                  {child}
-                </span>
-              );
-            } else {
-              return child;
-            }
-          })}
-        <Bracket onMouseOver={this.onMouseOver}>{"]"}</Bracket>
-      </PointerExportStyle>
+    const isNested = availablePointers.some(pointer => {
+      return pointer.nodes.some(node => {
+        return (node.type === 'pointerExport' && node.data.pointerId === nodeAsJson.data.pointerId);
+      })
+    });
+
+    const OuterPointerExportStyle: any = styled.span`
+    &::before {
+      background-color: rgba(12, 165, 0, 0.63);
+      color: rgb(233, 239, 233);
+      content: "$${parseInt(pointerIndex, 10) + 1}";
+      border-radius: 4px 0px 0px 4px;
+      margin-right: 1px;
+      padding: 0px 3px;
+    }`;
+
+    const PointerExportStyle: any = styled.span`
+      background: ${pointerExportBackground};
+      margin-left: 1px;
+      transition: background 0.2s;
+      color: #000000;
+      padding-left: ${isNested ? '4px' : 0 };
+      padding-right: 3px;
+
+      &::before {
+        color: rgba(12, 165, 0, 0.63);
+        font-size: 1.2em;
+        font-weight: 800;
+        content: "[";
+        position: absolute;
+        top: -5px;
+        left: -1px;
+      }
+
+      &::after {
+        color: rgba(12, 165, 0, 0.63);
+        font-size: 1.2em;
+        font-weight: 800;
+        position: absolute;
+        top: -5px;
+        right: 1px;
+        content: "]";
+      }
+    `;
+    return (
+      <OuterPointerExportStyle>
+        <span style={{ position: 'relative' }}>
+          <PointerExportStyle
+            isSelected={isSelected}
+            onMouseOut={this.props.onMouseOut}
+          >
+              {children.map((child, index) => {
+                const isNestedPointer = child.props.node.object === "inline";
+
+                if (!isNestedPointer) {
+                  return (
+                    <span key={index} onMouseOver={this.onMouseOver}>
+                      {child}
+                    </span>
+                  );
+                } else {
+                  return child;
+                }
+              })}
+          </PointerExportStyle>
+        </span>
+      </OuterPointerExportStyle>
     );
   }
 }

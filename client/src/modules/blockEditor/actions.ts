@@ -87,22 +87,48 @@ export const exportSelection = () => {
       }
 
       let nodes = topLevelNodes;
+      let isNested = false;
 
       while (
         onlyOneNodeThatIsPointerExport(nodes)
         ||
         twoNodesFirstExportSecondEmptyString(nodes)
       ) {
-          nodes = nodes[0].nodes
+          nodes = nodes[0].nodes;
+          isNested = true;
         }
 
-      const change = block.value
-        .change()
-        .insertInline({
-          type: "pointerExport",
-          data: { pointerId: uuid },
-          nodes: nodes,
-        });
+      const spaceNode =
+      { object: 'text',
+        leaves: [
+          {
+            object: 'leaf',
+            text: ' ',
+            marks: []
+          }
+        ]
+      };
+
+      let change;
+      if (isNested) {
+        change = block.value
+          .change()
+          .insertText(' ') // thin space
+          .insertInline({
+            type: "pointerExport",
+            data: { pointerId: uuid },
+            nodes: [...nodes, spaceNode],
+          });
+      } else {
+        change = block.value
+          .change()
+          .insertText(' ')
+          .insertInline({
+            type: "pointerExport",
+            data: { pointerId: uuid },
+            nodes: [spaceNode, ...nodes, spaceNode],
+          });
+      }
 
       dispatch({
         type: UPDATE_BLOCK,
