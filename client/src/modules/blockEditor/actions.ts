@@ -98,35 +98,67 @@ export const exportSelection = () => {
           isNested = true;
         }
 
-      const spaceNode =
-      { object: 'text',
+      const spaceTextNode = {
+        object: 'text',
         leaves: [
           {
             object: 'leaf',
             text: ' ',
-            marks: []
+            marks: [{object: 'mark', type: 'spaceTextNode' }]
           }
         ]
       };
+
+      // if you try to insert to inlines in a row, the second is inserted in the
+      // first, couldn't find an easy way around this
+
+      // if you insert text with a mark, though, you should hopefully be able
+      // to keep track of it
 
       let change;
       if (isNested) {
         change = block.value
           .change()
-          .insertText(' ') // thin space
+          .insertText(' ')
+          .extend(-1)
+          .addMark('thinspaceTextNode')
+          .collapseToEnd()
           .insertInline({
             type: "pointerExport",
             data: { pointerId: uuid },
-            nodes: [...nodes, spaceNode],
+            nodes: [...nodes, spaceTextNode],
           });
       } else {
+
+        // for each pointerExport in nodes, remove thinspace text node if its
+        // first
+        nodes = nodes.map(node => {
+          if (node.type === 'pointerExport') {
+            return {
+              ...node,
+              nodes: node.nodes.map(innerNode => {
+                if (innerNode.object === 'text') return {
+                  ...innerNode,
+                  leaves: innerNode.leaves.filter((leaf, leafI) => leafI !== 0 || !leaf.marks.find(mark => mark.type == 'spaceTextNode')),
+                };
+                else return innerNode;
+              }),
+            };
+          } else {
+            return node;
+          }
+        });
+
         change = block.value
           .change()
-          .insertText(' ')
+          .insertText(' ')
+          .extend(-1)
+          .addMark('thinspaceTextNode')
+          .collapseToEnd()
           .insertInline({
             type: "pointerExport",
             data: { pointerId: uuid },
-            nodes: [spaceNode, ...nodes, spaceNode],
+            nodes: [spaceTextNode, ...nodes, spaceTextNode],
           });
       }
 
