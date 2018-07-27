@@ -82,11 +82,44 @@ const BlockModel = (
     return _.uniqBy(allPointers, "id");
   };
 
+  Block.prototype.newConnectedPointers = async function(pointersSoFar) {
+    const pointers = await this.newTopLevelPointers(pointersSoFar);
+
+    let allPointers = [...pointers];
+
+    for (const pointer of pointers) {
+      const subPointers = await pointer.newContainedPointers([...allPointers, ...pointersSoFar]);
+      allPointers = [...allPointers, ...subPointers];
+    }
+    return _.uniqBy(allPointers, "id");
+  };
+
   // private
   Block.prototype.topLevelPointers = async function() {
     const topLevelPointerIds = await this.topLevelPointersIds();
     const pointers: any = [];
     for (const id of topLevelPointerIds) {
+      const pointer = await sequelize.models.Pointer.findById(id);
+      if (!!pointer) {
+        pointers.push(pointer);
+      } else {
+        console.error(
+          `Referenced pointer with ID ${id} not found in database.`
+        );
+      }
+    }
+    return _.uniqBy(pointers, "id");
+  };
+
+  Block.prototype.newTopLevelPointers = async function(pointersSoFar) {
+    const topLevelPointerIds = await this.topLevelPointersIds();
+    const newTopLevelPointerIds = topLevelPointerIds.filter(pointerId => {
+      const alreadyListed = _.some(pointersSoFar, pointerSoFar => pointerSoFar.id === pointerId);
+      return !alreadyListed;
+    });
+
+    const pointers: any = [];
+    for (const id of newTopLevelPointerIds) {
       const pointer = await sequelize.models.Pointer.findById(id);
       if (!!pointer) {
         pointers.push(pointer);

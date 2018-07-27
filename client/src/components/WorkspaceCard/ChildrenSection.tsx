@@ -39,15 +39,12 @@ const ChildContainer = styled.div`
 
 export const ChildrenSection = ({
   workspace,
-  workspaces,
   childrenToggle,
   onChangeToggle,
   parentPointers
 }) => {
-  const children = workspace.childWorkspaceOrder.map(id =>
-    workspaces.find(w => w.id === id)
-  );
-  if (!!children.length) {
+  const childrenIds = workspace.childWorkspaceOrder;
+  if (!!childrenIds.length) {
     return (
       <ChildrenContainer>
         <Bullet href="#!" isActive={childrenToggle} onClick={onChangeToggle}>
@@ -55,10 +52,11 @@ export const ChildrenSection = ({
         </Bullet>
         {childrenToggle && (
           <Collection>
-            {children.map(child => (
-              <ChildContainer key={child.id}>
+            {childrenIds.map(childId => (
+              <ChildContainer key={childId}>
                 <WorkspaceCard
-                  workspaceId={child.id}
+                  isTopLevelOfCurrentTree={false}
+                  workspaceId={childId}
                   parentPointers={parentPointers}
                 />
               </ChildContainer>

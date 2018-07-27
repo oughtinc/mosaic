@@ -5,7 +5,10 @@ import { ChildrenSection } from "./ChildrenSection";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import _ = require("lodash");
-import { WORKSPACE_SUBTREE_QUERY } from "../../graphqlQueries";
+import {
+  ROOT_WORKSPACE_SUBTREE_QUERY,
+  CHILD_WORKSPACE_SUBTREE_QUERY,
+} from "../../graphqlQueries";
 
 import { Auth } from "../../auth";
 
@@ -29,6 +32,20 @@ const CardBody = styled.div`
   border-radius: 0 2px 2px 2px;
 `;
 
+const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
+  return (
+    <div>
+      {
+        isTopLevelOfCurrentTree
+        ?
+        "Loading... This may take some time for complex trees."
+        :
+        "Loading..."
+      }
+    </div>
+  );
+};
+
 // TODO: Eventually these should be used in a common file for many cases that use them.
 interface ConnectedPointerType {
   data: any;
@@ -41,13 +58,20 @@ interface ConnectedPointerType {
 interface WorkspaceType {
   blocks: any[];
   childWorkspaceOrder: string[];
-  connectedPointers: any;
+  connectedPointersOfSubtree: ConnectedPointerType[];
   id: string;
 }
 
 interface WorkspaceCardProps {
+  isTopLevelOfCurrentTree: boolean;
   parentPointers: ConnectedPointerType[];
   workspaceId: string;
+  subtreeQuery: SubtreeQuery;
+}
+
+interface SubtreeQuery {
+  loading: boolean;
+  workspace: any;
 }
 
 interface WorkspaceCardState {
@@ -80,36 +104,33 @@ export class WorkspaceCardPresentational extends React.PureComponent<
   };
 
   public render() {
-    const workspaces: WorkspaceType[] =
-      _.get(this.props, "workspaceSubtreeWorkspaces.subtreeWorkspaces") || [];
-
-    const workspace: WorkspaceType | undefined = workspaces.find(
-      w => w.id === this.props.workspaceId
-    );
+    const workspace: WorkspaceType | undefined =
+      this.props.subtreeQuery.loading
+      ?
+      undefined
+      :
+      this.props.subtreeQuery.workspace;
 
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
 
-    const newPointers: ConnectedPointerType[] = _.chain(workspaces)
-      .map((w: any) => w.connectedPointers)
-      .flatten()
-      .uniqBy(getPointerId)
-      .map(node => {
-        return { ...node, readOnly: !editable };
-      })
-      .value();
-
-    const availablePointers: ConnectedPointerType[] = _.chain(
+    const availablePointers: ConnectedPointerType[] =
+      !this.props.isTopLevelOfCurrentTree
+      ?
       this.props.parentPointers
-    )
-      .concat(newPointers)
-      .uniqBy(getPointerId)
-      .map(node => {
-        return { ...node, readOnly: !editable };
-      })
-      .value();
+      :
+        (
+          workspace
+          ?
+          _(workspace.connectedPointersOfSubtree)
+            .uniqBy(getPointerId)
+            .map(node => ({...node, readOnly: !editable }))
+            .value()
+          :
+          []
+        );
 
     if (!workspace) {
-      return <div>Loading...</div>;
+      return <LoadingMsg isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}/>;
     }
     return (
       <Container>
@@ -122,7 +143,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<
         <ChildrenSection
           parentPointers={availablePointers}
           workspace={workspace}
-          workspaces={workspaces}
           childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
           onChangeToggle={() =>
             this.handleChangeToggle(
@@ -135,13 +155,24 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     );
   }
 }
-const options = ({ workspaceId }) => ({
-  variables: { workspaceId }
+
+const optionsForTopLevel = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
+  variables: { workspaceId },
+  skip: !isTopLevelOfCurrentTree
+});
+
+const optionsForNested = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
+  variables: { workspaceId },
+  skip: isTopLevelOfCurrentTree
 });
 
 export const WorkspaceCard: any = compose(
-  graphql(WORKSPACE_SUBTREE_QUERY, {
-    name: "workspaceSubtreeWorkspaces",
-    options
-  })
+  graphql(ROOT_WORKSPACE_SUBTREE_QUERY, {
+    name: "subtreeQuery",
+    options: optionsForTopLevel,
+  }),
+  graphql(CHILD_WORKSPACE_SUBTREE_QUERY, {
+    name: "subtreeQuery",
+    options: optionsForNested,
+  }),
 )(WorkspaceCardPresentational);

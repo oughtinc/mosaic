@@ -10,7 +10,11 @@ export class WorkspaceSubtreePage extends React.PureComponent<any, any> {
       <div>
         <BlockHoverMenu>
           {workspaceId && (
-            <WorkspaceCard parentPointers={[]} workspaceId={workspaceId} />
+            <WorkspaceCard
+              isTopLevelOfCurrentTree={true}
+              parentPointers={[]}
+              workspaceId={workspaceId}
+            />
           )}
         </BlockHoverMenu>
       </div>

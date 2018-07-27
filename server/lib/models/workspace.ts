@@ -84,6 +84,26 @@ const WorkspaceModel = (
           }
           return values.filter(v => !!v);
         }
+      },
+      connectedPointersOfSubtree: {
+        type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
+        get: async function() {
+          const _connectedPointers = await this.getConnectedPointersOfSubtree();
+          const values: any = [];
+          for (const pointer of _connectedPointers) {
+            const value = await pointer.value;
+            if (value) {
+              values.push(value);
+            } else {
+              console.error(
+                `Error: Value for pointer with id ${
+                  pointer.id
+                } was not found in its respecting block.`
+              );
+            }
+          }
+          return values.filter(v => !!v);
+        }
       }
     },
     {
@@ -235,6 +255,31 @@ const WorkspaceModel = (
     }
 
     return _connectedPointers;
+  };
+
+  // Returns an array containing the pointers connected to a workspace and all
+  // of its descendants. Passes "pointerSoFar" parameter to recursive
+  // subcalls in order to avoid duplicate SQL queries for pointers.
+  Workspace.prototype.getConnectedPointersOfSubtree = async function(pointersSoFar = []) {
+    const connectedPointersOfSubtree = [];
+
+    // Can use this.getBlocks instead of this.getVisibleBlocks because later we
+    // will go on to iterate through all the children workspaces.
+    const blocks = await this.getBlocks();
+
+    for (const block of blocks) {
+      const blockPointersToAdd = await block.newConnectedPointers(pointersSoFar);
+      connectedPointersOfSubtree = connectedPointersOfSubtree.concat(blockPointersToAdd);
+      pointersSoFar = pointersSoFar.concat(blockPointersToAdd);
+    }
+
+    for (const childWorkspaceId of this.childWorkspaceOrder) {
+      const currentWorkspace = await sequelize.models.Workspace.findById(childWorkspaceId);
+      const workspacePointersToAdd = await currentWorkspace.getConnectedPointersOfSubtree(pointersSoFar);
+      connectedPointersOfSubtree = connectedPointersOfSubtree.concat(workspacePointersToAdd);
+    }
+
+    return connectedPointersOfSubtree;
   };
 
   // private
