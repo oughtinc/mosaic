@@ -75,10 +75,9 @@ export class ShowExpandedPointer extends React.Component<any, any> {
             node.object === "GeneratedNestedExportNode"
           ) {
             return (
-              <span style={{ marginLeft: "4px", marginRight: "6px" }}>
+              <span key={index} style={{ marginLeft: "4px", marginRight: "6px" }}>
                 <InlineNode
                   node={node}
-                  key={index}
                   blockEditor={this.props.blockEditor}
                   availablePointers={this.props.availablePointers}
                   pointerId={this.props.exportingPointer.pointerId}
