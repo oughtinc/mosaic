@@ -209,8 +209,9 @@ export const removeExportOfSelection = () => {
         return;
       }
 
+      const nodeToRemove = matchingNodes[0];
 
-      const ancestorNodes = block.value.document.getAncestors(matchingNodes[0].key);
+      const ancestorNodes = block.value.document.getAncestors(nodeToRemove.key);
 
       const isNested = ancestorNodes.find(ancestor => ancestor.type === 'pointerExport');
 
@@ -218,13 +219,32 @@ export const removeExportOfSelection = () => {
       if (isNested) {
         change = block.value
           .change()
-          .unwrapInlineByKey(matchingNodes[0].key,  { data: { pointerId: hoveredItem.id } })
-          .removeNodeByKey(matchingNodes[0].key);
+          .unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } })
+          .removeNodeByKey(nodeToRemove.key);
       } else {
         change = block.value
           .change()
-          .unwrapInlineByKey(matchingNodes[0].key,  { data: { pointerId: hoveredItem.id } });
+          .unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } });
       }
+
+      const spaceTextNode = {
+        object: 'text',
+        leaves: [
+          {
+            object: 'leaf',
+            text: ' ',
+            marks: [{object: 'mark', type: 'spaceTextNode' }]
+          }
+        ]
+      };
+
+      // iterate through direct children that are exported pointers
+      // and insert spacer node now that they are non-nested
+      nodeToRemove.nodes.forEach(childNode => {
+        if (childNode.type === 'pointerExport') {
+          change.insertNodeByKey(childNode.key, 0, spaceTextNode);
+        }
+      });
 
       dispatch({
         type: UPDATE_BLOCK,
