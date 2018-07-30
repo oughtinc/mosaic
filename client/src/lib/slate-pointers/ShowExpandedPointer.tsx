@@ -10,7 +10,7 @@ export class LeafNode extends React.Component<any, any> {
         onMouseOver={this.props.onMouseOver}
         onMouseOut={this.props.onMouseOut}
       >
-        {this.props.node.text}
+        {this.props.node.leaves.map(leaf => leaf.text)}
       </span>
     );
   }
@@ -89,7 +89,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
             return (
               <LeafNode
                 key={index}
-                node={node.leaves[0]}
+                node={node}
                 isHoverable={this.props.isHoverable}
                 onMouseOver={this.props.onMouseOverExpandedPointer}
                 onMouseOut={this.props.onMouseOut}
