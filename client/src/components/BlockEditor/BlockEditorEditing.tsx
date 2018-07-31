@@ -176,7 +176,43 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   };
 
-  private onKeyDown = event => {
+  private onKeyDown = (event, change) => {
+
+    let value = change.value;
+    let changeValue = change;
+
+    const movingLeft = event.key === 'ArrowLeft' || event.key === 'Backspace';
+    const movingRight = event.key === 'ArrowRight';
+    if (movingLeft) changeValue = value.change().move(-1);
+    if (movingRight) changeValue = value.change().move(1);
+
+    const textNode = changeValue.value.document.getNode(value.selection.focusKey);
+    const nextTextNode = value.document.getNextText(textNode.key);
+    const prevTextNode = value.document.getPreviousText(textNode.key);
+
+    const focusOffsetAtStart = changeValue.value.selection.focusOffset === 0;
+    const focusOffsetAtEnd = changeValue.value.selection.focusOffset === textNode.characters.size;
+
+    if (focusOffsetAtStart && movingLeft && prevTextNode) {
+      changeValue
+        .moveToRangeOf(prevTextNode)
+        .collapseToEnd()
+        .move(-1);
+      this.props.updateBlock({ id: this.props.block.id, value: changeValue.value, pointerChanged: false });
+      event.preventDefault();
+      return false;
+    }
+
+    if (focusOffsetAtEnd && movingRight && nextTextNode) {
+      changeValue
+        .moveToRangeOf(nextTextNode)
+        .collapseToStart()
+        .move(1);
+      this.props.updateBlock({ id: this.props.block.id, value: changeValue.value, pointerChanged: false });
+      event.preventDefault();
+      return false;
+    }
+
     const pressedControlAndE = _event => _event.metaKey && _event.key === "e";
     if (pressedControlAndE(event)) {
       this.props.exportSelection();
@@ -186,6 +222,10 @@ export class BlockEditorEditingPresentational extends React.Component<
     if (!!this.props.onKeyDown) {
       this.props.onKeyDown(event);
     }
+
+    // because false is sometimes return in this function
+    // all paths need to explicitly return or the linter raises an error
+    return;
   };
 
   private onValueChange = () => {
@@ -202,6 +242,41 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onChangeCallback = (c: any) => {
+    // everything in this method before the last two lines are trying to prevent
+    // the user from using a click top get the text cursor in off limit spacing
+    // the onClick handler didn't seem to have access to the new cursor position
+    // so this logic lives here instead
+    const textNode = c.value.document.getNode(c.value.selection.focusKey);
+
+    const focusOffsetAtStart = c.value.selection.focusOffset === 0;
+    const focusOffsetAtEnd = c.value.selection.focusOffset === textNode.characters.size;
+
+    const nextTextNode = c.value.document.getNextText(textNode.key);
+    const prevTextNode = c.value.document.getPreviousText(textNode.key);
+
+    if (focusOffsetAtStart) {
+      if (prevTextNode) {
+        c.moveToRangeOf(prevTextNode)
+          .collapseToEnd()
+          .move(-1);
+      } else {
+        c.move(1);
+      }
+      this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
+    }
+
+    if (focusOffsetAtEnd) {
+      if (nextTextNode) {
+        c.moveToRangeOf(nextTextNode)
+          .collapseToStart()
+          .move(1);
+      } else {
+        c.move(-1);
+      }
+      this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
+    }
+
+
     this.onChange(c.value);
   };
 

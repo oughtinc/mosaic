@@ -104,63 +104,21 @@ export const exportSelection = () => {
           {
             object: 'leaf',
             text: ' ',
-            marks: [{object: 'mark', type: 'spaceTextNode' }]
           }
         ]
       };
 
-      // if you try to insert to inlines in a row, the second is inserted in the
-      // first, couldn't find an easy way around this
-
-      // if you insert text with a mark, though, you should hopefully be able
-      // to keep track of it
-
-      let change;
-      if (isNested) {
-        change = block.value
-          .change()
-          .insertText(' ')
-          .extend(-1)
-          .addMark('thinspaceTextNode')
-          .collapseToEnd()
-          .insertInline({
-            type: "pointerExport",
-            data: { pointerId: uuid },
-            nodes: [...nodes, spaceTextNode],
-          });
-      } else {
-
-        // for each pointerExport in nodes, remove thinspace text node if its
-        // first
-        nodes = nodes.map(node => {
-          if (node.type === 'pointerExport') {
-            return {
-              ...node,
-              nodes: node.nodes.map(innerNode => {
-                if (innerNode.object === 'text') return {
-                  ...innerNode,
-                  leaves: innerNode.leaves.filter((leaf, leafI) => leafI !== 0 || !leaf.marks.find(mark => mark.type == 'spaceTextNode')),
-                };
-                else return innerNode;
-              }),
-            };
-          } else {
-            return node;
-          }
+      const change = block.value
+        .change()
+        .insertText(' ')
+        .insertText(' ')
+        .collapseToEnd()
+        .move(-1)
+        .insertInline({
+          type: "pointerExport",
+          data: { pointerId: uuid },
+          nodes: [spaceTextNode, ...nodes, spaceTextNode],
         });
-
-        change = block.value
-          .change()
-          .insertText(' ')
-          .extend(-1)
-          .addMark('thinspaceTextNode')
-          .collapseToEnd()
-          .insertInline({
-            type: "pointerExport",
-            data: { pointerId: uuid },
-            nodes: [spaceTextNode, ...nodes, spaceTextNode],
-          });
-      }
 
       dispatch({
         type: UPDATE_BLOCK,
