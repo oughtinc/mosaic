@@ -81,7 +81,6 @@ export class PointerExportMark extends React.Component<any, any> {
       color: rgb(233, 239, 233);
       content: "$${parseInt(pointerIndex, 10) + 1}";
       border-radius: 4px 0px 0px 4px;
-      margin-right: 1px;
       padding: 0px 3px;
     }`;
 
@@ -90,26 +89,18 @@ export class PointerExportMark extends React.Component<any, any> {
       margin-left: 1px;
       transition: background 0.2s;
       color: #000000;
-      padding-left: ${isNested ? '4px' : 0 };
-      padding-right: 3px;
 
       &::before {
         color: rgba(12, 165, 0, 0.63);
         font-size: 1.2em;
         font-weight: 800;
         content: "[";
-        position: absolute;
-        top: -5px;
-        left: -1px;
       }
 
       &::after {
         color: rgba(12, 165, 0, 0.63);
         font-size: 1.2em;
         font-weight: 800;
-        position: absolute;
-        top: -5px;
-        right: 1px;
         content: "]";
       }
     `;
