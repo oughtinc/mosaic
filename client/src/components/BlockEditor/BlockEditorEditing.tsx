@@ -249,26 +249,35 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     const textNode = c.value.document.getNode(c.value.selection.focusKey);
 
-    const focusOffsetAtStart = c.value.selection.focusOffset === 0;
-    const focusOffsetAtEnd = c.value.selection.focusOffset === textNode.characters.size;
+    const anchorKey = c.value.selection.anchorKey;
+    const focusKey = c.value.selection.offsetKey;
 
-    const nextTextNode = c.value.document.getNextText(textNode.key);
-    const prevTextNode = c.value.document.getPreviousText(textNode.key);
+    const anchorOffset = c.value.selection.anchorOffset;
+    const focusOffset = c.value.selection.focusOffset;
 
-    if (focusOffsetAtStart && prevTextNode) {
-      c.moveToRangeOf(prevTextNode)
-        .collapseToEnd()
-        .move(-1);
-      this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
+    const selectionIsExpanded = (anchorKey !== focusKey) || (anchorOffset !== focusOffset);
+
+    if (!selectionIsExpanded) {
+      const focusOffsetAtStart = c.value.selection.focusOffset === 0;
+      const focusOffsetAtEnd = c.value.selection.focusOffset === textNode.characters.size;
+
+      const nextTextNode = c.value.document.getNextText(textNode.key);
+      const prevTextNode = c.value.document.getPreviousText(textNode.key);
+
+      if (focusOffsetAtStart && prevTextNode) {
+        c.moveToRangeOf(prevTextNode)
+          .collapseToEnd()
+          .move(-1);
+        this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
+      }
+
+      if (focusOffsetAtEnd && nextTextNode) {
+        c.moveToRangeOf(nextTextNode)
+          .collapseToStart()
+          .move(1);
+        this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
+      }
     }
-
-    if (focusOffsetAtEnd && nextTextNode) {
-      c.moveToRangeOf(nextTextNode)
-        .collapseToStart()
-        .move(1);
-      this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
-    }
-
 
     this.onChange(c.value);
   };
