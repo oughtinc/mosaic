@@ -250,7 +250,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     const textNode = c.value.document.getNode(c.value.selection.focusKey);
 
     const anchorKey = c.value.selection.anchorKey;
-    const focusKey = c.value.selection.offsetKey;
+    const focusKey = c.value.selection.focusKey;
 
     const anchorOffset = c.value.selection.anchorOffset;
     const focusOffset = c.value.selection.focusOffset;
