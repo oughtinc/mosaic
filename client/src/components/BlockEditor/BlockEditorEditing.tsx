@@ -247,22 +247,25 @@ export class BlockEditorEditingPresentational extends React.Component<
     // the onClick handler didn't seem to have access to the new cursor position
     // so this logic lives here instead
 
-    const textNode = c.value.document.getNode(c.value.selection.focusKey);
+    // if selection is expanded, then we don't do this
+    // this allows mouse dragging to select across pointers
+    const value = c.value;
+    const selection = value.selection;
 
-    const anchorKey = c.value.selection.anchorKey;
-    const focusKey = c.value.selection.focusKey;
-
-    const anchorOffset = c.value.selection.anchorOffset;
-    const focusOffset = c.value.selection.focusOffset;
+    const anchorKey = selection.anchorKey;
+    const focusKey = selection.focusKey;
+    const anchorOffset = selection.anchorOffset;
+    const focusOffset = selection.focusOffset;
 
     const selectionIsExpanded = (anchorKey !== focusKey) || (anchorOffset !== focusOffset);
 
     if (!selectionIsExpanded) {
-      const focusOffsetAtStart = c.value.selection.focusOffset === 0;
-      const focusOffsetAtEnd = c.value.selection.focusOffset === textNode.characters.size;
+      const textNode = value.document.getNode(focusKey);
 
-      const nextTextNode = c.value.document.getNextText(textNode.key);
-      const prevTextNode = c.value.document.getPreviousText(textNode.key);
+      const focusOffsetAtStart = focusOffset === 0;
+      const focusOffsetAtEnd = focusOffset === textNode.characters.size;
+      const nextTextNode = value.document.getNextText(textNode.key);
+      const prevTextNode = value.document.getPreviousText(textNode.key);
 
       if (focusOffsetAtStart && prevTextNode) {
         c.moveToRangeOf(prevTextNode)
