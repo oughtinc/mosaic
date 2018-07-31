@@ -246,6 +246,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     // the user from using a click top get the text cursor in off limit spacing
     // the onClick handler didn't seem to have access to the new cursor position
     // so this logic lives here instead
+
     const textNode = c.value.document.getNode(c.value.selection.focusKey);
 
     const focusOffsetAtStart = c.value.selection.focusOffset === 0;
@@ -254,25 +255,17 @@ export class BlockEditorEditingPresentational extends React.Component<
     const nextTextNode = c.value.document.getNextText(textNode.key);
     const prevTextNode = c.value.document.getPreviousText(textNode.key);
 
-    if (focusOffsetAtStart) {
-      if (prevTextNode) {
-        c.moveToRangeOf(prevTextNode)
-          .collapseToEnd()
-          .move(-1);
-      } else {
-        c.move(1);
-      }
+    if (focusOffsetAtStart && prevTextNode) {
+      c.moveToRangeOf(prevTextNode)
+        .collapseToEnd()
+        .move(-1);
       this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
     }
 
-    if (focusOffsetAtEnd) {
-      if (nextTextNode) {
-        c.moveToRangeOf(nextTextNode)
-          .collapseToStart()
-          .move(1);
-      } else {
-        c.move(-1);
-      }
+    if (focusOffsetAtEnd && nextTextNode) {
+      c.moveToRangeOf(nextTextNode)
+        .collapseToStart()
+        .move(1);
       this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
     }
 
