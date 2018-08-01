@@ -185,25 +185,6 @@ export const removeExportOfSelection = () => {
           .unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } });
       }
 
-      const spaceTextNode = {
-        object: "text",
-        leaves: [
-          {
-            object: "leaf",
-            text: " ",
-            marks: [{object: "mark", type: "spaceTextNode" }]
-          }
-        ]
-      };
-
-      // iterate through direct children that are exported pointers
-      // and insert spacer node now that they are non-nested
-      nodeToRemove.nodes.forEach(childNode => {
-        if (childNode.type === "pointerExport") {
-          change.insertNodeByKey(childNode.key, 0, spaceTextNode);
-        }
-      });
-
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
