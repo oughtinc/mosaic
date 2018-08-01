@@ -123,6 +123,65 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   }
 
+  public normalizeChangeWrtTextNodeSpacing(c) {
+    const value = c.value;
+
+    let changedOccured = false;
+
+    function directlyBeforeExport(textNode) {
+      return value.document.getNextSibling(textNode.key) && value.document.getNextSibling(textNode.key).type === 'pointerExport';
+    }
+
+    function directlyAfterExport(textNode) {
+      return value.document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === 'pointerExport';
+    }
+
+    function insideExport(textNode) {
+      return value.document.getParent(textNode.key) && value.document.getParent(textNode.key).type === 'pointerExport';
+    }
+
+    function firstCharIsSpace(textNode) {
+      return textNode.text.charAt(0) === ' ';
+    }
+
+    function lastCharIsSpace(textNode) {
+      return textNode.text.charAt(textNode.text.length - 1) === ' ';
+    }
+
+    value.document.getTexts().forEach(textNode => {
+      if (!insideExport(textNode) && directlyBeforeExport(textNode) && !lastCharIsSpace(textNode)) {
+        c.insertTextByKey(textNode.key, textNode.text.length, ' ');
+      }
+
+      if (!insideExport(textNode) && directlyAfterExport(textNode) && !firstCharIsSpace(textNode)) {
+        c.insertTextByKey(textNode.key, 0, ' ');
+      }
+
+      if (insideExport(textNode) && !firstCharIsSpace(textNode)) {
+        c.insertTextByKey(textNode.key, 0, ' ');
+      }
+
+      if (insideExport(textNode) && !lastCharIsSpace(textNode)) {
+        c.insertTextByKey(textNode.key, textNode.text.length, ' ');
+      }
+
+      // for edge case where there is only two spaces in a pointer
+      // and you delete one, then first and last char are both spaces
+      // since they are the same char, so you need to additionaly enforce
+      // that there are at least two chars
+      if (insideExport(textNode) && textNode.text.length === 1) {
+        c.insertTextByKey(textNode.key, 0, ' ');
+      }
+    });
+
+    return c;
+  }
+
+  public componentDidMount() {
+    const change = this.normalizeChangeWrtTextNodeSpacing(this.props.block.value.change());
+    this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
+  }
+
   public render() {
     return (
       <BlockEditorStyle>
@@ -242,13 +301,18 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onChangeCallback = (c: any) => {
-    // everything in this method before the last two lines are trying to prevent
+    // first check to see if document changed, which we can do with !== b/c
+    // Slate uses immutable objects, if it has changed then normalize wrt
+    // pointer spacing
+    if (c.value.document !== this.props.block.value.document) {
+      c = this.normalizeChangeWrtTextNodeSpacing(c);
+    }
+
+    // the rest of this method before the last two lines are trying to prevent
     // the user from using a click top get the text cursor in off limit spacing
     // the onClick handler didn't seem to have access to the new cursor position
     // so this logic lives here instead
 
-    // if selection is expanded, then we don't do this
-    // this allows mouse dragging to select across pointers
     const value = c.value;
     const selection = value.selection;
 
@@ -257,11 +321,13 @@ export class BlockEditorEditingPresentational extends React.Component<
     const anchorOffset = selection.anchorOffset;
     const focusOffset = selection.focusOffset;
 
+
     const selectionIsExpanded = (anchorKey !== focusKey) || (anchorOffset !== focusOffset);
 
+    // if selection is expanded, then we don't do this
+    // this allows mouse dragging to select across pointers
     if (!selectionIsExpanded) {
       const textNode = value.document.getNode(focusKey);
-
       const focusOffsetAtStart = focusOffset === 0;
       const focusOffsetAtEnd = focusOffset === textNode.characters.size;
       const nextTextNode = value.document.getNextText(textNode.key);
