@@ -1,5 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
+import { SPACER } from '../../lib/slate-pointers/exportedPointerSpacer';
+
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -62,6 +64,7 @@ export const exportSelection = () => {
     const { hoveredItem } = blockEditor;
 
     const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
+
     const uuid = uuidv1();
     if (block) {
       const fragment = block.value.fragment;
@@ -103,15 +106,15 @@ export const exportSelection = () => {
         leaves: [
           {
             object: 'leaf',
-            text: ' ',
+            text: SPACER,
           }
         ]
       };
 
       const change = block.value
         .change()
-        .insertText(' ')
-        .insertText(' ')
+        .insertText(SPACER)
+        .insertText(SPACER)
         .collapseToEnd()
         .move(-1)
         .insertInline({

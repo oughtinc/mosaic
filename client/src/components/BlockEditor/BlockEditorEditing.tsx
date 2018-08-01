@@ -13,6 +13,7 @@ import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
+import { SPACER } from '../../lib/slate-pointers/exportedPointerSpacer';
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;
@@ -140,29 +141,29 @@ export class BlockEditorEditingPresentational extends React.Component<
       return value.document.getParent(textNode.key) && value.document.getParent(textNode.key).type === 'pointerExport';
     }
 
-    function firstCharIsSpace(textNode) {
-      return textNode.text.charAt(0) === ' ';
+    function firstCharIsSpacer(textNode) {
+      return textNode.text.charAt(0) === SPACER;
     }
 
-    function lastCharIsSpace(textNode) {
-      return textNode.text.charAt(textNode.text.length - 1) === ' ';
+    function lastCharIsSpacer(textNode) {
+      return textNode.text.charAt(textNode.text.length - 1) === SPACER;
     }
 
     value.document.getTexts().forEach(textNode => {
-      if (!insideExport(textNode) && directlyBeforeExport(textNode) && !lastCharIsSpace(textNode)) {
-        c.insertTextByKey(textNode.key, textNode.text.length, ' ');
+      if (!insideExport(textNode) && directlyBeforeExport(textNode) && !lastCharIsSpacer(textNode)) {
+        c.insertTextByKey(textNode.key, textNode.text.length, SPACER);
       }
 
-      if (!insideExport(textNode) && directlyAfterExport(textNode) && !firstCharIsSpace(textNode)) {
-        c.insertTextByKey(textNode.key, 0, ' ');
+      if (!insideExport(textNode) && directlyAfterExport(textNode) && !firstCharIsSpacer(textNode)) {
+        c.insertTextByKey(textNode.key, 0, SPACER);
       }
 
-      if (insideExport(textNode) && !firstCharIsSpace(textNode)) {
-        c.insertTextByKey(textNode.key, 0, ' ');
+      if (insideExport(textNode) && !firstCharIsSpacer(textNode)) {
+        c.insertTextByKey(textNode.key, 0, SPACER);
       }
 
-      if (insideExport(textNode) && !lastCharIsSpace(textNode)) {
-        c.insertTextByKey(textNode.key, textNode.text.length, ' ');
+      if (insideExport(textNode) && !lastCharIsSpacer(textNode)) {
+        c.insertTextByKey(textNode.key, textNode.text.length, SPACER);
       }
 
       // for edge case where there is only two spaces in a pointer
@@ -170,7 +171,7 @@ export class BlockEditorEditingPresentational extends React.Component<
       // since they are the same char, so you need to additionaly enforce
       // that there are at least two chars
       if (insideExport(textNode) && textNode.text.length === 1) {
-        c.insertTextByKey(textNode.key, 0, ' ');
+        c.insertTextByKey(textNode.key, 0, SPACER);
       }
     });
 
