@@ -13,7 +13,19 @@ import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
-import { SPACER } from '../../lib/slate-pointers/exportedPointerSpacer';
+import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
+
+interface Change {
+  insertTextByKey: any;
+  value: any;
+}
+
+interface TextNode {
+  key: string;
+  object: string;
+  leaves: any[];
+  text: string;
+}
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;
@@ -124,28 +136,26 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   }
 
-  public normalizeChangeWrtTextNodeSpacing(c) {
+  public normalizeChangeWrtTextNodeSpacing(c: Change) {
     const value = c.value;
 
-    let changedOccured = false;
-
-    function directlyBeforeExport(textNode) {
-      return value.document.getNextSibling(textNode.key) && value.document.getNextSibling(textNode.key).type === 'pointerExport';
+    function directlyBeforeExport(textNode: TextNode) {
+      return value.document.getNextSibling(textNode.key) && value.document.getNextSibling(textNode.key).type === "pointerExport";
     }
 
-    function directlyAfterExport(textNode) {
-      return value.document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === 'pointerExport';
+    function directlyAfterExport(textNode: TextNode) {
+      return value.document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === "pointerExport";
     }
 
-    function insideExport(textNode) {
-      return value.document.getParent(textNode.key) && value.document.getParent(textNode.key).type === 'pointerExport';
+    function insideExport(textNode: TextNode) {
+      return value.document.getParent(textNode.key) && value.document.getParent(textNode.key).type === "pointerExport";
     }
 
-    function firstCharIsSpacer(textNode) {
+    function firstCharIsSpacer(textNode: TextNode) {
       return textNode.text.charAt(0) === SPACER;
     }
 
-    function lastCharIsSpacer(textNode) {
+    function lastCharIsSpacer(textNode: TextNode) {
       return textNode.text.charAt(textNode.text.length - 1) === SPACER;
     }
 
@@ -238,13 +248,19 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   private onKeyDown = (event, change) => {
 
-    let value = change.value;
+    const value = change.value;
     let changeValue = change;
 
-    const movingLeft = event.key === 'ArrowLeft' || event.key === 'Backspace';
-    const movingRight = event.key === 'ArrowRight';
-    if (movingLeft) changeValue = value.change().move(-1);
-    if (movingRight) changeValue = value.change().move(1);
+    const movingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
+    const movingRight = event.key === "ArrowRight";
+
+    if (movingLeft) {
+      changeValue = value.change().move(-1);
+    }
+
+    if (movingRight) {
+      changeValue = value.change().move(1);
+    }
 
     const textNode = changeValue.value.document.getNode(value.selection.focusKey);
     const nextTextNode = value.document.getNextText(textNode.key);
@@ -321,7 +337,6 @@ export class BlockEditorEditingPresentational extends React.Component<
     const focusKey = selection.focusKey;
     const anchorOffset = selection.anchorOffset;
     const focusOffset = selection.focusOffset;
-
 
     const selectionIsExpanded = (anchorKey !== focusKey) || (anchorOffset !== focusOffset);
 

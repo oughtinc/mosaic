@@ -1,7 +1,6 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
-import { SPACER } from '../../lib/slate-pointers/exportedPointerSpacer';
-
+import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -74,23 +73,22 @@ export const exportSelection = () => {
         return (
           nodes.length === 1
           &&
-          nodes[0].type === 'pointerExport'
+          nodes[0].type === "pointerExport"
         );
-      }
+      };
 
       const twoNodesFirstExportSecondEmptyString = nodes => {
         return (
           nodes.length === 2
           &&
-          nodes[0].type === 'pointerExport'
+          nodes[0].type === "pointerExport"
           &&
-          nodes[1].object === 'text'
-          && nodes[1].leaves[0].text === ''
+          nodes[1].object === "text"
+          && nodes[1].leaves[0].text === ""
         );
-      }
+      };
 
       let nodes = topLevelNodes;
-      let isNested = false;
 
       while (
         onlyOneNodeThatIsPointerExport(nodes)
@@ -98,14 +96,13 @@ export const exportSelection = () => {
         twoNodesFirstExportSecondEmptyString(nodes)
       ) {
           nodes = nodes[0].nodes;
-          isNested = true;
         }
 
       const spaceTextNode = {
-        object: 'text',
+        object: "text",
         leaves: [
           {
-            object: 'leaf',
+            object: "leaf",
             text: SPACER,
           }
         ]
@@ -174,7 +171,7 @@ export const removeExportOfSelection = () => {
 
       const ancestorNodes = block.value.document.getAncestors(nodeToRemove.key);
 
-      const isNested = ancestorNodes.find(ancestor => ancestor.type === 'pointerExport');
+      const isNested = ancestorNodes.find(ancestor => ancestor.type === "pointerExport");
 
       let change;
       if (isNested) {
@@ -189,12 +186,12 @@ export const removeExportOfSelection = () => {
       }
 
       const spaceTextNode = {
-        object: 'text',
+        object: "text",
         leaves: [
           {
-            object: 'leaf',
-            text: ' ',
-            marks: [{object: 'mark', type: 'spaceTextNode' }]
+            object: "leaf",
+            text: " ",
+            marks: [{object: "mark", type: "spaceTextNode" }]
           }
         ]
       };
@@ -202,7 +199,7 @@ export const removeExportOfSelection = () => {
       // iterate through direct children that are exported pointers
       // and insert spacer node now that they are non-nested
       nodeToRemove.nodes.forEach(childNode => {
-        if (childNode.type === 'pointerExport') {
+        if (childNode.type === "pointerExport") {
           change.insertNodeByKey(childNode.key, 0, spaceTextNode);
         }
       });

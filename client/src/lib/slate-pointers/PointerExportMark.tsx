@@ -18,24 +18,6 @@ const pointerExportBackground: any = ({ isSelected }: any) => {
   }
 };
 
-const darkGreen = "rgba(12, 165, 0, 0.63)";
-
-const Bracket = styled.span`
-  color: ${darkGreen};
-  font-size: 1.2em;
-  font-weight: 800;
-  line-height: 1em;
-`;
-
-const Tag = styled.span`
-  padding: 0 3px;
-  background: ${darkGreen};
-  color: #e9efe9;
-  margin-right: 1px;
-  border-radius: 4px 0 0 4px;
-  margin-left: 0px;
-`;
-
 export class PointerExportMark extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
@@ -69,12 +51,6 @@ export class PointerExportMark extends React.Component<any, any> {
       nodeAsJson
     });
 
-    const isNested = availablePointers.some(pointer => {
-      return pointer.nodes.some(node => {
-        return (node.type === 'pointerExport' && node.data.pointerId === nodeAsJson.data.pointerId);
-      })
-    });
-
     const OuterPointerExportStyle: any = styled.span`
     &::before {
       background-color: rgba(12, 165, 0, 0.63);
@@ -106,7 +82,7 @@ export class PointerExportMark extends React.Component<any, any> {
     `;
     return (
       <OuterPointerExportStyle>
-        <span style={{ position: 'relative' }}>
+        <span style={{ position: "relative" }}>
           <PointerExportStyle
             isSelected={isSelected}
             onMouseOut={this.props.onMouseOut}
