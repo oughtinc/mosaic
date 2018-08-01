@@ -174,15 +174,40 @@ export const removeExportOfSelection = () => {
       const isNested = ancestorNodes.find(ancestor => ancestor.type === "pointerExport");
 
       let change;
+      change = block.value.change();
+
+      // delete spacer at start and end
+      const firstText = nodeToRemove.getFirstText();
+      if (firstText && firstText.text.charAt(0) === SPACER) {
+        change.removeTextByKey(firstText.key, 0, 1);
+      }
+
+      // need to "refetch" nodeToRemove here because it might have relevantly
+      // changed after removing the first char of the first text
+      // but this change won't be reflected in the node due to immutability
+      const lastText = change.value.document.getNode(nodeToRemove.key).getLastText();
+      if (lastText && lastText.text.charAt(lastText.text.length - 1) === SPACER) {
+        change.removeTextByKey(lastText.key, lastText.text.length - 1, 1);
+      }
+
+      // delete spacer before and after
+      const prevText = block.value.document.getPreviousSibling(nodeToRemove.key);
+      const nextText = block.value.document.getNextSibling(nodeToRemove.key);
+      if (prevText && prevText.text.charAt(prevText.text.length - 1) === SPACER) {
+        change.removeTextByKey(prevText.key, prevText.text.length - 1, 1);
+      }
+
+      if (nextText && nextText.text.charAt(0) === SPACER) {
+        change.removeTextByKey(nextText.key, 0, 1);
+      }
+
+      // remove pointerExport inline
       if (isNested) {
-        change = block.value
-          .change()
+        change
           .unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } })
           .removeNodeByKey(nodeToRemove.key);
       } else {
-        change = block.value
-          .change()
-          .unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } });
+        change.unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } });
       }
 
       dispatch({
