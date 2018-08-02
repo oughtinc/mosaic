@@ -248,43 +248,54 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   private onKeyDown = (event, change) => {
 
-    const value = change.value;
-    let changeValue = change;
+    const valueBeforeSimulatedMove = change.value;
+
+    const textNode = valueBeforeSimulatedMove.document.getNode(valueBeforeSimulatedMove.selection.focusKey);
+    const nextTextNode = valueBeforeSimulatedMove.document.getNextText(textNode.key);
+    const prevTextNode = valueBeforeSimulatedMove.document.getPreviousText(textNode.key);
 
     const movingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
     const movingRight = event.key === "ArrowRight";
 
+    // simulate the inteded move to the left or right
+    // because they are simulated we don't use the original change object
+
+    let valueAfterSimulatedMove = valueBeforeSimulatedMove;
+
     if (movingLeft) {
-      changeValue = value.change().move(-1);
+      valueAfterSimulatedMove = valueBeforeSimulatedMove.change().move(-1).value;
     }
 
     if (movingRight) {
-      changeValue = value.change().move(1);
+      valueAfterSimulatedMove = valueBeforeSimulatedMove.change().move(1).value;;
     }
 
-    const textNode = changeValue.value.document.getNode(value.selection.focusKey);
-    const nextTextNode = value.document.getNextText(textNode.key);
-    const prevTextNode = value.document.getPreviousText(textNode.key);
+    // check to see whether cursor is now at the edge of a text node
 
-    const focusOffsetAtStart = changeValue.value.selection.focusOffset === 0;
-    const focusOffsetAtEnd = changeValue.value.selection.focusOffset === textNode.characters.size;
+    const focusOffsetAtStart = valueAfterSimulatedMove.selection.focusOffset === 0;
+    const focusOffsetAtEnd = valueAfterSimulatedMove.selection.focusOffset === textNode.characters.size;
+
+    // if cursor is at edge, keep moving in that direction
+    // into new text node and then move one away from that node's edge
+    // these are actual (not simulated) moves, so we use the original change
+    // object and pass change.value to updateBlock
 
     if (focusOffsetAtStart && movingLeft && prevTextNode) {
-      changeValue
+      change
         .moveToRangeOf(prevTextNode)
         .collapseToEnd()
         .move(-1);
-      this.props.updateBlock({ id: this.props.block.id, value: changeValue.value, pointerChanged: false });
+      this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
       event.preventDefault();
       return false;
     }
 
     if (focusOffsetAtEnd && movingRight && nextTextNode) {
-      changeValue
+      change
         .moveToRangeOf(nextTextNode)
         .collapseToStart()
         .move(1);
-      this.props.updateBlock({ id: this.props.block.id, value: changeValue.value, pointerChanged: false });
+      this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
       event.preventDefault();
       return false;
     }
@@ -301,6 +312,7 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     // because false is sometimes return in this function
     // all paths need to explicitly return or the linter raises an error
+
     return;
   };
 
