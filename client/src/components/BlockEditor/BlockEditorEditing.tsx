@@ -203,7 +203,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
 
     if (movingRight) {
-      valueAfterSimulatedMove = valueBeforeSimulatedMove.change().move(1).value;;
+      valueAfterSimulatedMove = valueBeforeSimulatedMove.change().move(1).value;
     }
 
     // check to see whether cursor is now at the edge of a text node
