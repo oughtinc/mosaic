@@ -57,18 +57,8 @@ export class ShowExpandedPointer extends React.Component<any, any> {
   }
 
   public render() {
-    const isNestedAsExportingPointer = this.props.availablePointers.some(pointer => {
-      return pointer.nodes.some(node => {
-        return (node.type === "pointerExport" && node.data.pointerId === this.props.exportingPointer.data.pointerId);
-      });
-    });
-
     return (
-      <div
-        style={{
-          paddingLeft: isNestedAsExportingPointer ? "5px" : 0,
-        }}
-      >
+      <div>
         {this.props.exportingPointer.nodes.map((node, index) => {
           if (
             node.object === "inline" ||
