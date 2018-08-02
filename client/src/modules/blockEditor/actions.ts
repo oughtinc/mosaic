@@ -57,6 +57,35 @@ export const changePointerReference = ({ id, reference }) => {
   };
 };
 
+const onlyOneNodeThatIsPointerExport = nodes => {
+  return (
+    nodes.length === 1
+    &&
+    nodes[0].type === "pointerExport"
+  );
+};
+
+const twoNodesFirstExportSecondEmptyString = nodes => {
+  return (
+    nodes.length === 2
+    &&
+    nodes[0].type === "pointerExport"
+    &&
+    nodes[1].object === "text"
+    && nodes[1].leaves[0].text === ""
+  );
+};
+
+const spaceTextNode = {
+  object: "text",
+  leaves: [
+    {
+      object: "leaf",
+      text: SPACER,
+    }
+  ]
+};
+
 export const exportSelection = () => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();
@@ -69,25 +98,6 @@ export const exportSelection = () => {
       const fragment = block.value.fragment;
       const topLevelNodes = fragment.nodes.toJSON()[0].nodes;
 
-      const onlyOneNodeThatIsPointerExport = nodes => {
-        return (
-          nodes.length === 1
-          &&
-          nodes[0].type === "pointerExport"
-        );
-      };
-
-      const twoNodesFirstExportSecondEmptyString = nodes => {
-        return (
-          nodes.length === 2
-          &&
-          nodes[0].type === "pointerExport"
-          &&
-          nodes[1].object === "text"
-          && nodes[1].leaves[0].text === ""
-        );
-      };
-
       let nodes = topLevelNodes;
 
       while (
@@ -97,16 +107,6 @@ export const exportSelection = () => {
       ) {
           nodes = nodes[0].nodes;
         }
-
-      const spaceTextNode = {
-        object: "text",
-        leaves: [
-          {
-            object: "leaf",
-            text: SPACER,
-          }
-        ]
-      };
 
       const change = block.value
         .change()
