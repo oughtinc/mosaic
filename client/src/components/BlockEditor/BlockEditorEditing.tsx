@@ -345,10 +345,12 @@ export class BlockEditorEditingPresentational extends React.Component<
     const value = c.value;
     const selection = value.selection;
 
-    const anchorKey = selection.anchorKey;
-    const focusKey = selection.focusKey;
-    const anchorOffset = selection.anchorOffset;
-    const focusOffset = selection.focusOffset;
+    const {
+      anchorKey,
+      anchorOffset,
+      focusKey,
+      focusOffset,
+    } = selection;
 
     const selectionIsExpanded = (anchorKey !== focusKey) || (anchorOffset !== focusOffset);
 
