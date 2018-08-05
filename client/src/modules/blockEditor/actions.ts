@@ -95,9 +95,16 @@ export const exportSelection = () => {
 
     const uuid = uuidv1();
     if (block) {
+
+      // A Slate fragment is a document: value.fragment is the document
+      // encompassing the currently selected portion of the editor.
+      // If the user has selected part of a deeply nested node, then the
+      // associated fragment will include all levels of the nesting.
+      // The next few lines (until the end of the while loop) drill down
+      // through such a nested document to unnest all the nodes that are
+      // selected.
       const fragment = block.value.fragment;
       const topLevelNodes = fragment.nodes.toJSON()[0].nodes;
-
       let nodes = topLevelNodes;
 
       while (
