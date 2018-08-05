@@ -176,14 +176,10 @@ export const removeExportOfSelection = () => {
 
       const nodeToRemove = matchingNodes[0];
 
-      const ancestorNodes = block.value.document.getAncestors(nodeToRemove.key);
-
-      const isNested = ancestorNodes.find(ancestor => ancestor.type === "pointerExport");
-
       let change;
       change = block.value.change();
 
-      // delete spacer at start and end
+      // delete spacer at start
       const firstText = nodeToRemove.getFirstText();
       if (firstText && firstText.text.charAt(0) === SPACER) {
         change.removeTextByKey(firstText.key, 0, 1);
@@ -192,23 +188,30 @@ export const removeExportOfSelection = () => {
       // need to "refetch" nodeToRemove here because it might have relevantly
       // changed after removing the first char of the first text
       // but this change won't be reflected in the node due to immutability
+
+      // delete spacer at end
       const lastText = change.value.document.getNode(nodeToRemove.key).getLastText();
       if (lastText && lastText.text.charAt(lastText.text.length - 1) === SPACER) {
         change.removeTextByKey(lastText.key, lastText.text.length - 1, 1);
       }
 
-      // delete spacer before and after
+      // delete spacer before
       const prevText = block.value.document.getPreviousSibling(nodeToRemove.key);
-      const nextText = block.value.document.getNextSibling(nodeToRemove.key);
       if (prevText && prevText.text.charAt(prevText.text.length - 1) === SPACER) {
         change.removeTextByKey(prevText.key, prevText.text.length - 1, 1);
       }
 
+      // delete spacer after
+      const nextText = block.value.document.getNextSibling(nodeToRemove.key);
       if (nextText && nextText.text.charAt(0) === SPACER) {
         change.removeTextByKey(nextText.key, 0, 1);
       }
 
       // remove pointerExport inline
+
+      const ancestorNodes = block.value.document.getAncestors(nodeToRemove.key);
+      const isNested = ancestorNodes.find(ancestor => ancestor.type === "pointerExport");
+
       if (isNested) {
         change
           .unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } })
