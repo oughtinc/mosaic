@@ -14,6 +14,7 @@ import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { normalizeChangeWrtTextNodeSpacing } from "./normalizeChange";
+import { isSelectionExpanded } from "./isSelectionExpanded";
 import { Change } from "./types";
 
 const BlockEditorStyle = styled.div`
@@ -281,19 +282,12 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     const value = c.value;
     const selection = value.selection;
-
-    const {
-      anchorKey,
-      anchorOffset,
-      focusKey,
-      focusOffset,
-    } = selection;
-
-    const selectionIsExpanded = (anchorKey !== focusKey) || (anchorOffset !== focusOffset);
+    const selectionIsExpanded = isSelectionExpanded(selection);
 
     // if selection is expanded, then we don't do this
     // this allows mouse dragging to select across pointers
     if (!selectionIsExpanded) {
+      const { focusKey, focusOffset } = selection;
       const textNode = value.document.getNode(focusKey);
       const focusOffsetAtStart = focusOffset === 0;
       const focusOffsetAtEnd = focusOffset === textNode.characters.size;
