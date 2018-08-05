@@ -11,12 +11,7 @@ function SlatePointers(options: any = {}) {
       }
 
       const selection = window.getSelection();
-      let range;
-      try {
-        range = selection.getRangeAt(0);
-      } catch (e) {
-        return;
-      }
+      let range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
 
       if (rect.width === 0) {
