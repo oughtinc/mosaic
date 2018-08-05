@@ -1,4 +1,5 @@
 import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
+import { Change, TextNode } from './types';
 
 export function normalizeChangeWrtTextNodeSpacing(c: Change) {
   const value = c.value;

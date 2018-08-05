@@ -14,6 +14,7 @@ import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { normalizeChangeWrtTextNodeSpacing } from "./normalizeChange";
+import { Change } from "./types";
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;
@@ -182,7 +183,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   };
 
-  private onKeyDown = (event, change) => {
+  private onKeyDown = (event: any, change: Change) => {
 
     const valueBeforeSimulatedMove = change.value;
 
@@ -265,7 +266,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   };
 
-  private onChangeCallback = (c: any) => {
+  private onChangeCallback = (c: Change) => {
     // first check to see if document changed, which we can do with !== b/c
     // Slate uses immutable objects, if it has changed then normalize wrt
     // pointer spacing
