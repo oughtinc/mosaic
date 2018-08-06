@@ -96,6 +96,46 @@ export const exportSelection = () => {
     const uuid = uuidv1();
     if (block) {
 
+      const value = block.value;
+
+      const initialFragment = value.fragment;
+      const initialTopLevelNodes = initialFragment.nodes.toJSON()[0].nodes;
+
+      const isNestedInPointerExport =
+        onlyOneNodeThatIsPointerExport(initialTopLevelNodes)
+        ||
+        twoNodesFirstExportSecondEmptyString(initialTopLevelNodes);
+
+      // if we are exporting a nested pointer, guarantee that the selection is
+      // not extending to an edge
+      const change = value.change();
+      if (isNestedInPointerExport) {
+        const selection = value.selection;
+        const { anchorKey, anchorOffset, focusKey, focusOffset } = selection;
+
+        const anchorTextNode = value.document.getNode(anchorKey);
+        const anchorOffsetAtStart = anchorOffset === 0;
+
+        if (anchorOffsetAtStart) {
+          if (!selection.isBackward) {
+            change.moveAnchor(1)
+          } else {
+            change.moveAnchorToEndOfPreviousText().moveFocus(-1);
+          }
+        }
+
+        const focusTextNode = value.document.getNode(focusKey);
+        const focusOffsetAtStart = focusOffset === 0;
+
+        if (focusOffsetAtStart) {
+          if (!selection.isBackward) {
+            change.moveFocusToEndOfPreviousText().moveFocus(-1);
+          } else {
+            change.moveFocus(1);
+          }
+        }
+      }
+
       // A Slate fragment is a document: value.fragment is the document
       // encompassing the currently selected portion of the editor.
       // If the user has selected part of a deeply nested node, then the
@@ -103,21 +143,15 @@ export const exportSelection = () => {
       // The next few lines (until the end of the while loop) drill down
       // through such a nested document to unnest all the nodes that are
       // selected.
-      const fragment = block.value.fragment;
-      const topLevelNodes = fragment.nodes.toJSON()[0].nodes;
-      let nodes = topLevelNodes;
+      const maybeChangedFragment = change.value.fragment;
+      const maybeChangedTopLevelNodes = maybeChangedFragment.nodes.toJSON()[0].nodes;
 
-      while (
-        onlyOneNodeThatIsPointerExport(nodes)
-        ||
-        twoNodesFirstExportSecondEmptyString(nodes)
-      ) {
-          nodes = nodes[0].nodes;
-        }
+      let nodes = maybeChangedTopLevelNodes;
+      while (onlyOneNodeThatIsPointerExport(nodes)) {
+        nodes = nodes[0].nodes;
+      }
 
-      const change = block.value
-        .change()
-        .insertText(SPACER)
+      change.insertText(SPACER)
         .insertText(SPACER)
         .collapseToEnd()
         .move(-1)
