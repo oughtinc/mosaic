@@ -1,6 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
 import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
+import { normalizeAfterRemoval } from "./normalizeAfterRemoval";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -213,36 +214,7 @@ export const removeExportOfSelection = () => {
       let change;
       change = block.value.change();
 
-      // delete spacer at start
-      const firstText = nodeToRemove.getFirstText();
-      if (firstText && firstText.text.charAt(0) === SPACER) {
-        change.removeTextByKey(firstText.key, 0, 1);
-      }
-
-      // need to "refetch" nodeToRemove here because it might have relevantly
-      // changed after removing the first char of the first text
-      // but this change won't be reflected in the node due to immutability
-
-      // delete spacer at end
-      const lastText = change.value.document.getNode(nodeToRemove.key).getLastText();
-      if (lastText && lastText.text.charAt(lastText.text.length - 1) === SPACER) {
-        change.removeTextByKey(lastText.key, lastText.text.length - 1, 1);
-      }
-
-      // delete spacer before
-      const prevText = block.value.document.getPreviousSibling(nodeToRemove.key);
-      if (prevText && prevText.text.charAt(prevText.text.length - 1) === SPACER) {
-        change.removeTextByKey(prevText.key, prevText.text.length - 1, 1);
-      }
-
-      // delete spacer after
-      const nextText = block.value.document.getNextSibling(nodeToRemove.key);
-      if (nextText && nextText.text.charAt(0) === SPACER) {
-        change.removeTextByKey(nextText.key, 0, 1);
-      }
-
       // remove pointerExport inline
-
       const ancestorNodes = block.value.document.getAncestors(nodeToRemove.key);
       const isNested = ancestorNodes.find(ancestor => ancestor.type === "pointerExport");
 
@@ -253,6 +225,8 @@ export const removeExportOfSelection = () => {
       } else {
         change.unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } });
       }
+
+      normalizeAfterRemoval(change);
 
       dispatch({
         type: UPDATE_BLOCK,
