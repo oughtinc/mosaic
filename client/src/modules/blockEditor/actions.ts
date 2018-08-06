@@ -112,20 +112,18 @@ export const exportSelection = () => {
       const change = value.change();
       if (isNestedInPointerExport) {
         const selection = value.selection;
-        const { anchorKey, anchorOffset, focusKey, focusOffset } = selection;
+        const { anchorOffset, focusOffset } = selection;
 
-        const anchorTextNode = value.document.getNode(anchorKey);
         const anchorOffsetAtStart = anchorOffset === 0;
 
         if (anchorOffsetAtStart) {
           if (!selection.isBackward) {
-            change.moveAnchor(1)
+            change.moveAnchor(1);
           } else {
             change.moveAnchorToEndOfPreviousText().moveFocus(-1);
           }
         }
 
-        const focusTextNode = value.document.getNode(focusKey);
         const focusOffsetAtStart = focusOffset === 0;
 
         if (focusOffsetAtStart) {
