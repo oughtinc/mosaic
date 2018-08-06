@@ -14,7 +14,6 @@ import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { normalizeChangeWrtTextNodeSpacing } from "./normalizeChange";
-import { isSelectionExpanded } from "./isSelectionExpanded";
 import { Change } from "./types";
 
 const BlockEditorStyle = styled.div`
@@ -282,7 +281,7 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     const value = c.value;
     const selection = value.selection;
-    const selectionIsExpanded = isSelectionExpanded(selection);
+    const selectionIsExpanded = selection.isExpanded;
 
     // if selection is expanded, then we don't do this
     // this allows mouse dragging to select across pointers
