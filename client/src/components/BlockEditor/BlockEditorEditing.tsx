@@ -13,7 +13,7 @@ import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
-import { normalizeChangeWrtTextNodeSpacing } from "./normalizeChange";
+import { normalizeExportSpacing } from "./normalizeChange";
 import { Change } from "./types";
 
 const BlockEditorStyle = styled.div`
@@ -126,7 +126,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentDidMount() {
-    const change = normalizeChangeWrtTextNodeSpacing(this.props.block.value.change());
+    const change = normalizeExportSpacing(this.props.block.value.change());
     this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
   }
 
@@ -271,7 +271,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     // Slate uses immutable objects, if it has changed then normalize wrt
     // pointer spacing
     if (c.value.document !== this.props.block.value.document) {
-      c = normalizeChangeWrtTextNodeSpacing(c);
+      c = normalizeExportSpacing(c);
     }
 
     // the rest of this method before the last two lines are trying to prevent
