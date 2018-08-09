@@ -2,11 +2,11 @@ import { closestPointerExportAncestor } from "./closestPointerExportAncestor";
 import { TextNode } from "../../components/BlockEditor/types";
 
 export function isCursorInPotentiallyProblematicPosition(value: any) {
-  function directlyBeforeExport(textNode: TextNode, document) {
+  function isDirectlyBeforeExport(textNode: TextNode, document) {
     return document.getNextSibling(textNode.key) && value.document.getNextSibling(textNode.key).type === "pointerExport";
   }
 
-  function directlyAfterExport(textNode: TextNode, document) {
+  function isDirectlyAfterExport(textNode: TextNode, document) {
     return document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === "pointerExport";
   }
 
@@ -39,9 +39,9 @@ export function isCursorInPotentiallyProblematicPosition(value: any) {
   const focusOffsetAtEnd = value.selection.focusOffset === textNode.characters.size;
 
   return (
-    (directlyBeforeExport(textNode, value.document) && focusOffsetAtEnd)
+    (isDirectlyBeforeExport(textNode, value.document) && focusOffsetAtEnd)
     ||
-    (directlyAfterExport(textNode, value.document) && focusOffsetAtStart)
+    (isDirectlyAfterExport(textNode, value.document) && focusOffsetAtStart)
     ||
     (isFirstTextOfExport(textNode, value.document) && focusOffsetAtStart)
     ||

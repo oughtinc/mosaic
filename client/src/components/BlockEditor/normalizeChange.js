@@ -4,11 +4,11 @@ import { Change, TextNode } from './types';
 export function normalizeExportSpacing(c: Change) {
   const value = c.value;
 
-  function directlyBeforeExport(textNode: TextNode, document) {
+  function isDirectlyBeforeExport(textNode: TextNode, document) {
     return document.getNextSibling(textNode.key) && value.document.getNextSibling(textNode.key).type === "pointerExport";
   }
 
-  function directlyAfterExport(textNode: TextNode, document) {
+  function isDirectlyAfterExport(textNode: TextNode, document) {
     return document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === "pointerExport";
   }
 
@@ -36,31 +36,31 @@ export function normalizeExportSpacing(c: Change) {
     return textNode === lastTextOfParent;
   }
 
-  function firstCharIsSpacer(textNode: TextNode, document) {
+  function hasSpacerAsFirstChar(textNode: TextNode, document) {
     return textNode.text.charAt(0) === SPACER;
   }
 
-  function lastCharIsSpacer(textNode: TextNode, document) {
+  function hasSpacerAsLastChar(textNode: TextNode, document) {
     return textNode.text.charAt(textNode.text.length - 1) === SPACER;
   }
 
   value.document.getTexts().forEach(textNode => {
-    if (directlyBeforeExport(textNode, c.value.document) && !lastCharIsSpacer(textNode, c.value.document)) {
+    if (isDirectlyBeforeExport(textNode, c.value.document) && !hasSpacerAsLastChar(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, textNode.text.length, SPACER);
     }
 
     textNode = c.value.document.getNode(textNode.key);
-    if (directlyAfterExport(textNode, c.value.document) && !firstCharIsSpacer(textNode, c.value.document)) {
+    if (isDirectlyAfterExport(textNode, c.value.document) && !hasSpacerAsFirstChar(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, 0, SPACER);
     }
 
     textNode = c.value.document.getNode(textNode.key);
-    if (isFirstTextOfExport(textNode, c.value.document) && !firstCharIsSpacer(textNode, c.value.document)) {
+    if (isFirstTextOfExport(textNode, c.value.document) && !hasSpacerAsFirstChar(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, 0, SPACER);
     }
 
     textNode = c.value.document.getNode(textNode.key);
-    if (isLastTextOfExport(textNode, c.value.document) && !lastCharIsSpacer(textNode, c.value.document)) {
+    if (isLastTextOfExport(textNode, c.value.document) && !hasSpacerAsLastChar(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, textNode.text.length, SPACER);
     }
 
