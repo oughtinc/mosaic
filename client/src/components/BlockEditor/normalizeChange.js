@@ -12,8 +12,28 @@ export function normalizeExportSpacing(c: Change) {
     return document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === "pointerExport";
   }
 
-  function insideExport(textNode: TextNode, document) {
-    return document.getParent(textNode.key) && value.document.getParent(textNode.key).type === "pointerExport";
+  function isFirstTextOfExport(textNode: TextNode, document) {
+    const parent = document.getParent(textNode.key);
+    const parentIsExport = parent && parent.type === "pointerExport";
+
+    if (!parentIsExport) {
+      return false;
+    }
+
+    const firstTextOfParent = parent.getFirstText();
+    return textNode === firstTextOfParent;
+  }
+
+  function isLastTextOfExport(textNode: TextNode, document) {
+    const parent = document.getParent(textNode.key);
+    const parentIsExport = parent && parent.type === "pointerExport";
+
+    if (!parentIsExport) {
+      return false;
+    }
+
+    const lastTextOfParent = parent.getLastText();
+    return textNode === lastTextOfParent;
   }
 
   function firstCharIsSpacer(textNode: TextNode, document) {
@@ -25,22 +45,22 @@ export function normalizeExportSpacing(c: Change) {
   }
 
   value.document.getTexts().forEach(textNode => {
-    if (!insideExport(textNode, c.value.document) && directlyBeforeExport(textNode, c.value.document) && !lastCharIsSpacer(textNode, c.value.document)) {
+    if (directlyBeforeExport(textNode, c.value.document) && !lastCharIsSpacer(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, textNode.text.length, SPACER);
     }
 
     textNode = c.value.document.getNode(textNode.key);
-    if (!insideExport(textNode, c.value.document) && directlyAfterExport(textNode, c.value.document) && !firstCharIsSpacer(textNode, c.value.document)) {
+    if (directlyAfterExport(textNode, c.value.document) && !firstCharIsSpacer(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, 0, SPACER);
     }
 
     textNode = c.value.document.getNode(textNode.key);
-    if (insideExport(textNode, c.value.document) && !firstCharIsSpacer(textNode, c.value.document)) {
+    if (isFirstTextOfExport(textNode, c.value.document) && !firstCharIsSpacer(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, 0, SPACER);
     }
 
     textNode = c.value.document.getNode(textNode.key);
-    if (insideExport(textNode, c.value.document) && !lastCharIsSpacer(textNode, c.value.document)) {
+    if (isLastTextOfExport(textNode, c.value.document) && !lastCharIsSpacer(textNode, c.value.document)) {
       c.insertTextByKey(textNode.key, textNode.text.length, SPACER);
     }
 
@@ -49,7 +69,7 @@ export function normalizeExportSpacing(c: Change) {
     // since they are the same char, so you need to additionaly enforce
     // that there are at least two chars
     textNode = c.value.document.getNode(textNode.key);
-    if (insideExport(textNode, c.value.document) && textNode.text.length === 1) {
+    if ((isFirstTextOfExport(textNode, c.value.document) || isLastTextOfExport(textNode, c.value.document)) && textNode.text.length === 1) {
       c.insertTextByKey(textNode.key, 0, SPACER);
     }
   });
