@@ -13,7 +13,7 @@ import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
-import { normalizeExportSpacing } from "./normalizeChange";
+import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
 import { Change } from "./types";
 import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
 

@@ -1,6 +1,6 @@
 import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
 import { Change } from "../../components/BlockEditor/types";
-import { normalizeExportSpacing } from "../../components/BlockEditor/normalizeChange";
+import { normalizeExportSpacing } from "./normalizeChange";
 
 export function normalizeAfterRemoval(c: Change) {
   const value = c.value;

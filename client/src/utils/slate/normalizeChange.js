@@ -1,48 +1,16 @@
+import { closestPointerExportAncestor } from "./closestPointerExportAncestor";
+import { hasSpacerAsFirstChar } from "./hasSpacerAsFirstChar";
+import { hasSpacerAsLastChar } from "./hasSpacerAsLastChar";
+import { isDirectlyAfterExport } from "./isDirectlyAfterExport";
+import { isDirectlyBeforeExport } from "./isDirectlyBeforeExport";
+import { isFirstTextOfExport } from "./isFirstTextOfExport";
+import { isLastTextOfExport } from "./isLastTextOfExport";
+
 import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
-import { Change, TextNode } from './types';
+import { Change, TextNode } from "../../components/BlockEditor/types";
 
 export function normalizeExportSpacing(c: Change) {
   const value = c.value;
-
-  function isDirectlyBeforeExport(textNode: TextNode, document) {
-    return document.getNextSibling(textNode.key) && value.document.getNextSibling(textNode.key).type === "pointerExport";
-  }
-
-  function isDirectlyAfterExport(textNode: TextNode, document) {
-    return document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === "pointerExport";
-  }
-
-  function isFirstTextOfExport(textNode: TextNode, document) {
-    const parent = document.getParent(textNode.key);
-    const parentIsExport = parent && parent.type === "pointerExport";
-
-    if (!parentIsExport) {
-      return false;
-    }
-
-    const firstTextOfParent = parent.getFirstText();
-    return textNode === firstTextOfParent;
-  }
-
-  function isLastTextOfExport(textNode: TextNode, document) {
-    const parent = document.getParent(textNode.key);
-    const parentIsExport = parent && parent.type === "pointerExport";
-
-    if (!parentIsExport) {
-      return false;
-    }
-
-    const lastTextOfParent = parent.getLastText();
-    return textNode === lastTextOfParent;
-  }
-
-  function hasSpacerAsFirstChar(textNode: TextNode, document) {
-    return textNode.text.charAt(0) === SPACER;
-  }
-
-  function hasSpacerAsLastChar(textNode: TextNode, document) {
-    return textNode.text.charAt(textNode.text.length - 1) === SPACER;
-  }
 
   value.document.getTexts().forEach(textNode => {
     if (isDirectlyBeforeExport(textNode, c.value.document) && !hasSpacerAsLastChar(textNode, c.value.document)) {

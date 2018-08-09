@@ -1,38 +1,9 @@
-import { closestPointerExportAncestor } from "./closestPointerExportAncestor";
-import { TextNode } from "../../components/BlockEditor/types";
+import { isDirectlyAfterExport } from "./isDirectlyAfterExport";
+import { isDirectlyBeforeExport } from "./isDirectlyBeforeExport";
+import { isFirstTextOfExport } from "./isFirstTextOfExport";
+import { isLastTextOfExport } from "./isLastTextOfExport";
 
 export function isCursorInPotentiallyProblematicPosition(value: any) {
-  function isDirectlyBeforeExport(textNode: TextNode, document) {
-    return document.getNextSibling(textNode.key) && value.document.getNextSibling(textNode.key).type === "pointerExport";
-  }
-
-  function isDirectlyAfterExport(textNode: TextNode, document) {
-    return document.getPreviousSibling(textNode.key) && value.document.getPreviousSibling(textNode.key).type === "pointerExport";
-  }
-
-  function isFirstTextOfExport(textNode: TextNode, document) {
-    const parent = document.getParent(textNode.key);
-    const parentIsExport = parent && parent.type === "pointerExport";
-
-    if (!parentIsExport) {
-      return false;
-    }
-
-    const firstTextOfParent = parent.getFirstText();
-    return textNode === firstTextOfParent;
-  }
-
-  function isLastTextOfExport(textNode: TextNode, document) {
-    const parent = document.getParent(textNode.key);
-    const parentIsExport = parent && parent.type === "pointerExport";
-
-    if (!parentIsExport) {
-      return false;
-    }
-
-    const lastTextOfParent = parent.getLastText();
-    return textNode === lastTextOfParent;
-  }
 
   const textNode = value.document.getNode(value.selection.focusKey);
   const focusOffsetAtStart = value.selection.focusOffset === 0;
