@@ -1,5 +1,4 @@
 import { css, StyleSheet } from "aphrodite";
-import styled from "styled-components";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { propsToPointerDetails } from "./helpers";
@@ -53,7 +52,7 @@ export class PointerExportMark extends React.Component<any, any> {
 
     const styles = StyleSheet.create({
       OuterPointerExportStyle: {
-        ':before': {
+        ":before": {
           backgroundColor: "rgba(12, 165, 0, 0.63)",
           color: "rgb(233, 239, 233)",
           content: `"$${parseInt(pointerIndex, 10) + 1}"`,
@@ -68,13 +67,13 @@ export class PointerExportMark extends React.Component<any, any> {
         marginLeft: "0.5px",
         transition: "background 0.2s",
 
-        ':before': {
+        ":before": {
           color: "rgba(12, 165, 0, 0.63)",
           content: `"["`,
           font: "800 1.2em sans-serif",
         },
 
-        ':after': {
+        ":after": {
           color: "rgba(12, 165, 0, 0.63)",
           content: `"]"`,
           font: "800 1.2em sans-serif",
