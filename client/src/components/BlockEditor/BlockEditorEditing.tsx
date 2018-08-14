@@ -16,6 +16,8 @@ import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
 import { Change } from "./types";
 import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
+import { handleMovingCursor } from "../../utils/slate/handleMovingCursor";
+import { handleStationaryCursor } from "../../utils/slate/handleStationaryCursor";
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;
@@ -186,52 +188,27 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   private onKeyDown = (event: any, change: Change) => {
 
-    const movingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
-    const movingRight = event.key === "ArrowRight";
+    const isMovingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
+    const isMovingRight = event.key === "ArrowRight";
 
     // simulate the inteded move to the left or right
     // because they are simulated we don't use the original change object
 
-    let value = change.value;
+    let valueAfterSimulatedChange = change.value;
 
-    if (movingLeft) {
-      value = value.change().move(-1).value;
+    if (isMovingLeft) {
+      valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(-1).value;
     }
 
-    if (movingRight) {
-      value = value.change().move(1).value;
+    if (isMovingRight) {
+      valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(1).value;
     }
 
-    if (isCursorInPotentiallyProblematicPosition(value)) {
-      // if cursor is at edge, keep moving in that direction
-      // into new text node and then move one away from that node's edge
-      // these are actual (not simulated) moves, so we use the original change
-      // object and pass change.value to updateBlock
-      const textNode = value.document.getNode(value.selection.focusKey);
-      const nextTextNode = value.document.getNextText(textNode.key);
-      const prevTextNode = value.document.getPreviousText(textNode.key);
-      const focusOffsetAtStart = value.selection.focusOffset === 0;
-      const focusOffsetAtEnd = value.selection.focusOffset === textNode.characters.size;
-
-      if (focusOffsetAtStart && movingLeft && prevTextNode) {
-        change
-          .moveToRangeOf(prevTextNode)
-          .collapseToEnd()
-          .move(-1);
-        this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
-        event.preventDefault();
-        return false;
-      }
-
-      if (focusOffsetAtEnd && movingRight && nextTextNode) {
-        change
-          .moveToRangeOf(nextTextNode)
-          .collapseToStart()
-          .move(1);
-        this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
-        event.preventDefault();
-        return false;
-      }
+    if (isCursorInPotentiallyProblematicPosition(valueAfterSimulatedChange)) {
+      const correctedChange = handleMovingCursor(change, valueAfterSimulatedChange, isMovingLeft, isMovingRight);
+      this.props.updateBlock({ id: this.props.block.id, value: correctedChange.value, pointerChanged: false });
+      event.preventDefault();
+      return false;
     }
 
     const pressedControlAndE = _event => _event.metaKey && _event.key === "e";
@@ -284,26 +261,8 @@ export class BlockEditorEditingPresentational extends React.Component<
     // if selection is expanded, then we don't do this
     // this allows mouse dragging to select across pointers
     if (!selectionIsExpanded && isCursorInPotentiallyProblematicPosition(value)) {
-      const { focusKey, focusOffset } = selection;
-      const textNode = value.document.getNode(focusKey);
-      const focusOffsetAtStart = focusOffset === 0;
-      const focusOffsetAtEnd = focusOffset === textNode.characters.size;
-      const nextTextNode = value.document.getNextText(textNode.key);
-      const prevTextNode = value.document.getPreviousText(textNode.key);
-
-      if (focusOffsetAtStart && prevTextNode) {
-        c.moveToRangeOf(prevTextNode)
-          .collapseToEnd()
-          .move(-1);
-        this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
-      }
-
-      if (focusOffsetAtEnd && nextTextNode) {
-        c.moveToRangeOf(nextTextNode)
-          .collapseToStart()
-          .move(1);
-        this.props.updateBlock({ id: this.props.block.id, value: c.value, pointerChanged: false });
-      }
+      const correctedChange = handleStationaryCursor(c);
+      this.props.updateBlock({ id: this.props.block.id, value: correctedChange.value, pointerChanged: false });
     }
 
     this.onChange(c.value);
