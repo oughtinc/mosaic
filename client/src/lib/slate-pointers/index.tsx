@@ -59,7 +59,7 @@ function SlatePointers(options: any = {}) {
         );
       }
       if (node.type === "text") {
-        return <div>{children}</div>;
+        return <span>{children}</span>;
       }
       if (node.type === "pointerImport") {
         return (

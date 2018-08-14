@@ -29,7 +29,7 @@ const ClosedPointerImport: any = styled.span`
   }
 `;
 
-const OpenPointerImport: any = styled.div`
+const OpenPointerImport: any = styled.span`
   background: ${(props: any) =>
     props.isSelected
       ? "rgba(111, 186, 209, 0.66)"
@@ -38,7 +38,6 @@ const OpenPointerImport: any = styled.div`
   border-radius: 2px;
   font-weight: 500;
   transition: background-color color 0.8s;
-  display: inline-block;
   &:hover {
     cursor: pointer;
   }

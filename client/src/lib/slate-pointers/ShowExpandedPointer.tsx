@@ -58,7 +58,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
 
   public render() {
     return (
-      <div>
+      <span>
         {this.props.exportingPointer.nodes.map((node, index) => {
           if (
             node.object === "inline" ||
@@ -88,7 +88,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
             );
           }
         })}
-      </div>
+      </span>
     );
   }
 }
