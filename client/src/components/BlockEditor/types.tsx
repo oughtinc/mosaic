@@ -21,3 +21,8 @@ export interface TextNode {
   leaves: any[];
   text: string;
 }
+
+export interface Value {
+  document: any;
+  selection: any;
+}

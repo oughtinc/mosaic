@@ -1,4 +1,6 @@
-export function handleStationaryCursor(change) {
+import { Change } from "../../components/BlockEditor/types";
+
+export function handleStationaryCursor(change: Change) {
   const value = change.value;
   const { focusKey, focusOffset } = value.selection;
   const textNode = value.document.getNode(focusKey);
