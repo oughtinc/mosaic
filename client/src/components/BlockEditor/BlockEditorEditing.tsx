@@ -225,14 +225,12 @@ export class BlockEditorEditingPresentational extends React.Component<
     // so this logic lives here instead
 
     const value = c.value;
-    const selection = value.selection;
-    const selectionIsExpanded = selection.isExpanded;
+    const selectionIsExpanded = value.selection.isExpanded;
 
     // if selection is expanded, then we don't do this
     // this allows mouse dragging to select across pointers
     if (!selectionIsExpanded && isCursorInPotentiallyProblematicPosition(value)) {
-      const correctedChange = handleStationaryCursor(c);
-      this.props.updateBlock({ id: this.props.block.id, value: correctedChange.value, pointerChanged: false });
+      handleStationaryCursor(c);
     }
 
     this.onChange(c.value);
