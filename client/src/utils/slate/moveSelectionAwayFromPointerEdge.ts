@@ -1,4 +1,6 @@
-export function moveSelectionAwayFromPointerEdge(change) {
+import { Change } from "../../components/BlockEditor/types";
+
+export function moveSelectionAwayFromPointerEdge(change: Change) {
   const value = change.value;
   const selection = value.selection;
   const { anchorOffset, focusOffset } = selection;

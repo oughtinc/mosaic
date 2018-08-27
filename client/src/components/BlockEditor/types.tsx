@@ -11,6 +11,10 @@ export interface Change {
   collapseToStart(): Change;
   insertTextByKey(key: any, offset: number, text: string): Change;
   move(n: number): Change;
+  moveAnchor(n: number): Change;
+  moveAnchorToEndOfPreviousText(): Change;
+  moveFocus(n: number): Change;
+  moveFocusToEndOfPreviousText(): Change;
   moveToRangeOf(node: any): Change;
   removeTextByKey(key: string, offset: number, length: number): Change;
 }
