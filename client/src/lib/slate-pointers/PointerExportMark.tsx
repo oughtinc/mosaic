@@ -10,6 +10,9 @@ import { propsToPointerDetails } from "./helpers";
 //     return _.max(possibilities.map((p) => (getMaxNesting(p) + 1))) || 0;
 // }
 
+const darkGreen = "rgba(12, 165, 0, 0.63)";
+const bracketFont = "800 1.2em sans-serif";
+
 export class PointerExportMark extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
@@ -53,7 +56,7 @@ export class PointerExportMark extends React.Component<any, any> {
     const styles = StyleSheet.create({
       OuterPointerExportStyle: {
         ":before": {
-          backgroundColor: "rgba(12, 165, 0, 0.63)",
+          backgroundColor: darkGreen,
           color: "rgb(233, 239, 233)",
           content: `"$${parseInt(pointerIndex, 10) + 1}"`,
           borderRadius: "4px 0px 0px 4px",
@@ -68,15 +71,15 @@ export class PointerExportMark extends React.Component<any, any> {
         transition: "background 0.2s",
 
         ":before": {
-          color: "rgba(12, 165, 0, 0.63)",
+          color: darkGreen,
           content: `"["`,
-          font: "800 1.2em sans-serif",
+          font: bracketFont,
         },
 
         ":after": {
-          color: "rgba(12, 165, 0, 0.63)",
+          color: darkGreen,
           content: `"]"`,
-          font: "800 1.2em sans-serif",
+          font: bracketFont,
         },
       },
     });
