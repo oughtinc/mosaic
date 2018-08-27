@@ -101,7 +101,8 @@ export const exportSelection = () => {
       const change = value.change();
 
       // if we are exporting a nested pointer, guarantee that the selection is
-      // not extending to an edge (i.e., including the spacer char in the selection)
+      // not extending to an edge, because selections on the edge of an inline
+      // pick up what comes after
       if (isNestedInPointerExport) {
         moveSelectionAwayFromPointerEdge(change);
       }
