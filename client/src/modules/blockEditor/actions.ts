@@ -2,6 +2,7 @@ import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
 import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
 import { normalizeAfterRemoval } from "../../utils/slate/normalizeAfterRemoval";
+import { moveSelectionAwayFromPointerEdge } from "../../utils/slate/moveSelectionAwayFromPointerEdge";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -97,32 +98,12 @@ export const exportSelection = () => {
         ||
         twoNodesFirstExportSecondEmptyString(initialTopLevelNodes);
 
-      // if we are exporting a nested pointer, guarantee that the selection is
-      // not extending to an edge
       const change = value.change();
+
+      // if we are exporting a nested pointer, guarantee that the selection is
+      // not extending to an edge (i.e., including the spacer char in the selection)
       if (isNestedInPointerExport) {
-        const selection = value.selection;
-        const { anchorOffset, focusOffset } = selection;
-
-        const anchorOffsetAtStart = anchorOffset === 0;
-
-        if (anchorOffsetAtStart) {
-          if (!selection.isBackward) {
-            change.moveAnchor(1);
-          } else {
-            change.moveAnchorToEndOfPreviousText().moveFocus(-1);
-          }
-        }
-
-        const focusOffsetAtStart = focusOffset === 0;
-
-        if (focusOffsetAtStart) {
-          if (!selection.isBackward) {
-            change.moveFocusToEndOfPreviousText().moveFocus(-1);
-          } else {
-            change.moveFocus(1);
-          }
-        }
+        moveSelectionAwayFromPointerEdge(change);
       }
 
       // A Slate fragment is a document: value.fragment is the document
