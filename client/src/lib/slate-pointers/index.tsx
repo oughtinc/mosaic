@@ -1,6 +1,8 @@
 import * as React from "react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportNode } from "./PointerImportNode";
+import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
+import { handleMovingCursor } from "../../utils/slate/handleMovingCursor";
 
 function SlatePointers(options: any = {}) {
   return {
@@ -29,6 +31,32 @@ function SlatePointers(options: any = {}) {
 
     shouldNodeComponentUpdate(a: object, b: object) {
       return true;
+    },
+
+    // handles moving cursor across spacer characters
+    onKeyDown(event: any, change: any, editor: any) {
+      const isMovingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
+      const isMovingRight = event.key === "ArrowRight";
+
+      // simulate the inteded move to the left or right
+      // because they are simulated we don't use the original change object
+
+      let valueAfterSimulatedChange = change.value;
+
+      if (isMovingLeft) {
+        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(-1).value;
+      }
+
+      if (isMovingRight) {
+        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(1).value;
+      }
+
+      if (isCursorInPotentiallyProblematicPosition(valueAfterSimulatedChange)) {
+        handleMovingCursor(change, valueAfterSimulatedChange, isMovingLeft, isMovingRight);
+        event.preventDefault();
+        return false;
+      }
+      return;
     },
 
     renderNode(props: any) {

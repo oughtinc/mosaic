@@ -16,7 +16,6 @@ import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
 import { Change } from "./types";
 import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
-import { handleMovingCursor } from "../../utils/slate/handleMovingCursor";
 import { handleStationaryCursor } from "../../utils/slate/handleStationaryCursor";
 
 const BlockEditorStyle = styled.div`
@@ -187,30 +186,6 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onKeyDown = (event: any, change: Change) => {
-
-    const isMovingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
-    const isMovingRight = event.key === "ArrowRight";
-
-    // simulate the inteded move to the left or right
-    // because they are simulated we don't use the original change object
-
-    let valueAfterSimulatedChange = change.value;
-
-    if (isMovingLeft) {
-      valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(-1).value;
-    }
-
-    if (isMovingRight) {
-      valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(1).value;
-    }
-
-    if (isCursorInPotentiallyProblematicPosition(valueAfterSimulatedChange)) {
-      const correctedChange = handleMovingCursor(change, valueAfterSimulatedChange, isMovingLeft, isMovingRight);
-      this.props.updateBlock({ id: this.props.block.id, value: correctedChange.value, pointerChanged: false });
-      event.preventDefault();
-      return false;
-    }
-
     const pressedControlAndE = _event => _event.metaKey && _event.key === "e";
     if (pressedControlAndE(event)) {
       this.props.exportSelection();
@@ -220,11 +195,6 @@ export class BlockEditorEditingPresentational extends React.Component<
     if (!!this.props.onKeyDown) {
       this.props.onKeyDown(event);
     }
-
-    // because false is sometimes return in this function
-    // all paths need to explicitly return or the linter raises an error
-
-    return;
   };
 
   private onValueChange = () => {
