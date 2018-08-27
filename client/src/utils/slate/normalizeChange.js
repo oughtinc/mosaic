@@ -40,6 +40,13 @@ export function normalizeExportSpacing(c: Change) {
     if ((isFirstTextOfExport(textNode, c.value.document) || isLastTextOfExport(textNode, c.value.document)) && textNode.text.length === 1) {
       c.insertTextByKey(textNode.key, 0, SPACER);
     }
+
+    // for edge case where there is only one spacer between two pointers,
+    // you always need two so text cursor issues don't arise
+    textNode = c.value.document.getNode(textNode.key);
+    if ((isDirectlyAfterExport(textNode, c.value.document) && isDirectlyAfterExport(textNode, c.value.document)) && textNode.text.length === 1) {
+      c.insertTextByKey(textNode.key, 0, SPACER);
+    }
   });
 
   return c;
