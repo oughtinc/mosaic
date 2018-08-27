@@ -32,10 +32,10 @@ export function normalizeExportSpacing(c: Change) {
       c.insertTextByKey(textNode.key, textNode.text.length, SPACER);
     }
 
-    // for edge case where there is only two spaces in a pointer
-    // and you delete one, then first and last char are both spaces
+    // For edge case a pointer contains two spacers, and nothing
+    // else, and you delete one. Then the first and last chars are both spacers
     // since they are the same char, so you need to additionaly enforce
-    // that there are at least two chars
+    // that there are at least two chars.
     textNode = c.value.document.getNode(textNode.key);
     if ((isFirstTextOfExport(textNode, c.value.document) || isLastTextOfExport(textNode, c.value.document)) && textNode.text.length === 1) {
       c.insertTextByKey(textNode.key, 0, SPACER);
