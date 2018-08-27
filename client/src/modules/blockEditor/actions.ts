@@ -1,6 +1,6 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
-import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
+import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
 import { normalizeAfterRemoval } from "../../utils/slate/normalizeAfterRemoval";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
@@ -77,16 +77,6 @@ const twoNodesFirstExportSecondEmptyString = nodes => {
   );
 };
 
-const spaceTextNode = {
-  object: "text",
-  leaves: [
-    {
-      object: "leaf",
-      text: SPACER,
-    }
-  ]
-};
-
 export const exportSelection = () => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();
@@ -150,15 +140,13 @@ export const exportSelection = () => {
         nodes = nodes[0].nodes;
       }
 
-      change.insertText(SPACER)
-        .insertText(SPACER)
-        .collapseToEnd()
-        .move(-1)
-        .insertInline({
-          type: "pointerExport",
-          data: { pointerId: uuid },
-          nodes: [spaceTextNode, ...nodes, spaceTextNode],
-        });
+      change.insertInline({
+        type: "pointerExport",
+        data: { pointerId: uuid },
+        nodes,
+      });
+
+      normalizeExportSpacing(change);
 
       dispatch({
         type: UPDATE_BLOCK,
