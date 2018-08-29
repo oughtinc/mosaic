@@ -4,6 +4,7 @@ import { insertPointerExport } from "./insertPointerExport";
 import { moveSelectionAwayFromPointerEdge } from "./moveSelectionAwayFromPointerEdge";
 import { normalizeAfterRemoval } from "./normalizeAfterRemoval";
 import { normalizeExportSpacing } from "./normalizeChange";
+import { removePointerExport } from "./removePointerExport";
 
 export {
   adjustCursorIfAtEdge,
@@ -11,5 +12,6 @@ export {
   insertPointerExport,
   moveSelectionAwayFromPointerEdge,
   normalizeAfterRemoval,
-  normalizeExportSpacing
+  normalizeExportSpacing,
+  removePointerExport,
 };
