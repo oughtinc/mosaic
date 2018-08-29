@@ -9,6 +9,7 @@ export interface Change {
   value: any;
   collapseToEnd(): Change;
   collapseToStart(): Change;
+  insertInline(inlineOrProperties: any): Change;
   insertTextByKey(key: any, offset: number, text: string): Change;
   move(n: number): Change;
   moveAnchor(n: number): Change;
