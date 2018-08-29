@@ -1,14 +1,18 @@
+function isPointerExport(node) {
+  return node.type && node.type === "pointerExport";
+}
+
 export function closestPointerExportAncestor(node: any, document: any) {
   let curNode = node;
   while (
-    !(curNode.type && curNode.type === "pointerExport")
+    !(isPointerExport(curNode))
     &&
     document.getParent(curNode.key)
   ) {
     curNode = document.getParent(curNode.key);
   }
 
-  if (curNode.type && curNode.type === "pointerExport") {
+  if (isPointerExport(curNode)) {
     return curNode;
   }
   return undefined;
