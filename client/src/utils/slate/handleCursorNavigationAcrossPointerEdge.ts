@@ -1,6 +1,6 @@
 import { Change, Value } from "../../components/BlockEditor/types";
 
-export function handleMovingCursor(change: Change, value: Value, isMovingLeft: boolean, isMovingRight: boolean) {
+export function handleCursorNavigationAcrossPointerEdge(change: Change, value: Value, isMovingLeft: boolean, isMovingRight: boolean) {
 
   const textNode = value.document.getNode(value.selection.focusKey);
   const nextTextNode = value.document.getNextText(textNode.key);

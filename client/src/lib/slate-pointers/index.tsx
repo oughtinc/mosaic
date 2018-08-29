@@ -2,7 +2,7 @@ import * as React from "react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportNode } from "./PointerImportNode";
 import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
-import { handleMovingCursor } from "../../utils/slate/handleMovingCursor";
+import { handleCursorNavigationAcrossPointerEdge } from "../../utils/slate/handleCursorNavigationAcrossPointerEdge";
 
 function SlatePointers(options: any = {}) {
   return {
@@ -52,7 +52,7 @@ function SlatePointers(options: any = {}) {
       }
 
       if (isCursorInPotentiallyProblematicPosition(valueAfterSimulatedChange)) {
-        handleMovingCursor(change, valueAfterSimulatedChange, isMovingLeft, isMovingRight);
+        handleCursorNavigationAcrossPointerEdge(change, valueAfterSimulatedChange, isMovingLeft, isMovingRight);
         event.preventDefault();
         return false;
       }
