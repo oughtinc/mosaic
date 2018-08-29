@@ -52,7 +52,12 @@ function SlatePointers(options: any = {}) {
       }
 
       if (isCursorInPotentiallyProblematicPosition(valueAfterSimulatedChange)) {
-        handleCursorNavigationAcrossPointerEdge(change, valueAfterSimulatedChange, isMovingLeft, isMovingRight);
+        handleCursorNavigationAcrossPointerEdge({
+          change,
+          value: valueAfterSimulatedChange,
+          isMovingLeft,
+          isMovingRight,
+        });
         event.preventDefault();
         return false;
       }
