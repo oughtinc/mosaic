@@ -1,8 +1,6 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
-import { normalizeExportSpacing } from "../../slate-helpers/slate-change-mutations/normalizeChange";
-import { normalizeAfterRemoval } from "../../slate-helpers/slate-change-mutations/normalizeAfterRemoval";
-import { moveSelectionAwayFromPointerEdge } from "../../slate-helpers/slate-change-mutations/moveSelectionAwayFromPointerEdge";
+import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -104,7 +102,7 @@ export const exportSelection = () => {
       // not extending to an edge, because selections on the edge of an inline
       // pick up what comes after
       if (isNestedInPointerExport) {
-        moveSelectionAwayFromPointerEdge(change);
+        slateChangeMutations.moveSelectionAwayFromPointerEdge(change);
       }
 
       // A Slate fragment is a document: value.fragment is the document
@@ -128,7 +126,7 @@ export const exportSelection = () => {
         nodes,
       });
 
-      normalizeExportSpacing(change);
+      slateChangeMutations.normalizeExportSpacing(change);
 
       dispatch({
         type: UPDATE_BLOCK,
@@ -194,7 +192,7 @@ export const removeExportOfSelection = () => {
         change.unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: hoveredItem.id } });
       }
 
-      normalizeAfterRemoval(change);
+      slateChangeMutations.normalizeAfterRemoval(change);
 
       dispatch({
         type: UPDATE_BLOCK,

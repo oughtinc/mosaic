@@ -13,9 +13,8 @@ import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
-import { normalizeExportSpacing } from "../../slate-helpers/slate-change-mutations/normalizeChange";
 import { Change } from "./types";
-import { adjustCursorIfAtEdge } from "../../slate-helpers/slate-change-mutations/adjustCursorIfAtEdge";
+import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;
@@ -127,7 +126,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentDidMount() {
-    const change = normalizeExportSpacing(this.props.block.value.change());
+    const change = slateChangeMutations.normalizeExportSpacing(this.props.block.value.change());
     this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
   }
 
@@ -215,14 +214,14 @@ export class BlockEditorEditingPresentational extends React.Component<
     // pointer spacing
     const documentHasChanged = c.value.document !== this.props.block.value.document;
     if (documentHasChanged) {
-      normalizeExportSpacing(c);
+      slateChangeMutations.normalizeExportSpacing(c);
     }
 
     // the following function is trying to prevent
     // the user from using a click to get the text cursor in an off-limit spot,
     // the onClick handler didn't seem to have access to the new cursor position
     // so this lives here instead
-    adjustCursorIfAtEdge(c);
+    slateChangeMutations.adjustCursorIfAtEdge(c);
 
     this.onChange(c.value);
   };

@@ -1,6 +1,8 @@
 import { Change } from "../../components/BlockEditor/types";
 import { isCursorInPotentiallyProblematicPosition } from "../slate-utils/isCursorInPotentiallyProblematicPosition";
+
 export function adjustCursorIfAtEdge(change: Change) {
+
   const value = change.value;
   const selectionIsExpanded = value.selection.isExpanded;
 
