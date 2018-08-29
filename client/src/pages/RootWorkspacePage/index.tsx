@@ -53,7 +53,7 @@ const Description = styled.div`
 const workspaceToBlock = (workspace: any, blockType: string) =>
   workspace.blocks && workspace.blocks.find(b => b.type === blockType);
 
-const RootBlock = ({ availablePointers, block }) =>
+const RootBlock = ({ availablePointers = [], block }) =>
   block &&
   block.value && (
     <TextBlock>
@@ -75,9 +75,9 @@ const RootWorkspace = ({ workspace }) => {
   return (
     <WorkspaceStyle>
       <Link to={`/workspaces/${workspace.id}`}>
-        <RootBlock block={question} availablePointers={[]} />
+        <RootBlock block={question} />
       </Link>
-      <RootBlock block={answer} availablePointers={[]} />
+      <RootBlock block={answer} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <TreeButton className="pull-right">Tree</TreeButton>
       </Link>
