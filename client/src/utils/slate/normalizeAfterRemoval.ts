@@ -1,4 +1,4 @@
-import { SPACER } from "../../lib/slate-pointers/exportedPointerSpacer";
+import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
 import { Change } from "../../components/BlockEditor/types";
 import { normalizeExportSpacing } from "./normalizeChange";
 
@@ -8,7 +8,7 @@ export function normalizeAfterRemoval(c: Change) {
   value.document.getTexts().forEach(textNode => {
     // remove all spacer characters
     const oldText = textNode.text;
-    const newText = oldText.split(SPACER).join("");
+    const newText = oldText.split(POINTER_EDGE_SPACE).join("");
 
     if (oldText !== newText) {
       c.insertTextByKey(textNode.key, textNode.text.length, newText);
