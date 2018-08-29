@@ -16,7 +16,7 @@ import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
 import { Change } from "./types";
 import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
-import { handleStationaryCursor } from "../../utils/slate/handleStationaryCursor";
+import { adjustCursorIfAtEdge } from "../../utils/slate/adjustCursorIfAtEdge";
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;
@@ -214,24 +214,16 @@ export class BlockEditorEditingPresentational extends React.Component<
     // first check to see if document changed, which we can do with !== b/c
     // Slate uses immutable objects, if it has changed then normalize wrt
     // pointer spacing
-
-    if (c.value.document !== this.props.block.value.document) {
-      c = normalizeExportSpacing(c);
+    const documentHasChanged = c.value.document !== this.props.block.value.document;
+    if (documentHasChanged) {
+      normalizeExportSpacing(c);
     }
 
-    // the rest of this method before the last two lines are trying to prevent
-    // the user from using a click top get the text cursor in off limit spacing
+    // the following function is trying to prevent
+    // the user from using a click to get the text cursor in an off-limit spot,
     // the onClick handler didn't seem to have access to the new cursor position
-    // so this logic lives here instead
-
-    const value = c.value;
-    const selectionIsExpanded = value.selection.isExpanded;
-
-    // if selection is expanded, then we don't do this
-    // this allows mouse dragging to select across pointers
-    if (!selectionIsExpanded && isCursorInPotentiallyProblematicPosition(value)) {
-      handleStationaryCursor(c);
-    }
+    // so this lives here instead
+    adjustCursorIfAtEdge(c);
 
     this.onChange(c.value);
   };
