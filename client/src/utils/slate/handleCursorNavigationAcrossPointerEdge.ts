@@ -1,5 +1,3 @@
-import { Change, Value } from "../../components/BlockEditor/types";
-
 export function handleCursorNavigationAcrossPointerEdge({
   change,
   value,

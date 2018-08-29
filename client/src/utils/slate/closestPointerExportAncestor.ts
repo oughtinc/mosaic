@@ -1,4 +1,4 @@
-function isPointerExport(node) {
+function isPointerExport(node: any) {
   return node.type && node.type === "pointerExport";
 }
 
