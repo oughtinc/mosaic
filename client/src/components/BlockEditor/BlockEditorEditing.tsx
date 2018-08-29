@@ -13,9 +13,9 @@ import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
-import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
+import { normalizeExportSpacing } from "../../slate-helpers/slate-change-mutations/normalizeChange";
 import { Change } from "./types";
-import { adjustCursorIfAtEdge } from "../../utils/slate/adjustCursorIfAtEdge";
+import { adjustCursorIfAtEdge } from "../../slate-helpers/slate-change-mutations/adjustCursorIfAtEdge";
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;

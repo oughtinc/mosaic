@@ -1,10 +1,10 @@
-import { closestPointerExportAncestor } from "./closestPointerExportAncestor";
-import { hasSpacerAsFirstChar } from "./hasSpacerAsFirstChar";
-import { hasSpacerAsLastChar } from "./hasSpacerAsLastChar";
-import { isDirectlyAfterExport } from "./isDirectlyAfterExport";
-import { isDirectlyBeforeExport } from "./isDirectlyBeforeExport";
-import { isFirstTextOfExport } from "./isFirstTextOfExport";
-import { isLastTextOfExport } from "./isLastTextOfExport";
+import { closestPointerExportAncestor } from "../slate-utils/closestPointerExportAncestor";
+import { hasSpacerAsFirstChar } from "../slate-utils//hasSpacerAsFirstChar";
+import { hasSpacerAsLastChar } from "../slate-utils//hasSpacerAsLastChar";
+import { isDirectlyAfterExport } from "../slate-utils//isDirectlyAfterExport";
+import { isDirectlyBeforeExport } from "../slate-utils//isDirectlyBeforeExport";
+import { isFirstTextOfExport } from "../slate-utils//isFirstTextOfExport";
+import { isLastTextOfExport } from "../slate-utils//isLastTextOfExport";
 
 import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
 import { Change, TextNode } from "../../components/BlockEditor/types";

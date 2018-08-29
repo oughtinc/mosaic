@@ -1,8 +1,8 @@
 import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
-import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
-import { normalizeAfterRemoval } from "../../utils/slate/normalizeAfterRemoval";
-import { moveSelectionAwayFromPointerEdge } from "../../utils/slate/moveSelectionAwayFromPointerEdge";
+import { normalizeExportSpacing } from "../../slate-helpers/slate-change-mutations/normalizeChange";
+import { normalizeAfterRemoval } from "../../slate-helpers/slate-change-mutations/normalizeAfterRemoval";
+import { moveSelectionAwayFromPointerEdge } from "../../slate-helpers/slate-change-mutations/moveSelectionAwayFromPointerEdge";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";

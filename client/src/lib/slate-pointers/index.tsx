@@ -1,8 +1,8 @@
 import * as React from "react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportNode } from "./PointerImportNode";
-import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
-import { handleCursorNavigationAcrossPointerEdge } from "../../utils/slate/handleCursorNavigationAcrossPointerEdge";
+import { isCursorInPotentiallyProblematicPosition } from "../../slate-helpers/slate-utils/isCursorInPotentiallyProblematicPosition";
+import { handleCursorNavigationAcrossPointerEdge } from "../../slate-helpers/slate-change-mutations/handleCursorNavigationAcrossPointerEdge";
 
 function SlatePointers(options: any = {}) {
   return {
