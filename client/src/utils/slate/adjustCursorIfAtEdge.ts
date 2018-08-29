@@ -25,5 +25,6 @@ export function adjustCursorIfAtEdge(change: Change) {
         .move(1);
     }
   }
-    return change;
+
+  return change;
 }

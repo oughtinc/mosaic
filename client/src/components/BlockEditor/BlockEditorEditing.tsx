@@ -15,7 +15,6 @@ import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { normalizeExportSpacing } from "../../utils/slate/normalizeChange";
 import { Change } from "./types";
-import { isCursorInPotentiallyProblematicPosition } from "../../utils/slate/isCursorInPotentiallyProblematicPosition";
 import { adjustCursorIfAtEdge } from "../../utils/slate/adjustCursorIfAtEdge";
 
 const BlockEditorStyle = styled.div`
