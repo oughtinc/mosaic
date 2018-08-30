@@ -1,5 +1,5 @@
-import * as uuidv1 from "uuid/v1";
 import { UPDATE_BLOCK } from "../blocks/actions";
+import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
@@ -62,11 +62,12 @@ export const exportSelection = () => {
     const { hoveredItem } = blockEditor;
 
     const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
-    const uuid = uuidv1();
+
     if (block) {
-      const change = block.value
-        .change()
-        .wrapInline({ type: "pointerExport", data: { pointerId: uuid } });
+      const change = block.value.change();
+      slateChangeMutations.insertPointerExport(change);
+      slateChangeMutations.normalizeExportSpacing(change);
+
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
@@ -79,24 +80,6 @@ export const exportSelection = () => {
   };
 };
 
-function getInlinesAsArray(node: any) {
-  let array: any = [];
-
-  node.nodes.forEach(child => {
-    if (child.object === "text") {
-      return;
-    }
-    if (child.object === "inline") {
-      array.push(child);
-    }
-    if (!child.isLeafInline()) {
-      array = array.concat(getInlinesAsArray(child));
-    }
-  });
-
-  return array;
-}
-
 export const removeExportOfSelection = () => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();
@@ -105,20 +88,9 @@ export const removeExportOfSelection = () => {
     const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
 
     if (block) {
-      const inlines = getInlinesAsArray(block.value.document);
-      const matchingNodes = inlines.filter(
-        i => i.toJSON().data.pointerId === hoveredItem.id
-      );
-      if (!matchingNodes.length) {
-        console.error("Exporting node not found in Redux store");
-        return;
-      }
-
-      const change = block.value
-        .change()
-        .unwrapInlineByKey(matchingNodes[0].key, {
-          data: { pointerId: hoveredItem.id }
-        });
+      const change = block.value.change();
+      slateChangeMutations.removePointerExport(change, hoveredItem);
+      slateChangeMutations.normalizeAfterRemoval(change);
 
       dispatch({
         type: UPDATE_BLOCK,

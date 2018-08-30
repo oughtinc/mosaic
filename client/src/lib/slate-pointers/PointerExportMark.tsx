@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { propsToPointerDetails } from "./helpers";
@@ -10,62 +10,8 @@ import { propsToPointerDetails } from "./helpers";
 //     return _.max(possibilities.map((p) => (getMaxNesting(p) + 1))) || 0;
 // }
 
-const pointerExportBackground: any = ({ isSelected, isDisplayMode }: any) => {
-  if (isSelected) {
-    return "rgba(85, 228, 38, 0.9)";
-  } else if (isDisplayMode) {
-    return "rgba(200, 243, 197, 0.5)";
-  } else {
-    return "rgba(200, 243, 197, 0.8)";
-  }
-};
-
-const PointerExportStyle: any = styled.span`
-  background: ${pointerExportBackground};
-  margin-left: ${({ isDisplayMode }: any) => (isDisplayMode ? "3px" : "0")};
-  transition: background 0.2s;
-  color: #000000;
-`;
-
 const darkGreen = "rgba(12, 165, 0, 0.63)";
-
-const Bracket = styled.span`
-  color: ${darkGreen};
-  font-size: 1.2em;
-  font-weight: 800;
-  line-height: 1em;
-`;
-
-const Tag = styled.span`
-  padding: 0 3px;
-  background: ${darkGreen};
-  color: #e9efe9;
-  margin-right: 1px;
-  border-radius: 4px 0 0 4px;
-  margin-left: 0px;
-`;
-
-const DisplayModeSurround = ({
-  isDisplayMode,
-  children,
-  pointerIndex,
-  onMouseOver
-}: any) => {
-  if (!isDisplayMode) {
-    return children;
-  } else {
-    return (
-      <span>
-        <Tag onMouseOver={onMouseOver}>
-          {`$${parseInt(pointerIndex, 10) + 1}`}
-        </Tag>
-        <Bracket onMouseOver={onMouseOver}>{"["}</Bracket>
-        {children}
-        <Bracket onMouseOver={onMouseOver}>{"]"}</Bracket>
-      </span>
-    );
-  }
-};
+const bracketFont = "800 1.2em sans-serif";
 
 export class PointerExportMark extends React.Component<any, any> {
   public constructor(props: any) {
@@ -92,24 +38,57 @@ export class PointerExportMark extends React.Component<any, any> {
       availablePointers,
       nodeAsJson,
       children,
-      isDisplayMode
     }: any = this.props;
+
+    const pointerExportBackground: any =
+      isSelected
+      ?
+      "rgba(85, 228, 38, 0.9)"
+      :
+      "rgba(200, 243, 197, 0.5)";
 
     const { pointerIndex }: any = propsToPointerDetails({
       blockEditor,
       availablePointers,
       nodeAsJson
     });
+
+    const styles = StyleSheet.create({
+      OuterPointerExportStyle: {
+        ":before": {
+          backgroundColor: darkGreen,
+          color: "rgb(233, 239, 233)",
+          content: `"$${parseInt(pointerIndex, 10) + 1}"`,
+          borderRadius: "4px 0px 0px 4px",
+          padding: "0px 3px",
+        },
+      },
+
+      PointerExportStyle: {
+        background: `${pointerExportBackground}`,
+        color: "#000000",
+        marginLeft: "0.5px",
+        transition: "background 0.2s",
+
+        ":before": {
+          color: darkGreen,
+          content: `"["`,
+          font: bracketFont,
+        },
+
+        ":after": {
+          color: darkGreen,
+          content: `"]"`,
+          font: bracketFont,
+        },
+      },
+    });
+
     return (
-      <PointerExportStyle
-        isSelected={isSelected}
-        onMouseOut={this.props.onMouseOut}
-        isDisplayMode={isDisplayMode}
-      >
-        <DisplayModeSurround
-          isDisplayMode={isDisplayMode}
-          pointerIndex={pointerIndex}
-          onMouseOver={this.onMouseOver}
+      <span className={css(styles.OuterPointerExportStyle)}>
+        <span
+          className={css(styles.PointerExportStyle)}
+          onMouseOut={this.props.onMouseOut}
         >
           {children.map((child, index) => {
             const isNestedPointer = child.props.node.object === "inline";
@@ -124,8 +103,8 @@ export class PointerExportMark extends React.Component<any, any> {
               return child;
             }
           })}
-        </DisplayModeSurround>
-      </PointerExportStyle>
+        </span>
+      </span>
     );
   }
 }

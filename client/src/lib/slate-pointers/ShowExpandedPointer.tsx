@@ -10,7 +10,7 @@ export class LeafNode extends React.Component<any, any> {
         onMouseOver={this.props.onMouseOver}
         onMouseOut={this.props.onMouseOut}
       >
-        {this.props.node.text}
+        {this.props.node.leaves.map(leaf => leaf.text)}
       </span>
     );
   }
@@ -58,28 +58,29 @@ export class ShowExpandedPointer extends React.Component<any, any> {
 
   public render() {
     return (
-      <div>
+      <span>
         {this.props.exportingPointer.nodes.map((node, index) => {
           if (
             node.object === "inline" ||
             node.object === "GeneratedNestedExportNode"
           ) {
             return (
-              <InlineNode
-                node={node}
-                key={index}
-                blockEditor={this.props.blockEditor}
-                availablePointers={this.props.availablePointers}
-                pointerId={this.props.exportingPointer.pointerId}
-                onMouseOver={this.props.onMouseOverPointerImport}
-                isHoverable={this.props.isHoverable}
-              />
+              <span key={index} style={{ marginLeft: "4px", marginRight: "6px" }}>
+                <InlineNode
+                  node={node}
+                  blockEditor={this.props.blockEditor}
+                  availablePointers={this.props.availablePointers}
+                  pointerId={this.props.exportingPointer.pointerId}
+                  onMouseOver={this.props.onMouseOverPointerImport}
+                  isHoverable={this.props.isHoverable}
+                />
+              </span>
             );
           } else {
             return (
               <LeafNode
                 key={index}
-                node={node.leaves[0]}
+                node={node}
                 isHoverable={this.props.isHoverable}
                 onMouseOver={this.props.onMouseOverExpandedPointer}
                 onMouseOut={this.props.onMouseOut}
@@ -87,7 +88,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
             );
           }
         })}
-      </div>
+      </span>
     );
   }
 }

@@ -13,6 +13,8 @@ import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
+import { Change } from "./types";
+import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 const BlockEditorStyle = styled.div`
   background: #f4f4f4;
@@ -123,6 +125,11 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   }
 
+  public componentDidMount() {
+    const change = slateChangeMutations.normalizeExportSpacing(this.props.block.value.change());
+    this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
+  }
+
   public render() {
     return (
       <BlockEditorStyle>
@@ -176,7 +183,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   };
 
-  private onKeyDown = event => {
+  private onKeyDown = (event: any, change: Change) => {
     const pressedControlAndE = _event => _event.metaKey && _event.key === "e";
     if (pressedControlAndE(event)) {
       this.props.exportSelection();
@@ -201,7 +208,21 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   };
 
-  private onChangeCallback = (c: any) => {
+  private onChangeCallback = (c: Change) => {
+    // first check to see if document changed, which we can do with !== b/c
+    // Slate uses immutable objects, if it has changed then normalize wrt
+    // pointer spacing
+    const documentHasChanged = c.value.document !== this.props.block.value.document;
+    if (documentHasChanged) {
+      slateChangeMutations.normalizeExportSpacing(c);
+    }
+
+    // the following function is trying to prevent
+    // the user from using a click to get the text cursor in an off-limit spot,
+    // the onClick handler didn't seem to have access to the new cursor position
+    // so this lives here instead
+    slateChangeMutations.adjustCursorIfAtEdge(c);
+
     this.onChange(c.value);
   };
 

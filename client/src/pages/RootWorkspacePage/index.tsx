@@ -53,7 +53,7 @@ const Description = styled.div`
 const workspaceToBlock = (workspace: any, blockType: string) =>
   workspace.blocks && workspace.blocks.find(b => b.type === blockType);
 
-const RootBlock = ({ block }) =>
+const RootBlock = ({ availablePointers = [], block }) =>
   block &&
   block.value && (
     <TextBlock>
@@ -63,7 +63,7 @@ const RootBlock = ({ block }) =>
         initialValue={databaseJSONToValue(block.value)}
         readOnly={true}
         shouldAutosave={false}
-        availablePointers={[]}
+        availablePointers={availablePointers}
       />
     </TextBlock>
   );
@@ -82,7 +82,7 @@ const RootWorkspace = ({ workspace }) => {
         <TreeButton className="pull-right">Tree</TreeButton>
       </Link>
       <Description>
-        <RootBlock block={scratchpad} />
+        <RootBlock block={scratchpad} availablePointers={workspace.connectedPointers} />
       </Description>
     </WorkspaceStyle>
   );

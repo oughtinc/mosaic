@@ -1,6 +1,8 @@
 import * as React from "react";
 import { PointerExportMark } from "./PointerExportMark";
 import { PointerImportNode } from "./PointerImportNode";
+import { isCursorInPotentiallyProblematicPosition } from "../../slate-helpers/slate-utils/isCursorInPotentiallyProblematicPosition";
+import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 function SlatePointers(options: any = {}) {
   return {
@@ -31,6 +33,37 @@ function SlatePointers(options: any = {}) {
       return true;
     },
 
+    // handles moving cursor across spacer characters
+    onKeyDown(event: any, change: any, editor: any) {
+      const isMovingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
+      const isMovingRight = event.key === "ArrowRight";
+
+      // simulate the inteded move to the left or right
+      // because they are simulated we don't use the original change object
+
+      let valueAfterSimulatedChange = change.value;
+
+      if (isMovingLeft) {
+        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(-1).value;
+      }
+
+      if (isMovingRight) {
+        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(1).value;
+      }
+
+      if (isCursorInPotentiallyProblematicPosition(valueAfterSimulatedChange)) {
+        slateChangeMutations.handleCursorNavigationAcrossPointerEdge({
+          change,
+          value: valueAfterSimulatedChange,
+          isMovingLeft,
+          isMovingRight,
+        });
+        event.preventDefault();
+        return false;
+      }
+      return;
+    },
+
     renderNode(props: any) {
       const { children, node } = props; // { attributes, isSelected }
       if (node.type === "pointerExport") {
@@ -42,7 +75,6 @@ function SlatePointers(options: any = {}) {
         return (
           <PointerExportMark
             blockEditor={options.blockEditor}
-            isDisplayMode={options.isDisplayMode}
             nodeAsJson={nodeAsJson}
             availablePointers={options.availablePointers}
             onMouseOver={({ left, right, top, bottom }) => {
@@ -60,7 +92,7 @@ function SlatePointers(options: any = {}) {
         );
       }
       if (node.type === "text") {
-        return <div>{children}</div>;
+        return <span>{children}</span>;
       }
       if (node.type === "pointerImport") {
         return (

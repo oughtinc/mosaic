@@ -8,6 +8,7 @@
     "@fortawesome/fontawesome": "^1.1.4",
     "@fortawesome/fontawesome-free-solid": "^5.0.8",
     "@fortawesome/react-fontawesome": "0.0.17",
+    "aphrodite": "^2.2.2",
     "apollo-cache-inmemory": "^1.1.10",
     "apollo-client": "^2.2.6",
     "apollo-link-error": "^1.0.9",
