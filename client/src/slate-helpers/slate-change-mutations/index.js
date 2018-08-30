@@ -5,3 +5,4 @@ export { moveSelectionAwayFromPointerEdge } from "./moveSelectionAwayFromPointer
 export { normalizeAfterRemoval } from "./normalizeAfterRemoval";
 export { normalizeExportSpacing } from "./normalizeChange";
 export { removePointerExport } from "./removePointerExport";
+export { scanBlockAndConvertOuterSquareBrackets } from "./scanBlockAndConvertOuterSquareBrackets";

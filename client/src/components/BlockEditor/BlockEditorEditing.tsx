@@ -147,6 +147,7 @@ export class BlockEditorEditingPresentational extends React.Component<
           spellCheck={false}
           onBlur={this.handleBlur}
           onKeyDown={this.onKeyDown}
+          onKeyUp={this.onKeyUp}
           ref={this.updateEditor}
         />
       </BlockEditorStyle>
@@ -194,6 +195,26 @@ export class BlockEditorEditingPresentational extends React.Component<
       this.props.onKeyDown(event);
     }
   };
+
+  private handleSquareBracketExport() {
+    // check to see whether there are a balanced number of square brackets
+    // if there are, everything within the outermost brackets gets exported
+    const didConvertBrackets = slateChangeMutations.scanBlockAndConvertOuterSquareBrackets({
+      change: this.props.value.change(),
+      updateBlock: this.props.updateBlock,
+      exportSelection: this.props.exportSelection,
+      blockId: this.props.block.id,
+    });
+
+    // if something was exported, redo this process
+    if (didConvertBrackets) {
+      setTimeout(() => this.handleSquareBracketExport(), 10);
+    }
+  }
+
+  private onKeyUp = (event: any, change: any) => {
+    this.handleSquareBracketExport();
+  }
 
   private onValueChange = () => {
     const changeFromOutsideComponent = this.props.block.pointerChanged;
