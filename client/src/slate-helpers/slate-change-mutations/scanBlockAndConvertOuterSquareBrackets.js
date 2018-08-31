@@ -76,9 +76,7 @@ function findOutermostSquareBrackets(textNodes) {
   let endKey;
   let endOffset;
 
-  let startingPosAlreadyFound = false;
-  let endingPosAlreadyFound = false;
-
+  let matchFound = false;
   let squareBracketBalance = 0;
 
   for (let j = 0; j < textNodes.size; j++) {
@@ -89,17 +87,16 @@ function findOutermostSquareBrackets(textNodes) {
     while (i++ < chars.length) {
       if (chars[i] === "[") {
         squareBracketBalance++;
-        if (!startingPosAlreadyFound) {
+        if (!matchFound) {
           startKey = textNode.key;
           startOffset = i;
-          startingPosAlreadyFound = true;
         }
       } else if (chars[i] === "]") {
         squareBracketBalance--;
-        if (squareBracketBalance === 0 && !endingPosAlreadyFound) {
+        if (!matchFound) {
           endKey = textNode.key;
           endOffset = i;
-          endingPosAlreadyFound = true;
+          matchFound = true;
         } else if (squareBracketBalance < 0) {
           return { balancedBrackets: false };
         }
@@ -107,9 +104,7 @@ function findOutermostSquareBrackets(textNodes) {
     }
   }
 
-  const matchFound = endingPosAlreadyFound;
-
-  if (endingPosAlreadyFound && squareBracketBalance === 0) {
+  if (matchFound && squareBracketBalance === 0) {
     return {
       balancedBrackets: true,
       startKey,
