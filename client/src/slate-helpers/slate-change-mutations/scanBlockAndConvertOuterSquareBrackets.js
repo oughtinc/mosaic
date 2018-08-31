@@ -77,6 +77,7 @@ function findOutermostSquareBrackets(textNodes) {
   let endOffset;
 
   let startingPosAlreadyFound = false;
+  let endingPosAlreadyFound = false;
 
   let squareBracketBalance = 0;
 
@@ -95,18 +96,20 @@ function findOutermostSquareBrackets(textNodes) {
         }
       } else if (chars[i] === "]") {
         squareBracketBalance--;
-        endKey = textNode.key;
-        endOffset = i;
-        if (squareBracketBalance < 0) {
+        if (squareBracketBalance === 0 && !endingPosAlreadyFound) {
+          endKey = textNode.key;
+          endOffset = i;
+          endingPosAlreadyFound = true;
+        } else if (squareBracketBalance < 0) {
           return { balancedBrackets: false };
         }
       }
     }
   }
 
-  const atLeastOneBracketFound = startingPosAlreadyFound;
+  const matchFound = endingPosAlreadyFound;
 
-  if (atLeastOneBracketFound && squareBracketBalance === 0) {
+  if (endingPosAlreadyFound && squareBracketBalance === 0) {
     return {
       balancedBrackets: true,
       startKey,
