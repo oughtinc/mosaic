@@ -102,7 +102,7 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
     const cacheTimestamp = userFromAuthToken.cache[accessToken].timestamp;
     const TEN_SECONDS = 10000;
     if (nowTimestamp - cacheTimestamp < TEN_SECONDS) {
-      return userFromAuthToken.cache[accessToken].data;
+      return Promise.resolve(userFromAuthToken.cache[accessToken].data);
     }
   }
 
