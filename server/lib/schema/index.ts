@@ -96,6 +96,17 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
     return Promise.resolve(null);
   }
 
+  // first check cache and return cached value if it's younger than 10 seconds
+  const cachedToken = userFromAuthToken.cache[accessToken];
+  if (cachedToken) {
+    const nowTimestamp = Date.now();
+    const cacheTimestamp = cachedToken.timestamp;
+    const TEN_SECONDS = 10000;
+    if (nowTimestamp - cacheTimestamp < TEN_SECONDS) {
+      return Promise.resolve(cachedToken.data);
+    }
+  }
+
   return new Promise(resolve => {
     webAuth.client.userInfo(accessToken, function(err: any, user: any) {
       if (err != null) {
@@ -104,10 +115,20 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
       }
       const metadataKey = "https://mosaic:auth0:com/app_metadata";
       const isAdmin = user[metadataKey] ? user[metadataKey].is_admin : false;
-      return resolve({ user_id: user.sub, is_admin: isAdmin });
+      const data = { user_id: user.sub, is_admin: isAdmin };
+
+      // update cache
+      userFromAuthToken.cache[accessToken] = {
+        data,
+        timestamp: Date.now(),
+      };
+
+      return resolve(data);
     });
   });
 }
+
+userFromAuthToken.cache = {};
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
