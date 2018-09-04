@@ -97,12 +97,13 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
   }
 
   // first check cache and return cached value if it's younger than 10 seconds
-  if (userFromAuthToken.cache[accessToken]) {
+  const cachedToken = userFromAuthToken.cache[accessToken];
+  if (cachedToken) {
     const nowTimestamp = Date.now();
-    const cacheTimestamp = userFromAuthToken.cache[accessToken].timestamp;
+    const cacheTimestamp = cachedToken.timestamp;
     const TEN_SECONDS = 10000;
     if (nowTimestamp - cacheTimestamp < TEN_SECONDS) {
-      return Promise.resolve(userFromAuthToken.cache[accessToken].data);
+      return Promise.resolve(cachedToken.data);
     }
   }
 
