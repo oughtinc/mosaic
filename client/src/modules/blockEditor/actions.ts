@@ -56,12 +56,13 @@ export const changePointerReference = ({ id, reference }) => {
   };
 };
 
-export const exportSelection = () => {
+export const exportSelection = blockId => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();
     const { hoveredItem } = blockEditor;
 
-    const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
+    const block =
+      blocks.blocks.find(b => b.id === blockId || b.id === hoveredItem.blockId);
 
     if (block) {
       const change = block.value.change();
