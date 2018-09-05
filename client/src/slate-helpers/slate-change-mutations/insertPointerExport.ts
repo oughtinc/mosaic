@@ -39,9 +39,7 @@ export function insertPointerExport(change: Change) {
   }
 
   // disallow attempts to export across pointer boundaries
-  const selection = change.value.selection;
-  const document = change.value.document;
-  const isExportingAcrossPointers = isSelectionAcrossPointers(selection, document);
+  const isExportingAcrossPointers = isSelectionAcrossPointers(change.value);
   if (isExportingAcrossPointers) {
     return;
   }

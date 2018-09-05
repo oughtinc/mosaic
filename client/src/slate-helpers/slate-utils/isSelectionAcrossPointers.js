@@ -1,6 +1,7 @@
 import { closestPointerExportAncestor } from "./closestPointerExportAncestor";
 
-export function isSelectionAcrossPointers(selection, document) {
+export function isSelectionAcrossPointers(value) {
+  const { document, selection } = value;
   const { anchorKey, focusKey } = selection;
   const anchorNode = document.getNode(anchorKey);
   const focusNode = document.getNode(focusKey);
