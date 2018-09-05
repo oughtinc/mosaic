@@ -62,9 +62,7 @@ export const exportSelection = blockId => {
     const { hoveredItem } = blockEditor;
 
     const block =
-      blocks.blocks.find(b => b.id === blockId)
-      ||
-      blocks.blocks.find(b => b.id === hoveredItem.blockId);
+      blocks.blocks.find(b => b.id === blockId || b.id === hoveredItem.blockId);
 
     if (block) {
       const change = block.value.change();
