@@ -1,6 +1,4 @@
-import * as _ from "lodash";
-
-export const getAllInlinesAsArray = nodeOrNodes => {
+export function getInlinesAsArray(nodeOrNodes: any) {
   let array: any = [];
 
   let nodes;
@@ -17,8 +15,8 @@ export const getAllInlinesAsArray = nodeOrNodes => {
     if (child.object === "inline") {
       array.push(child);
     }
-    if (_.has(child, "nodes")) {
-      array = array.concat(getAllInlinesAsArray(child));
+    if (!child.isLeafInline()) {
+      array = array.concat(getInlinesAsArray(child));
     }
   });
 
