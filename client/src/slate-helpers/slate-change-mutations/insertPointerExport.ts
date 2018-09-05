@@ -1,6 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 import { Change } from "../../components/BlockEditor/types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
+import { isSelectionAcrossPointers } from "../slate-utils/isSelectionAcrossPointers";
 
 const onlyOneNodeThatIsPointerExport = nodes => {
   return (
@@ -35,6 +36,12 @@ export function insertPointerExport(change: Change) {
   // pick up what comes after
   if (isNestedInPointerExport) {
     slateChangeMutations.moveSelectionAwayFromPointerEdge(change);
+  }
+
+  // disallow attempts to export across pointer boundaries
+  const isExportingAcrossPointers = isSelectionAcrossPointers(change.value);
+  if (isExportingAcrossPointers) {
+    return;
   }
 
   // A Slate fragment is a document: value.fragment is the document
