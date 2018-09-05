@@ -1,4 +1,4 @@
-import { closestPointerExportAncestor } from "./closestPointerExportAncestor";
+import { containingPointerExportAncestor } from "./containingPointerExportAncestor";
 
 export function isSelectionAcrossPointers(value) {
   const { document, selection } = value;
@@ -6,10 +6,10 @@ export function isSelectionAcrossPointers(value) {
   const anchorNode = document.getNode(anchorKey);
   const focusNode = document.getNode(focusKey);
 
-  const closestPointerExportAncestorOfAnchorNode = closestPointerExportAncestor(anchorNode, document);
-  const closestPointerExportAncestorOfFocusNode = closestPointerExportAncestor(focusNode, document);
+  const containingPointerExportAncestorOfAnchorNode = containingPointerExportAncestor(anchorNode, document);
+  const containingPointerExportAncestorOfFocusNode = containingPointerExportAncestor(focusNode, document);
 
-  if (closestPointerExportAncestorOfAnchorNode !== closestPointerExportAncestorOfFocusNode) {
+  if (containingPointerExportAncestorOfAnchorNode !== containingPointerExportAncestorOfFocusNode) {
     return true;
   }
 
