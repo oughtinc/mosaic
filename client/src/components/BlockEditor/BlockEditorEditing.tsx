@@ -199,7 +199,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   private handleSquareBracketExport = () => {
     // check to see whether there are a balanced number of square brackets
     // if there are, everything within the outermost brackets gets exported
-    const didConvertBrackets = slateChangeMutations.scanBlockAndConvertOuterSquareBrackets({
+    const { wasMutationPerformed } = slateChangeMutations.scanBlockAndConvertOuterSquareBrackets({
       change: this.props.value.change(),
       updateBlock: this.props.updateBlock,
       exportSelection: this.props.exportSelection,
@@ -207,7 +207,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     });
 
     // if something was exported, redo this process
-    if (didConvertBrackets) {
+    if (wasMutationPerformed) {
       setTimeout(this.handleSquareBracketExport, 10);
     }
   }

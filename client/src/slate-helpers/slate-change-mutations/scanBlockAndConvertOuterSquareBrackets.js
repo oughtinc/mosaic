@@ -21,9 +21,9 @@ export function scanBlockAndConvertOuterSquareBrackets ({ change, updateBlock, e
       endKey,
       endOffset,
      });
-    return true;
+    return { wasMutationPerformed: true };
   }
-  return false;
+  return { wasMutationPerformed: false };
 }
 
 function exportBracketedSelectionFromRange ({
