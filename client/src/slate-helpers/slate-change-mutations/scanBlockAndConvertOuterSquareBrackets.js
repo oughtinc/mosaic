@@ -3,14 +3,14 @@ export function scanBlockAndConvertOuterSquareBrackets ({ change, updateBlock, e
   const textNodes = value.document.getTexts();
 
   const {
-    balancedBrackets,
+    hasBalancedBrackets,
     startKey,
     startOffset,
     endKey,
     endOffset,
   } = findOutermostSquareBrackets(textNodes);
 
-  if (balancedBrackets) {
+  if (hasBalancedBrackets) {
     exportBracketedSelectionFromRange({
       change,
       updateBlock,
@@ -98,7 +98,7 @@ function findOutermostSquareBrackets(textNodes) {
           endOffset = i;
           matchFound = true;
         } else if (squareBracketBalance < 0) {
-          return { balancedBrackets: false };
+          return { hasBalancedBrackets: false };
         }
       }
     }
@@ -106,7 +106,7 @@ function findOutermostSquareBrackets(textNodes) {
 
   if (matchFound && squareBracketBalance === 0) {
     return {
-      balancedBrackets: true,
+      hasBalancedBrackets: true,
       startKey,
       startOffset,
       endKey,
@@ -114,5 +114,5 @@ function findOutermostSquareBrackets(textNodes) {
     };
   }
 
-  return { balancedBrackets: false };
+  return { hasBalancedBrackets: false };
 }
