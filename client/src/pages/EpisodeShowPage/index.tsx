@@ -134,6 +134,13 @@ export class FormPagePresentational extends React.Component<any, any> {
 
   public constructor(props: any) {
     super(props);
+    this.state = {
+      pointersExportedInNewQuestionForm: [],
+    };
+  }
+
+  public setExportsInNewQuestionForm = pointersExportedInNewQuestionForm => {
+    this.setState({ pointersExportedInNewQuestionForm });
   }
 
   public componentDidMount() {
@@ -176,7 +183,8 @@ export class FormPagePresentational extends React.Component<any, any> {
       [
         ...this.props.exportingPointers,
         ...importedPointers,
-        ...readOnlyExportedPointers
+        ...readOnlyExportedPointers,
+        ...this.state.pointersExportedInNewQuestionForm
       ],
       p => p.data.pointerId
     );
@@ -244,6 +252,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
+                setExportsInNewQuestionForm={this.setExportsInNewQuestionForm}
                 workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}

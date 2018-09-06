@@ -154,6 +154,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
           <div>
             <h3>New subquestion</h3>
             <NewBlockForm
+              setExportsInNewQuestionForm={this.props.setExportsInNewQuestionForm}
               maxTotalBudget={this.props.availableBudget}
               onMutate={this.props.onCreateChild}
               availablePointers={this.props.availablePointers}

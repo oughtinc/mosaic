@@ -5,12 +5,48 @@ import { valueToDatabaseJSON } from "../lib/slateParser";
 import _ = require("lodash");
 import { FormControl } from "react-bootstrap";
 
+import { getExportsFromNodeAndDescendants } from "../slate-helpers/slate-utils/getInlinesFromNodeAndDescendants";
+
 export class NewBlockForm extends React.Component<any, any> {
   public blockEditor;
+  public numOfPointerExports;
 
   public constructor(props: any) {
     super(props);
     this.state = this.blankState();
+    this.numOfPointerExports = 0;
+  }
+
+  public shouldComponentUpdate(nextProps: any, nextState: any) {
+    // initially, this.state.blockValue is an empty object {}
+    // if it hasn't been updated yet, we just update as usual
+    if (typeof nextState.blockValue.toJSON !== "function") {
+      return true;
+    }
+
+    // otherwise we'll check to see if the number of
+    // exported pointers has changed
+
+    const valueAsJSON = nextState.blockValue.toJSON();
+    const pointerExports: any[] = getExportsFromNodeAndDescendants(valueAsJSON.document);
+
+    // if the number of pointers has changed, we send
+    // the pointers up the React hierarchy to the EpisodeShowPage
+    // to add to availablePointers
+    if (this.numOfPointerExports !== pointerExports.length) {
+      this.props.setExportsInNewQuestionForm(pointerExports);
+      this.numOfPointerExports = pointerExports.length;
+
+      // we can return false here because the change to availablePointers
+      // up the hierarchy will trigger a new update
+      return false;
+    }
+
+    return true;
+  }
+
+  public onChange = blockValue => {
+    this.setState({ blockValue });
   }
 
   public editor() {
@@ -30,7 +66,7 @@ export class NewBlockForm extends React.Component<any, any> {
           blockId={this.state.id}
           name={`new-block-${this.state.id}`}
           initialValue={""}
-          onChange={blockValue => this.setState({ blockValue })}
+          onChange={this.onChange}
           availablePointers={this.props.availablePointers || []}
           onKeyDown={this.onKeyDown}
           ref={input => (this.blockEditor = input)}
