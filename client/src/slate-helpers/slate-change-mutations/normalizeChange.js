@@ -48,7 +48,7 @@ export function normalizeExportSpacing(c: Change) {
     // for edge case where there is only one spacer between two pointers,
     // you always need two so text cursor issues don't arise
     textNode = getCurTextNode();
-    if ((isDirectlyAfterExport(textNode, c.value.document) && isDirectlyAfterExport(textNode, c.value.document)) && textNode.text.length === 1) {
+    if ((isDirectlyAfterExport(textNode, c.value.document) && isDirectlyBeforeExport(textNode, c.value.document)) && textNode.text.length === 1) {
       c.insertTextByKey(textNode.key, 0, POINTER_EDGE_SPACE);
     }
   });
