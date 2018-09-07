@@ -36,6 +36,7 @@ const OpenPointerImport: any = styled.span`
       ? "rgba(111, 186, 209, 0.66)"
       : "rgba(158, 224, 244, 0.66)"};
   border-radius: 2px;
+  color: #000;
   cursor: pointer;
   font-weight: 500;
   transition: background-color color 0.8s;
