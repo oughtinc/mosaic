@@ -1,0 +1,38 @@
+import * as React from "react";
+import { Glyphicon } from "react-bootstrap";
+
+export class AvailableBudget extends React.Component<any,  any> {
+  public render() {
+    return (
+      <span>
+        <span
+          style={{
+            color: "#137a9a",
+            fontVariant: "small-caps",
+            fontWeight: 700,
+          }}
+        >
+          <Glyphicon glyph="piggy-bank" /> budget remaining
+        </span>
+        <br />
+        <span
+          style={{
+            fontSize: "28px",
+          }}
+        >
+          {this.props.totalBudget - this.props.allocatedBudget}
+        </span>
+        {" "}
+        out of
+        {" "}
+        <span
+          style={{
+            fontSize: "28px",
+          }}
+        >
+            {this.props.totalBudget}
+        </span>
+      </span>
+    );
+  }
+}

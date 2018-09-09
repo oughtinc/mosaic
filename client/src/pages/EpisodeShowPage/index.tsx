@@ -3,9 +3,11 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { Row, Col, Button, Badge } from "react-bootstrap";
+import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 
+import { AvailableBudget } from "./AvailableBudget";
+import { Timer } from "./Timer";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -25,6 +27,10 @@ import {
 } from "./WorkspaceRelations";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
+
+import hasTimerStarted from "../../lib/timer/hasTimerStarted";
+import startTimer from "../../lib/timer/startTimer";
+import howMuchTimeLeftOnTimer from "../../lib/timer/howMuchTimeLeftOnTimer";
 
 const WORKSPACE_QUERY = gql`
   query workspace($id: String!) {
@@ -134,9 +140,22 @@ export class FormPagePresentational extends React.Component<any, any> {
 
   public constructor(props: any) {
     super(props);
+    this.state = {
+      timeLeft: Infinity,
+    };
   }
 
   public componentDidMount() {
+    if (this.props.match.params.timeLimit) {
+      if (!hasTimerStarted()) {
+        startTimer(Number(this.props.match.params.timeLimit));
+      }
+
+      setInterval(() => {
+        this.setState({timeLeft: howMuchTimeLeftOnTimer()});
+      }, 250);
+    }
+
     keyboardJS.bind("alt+s", e => {
       e.preventDefault();
       this.scratchpadField.focus();
@@ -193,27 +212,38 @@ export class FormPagePresentational extends React.Component<any, any> {
       WorkspaceRelationTypes.WorkspaceAnswer,
       workspace
     ).blockEditorAttributes();
+
+    if (this.state.timeLeft <= 0) {
+        return <div>Your time with this workspace is up. Thanks for contributing!</div>;
+    }
+
     return (
       <div key={workspace.id}>
         <BlockHoverMenu>
           <Row>
-            <Col sm={10}>
+            <Col sm={7}>
               {workspace.parentId && (
                 <ParentLink parentId={workspace.parentId} />
               )}
               {workspace && <SubtreeLink workspace={workspace} />}
             </Col>
             <Col sm={2}>
-              {workspace && (
-                <div style={{ float: "right" }}>
-                  Available Budget:{" "}
-                  <Badge>
-                    {workspace.totalBudget - workspace.allocatedBudget} /{" "}
-                    {workspace.totalBudget}
-                  </Badge>
-                </div>
-              )}
+              {
+                this.props.match.params.timeLimit
+                &&
+                <Timer
+                  timeLeft={this.state.timeLeft}
+                />
+              }
             </Col>
+            <Col sm={3}>
+              <AvailableBudget
+                allocatedBudget={workspace.allocatedBudget}
+                totalBudget={workspace.totalBudget}
+              />
+            </Col>
+          </Row>
+          <Row>
             <Col sm={12}>
               <h1>
                 <BlockEditor
