@@ -5,7 +5,9 @@ class Scheduler {
   private schedule = {};
 
   public async getCurrentWorkspace(user) {
-    return this.schedule[user.user_id].slice(-1)[0];
+    const userSchedule = this.schedule[user.user_id];
+    const lastAssignment = userSchedule.slice(-1)[0];
+    return lastAssignment.workspaceId;
   }
 
   public async findNextWorkspace(user) {
@@ -24,7 +26,10 @@ class Scheduler {
 
     const finalWorkspaces = filteredWorkspaces.length > 0 ? filteredWorkspaces : allWorkspaces;
 
-    this.schedule[user.user_id] = userSchedule.concat(finalWorkspaces[0].id);
+    this.schedule[user.user_id] = userSchedule.concat({
+      startedAt: Date.now(),
+      workspaceId: finalWorkspaces[0].id,
+    });
   }
 
   private async getTreesUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces) {
@@ -39,7 +44,7 @@ class Scheduler {
 
     // go through user schedule and update
     for (let i = 0; i < userSchedule.length; i++) {
-      const workspaceId = userSchedule[i];
+      const workspaceId = userSchedule[i].workspaceId;
       const workspace = await models.Workspace.findById(workspaceId);
       const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
       data[rootParentWorkspace.id] = i;
