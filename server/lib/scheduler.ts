@@ -1,4 +1,4 @@
-import { filter } from "asyncro";
+import { filter, map } from "asyncro";
 import * as models from "./models";
 
 class Scheduler {
@@ -36,6 +36,24 @@ class Scheduler {
         workspacesInTreeWorkedOnLeastRecently,
         async (w) => await this.hasRemainingBudgetForChildren(w)
       );
+    }
+
+    if (finalWorkspaces.length === 0) {
+      let workspaceWorkedOnLeastRecently;
+      let whenThisWorkspaceWasWorkedOn;
+
+      finalWorkspaces = await map(
+        workspacesInTreeWorkedOnLeastRecently,
+        async (w) => {
+          const lastWorkedOnTimestamp = await this.getTimestampWorkspaceLastWorkedOn(w);
+          if (!workspaceWorkedOnLeastRecently || lastWorkedOnTimestamp < whenThisWorkspaceWasWorkedOn) {
+            workspaceWorkedOnLeastRecently = w;
+            whenThisWorkspaceWasWorkedOn = lastWorkedOnTimestamp;
+          }
+        }
+      );
+
+      finalWorkspaces = [workspaceWorkedOnLeastRecently];
     }
 
     this.schedule[user.user_id] = userSchedule.concat({
@@ -113,6 +131,24 @@ class Scheduler {
 
   private async hasRemainingBudgetForChildren(workspace) {
     return workspace.totalBudget > workspace.allocatedBudget;
+  }
+
+  private async getTimestampWorkspaceLastWorkedOn(workspace) {
+    let lastWorkedOnTimestamp = -Infinity;
+
+    for (const userId in this.schedule) {
+      if (this.schedule.hasOwnProperty(userId)) {
+        for (const assignment of this.schedule[userId]) {
+          if (assignment.workspaceId === workspace.id) {
+            if (assignment.startedAt > lastWorkedOnTimestamp) {
+              lastWorkedOnTimestamp = assignment.startedAt;
+            }
+          }
+        }
+      }
+    }
+
+    return lastWorkedOnTimestamp;
   }
 }
 
