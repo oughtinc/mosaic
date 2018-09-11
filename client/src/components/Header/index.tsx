@@ -1,11 +1,15 @@
 import * as React from "react";
+import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import { Auth } from "../../auth";
 
 const HeaderContainer = styled.div`
+  align-items: center;
   background-color: #137a9a;
+  display: flex;
+  justify-content: space-between;
   padding: 20px;
   margin: 0 0 20px 0;
   color: #fff;
@@ -25,8 +29,15 @@ const BrandLink = styled(Link)`
   ${headerLinkStyle};
   font-weight: bold;
 `;
+
 const HeaderA = styled.a`
   ${headerLinkStyle};
+`;
+
+const UserControlsContainer = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Brand = () => (
@@ -68,16 +79,20 @@ const LoginLink = () => (
   </ActionLink>
 );
 
-const UserControlsContainer = styled.div`
-  position: absolute;
-  right: 20px;
-  top: 20px;
-`;
-
 const UserControls = () => (
+  Auth.isAuthenticated()
+  ?
   <UserControlsContainer>
-    {Auth.isAuthenticated() ? <LogoutLink /> : <LoginLink />}
+    <Link to="/current" style={{ marginRight: '30px' }}>
+      <Button bsSize="xsmall">Your Current Workspace</Button>
+    </Link>
+    <Link to="/next" style={{ marginRight: '30px' }}>
+      <Button bsSize="xsmall">Get Next Workspace</Button>
+    </Link>
+    <LogoutLink />
   </UserControlsContainer>
+  :
+  <LoginLink />
 );
 
 const Header = () => (
