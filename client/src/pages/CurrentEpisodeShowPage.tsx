@@ -31,5 +31,10 @@ const CURRENT_WORKSPACE_QUERY = gql`
 `;
 
 export const CurrentEpisodeShowPage = compose(
-  graphql(CURRENT_WORKSPACE_QUERY, { name: "currentWorkspaceQuery" })
+  graphql(CURRENT_WORKSPACE_QUERY, {
+    name: "currentWorkspaceQuery",
+    options: {
+      fetchPolicy: "network-only",
+    },
+  })
 )(CurrentEpisodeShowPagePresentational);
