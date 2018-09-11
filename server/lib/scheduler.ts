@@ -19,12 +19,17 @@ class Scheduler {
 
     const allWorkspaces = await models.Workspace.findAll();
 
-    const filteredWorkspaces = await filter(
+    const workspacesInTreeWorkedOnLeastRecently = await filter(
       allWorkspaces,
       async (w) => await this.isInTreeUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces, w.id)
     );
 
-    const finalWorkspaces = filteredWorkspaces.length > 0 ? filteredWorkspaces : allWorkspaces;
+    const notYetWorkedOnInThatTree = await filter(
+      workspacesInTreeWorkedOnLeastRecently,
+      async (w) => await this.hasNotBeenWorkedOnYet(w)
+    );
+
+    const finalWorkspaces = notYetWorkedOnInThatTree.length > 0 ? notYetWorkedOnInThatTree : allWorkspaces;
 
     this.schedule[user.user_id] = userSchedule.concat({
       startedAt: Date.now(),
@@ -83,6 +88,20 @@ class Scheduler {
     const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
 
     return leastRecentlyWorkedOnTrees.find(id => id === rootParentWorkspace.id);
+  }
+
+  private async hasNotBeenWorkedOnYet(workspace) {
+    for (const userId in this.schedule) {
+      if (this.schedule.hasOwnProperty(userId)) {
+        for (const assignment of this.schedule[userId]) {
+          if (assignment.workspaceId === workspace.id) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
   }
 }
 
