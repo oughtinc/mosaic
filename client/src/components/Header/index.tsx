@@ -79,21 +79,25 @@ const LoginLink = () => (
   </ActionLink>
 );
 
-const UserControls = () => (
-  Auth.isAuthenticated()
-  ?
-  <UserControlsContainer>
-    <Link to="/current" style={{ marginRight: '20px' }}>
-      <Button bsSize="small">Your Current Workspace</Button>
-    </Link>
-    <Link to="/next" style={{ marginRight: '20px' }}>
-      <Button bsSize="small">Get Next Workspace</Button>
-    </Link>
-    <LogoutLink />
-  </UserControlsContainer>
-  :
-  <LoginLink />
-);
+const UserControls = () => {
+  if (Auth.isAuthenticated()) {
+    return (
+      <UserControlsContainer>
+        <Link to="/current" style={{ marginRight: "20px" }}>
+          <Button bsSize="small">Your Current Workspace</Button>
+        </Link>
+        <Link to="/next" style={{ marginRight: "20px" }}>
+          <Button bsSize="small">Get Next Workspace</Button>
+        </Link>
+        <LogoutLink />
+      </UserControlsContainer>
+    );
+  } else {
+    return (
+      <LoginLink />
+    );
+  }
+};
 
 const Header = () => (
   <HeaderContainer>
