@@ -83,11 +83,11 @@ const UserControls = () => (
   Auth.isAuthenticated()
   ?
   <UserControlsContainer>
-    <Link to="/current" style={{ marginRight: '30px' }}>
-      <Button bsSize="xsmall">Your Current Workspace</Button>
+    <Link to="/current" style={{ marginRight: '20px' }}>
+      <Button bsSize="small">Your Current Workspace</Button>
     </Link>
-    <Link to="/next" style={{ marginRight: '30px' }}>
-      <Button bsSize="xsmall">Get Next Workspace</Button>
+    <Link to="/next" style={{ marginRight: '20px' }}>
+      <Button bsSize="small">Get Next Workspace</Button>
     </Link>
     <LogoutLink />
   </UserControlsContainer>
