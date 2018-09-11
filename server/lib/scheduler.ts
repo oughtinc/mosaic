@@ -29,7 +29,14 @@ class Scheduler {
       async (w) => await this.hasNotBeenWorkedOnYet(w)
     );
 
-    const finalWorkspaces = notYetWorkedOnInThatTree.length > 0 ? notYetWorkedOnInThatTree : allWorkspaces;
+    let finalWorkspaces = notYetWorkedOnInThatTree;
+
+    if (finalWorkspaces.length === 0) {
+      finalWorkspaces = await filter(
+        workspacesInTreeWorkedOnLeastRecently,
+        async (w) => await this.hasRemainingBudgetForChildren(w)
+      );
+    }
 
     this.schedule[user.user_id] = userSchedule.concat({
       startedAt: Date.now(),
@@ -102,6 +109,10 @@ class Scheduler {
     }
 
     return true;
+  }
+
+  private async hasRemainingBudgetForChildren(workspace) {
+    return workspace.totalBudget > workspace.allocatedBudget;
   }
 }
 
