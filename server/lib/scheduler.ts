@@ -4,19 +4,19 @@ import * as models from "./models";
 class Scheduler {
   private schedule = {};
 
-  public async getCurrentWorkspace(user) {
-    const userSchedule = this.schedule[user.user_id];
+  public async getCurrentWorkspace(userId) {
+    const userSchedule = this.schedule[userId];
     if (!userSchedule) return null;
     const lastAssignment = userSchedule.slice(-1)[0];
     return lastAssignment.workspaceId;
   }
 
-  public async findNextWorkspace(user) {
-    if (!this.schedule[user.user_id]) {
-      this.schedule[user.user_id] = [];
+  public async findNextWorkspace(userId) {
+    if (!this.schedule[userId]) {
+      this.schedule[userId] = [];
     }
 
-    const userSchedule = this.schedule[user.user_id];
+    const userSchedule = this.schedule[userId];
 
     const allWorkspaces = await models.Workspace.findAll();
 
@@ -57,7 +57,7 @@ class Scheduler {
       finalWorkspaces = [workspaceWorkedOnLeastRecently];
     }
 
-    this.schedule[user.user_id] = userSchedule.concat({
+    this.schedule[userId] = userSchedule.concat({
       startedAt: Date.now(),
       workspaceId: finalWorkspaces[0].id,
     });

@@ -169,7 +169,7 @@ const schema = new GraphQLSchema({
         resolve: resolver(models.Workspace, {
           before: async (findOptions, args, context, info) => {
             const user = await userFromAuthToken(context.authorization);
-            const currentWorkspaceId = await scheduler.getCurrentWorkspace(user);
+            const currentWorkspaceId = await scheduler.getCurrentWorkspace(user.user_id);
             findOptions.where = { id: currentWorkspaceId };
             return findOptions;
           },
@@ -328,8 +328,8 @@ const schema = new GraphQLSchema({
               "No user found when attempting get next workspace."
             );
           }
-          await scheduler.findNextWorkspace(user);
-          const workspaceId = await scheduler.getCurrentWorkspace(user);
+          await scheduler.findNextWorkspace(user.user_id);
+          const workspaceId = await scheduler.getCurrentWorkspace(user.user_id);
           return { id: workspaceId };
         }
       },
