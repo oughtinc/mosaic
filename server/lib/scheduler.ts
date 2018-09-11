@@ -6,6 +6,7 @@ class Scheduler {
 
   public async getCurrentWorkspace(user) {
     const userSchedule = this.schedule[user.user_id];
+    if (!userSchedule) return null;
     const lastAssignment = userSchedule.slice(-1)[0];
     return lastAssignment.workspaceId;
   }

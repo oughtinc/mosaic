@@ -9,7 +9,12 @@ export class CurrentEpisodeShowPagePresentational extends React.Component<any, a
     if (this.props.currentWorkspaceQuery.loading) {
       return <div>Finding your current workspace...</div>;
     } else {
+      if (!this.props.currentWorkspaceQuery.currentWorkspace) {
+        return <Redirect to="next" />
+      }
+
       const currentWorkspaceId = this.props.currentWorkspaceQuery.currentWorkspace.id;
+
       return (
         <Redirect to={`/workspaces/${currentWorkspaceId}`} />
       );
