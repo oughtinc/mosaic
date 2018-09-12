@@ -316,6 +316,10 @@ function visibleBlockIds(workspace: any) {
 }
 
 function getNewQuestionFormBlockId(state: any, workspace: any) {
+  if (!workspace) {
+    return [];
+  }
+  
   const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
   return block && block.id;
 }
