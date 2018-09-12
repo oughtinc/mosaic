@@ -134,13 +134,6 @@ export class FormPagePresentational extends React.Component<any, any> {
 
   public constructor(props: any) {
     super(props);
-    this.state = {
-      pointersExportedInNewQuestionForm: [],
-    };
-  }
-
-  public setExportsInNewQuestionForm = pointersExportedInNewQuestionForm => {
-    this.setState({ pointersExportedInNewQuestionForm });
   }
 
   public componentDidMount() {
@@ -184,7 +177,6 @@ export class FormPagePresentational extends React.Component<any, any> {
         ...this.props.exportingPointers,
         ...importedPointers,
         ...readOnlyExportedPointers,
-        ...this.state.pointersExportedInNewQuestionForm
       ],
       p => p.data.pointerId
     );
@@ -252,7 +244,6 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
-                setExportsInNewQuestionForm={this.setExportsInNewQuestionForm}
                 workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}
@@ -324,9 +315,16 @@ function visibleBlockIds(workspace: any) {
   return [...directBlockIds, ...childBlockIds];
 }
 
+function getNewQuestionFormBlockId(state, workspace: any) {
+  const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
+  return block && block.id
+}
+
 function mapStateToProps(state: any, { workspace }: any) {
   const _visibleBlockIds = visibleBlockIds(workspace.workspace);
-  const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(
+  const newQuestionFormBlockId = getNewQuestionFormBlockId(state, workspace.workspace);
+  const allBlockIds = [ ..._visibleBlockIds, newQuestionFormBlockId];
+  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(
     state
   );
   const { blocks } = state;
