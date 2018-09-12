@@ -315,9 +315,9 @@ function visibleBlockIds(workspace: any) {
   return [...directBlockIds, ...childBlockIds];
 }
 
-function getNewQuestionFormBlockId(state, workspace: any) {
+function getNewQuestionFormBlockId(state: any, workspace: any) {
   const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
-  return block && block.id
+  return block && block.id;
 }
 
 function mapStateToProps(state: any, { workspace }: any) {
