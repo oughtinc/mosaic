@@ -176,7 +176,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       [
         ...this.props.exportingPointers,
         ...importedPointers,
-        ...readOnlyExportedPointers
+        ...readOnlyExportedPointers,
       ],
       p => p.data.pointerId
     );
@@ -315,9 +315,16 @@ function visibleBlockIds(workspace: any) {
   return [...directBlockIds, ...childBlockIds];
 }
 
+function getNewQuestionFormBlockId(state: any, workspace: any) {
+  const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
+  return block && block.id;
+}
+
 function mapStateToProps(state: any, { workspace }: any) {
   const _visibleBlockIds = visibleBlockIds(workspace.workspace);
-  const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(
+  const newQuestionFormBlockId = getNewQuestionFormBlockId(state, workspace.workspace);
+  const allBlockIds = [ ..._visibleBlockIds, newQuestionFormBlockId];
+  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(
     state
   );
   const { blocks } = state;
