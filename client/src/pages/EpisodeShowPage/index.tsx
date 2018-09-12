@@ -28,10 +28,6 @@ import {
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
 
-import hasTimerStarted from "../../lib/timer/hasTimerStarted";
-import startTimer from "../../lib/timer/startTimer";
-import howMuchTimeLeftOnTimer from "../../lib/timer/howMuchTimeLeftOnTimer";
-
 const WORKSPACE_QUERY = gql`
   query workspace($id: String!) {
     workspace(id: $id) {
@@ -141,21 +137,11 @@ export class FormPagePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
-      timeLeft: Infinity,
+      hasTimerEnded: false,
     };
   }
 
   public componentDidMount() {
-    if (this.props.match.params.timeLimit) {
-      if (!hasTimerStarted()) {
-        startTimer(Number(this.props.match.params.timeLimit));
-      }
-
-      setInterval(() => {
-        this.setState({timeLeft: howMuchTimeLeftOnTimer()});
-      }, 250);
-    }
-
     keyboardJS.bind("alt+s", e => {
       e.preventDefault();
       this.scratchpadField.focus();
@@ -176,6 +162,12 @@ export class FormPagePresentational extends React.Component<any, any> {
       variables
     });
   };
+
+  public handleTimerEnd = () => {
+    this.setState({
+      hasTimerEnded: true,
+    });
+  }
 
   public render() {
     const workspace = this.props.workspace.workspace;
@@ -213,8 +205,8 @@ export class FormPagePresentational extends React.Component<any, any> {
       workspace
     ).blockEditorAttributes();
 
-    if (this.state.timeLeft <= 0) {
-        return <div>Your time with this workspace is up. Thanks for contributing!</div>;
+    if (this.state.hasTimerEnded) {
+      return <div>Your time with this workspace is up. Thanks for contributing!</div>;
     }
 
     return (
@@ -232,7 +224,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                 this.props.match.params.timeLimit
                 &&
                 <Timer
-                  timeLeft={this.state.timeLeft}
+                  durationString={this.props.match.params.timeLimit}
+                  onTimerEnd={this.handleTimerEnd}
+                  workspaceId={workspace.id}
                 />
               }
             </Col>
