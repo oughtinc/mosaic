@@ -7,8 +7,6 @@ import { Button } from "react-bootstrap";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import {
-  changePointerReference,
-  exportSelection,
   removeExportOfSelection,
   HOVER_ITEM_TYPES
 } from "../../modules/blockEditor/actions";
@@ -65,6 +63,6 @@ export class MenuPresentational extends React.Component<any> {
 export const Menu: any = compose(
   connect(
     ({ blockEditor }) => ({ blockEditor }),
-    { changePointerReference, exportSelection, removeExportOfSelection }
+    { removeExportOfSelection }
   )
 )(MenuPresentational);
