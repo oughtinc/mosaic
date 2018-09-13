@@ -8,11 +8,9 @@ class TimerPresentational extends React.Component<any,  any> {
     const timerRunning = !(this.props.timeLeft === Infinity || this.props.timeLeft <= 0);
 
     return (
-      <span
-        style={{
-          display: timerRunning ? "inline" : "none"
-        }}
-      >
+      timerRunning
+      &&
+      <span>
         <span
           style={{
             color: "#137a9a",
