@@ -33,10 +33,6 @@ const ExportedPointerMenu = ({ removeExportOfSelection }) => (
   <HoverButton onClick={removeExportOfSelection}>Remove Pointer</HoverButton>
 );
 
-const ExportSelectionMenu = ({ exportSelection }) => (
-  <HoverButton onClick={exportSelection}>Export</HoverButton>
-);
-
 export class MenuPresentational extends React.Component<any> {
   public constructor(props: any) {
     super(props);
@@ -52,11 +48,6 @@ export class MenuPresentational extends React.Component<any> {
       <div className="menu hover-menu" ref={this.props.menuRef} id="hover-menu">
         {blockEditor && (
           <div>
-            {hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT && (
-              <ExportSelectionMenu
-                exportSelection={this.props.exportSelection}
-              />
-            )}
             {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT &&
               !readOnly && (
                 <ExportedPointerMenu
