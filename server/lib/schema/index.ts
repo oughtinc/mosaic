@@ -14,6 +14,7 @@ import {
 import * as GraphQLJSON from "graphql-type-json";
 import * as auth0 from "auth0-js";
 import * as Sequelize from "sequelize";
+import { scheduler } from "../scheduler";
 
 const { auth0_client_id } = require(__dirname + "/../../config/config.json");
 
@@ -163,6 +164,17 @@ const schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(models.Workspace)
       },
+      currentWorkspace: {
+        type: workspaceType,
+        resolve: resolver(models.Workspace, {
+          before: async (findOptions, args, context, info) => {
+            const user = await userFromAuthToken(context.authorization);
+            const currentWorkspaceId = await scheduler.getCurrentWorkspace(user);
+            findOptions.where = { id: currentWorkspaceId };
+            return findOptions;
+          },
+        }),
+      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(
         new GraphQLList(pointerType),
@@ -306,7 +318,21 @@ const schema = new GraphQLSchema({
             event
           });
         }
-      }
+      },
+      findNextWorkspace: {
+        type: workspaceType,
+        resolve: async (_, args, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting get next workspace."
+            );
+          }
+          await scheduler.findNextWorkspace(user);
+          const workspaceId = await scheduler.getCurrentWorkspace(user);
+          return { id: workspaceId };
+        }
+      },
     }
   })
 });
