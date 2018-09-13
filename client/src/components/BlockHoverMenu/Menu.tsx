@@ -29,27 +29,6 @@ const HoverButton = ({ children, onClick }) => (
   </HoverBackground>
 );
 
-const ImportedPointerMenu = props => {
-  const {
-    blockEditor: {
-      hoveredItem: { id },
-      pointerReferences
-    },
-    onChangePointerReference
-  } = props;
-  const reference = pointerReferences[id];
-  const isOpen = reference && reference.isOpen;
-  return (
-    <HoverButton
-      onClick={() =>
-        onChangePointerReference({ id, reference: { isOpen: !isOpen } })
-      }
-    >
-      {isOpen ? "Close" : "Expand"}
-    </HoverButton>
-  );
-};
-
 const ExportedPointerMenu = ({ removeExportOfSelection }) => (
   <HoverButton onClick={removeExportOfSelection}>Remove Pointer</HoverButton>
 );
@@ -76,12 +55,6 @@ export class MenuPresentational extends React.Component<any> {
             {hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT && (
               <ExportSelectionMenu
                 exportSelection={this.props.exportSelection}
-              />
-            )}
-            {hoverItemType === HOVER_ITEM_TYPES.POINTER_IMPORT && (
-              <ImportedPointerMenu
-                blockEditor={this.props.blockEditor}
-                onChangePointerReference={this.props.changePointerReference}
               />
             )}
             {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT &&
