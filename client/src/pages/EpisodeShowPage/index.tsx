@@ -198,10 +198,10 @@ export class FormPagePresentational extends React.Component<any, any> {
         <BlockHoverMenu>
           <Row>
             <Col sm={10}>
-              {workspace.parentId && (
+              {workspace.parentId && !this.props.isIsolatedWorkspace && (
                 <ParentLink parentId={workspace.parentId} />
               )}
-              {workspace && <SubtreeLink workspace={workspace} />}
+              {workspace && !this.props.isIsolatedWorkspace && <SubtreeLink workspace={workspace} />}
             </Col>
             <Col sm={2}>
               {workspace && (
@@ -244,6 +244,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
+                isIsolatedWorkspace={this.props.isIsolatedWorkspace}
                 workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}
@@ -319,7 +320,7 @@ function getNewQuestionFormBlockId(state: any, workspace: any) {
   if (!workspace) {
     return [];
   }
-  
+
   const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
   return block && block.id;
 }

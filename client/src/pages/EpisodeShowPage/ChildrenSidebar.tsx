@@ -58,9 +58,13 @@ export class Child extends React.Component<any, any> {
         )}
 
         <ChildControls>
-          <Link to={`/workspaces/${workspace.id}`}>
-            <Button> Open </Button>
-          </Link>
+          {
+            !this.props.isIsolatedWorkspace
+            &&
+            <Link to={`/workspaces/${workspace.id}`}>
+              <Button> Open </Button>
+            </Link>
+          }
           {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
             <Button onClick={this.props.onDelete}>Archive</Button>
           )}
@@ -135,6 +139,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
               );
               return (
                 <Child
+                  isIsolatedWorkspace={this.props.isIsolatedWorkspace}
                   workspace={workspace}
                   key={workspace.id}
                   onDelete={() => {
