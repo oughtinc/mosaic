@@ -12,35 +12,37 @@ class TimerPresentational extends React.Component<any,  any> {
     return (
       timerRunning
       &&
-      <span>
-        <span
-          style={{
-            color: "#137a9a",
-            fontVariant: "small-caps",
-            fontWeight: 700,
-          }}
-        >
-          <Glyphicon glyph="time" /> time left
+      (
+        <span>
+          <span
+            style={{
+              color: "#137a9a",
+              fontVariant: "small-caps",
+              fontWeight: 700,
+            }}
+          >
+            <Glyphicon glyph="time" /> time left
+          </span>
+            <br />
+          <span
+            style={{
+              fontSize: "28px",
+            }}
+          >
+            {moment(this.props.timeLeft).format("m")}
+          </span>
+          m
+          {" "}
+          <span
+            style={{
+              fontSize: "28px",
+            }}
+          >
+            {moment(this.props.timeLeft).format("ss")}
+          </span>
+          s
         </span>
-          <br />
-        <span
-          style={{
-            fontSize: "28px",
-          }}
-        >
-          {moment(this.props.timeLeft).format("m")}
-        </span>
-        m
-        {" "}
-        <span
-          style={{
-            fontSize: "28px",
-          }}
-        >
-          {moment(this.props.timeLeft).format("ss")}
-        </span>
-        s
-      </span>
+      )
     );
   }
 }
