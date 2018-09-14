@@ -7,8 +7,6 @@ import { Button } from "react-bootstrap";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import {
-  changePointerReference,
-  exportSelection,
   removeExportOfSelection,
   HOVER_ITEM_TYPES
 } from "../../modules/blockEditor/actions";
@@ -29,33 +27,8 @@ const HoverButton = ({ children, onClick }) => (
   </HoverBackground>
 );
 
-const ImportedPointerMenu = props => {
-  const {
-    blockEditor: {
-      hoveredItem: { id },
-      pointerReferences
-    },
-    onChangePointerReference
-  } = props;
-  const reference = pointerReferences[id];
-  const isOpen = reference && reference.isOpen;
-  return (
-    <HoverButton
-      onClick={() =>
-        onChangePointerReference({ id, reference: { isOpen: !isOpen } })
-      }
-    >
-      {isOpen ? "Close" : "Expand"}
-    </HoverButton>
-  );
-};
-
 const ExportedPointerMenu = ({ removeExportOfSelection }) => (
   <HoverButton onClick={removeExportOfSelection}>Remove Pointer</HoverButton>
-);
-
-const ExportSelectionMenu = ({ exportSelection }) => (
-  <HoverButton onClick={exportSelection}>Export</HoverButton>
 );
 
 export class MenuPresentational extends React.Component<any> {
@@ -73,17 +46,6 @@ export class MenuPresentational extends React.Component<any> {
       <div className="menu hover-menu" ref={this.props.menuRef} id="hover-menu">
         {blockEditor && (
           <div>
-            {hoverItemType === HOVER_ITEM_TYPES.SELECTED_TEXT && (
-              <ExportSelectionMenu
-                exportSelection={this.props.exportSelection}
-              />
-            )}
-            {hoverItemType === HOVER_ITEM_TYPES.POINTER_IMPORT && (
-              <ImportedPointerMenu
-                blockEditor={this.props.blockEditor}
-                onChangePointerReference={this.props.changePointerReference}
-              />
-            )}
             {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT &&
               !readOnly && (
                 <ExportedPointerMenu
@@ -101,6 +63,6 @@ export class MenuPresentational extends React.Component<any> {
 export const Menu: any = compose(
   connect(
     ({ blockEditor }) => ({ blockEditor }),
-    { changePointerReference, exportSelection, removeExportOfSelection }
+    { removeExportOfSelection }
   )
 )(MenuPresentational);

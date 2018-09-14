@@ -135,8 +135,6 @@ export class BlockEditorEditingPresentational extends React.Component<
       <BlockEditorStyle>
         <MenuBar
           blockEditor={this.props.blockEditor}
-          onAddPointerImport={this.onAddPointerImport}
-          availablePointers={this.props.availablePointers}
           mutationStatus={this.props.mutationStatus}
           hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
         />
@@ -256,13 +254,6 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   private updateEditor = (input: any) => {
     this.editor = input;
-  };
-
-  private onAddPointerImport = (pointerId: string) => {
-    const { value } = this.props.value
-      .change()
-      .insertInline(inlinePointerImportJSON(pointerId));
-    this.onChange(value, true);
   };
 
   private considerSaveToDatabase = () => {

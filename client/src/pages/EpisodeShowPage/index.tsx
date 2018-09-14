@@ -188,7 +188,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       [
         ...this.props.exportingPointers,
         ...importedPointers,
-        ...readOnlyExportedPointers
+        ...readOnlyExportedPointers,
       ],
       p => p.data.pointerId
     );
@@ -206,11 +206,8 @@ export class FormPagePresentational extends React.Component<any, any> {
       workspace
     ).blockEditorAttributes();
 
-    if (this.state.hasTimerEnded) {
-      return <div>Your time with this workspace is up. Thanks for contributing!</div>;
-    }
-
     const queryParams = parseQueryString(window.location.search);
+    const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
     const durationString = queryParams.timer;
 
@@ -218,11 +215,11 @@ export class FormPagePresentational extends React.Component<any, any> {
       <div key={workspace.id}>
         <BlockHoverMenu>
           <Row>
-            <Col sm={7}>
-              {workspace.parentId && (
+            <Col sm={10}>
+              {workspace.parentId && !isIsolatedWorkspace && (
                 <ParentLink parentId={workspace.parentId} />
               )}
-              {workspace && <SubtreeLink workspace={workspace} />}
+              {workspace && !isIsolatedWorkspace && <SubtreeLink workspace={workspace} />}
             </Col>
             <Col sm={2}>
               {
@@ -273,6 +270,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
+                isIsolatedWorkspace={isIsolatedWorkspace}
                 workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}
@@ -344,9 +342,20 @@ function visibleBlockIds(workspace: any) {
   return [...directBlockIds, ...childBlockIds];
 }
 
+function getNewQuestionFormBlockId(state: any, workspace: any) {
+  if (!workspace) {
+    return [];
+  }
+
+  const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
+  return block && block.id;
+}
+
 function mapStateToProps(state: any, { workspace }: any) {
   const _visibleBlockIds = visibleBlockIds(workspace.workspace);
-  const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(
+  const newQuestionFormBlockId = getNewQuestionFormBlockId(state, workspace.workspace);
+  const allBlockIds = [ ..._visibleBlockIds, newQuestionFormBlockId];
+  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(
     state
   );
   const { blocks } = state;

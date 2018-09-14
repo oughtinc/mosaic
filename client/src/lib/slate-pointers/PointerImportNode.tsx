@@ -1,3 +1,4 @@
+import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { connect } from "react-redux";
@@ -14,18 +15,18 @@ const RemovedPointer = styled.span`
   color: #7f0a0a;
 `;
 
+const darkBlueImportColor = "#3da1b2";
+const bracketFont = "800 1.2em sans-serif";
+
 const ClosedPointerImport: any = styled.span`
-  background-color: rgba(86, 214, 252, 0.66);
-  padding: 0 7px;
-  border-radius: 2px;
-  font-weight: 800;
-  color: #0a6e7f;
+  background-color: ${darkBlueImportColor};
+  color: rgb(233, 239, 233);
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
   transition: background-color color 0.8s;
   &:hover {
-    transition: background-color color 0.8s;
-    cursor: pointer;
-    background-color: rgb(112, 183, 201);
-    color: #044550;
+    background-color: #18a;
   }
 `;
 
@@ -34,12 +35,24 @@ const OpenPointerImport: any = styled.span`
     props.isSelected
       ? "rgba(111, 186, 209, 0.66)"
       : "rgba(158, 224, 244, 0.66)"};
-  padding: 0px 5px;
   border-radius: 2px;
+  color: #000;
+  cursor: pointer;
   font-weight: 500;
   transition: background-color color 0.8s;
-  &:hover {
-    cursor: pointer;
+`;
+
+const Brackets: any = styled.span`
+  &:before {
+    color: ${darkBlueImportColor};
+    content: "[";
+    font: ${bracketFont};
+  }
+
+  &:after {
+    color: ${darkBlueImportColor};
+    content: "]";
+    font: ${bracketFont};
   }
 `;
 
@@ -91,6 +104,18 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       nodeAsJson
     });
 
+    const styles = StyleSheet.create({
+      OuterPointerImportStyle: {
+        ":before": {
+          backgroundColor: darkBlueImportColor,
+          color: "rgb(233, 239, 233)",
+          content: `"$${pointerIndex + 1}"`,
+          borderRadius: "4px 0px 0px 4px",
+          padding: "0px 3px",
+        },
+      },
+    });
+
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
 
     if (!importingPointer) {
@@ -120,15 +145,19 @@ class PointerImportNodePresentational extends React.Component<any, any> {
           isSelected={isSelected}
           onClick={e => this.handleOpenPointerClick(e, pointerId)}
         >
-          <ShowExpandedPointer
-            blockEditor={blockEditor}
-            exportingPointer={importingPointer}
-            availablePointers={availablePointers}
-            onMouseOverExpandedPointer={this.onMouseOver}
-            onMouseOverPointerImport={this.props.onMouseOver}
-            onMouseOut={this.props.onMouseOut}
-            isHoverable={this.props.isHoverable}
-          />
+          <span className={css(styles.OuterPointerImportStyle)}>
+            <Brackets>
+              <ShowExpandedPointer
+                blockEditor={blockEditor}
+                exportingPointer={importingPointer}
+                availablePointers={availablePointers}
+                onMouseOverExpandedPointer={this.onMouseOver}
+                onMouseOverPointerImport={this.props.onMouseOver}
+                onMouseOut={this.props.onMouseOut}
+                isHoverable={this.props.isHoverable}
+              />
+            </Brackets>
+          </span>
         </OpenPointerImport>
       );
     }

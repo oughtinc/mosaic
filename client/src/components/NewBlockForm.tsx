@@ -7,10 +7,13 @@ import { FormControl } from "react-bootstrap";
 
 export class NewBlockForm extends React.Component<any, any> {
   public blockEditor;
-
   public constructor(props: any) {
     super(props);
     this.state = this.blankState();
+  }
+
+  public onChange = blockValue => {
+    this.setState({ blockValue });
   }
 
   public editor() {
@@ -30,10 +33,11 @@ export class NewBlockForm extends React.Component<any, any> {
           blockId={this.state.id}
           name={`new-block-${this.state.id}`}
           initialValue={""}
-          onChange={blockValue => this.setState({ blockValue })}
+          onChange={this.onChange}
           availablePointers={this.props.availablePointers || []}
           onKeyDown={this.onKeyDown}
           ref={input => (this.blockEditor = input)}
+          workspaceId={this.props.workspaceId}
         />
         <FormControl
           type="input"

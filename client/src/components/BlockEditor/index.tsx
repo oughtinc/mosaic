@@ -101,12 +101,13 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public componentDidMount() {
-    const { name, blockId, initialValue } = this.props;
+    const { name, blockId, initialValue, workspaceId } = this.props;
 
     const blockForm = {
       id: blockId,
       name,
-      value: initialValue
+      value: initialValue,
+      workspaceId,
     };
 
     this.props.addBlocks([blockForm]);
