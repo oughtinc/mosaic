@@ -196,7 +196,7 @@ export class FormPagePresentational extends React.Component<any, any> {
     ).blockEditorAttributes();
 
     const queryParams = parseQueryString(window.location.search);
-    const isIsolatedWorkspace = queryParams.isIsolated && queryParams.isIsolated === "true";
+    const isIsolatedWorkspace = queryParams.isolated === "true";
 
     return (
       <div key={workspace.id}>
