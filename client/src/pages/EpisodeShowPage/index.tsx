@@ -5,6 +5,7 @@ import { graphql } from "react-apollo";
 import { compose } from "recompose";
 import { Row, Col, Button, Badge } from "react-bootstrap";
 import { connect } from "react-redux";
+import { parse as parseQueryString } from "query-string";
 
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
@@ -193,15 +194,19 @@ export class FormPagePresentational extends React.Component<any, any> {
       WorkspaceRelationTypes.WorkspaceAnswer,
       workspace
     ).blockEditorAttributes();
+
+    const queryParams = parseQueryString(window.location.search);
+    const isIsolatedWorkspace = queryParams.isolated === "true";
+
     return (
       <div key={workspace.id}>
         <BlockHoverMenu>
           <Row>
             <Col sm={10}>
-              {workspace.parentId && (
+              {workspace.parentId && !isIsolatedWorkspace && (
                 <ParentLink parentId={workspace.parentId} />
               )}
-              {workspace && <SubtreeLink workspace={workspace} />}
+              {workspace && !isIsolatedWorkspace && <SubtreeLink workspace={workspace} />}
             </Col>
             <Col sm={2}>
               {workspace && (
@@ -244,6 +249,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
+                isIsolatedWorkspace={isIsolatedWorkspace}
                 workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}
@@ -319,7 +325,7 @@ function getNewQuestionFormBlockId(state: any, workspace: any) {
   if (!workspace) {
     return [];
   }
-  
+
   const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
   return block && block.id;
 }
