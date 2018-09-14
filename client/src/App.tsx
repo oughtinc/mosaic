@@ -93,11 +93,6 @@ const Routes = () => (
     />
     <Route
       exact={true}
-      path="/workspaces/:workspaceId/timed/:timeLimit"
-      component={EpisodeShowPage}
-    />
-    <Route
-      exact={true}
       path="/workspaces/:workspaceId/subtree"
       component={WorkspaceSubtreePage}
     />
