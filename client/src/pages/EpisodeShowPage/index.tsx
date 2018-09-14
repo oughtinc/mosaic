@@ -219,7 +219,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       <div key={workspace.id}>
         <BlockHoverMenu>
           <Row>
-            <Col sm={10}>
+            <Col sm={7}>
               {workspace.parentId && !isIsolatedWorkspace && (
                 <ParentLink parentId={workspace.parentId} />
               )}
