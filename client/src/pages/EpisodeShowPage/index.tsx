@@ -5,6 +5,7 @@ import { graphql } from "react-apollo";
 import { compose } from "recompose";
 import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
+import { parse as parseQueryString } from "query-string";
 
 import { AvailableBudget } from "./AvailableBudget";
 import { Timer } from "./Timer";
@@ -209,6 +210,10 @@ export class FormPagePresentational extends React.Component<any, any> {
       return <div>Your time with this workspace is up. Thanks for contributing!</div>;
     }
 
+    const queryParams = parseQueryString(window.location.search);
+    const hasTimer = queryParams.timer;
+    const durationString = queryParams.timer;
+
     return (
       <div key={workspace.id}>
         <BlockHoverMenu>
@@ -221,10 +226,10 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={2}>
               {
-                this.props.match.params.timeLimit
+                hasTimer
                 &&
                 <Timer
-                  durationString={this.props.match.params.timeLimit}
+                  durationString={durationString}
                   onTimerEnd={this.handleTimerEnd}
                   workspaceId={workspace.id}
                 />
