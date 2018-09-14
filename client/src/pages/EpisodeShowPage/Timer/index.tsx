@@ -3,6 +3,8 @@ import * as moment from "moment";
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
+const LOCAL_STORAGE_KEY = "mosaic-timer";
+
 class TimerPresentational extends React.Component<any,  any> {
   public render() {
     const timerRunning = !(this.props.timeLeft === Infinity || this.props.timeLeft <= 0);
@@ -48,13 +50,7 @@ export class Timer extends React.Component<any,  any> {
     timeLeft: Infinity,
   };
 
-  private localStorageKey;
   private pollingInterval;
-
-  public constructor(props: any) {
-    super(props);
-    this.localStorageKey = `mosiac-timer-${props.workspaceId}`;
-  }
 
   public componentDidMount() {
     if (!this.hasTimerStarted()) {
@@ -86,14 +82,14 @@ export class Timer extends React.Component<any,  any> {
   }
 
   private hasTimerStarted() {
-    const timerEndTime = localStorage.getItem(this.localStorageKey);
+    const localStorageEntry = localStorage.getItem(LOCAL_STORAGE_KEY);
 
-    const timerHasNotBeenSet = timerEndTime === null;
-
-    if (timerHasNotBeenSet) {
+    if (localStorageEntry === null) {
       return false;
     }
 
+    const timerData = JSON.parse(localStorageEntry);
+    const timerEndTime = timerData[this.props.workspaceId];
     const timerValueIsValid = _.isFinite(Number(timerEndTime));
 
     if (!timerValueIsValid) {
@@ -104,8 +100,25 @@ export class Timer extends React.Component<any,  any> {
   }
 
   private startTimer(durationInMs: number) {
+    const localStorageEntry = localStorage.getItem(LOCAL_STORAGE_KEY);
     const endTimeInMS = Date.now() + durationInMs;
-    localStorage.setItem(this.localStorageKey, String(endTimeInMS));
+    const newTimerData = this.createNewTimerData(localStorageEntry, endTimeInMS);
+    const newTimerDataStringified = JSON.stringify(newTimerData);
+    localStorage.setItem(LOCAL_STORAGE_KEY, newTimerDataStringified);
+  }
+
+  private createNewTimerData(localStorageEntry: string | null, endTimeInMS: number) {
+    if (localStorageEntry === null) {
+      return {
+        [this.props.workspaceId]: endTimeInMS,
+      };
+    } else {
+      const prevTimerData = JSON.parse(localStorageEntry);
+      return {
+        ...prevTimerData,
+        [this.props.workspaceId]: endTimeInMS,
+      };
+    }
   }
 
   private setTimeLeft() {
@@ -116,9 +129,15 @@ export class Timer extends React.Component<any,  any> {
 
   private getHowMuchTimeLeft() {
     const curTimeInMs = Date.now();
-    const endTimeInMs = Number(localStorage.getItem(this.localStorageKey));
-    const timeLeftInMs = endTimeInMs - curTimeInMs;
-    return timeLeftInMs;
+    const localStorageEntry = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (localStorageEntry !== null) {
+      const timerData = JSON.parse(localStorageEntry);
+      const endTimeInMS = timerData[this.props.workspaceId];
+      const timeLeftInMs = endTimeInMS - curTimeInMs;
+      return timeLeftInMs;
+    } else {
+      return Infinity;
+    }
   }
 
   private hasTimerEnded() {
