@@ -93,11 +93,6 @@ const Routes = () => (
     />
     <Route
       exact={true}
-      path="/isolated-workspaces/:workspaceId"
-      component={props => <EpisodeShowPage {...props} isIsolatedWorkspace={true} />}
-    />
-    <Route
-      exact={true}
       path="/workspaces/:workspaceId/subtree"
       component={WorkspaceSubtreePage}
     />
