@@ -131,6 +131,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   private scratchpadField;
   private answerField;
   private newChildField;
+  private timerInterval;
 
   public constructor(props: any) {
     super(props);
@@ -149,6 +150,10 @@ export class FormPagePresentational extends React.Component<any, any> {
       e.preventDefault();
       this.newChildField.focus();
     });
+  }
+
+  public componentWillUnmount() {
+    clearInterval(this.timerInterval);
   }
 
   public updateBlocks = (blocks: any) => {
