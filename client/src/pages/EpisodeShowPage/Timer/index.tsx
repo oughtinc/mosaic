@@ -132,14 +132,20 @@ export class Timer extends React.Component<any,  any> {
   private getHowMuchTimeLeft() {
     const curTimeInMs = Date.now();
     const localStorageEntry = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (localStorageEntry !== null) {
-      const timerData = JSON.parse(localStorageEntry);
-      const endTimeInMS = timerData[this.props.workspaceId];
-      const timeLeftInMs = endTimeInMS - curTimeInMs;
-      return timeLeftInMs;
-    } else {
+
+    if (localStorageEntry === null) {
       return Infinity;
     }
+
+    const timerData = JSON.parse(localStorageEntry);
+    const endTimeInMs = timerData[this.props.workspaceId];
+
+    if (!endTimeInMs) {
+      return Infinity;
+    }
+
+    const timeLeftInMs = endTimeInMs - curTimeInMs;
+    return timeLeftInMs;
   }
 
   private hasTimerEnded() {
