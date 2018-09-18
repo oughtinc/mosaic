@@ -24,16 +24,18 @@ const RootWorkspacePageHeading = styled.h2`
 `;
 
 const WorkspaceList = styled.div`
-  background-color: #f6f8fa;
-  padding: 1px;
-  border: 1px solid #ddd;
+
 `;
 
 const WorkspaceStyle = styled.div`
   background-color: #fff;
   border: 1px solid #ddd;
   padding: 1px 4px;
-  margin: 3px;
+  margin: 5px 0;
+
+  border-radius: 3px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
 `;
 
 const TextBlock = styled.div`
@@ -41,8 +43,7 @@ const TextBlock = styled.div`
 `;
 
 const TreeButton = styled(Button)`
-  padding: 1px 4px;
-  margin: 2px 0;
+  margin: 5px 1px;
 `;
 
 const Description = styled.div`
@@ -79,11 +80,12 @@ const RootWorkspace = ({ workspace }) => {
       </Link>
       <RootBlock block={answer} availablePointers={workspace.connectedPointers} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
-        <TreeButton className="pull-right">Tree</TreeButton>
+        <TreeButton bsSize="xsmall" bsStyle="primary" className="pull-right">Tree</TreeButton>
       </Link>
       <Description>
         <RootBlock block={scratchpad} availablePointers={workspace.connectedPointers} />
       </Description>
+      <div style={{ clear: "both" }} />
     </WorkspaceStyle>
   );
 };
@@ -92,9 +94,6 @@ class NewWorkspaceForm extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <RootWorkspacePageHeading>
-          {Auth.isAdmin() ? "New Question (public)" : "New Question (unlisted)"}
-        </RootWorkspacePageHeading>
         <NewBlockForm
           maxTotalBudget={10000}
           onMutate={this.props.onCreateWorkspace}

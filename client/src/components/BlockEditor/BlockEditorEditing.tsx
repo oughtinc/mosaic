@@ -50,6 +50,7 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
+  placeholder?: string;
   block: any;
   availablePointers: any[];
   value: any;
@@ -135,6 +136,7 @@ export class BlockEditorEditingPresentational extends React.Component<
           hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
         />
         <Editor
+          placeholder={this.props.placeholder}
           value={this.props.value}
           onChange={this.onChangeCallback}
           plugins={this.props.plugins}

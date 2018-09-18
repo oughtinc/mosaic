@@ -22,18 +22,22 @@ const ChildControls = styled.div`
 `;
 
 const BlockOuterContainer = styled.div`
-  box-shadow: 0 8px 10px 1px rgba(0,0,0,0.035), 0 3px 14px 2px rgba(0,0,0,0.03), 0 5px 5px -3px rgba(0,0,0,0.05);
-  margin-bottom: 40px;
+  border-radius: 3px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  margin-bottom: 25px;
 `;
 
 const BlockContainer = styled.div`
   background-color: #fff;
-  padding: 5px 10px 10px 10px;
+  border-radius: 0 0 3px 3px;
+  padding: 10px;
 `;
 
 const BlockHeader = styled.div`
   background-color: #f7f7f7;
   border-bottom: 1px solid #ddd;
+  border-radius: 3px 3px 0 0;
   color: #111;
   font-family: "Lato";
   font-size: 18px;
@@ -77,15 +81,24 @@ export class Child extends React.Component<any, any> {
             !this.props.isIsolatedWorkspace
             &&
             <Link to={`/workspaces/${workspace.id}`}>
-              <Button> Open </Button>
+              <Button bsStyle="primary" bsSize="xsmall" style={{marginRight: "5px"}}>Open</Button>
             </Link>
           }
           {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
-            <Button onClick={this.props.onDelete}>Archive</Button>
+            <Button
+              bsStyle="primary"
+              bsSize="xsmall"
+              style={{marginRight: "5px"}}
+              onClick={this.props.onDelete}
+            >
+              Archive
+            </Button>
           )}
           {!this.state.showChildBudgetForm &&
             Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
               <Button
+                bsStyle="primary"
+                bsSize="xsmall"
                 onClick={() => {
                   this.setState({ showChildBudgetForm: true });
                 }}
@@ -158,11 +171,11 @@ export class ChildrenSidebar extends React.Component<any, any> {
                       style={{
                         borderBottom: i !== arr.length - 1 ? "1px solid #ddd" : "none",
                       }}
+                      key={workspace.id}
                     >
                       <Child
                         isIsolatedWorkspace={this.props.isIsolatedWorkspace}
                         workspace={workspace}
-                        key={workspace.id}
                         onDelete={() => {
                           this.props.changeOrder(
                             this.props.workspaceOrder.filter(w => w !== workspace.id)

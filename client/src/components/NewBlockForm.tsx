@@ -4,21 +4,25 @@ import * as uuidv1 from "uuid/v1";
 import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
 import _ = require("lodash");
-import { FormControl } from "react-bootstrap";
+import { Button, FormControl } from "react-bootstrap";
 
 const BlockContainer = styled.div`
   background-color: #fff;
-  padding: 5px 10px;
+  border-radius: 0 0 3px 3px;
+  padding: 10px;
 `;
 
 const BlockOuterContainer = styled.div`
-  box-shadow: 0 8px 10px 1px rgba(0,0,0,0.035), 0 3px 14px 2px rgba(0,0,0,0.03), 0 5px 5px -3px rgba(0,0,0,0.05);
+  border-radius: 3px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
   margin-bottom: 20px;
 `;
 
 const BlockHeader = styled.div`
   background-color: #f7f7f7;
   border-bottom: 1px solid #ddd;
+  border-radius: 3px 3px 0 0;
   color: #111;
   font-family: "Lato";
   font-size: 18px;
@@ -51,6 +55,7 @@ export class NewBlockForm extends React.Component<any, any> {
           <BlockHeader>New Question</BlockHeader>
           <BlockContainer>
             <BlockEditor
+              placeholder="Text of a new question..."
               shouldAutosave={false}
               readOnly={false}
               blockId={this.state.id}
@@ -63,35 +68,38 @@ export class NewBlockForm extends React.Component<any, any> {
               workspaceId={this.props.workspaceId}
             />
           </BlockContainer>
-            <div style={{
+          <div
+            style={{
               backgroundColor: "#f7f7f7",
+              borderRadius: "0 0 3px 3px",
               borderTop: "1px solid #ddd",
               padding: "10px",
-            }}>
-              <FormControl
-                type="input"
-                value={this.state.totalBudget}
-                placeholder="budget"
-                onChange={(e: any) => {
-                  const { value } = e.target;
-                  if (value === "") {
-                    this.setState({ totalBudget: value });
-                  }
-                  const valueAsInt = parseInt(value, 10);
-                  if (
-                    !!valueAsInt &&
-                    valueAsInt > 0 &&
-                    valueAsInt <= this.props.maxTotalBudget
-                  ) {
-                    this.setState({ totalBudget: valueAsInt });
-                  }
-                }}
-              />
-              <div className="buttons">
-                <button type="submit" onClick={this.onSubmit}>
-                  Submit
-                </button>
-              </div>
+            }}
+          >
+            <FormControl
+              type="input"
+              value={this.state.totalBudget}
+              placeholder="budget"
+              onChange={(e: any) => {
+                const { value } = e.target;
+                if (value === "") {
+                  this.setState({ totalBudget: value });
+                }
+                const valueAsInt = parseInt(value, 10);
+                if (
+                  !!valueAsInt &&
+                  valueAsInt > 0 &&
+                  valueAsInt <= this.props.maxTotalBudget
+                ) {
+                  this.setState({ totalBudget: valueAsInt });
+                }
+              }}
+            />
+            <div className="buttons">
+              <Button bsStyle="primary" bsSize="xsmall" type="submit" onClick={this.onSubmit} style={{ marginTop: "5px" }}>
+                Submit
+              </Button>
+            </div>
           </div>
         </BlockOuterContainer>
       </div>

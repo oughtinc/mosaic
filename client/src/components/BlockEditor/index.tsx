@@ -151,6 +151,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       </BlockReadOnlyStyle>
     ) : (
       <BlockEditorEditing
+        placeholder={this.props.placeholder}
         value={value}
         readOnly={true}
         shouldAutosave={!!this.props.shouldAutosave}

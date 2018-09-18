@@ -15,7 +15,7 @@ const RemovedPointer = styled.span`
   color: #7f0a0a;
 `;
 
-const darkBlueImportColor = "#3da1b2";
+const darkBlueImportColor = "#337ab7";
 const bracketFont = "800 1.2em sans-serif";
 
 const ClosedPointerImport: any = styled.span`
@@ -26,7 +26,7 @@ const ClosedPointerImport: any = styled.span`
   border-radius: 4px;
   transition: background-color color 0.8s;
   &:hover {
-    background-color: #18a;
+    background-color: #26a;
   }
 `;
 

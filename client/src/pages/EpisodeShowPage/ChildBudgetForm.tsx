@@ -11,6 +11,14 @@ const FormStyle = styled.span`
   padding: 10px;
 `;
 
+const StyledDefaultButton = styled(Button)`
+  background-color: #f8f8f8;
+
+  &:hover {
+    background-color: #e8e8e8;
+  }
+`;
+
 interface ChildBudgetFormProps {
   initialValue: number;
   min: number;
@@ -46,12 +54,15 @@ export class ChildBudgetForm extends React.Component<
             const { value } = e.target;
             this.setState({ value: parseInt(value, 10) });
           }}
-          style={{ display: "inline-block", width: "100px" }}
+          style={{ display: "inline-block", width: "80px" }}
         />
         <span style={{ color: "#999" }}>
           {` ${this.props.min} to ${this.props.max} `}
         </span>
         <Button
+          bsSize="xsmall"
+          bsStyle="primary"
+          style={{ marginRight: "5px" }}
           onClick={() => {
             this.props.onSubmit(this.state.value);
             this.props.onClose();
@@ -60,7 +71,13 @@ export class ChildBudgetForm extends React.Component<
         >
           Submit
         </Button>
-        <Button onClick={this.props.onClose}>Close</Button>
+        <StyledDefaultButton
+          bsSize="xsmall"
+          bsStyle="default"
+          onClick={this.props.onClose}
+        >
+          Close
+        </StyledDefaultButton>
       </FormStyle>
     );
   }

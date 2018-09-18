@@ -9,7 +9,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
     super(props);
     this.state = { workspaceId: undefined };
   }
-  
+
   public async componentDidMount() {
     const response = await this.props.findNextWorkspaceMutation();
     const workspaceId =  response.data.findNextWorkspace.id;
@@ -21,7 +21,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
       return <div>Finding your next workspace...</div>;
     } else {
       return (
-        <Redirect to={`/workspaces/${this.state.workspaceId}`} />
+        <Redirect to={`/workspaces/${this.state.workspaceId}?isolated=true&timer=0:3:0`} />
       );
     }
   }

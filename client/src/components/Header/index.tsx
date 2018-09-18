@@ -7,7 +7,7 @@ import { Auth } from "../../auth";
 
 const HeaderContainer = styled.div`
   align-items: center;
-  background-color: #137a9a;
+  background-color: #337ab7;
   display: flex;
   justify-content: space-between;
   padding: 20px;
@@ -83,12 +83,6 @@ const UserControls = () => {
   if (Auth.isAuthenticated()) {
     return (
       <UserControlsContainer>
-        <Link to="/current" style={{ marginRight: "20px" }}>
-          <Button bsSize="small">Your Current Workspace</Button>
-        </Link>
-        <Link to="/next" style={{ marginRight: "20px" }}>
-          <Button bsSize="small">Get Next Workspace</Button>
-        </Link>
         <LogoutLink />
       </UserControlsContainer>
     );
@@ -102,6 +96,9 @@ const UserControls = () => {
 const Header = () => (
   <HeaderContainer>
     <Brand />
+    <Link to="/next" style={{ marginRight: "20px" }}>
+      <Button bsSize="small">Get Next Workspace »</Button>
+    </Link>
     <UserControls />
   </HeaderContainer>
 );

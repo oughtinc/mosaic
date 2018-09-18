@@ -25,10 +25,11 @@ const Container = styled.div`
 `;
 
 const CardBody = styled.div`
+  border: 1px solid #ddd;
   float: left;
   margin-bottom: 1em;
   width: 40em;
-  background: #f2f2f2;
+  background: #fff;
   border-radius: 0 2px 2px 2px;
 `;
 

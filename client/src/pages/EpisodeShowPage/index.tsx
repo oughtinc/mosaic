@@ -106,20 +106,24 @@ const NavLink = styled(Link)`
 `;
 
 const BlockOuterContainer = styled.div`
-  box-shadow: 0 8px 10px 1px rgba(0,0,0,0.035), 0 3px 14px 2px rgba(0,0,0,0.03), 0 5px 5px -3px rgba(0,0,0,0.05);
-  margin-bottom: 40px;
+  border-radius: 3px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+  margin-bottom: 25px;
 `;
 
 const BlockContainer = styled.div`
   background-color: #fff;
-  border: 2px solid
-    ${(props: { readOnly: boolean }) => (props.readOnly ? "#ddd" : "#fff")};
-  padding: 5px 10px;
+  border: 0px solid
+    ${(props: { readOnly: boolean }) => (props.readOnly ? " #ddd" : "#fff")};
+  border-radius: 0 0 3px 3px;
+  padding: 10px;
 `;
 
 const BlockHeader = styled.div`
   background-color: #f7f7f7;
   border-bottom: 1px solid #ddd;
+  border-radius: 3px 3px 0 0;
   color: #111;
   font-family: "Lato";
   font-size: 18px;
@@ -128,13 +132,13 @@ const BlockHeader = styled.div`
 
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
-    <Button>Parent</Button>
+    <Button bsStyle="primary" bsSize="xsmall">Parent</Button>
   </NavLink>
 );
 
 const SubtreeLink = ({ workspace }) => (
   <NavLink to={`/workspaces/${workspace.id}/subtree`}>
-    <Button>Subtree</Button>
+    <Button bsStyle="primary" bsSize="xsmall">Subtree</Button>
   </NavLink>
 );
 
@@ -238,38 +242,51 @@ export class FormPagePresentational extends React.Component<any, any> {
       <div key={workspace.id}>
         <BlockHoverMenu>
           <Row>
-            <Col sm={7}>
-              {workspace.parentId && !isIsolatedWorkspace && (
-                <ParentLink parentId={workspace.parentId} />
-              )}
-              {workspace && !isIsolatedWorkspace && <SubtreeLink workspace={workspace} />}
-            </Col>
-            <Col sm={2}>
-              {
-                hasTimer
-                &&
-                <Timer
-                  durationString={durationString}
-                  onTimerEnd={this.handleTimerEnd}
-                  workspaceId={workspace.id}
+            <Col sm={12}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                }}
+              >
+                {
+                  hasTimer
+                  &&
+                  <Timer
+                    durationString={durationString}
+                    onTimerEnd={this.handleTimerEnd}
+                    style={{ marginRight: "30px" }}
+                    workspaceId={workspace.id}
+                  />
+                }
+                <AvailableBudget
+                  allocatedBudget={workspace.allocatedBudget}
+                  style={{ marginRight: "30px" }}
+                  totalBudget={workspace.totalBudget}
                 />
-              }
-            </Col>
-            <Col sm={3}>
-              <AvailableBudget
-                allocatedBudget={workspace.allocatedBudget}
-                totalBudget={workspace.totalBudget}
-              />
+              </div>
             </Col>
           </Row>
           <Row>
             <Col sm={12}>
-              <h1>
-                <BlockEditor
-                  availablePointers={availablePointers}
-                  {...questionProps}
-                />
-              </h1>
+              <div style={{display: "flex", alignItems: "flex-end"}}>
+                <div style={{ fontSize: "28px", marginLeft: "-10px", marginRight: "3px" }}>
+                  <BlockEditor
+                    availablePointers={availablePointers}
+                    {...questionProps}
+                  />
+                </div>
+                {workspace.parentId && !isIsolatedWorkspace && (
+                  <div style={{paddingBottom: "16px"}}>
+                    <ParentLink parentId={workspace.parentId} />
+                  </div>
+                )}
+                {workspace && !isIsolatedWorkspace && (
+                  <div style={{paddingBottom: "16px"}}>
+                    <SubtreeLink workspace={workspace} />
+                  </div>
+                )}
+              </div>
             </Col>
           </Row>
           <Row>
@@ -279,6 +296,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                 <BlockContainer readOnly={scratchpadProps.readOnly}>
                   <BlockEditor
                     availablePointers={availablePointers}
+                    placeholder="Text for the scratchpad..."
                     ref={this.registerEditorRef("scratchpadField")}
                     {...scratchpadProps}
                   />
@@ -289,6 +307,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                 <BlockContainer readOnly={scratchpadProps.readOnly}>
                   <BlockEditor
                     availablePointers={availablePointers}
+                    placeholder="Text for the answer..."
                     ref={this.registerEditorRef("answerField")}
                     {...answerProps}
                   />
