@@ -1,22 +1,23 @@
 import { filter, map } from "asyncro";
+import { Schedule } from "./Schedule";
 import * as models from "../models";
 
 class Scheduler {
-  private schedule = {};
+  private schedulingInfo = {};
 
   public async getCurrentWorkspace(userId) {
-    const userSchedule = this.schedule[userId];
+    const userSchedule = this.schedulingInfo[userId];
     if (!userSchedule) return null;
-    const lastAssignment = userSchedule.slice(-1)[0];
-    return lastAssignment.workspaceId;
+    const mostRecentAssignment = userSchedule.getMostRecentAssignment();
+    return mostRecentAssignment.workspaceId;
   }
 
   public async findNextWorkspace(userId) {
-    if (!this.schedule[userId]) {
-      this.schedule[userId] = [];
+    if (!this.schedulingInfo[userId]) {
+      this.schedulingInfo[userId] = new Schedule();
     }
 
-    const userSchedule = this.schedule[userId];
+    const userSchedule = this.schedulingInfo[userId];
 
     const allWorkspaces = await models.Workspace.findAll();
 
@@ -57,7 +58,7 @@ class Scheduler {
       finalWorkspaces = [workspaceWorkedOnLeastRecently];
     }
 
-    this.schedule[userId] = userSchedule.concat({
+    userSchedule.addAssignment({
       startedAt: Date.now(),
       workspaceId: finalWorkspaces[0].id,
     });
@@ -74,8 +75,8 @@ class Scheduler {
     }
 
     // go through user schedule and update
-    for (let i = 0; i < userSchedule.length; i++) {
-      const workspaceId = userSchedule[i].workspaceId;
+    for (let i = 0; i < userSchedule.schedule.length; i++) {
+      const workspaceId = userSchedule.schedule[i].workspaceId;
       const workspace = await models.Workspace.findById(workspaceId);
       const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
       data[rootParentWorkspace.id] = i;
@@ -117,9 +118,9 @@ class Scheduler {
   }
 
   private async hasNotBeenWorkedOnYet(workspace) {
-    for (const userId in this.schedule) {
-      if (this.schedule.hasOwnProperty(userId)) {
-        for (const assignment of this.schedule[userId]) {
+    for (const userId in this.schedulingInfo) {
+      if (this.schedulingInfo.hasOwnProperty(userId)) {
+        for (const assignment of this.schedulingInfo[userId]) {
           if (assignment.workspaceId === workspace.id) {
             return false;
           }
@@ -137,9 +138,9 @@ class Scheduler {
   private async getTimestampWorkspaceLastWorkedOn(workspace) {
     let lastWorkedOnTimestamp = -Infinity;
 
-    for (const userId in this.schedule) {
-      if (this.schedule.hasOwnProperty(userId)) {
-        for (const assignment of this.schedule[userId]) {
+    for (const userId in this.schedulingInfo) {
+      if (this.schedulingInfo.hasOwnProperty(userId)) {
+        for (const assignment of this.schedulingInfo[userId]) {
           if (assignment.workspaceId === workspace.id) {
             if (assignment.startedAt > lastWorkedOnTimestamp) {
               lastWorkedOnTimestamp = assignment.startedAt;
