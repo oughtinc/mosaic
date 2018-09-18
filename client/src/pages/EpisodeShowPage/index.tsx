@@ -105,11 +105,25 @@ const NavLink = styled(Link)`
   margin-right: 5px;
 `;
 
+const BlockOuterContainer = styled.div`
+  box-shadow: 0 8px 10px 1px rgba(0,0,0,0.035), 0 3px 14px 2px rgba(0,0,0,0.03), 0 5px 5px -3px rgba(0,0,0,0.05);
+  margin-bottom: 40px;
+`;
+
 const BlockContainer = styled.div`
+  background-color: #fff;
   border: 2px solid
     ${(props: { readOnly: boolean }) => (props.readOnly ? "#ddd" : "#fff")};
-  padding: ${(props: { readOnly: boolean }) =>
-    props.readOnly ? "1em" : "0em"};
+  padding: 5px 10px;
+`;
+
+const BlockHeader = styled.div`
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ddd;
+  color: #111;
+  font-family: "Lato";
+  font-size: 18px;
+  padding: 5px 10px;
 `;
 
 const ParentLink = props => (
@@ -260,22 +274,26 @@ export class FormPagePresentational extends React.Component<any, any> {
           </Row>
           <Row>
             <Col sm={6}>
-              <h3>Scratchpad</h3>
-              <BlockContainer readOnly={scratchpadProps.readOnly}>
-                <BlockEditor
-                  availablePointers={availablePointers}
-                  ref={this.registerEditorRef("scratchpadField")}
-                  {...scratchpadProps}
-                />
-              </BlockContainer>
-              <h3>Answer</h3>
-              <BlockContainer readOnly={scratchpadProps.readOnly}>
-                <BlockEditor
-                  availablePointers={availablePointers}
-                  ref={this.registerEditorRef("answerField")}
-                  {...answerProps}
-                />
-              </BlockContainer>
+              <BlockOuterContainer>
+                <BlockHeader>Scratchpad</BlockHeader>
+                <BlockContainer readOnly={scratchpadProps.readOnly}>
+                  <BlockEditor
+                    availablePointers={availablePointers}
+                    ref={this.registerEditorRef("scratchpadField")}
+                    {...scratchpadProps}
+                  />
+                </BlockContainer>
+              </BlockOuterContainer>
+              <BlockOuterContainer>
+              <BlockHeader>Answer</BlockHeader>
+                <BlockContainer readOnly={scratchpadProps.readOnly}>
+                  <BlockEditor
+                    availablePointers={availablePointers}
+                    ref={this.registerEditorRef("answerField")}
+                    {...answerProps}
+                  />
+                </BlockContainer>
+              </BlockOuterContainer>
             </Col>
             <Col sm={6}>
               <ChildrenSidebar

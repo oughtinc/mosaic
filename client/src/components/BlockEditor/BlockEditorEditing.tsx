@@ -17,11 +17,7 @@ import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 const BlockEditorStyle = styled.div`
-  background: #f4f4f4;
-  border-radius: 2px;
-  border: 1px solid #d5d5d5;
-  margin-bottom: 1em;
-  padding: 0.3em;
+
 `;
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
