@@ -4,11 +4,12 @@ import { Glyphicon } from "react-bootstrap";
 export class AvailableBudget extends React.Component<any,  any> {
   public render() {
     return (
-      <span>
+      <div style={this.props.style}>
         <span
           style={{
-            color: "#137a9a",
+            color: "#337ab7",
             fontVariant: "small-caps",
+            fontSize: "18px",
             fontWeight: 700,
           }}
         >
@@ -32,7 +33,7 @@ export class AvailableBudget extends React.Component<any,  any> {
         >
             {this.props.totalBudget}
         </span>
-      </span>
+      </div>
     );
   }
 }

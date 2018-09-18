@@ -17,11 +17,7 @@ import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 const BlockEditorStyle = styled.div`
-  background: #f4f4f4;
-  border-radius: 2px;
-  border: 1px solid #d5d5d5;
-  margin-bottom: 1em;
-  padding: 0.3em;
+
 `;
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
@@ -54,6 +50,7 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
+  placeholder?: string;
   block: any;
   availablePointers: any[];
   value: any;
@@ -139,6 +136,7 @@ export class BlockEditorEditingPresentational extends React.Component<
           hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
         />
         <Editor
+          placeholder={this.props.placeholder}
           value={this.props.value}
           onChange={this.onChangeCallback}
           plugins={this.props.plugins}
