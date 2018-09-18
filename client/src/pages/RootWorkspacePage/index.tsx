@@ -77,7 +77,7 @@ const RootWorkspace = ({ workspace }) => {
       <Link to={`/workspaces/${workspace.id}`}>
         <RootBlock block={question} />
       </Link>
-      <RootBlock block={answer} />
+      <RootBlock block={answer} availablePointers={workspace.connectedPointers} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <TreeButton className="pull-right">Tree</TreeButton>
       </Link>

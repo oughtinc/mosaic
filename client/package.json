@@ -23,7 +23,7 @@
     "lodash": "^4.17.5",
     "logrocket": "^0.6.10",
     "moment": "^2.21.0",
-    "query-string": "^5.1.0",
+    "query-string": "^6.1.0",
     "react": "^16.2.0",
     "react-apollo": "^2.0.4",
     "react-bootstrap": "^0.32.1",

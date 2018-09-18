@@ -3,9 +3,12 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { Row, Col, Button, Badge } from "react-bootstrap";
+import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
+import { parse as parseQueryString } from "query-string";
 
+import { AvailableBudget } from "./AvailableBudget";
+import { Timer } from "./Timer";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -135,6 +138,9 @@ export class FormPagePresentational extends React.Component<any, any> {
 
   public constructor(props: any) {
     super(props);
+    this.state = {
+      hasTimerEnded: false,
+    };
   }
 
   public componentDidMount() {
@@ -163,6 +169,12 @@ export class FormPagePresentational extends React.Component<any, any> {
     });
   };
 
+  public handleTimerEnd = () => {
+    this.setState({
+      hasTimerEnded: true,
+    });
+  }
+
   public render() {
     const workspace = this.props.workspace.workspace;
     if (!workspace) {
@@ -181,7 +193,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       [
         ...this.props.exportingPointers,
         ...importedPointers,
-        ...readOnlyExportedPointers
+        ...readOnlyExportedPointers,
       ],
       p => p.data.pointerId
     );
@@ -198,27 +210,45 @@ export class FormPagePresentational extends React.Component<any, any> {
       WorkspaceRelationTypes.WorkspaceAnswer,
       workspace
     ).blockEditorAttributes();
+
+    if (this.state.hasTimerEnded) {
+      return <div>Your time with this workspace is up. Thanks for contributing!</div>;
+    }
+
+    const queryParams = parseQueryString(window.location.search);
+    const isIsolatedWorkspace = queryParams.isolated === "true";
+    const hasTimer = queryParams.timer;
+    const durationString = queryParams.timer;
+
     return (
       <div key={workspace.id}>
         <BlockHoverMenu>
           <Row>
-            <Col sm={10}>
-              {workspace.parentId && (
+            <Col sm={7}>
+              {workspace.parentId && !isIsolatedWorkspace && (
                 <ParentLink parentId={workspace.parentId} />
               )}
-              {workspace && <SubtreeLink workspace={workspace} />}
+              {workspace && !isIsolatedWorkspace && <SubtreeLink workspace={workspace} />}
             </Col>
             <Col sm={2}>
-              {workspace && (
-                <div style={{ float: "right" }}>
-                  Available Budget:{" "}
-                  <Badge>
-                    {workspace.totalBudget - workspace.allocatedBudget} /{" "}
-                    {workspace.totalBudget}
-                  </Badge>
-                </div>
-              )}
+              {
+                hasTimer
+                &&
+                <Timer
+                  durationString={durationString}
+                  onTimerEnd={this.handleTimerEnd}
+                  workspaceId={workspace.id}
+                />
+              }
             </Col>
+            <Col sm={3}>
+              <AvailableBudget
+                allocatedBudget={workspace.allocatedBudget}
+                totalBudget={workspace.totalBudget}
+              />
+            </Col>
+          </Row>
+          <Row>
             <Col sm={12}>
               <h1>
                 <BlockEditor
@@ -249,6 +279,7 @@ export class FormPagePresentational extends React.Component<any, any> {
             </Col>
             <Col sm={6}>
               <ChildrenSidebar
+                isIsolatedWorkspace={isIsolatedWorkspace}
                 workspace={workspace}
                 workspaces={workspace.childWorkspaces}
                 availablePointers={availablePointers}
@@ -320,9 +351,20 @@ function visibleBlockIds(workspace: any) {
   return [...directBlockIds, ...childBlockIds];
 }
 
+function getNewQuestionFormBlockId(state: any, workspace: any) {
+  if (!workspace) {
+    return [];
+  }
+
+  const block = state.blocks.blocks.find(b => b.workspaceId === workspace.id);
+  return block && block.id;
+}
+
 function mapStateToProps(state: any, { workspace }: any) {
   const _visibleBlockIds = visibleBlockIds(workspace.workspace);
-  const exportingPointers = exportingBlocksPointersSelector(_visibleBlockIds)(
+  const newQuestionFormBlockId = getNewQuestionFormBlockId(state, workspace.workspace);
+  const allBlockIds = [ ..._visibleBlockIds, newQuestionFormBlockId];
+  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(
     state
   );
   const { blocks } = state;
