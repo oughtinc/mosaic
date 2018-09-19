@@ -87,7 +87,7 @@ export class Auth {
   }
 
   public static isAuthorizedToEditWorkspace(workspace?: any): boolean {
-    return true;
+    return Auth.isAuthenticated();
     /*
     if (workspace == null) {
       return false;
