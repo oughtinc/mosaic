@@ -132,13 +132,13 @@ const BlockHeader = styled.div`
 
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
-    <Button bsStyle="primary" bsSize="xsmall">Parent</Button>
+    <Button bsStyle="default" bsSize="xsmall">Parent »</Button>
   </NavLink>
 );
 
 const SubtreeLink = ({ workspace }) => (
   <NavLink to={`/workspaces/${workspace.id}/subtree`}>
-    <Button bsStyle="primary" bsSize="xsmall">Subtree</Button>
+    <Button bsStyle="default" bsSize="xsmall">Subtree »</Button>
   </NavLink>
 );
 

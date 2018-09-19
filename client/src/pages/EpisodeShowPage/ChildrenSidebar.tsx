@@ -81,12 +81,12 @@ export class Child extends React.Component<any, any> {
             !this.props.isIsolatedWorkspace
             &&
             <Link to={`/workspaces/${workspace.id}`}>
-              <Button bsStyle="primary" bsSize="xsmall" style={{marginRight: "5px"}}>Open</Button>
+              <Button bsStyle="default" bsSize="xsmall" style={{marginRight: "5px"}}>Open »</Button>
             </Link>
           }
           {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
             <Button
-              bsStyle="primary"
+              bsStyle="default"
               bsSize="xsmall"
               style={{marginRight: "5px"}}
               onClick={this.props.onDelete}
@@ -97,7 +97,7 @@ export class Child extends React.Component<any, any> {
           {!this.state.showChildBudgetForm &&
             Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
               <Button
-                bsStyle="primary"
+                bsStyle="default"
                 bsSize="xsmall"
                 onClick={() => {
                   this.setState({ showChildBudgetForm: true });

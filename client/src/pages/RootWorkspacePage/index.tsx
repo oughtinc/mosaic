@@ -80,7 +80,7 @@ const RootWorkspace = ({ workspace }) => {
       </Link>
       <RootBlock block={answer} availablePointers={workspace.connectedPointers} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
-        <TreeButton bsSize="xsmall" bsStyle="primary" className="pull-right">Tree</TreeButton>
+        <TreeButton bsSize="xsmall" bsStyle="default" className="pull-right">Tree »</TreeButton>
       </Link>
       <Description>
         <RootBlock block={scratchpad} availablePointers={workspace.connectedPointers} />

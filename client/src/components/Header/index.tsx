@@ -6,13 +6,17 @@ import styled from "styled-components";
 import { Auth } from "../../auth";
 
 const HeaderContainer = styled.div`
-  align-items: center;
   background-color: #337ab7;
-  display: flex;
-  justify-content: space-between;
   padding: 20px;
   margin: 0 0 20px 0;
   color: #fff;
+`;
+
+const HeaderContentContainer = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
 `;
 
 const headerLinkStyle = `
@@ -79,6 +83,18 @@ const LoginLink = () => (
   </ActionLink>
 );
 
+const NextWorkspaceBtn = () => {
+  if (Auth.isAuthenticated()) {
+    return (
+      <Link to="/next">
+        <Button bsSize="small">Get Next Workspace »</Button>
+      </Link>
+    );
+  } else {
+    return null;
+  }
+};
+
 const UserControls = () => {
   if (Auth.isAuthenticated()) {
     return (
@@ -94,13 +110,15 @@ const UserControls = () => {
 };
 
 const Header = () => (
-  <HeaderContainer>
-    <Brand />
-    <Link to="/next" style={{ marginRight: "20px" }}>
-      <Button bsSize="small">Get Next Workspace »</Button>
-    </Link>
-    <UserControls />
-  </HeaderContainer>
+    <HeaderContainer>
+      <div className="container">
+        <HeaderContentContainer>
+          <Brand />
+          <NextWorkspaceBtn />
+          <UserControls />
+        </HeaderContentContainer>
+      </div>
+    </HeaderContainer>
 );
 
 export { Header };

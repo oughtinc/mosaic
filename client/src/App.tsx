@@ -76,7 +76,7 @@ export class Layout extends React.Component {
     return (
       <div className="Layout">
         <Header />
-        <div className="container-fluid">
+        <div className="container">
           <ContentContainer>{this.props.children}</ContentContainer>
         </div>
       </div>
