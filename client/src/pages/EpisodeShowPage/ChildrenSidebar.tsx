@@ -70,7 +70,7 @@ export class Child extends React.Component<any, any> {
         )}
 
         {answerRelationship.findBlock().value && (
-          <div style={{ color: "#999" }}>
+          <div style={{ color: "#999", marginTop: "8px" }}>
             <BlockEditor
               {...answerRelationship.blockEditorAttributes()}
               availablePointers={availablePointers}
