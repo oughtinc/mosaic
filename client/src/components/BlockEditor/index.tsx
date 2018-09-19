@@ -14,10 +14,6 @@ import { SlatePointers } from "../../lib/slate-pointers";
 import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
 
-const BlockReadOnlyStyle = styled.div`
-  padding: 0.3em;
-`;
-
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
   public blockEditorEditing;
@@ -146,9 +142,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const value = block.value;
     const { plugins } = this.state;
     return readOnly ? (
-      <BlockReadOnlyStyle>
-        <Editor value={value} readOnly={true} plugins={plugins} />
-      </BlockReadOnlyStyle>
+      <Editor value={value} readOnly={true} plugins={plugins} />
     ) : (
       <BlockEditorEditing
         placeholder={this.props.placeholder}

@@ -30,7 +30,7 @@ const WorkspaceList = styled.div`
 const WorkspaceStyle = styled.div`
   background-color: #fff;
   border: 1px solid #ddd;
-  padding: 1px 4px;
+  padding: 10px;
   margin: 5px 0;
 
   border-radius: 3px;
@@ -78,6 +78,7 @@ const RootWorkspace = ({ workspace }) => {
       <Link to={`/workspaces/${workspace.id}`}>
         <RootBlock block={question} />
       </Link>
+      {' '}
       <RootBlock block={answer} availablePointers={workspace.connectedPointers} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <TreeButton bsSize="xsmall" bsStyle="default" className="pull-right">Tree »</TreeButton>

@@ -269,20 +269,20 @@ export class FormPagePresentational extends React.Component<any, any> {
           </Row>
           <Row>
             <Col sm={12}>
-              <div style={{display: "flex", alignItems: "flex-end"}}>
-                <div style={{ fontSize: "28px", marginLeft: "-10px", marginRight: "3px" }}>
+              <div style={{display: "flex", alignItems: "flex-end", marginBottom: "10px" }}>
+                <div style={{ fontSize: "28px", marginRight: "8px" }}>
                   <BlockEditor
                     availablePointers={availablePointers}
                     {...questionProps}
                   />
                 </div>
                 {workspace.parentId && !isIsolatedWorkspace && (
-                  <div style={{paddingBottom: "16px"}}>
+                  <div style={{paddingBottom: "8px"}}>
                     <ParentLink parentId={workspace.parentId} />
                   </div>
                 )}
                 {workspace && !isIsolatedWorkspace && (
-                  <div style={{paddingBottom: "16px"}}>
+                  <div style={{paddingBottom: "8px"}}>
                     <SubtreeLink workspace={workspace} />
                   </div>
                 )}
