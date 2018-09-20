@@ -18,7 +18,9 @@ class Scheduler {
 
     const userSchedule = this.schedule[userId];
 
-    const allWorkspaces = await models.Workspace.findAll();
+    const allWorkspaces = await models.Workspace.findAll({
+      attributes: ["id", "parentId", "childWorkspaceOrder"] // virtual attrs added anyway, see: https://github.com/sequelize/sequelize/issues/5566
+    });
 
     const workspacesInTreeWorkedOnLeastRecently = await filter(
       allWorkspaces,
@@ -76,7 +78,7 @@ class Scheduler {
     // go through user schedule and update
     for (let i = 0; i < userSchedule.length; i++) {
       const workspaceId = userSchedule[i].workspaceId;
-      const workspace = await models.Workspace.findById(workspaceId);
+      const workspace = await models.Workspace.findById(workspaceId, { attributes: ["id"]});
       const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
       data[rootParentWorkspace.id] = i;
     }
@@ -101,16 +103,29 @@ class Scheduler {
     return leastRecentlyWorkedOnTrees;
   }
 
+  private rootParentCache = new Map;
+
   private async getRootParentOfWorkspace(workspace) {
-    while (workspace.parentId) {
-      workspace = await workspace.getParentWorkspace();
+    if (this.rootParentCache.has(workspace)) {
+      return this.rootParentCache.get(workspace);
     }
-    return workspace;
+
+    let curWorkspace = workspace;
+
+    while (curWorkspace.parentId) {
+      curWorkspace = await workspace.getParentWorkspace();
+    }
+
+    const rootParentWorkspace = curWorkspace;
+
+    this.rootParentCache.set(workspace, rootParentWorkspace);
+
+    return rootParentWorkspace;
   }
 
   private async isInTreeUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces, workspaceId) {
     const leastRecentlyWorkedOnTrees = await this.getTreesUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces);
-    const workspace = await models.Workspace.findById(workspaceId);
+    const workspace = await models.Workspace.findById(workspaceId, { attributes: ["id"]});
     const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
 
     return leastRecentlyWorkedOnTrees.find(id => id === rootParentWorkspace.id);
