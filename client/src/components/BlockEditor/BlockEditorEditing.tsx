@@ -21,7 +21,7 @@ const BlockEditorStyle = styled.div`
 `;
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
-const DOLLAR_NUMBER_SPACE = /\$[0-9]+\s/;
+const DOLLAR_NUMBERS_NOT_NUMBER = /\$[0-9]+[^0-9]/;
 
 function lastCharactersAfterEvent(event: any, n: any) {
   const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
@@ -152,7 +152,7 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   private checkAutocomplete = event => {
     const lastCharacters = lastCharactersAfterEvent(event, 4);
-    const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBER_SPACE);
+    const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBERS_NOT_NUMBER);
     if (pointerNameMatch) {
       this.handlePointerNameAutocomplete(
         lastCharacters,
@@ -172,11 +172,9 @@ export class BlockEditorEditingPresentational extends React.Component<
         .deleteBackward(matchNumber.toString().length + 1)
         .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
         .collapseToStartOfNextText()
-        .focus()
-        .insertText(" ");
+        .focus();
 
       this.onChange(value, true);
-      event.preventDefault();
     }
   };
 
