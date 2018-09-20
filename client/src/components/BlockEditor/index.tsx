@@ -1,5 +1,4 @@
 import * as React from "react";
-import styled from "styled-components";
 import { Editor } from "slate-react";
 import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
 import {

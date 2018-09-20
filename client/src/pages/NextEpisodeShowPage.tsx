@@ -21,11 +21,13 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
       return <div>Finding your next workspace...</div>;
     } else {
       return (
-        <Redirect to={{
-          pathname: `/workspaces/${this.state.workspaceId}`,
-          search: "?isolated=true&timer=0:3:0",
-          state: { shouldTimerReset: true }
-        }} />
+        <Redirect
+          to={{
+            pathname: `/workspaces/${this.state.workspaceId}`,
+            search: "?isolated=true&timer=0:3:0",
+            state: { shouldTimerReset: true }
+          }}
+        />
       );
     }
   }

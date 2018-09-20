@@ -106,7 +106,7 @@ export class Timer extends React.Component<any,  any> {
     return true;
   }
 
-  private resetTimer(durationInMs) {
+  private resetTimer(durationInMs: number) {
     // currently this.startTimer() overwrites any current timer data
     // effectively reseting the timer
     this.startTimer(durationInMs);
