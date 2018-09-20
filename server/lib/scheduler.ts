@@ -19,13 +19,17 @@ class Scheduler {
     const userSchedule = this.schedule[userId];
 
     const allWorkspaces = await models.Workspace.findAll({
-      attributes: ["id", "parentId", "childWorkspaceOrder"] // virtual attrs added anyway, see: https://github.com/sequelize/sequelize/issues/5566
+      attributes: ["id", "parentId", "childWorkspaceOrder", "totalBudget", "allocatedBudget"] // virtual attrs added anyway, see: https://github.com/sequelize/sequelize/issues/5566
     });
 
-    const workspacesInTreeWorkedOnLeastRecently = await filter(
-      allWorkspaces,
-      async (w) => await this.isInTreeUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces, w.id)
-    );
+    let workspacesInTreeWorkedOnLeastRecently = [];
+
+    for (const w of allWorkspaces) {
+      const shouldInclude = await this.isInTreeUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces, w);
+      if (shouldInclude) {
+        workspacesInTreeWorkedOnLeastRecently.push(w);
+      }
+    }
 
     const notYetWorkedOnInThatTree = await filter(
       workspacesInTreeWorkedOnLeastRecently,
@@ -71,15 +75,15 @@ class Scheduler {
     // initialize at -1
     for (let i = 0; i < allWorkspaces.length; i++) {
       const workspace = allWorkspaces[i];
-      const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
+      const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace.id, workspace);
       data[rootParentWorkspace.id] = -1;
     }
 
     // go through user schedule and update
     for (let i = 0; i < userSchedule.length; i++) {
       const workspaceId = userSchedule[i].workspaceId;
-      const workspace = await models.Workspace.findById(workspaceId, { attributes: ["id"]});
-      const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
+      const workspace = await models.Workspace.findById(workspaceId, { attributes: ["id", "parentId"]});
+      const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace.id, workspace);
       data[rootParentWorkspace.id] = i;
     }
 
@@ -103,30 +107,31 @@ class Scheduler {
     return leastRecentlyWorkedOnTrees;
   }
 
-  private rootParentCache = new Map;
+  private rootParentCache = {};
 
-  private async getRootParentOfWorkspace(workspace) {
-    if (this.rootParentCache.has(workspace)) {
-      return this.rootParentCache.get(workspace);
+  private async getRootParentOfWorkspace(workspaceId, workspace) {
+    if (this.rootParentCache[workspaceId]) {
+      console.log('using cache');
+      return this.rootParentCache[workspaceId];
     }
 
-    let curWorkspace = workspace;
-
-    while (curWorkspace.parentId) {
-      curWorkspace = await workspace.getParentWorkspace();
+    if (!workspace) {
+      workspace = models.Workspace.findById(workspaceId, { attributes: ["id", "parentId"]});
     }
 
-    const rootParentWorkspace = curWorkspace;
-
-    this.rootParentCache.set(workspace, rootParentWorkspace);
-
-    return rootParentWorkspace;
+    if (!workspace.parentId) {
+      return workspace;
+    } else {
+      const rootParent = await this.getRootParentOfWorkspace(workspace.parentId);
+      this.rootParentCache[workspaceId] = rootParent;
+      console.log('saving to cache')
+      return rootParent;
+    }
   }
 
-  private async isInTreeUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces, workspaceId) {
+  private async isInTreeUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces, workspace) {
     const leastRecentlyWorkedOnTrees = await this.getTreesUserHasWorkedOnLeastRecently(userSchedule, allWorkspaces);
-    const workspace = await models.Workspace.findById(workspaceId, { attributes: ["id"]});
-    const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace);
+    const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace.id, workspace);
 
     return leastRecentlyWorkedOnTrees.find(id => id === rootParentWorkspace.id);
   }
