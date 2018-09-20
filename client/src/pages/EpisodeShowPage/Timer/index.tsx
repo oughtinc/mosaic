@@ -56,11 +56,14 @@ export class Timer extends React.Component<any,  any> {
   private pollingInterval;
 
   public componentDidMount() {
+    const durationInMs = moment.duration(this.props.durationString).asMilliseconds();
+
     if (!this.hasTimerStarted()) {
       // please see https://momentjs.com/docs/#/durations/creating/ for more
       // on the different duration string formats moment.duration() accepts
-      const durationInMs = moment.duration(this.props.durationString).asMilliseconds();
       this.startTimer(durationInMs);
+    } else if (this.props.shouldTimerReset) {
+      this.resetTimer(durationInMs);
     }
 
     this.pollingInterval = setInterval(() => {
@@ -101,6 +104,12 @@ export class Timer extends React.Component<any,  any> {
     }
 
     return true;
+  }
+
+  private resetTimer(durationInMs) {
+    // currently this.startTimer() overwrites any current timer data
+    // effectively reseting the timer
+    this.startTimer(durationInMs);
   }
 
   private startTimer(durationInMs: number) {
