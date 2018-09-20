@@ -63,9 +63,11 @@ class Scheduler {
       finalWorkspaces = [workspaceWorkedOnLeastRecently];
     }
 
+    const randomIndex = Math.floor(Math.random() * (finalWorkspaces.length));
+
     this.schedule[userId] = userSchedule.concat({
       startedAt: Date.now(),
-      workspaceId: finalWorkspaces[0].id,
+      workspaceId: finalWorkspaces[randomIndex].id,
     });
   }
 
@@ -111,20 +113,19 @@ class Scheduler {
 
   private async getRootParentOfWorkspace(workspaceId, workspace) {
     if (this.rootParentCache[workspaceId]) {
-      console.log('using cache');
       return this.rootParentCache[workspaceId];
     }
 
     if (!workspace) {
-      workspace = models.Workspace.findById(workspaceId, { attributes: ["id", "parentId"]});
+      workspace = await models.Workspace.findById(workspaceId, { attributes: ["id", "parentId"]});
     }
 
     if (!workspace.parentId) {
+      this.rootParentCache[workspaceId] = workspace;
       return workspace;
     } else {
       const rootParent = await this.getRootParentOfWorkspace(workspace.parentId);
       this.rootParentCache[workspaceId] = rootParent;
-      console.log('saving to cache')
       return rootParent;
     }
   }
