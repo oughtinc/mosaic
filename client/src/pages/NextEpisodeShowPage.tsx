@@ -24,7 +24,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
         <Redirect
           to={{
             pathname: `/workspaces/${this.state.workspaceId}`,
-            search: "?isolated=true&timer=0:3:0",
+            search: "?isolated=true&timer=0:5:0",
             state: { shouldTimerReset: true }
           }}
         />
