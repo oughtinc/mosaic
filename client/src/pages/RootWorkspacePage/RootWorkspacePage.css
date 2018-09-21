@@ -1,4 +1,16 @@
-.AuthMessage a {
+.AuthMessage {
+  background-color: #f8f8f8;
+}
+
+.alert-info {
+  background-color: #f0f8ff;
+  background-image: none;
+  border: none;
+  border: 1px solid #ddd;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.AuthMessage a {s
     text-decoration: underline;
 }
 
