@@ -12,18 +12,25 @@ class Scheduler {
   }
 
   public async findNextWorkspace(userId) {
+    // reset cache so we don't use old eligibility info
+    this.rootParentCache = {};
+
     if (!this.schedule[userId]) {
       this.schedule[userId] = [];
     }
 
     const userSchedule = this.schedule[userId];
 
-    const allEligibleWorkspaces = await models.Workspace.findAll({
-      where: {
-        isEligibleForAssignment: true,
-      },
-      attributes: ["id", "parentId", "childWorkspaceOrder", "totalBudget", "allocatedBudget"] // virtual attrs added anyway, see: https://github.com/sequelize/sequelize/issues/5566
-    });
+    const allWorkspaces = await models.Workspace.findAll();
+
+    let allEligibleWorkspaces = [];
+
+    for (const w of allWorkspaces) {
+      const shouldInclude = await this.isWorkspaceEligible(w);
+      if (shouldInclude) {
+        allEligibleWorkspaces.push(w);
+      }
+    }
 
     let workspacesInTreeWorkedOnLeastRecently = [];
 
@@ -90,7 +97,7 @@ class Scheduler {
       if (!workspaces.find(w => w.id === workspaceId)) {
         continue;
       }
-      const workspace = await models.Workspace.findById(workspaceId, { attributes: ["id", "parentId"]});
+      const workspace = await models.Workspace.findById(workspaceId);
       const rootParentWorkspace = await this.getRootParentOfWorkspace(workspace.id, workspace);
       data[rootParentWorkspace.id] = i;
     }
@@ -123,7 +130,7 @@ class Scheduler {
     }
 
     if (!workspace) {
-      workspace = await models.Workspace.findById(workspaceId, { attributes: ["id", "parentId"]});
+      workspace = await models.Workspace.findById(workspaceId);
     }
 
     if (!workspace.parentId) {
@@ -134,6 +141,11 @@ class Scheduler {
       this.rootParentCache[workspaceId] = rootParent;
       return rootParent;
     }
+  }
+
+  private async isWorkspaceEligible(w) {
+    const rootParent = await this.getRootParentOfWorkspace(w.id, w);
+    return rootParent.isEligibleForAssignment;
   }
 
   private async isInTreeUserHasWorkedOnLeastRecently(userSchedule, workspaces, workspace) {
