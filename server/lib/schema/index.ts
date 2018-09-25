@@ -339,6 +339,23 @@ const schema = new GraphQLSchema({
           return { id: workspaceId };
         }
       },
+      toggleWorkspaceEligibility: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to toggle workspace eligibility."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isEligibleForAssignment: !workspace.isEligibleForAssignment });
+          return { id: workspaceId };
+        }
+      },
     }
   })
 });

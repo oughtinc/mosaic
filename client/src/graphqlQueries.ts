@@ -19,6 +19,14 @@ export const CREATE_ROOT_WORKSPACE = gql`
   }
 `;
 
+export const TOGGLE_WORKSPACE_ELIGIBILITY = gql`
+  mutation toggleWorkspaceEligibility($workspaceId: String) {
+      toggleWorkspaceEligibility(workspaceId: $workspaceId) {
+        id
+      }
+    }
+`;
+
 export const UPDATE_BLOCKS = gql`
   mutation updateBlocks($blocks: [blockInput]) {
     updateBlocks(blocks: $blocks) {
@@ -46,6 +54,7 @@ export const WORKSPACES_QUERY = gql`
         type
       }
       connectedPointers
+      isEligibleForAssignment
     }
   }
 `;

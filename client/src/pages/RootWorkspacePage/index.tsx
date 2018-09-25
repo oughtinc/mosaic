@@ -9,7 +9,7 @@ import { Alert, Button } from "react-bootstrap";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
-import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
+import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY, TOGGLE_WORKSPACE_ELIGIBILITY } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
 import "./RootWorkspacePage.css";
@@ -69,12 +69,24 @@ const RootBlock = ({ availablePointers = [], block }) =>
     </TextBlock>
   );
 
-const RootWorkspace = ({ workspace }) => {
+const RootWorkspace = ({ workspace, toggleWorkspaceEligibility }) => {
   const question = workspaceToBlock(workspace, "QUESTION");
   const answer = workspaceToBlock(workspace, "ANSWER");
   const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
   return (
     <WorkspaceStyle>
+      {
+        Auth.isAdmin()
+        &&
+        <input
+          style={{
+            marginRight: "10px",
+          }}
+          type="checkbox"
+          defaultChecked={workspace.isEligibleForAssignment}
+          onChange={() => toggleWorkspaceEligibility({ variables: { workspaceId: workspace.id }})}
+        />
+      }
       <Link to={`/workspaces/${workspace.id}`}>
         <RootBlock block={question} />
       </Link>
@@ -141,7 +153,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <WorkspaceList>
             {isLoading
               ? "Loading..."
-              : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
+              : workspaces.map(w => <RootWorkspace toggleWorkspaceEligibility={this.props.toggleWorkspaceEligibility} workspace={w} key={w.id} />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAuthenticated() && (
@@ -164,6 +176,12 @@ export const RootWorkspacePage = compose(
   graphql(WORKSPACES_QUERY, { name: "originWorkspaces" }),
   graphql(CREATE_ROOT_WORKSPACE, {
     name: "createWorkspace",
+    options: {
+      refetchQueries: ["OriginWorkspaces"]
+    }
+  }),
+  graphql(TOGGLE_WORKSPACE_ELIGIBILITY, {
+    name: "toggleWorkspaceEligibility",
     options: {
       refetchQueries: ["OriginWorkspaces"]
     }
