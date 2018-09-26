@@ -46,7 +46,7 @@ const UserControlsContainer = styled.div`
 
 const Brand = () => (
   <div className="Brand">
-    <BrandLink to="/">Mosaic v0.1</BrandLink>
+    <BrandLink to="/">Mosaic v0.2</BrandLink>
   </div>
 );
 
