@@ -140,7 +140,7 @@ const schema = new GraphQLSchema({
         args: { where: { type: GraphQLJSON } },
         resolve: resolver(models.Workspace, {
           before: async function(findOptions, args, context, info) {
-            /*const user = await userFromAuthToken(context.authorization);
+            const user = await userFromAuthToken(context.authorization);
             if (user == null) {
               findOptions.where = {
                 isPublic: true,
@@ -154,7 +154,7 @@ const schema = new GraphQLSchema({
                 ],
                 ...findOptions.where
               };
-            }*/
+            }
             return findOptions;
           }
         })
@@ -351,8 +351,35 @@ const schema = new GraphQLSchema({
               "No user found when attempting to toggle workspace eligibility."
             );
           }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to toggle workspace eligibility"
+            );
+          }
           const workspace = await models.Workspace.findById(workspaceId);
           await workspace.update({ isEligibleForAssignment: !workspace.isEligibleForAssignment });
+          return { id: workspaceId };
+        }
+      },
+      toggleWorkspaceFrontPageVisibility: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to toggle workspace visiblity."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to toggle workspace visiblity"
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isPublic: !workspace.isPublic });
           return { id: workspaceId };
         }
       },

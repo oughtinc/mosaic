@@ -27,6 +27,14 @@ export const TOGGLE_WORKSPACE_ELIGIBILITY = gql`
     }
 `;
 
+export const TOGGLE_WORKSPACE_FRONT_PAGE_VISIBILITY = gql`
+  mutation toggleWorkspaceFrontPageVisibility($workspaceId: String) {
+      toggleWorkspaceFrontPageVisibility(workspaceId: $workspaceId) {
+        id
+      }
+    }
+`;
+
 export const UPDATE_BLOCKS = gql`
   mutation updateBlocks($blocks: [blockInput]) {
     updateBlocks(blocks: $blocks) {

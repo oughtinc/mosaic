@@ -104,9 +104,7 @@ const Routes = () => (
       path="/authCallback"
       render={props => {
         if (/access_token|error/.test(props.location.hash)) {
-          Auth.handleAuthentication(() => {
-            location.reload();
-          });
+          Auth.handleAuthentication(() => window.location.href = Auth.getPreAuthUrl());
         }
         return <Redirect to="/" />;
       }}

@@ -4,12 +4,17 @@ import styled from "styled-components";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
-import { Alert, Button } from "react-bootstrap";
+import { Alert, Button, Checkbox } from "react-bootstrap";
 
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
-import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY, TOGGLE_WORKSPACE_ELIGIBILITY } from "../../graphqlQueries";
+import {
+  CREATE_ROOT_WORKSPACE,
+  WORKSPACES_QUERY,
+  TOGGLE_WORKSPACE_ELIGIBILITY,
+  TOGGLE_WORKSPACE_FRONT_PAGE_VISIBILITY,
+} from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
 import "./RootWorkspacePage.css";
@@ -69,7 +74,11 @@ const RootBlock = ({ availablePointers = [], block }) =>
     </TextBlock>
   );
 
-const RootWorkspace = ({ workspace, toggleWorkspaceEligibility }) => {
+const RootWorkspace = ({
+  workspace,
+  toggleWorkspaceEligibility,
+  toggleWorkspaceFrontPageVisibility,
+}) => {
   const question = workspaceToBlock(workspace, "QUESTION");
   const answer = workspaceToBlock(workspace, "ANSWER");
   const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
@@ -78,14 +87,40 @@ const RootWorkspace = ({ workspace, toggleWorkspaceEligibility }) => {
       {
         Auth.isAdmin()
         &&
-        <input
+        <div
           style={{
-            marginRight: "10px",
+            marginBottom: "5px",
           }}
-          type="checkbox"
-          defaultChecked={workspace.isEligibleForAssignment}
-          onChange={() => toggleWorkspaceEligibility({ variables: { workspaceId: workspace.id }})}
-        />
+        >
+            <Checkbox
+              style={{
+                backgroundColor: "#f8f8f8",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                padding: "5px 5px 5px 25px",
+              }}
+              inline={true}
+              type="checkbox"
+              defaultChecked={workspace.isEligibleForAssignment}
+              onChange={() => toggleWorkspaceEligibility({ variables: { workspaceId: workspace.id }})}
+            >
+              is eligible
+            </Checkbox>
+            <Checkbox
+              style={{
+                backgroundColor: "#f8f8f8",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                padding: "5px 5px 5px 25px",
+              }}
+              inline={true}
+              type="checkbox"
+              defaultChecked={workspace.isPublic}
+              onChange={() => toggleWorkspaceFrontPageVisibility({ variables: { workspaceId: workspace.id }})}
+            >
+              appears on front page
+            </Checkbox>
+        </div>
       }
       <Link to={`/workspaces/${workspace.id}`}>
         <RootBlock block={question} />
@@ -153,7 +188,12 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <WorkspaceList>
             {isLoading
               ? "Loading..."
-              : workspaces.map(w => <RootWorkspace toggleWorkspaceEligibility={this.props.toggleWorkspaceEligibility} workspace={w} key={w.id} />)}
+              : workspaces.map(w => <RootWorkspace
+                toggleWorkspaceEligibility={this.props.toggleWorkspaceEligibility}
+                toggleWorkspaceFrontPageVisibility={this.props.toggleWorkspaceFrontPageVisibility}
+                workspace={w}
+                key={w.id}
+              />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAuthenticated() && (
@@ -182,6 +222,12 @@ export const RootWorkspacePage = compose(
   }),
   graphql(TOGGLE_WORKSPACE_ELIGIBILITY, {
     name: "toggleWorkspaceEligibility",
+    options: {
+      refetchQueries: ["OriginWorkspaces"]
+    }
+  }),
+  graphql(TOGGLE_WORKSPACE_FRONT_PAGE_VISIBILITY, {
+    name: "toggleWorkspaceFrontPageVisibility",
     options: {
       refetchQueries: ["OriginWorkspaces"]
     }
