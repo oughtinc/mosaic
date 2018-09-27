@@ -26,8 +26,9 @@ class Scheduler {
     let allEligibleWorkspaces = [];
 
     for (const w of allWorkspaces) {
-      const shouldInclude = await this.isWorkspaceEligible(w);
-      if (shouldInclude) {
+      const isMarkedEligible = await this.isWorkspaceEligible(w);
+      const isCurrentlyBeingWorkedOn = await this.isWorkspaceCurrentlyBeingWorkedOn(w);
+      if (isMarkedEligible && !isCurrentlyBeingWorkedOn) {
         allEligibleWorkspaces.push(w);
       }
     }
@@ -141,6 +142,31 @@ class Scheduler {
       this.rootParentCache[workspaceId] = rootParent;
       return rootParent;
     }
+  }
+
+  private async isWorkspaceCurrentlyBeingWorkedOn(w) {
+    for (const userId in this.schedule) {
+      if (this.schedule.hasOwnProperty(userId)) {
+        const userSchedule = this.schedule[userId];
+        if (userSchedule.length === 0) {
+          continue;
+        }
+
+        const lastWorkedOn = userSchedule[userSchedule.length - 1];
+        const didUserLastWorkOnWorkspace = lastWorkedOn.workspaceId === w.id;
+        if (!didUserLastWorkOnWorkspace) {
+          continue;
+        }
+
+        const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOn.startedAt;
+        const FIVE_MINUTES = 5 * 60 * 1000;
+        const didUserStartWorkingOnItFewerThan5MinutesAgo = howLongAgoUserStartedWorkingOnIt < FIVE_MINUTES;
+        if (didUserStartWorkingOnItFewerThan5MinutesAgo) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private async isWorkspaceEligible(w) {
