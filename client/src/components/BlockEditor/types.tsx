@@ -11,6 +11,7 @@ export interface Change {
   collapseToStart(): Change;
   insertInline(inlineOrProperties: any): Change;
   insertTextByKey(key: any, offset: number, text: string): Change;
+  mergeNodeByKey(key: string): Change;
   move(n: number): Change;
   moveAnchor(n: number): Change;
   moveAnchorToEndOfPreviousText(): Change;
