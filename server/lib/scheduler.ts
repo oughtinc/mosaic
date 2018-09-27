@@ -160,7 +160,9 @@ class Scheduler {
 
         const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOn.startedAt;
         const FIVE_MINUTES = 5 * 60 * 1000;
-        const didUserStartWorkingOnItFewerThan5MinutesAgo = howLongAgoUserStartedWorkingOnIt < FIVE_MINUTES;
+        const FIFTEEN_SECOND_BUFFER = 15 * 1000;
+        const didUserStartWorkingOnItFewerThan5MinutesAgo =
+          howLongAgoUserStartedWorkingOnIt < (FIVE_MINUTES + FIFTEEN_SECOND_BUFFER);
         if (didUserStartWorkingOnItFewerThan5MinutesAgo) {
           return true;
         }
