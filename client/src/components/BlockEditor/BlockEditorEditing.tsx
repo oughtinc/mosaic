@@ -243,14 +243,12 @@ export class BlockEditorEditingPresentational extends React.Component<
     // after we update Slate, can redo this very elegantly as a schema
     let blocks = c.value.document.getBlocks();
     while (blocks.size > 2) {
-      const firstBlock = blocks.get(0);
       const secondBlock = blocks.get(1);
       const firstText = secondBlock.getFirstText();
-      c.insertTextByKey(firstText.key, 0, '\n');
+      c.insertTextByKey(firstText.key, 0, "\n");
       c.mergeNodeByKey(secondBlock.key);
       blocks = c.value.document.getBlocks();
     }
-
 
     this.onChange(c.value);
   };
