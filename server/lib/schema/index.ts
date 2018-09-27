@@ -14,6 +14,7 @@ import {
 import * as GraphQLJSON from "graphql-type-json";
 import * as auth0 from "auth0-js";
 import * as Sequelize from "sequelize";
+import { scheduler } from "../scheduler";
 
 const { auth0_client_id } = require(__dirname + "/../../config/config.json");
 
@@ -163,6 +164,17 @@ const schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(models.Workspace)
       },
+      currentWorkspace: {
+        type: workspaceType,
+        resolve: resolver(models.Workspace, {
+          before: async (findOptions, args, context, info) => {
+            const user = await userFromAuthToken(context.authorization);
+            const currentWorkspaceId = await scheduler.getCurrentWorkspace(user.user_id);
+            findOptions.where = { id: currentWorkspaceId };
+            return findOptions;
+          },
+        }),
+      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(
         new GraphQLList(pointerType),
@@ -196,6 +208,7 @@ const schema = new GraphQLSchema({
                 "Got null workspace while attempting to update blocks"
               );
             }
+            /*
             if (
               workspace.isPublic &&
               !user.is_admin &&
@@ -205,6 +218,7 @@ const schema = new GraphQLSchema({
                 "Non-admin user attempted to edit block on public workspace"
               );
             }
+            */
             await block.update({ ..._block }, { event });
             newBlocks = [...newBlocks, block];
           }
@@ -263,11 +277,13 @@ const schema = new GraphQLSchema({
             );
           }
           const workspace = await models.Workspace.findById(workspaceId);
+          /*
           if (!user.is_admin && workspace.creatorId !== user.user_id) {
             throw new Error(
               "Non-admin, non-creator user attempted to create child workspace"
             );
           }
+          */
           const event = await models.Event.create();
           const child = await workspace.createChild({
             event,
@@ -296,17 +312,77 @@ const schema = new GraphQLSchema({
 
           const event = await models.Event.create();
           const workspace = await models.Workspace.findById(workspaceId);
+          /*
           if (!user.is_admin && workspace.creatorId !== user.user_id) {
             throw new Error(
               "Non-admin, non-creator user attempted to update child workspace"
             );
           }
+          */
           const child = await models.Workspace.findById(childId);
           await workspace.changeAllocationToChild(child, totalBudget, {
             event
           });
         }
-      }
+      },
+      findNextWorkspace: {
+        type: workspaceType,
+        resolve: async (_, args, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting get next workspace."
+            );
+          }
+          await scheduler.findNextWorkspace(user.user_id);
+          const workspaceId = await scheduler.getCurrentWorkspace(user.user_id);
+          return { id: workspaceId };
+        }
+      },
+      toggleWorkspaceEligibility: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to toggle workspace eligibility."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to toggle workspace eligibility"
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isEligibleForAssignment: !workspace.isEligibleForAssignment });
+          return { id: workspaceId };
+        }
+      },
+      toggleWorkspaceFrontPageVisibility: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to toggle workspace visiblity."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to toggle workspace visiblity"
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isPublic: !workspace.isPublic });
+          return { id: workspaceId };
+        }
+      },
     }
   })
 });

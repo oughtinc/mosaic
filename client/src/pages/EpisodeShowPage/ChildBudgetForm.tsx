@@ -3,12 +3,20 @@ import * as React from "react";
 import styled from "styled-components";
 import { Button, FormControl } from "react-bootstrap";
 
-const FormStyle = styled.div`
-  margin-top: 10px;
-  background: #eee;
-  padding: 10px;
-  float: left;
+const FormStyle = styled.span`
   border-radius: 2px;
+  box-shadow: 0 0 6px #666;
+  display: inline-block;
+  margin-left: 10px;
+  padding: 10px;
+`;
+
+const StyledDefaultButton = styled(Button)`
+  background-color: #f8f8f8;
+
+  &:hover {
+    background-color: #e8e8e8;
+  }
 `;
 
 interface ChildBudgetFormProps {
@@ -35,34 +43,41 @@ export class ChildBudgetForm extends React.Component<
   public render() {
     return (
       <FormStyle>
-        <div style={{ width: "100px", float: "left" }}>
-          <FormControl
-            type="number"
-            autoFocus={true}
-            value={this.state.value}
-            placeholder="0"
-            min={this.props.min}
-            max={this.props.max}
-            onChange={(e: any) => {
-              const { value } = e.target;
-              this.setState({ value: parseInt(value, 10) });
-            }}
-          />
-        </div>
-        {`${this.props.min} to ${this.props.max}`}
-
-        <div style={{ float: "left" }}>
-          <Button
-            onClick={() => {
-              this.props.onSubmit(this.state.value);
-              this.props.onClose();
-            }}
-            disabled={!this.isValid()}
-          >
-            Submit
-          </Button>
-          <Button onClick={this.props.onClose}>Close</Button>
-        </div>
+        <FormControl
+          type="number"
+          autoFocus={true}
+          value={this.state.value}
+          placeholder="0"
+          min={this.props.min}
+          max={this.props.max}
+          onChange={(e: any) => {
+            const { value } = e.target;
+            this.setState({ value: parseInt(value, 10) });
+          }}
+          style={{ display: "inline-block", width: "80px" }}
+        />
+        <span style={{ color: "#999" }}>
+          {` ${this.props.min} to ${this.props.max} `}
+        </span>
+        <Button
+          bsSize="xsmall"
+          bsStyle="primary"
+          style={{ marginRight: "5px" }}
+          onClick={() => {
+            this.props.onSubmit(this.state.value);
+            this.props.onClose();
+          }}
+          disabled={!this.isValid()}
+        >
+          Submit
+        </Button>
+        <StyledDefaultButton
+          bsSize="xsmall"
+          bsStyle="default"
+          onClick={this.props.onClose}
+        >
+          Close
+        </StyledDefaultButton>
       </FormStyle>
     );
   }

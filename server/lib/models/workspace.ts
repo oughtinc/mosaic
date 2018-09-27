@@ -30,6 +30,11 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      isEligibleForAssignment: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       ...eventRelationshipColumns(DataTypes),
       childWorkspaceOrder: {
         type: DataTypes.ARRAY(DataTypes.TEXT),

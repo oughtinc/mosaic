@@ -14,7 +14,12 @@ export class Auth {
   });
 
   public static login(): void {
+    localStorage.setItem("mosaic_auth0_url", window.location.href);
     Auth.auth0.authorize();
+  }
+
+  public static getPreAuthUrl(): string {
+    return localStorage.getItem("mosaic_auth0_url") || window.location.href;
   }
 
   public static logout(): void {
@@ -87,6 +92,8 @@ export class Auth {
   }
 
   public static isAuthorizedToEditWorkspace(workspace?: any): boolean {
+    return Auth.isAuthenticated();
+    /*
     if (workspace == null) {
       return false;
     }
@@ -96,6 +103,7 @@ export class Auth {
     } else {
       return Auth.isAuthenticated();
     }
+    */
   }
 
   public static isAdmin(): boolean {

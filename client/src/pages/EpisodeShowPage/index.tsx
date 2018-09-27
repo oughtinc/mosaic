@@ -105,22 +105,41 @@ const NavLink = styled(Link)`
   margin-right: 5px;
 `;
 
+const BlockOuterContainer = styled.div`
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05);
+  margin-bottom: 25px;
+`;
+
 const BlockContainer = styled.div`
-  border: 2px solid
-    ${(props: { readOnly: boolean }) => (props.readOnly ? "#ddd" : "#fff")};
-  padding: ${(props: { readOnly: boolean }) =>
-    props.readOnly ? "1em" : "0em"};
+  background-color: #fff;
+  border: 0px solid
+    ${(props: { readOnly: boolean }) => (props.readOnly ? " #ddd" : "#fff")};
+  border-radius: 0 0 3px 3px;
+  padding: 10px;
+`;
+
+const BlockHeader = styled.div`
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ddd;
+  border-radius: 3px 3px 0 0;
+  color: #111;
+  font-family: "Lato";
+  font-size: 18px;
+  padding: 5px 10px;
 `;
 
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
-    <Button>Parent</Button>
+    <Button bsStyle="default" bsSize="xsmall">Parent »</Button>
   </NavLink>
 );
 
 const SubtreeLink = ({ workspace }) => (
   <NavLink to={`/workspaces/${workspace.id}/subtree`}>
-    <Button>Subtree</Button>
+    <Button bsStyle="default" bsSize="xsmall">Subtree »</Button>
   </NavLink>
 );
 
@@ -134,6 +153,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   private scratchpadField;
   private answerField;
   private newChildField;
+  private timerInterval;
 
   public constructor(props: any) {
     super(props);
@@ -157,6 +177,10 @@ export class FormPagePresentational extends React.Component<any, any> {
     });
   }
 
+  public componentWillUnmount() {
+    clearInterval(this.timerInterval);
+  }
+
   public updateBlocks = (blocks: any) => {
     const variables = { blocks };
     this.props.updateBlocks({
@@ -171,10 +195,12 @@ export class FormPagePresentational extends React.Component<any, any> {
   }
 
   public render() {
-    const workspace = this.props.workspace.workspace;
-    if (!workspace) {
+    const isLoading = this.props.workspace.loading;
+    if (isLoading) {
       return <div> Loading </div>;
     }
+
+    const workspace = this.props.workspace.workspace;
 
     const importedPointers = workspace.connectedPointers;
 
@@ -219,58 +245,78 @@ export class FormPagePresentational extends React.Component<any, any> {
       <div key={workspace.id}>
         <BlockHoverMenu>
           <Row>
-            <Col sm={7}>
-              {workspace.parentId && !isIsolatedWorkspace && (
-                <ParentLink parentId={workspace.parentId} />
-              )}
-              {workspace && !isIsolatedWorkspace && <SubtreeLink workspace={workspace} />}
-            </Col>
-            <Col sm={2}>
-              {
-                hasTimer
-                &&
-                <Timer
-                  durationString={durationString}
-                  onTimerEnd={this.handleTimerEnd}
-                  workspaceId={workspace.id}
+            <Col sm={12}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                }}
+              >
+                {
+                  hasTimer
+                  &&
+                  <Timer
+                    durationString={durationString}
+                    onTimerEnd={this.handleTimerEnd}
+                    shouldTimerReset={this.props.location.state.shouldTimerReset}
+                    style={{ marginRight: "30px" }}
+                    workspaceId={workspace.id}
+                  />
+                }
+                <AvailableBudget
+                  allocatedBudget={workspace.allocatedBudget}
+                  style={{ marginRight: "30px" }}
+                  totalBudget={workspace.totalBudget}
                 />
-              }
-            </Col>
-            <Col sm={3}>
-              <AvailableBudget
-                allocatedBudget={workspace.allocatedBudget}
-                totalBudget={workspace.totalBudget}
-              />
+              </div>
             </Col>
           </Row>
           <Row>
             <Col sm={12}>
-              <h1>
-                <BlockEditor
-                  availablePointers={availablePointers}
-                  {...questionProps}
-                />
-              </h1>
+              <div style={{display: "flex", alignItems: "flex-end", marginBottom: "10px" }}>
+                <div style={{ fontSize: "28px", marginRight: "8px" }}>
+                  <BlockEditor
+                    availablePointers={availablePointers}
+                    {...questionProps}
+                  />
+                </div>
+                {workspace.parentId && !isIsolatedWorkspace && (
+                  <div style={{paddingBottom: "8px"}}>
+                    <ParentLink parentId={workspace.parentId} />
+                  </div>
+                )}
+                {workspace && !isIsolatedWorkspace && (
+                  <div style={{paddingBottom: "8px"}}>
+                    <SubtreeLink workspace={workspace} />
+                  </div>
+                )}
+              </div>
             </Col>
           </Row>
           <Row>
             <Col sm={6}>
-              <h3>Scratchpad</h3>
-              <BlockContainer readOnly={scratchpadProps.readOnly}>
-                <BlockEditor
-                  availablePointers={availablePointers}
-                  ref={this.registerEditorRef("scratchpadField")}
-                  {...scratchpadProps}
-                />
-              </BlockContainer>
-              <h3>Answer</h3>
-              <BlockContainer readOnly={scratchpadProps.readOnly}>
-                <BlockEditor
-                  availablePointers={availablePointers}
-                  ref={this.registerEditorRef("answerField")}
-                  {...answerProps}
-                />
-              </BlockContainer>
+              <BlockOuterContainer>
+                <BlockHeader>Scratchpad</BlockHeader>
+                <BlockContainer readOnly={scratchpadProps.readOnly}>
+                  <BlockEditor
+                    availablePointers={availablePointers}
+                    placeholder="Text for the scratchpad..."
+                    ref={this.registerEditorRef("scratchpadField")}
+                    {...scratchpadProps}
+                  />
+                </BlockContainer>
+              </BlockOuterContainer>
+              <BlockOuterContainer>
+              <BlockHeader>Answer</BlockHeader>
+                <BlockContainer readOnly={scratchpadProps.readOnly}>
+                  <BlockEditor
+                    availablePointers={availablePointers}
+                    placeholder="Text for the answer..."
+                    ref={this.registerEditorRef("answerField")}
+                    {...answerProps}
+                  />
+                </BlockContainer>
+              </BlockOuterContainer>
             </Col>
             <Col sm={6}>
               <ChildrenSidebar

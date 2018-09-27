@@ -29,6 +29,7 @@ const BlockContainer = styled.div`
 const BlockEditorContainer = styled.div`
   float: left;
   flex: 40;
+  margin: 4px 0 4px 0;
 `;
 
 const BlockSectionContainer = styled.div`

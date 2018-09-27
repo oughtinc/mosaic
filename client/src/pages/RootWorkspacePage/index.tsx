@@ -4,12 +4,17 @@ import styled from "styled-components";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { Link } from "react-router-dom";
-import { Alert, Button } from "react-bootstrap";
+import { Alert, Button, Checkbox } from "react-bootstrap";
 
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import { databaseJSONToValue } from "../../lib/slateParser";
-import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
+import {
+  CREATE_ROOT_WORKSPACE,
+  WORKSPACES_QUERY,
+  TOGGLE_WORKSPACE_ELIGIBILITY,
+  TOGGLE_WORKSPACE_FRONT_PAGE_VISIBILITY,
+} from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
 import "./RootWorkspacePage.css";
@@ -24,16 +29,18 @@ const RootWorkspacePageHeading = styled.h2`
 `;
 
 const WorkspaceList = styled.div`
-  background-color: #f6f8fa;
-  padding: 1px;
-  border: 1px solid #ddd;
+
 `;
 
 const WorkspaceStyle = styled.div`
   background-color: #fff;
+  padding: 10px;
+  margin: 5px 0;
+
+  border-radius: 3px;
   border: 1px solid #ddd;
-  padding: 1px 4px;
-  margin: 3px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05);
 `;
 
 const TextBlock = styled.div`
@@ -41,8 +48,7 @@ const TextBlock = styled.div`
 `;
 
 const TreeButton = styled(Button)`
-  padding: 1px 4px;
-  margin: 2px 0;
+  margin: 5px 1px;
 `;
 
 const Description = styled.div`
@@ -68,22 +74,66 @@ const RootBlock = ({ availablePointers = [], block }) =>
     </TextBlock>
   );
 
-const RootWorkspace = ({ workspace }) => {
+const RootWorkspace = ({
+  workspace,
+  toggleWorkspaceEligibility,
+  toggleWorkspaceFrontPageVisibility,
+}) => {
   const question = workspaceToBlock(workspace, "QUESTION");
   const answer = workspaceToBlock(workspace, "ANSWER");
   const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
   return (
     <WorkspaceStyle>
+      {
+        Auth.isAdmin()
+        &&
+        <div
+          style={{
+            marginBottom: "5px",
+          }}
+        >
+            <Checkbox
+              style={{
+                backgroundColor: "#f8f8f8",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                padding: "5px 5px 5px 25px",
+              }}
+              inline={true}
+              type="checkbox"
+              defaultChecked={workspace.isEligibleForAssignment}
+              onChange={() => toggleWorkspaceEligibility({ variables: { workspaceId: workspace.id }})}
+            >
+              is eligible
+            </Checkbox>
+            <Checkbox
+              style={{
+                backgroundColor: "#f8f8f8",
+                border: "1px solid #ccc",
+                borderRadius: "3px",
+                padding: "5px 5px 5px 25px",
+              }}
+              inline={true}
+              type="checkbox"
+              defaultChecked={workspace.isPublic}
+              onChange={() => toggleWorkspaceFrontPageVisibility({ variables: { workspaceId: workspace.id }})}
+            >
+              appears on front page
+            </Checkbox>
+        </div>
+      }
       <Link to={`/workspaces/${workspace.id}`}>
         <RootBlock block={question} />
       </Link>
+      {" "}
       <RootBlock block={answer} availablePointers={workspace.connectedPointers} />
       <Link to={`/workspaces/${workspace.id}/subtree`}>
-        <TreeButton className="pull-right">Tree</TreeButton>
+        <TreeButton bsSize="xsmall" bsStyle="default" className="pull-right">Tree »</TreeButton>
       </Link>
       <Description>
         <RootBlock block={scratchpad} availablePointers={workspace.connectedPointers} />
       </Description>
+      <div style={{ clear: "both" }} />
     </WorkspaceStyle>
   );
 };
@@ -92,9 +142,6 @@ class NewWorkspaceForm extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        <RootWorkspacePageHeading>
-          {Auth.isAdmin() ? "New Question (public)" : "New Question (unlisted)"}
-        </RootWorkspacePageHeading>
         <NewBlockForm
           maxTotalBudget={10000}
           onMutate={this.props.onCreateWorkspace}
@@ -141,7 +188,12 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <WorkspaceList>
             {isLoading
               ? "Loading..."
-              : workspaces.map(w => <RootWorkspace workspace={w} key={w.id} />)}
+              : workspaces.map(w => <RootWorkspace
+                toggleWorkspaceEligibility={this.props.toggleWorkspaceEligibility}
+                toggleWorkspaceFrontPageVisibility={this.props.toggleWorkspaceFrontPageVisibility}
+                workspace={w}
+                key={w.id}
+              />)}
           </WorkspaceList>
         </RootWorkspacePageSection>
         {Auth.isAuthenticated() && (
@@ -164,6 +216,18 @@ export const RootWorkspacePage = compose(
   graphql(WORKSPACES_QUERY, { name: "originWorkspaces" }),
   graphql(CREATE_ROOT_WORKSPACE, {
     name: "createWorkspace",
+    options: {
+      refetchQueries: ["OriginWorkspaces"]
+    }
+  }),
+  graphql(TOGGLE_WORKSPACE_ELIGIBILITY, {
+    name: "toggleWorkspaceEligibility",
+    options: {
+      refetchQueries: ["OriginWorkspaces"]
+    }
+  }),
+  graphql(TOGGLE_WORKSPACE_FRONT_PAGE_VISIBILITY, {
+    name: "toggleWorkspaceFrontPageVisibility",
     options: {
       refetchQueries: ["OriginWorkspaces"]
     }
