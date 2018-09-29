@@ -8,7 +8,7 @@ import {
   BrandCSS,
   HeaderContainerCSS,
   HeaderLinkCSS,
-} from "../styles";
+} from "../../styles";
 
 const Brand = styled(Link)`${BrandCSS}`;
 const HeaderContainer = styled.div`${HeaderContainerCSS}`;
