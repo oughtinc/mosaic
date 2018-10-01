@@ -11,13 +11,13 @@ import {
   homepageWorkspaceScratchpadFontColor,
 } from "../../styles";
 
-const WorkspaceStyle = styled.div`
+const WorkspaceContainer = styled.div`
   background-color: ${homepageWorkspaceBgColor};
   border: 1px solid ${homepageWorkspaceBorderColor};
   padding: 1px 4px;
 `;
 
-const ScratchpadStyle = styled.div`
+const ScratchpadContainer = styled.div`
   color: ${homepageWorkspaceScratchpadFontColor};
 `;
 
@@ -30,7 +30,7 @@ const RootWorkspace = ({ style, workspace }) => {
   const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
 
   return (
-    <WorkspaceStyle style={style}>
+    <WorkspaceContainer style={style}>
       <Link to={`/workspaces/${workspace.id}`}>
         <RootBlock
           availablePointers={workspace.connectedPointers}
@@ -55,15 +55,15 @@ const RootWorkspace = ({ style, workspace }) => {
         </Button>
       </Link>
 
-      <ScratchpadStyle>
+      <ScratchpadContainer>
         <RootBlock
           availablePointers={workspace.connectedPointers}
           block={scratchpad}
         />
-      </ScratchpadStyle>
+      </ScratchpadContainer>
 
       <div style={{ clear: "both" }} />
-    </WorkspaceStyle>
+    </WorkspaceContainer>
   );
 };
 
