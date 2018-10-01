@@ -37,7 +37,7 @@ const RootWorkspace = ({ style, workspace }) => {
           block={question}
         />
       </Link>
-      
+
       <RootBlock
         availablePointers={workspace.connectedPointers}
         block={answer}
