@@ -79,12 +79,8 @@ const UserControls = () => (
   </div>
 );
 
-const Header = () => (
-  <HeaderContainer
-    style={{
-      marginBottom: "20px",
-    }}
-  >
+const Header = ({ style }) => (
+  <HeaderContainer style={style}>
     <div className="container">
       <div
         style={{
