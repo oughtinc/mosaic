@@ -18,7 +18,6 @@ const WorkspaceStyle = styled.div`
 `;
 
 const ScratchpadStyle = styled.div`
-  display: block;
   color: ${homepageWorkspaceScratchpadFontColor};
 `;
 
@@ -38,10 +37,12 @@ const RootWorkspace = ({ style, workspace }) => {
           block={question}
         />
       </Link>
+      
       <RootBlock
         availablePointers={workspace.connectedPointers}
         block={answer}
       />
+
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <Button
           className="pull-right"
