@@ -30,7 +30,7 @@ export const UPDATE_BLOCKS = gql`
 `;
 
 export const WORKSPACES_QUERY = gql`
-  query OriginWorkspaces {
+  query RootWorkspacesQuery {
     workspaces(where: { parentId: null, hasBeenDeletedByAncestor: false }) {
       id
       parentId

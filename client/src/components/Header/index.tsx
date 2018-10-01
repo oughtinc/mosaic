@@ -4,39 +4,44 @@ import styled from "styled-components";
 
 import { Auth } from "../../auth";
 
+import {
+  brandFontColor,
+  brandFontSize,
+  brandFontWeight,
+  headerBgColor,
+  headerLinkFontColor,
+  headerLinkFontSize
+} from "../../styles";
+
 const HeaderContainer = styled.div`
-  background-color: #137a9a;
-  padding: 20px;
-  margin: 0 0 20px 0;
-  color: #fff;
+  background-color: ${headerBgColor};
 `;
 
-const headerLinkStyle = `
-  color: #fff;
+const Brand = styled(Link)`
+  color: ${brandFontColor};
+  font-size: ${brandFontSize};
+  font-weight: ${brandFontWeight};
+
+  &:active,
+  &:hover,
+  &:focus {
+    color: ${brandFontColor};
+  }
+`;
+
+const HeaderLink = styled.a`
+  color: ${headerLinkFontColor};
+  font-size: ${headerLinkFontSize};
 
   &:hover,
   &:active,
   &:visited {
-    color: #fff;
+    color: ${headerLinkFontColor};
   }
 `;
 
-const BrandLink = styled(Link)`
-  ${headerLinkStyle};
-  font-weight: bold;
-`;
-const HeaderA = styled.a`
-  ${headerLinkStyle};
-`;
-
-const Brand = () => (
-  <div className="Brand">
-    <BrandLink to="/">Mosaic v0.1</BrandLink>
-  </div>
-);
-
 const ActionLink = ({ action, children }) => (
-  <HeaderA
+  <HeaderLink
     href="#"
     onClick={e => {
       action();
@@ -44,7 +49,7 @@ const ActionLink = ({ action, children }) => (
     }}
   >
     {children}
-  </HeaderA>
+  </HeaderLink>
 );
 
 const LogoutLink = () => (
@@ -68,22 +73,28 @@ const LoginLink = () => (
   </ActionLink>
 );
 
-const UserControlsContainer = styled.div`
-  position: absolute;
-  right: 20px;
-  top: 20px;
-`;
-
 const UserControls = () => (
-  <UserControlsContainer>
+  <div>
     {Auth.isAuthenticated() ? <LogoutLink /> : <LoginLink />}
-  </UserControlsContainer>
+  </div>
 );
 
-const Header = () => (
-  <HeaderContainer>
-    <Brand />
-    <UserControls />
+const Header = ({ style }) => (
+  <HeaderContainer style={style}>
+    <div className="container">
+      <div
+        style={{
+          alignContent: "center",
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "20px",
+        }}
+      >
+        <Brand to="/">Mosaic v0.1</Brand>
+        <div style={{ flex: 1 }} />
+        <UserControls />
+      </div>
+    </div>
   </HeaderContainer>
 );
 
