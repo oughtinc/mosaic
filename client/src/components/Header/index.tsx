@@ -94,7 +94,7 @@ const Header = () => (
           padding: "20px",
         }}
       >
-        <Brand to="/">Mosaic v0.2</Brand>
+        <Brand to="/">Mosaic v0.1</Brand>
         <div style={{ flex: 1 }} />
         <UserControls />
       </div>
