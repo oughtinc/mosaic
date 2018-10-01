@@ -1,36 +1,25 @@
-import { css } from "styled-components";
+export const WHITE = "#fff";
+export const LIGHT_GRAY = "#ddd";
+export const GRAY = "#bbb";
+export const VERY_LIGHT_BLUE = "#f0f8ff";
+export const DARK_BLUE = "rgb(19, 122, 154)";
 
-const darkBlue = "#337ab7";
-const headerBgColor = darkBlue;
+export const headerBgColor = DARK_BLUE;
+export const brandFontColor = WHITE;
+export const headerLinkFontColor = WHITE;
 
-const white = "#fff";
-const brandFontColor = white;
-const headerLinkFontColor = white;
+export const homepageWorkspaceBgColor = WHITE;
+export const homepageWorkspaceBorderColor = LIGHT_GRAY;
+export const homepageWorkspaceScratchpadFontColor = GRAY;
+
+export const welcomeMessageBgColor = VERY_LIGHT_BLUE;
+export const welcomeMessageBorderColor = GRAY;
 
 // 16px
-const brandFontSize = "16px";
-const headerLinkFontSize = "16px";
+export const brandFontSize = "16px";
+export const headerLinkFontSize = "16px";
+// 25px
+export const homePageHeadingFontSize = "25px";
 
 // 600
-const brandFontWeight = 600;
-
-export const HeaderContainerCSS = css`
-  background-color: ${headerBgColor};
-`;
-
-export const BrandCSS = css`
-  color: ${brandFontColor};
-  font-size: ${brandFontSize};
-  font-weight: ${brandFontWeight};
-`;
-
-export const HeaderLinkCSS = css`
-  color: ${headerLinkFontColor};
-  font-size: ${headerLinkFontSize};
-
-  &:hover,
-  &:active,
-  &:visited {
-    color: ${headerLinkFontColor};
-  }
-`;
+export const brandFontWeight = 600;

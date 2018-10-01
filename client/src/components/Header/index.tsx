@@ -5,14 +5,40 @@ import styled from "styled-components";
 import { Auth } from "../../auth";
 
 import {
-  BrandCSS,
-  HeaderContainerCSS,
-  HeaderLinkCSS,
+  brandFontColor,
+  brandFontSize,
+  brandFontWeight,
+  headerBgColor,
+  headerLinkFontColor,
+  headerLinkFontSize
 } from "../../styles";
 
-const Brand = styled(Link)`${BrandCSS}`;
-const HeaderContainer = styled.div`${HeaderContainerCSS}`;
-const HeaderLink = styled.a`${HeaderLinkCSS}`;
+const HeaderContainer = styled.div`
+  background-color: ${headerBgColor};
+`;
+
+const Brand = styled(Link)`
+  color: ${brandFontColor};
+  font-size: ${brandFontSize};
+  font-weight: ${brandFontWeight};
+
+  &:active,
+  &:hover,
+  &:focus {
+    color: ${brandFontColor};
+  }
+`;
+
+const HeaderLink = styled.a`
+  color: ${headerLinkFontColor};
+  font-size: ${headerLinkFontSize};
+
+  &:hover,
+  &:active,
+  &:visited {
+    color: ${headerLinkFontColor};
+  }
+`;
 
 const ActionLink = ({ action, children }) => (
   <HeaderLink

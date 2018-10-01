@@ -1,0 +1,8 @@
+.alert-info {
+  background-image: none;
+  border: none;
+}
+
+.welcome-message a {
+    text-decoration: underline;
+}
