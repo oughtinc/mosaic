@@ -1,7 +1,10 @@
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
-import { availableBudgetHeaderFontSize } from "../../styles";
+import {
+  availableBudgetHeaderFontColor,
+  availableBudgetHeaderFontSize,
+} from "../../styles";
 
 export class AvailableBudget extends React.Component<any,  any> {
   public render() {
@@ -9,7 +12,7 @@ export class AvailableBudget extends React.Component<any,  any> {
       <span>
         <span
           style={{
-            color: "#137a9a",
+            color: availableBudgetHeaderFontColor,
             fontSize: availableBudgetHeaderFontSize,
             fontVariant: "small-caps",
             fontWeight: 700,

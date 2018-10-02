@@ -10,6 +10,7 @@ export const VERY_LIGHT_BLUE = "#f0f8ff";
 export const DARK_BLUE = "#337ab7";
 export const VERY_DARK_BLUE = "#26a";
 
+export const availableBudgetHeaderFontColor = DARK_BLUE;
 export const blockBodyBgColor = WHITE;
 export const blockBorderColor = LIGHT_GRAY;
 export const blockHeaderBgColor = VERY_LIGHT_GRAY;
@@ -23,6 +24,7 @@ export const newQuestionFormFooterBgColor = VERY_LIGHT_GRAY;
 export const newQuestionFormBorderTopColor = LIGHT_GRAY;
 export const pointerImportNameColor = DARK_BLUE;
 export const pointerImportNameColorOnHover = VERY_DARK_BLUE;
+export const timerHeaderFontColor = DARK_BLUE;
 export const treeBulletBgColor = WHITE;
 export const treeBulletBgColorOnHover = VERY_LIGHT_GRAY;
 export const treeBulletArrowColor = GRAY;
