@@ -3,6 +3,8 @@ import * as moment from "moment";
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
+import { timerHeaderFontSize } from "../../../styles";
+
 const LOCAL_STORAGE_KEY = "mosaic-timer";
 
 class TimerPresentational extends React.Component<any,  any> {
@@ -17,6 +19,7 @@ class TimerPresentational extends React.Component<any,  any> {
           <span
             style={{
               color: "#137a9a",
+              fontSize: timerHeaderFontSize,
               fontVariant: "small-caps",
               fontWeight: 700,
             }}

@@ -44,6 +44,8 @@ export const brandFontSize = "14px";
 export const headerLinkFontSize = "14px";
 // 18px
 export const blockHeaderFontSize = "18px";
+export const timerHeaderFontSize = "18px";
+export const availableBudgetHeaderFontSize = "18px";
 // 25px
 export const homePageHeadingFontSize = "25px";
 // 28px

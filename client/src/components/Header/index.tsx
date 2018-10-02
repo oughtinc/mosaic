@@ -15,6 +15,7 @@ import {
 
 const HeaderContainer = styled.div`
   background-color: ${headerBgColor};
+  padding: 20px;
 `;
 
 const Brand = styled(Link)`
@@ -87,7 +88,7 @@ const Header = () => (
           alignContent: "center",
           display: "flex",
           justifyContent: "space-between",
-          padding: "20px",
+          padding: "0 20px",
         }}
       >
         <Brand to="/">Mosaic v0.1</Brand>
