@@ -13,16 +13,25 @@ import {
 import { ChildBudgetForm } from "./ChildBudgetForm";
 import { Auth } from "../../auth";
 
-const ChildStyle = styled.div`
-  border: 2px solid #ddd;
-  padding: 1em;
-  margin-bottom: 1em;
-  float: left;
-  width: 100%;
+import {
+  blockBorderAndBoxShadow,
+  blockBorderColor,
+  blockHeaderCSS,
+  blockBodyCSS,
+  subQuestionAnswerFontColor,
+} from "../../styles";
+
+const BlockContainer = styled.div`
+  ${blockBorderAndBoxShadow};
+  margin-bottom: 25px;
 `;
 
-const ChildControls = styled.div`
-  margin-top: 0.5em;
+const BlockBody = styled.div`
+  ${blockBodyCSS};
+`;
+
+const BlockHeader = styled.div`
+  ${blockHeaderCSS};
 `;
 
 export class Child extends React.Component<any, any> {
@@ -42,7 +51,7 @@ export class Child extends React.Component<any, any> {
       workspace
     );
     return (
-      <ChildStyle>
+      <div>
         {questionRelationship.findBlock().value && (
           <BlockEditor
             {...questionRelationship.blockEditorAttributes()}
@@ -50,27 +59,44 @@ export class Child extends React.Component<any, any> {
           />
         )}
 
-        {answerRelationship.findBlock().value && (
-          <BlockEditor
-            {...answerRelationship.blockEditorAttributes()}
-            availablePointers={availablePointers}
-          />
-        )}
+        <div style={{ color: subQuestionAnswerFontColor, marginTop: "8px" }}>
+          {answerRelationship.findBlock().value && (
+            <BlockEditor
+              {...answerRelationship.blockEditorAttributes()}
+              availablePointers={availablePointers}
+            />
+          )}
+        </div>
 
-        <ChildControls>
+        <div style={{ marginTop: "15px" }}>
           {
             !this.props.isIsolatedWorkspace
             &&
             <Link to={`/workspaces/${workspace.id}`}>
-              <Button> Open </Button>
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                style={{ marginRight: "5px" }}
+              >
+                Open »
+              </Button>
             </Link>
           }
           {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
-            <Button onClick={this.props.onDelete}>Archive</Button>
+            <Button
+              bsSize="xsmall"
+              bsStyle="default"
+              onClick={this.props.onDelete}
+              style={{ marginRight: "5px" }}
+            >
+              Archive
+            </Button>
           )}
           {!this.state.showChildBudgetForm &&
             Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
               <Button
+                bsSize="xsmall"
+                bsStyle="default"
                 onClick={() => {
                   this.setState({ showChildBudgetForm: true });
                 }}
@@ -84,7 +110,7 @@ export class Child extends React.Component<any, any> {
               {workspace.totalBudget}
             </Badge>
           </div>
-        </ChildControls>
+        </div>
         {this.state.showChildBudgetForm && (
           <ChildBudgetForm
             initialValue={workspace.totalBudget}
@@ -102,7 +128,7 @@ export class Child extends React.Component<any, any> {
             onClose={() => this.setState({ showChildBudgetForm: false })}
           />
         )}
-      </ChildStyle>
+      </div>
     );
   }
 }
@@ -131,43 +157,47 @@ export class ChildrenSidebar extends React.Component<any, any> {
     return (
       <div>
         {!!this.props.workspaceOrder.length && (
-          <div>
-            <h3>Subquestions</h3>
-            {this.props.workspaceOrder.map(workspaceId => {
+          <BlockContainer>
+            <BlockHeader>Subquestions</BlockHeader>
+            {this.props.workspaceOrder.map((workspaceId, i, arr) => {
               const workspace = this.props.workspaces.find(
                 w => w.id === workspaceId
               );
               return (
-                <Child
-                  isIsolatedWorkspace={this.props.isIsolatedWorkspace}
-                  workspace={workspace}
+                <BlockBody
                   key={workspace.id}
-                  onDelete={() => {
-                    this.props.changeOrder(
-                      this.props.workspaceOrder.filter(w => w !== workspace.id)
-                    );
+                  style={{
+                    borderBottom: i !== arr.length - 1 ? `1px solid ${blockBorderColor}` : "none",
                   }}
-                  availablePointers={this.props.availablePointers}
-                  parentAvailableBudget={this.props.availableBudget}
-                  onUpdateChildTotalBudget={this.props.onUpdateChildTotalBudget}
-                />
+                >
+                  <Child
+                    isIsolatedWorkspace={this.props.isIsolatedWorkspace}
+                    workspace={workspace}
+                    key={workspace.id}
+                    onDelete={() => {
+                      this.props.changeOrder(
+                        this.props.workspaceOrder.filter(w => w !== workspace.id)
+                      );
+                    }}
+                    availablePointers={this.props.availablePointers}
+                    parentAvailableBudget={this.props.availableBudget}
+                    onUpdateChildTotalBudget={this.props.onUpdateChildTotalBudget}
+                  />
+                </BlockBody>
               );
             })}
-          </div>
+          </BlockContainer>
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
-          <div>
-            <h3>New subquestion</h3>
-            <NewBlockForm
-              workspaceId={this.props.workspace.id}
-              maxTotalBudget={this.props.availableBudget}
-              onMutate={this.props.onCreateChild}
-              availablePointers={this.props.availablePointers}
-              ref={input => {
-                this.newChildField = input;
-              }}
-            />
-          </div>
+          <NewBlockForm
+            workspaceId={this.props.workspace.id}
+            maxTotalBudget={this.props.availableBudget}
+            onMutate={this.props.onCreateChild}
+            availablePointers={this.props.availablePointers}
+            ref={input => {
+              this.newChildField = input;
+            }}
+          />
         )}
       </div>
     );

@@ -7,14 +7,14 @@ import { RootBlock } from "./RootBlock";
 
 import {
   homepageWorkspaceBgColor,
-  homepageWorkspaceBorderColor,
   homepageWorkspaceScratchpadFontColor,
+  blockBorderAndBoxShadow
 } from "../../styles";
 
 const WorkspaceContainer = styled.div`
+  ${blockBorderAndBoxShadow};
   background-color: ${homepageWorkspaceBgColor};
-  border: 1px solid ${homepageWorkspaceBorderColor};
-  padding: 1px 4px;
+  padding: 10px;
 `;
 
 const ScratchpadContainer = styled.div`
@@ -38,6 +38,8 @@ const RootWorkspace = ({ style, workspace }) => {
         />
       </Link>
 
+      {" "}
+
       <RootBlock
         availablePointers={workspace.connectedPointers}
         block={answer}
@@ -45,13 +47,15 @@ const RootWorkspace = ({ style, workspace }) => {
 
       <Link to={`/workspaces/${workspace.id}/subtree`}>
         <Button
+          bsSize="xsmall"
+          bsStyle="default"
           className="pull-right"
           style={{
             margin: "5px 1px",
             padding: "1px 4px",
           }}
         >
-          Tree
+          Tree »
         </Button>
       </Link>
 

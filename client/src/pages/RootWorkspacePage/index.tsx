@@ -28,17 +28,11 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <WelcomeMessage />
         }
 
-        <div
-          style={{
-            marginTop: "35px",
-          }}
-        >
-          <HomePageHeading>Questions</HomePageHeading>
-          <ListOfRootWorkspaces
-            isLoading={isLoading}
-            workspaces={workspaces}
-          />
-        </div>
+        <HomePageHeading>Questions</HomePageHeading>
+        <ListOfRootWorkspaces
+          isLoading={isLoading}
+          workspaces={workspaces}
+        />
 
         {
           Auth.isAuthenticated()
@@ -46,8 +40,8 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
           <NewRootWorkspaceForm
             createWorkspace={this.props.createWorkspace}
             style={{
-              marginBottom: "50px",
-              marginTop: "85px",
+              marginBottom: "30px",
+              marginTop: "30px",
             }}
           />
         }

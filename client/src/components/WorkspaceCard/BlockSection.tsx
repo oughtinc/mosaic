@@ -16,6 +16,7 @@ const BlockBullet = styled(Link)`
   flex: 1;
   &:hover {
     background: #ccc;
+    color: #666;
     text-decoration: none;
   }
 `;
@@ -27,6 +28,7 @@ const BlockContainer = styled.div`
 `;
 
 const BlockEditorContainer = styled.div`
+  margin: 4px 0 4px 0;
   float: left;
   flex: 40;
 `;

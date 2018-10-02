@@ -1,5 +1,4 @@
 import * as React from "react";
-import styled from "styled-components";
 import { Inline } from "slate";
 import * as uuidv1 from "uuid/v1";
 import { Editor } from "slate-react";
@@ -15,14 +14,6 @@ import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
-
-const BlockEditorStyle = styled.div`
-  background: #f4f4f4;
-  border-radius: 2px;
-  border: 1px solid #d5d5d5;
-  margin-bottom: 1em;
-  padding: 0.3em;
-`;
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
 const DOLLAR_NUMBERS_NOT_NUMBER = /\$[0-9]+[^0-9]/;
@@ -54,6 +45,7 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
+  placeholder?: string;
   block: any;
   availablePointers: any[];
   value: any;
@@ -132,13 +124,14 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   public render() {
     return (
-      <BlockEditorStyle>
+      <div>
         <MenuBar
           blockEditor={this.props.blockEditor}
           mutationStatus={this.props.mutationStatus}
           hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
         />
         <Editor
+          placeholder={this.props.placeholder}
           value={this.props.value}
           onChange={this.onChangeCallback}
           plugins={this.props.plugins}
@@ -148,7 +141,7 @@ export class BlockEditorEditingPresentational extends React.Component<
           onKeyUp={this.onKeyUp}
           ref={this.updateEditor}
         />
-      </BlockEditorStyle>
+      </div>
     );
   }
 

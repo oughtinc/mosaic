@@ -12,7 +12,7 @@ const ListOfRootWorkspaces = ({ isLoading, workspaces }) => (
         <RootWorkspace
           key={w.id}
           style={{
-            margin: "3px",
+            margin: "5px 0",
           }}
           workspace={w}
         />

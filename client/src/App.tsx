@@ -73,11 +73,7 @@ export class Layout extends React.Component {
   public render() {
     return (
       <div className="Layout">
-        <Header
-          style={{
-            marginBottom: "20px",
-          }}
-        />
+        <Header />
         <div className="container">
           <ContentContainer>{this.props.children}</ContentContainer>
         </div>

@@ -5,24 +5,33 @@ import faLongArrowAltRight = require("@fortawesome/fontawesome-free-solid/faLong
 
 import { WorkspaceCard } from "./index";
 
+import {
+  blockBorderAndBoxShadow,
+  treeBulletBgColor,
+  treeBulletBgColorOnHover,
+  treeBulletArrowColor,
+  treeBulletArrowColorWhenActive,
+} from "../../styles";
+
 const ChildrenContainer = styled.div`
   float: left;
   width: 100%;
 `;
 
 const Bullet: any = styled.a`
+  ${blockBorderAndBoxShadow};
   float: left;
-  background: #f2f2f2;
+  background: ${treeBulletBgColor};
   margin-left: 9px;
   margin-bottom: 10px;
   border-radius: 2px;
   margin-right: 13px;
   svg {
-    color: ${(props: any) => (props.isActive ? "#999" : "#c3c3c3")};
+    color: ${(props: any) => (props.isActive ? treeBulletArrowColorWhenActive : treeBulletArrowColor)};
     margin: 5px 5px 2px 5px;
   }
   &:hover {
-    background: #e6e6e6;
+    background: ${treeBulletBgColorOnHover};
   }
 `;
 

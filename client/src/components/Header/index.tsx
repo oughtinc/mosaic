@@ -79,8 +79,8 @@ const UserControls = () => (
   </div>
 );
 
-const Header = ({ style }) => (
-  <HeaderContainer style={style}>
+const Header = () => (
+  <HeaderContainer>
     <div className="container">
       <div
         style={{

@@ -13,7 +13,7 @@ class TimerPresentational extends React.Component<any,  any> {
       timerRunning
       &&
       (
-        <span>
+        <div style={this.props.style}>
           <span
             style={{
               color: "#137a9a",
@@ -41,7 +41,7 @@ class TimerPresentational extends React.Component<any,  any> {
             {moment(this.props.timeLeft).format("ss")}
           </span>
           s
-        </span>
+        </div>
       )
     );
   }
@@ -79,6 +79,7 @@ export class Timer extends React.Component<any,  any> {
     return (
       <TimerPresentational
         timeLeft={this.state.timeLeft}
+        {...this.props}
       />
     );
   }

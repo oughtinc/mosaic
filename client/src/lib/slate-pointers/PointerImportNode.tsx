@@ -6,6 +6,10 @@ import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
 import { changePointerReference } from "../../modules/blockEditor/actions";
+import {
+  pointerImportNameColor,
+  pointerImportNameColorOnHover,
+} from "../../styles";
 
 const RemovedPointer = styled.span`
   background-color: rgba(252, 86, 86, 0.66);
@@ -15,18 +19,17 @@ const RemovedPointer = styled.span`
   color: #7f0a0a;
 `;
 
-const darkBlueImportColor = "#3da1b2";
 const bracketFont = "800 1.2em sans-serif";
 
 const ClosedPointerImport: any = styled.span`
-  background-color: ${darkBlueImportColor};
+  background-color: ${pointerImportNameColor};
   color: rgb(233, 239, 233);
   cursor: pointer;
   padding: 0 4px;
   border-radius: 4px;
   transition: background-color color 0.8s;
   &:hover {
-    background-color: #18a;
+    background-color: ${pointerImportNameColorOnHover};
   }
 `;
 
@@ -44,13 +47,13 @@ const OpenPointerImport: any = styled.span`
 
 const Brackets: any = styled.span`
   &:before {
-    color: ${darkBlueImportColor};
+    color: ${pointerImportNameColor};
     content: "[";
     font: ${bracketFont};
   }
 
   &:after {
-    color: ${darkBlueImportColor};
+    color: ${pointerImportNameColor};
     content: "]";
     font: ${bracketFont};
   }
@@ -107,7 +110,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     const styles = StyleSheet.create({
       OuterPointerImportStyle: {
         ":before": {
-          backgroundColor: darkBlueImportColor,
+          backgroundColor: pointerImportNameColor,
           color: "rgb(233, 239, 233)",
           content: `"$${pointerIndex + 1}"`,
           borderRadius: "4px 0px 0px 4px",
