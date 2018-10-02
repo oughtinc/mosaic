@@ -13,6 +13,10 @@ export const VERY_DARK_BLUE = "#26a";
 export const blockBodyBgColor = WHITE;
 export const blockBorderColor = LIGHT_GRAY;
 export const blockHeaderBgColor = VERY_LIGHT_GRAY;
+export const blockBulletBgColor = WHITE;
+export const blockBulletFontColor = GRAY;
+export const blockBulletBgColorOnHover = VERY_LIGHT_GRAY;
+export const blockBulletFontColorOnHover = SLIGHTLY_DARKER_GRAY;
 export const editBudgetFormBoxShadow = `0 0 6px ${DARK_GRAY}`;
 export const headerBgColor = DARK_BLUE;
 export const newQuestionFormFooterBgColor = VERY_LIGHT_GRAY;
@@ -42,6 +46,8 @@ export const headerLinkFontSize = "14px";
 export const blockHeaderFontSize = "18px";
 // 25px
 export const homePageHeadingFontSize = "25px";
+// 28px
+export const workspaceViewQuestionFontSize = "28px";
 
 // 600
 export const brandFontWeight = 600;

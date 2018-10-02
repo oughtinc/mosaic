@@ -33,6 +33,7 @@ import {
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
+  workspaceViewQuestionFontSize,
 } from "../../styles";
 
 const WORKSPACE_QUERY = gql`
@@ -267,7 +268,7 @@ export class FormPagePresentational extends React.Component<any, any> {
               >
                 <div
                   style={{
-                    fontSize: "28px",
+                    fontSize: workspaceViewQuestionFontSize,
                     marginRight: "8px",
                   }}
                 >
