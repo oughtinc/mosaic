@@ -68,7 +68,7 @@ export class Child extends React.Component<any, any> {
           )}
         </div>
 
-        <div style={{ marginTop: "15px" }}>
+        <div style={{ marginTop: "0.5em" }}>
           {
             !this.props.isIsolatedWorkspace
             &&
