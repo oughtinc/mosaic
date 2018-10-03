@@ -3,6 +3,11 @@ import * as moment from "moment";
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
+import {
+  timerHeaderFontColor,
+  timerHeaderFontSize,
+} from "../../../styles";
+
 const LOCAL_STORAGE_KEY = "mosaic-timer";
 
 class TimerPresentational extends React.Component<any,  any> {
@@ -13,10 +18,11 @@ class TimerPresentational extends React.Component<any,  any> {
       timerRunning
       &&
       (
-        <span>
+        <div style={this.props.style}>
           <span
             style={{
-              color: "#137a9a",
+              color: timerHeaderFontColor,
+              fontSize: timerHeaderFontSize,
               fontVariant: "small-caps",
               fontWeight: 700,
             }}
@@ -41,7 +47,7 @@ class TimerPresentational extends React.Component<any,  any> {
             {moment(this.props.timeLeft).format("ss")}
           </span>
           s
-        </span>
+        </div>
       )
     );
   }
@@ -79,6 +85,7 @@ export class Timer extends React.Component<any,  any> {
     return (
       <TimerPresentational
         timeLeft={this.state.timeLeft}
+        {...this.props}
       />
     );
   }

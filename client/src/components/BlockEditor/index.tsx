@@ -1,5 +1,4 @@
 import * as React from "react";
-import styled from "styled-components";
 import { Editor } from "slate-react";
 import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
 import {
@@ -13,10 +12,6 @@ import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
 import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
-
-const BlockReadOnlyStyle = styled.div`
-  padding: 0.3em;
-`;
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
@@ -146,11 +141,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const value = block.value;
     const { plugins } = this.state;
     return readOnly ? (
-      <BlockReadOnlyStyle>
-        <Editor value={value} readOnly={true} plugins={plugins} />
-      </BlockReadOnlyStyle>
+      <Editor value={value} readOnly={true} plugins={plugins} />
     ) : (
       <BlockEditorEditing
+        placeholder={this.props.placeholder}
         value={value}
         readOnly={true}
         shouldAutosave={!!this.props.shouldAutosave}

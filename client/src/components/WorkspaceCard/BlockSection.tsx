@@ -6,16 +6,25 @@ import Plain from "slate-plain-serializer";
 import { Value } from "slate";
 import { Link } from "react-router-dom";
 
+import {
+  blockBulletBgColor,
+  blockBulletFontColor,
+  blockBulletBgColorOnHover,
+  blockBulletFontColorOnHover,
+} from "../../styles";
+
 const BlockBullet = styled(Link)`
+  background-color: ${blockBulletBgColor};
   float: left;
   border-radius: 2px;
-  color: #d0cccc;
+  color: ${blockBulletFontColor};
   padding: 0px 4px;
   margin: 4px 4px 4px 9px;
   font-weight: 500;
   flex: 1;
   &:hover {
-    background: #ccc;
+    background: ${blockBulletBgColorOnHover};
+    color: ${blockBulletFontColorOnHover};
     text-decoration: none;
   }
 `;
@@ -27,6 +36,7 @@ const BlockContainer = styled.div`
 `;
 
 const BlockEditorContainer = styled.div`
+  margin: 4px 0 4px 0;
   float: left;
   flex: 40;
 `;

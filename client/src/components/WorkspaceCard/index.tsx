@@ -12,6 +12,11 @@ import {
 
 import { Auth } from "../../auth";
 
+import {
+  blockBorderAndBoxShadow,
+  treeWorkspaceBgColor,
+} from "../../styles";
+
 export enum toggleTypes {
   FULL,
   QUESTION = 0,
@@ -25,11 +30,11 @@ const Container = styled.div`
 `;
 
 const CardBody = styled.div`
+  ${blockBorderAndBoxShadow};
   float: left;
   margin-bottom: 1em;
   width: 40em;
-  background: #f2f2f2;
-  border-radius: 0 2px 2px 2px;
+  background: ${treeWorkspaceBgColor};
 `;
 
 const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
