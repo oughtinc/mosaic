@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -74,6 +75,18 @@ const LoginLink = () => (
   </ActionLink>
 );
 
+const NextWorkspaceBtn = () => {
+  if (Auth.isAuthenticated()) {
+    return (
+      <Link to="/next">
+        <Button bsSize="small">Get Next Workspace »</Button>
+      </Link>
+    );
+  } else {
+    return null;
+  }
+};
+
 const UserControls = () => (
   <div>
     {Auth.isAuthenticated() ? <LogoutLink /> : <LoginLink />}
@@ -92,7 +105,7 @@ const Header = () => (
         }}
       >
         <Brand to="/">Mosaic v0.1</Brand>
-        <div style={{ flex: 1 }} />
+        <NextWorkspaceBtn />
         <UserControls />
       </div>
     </div>
