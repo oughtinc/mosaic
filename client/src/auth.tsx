@@ -3,6 +3,8 @@ import * as auth0 from "auth0-js";
 // May consider alternate architecture ie through the redux-localstorage package
 import { Config } from "./config";
 
+const MOSAIC_PRE_AUTH_URL = "MOSAIC_PRE_AUTH_URL";
+
 export class Auth {
   public static auth0 = new auth0.WebAuth({
     domain: "mosaicapp.auth0.com",
@@ -14,7 +16,20 @@ export class Auth {
   });
 
   public static login(): void {
+    Auth.savePreAuthUrl();
     Auth.auth0.authorize();
+  }
+
+  public static savePreAuthUrl(): void {
+    localStorage.setItem(MOSAIC_PRE_AUTH_URL, window.location.href);
+  }
+
+  public static getPreAuthUrl(): string {
+    return localStorage.getItem(MOSAIC_PRE_AUTH_URL) || window.location.href;
+  }
+
+  public static clearPreAuthUrl(): void {
+    localStorage.removeItem(MOSAIC_PRE_AUTH_URL);
   }
 
   public static logout(): void {
