@@ -105,7 +105,8 @@ const Routes = () => (
       render={props => {
         if (/access_token|error/.test(props.location.hash)) {
           Auth.handleAuthentication(() => {
-            location.reload();
+            location.assign(Auth.getPreAuthUrl());
+            Auth.clearPreAuthUrl();
           });
         }
         return <Redirect to="/" />;
