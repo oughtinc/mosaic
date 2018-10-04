@@ -1,4 +1,3 @@
-import { map } from "asyncro";
 import { UserSchedule } from "./UserSchedule";
 
 class Schedule {
