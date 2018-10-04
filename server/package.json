@@ -18,6 +18,7 @@
     "db:reset": "yarn run db:clear; yarn run db:migrate",
     "db:clear": "yarn run db:drop; yarn run db:create",
     "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
+    "test-scheduler": "mocha --watch --watch-extensions ts -r ts-node/register test/lib/scheduler/*.spec.ts",
     "pretest": "NODE_ENV=test npm run db:reset"
   },
   "dependencies": {
@@ -72,6 +73,7 @@
     "mocha": "^3.0.1",
     "nodemon": "^1.12.1",
     "rimraf": "^2.6.2",
+    "sinon": "^6.3.5",
     "ts-node": "^5.0.1",
     "tslint": "^5.10.0",
     "typescript": "^2.7.2"

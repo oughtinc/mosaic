@@ -17,7 +17,8 @@
     "noImplicitAny": false,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "downlevelIteration": true
   },
   "experimentalDecorators": true,
   "emitDecoratorMetadata": true,

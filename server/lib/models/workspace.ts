@@ -299,6 +299,12 @@ const WorkspaceModel = (
     return blocks;
   };
 
+  Workspace.prototype.getQuestionText = async function() {
+    const blocks = await this.getBlocks();
+    const questionBlock = blocks.find(b => b.type === "QUESTION");
+    return questionBlock.value[0].nodes[0].leaves[0].text;
+  };
+
   return Workspace;
 };
 
