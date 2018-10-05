@@ -1,4 +1,3 @@
-import * as models from "../models";
 import { Assignment } from "./Assignment";
 import { RootParentFinder } from "./RootParentFinder";
 
