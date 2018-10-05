@@ -1,4 +1,4 @@
-import { filter, map } from "asyncro";
+import { filter } from "asyncro";
 
 class Scheduler {
   private fetchAllWorkspaces;
