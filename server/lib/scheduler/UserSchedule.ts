@@ -3,10 +3,12 @@ import { Assignment } from "./Assignment";
 import { RootParentFinder } from "./RootParentFinder";
 
 class UserSchedule {
+  private timeLimit;
   private userId;
   private userSchedule = [];
 
-  public constructor(userId){
+  public constructor({ timeLimit, userId }) {
+    this.timeLimit = timeLimit;
     this.userId = userId;
   }
 
@@ -18,8 +20,12 @@ class UserSchedule {
     return this.userSchedule.length > 0;
   }
 
-  public assignWorkspace(workspaceId) {
-    const assignment = new Assignment(this.userId, workspaceId);
+  public assignWorkspace(workspaceId, startAtTimestamp) {
+    const assignment = new Assignment({
+      userId: this.userId,
+      workspaceId,
+      startAtTimestamp,
+    });
     this.userSchedule.push(assignment);
   }
 
@@ -32,6 +38,24 @@ class UserSchedule {
       if (assignment.getWorkspaceId() === workspaceId) {
         return true;
       }
+    }
+
+    return false;
+  }
+
+  public isUserCurrentlyWorkingOnWorkspace(workspaceId) {
+    const lastWorkedOnAssignment = this.getMostRecentAssignment();
+    const didUserLastWorkOnWorkspace = lastWorkedOnAssignment.getWorkspaceId() === workspaceId;
+
+    if (!didUserLastWorkOnWorkspace) {
+      return false;
+    }
+
+    const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
+    const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < this.timeLimit;
+
+    if (didUserStartWorkingOnItWithinTimeLimit) {
+      return true;
     }
 
     return false;

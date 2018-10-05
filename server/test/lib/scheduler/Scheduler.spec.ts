@@ -8,7 +8,6 @@ import { Scheduler } from "../../../lib/scheduler/Scheduler";
 const userId = "user";
 const user1Id = "user1Id";
 const user2Id = "user2Id";
-
 const workspaceId = "workspace";
 const workspace1Id = "workspace1";
 const workspace2Id = "workspace2";

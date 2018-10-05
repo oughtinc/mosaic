@@ -1,6 +1,9 @@
+import { map } from "asyncro";
+import * as _ from "lodash";
 import { UserSchedule } from "./UserSchedule";
 
 class Schedule {
+  private cacheForWhenTreeLastWorkedOn = {};
   private rootParentFinder;
   private schedule = new Map;
   private timeLimit;
@@ -15,7 +18,7 @@ class Schedule {
   }
 
   private createUserSchedule(userId) {
-    this.schedule.set(userId, new UserSchedule(userId));
+    this.schedule.set(userId, new UserSchedule({ timeLimit: this.timeLimit, userId }));
   }
 
   private getUserSchedule(userId) {
@@ -28,7 +31,11 @@ class Schedule {
     }
 
     const userSchedule = this.getUserSchedule(userId);
-    userSchedule.assignWorkspace(workspaceId);
+    const startAtTimestamp = Date.now();
+    userSchedule.assignWorkspace(workspaceId, startAtTimestamp);
+
+    const rootParentId = this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId);
+    this.cacheForWhenTreeLastWorkedOn[rootParentId] = startAtTimestamp;
   }
 
   public getMostRecentAssignmentForUser(userId) {
@@ -42,7 +49,7 @@ class Schedule {
 
   /*
     NOTE: this only considers the trees that at least one workspace in the
-    workspaces argument belong to
+    argument belong to
   */
   public async isInTreeWorkedOnLeastRecently(workspaceIds, workspaceId) {
     const treesWorksOnLeastRecently = await this.getTreesWorkedOnLeastRecently(workspaceIds);
@@ -52,61 +59,40 @@ class Schedule {
 
   /*
     NOTE: this only considers the trees that at least one workspace in the
-    workspaces argument belong to
+    argument belong to
   */
   public async getTreesWorkedOnLeastRecently(workspaceIds) {
-    const data = {}; // maps rootWorkspaceIds to most recent timestamp
+    const rootParentIds = await map(
+      workspaceIds,
+      async (wId) => await this.rootParentFinder.getRootParentIdOfWorkspace(wId),
+    );
 
-    // initialize at -1
-    for (let i = 0; i < workspaceIds.length; i++) {
-      const workspaceId = workspaceIds[i];
-      const rootParentId = await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId);
-      data[rootParentId] = -1;
-    }
+    const uniqRootParentIds = _.uniq(rootParentIds);
 
-    // go through all user schedule and update index
-    for (const [userId, userSchedule] of this.schedule) {
-      const userScheduleAsArrayOfAssignments = userSchedule.asAnArrayOfAssignments();
-      for (const assignment of userScheduleAsArrayOfAssignments) {
-        const workspaceId = await assignment.getWorkspaceId(); // WHAT IS GOING ON HERE, WHY NEED AWAIT???
-        const rootParentId = await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId);
-        data[rootParentId] = Math.max(data[rootParentId], assignment.getStartedAtTimestamp());
-      }
+    const treesNotYetWorkedOn = uniqRootParentIds.filter(
+      id => this.cacheForWhenTreeLastWorkedOn[id] === undefined
+    );
+
+    if (treesNotYetWorkedOn.length > 0) {
+      return treesNotYetWorkedOn;
     }
 
-    // get smallest index
-    let smallestIndex = Infinity;
-    for (const workspaceId in data) {
-      if (data.hasOwnProperty(workspaceId)) {
-        smallestIndex = Math.min(smallestIndex, data[workspaceId]);
-      }
-    }
-    // collect rootWorkspaceIds with this index
-    const leastRecentlyWorkedOnTrees = [];
-    for (const workspaceId in data) {
-      if (data.hasOwnProperty(workspaceId)) {
-        if (data[workspaceId] === smallestIndex)
-        leastRecentlyWorkedOnTrees.push(workspaceId);
-      }
-    }
+    const lastWorkedOnTimestamps = uniqRootParentIds.map(
+      id => this.cacheForWhenTreeLastWorkedOn[id]
+    );
+
+    const minTimestamp = Math.min.apply(Math, lastWorkedOnTimestamps);
+
+    const leastRecentlyWorkedOnTrees = uniqRootParentIds.filter(id =>
+      this.cacheForWhenTreeLastWorkedOn[id] === minTimestamp
+    );
+
     return leastRecentlyWorkedOnTrees;
   }
 
   public isWorkspaceCurrentlyBeingWorkedOn(workspaceId) {
     for (const [userId, userSchedule] of this.schedule) {
-      if (!userSchedule.hasUserBeenAssignedToAnyWorkspaces()) {
-        continue;
-      }
-
-      const lastWorkedOnAssignment = userSchedule.getMostRecentAssignment();
-      const didUserLastWorkOnWorkspace = lastWorkedOnAssignment.getWorkspaceId() === workspaceId;
-      if (!didUserLastWorkOnWorkspace) {
-        continue;
-      }
-
-      const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
-      const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < this.timeLimit;
-      if (didUserStartWorkingOnItWithinTimeLimit) {
+      if (userSchedule.isUserCurrentlyWorkingOnWorkspace(workspaceId)) {
         return true;
       }
     }

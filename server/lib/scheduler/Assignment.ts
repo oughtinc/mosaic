@@ -3,14 +3,14 @@ class Assignment {
   private userId;
   private workspaceId;
 
-  public constructor(userId, workspaceId){
-    this.startedAt = Date.now();
+  public constructor({ userId, workspaceId, startAtTimestamp = Date.now() }){
+    this.startAtTimestamp = startAtTimestamp;
     this.userId = userId;
     this.workspaceId = workspaceId;
   }
 
   public getStartedAtTimestamp() {
-    return this.startedAt;
+    return this.startAtTimestamp;
   }
 
   public getWorkspaceId() {

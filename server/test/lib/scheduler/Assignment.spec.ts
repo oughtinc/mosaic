@@ -8,7 +8,7 @@ const workspaceId = "workspace1";
 describe("Assignment class", () => {
   let assignment;
   beforeEach(() => {
-    assignment = new Assignment(userId, workspaceId);
+    assignment = new Assignment({ userId, workspaceId });
   });
 
   it("has tests that work", () => {
