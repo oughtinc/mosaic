@@ -90,7 +90,7 @@ class Scheduler {
   private async filterByWhetherNotYetWorkedOn(workspaces) {
     return await filter(
       workspaces,
-      async (w) => !await this.schedule.hasWorkspaceBeenWorkedOnYet(w.id)
+      async w => !await this.schedule.hasWorkspaceBeenWorkedOnYet(w.id)
     );
   }
 

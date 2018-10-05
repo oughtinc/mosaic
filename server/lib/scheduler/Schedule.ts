@@ -64,7 +64,7 @@ class Schedule {
   public async getTreesWorkedOnLeastRecently(workspaceIds) {
     const rootParentIds = await map(
       workspaceIds,
-      async (wId) => await this.rootParentFinder.getRootParentIdOfWorkspace(wId),
+      async wId => await this.rootParentFinder.getRootParentIdOfWorkspace(wId),
     );
 
     const uniqRootParentIds = _.uniq(rootParentIds);
