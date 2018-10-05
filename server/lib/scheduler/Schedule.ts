@@ -54,7 +54,7 @@ class Schedule {
   public async isInTreeWorkedOnLeastRecently(workspaceIds, workspaceId) {
     const treesWorksOnLeastRecently = await this.getTreesWorkedOnLeastRecently(workspaceIds);
     const rootParentId = await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId);
-    return Boolean(treesWorksOnLeastRecently.find(wId => wId === rootParentId));
+    return Boolean(treesWorksOnLeastRecently.find(rootWorkspaceId => rootWorkspaceId === rootParentId));
   }
 
   /*
@@ -64,7 +64,7 @@ class Schedule {
   public async getTreesWorkedOnLeastRecently(workspaceIds) {
     const rootParentIds = await map(
       workspaceIds,
-      async wId => await this.rootParentFinder.getRootParentIdOfWorkspace(wId),
+      async workspaceId => await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId),
     );
 
     const uniqRootParentIds = _.uniq(rootParentIds);
