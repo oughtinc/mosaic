@@ -128,18 +128,18 @@ class Schedule {
   }
 
   public getWhichOfTheseWorkspacesWorkedOnLeastRecently(workspaceIds) {
-    let idOfworkspaceWorkedOnLeastRecently;
+    let idOfWorkspaceWorkedOnLeastRecently;
     let whenThisWorkspaceWasWorkedOn;
 
     workspaceIds.forEach(workspaceId => {
       const lastWorkedOnTimestamp = this.getTimestampWorkspaceLastWorkedOn(workspaceId);
-      if (!idOfworkspaceWorkedOnLeastRecently || lastWorkedOnTimestamp < whenThisWorkspaceWasWorkedOn) {
-        idOfworkspaceWorkedOnLeastRecently = workspaceId;
+      if (!idOfWorkspaceWorkedOnLeastRecently || lastWorkedOnTimestamp < whenThisWorkspaceWasWorkedOn) {
+        idOfWorkspaceWorkedOnLeastRecently = workspaceId;
         whenThisWorkspaceWasWorkedOn = lastWorkedOnTimestamp;
       }
     });
 
-    return idOfworkspaceWorkedOnLeastRecently;
+    return idOfWorkspaceWorkedOnLeastRecently;
   }
 
 }
