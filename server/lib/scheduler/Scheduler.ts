@@ -11,7 +11,7 @@ class Scheduler {
     this.schedule = schedule;
   }
 
-  public async getCurrentWorkspace(userId) {
+  public async getIdOfCurrentWorkspace(userId) {
     const assignment = this.schedule.getMostRecentAssignmentForUser(userId);
     return assignment.getWorkspaceId();
   }
@@ -19,13 +19,12 @@ class Scheduler {
   public async findNextWorkspace(userId) {
     // clear cache so we don't use old eligibility info
     this.rootParentFinder.clearRootParentCache();
-    const workspacesThatCouldBeNext = await this.getWorkspacesThatCouldBeNext(userId);
-    const idsOfWorkspacesThatCouldBeNext = workspacesThatCouldBeNext.map(w => w.id);
+    const idsOfWorkspacesThatCouldBeNext = await this.getIdsOfWorkspacesThatCouldBeNext(userId);
     const assignedWorkspaceId = this.pickWorkspaceIdAtRandom(idsOfWorkspacesThatCouldBeNext);
     this.schedule.assignWorkspaceToUser(userId, assignedWorkspaceId);
   }
 
-  private async getWorkspacesThatCouldBeNext(userId) {
+  private async getIdsOfWorkspacesThatCouldBeNext(userId) {
     const allWorkspaces = await this.fetchAllWorkspaces();
     const allEligibleWorkspaces = await this.filterByEligibility(allWorkspaces);
     const workspacesInTreeWorkedOnLeastRecently = await this.filterByWhetherInTreeWorkedOnLeastRecently(allEligibleWorkspaces);
@@ -42,14 +41,14 @@ class Scheduler {
     // if every workspace in that tree has 0 remaining budget
     // then instead look for the workspace worked on least recently
     if (finalWorkspaces.length === 0) {
-      const workspaceWorkedOnLeastRecently = await this.schedule.getWhichOfTheseWorkspacesWorkedOnLeastRecently(workspacesInTreeWorkedOnLeastRecently);
-      finalWorkspaces = [workspaceWorkedOnLeastRecently];
+      const idOfWorkspaceWorkedOnLeastRecently = await this.schedule.getWhichOfTheseWorkspacesWorkedOnLeastRecently(workspacesInTreeWorkedOnLeastRecently.map(w => w.id));
+      return [idOfWorkspaceWorkedOnLeastRecently];
     }
 
-    return finalWorkspaces;
+    return finalWorkspaces.map(w => w.id);
   }
 
-  private async pickWorkspaceIdAtRandom(workspaceIds) {
+  private pickWorkspaceIdAtRandom(workspaceIds) {
     const randomIndex = Math.floor(Math.random() * (workspaceIds.length));
     return workspaceIds[randomIndex];
   }

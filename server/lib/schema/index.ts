@@ -318,7 +318,7 @@ const schema = new GraphQLSchema({
             );
           }
           await scheduler.findNextWorkspace(user.user_id);
-          const workspaceId = await scheduler.getCurrentWorkspace(user.user_id);
+          const workspaceId = await scheduler.getIdOfCurrentWorkspace(user.user_id);
           return { id: workspaceId };
         }
       },

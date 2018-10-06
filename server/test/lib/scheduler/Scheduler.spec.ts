@@ -16,9 +16,13 @@ const workspace3Id = "workspace3";
 const ONE_MINUTE = 60 * 1000;
 
 const rootParentFinderStub = {
+  clearRootParentCache() {
+
+  },
+
   getRootParentIdOfWorkspace(workspaceId) {
     return workspaceId[0];
-  }
+  },
 };
 
 const workspaces = [
@@ -41,7 +45,8 @@ const fetchAllWorkspacesStub = () => workspaces;
 
 describe("Scheduler class", () => {
   let fakeClock, schedule, scheduler;
-  beforeEach(() => {
+
+  const resetBeforeTesting = () => {
     fakeClock = sinon.useFakeTimers();
     schedule = new Schedule({
       rootParentFinder: rootParentFinderStub,
@@ -53,7 +58,9 @@ describe("Scheduler class", () => {
       rootParentFinder: rootParentFinderStub,
       schedule,
     });
-  });
+  };
+
+  beforeEach(resetBeforeTesting);
 
   it("has tests that work", () => {
     expect(true).to.equal(true);
@@ -215,19 +222,15 @@ describe("Scheduler class", () => {
     });
   });
 
-  describe("getWorkspacesThatCouldBeNext", () => {
+  describe("getIdsOfWorkspacesThatCouldBeNext", () => {
     it("works in a straightforward case", done => {
       schedule.assignWorkspaceToUser(user1Id, "1-1");
       fakeClock.tick(ONE_MINUTE / 2);
       schedule.assignWorkspaceToUser(user2Id, "2");
 
-      const promise = scheduler.getWorkspacesThatCouldBeNext(user1Id);
+      const promise = scheduler.getIdsOfWorkspacesThatCouldBeNext(user1Id);
       promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => (
-          w.id !== "1" && w.id !== "1-1" && w.id !== "1-1-1"
-          &&
-          w.id !== "2" && w.id !== "2-1" && w.id !== "2-2"
-        )));
+        expect(result).to.have.deep.members(["3", "4", "5", "5-1", "5-2", "5-3", "5-4"]);
         done();
       }).catch(e => {
         done(e);
@@ -253,14 +256,40 @@ describe("Scheduler class", () => {
       schedule.assignWorkspaceToUser(userId, "2");
 
       // NOTE 5-1 is excluded because it's currently being worked on!
-      const promise = scheduler.getWorkspacesThatCouldBeNext(user1Id);
+      const promise = scheduler.getIdsOfWorkspacesThatCouldBeNext(user1Id);
       promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => (
-          w.id === "5" || w.id === "5-2" || w.id === "5-3" || w.id === "5-4"
-        )));
+        expect(result).to.have.deep.members(["5", "5-2", "5-3", "5-4"]);
         done();
       }).catch(e => {
         done(e);
+      });
+    });
+  });
+
+  describe("findNextWorkspace", () => {
+    it("works in a straightforward case", done => {
+      scheduler.findNextWorkspace(user1Id).then(() => {
+        const promise = scheduler.getIdOfCurrentWorkspace(user1Id);
+        promise.then(result => {
+          expect(result).to.be.oneOf([
+            "1",
+            "1-1",
+            "1-1-1",
+            "2",
+            "2-1",
+            "2-2",
+            "3",
+            "4",
+            "5",
+            "5-1",
+            "5-2",
+            "5-3",
+            "5-4",
+          ]);
+          done();
+        }).catch(e => {
+          done(e);
+        });
       });
     });
   });
