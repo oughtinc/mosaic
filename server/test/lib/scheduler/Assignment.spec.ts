@@ -2,13 +2,15 @@ import * as chai from "chai";
 const { expect } = chai;
 import { Assignment } from "../../../lib/scheduler/Assignment";
 
-const userId = "user1";
-const workspaceId = "workspace1";
+import { USER_ID, WORKSPACE_ID } from "./utils";
 
 describe("Assignment class", () => {
   let assignment;
   beforeEach(() => {
-    assignment = new Assignment({ userId, workspaceId });
+    assignment = new Assignment({
+      userId: USER_ID,
+      workspaceId: WORKSPACE_ID,
+    });
   });
 
   it("has tests that work", () => {
@@ -16,7 +18,7 @@ describe("Assignment class", () => {
   });
 
   it("can retrieve workspace id", () => {
-    expect(assignment.getWorkspaceId()).to.equal("workspace1");
+    expect(assignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
   });
 
   it("records initial timestamp", () => {

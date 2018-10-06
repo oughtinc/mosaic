@@ -2,15 +2,17 @@ import * as chai from "chai";
 const { expect } = chai;
 import { UserSchedule } from "../../../lib/scheduler/UserSchedule";
 
-const userId = "user1";
-const workspaceId = "workspace";
-const workspace1Id = "workspace1";
-const workspace2Id = "workspace2";
+import {
+  USER_ID,
+  WORKSPACE_ID,
+  WORKSPACE_ID_1,
+  WORKSPACE_ID_2,
+} from "./utils";
 
 describe("UserSchedule class", () => {
   let userSchedule;
   beforeEach(() => {
-    userSchedule = new UserSchedule(userId);;
+    userSchedule = new UserSchedule(USER_ID);;
   });
 
   it("has tests that work", () => {
@@ -23,7 +25,7 @@ describe("UserSchedule class", () => {
     });
 
     it("knows if user has been assigned to a workspaces", () => {
-      userSchedule.assignWorkspace(workspaceId);
+      userSchedule.assignWorkspace(WORKSPACE_ID);
       expect(userSchedule.hasUserBeenAssignedToAnyWorkspaces()).to.equal(true);
     });
   });
@@ -34,39 +36,39 @@ describe("UserSchedule class", () => {
     });
 
     it("works with one assignment", () => {
-      userSchedule.assignWorkspace(workspaceId);
+      userSchedule.assignWorkspace(WORKSPACE_ID);
       const mostRecentAssignment = userSchedule.getMostRecentAssignment()
-      expect(mostRecentAssignment.getWorkspaceId()).to.equal(workspaceId);
+      expect(mostRecentAssignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
     });
 
     it("works with two assignments", () => {
-      userSchedule.assignWorkspace(workspace1Id);
-      userSchedule.assignWorkspace(workspace2Id);
+      userSchedule.assignWorkspace(WORKSPACE_ID_1);
+      userSchedule.assignWorkspace(WORKSPACE_ID_2);
       const mostRecentAssignment = userSchedule.getMostRecentAssignment()
-      expect(mostRecentAssignment.getWorkspaceId()).to.equal(workspace2Id);
+      expect(mostRecentAssignment.getWorkspaceId()).to.equal(WORKSPACE_ID_2);
     });
   });
 
   describe("hasUserWorkedOnWorkspace method", () => {
     it("returns false if user has not been assigned to any workspace", () => {
-      expect(userSchedule.hasUserWorkedOnWorkspace(workspaceId)).to.equal(false);
+      expect(userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID)).to.equal(false);
     });
 
     it("returns true if user has worked on workspace", () => {
-      userSchedule.assignWorkspace(workspaceId);
-      expect(userSchedule.hasUserWorkedOnWorkspace(workspaceId)).to.equal(true);
+      userSchedule.assignWorkspace(WORKSPACE_ID);
+      expect(userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID)).to.equal(true);
     });
 
     it("returns false if user has worked on workspace but not one asked about", () => {
-      userSchedule.assignWorkspace(workspace1Id);
-      expect(userSchedule.hasUserWorkedOnWorkspace(workspace2Id)).to.equal(false);
+      userSchedule.assignWorkspace(WORKSPACE_ID_1);
+      expect(userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID_2)).to.equal(false);
     });
 
     it("returns true if user has worked on 2 workspaces", () => {
-      userSchedule.assignWorkspace(workspace1Id);
-      userSchedule.assignWorkspace(workspace2Id);
-      expect(userSchedule.hasUserWorkedOnWorkspace(workspace1Id)).to.equal(true);
-      expect(userSchedule.hasUserWorkedOnWorkspace(workspace2Id)).to.equal(true);
+      userSchedule.assignWorkspace(WORKSPACE_ID_1);
+      userSchedule.assignWorkspace(WORKSPACE_ID_2);
+      expect(userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID_1)).to.equal(true);
+      expect(userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID_2)).to.equal(true);
     });
   });
 });
