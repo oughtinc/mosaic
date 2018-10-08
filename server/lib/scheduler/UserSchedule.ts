@@ -11,10 +11,6 @@ class UserSchedule {
     this.userId = userId;
   }
 
-  public asAnArrayOfAssignments() {
-    return this.userSchedule;
-  }
-
   public hasUserBeenAssignedToAnyWorkspaces() {
     return this.userSchedule.length > 0;
   }
