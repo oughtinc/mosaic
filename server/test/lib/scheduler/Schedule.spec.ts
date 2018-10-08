@@ -182,57 +182,38 @@ describe("Schedule class", () => {
   });
 
   describe("getTreesWorkedOnLeastRecently", () => {
-    it("works in straightforward case", done => {
+    it("works in straightforward case", async () => {
       schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
       fakeClock.tick(ONE_MINUTE);
       schedule.assignWorkspaceToUser(USER_ID_2, "2");
-
-      const promise = schedule.getTreesWorkedOnLeastRecently(["1-1", "2"]);
-
-      promise.then(result => {
-        expect(result).to.have.deep.members(["1"]);
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await schedule.getTreesWorkedOnLeastRecently(["1-1", "2"]);
+      expect(result).to.have.deep.members(["1"]);
     });
 
-    it("works in more complicated case", done => {
+    it("works in more complicated case", async () => {
       schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
       fakeClock.tick(ONE_MINUTE);
       schedule.assignWorkspaceToUser(USER_ID_2, "2");
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID_2, "1-2");
 
-      const promise = schedule.getTreesWorkedOnLeastRecently(["1-1", "1-2", "2"]);
-
-      promise.then(result => {
-        expect(result.length).to.equal(1);
-        expect(result).to.have.deep.members(["2"]);
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await schedule.getTreesWorkedOnLeastRecently(["1-1", "1-2", "2"]);
+      expect(result.length).to.equal(1);
+      expect(result).to.have.deep.members(["2"]);
     });
   });
 
   describe("isInTreeWorkedOnLeastRecently", () => {
-    it("works in straightforward case", done => {
+    it("works in straightforward case", async () => {
       schedule.assignWorkspaceToUser(USER_ID_1, "1");
       fakeClock.tick(ONE_MINUTE);
       schedule.assignWorkspaceToUser(USER_ID_2, "2");
 
-      const promise = schedule.isInTreeWorkedOnLeastRecently(["1-1", "1-2", "2"], "1-1");
-
-      promise.then(result => {
-        expect(result).to.equal(true);
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await schedule.isInTreeWorkedOnLeastRecently(["1-1", "1-2", "2"], "1-1");
+      expect(result).to.equal(true);
     });
 
-    it("works in complicated case", done => {
+    it("works in complicated case", async () => {
       fakeClock.tick(1);
       schedule.assignWorkspaceToUser(USER_ID_1, "1-1-1");
       fakeClock.tick(1);
@@ -250,15 +231,8 @@ describe("Schedule class", () => {
       fakeClock.tick(1);
       schedule.assignWorkspaceToUser(USER_ID_2, "2");
 
-      const promise = schedule.isInTreeWorkedOnLeastRecently(["1", "2", "3"], "1-1");
-
-      promise.then(result => {
-        expect(result).to.equal(true);
-        done();
-      }).catch(e => {
-        done(e);
-      });
-
+      const result = await schedule.isInTreeWorkedOnLeastRecently(["1", "2", "3"], "1-1");
+      expect(result).to.equal(true);
     });
   });
 });

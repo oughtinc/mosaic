@@ -57,83 +57,58 @@ describe("Scheduler class", () => {
   });
 
   describe("filterByEligibility method", () => {
-    it("excludes workspaces currently being worked on", done => {
+    it("excludes workspaces currently being worked on", async () => {
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
 
-      const promise = scheduler.filterByEligibility(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => w.id !== "1-1"));
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByEligibility(workspaces);
+      expect(result).to.have.deep.members(workspaces.filter(w => w.id !== "1-1"));
     });
 
-    it("doesn't exclude a workspace that was worked on but time limit has passed", done => {
+    it("doesn't exclude a workspace that was worked on but time limit has passed", async () => {
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
       fakeClock.tick(ONE_MINUTE + 100);
 
-      const promise = scheduler.filterByEligibility(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces);
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByEligibility(workspaces);
+      expect(result).to.have.deep.members(workspaces);
     });
 
-    it("doesn't exclude a workspace that was worked on but user has started different workspace", done => {
+    it("doesn't exclude a workspace that was worked on but user has started different workspace", async () => {
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
       fakeClock.tick(ONE_MINUTE / 2);
 
       schedule.assignWorkspaceToUser(USER_ID, "2");
 
-      const promise = scheduler.filterByEligibility(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => w.id !== "2"));
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByEligibility(workspaces);
+      expect(result).to.have.deep.members(workspaces.filter(w => w.id !== "2"));
     });
   });
 
   describe("filterByWhetherInTreeWorkedOnLeastRecently", () => {
-    it("works in straightforward case", done => {
+    it("works in straightforward case", async () => {
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
 
-      const promise = scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => (
-          w.id !== "1" && w.id !== "1-1" && w.id !== "1-1-1"
-        )));
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
+      expect(result).to.have.deep.members(workspaces.filter(w => (
+        w.id !== "1" && w.id !== "1-1" && w.id !== "1-1-1"
+      )));
     });
 
-    it("works in more complicated case", done => {
+    it("works in more complicated case", async () => {
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "2");
 
-      const promise = scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => (
-          w.id !== "1" && w.id !== "1-1" && w.id !== "1-1-1"
-          &&
-          w.id !== "2" && w.id !== "2-1" && w.id !== "2-2"
-        )));
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
+      expect(result).to.have.deep.members(workspaces.filter(w => (
+        w.id !== "1" && w.id !== "1-1" && w.id !== "1-1-1"
+        &&
+        w.id !== "2" && w.id !== "2-1" && w.id !== "2-2"
+      )));
     });
 
-    it("works when only one tree hasn't been worked on", done => {
+    it("works when only one tree hasn't been worked on", async () => {
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
       fakeClock.tick(100);
@@ -147,16 +122,11 @@ describe("Scheduler class", () => {
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "4");
 
-      const promise = scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => w.id === "3"));
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
+      expect(result).to.have.deep.members(workspaces.filter(w => w.id === "3"));
     });
 
-    it("works when every tree has been worked on", done => {
+    it("works when every tree has been worked on", async () => {
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
       fakeClock.tick(100);
@@ -172,34 +142,24 @@ describe("Scheduler class", () => {
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "3");
 
-      const promise = scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => (
-          w.id === "2" || w.id === "2-1" || w.id === "2-2"
-        )));
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
+      expect(result).to.have.deep.members(workspaces.filter(w => (
+        w.id === "2" || w.id === "2-1" || w.id === "2-2"
+      )));
     });
 
   });
 
   describe("filterByWhetherNotYetWorkedOn", () => {
-    it("works in straightforward case", done => {
+    it("works in straightforward case", async () => {
       schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
       fakeClock.tick(ONE_MINUTE / 2);
       schedule.assignWorkspaceToUser(USER_ID_2, "2");
 
-      const promise = scheduler.filterByWhetherNotYetWorkedOn(workspaces);
-      promise.then(result => {
-        expect(result).to.have.deep.members(workspaces.filter(w => (
-          w.id !== "1-1" && w.id !== "2"
-        )));
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.filterByWhetherNotYetWorkedOn(workspaces);
+      expect(result).to.have.deep.members(workspaces.filter(w => (
+        w.id !== "1-1" && w.id !== "2"
+      )));
     });
   });
 
@@ -213,21 +173,16 @@ describe("Scheduler class", () => {
   });
 
   describe("getIdsOfWorkspacesThatCouldBeNext", () => {
-    it("works in a straightforward case", done => {
+    it("works in a straightforward case", async () => {
       schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
       fakeClock.tick(ONE_MINUTE / 2);
       schedule.assignWorkspaceToUser(USER_ID_2, "2");
 
-      const promise = scheduler.getIdsOfWorkspacesThatCouldBeNext(USER_ID_1);
-      promise.then(result => {
-        expect(result).to.have.deep.members(["3", "4", "5", "5-1", "5-2", "5-3", "5-4"]);
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.getIdsOfWorkspacesThatCouldBeNext(USER_ID_1);
+      expect(result).to.have.deep.members(["3", "4", "5", "5-1", "5-2", "5-3", "5-4"]);
     });
 
-    it("works when all workspaces assigned at least once", done => {
+    it("works when all workspaces assigned at least once", async () => {
       fakeClock.tick(100);
       schedule.assignWorkspaceToUser(USER_ID, "1-1");
       fakeClock.tick(100);
@@ -246,41 +201,30 @@ describe("Scheduler class", () => {
       schedule.assignWorkspaceToUser(USER_ID, "2");
 
       // NOTE 5-1 is excluded because it's currently being worked on!
-      const promise = scheduler.getIdsOfWorkspacesThatCouldBeNext(USER_ID_1);
-      promise.then(result => {
-        expect(result).to.have.deep.members(["5", "5-2", "5-3", "5-4"]);
-        done();
-      }).catch(e => {
-        done(e);
-      });
+      const result = await scheduler.getIdsOfWorkspacesThatCouldBeNext(USER_ID_1);
+      expect(result).to.have.deep.members(["5", "5-2", "5-3", "5-4"]);
     });
   });
 
   describe("findNextWorkspace", () => {
-    it("works in a straightforward case", done => {
-      scheduler.findNextWorkspace(USER_ID_1).then(() => {
-        const promise = scheduler.getIdOfCurrentWorkspace(USER_ID_1);
-        promise.then(result => {
-          expect(result).to.be.oneOf([
-            "1",
-            "1-1",
-            "1-1-1",
-            "2",
-            "2-1",
-            "2-2",
-            "3",
-            "4",
-            "5",
-            "5-1",
-            "5-2",
-            "5-3",
-            "5-4",
-          ]);
-          done();
-        }).catch(e => {
-          done(e);
-        });
-      });
+    it("works in a straightforward case", async () => {
+      await scheduler.findNextWorkspace(USER_ID_1);
+      const result = await scheduler.getIdOfCurrentWorkspace(USER_ID_1);
+      expect(result).to.be.oneOf([
+        "1",
+        "1-1",
+        "1-1-1",
+        "2",
+        "2-1",
+        "2-2",
+        "3",
+        "4",
+        "5",
+        "5-1",
+        "5-2",
+        "5-3",
+        "5-4",
+      ]);
     });
   });
 
