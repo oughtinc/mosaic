@@ -21,7 +21,7 @@ class Scheduler {
     this.rootParentFinder.clearRootParentCache();
     const idsOfWorkspacesThatCouldBeNext = await this.getIdsOfWorkspacesThatCouldBeNext(userId);
     const assignedWorkspaceId = this.pickWorkspaceIdAtRandom(idsOfWorkspacesThatCouldBeNext);
-    this.schedule.assignWorkspaceToUser(userId, assignedWorkspaceId);
+    await this.schedule.assignWorkspaceToUser(userId, assignedWorkspaceId);
   }
 
   private async getIdsOfWorkspacesThatCouldBeNext(userId) {

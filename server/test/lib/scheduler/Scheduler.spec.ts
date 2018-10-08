@@ -17,7 +17,7 @@ const ONE_MINUTE = 60 * 1000;
 const rootParentFinderStub = {
   clearRootParentCache() {},
 
-  getRootParentIdOfWorkspace(workspaceId) {
+  async getRootParentIdOfWorkspace(workspaceId) {
     return workspaceId[0];
   },
 };

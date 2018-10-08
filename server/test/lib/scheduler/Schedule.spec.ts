@@ -17,7 +17,7 @@ import {
 const ONE_MINUTE = 60 * 1000;
 
 const rootParentFinderStub = {
-  getRootParentIdOfWorkspace(workspaceId) {
+  async getRootParentIdOfWorkspace(workspaceId) {
     return workspaceId[0];
   }
 };
@@ -212,6 +212,7 @@ describe("Schedule class", () => {
       const promise = schedule.getTreesWorkedOnLeastRecently(["1-1", "1-2", "2"]);
 
       promise.then(result => {
+        expect(result.length).to.equal(1);
         expect(result).to.have.deep.members(["2"]);
         done();
       }).catch(e => {
