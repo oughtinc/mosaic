@@ -59,6 +59,21 @@ class UserSchedule {
 
     return false;
   }
+
+  public getTimestampWorkspaceLastWorkedOn(workspaceId) {
+    let mostRecentTimestamp = -Infinity;
+
+    for (const assignment of this.userSchedule) {
+      if (assignment.getWorkspaceId() === workspaceId) {
+        const curTimestamp = assignment.getStartedAtTimestamp();
+        if (mostRecentTimestamp < curTimestamp) {
+          mostRecentTimestamp = curTimestamp;
+        }
+      }
+    }
+
+    return mostRecentTimestamp;
+  }
 }
 
 export { UserSchedule };

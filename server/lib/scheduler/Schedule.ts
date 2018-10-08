@@ -111,20 +111,16 @@ class Schedule {
   }
 
   public getTimestampWorkspaceLastWorkedOn(workspaceId) {
-    let lastWorkedOnTimestamp = -Infinity;
+    let mostRecentTimestamp = -Infinity;
 
     for (const [userId, userSchedule] of this.schedule) {
-      for (const assignment of userSchedule.userSchedule) {
-        if (assignment.workspaceId === workspaceId) {
-          const startedAtTimestamp = assignment.getStartedAtTimestamp();
-          if (startedAtTimestamp > lastWorkedOnTimestamp) {
-            lastWorkedOnTimestamp = startedAtTimestamp;
-          }
-        }
+      const curTimestamp = userSchedule.getTimestampWorkspaceLastWorkedOn(workspaceId);
+      if (mostRecentTimestamp < curTimestamp) {
+        mostRecentTimestamp = curTimestamp;
       }
     }
 
-    return lastWorkedOnTimestamp;
+    return mostRecentTimestamp;
   }
 
   public getWhichOfTheseWorkspacesWorkedOnLeastRecently(workspaceIds) {
