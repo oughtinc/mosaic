@@ -10,17 +10,10 @@ import {
   USER_ID_1,
   USER_ID_2,
   WORKSPACE_ID,
+  rootParentFinderFake
 } from "./utils";
 
 const ONE_MINUTE = 60 * 1000;
-
-const rootParentFinderStub = {
-  clearRootParentCache() {},
-
-  async getRootParentIdOfWorkspace(workspaceId) {
-    return workspaceId[0];
-  },
-};
 
 const workspaces = [
   { id: "1", totalBudget: 100, allocatedBudget: 50 },
@@ -38,7 +31,7 @@ const workspaces = [
   { id: "5-4", totalBudget: 100, allocatedBudget: 100 },
 ];
 
-const fetchAllWorkspacesStub = () => workspaces;
+const fetchAllWorkspacesFake = () => workspaces;
 
 describe("Scheduler class", () => {
   let fakeClock, schedule, scheduler;
@@ -46,13 +39,13 @@ describe("Scheduler class", () => {
   const resetBeforeTesting = () => {
     fakeClock = sinon.useFakeTimers();
     schedule = new Schedule({
-      rootParentFinder: rootParentFinderStub,
+      rootParentFinder: rootParentFinderFake,
       timeLimit: ONE_MINUTE,
     });
 
     scheduler = new Scheduler({
-      fetchAllWorkspaces: fetchAllWorkspacesStub,
-      rootParentFinder: rootParentFinderStub,
+      fetchAllWorkspaces: fetchAllWorkspacesFake,
+      rootParentFinder: rootParentFinderFake,
       schedule,
     });
   };

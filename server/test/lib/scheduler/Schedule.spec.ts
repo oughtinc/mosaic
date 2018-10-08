@@ -12,22 +12,17 @@ import {
   WORKSPACE_ID_1,
   WORKSPACE_ID_2,
   WORKSPACE_ID_3,
+  rootParentFinderFake,
 } from "./utils";
 
 const ONE_MINUTE = 60 * 1000;
-
-const rootParentFinderStub = {
-  async getRootParentIdOfWorkspace(workspaceId) {
-    return workspaceId[0];
-  }
-};
 
 describe("Schedule class", () => {
   let fakeClock, schedule;
   beforeEach(() => {
     fakeClock = sinon.useFakeTimers();
     schedule = new Schedule({
-      rootParentFinder: rootParentFinderStub,
+      rootParentFinder: rootParentFinderFake,
       timeLimit: ONE_MINUTE,
     });
   });
