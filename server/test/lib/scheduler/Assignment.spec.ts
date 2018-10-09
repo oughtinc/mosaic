@@ -13,10 +13,6 @@ describe("Assignment class", () => {
     });
   });
 
-  it("has tests that work", () => {
-    expect(true).to.equal(true);
-  });
-
   it("can retrieve workspace id", () => {
     expect(assignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
   });

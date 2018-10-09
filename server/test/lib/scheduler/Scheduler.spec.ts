@@ -52,10 +52,6 @@ describe("Scheduler class", () => {
 
   beforeEach(resetBeforeTesting);
 
-  it("has tests that work", () => {
-    expect(true).to.equal(true);
-  });
-
   describe("filterByEligibility method", () => {
     it("excludes workspaces currently being worked on", async () => {
       schedule.assignWorkspaceToUser(USER_ID, "1-1");

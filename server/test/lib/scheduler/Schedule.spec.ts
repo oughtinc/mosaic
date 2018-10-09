@@ -27,10 +27,6 @@ describe("Schedule class", () => {
     });
   });
 
-  it("has tests that work", () => {
-    expect(true).to.equal(true);
-  });
-
   // tests private method, maybe remove
   describe("doesUserHaveASchedule", () => {
     it("works when user doesn't have a schedule", () => {

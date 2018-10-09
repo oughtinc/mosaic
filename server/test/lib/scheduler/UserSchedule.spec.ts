@@ -15,10 +15,6 @@ describe("UserSchedule class", () => {
     userSchedule = new UserSchedule(USER_ID);;
   });
 
-  it("has tests that work", () => {
-    expect(true).to.equal(true);
-  });
-
   describe("hasUserBeenAssignedToAnyWorkspaces method", () => {
     it("it knows if user has not been assigned to workspace", () => {
       expect(userSchedule.hasUserBeenAssignedToAnyWorkspaces()).to.equal(false);
