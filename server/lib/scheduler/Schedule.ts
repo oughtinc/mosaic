@@ -123,7 +123,7 @@ class Schedule {
     return mostRecentTimestamp;
   }
 
-  public getWhichOfTheseWorkspacesWorkedOnLeastRecently(workspaceIds) {
+  public getLeastRecentlyActiveWorkspace(workspaceIds) {
     let idOfWorkspaceWorkedOnLeastRecently;
     let whenThisWorkspaceWasWorkedOn;
 

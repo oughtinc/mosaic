@@ -41,7 +41,7 @@ class Scheduler {
     // if every workspace in that tree has 0 remaining budget
     // then instead look for the workspace worked on least recently
     if (finalWorkspaces.length === 0) {
-      const idOfWorkspaceWorkedOnLeastRecently = await this.schedule.getWhichOfTheseWorkspacesWorkedOnLeastRecently(workspacesInTreeWorkedOnLeastRecently.map(w => w.id));
+      const idOfWorkspaceWorkedOnLeastRecently = await this.schedule.getLeastRecentlyActiveWorkspace(workspacesInTreeWorkedOnLeastRecently.map(w => w.id));
       return [idOfWorkspaceWorkedOnLeastRecently];
     }
 

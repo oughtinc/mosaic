@@ -159,20 +159,20 @@ describe("Schedule class", () => {
     });
   });
 
-  describe("getWhichOfTheseWorkspacesWorkedOnLeastRecently", () => {
+  describe("getLeastRecentlyActiveWorkspace", () => {
     it("works in straightforward case", () => {
       schedule.assignWorkspaceToUser(USER_ID_1, WORKSPACE_ID_1);
       fakeClock.tick(ONE_MINUTE);
       schedule.assignWorkspaceToUser(USER_ID_2, WORKSPACE_ID_2);
 
-      const result = schedule.getWhichOfTheseWorkspacesWorkedOnLeastRecently([WORKSPACE_ID_1, WORKSPACE_ID_2]);
+      const result = schedule.getLeastRecentlyActiveWorkspace([WORKSPACE_ID_1, WORKSPACE_ID_2]);
       expect(result).to.equal(WORKSPACE_ID_1);
     });
 
     it("works in case where only one has never been worked on", () => {
       schedule.assignWorkspaceToUser(USER_ID_1, WORKSPACE_ID_1);
 
-      const result = schedule.getWhichOfTheseWorkspacesWorkedOnLeastRecently([WORKSPACE_ID_1, WORKSPACE_ID_2]);
+      const result = schedule.getLeastRecentlyActiveWorkspace([WORKSPACE_ID_1, WORKSPACE_ID_2]);
       expect(result).to.equal(WORKSPACE_ID_2);
     });
   });
