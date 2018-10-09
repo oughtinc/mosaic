@@ -59,12 +59,13 @@ export class Timer extends React.Component<any,  any> {
   };
 
   private pollingInterval;
+  private tickInterval;
 
   public componentDidMount() {
     if (!this.hasTimerStarted()) {
       // please see https://momentjs.com/docs/#/durations/creating/ for more
       // on the different duration string formats moment.duration() accepts
-      const durationInMs = moment.duration(this.props.durationString).asMilliseconds();
+      const durationInMs = this.props.durationString;
       this.startTimer(durationInMs);
     }
 
@@ -75,10 +76,15 @@ export class Timer extends React.Component<any,  any> {
         clearInterval(this.pollingInterval);
       }
     }, 250);
+
+    this.tickInterval = setInterval(() => {
+      this.props.onTimerTick();
+    }, this.props.tickDuration * 1000);
   }
 
   public componentWillUnmount() {
     clearInterval(this.pollingInterval);
+    clearInterval(this.tickInterval);
   }
 
   public render() {

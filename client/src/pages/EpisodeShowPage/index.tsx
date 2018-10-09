@@ -26,7 +26,7 @@ import {
   WorkspaceBlockRelation,
   WorkspaceWithRelations
 } from "./WorkspaceRelations";
-import { UPDATE_BLOCKS } from "../../graphqlQueries";
+import { UPDATE_BLOCKS, UPDATE_TIME_BUDGET } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
 
 import {
@@ -147,6 +147,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   private scratchpadField;
   private answerField;
   private newChildField;
+  private tickDuration = 10;
 
   public constructor(props: any) {
     super(props);
@@ -180,6 +181,15 @@ export class FormPagePresentational extends React.Component<any, any> {
   public handleTimerEnd = () => {
     this.setState({
       hasTimerEnded: true,
+    });
+  }
+
+  public handleTimerTick = () => {
+    this.props.updateTimeBudget({
+      variables: {
+        workspaceId: this.props.workspace.workspace.id,
+        changeToBudget: -this.tickDuration,
+      }
     });
   }
 
@@ -226,7 +236,7 @@ export class FormPagePresentational extends React.Component<any, any> {
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
-    const durationString = queryParams.timer;
+    const durationString = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
 
     return (
       <div key={workspace.id}>
@@ -245,7 +255,9 @@ export class FormPagePresentational extends React.Component<any, any> {
                   <Timer
                     durationString={durationString}
                     onTimerEnd={this.handleTimerEnd}
+                    onTimerTick={this.handleTimerTick}
                     style={{ marginRight: "30px" }}
+                    tickDuration={10}
                     workspaceId={workspace.id}
                   />
                 }
@@ -429,6 +441,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(NEW_CHILD, {
     name: "createChild",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(UPDATE_TIME_BUDGET, {
+    name: "updateTimeBudget",
     options: {
       refetchQueries: ["workspace"]
     }

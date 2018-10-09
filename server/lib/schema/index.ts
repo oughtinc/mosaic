@@ -306,6 +306,27 @@ const schema = new GraphQLSchema({
             event
           });
         }
+      },
+      updateTimeBudget: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+          changeToBudget: { type: GraphQLInt }
+        },
+        resolve: async (_, { workspaceId, changeToBudget }, context) => {
+          console.log("changeToBudget", changeToBudget);
+          console.log("context", context);
+          const user = await userFromAuthToken(context.authorization);
+          console.log("user", user);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update time budet."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          console.log("workspace.totalBudget", workspace.totalBudget);
+          await workspace.update({ totalBudget: workspace.totalBudget + changeToBudget });
+        }
       }
     }
   })
