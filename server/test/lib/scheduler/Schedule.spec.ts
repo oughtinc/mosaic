@@ -12,7 +12,7 @@ import {
   WORKSPACE_ID_1,
   WORKSPACE_ID_2,
   WORKSPACE_ID_3,
-  rootParentFinderFake,
+  rootParentCacheFake,
 } from "./utils";
 
 const ONE_MINUTE = 60 * 1000;
@@ -21,7 +21,7 @@ describe("Schedule class", function() {
   beforeEach(function() {
     this.clock = sinon.useFakeTimers();
     this.schedule = new Schedule({
-      rootParentFinder: rootParentFinderFake,
+      rootParentCache: rootParentCacheFake,
       timeLimit: ONE_MINUTE,
     });
   });

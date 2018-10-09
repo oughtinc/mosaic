@@ -1,7 +1,7 @@
 import * as models from "../models";
 
-class RootParentFinder {
-  private static RootParentCache = {};
+class RootParentCache {
+  private static rootParentCache = {};
 
   public static clearRootParentCache() {
     this.rootParentCache = {};
@@ -44,4 +44,4 @@ class RootParentFinder {
   }
 }
 
-export { RootParentFinder };
+export { RootParentCache };

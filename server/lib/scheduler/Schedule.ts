@@ -4,12 +4,12 @@ import { UserSchedule } from "./UserSchedule";
 
 class Schedule {
   private cacheForWhenTreeLastWorkedOn = {};
-  private rootParentFinder;
+  private rootParentCache;
   private schedule = new Map;
   private timeLimit;
 
-  public constructor({ rootParentFinder, timeLimit }) {
-    this.rootParentFinder = rootParentFinder;
+  public constructor({ rootParentCache, timeLimit }) {
+    this.rootParentCache = rootParentCache;
     this.timeLimit = timeLimit;
   }
 
@@ -33,7 +33,7 @@ class Schedule {
     const userSchedule = this.getUserSchedule(userId);
     userSchedule.assignWorkspace(workspaceId, startAtTimestamp);
 
-    const rootParentId = await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId);
+    const rootParentId = await this.rootParentCache.getRootParentIdOfWorkspace(workspaceId);
     this.cacheForWhenTreeLastWorkedOn[rootParentId] = startAtTimestamp;
   }
 
@@ -52,7 +52,7 @@ class Schedule {
   */
   public async isInTreeWorkedOnLeastRecently(workspaceIds, workspaceId) {
     const treesWorksOnLeastRecently = await this.getTreesWorkedOnLeastRecently(workspaceIds);
-    const rootParentId = await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId);
+    const rootParentId = await this.rootParentCache.getRootParentIdOfWorkspace(workspaceId);
     return Boolean(treesWorksOnLeastRecently.find(rootWorkspaceId => rootWorkspaceId === rootParentId));
   }
 
@@ -63,7 +63,7 @@ class Schedule {
   public async getTreesWorkedOnLeastRecently(workspaceIds) {
     const rootParentIds = await map(
       workspaceIds,
-      async workspaceId => await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId),
+      async workspaceId => await this.rootParentCache.getRootParentIdOfWorkspace(workspaceId),
     );
 
     const uniqRootParentIds = _.uniq(rootParentIds);

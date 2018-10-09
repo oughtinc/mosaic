@@ -2,12 +2,12 @@ import { filter } from "asyncro";
 
 class Scheduler {
   private fetchAllWorkspaces;
-  private rootParentFinder;
+  private rootParentCache;
   private schedule;
 
-  public constructor({ fetchAllWorkspaces, rootParentFinder, schedule }) {
+  public constructor({ fetchAllWorkspaces, rootParentCache, schedule }) {
     this.fetchAllWorkspaces = fetchAllWorkspaces;
-    this.rootParentFinder = rootParentFinder;
+    this.rootParentCache = rootParentCache;
     this.schedule = schedule;
   }
 
@@ -18,7 +18,7 @@ class Scheduler {
 
   public async findNextWorkspace(userId) {
     // clear cache so we don't use old eligibility info
-    this.rootParentFinder.clearRootParentCache();
+    this.rootParentCache.clearRootParentCache();
     const idsOfWorkspacesThatCouldBeNext = await this.getIdsOfWorkspacesThatCouldBeNext(userId);
     const assignedWorkspaceId = this.pickWorkspaceIdAtRandom(idsOfWorkspacesThatCouldBeNext);
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspaceId);
@@ -55,9 +55,9 @@ class Scheduler {
 
   private async filterByEligibility(workspaces) {
     // use for... of instead of asyncro's filter
-    // because isWorkspaceEligible will use rootParentFinder
+    // because isWorkspaceEligible will use rootParentCache
     // and the parallel nature of filter doesn't work with
-    // rootParentFinder's caching
+    // rootParentCache's caching
     let allEligibleWorkspaces = [];
     for (const workspace of workspaces) {
       const isMarkedEligible = await this.isWorkspaceEligible(workspace);

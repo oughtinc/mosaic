@@ -10,7 +10,7 @@ import {
   USER_ID_1,
   USER_ID_2,
   WORKSPACE_ID,
-  rootParentFinderFake
+  rootParentCacheFake
 } from "./utils";
 
 const ONE_MINUTE = 60 * 1000;
@@ -37,13 +37,13 @@ describe("Scheduler class", function() {
   const resetBeforeTesting = function() {
     this.clock = sinon.useFakeTimers();
     this.schedule = new Schedule({
-      rootParentFinder: rootParentFinderFake,
+      rootParentCache: rootParentCacheFake,
       timeLimit: ONE_MINUTE,
     });
 
     this.scheduler = new Scheduler({
       fetchAllWorkspaces: fetchAllWorkspacesFake,
-      rootParentFinder: rootParentFinderFake,
+      rootParentCache: rootParentCacheFake,
       schedule: this.schedule,
     });
   };
