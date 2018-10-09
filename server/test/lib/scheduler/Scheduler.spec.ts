@@ -64,7 +64,7 @@ describe("Scheduler class", function() {
 
     it("doesn't exclude a workspace that was worked on but time limit has passed", async function() {
       this.schedule .assignWorkspaceToUser(USER_ID, "1-1");
-      this.clock .tick(ONE_MINUTE + 100);
+      this.clock.tick(ONE_MINUTE + 100);
 
       const result = await this.scheduler.filterByEligibility(workspaces);
       expect(result).to.have.deep.members(workspaces);
@@ -72,7 +72,7 @@ describe("Scheduler class", function() {
 
     it("doesn't exclude a workspace that was worked on but user has started different workspace", async function() {
       this.schedule.assignWorkspaceToUser(USER_ID, "1-1");
-      this.clock .tick(ONE_MINUTE / 2);
+      this.clock.tick(ONE_MINUTE / 2);
 
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
 
@@ -83,7 +83,7 @@ describe("Scheduler class", function() {
 
   describe("filterByWhetherInTreeWorkedOnLeastRecently", function() {
     it("works in straightforward case", async function() {
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1-1");
 
       const result = await this.scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
@@ -93,9 +93,9 @@ describe("Scheduler class", function() {
     });
 
     it("works in more complicated case", async function() {
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
 
       const result = await this.scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
@@ -107,17 +107,17 @@ describe("Scheduler class", function() {
     });
 
     it("works when only one tree hasn't been worked on", async function() {
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "5-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "4");
 
       const result = await this.scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
@@ -125,19 +125,19 @@ describe("Scheduler class", function() {
     });
 
     it("works when every tree has been worked on", async function() {
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "5-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "4");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "3");
 
       const result = await this.scheduler.filterByWhetherInTreeWorkedOnLeastRecently(workspaces);
@@ -151,7 +151,7 @@ describe("Scheduler class", function() {
   describe("filterByWhetherNotYetWorkedOn", function() {
     it("works in straightforward case", async function() {
       this.schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
-      this.clock .tick(ONE_MINUTE / 2);
+      this.clock.tick(ONE_MINUTE / 2);
       this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
 
       const result = await this.scheduler.filterByWhetherNotYetWorkedOn(workspaces);
@@ -173,7 +173,7 @@ describe("Scheduler class", function() {
   describe("getIdsOfWorkspacesThatCouldBeNext", function() {
     it("works in a straightforward case", async function() {
       this.schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
-      this.clock .tick(ONE_MINUTE / 2);
+      this.clock.tick(ONE_MINUTE / 2);
       this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
 
       const result = await this.scheduler.getIdsOfWorkspacesThatCouldBeNext(USER_ID_1);
@@ -181,21 +181,21 @@ describe("Scheduler class", function() {
     });
 
     it("works when all workspaces assigned at least once", async function() {
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "5-1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "4");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "3");
-      this.clock .tick(100);
+      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
 
       // NOTE 5-1 is excluded because it's currently being worked on!
