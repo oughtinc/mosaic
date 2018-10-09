@@ -25,13 +25,12 @@ class Schedule {
     return this.schedule.get(userId);
   }
 
-  public async assignWorkspaceToUser(userId, workspaceId) {
+  public async assignWorkspaceToUser(userId, workspaceId, startAtTimestamp = Date.now()) {
     if (!this.doesUserHaveASchedule(userId)) {
       this.createUserSchedule(userId);
     }
 
     const userSchedule = this.getUserSchedule(userId);
-    const startAtTimestamp = Date.now();
     userSchedule.assignWorkspace(workspaceId, startAtTimestamp);
 
     const rootParentId = await this.rootParentFinder.getRootParentIdOfWorkspace(workspaceId);

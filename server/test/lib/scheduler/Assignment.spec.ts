@@ -4,27 +4,22 @@ import { Assignment } from "../../../lib/scheduler/Assignment";
 
 import { USER_ID, WORKSPACE_ID } from "./utils";
 
-describe("Assignment class", () => {
-  let assignment;
-  beforeEach(() => {
-    assignment = new Assignment({
+describe("Assignment class", function() {
+  beforeEach(function() {
+    this.startedAtTimestamp = Date.now();
+
+    this.assignment = new Assignment({
       userId: USER_ID,
       workspaceId: WORKSPACE_ID,
+      startedAtTimestamp: this.startedAtTimestamp,
     });
   });
 
-  it("can retrieve workspace id", () => {
-    expect(assignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
+  it("can retrieve workspace id", function() {
+    expect(this.assignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
   });
 
-  it("records initial timestamp", () => {
-    expect(assignment.getStartedAtTimestamp()).to.be.a("number");
-    const curTimestamp = Date.now();
-    expect(curTimestamp - assignment.getStartedAtTimestamp() > 1000);
-  });
-
-  it("records correct timestamp", () => {
-    const curTimestamp = Date.now();
-    expect(curTimestamp - assignment.getStartedAtTimestamp() < 1000).to.equal(true);
+  it("records the timestamp at which the assignment started", function() {
+    expect(this.assignment.getStartedAtTimestamp()).to.equal(this.startedAtTimestamp);
   });
 });

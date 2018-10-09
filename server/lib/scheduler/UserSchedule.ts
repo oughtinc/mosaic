@@ -15,7 +15,7 @@ class UserSchedule {
     return this.userSchedule.length > 0;
   }
 
-  public assignWorkspace(workspaceId, startAtTimestamp) {
+  public assignWorkspace(workspaceId, startAtTimestamp = Date.now()) {
     const assignment = new Assignment({
       userId: this.userId,
       workspaceId,
