@@ -32,25 +32,33 @@ describe("Schedule class", function() {
 
   // tests private method, maybe remove
   describe("doesUserHaveASchedule", function () {
-    it("works when user doesn't have a schedule", function () {
-      expect(this.schedule.doesUserHaveASchedule(USER_ID)).to.equal(false);
+    context("with a user that doesn't have a schedule", function() {
+      it("returns false", function () {
+        expect(this.schedule.doesUserHaveASchedule(USER_ID)).to.equal(false);
+      });
     });
 
-    it("works when user has a schedule", function () {
-      this.schedule.createUserSchedule(USER_ID);
-      expect(this.schedule.doesUserHaveASchedule(USER_ID)).to.equal(true);
+    context("with a user that has a schedule", function() {
+      it("returns true", function () {
+        this.schedule.createUserSchedule(USER_ID);
+        expect(this.schedule.doesUserHaveASchedule(USER_ID)).to.equal(true);
+      });
     });
   });
 
   // tests private method, maybe remove
   describe("getUserSchedule", function() {
-    it("returns undefined when user doesn't have schedule", function() {
-      expect(this.schedule.getUserSchedule(USER_ID)).to.equal(undefined);
+    context("with a user that doesn't have a schedule", function() {
+      it("returns undefined", function() {
+        expect(this.schedule.getUserSchedule(USER_ID)).to.equal(undefined);
+      });
     });
 
-    it("returns schedule when user has schedule", function() {
-      this.schedule.createUserSchedule(USER_ID);
-      expect(this.schedule.getUserSchedule(USER_ID)).to.be.a("object");
+    context("with a user that has a schedule", function() {
+      it("returns user's schedule", function() {
+        this.schedule.createUserSchedule(USER_ID);
+        expect(this.schedule.getUserSchedule(USER_ID)).to.be.a("object");
+      });
     });
   });
 
