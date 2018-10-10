@@ -208,9 +208,9 @@ describe("Scheduler class", function() {
     });
   });
 
-  describe("findNextWorkspace", function() {
+  describe("assignNextWorkspace", function() {
     it("works in a straightforward case", async function() {
-      await this.scheduler.findNextWorkspace(USER_ID_1);
+      await this.scheduler.assignNextWorkspace(USER_ID_1);
       const result = await this.scheduler.getIdOfCurrentWorkspace(USER_ID_1);
       expect(result).to.be.oneOf([
         "1",

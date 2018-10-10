@@ -317,7 +317,7 @@ const schema = new GraphQLSchema({
               "No user found when attempting get next workspace."
             );
           }
-          await scheduler.findNextWorkspace(user.user_id);
+          await scheduler.assignNextWorkspace(user.user_id);
           const workspaceId = await scheduler.getIdOfCurrentWorkspace(user.user_id);
           return { id: workspaceId };
         }

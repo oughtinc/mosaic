@@ -17,7 +17,7 @@ class Scheduler {
     return assignment.getWorkspaceId();
   }
 
-  public async findNextWorkspace(userId) {
+  public async assignNextWorkspace(userId) {
     // clear cache so we don't use old eligibility info
     this.rootParentCache.clearRootParentCache();
     const actionableWorkspaces = await this.getActionableWorkspaces();
