@@ -30,6 +30,11 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      isStale: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false
+      },
       ...eventRelationshipColumns(DataTypes),
       childWorkspaceOrder: {
         type: DataTypes.ARRAY(DataTypes.TEXT),
@@ -260,7 +265,9 @@ const WorkspaceModel = (
   // Returns an array containing the pointers connected to a workspace and all
   // of its descendants. Passes "pointerSoFar" parameter to recursive
   // subcalls in order to avoid duplicate SQL queries for pointers.
-  Workspace.prototype.getConnectedPointersOfSubtree = async function(pointersSoFar = []) {
+  Workspace.prototype.getConnectedPointersOfSubtree = async function(
+    pointersSoFar = []
+  ) {
     const connectedPointersOfSubtree = [];
 
     // Can use this.getBlocks instead of this.getVisibleBlocks because later we
@@ -268,15 +275,25 @@ const WorkspaceModel = (
     const blocks = await this.getBlocks();
 
     for (const block of blocks) {
-      const blockPointersToAdd = await block.newConnectedPointers(pointersSoFar);
-      connectedPointersOfSubtree = connectedPointersOfSubtree.concat(blockPointersToAdd);
+      const blockPointersToAdd = await block.newConnectedPointers(
+        pointersSoFar
+      );
+      connectedPointersOfSubtree = connectedPointersOfSubtree.concat(
+        blockPointersToAdd
+      );
       pointersSoFar = pointersSoFar.concat(blockPointersToAdd);
     }
 
     for (const childWorkspaceId of this.childWorkspaceOrder) {
-      const currentWorkspace = await sequelize.models.Workspace.findById(childWorkspaceId);
-      const workspacePointersToAdd = await currentWorkspace.getConnectedPointersOfSubtree(pointersSoFar);
-      connectedPointersOfSubtree = connectedPointersOfSubtree.concat(workspacePointersToAdd);
+      const currentWorkspace = await sequelize.models.Workspace.findById(
+        childWorkspaceId
+      );
+      const workspacePointersToAdd = await currentWorkspace.getConnectedPointersOfSubtree(
+        pointersSoFar
+      );
+      connectedPointersOfSubtree = connectedPointersOfSubtree.concat(
+        workspacePointersToAdd
+      );
     }
 
     return connectedPointersOfSubtree;

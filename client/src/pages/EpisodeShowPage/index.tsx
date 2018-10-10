@@ -9,6 +9,7 @@ import { parse as parseQueryString } from "query-string";
 
 import { AvailableBudget } from "./AvailableBudget";
 import { Timer } from "./Timer";
+import { Staleness } from "./Staleness";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -33,7 +34,7 @@ import {
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
-  workspaceViewQuestionFontSize,
+  workspaceViewQuestionFontSize
 } from "../../styles";
 
 const WORKSPACE_QUERY = gql`
@@ -43,6 +44,7 @@ const WORKSPACE_QUERY = gql`
       parentId
       creatorId
       isPublic
+      isStale
       childWorkspaceOrder
       connectedPointers
       totalBudget
@@ -71,6 +73,14 @@ const WORKSPACE_QUERY = gql`
 const UPDATE_WORKSPACE = gql`
   mutation updateWorkspace($id: String!, $childWorkspaceOrder: [String]) {
     updateWorkspace(id: $id, childWorkspaceOrder: $childWorkspaceOrder) {
+      id
+    }
+  }
+`;
+
+const UPDATE_WORKSPACE_STALENESS = gql`
+  mutation updateWorkspaceStaleness($id: String!, $isStale: Boolean!) {
+    updateWorkspaceStaleness(id: $id, isStale: $isStale) {
       id
     }
   }
@@ -127,13 +137,17 @@ const BlockHeader = styled.div`
 
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
-    <Button bsStyle="default" bsSize="xsmall">Parent »</Button>
+    <Button bsStyle="default" bsSize="xsmall">
+      Parent »
+    </Button>
   </NavLink>
 );
 
 const SubtreeLink = ({ workspace }) => (
   <NavLink to={`/workspaces/${workspace.id}/subtree`}>
-    <Button bsStyle="default" bsSize="xsmall">Subtree »</Button>
+    <Button bsStyle="default" bsSize="xsmall">
+      Subtree »
+    </Button>
   </NavLink>
 );
 
@@ -151,7 +165,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
-      hasTimerEnded: false,
+      hasTimerEnded: false
     };
   }
 
@@ -179,9 +193,9 @@ export class FormPagePresentational extends React.Component<any, any> {
 
   public handleTimerEnd = () => {
     this.setState({
-      hasTimerEnded: true,
+      hasTimerEnded: true
     });
-  }
+  };
 
   public render() {
     const workspace = this.props.workspace.workspace;
@@ -201,7 +215,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       [
         ...this.props.exportingPointers,
         ...importedPointers,
-        ...readOnlyExportedPointers,
+        ...readOnlyExportedPointers
       ],
       p => p.data.pointerId
     );
@@ -220,7 +234,9 @@ export class FormPagePresentational extends React.Component<any, any> {
     ).blockEditorAttributes();
 
     if (this.state.hasTimerEnded) {
-      return <div>Your time with this workspace is up. Thanks for contributing!</div>;
+      return (
+        <div>Your time with this workspace is up. Thanks for contributing!</div>
+      );
     }
 
     const queryParams = parseQueryString(window.location.search);
@@ -236,23 +252,30 @@ export class FormPagePresentational extends React.Component<any, any> {
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "flex-end",
+                  justifyContent: "flex-end"
                 }}
               >
-                {
-                  hasTimer
-                  &&
+                {hasTimer && (
                   <Timer
                     durationString={durationString}
                     onTimerEnd={this.handleTimerEnd}
                     style={{ marginRight: "30px" }}
                     workspaceId={workspace.id}
                   />
-                }
+                )}
                 <AvailableBudget
                   allocatedBudget={workspace.allocatedBudget}
                   style={{ marginRight: "30px" }}
                   totalBudget={workspace.totalBudget}
+                />
+                <Staleness
+                  workspaceId={workspace.id}
+                  isStale={workspace.isStale}
+                  updateStaleness={isStale =>
+                    this.props.updateWorkspaceStaleness({
+                      variables: { id: workspace.id, isStale }
+                    })
+                  }
                 />
               </div>
             </Col>
@@ -263,13 +286,13 @@ export class FormPagePresentational extends React.Component<any, any> {
                 style={{
                   display: "flex",
                   alignItems: "flex-end",
-                  marginBottom: "10px",
+                  marginBottom: "10px"
                 }}
               >
                 <div
                   style={{
                     fontSize: workspaceViewQuestionFontSize,
-                    marginRight: "8px",
+                    marginRight: "8px"
                   }}
                 >
                   <BlockEditor
@@ -277,24 +300,18 @@ export class FormPagePresentational extends React.Component<any, any> {
                     {...questionProps}
                   />
                 </div>
-                {
-                  workspace.parentId
-                  &&
-                  !isIsolatedWorkspace
-                  &&
-                  <div style={{ paddingBottom: "8px" }}>
-                    <ParentLink parentId={workspace.parentId} />
-                  </div>
-                }
-                {
-                  workspace
-                  &&
-                  !isIsolatedWorkspace
-                  &&
-                  <div style={{paddingBottom: "8px"}}>
-                    <SubtreeLink workspace={workspace} />
-                  </div>
-                }
+                {workspace.parentId &&
+                  !isIsolatedWorkspace && (
+                    <div style={{ paddingBottom: "8px" }}>
+                      <ParentLink parentId={workspace.parentId} />
+                    </div>
+                  )}
+                {workspace &&
+                  !isIsolatedWorkspace && (
+                    <div style={{ paddingBottom: "8px" }}>
+                      <SubtreeLink workspace={workspace} />
+                    </div>
+                  )}
               </div>
             </Col>
           </Row>
@@ -409,11 +426,12 @@ function getNewQuestionFormBlockId(state: any, workspace: any) {
 
 function mapStateToProps(state: any, { workspace }: any) {
   const _visibleBlockIds = visibleBlockIds(workspace.workspace);
-  const newQuestionFormBlockId = getNewQuestionFormBlockId(state, workspace.workspace);
-  const allBlockIds = [ ..._visibleBlockIds, newQuestionFormBlockId];
-  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(
-    state
+  const newQuestionFormBlockId = getNewQuestionFormBlockId(
+    state,
+    workspace.workspace
   );
+  const allBlockIds = [..._visibleBlockIds, newQuestionFormBlockId];
+  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(state);
   const { blocks } = state;
   return { blocks, exportingPointers };
 }
@@ -435,6 +453,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_CHILD_TOTAL_BUDGET, {
     name: "updateChildTotalBudget",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(UPDATE_WORKSPACE_STALENESS, {
+    name: "updateWorkspaceStaleness",
     options: {
       refetchQueries: ["workspace"]
     }

@@ -2,6 +2,7 @@ import * as models from "../models";
 import * as _ from "lodash";
 import { resolver, attributeFields } from "graphql-sequelize";
 import {
+  GraphQLBoolean,
   GraphQLObjectType,
   GraphQLNonNull,
   GraphQLFloat,
@@ -121,7 +122,7 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
       // update cache
       userFromAuthToken.cache[accessToken] = {
         data,
-        timestamp: Date.now(),
+        timestamp: Date.now()
       };
 
       return resolve(data);
@@ -224,6 +225,18 @@ const schema = new GraphQLSchema({
           return workspace.update({ childWorkspaceOrder }, { event });
         }
       },
+      updateWorkspaceStaleness: {
+        type: workspaceType,
+        args: {
+          id: { type: GraphQLString },
+          isStale: { type: GraphQLBoolean }
+        },
+        resolve: async (_, { id, isStale }) => {
+          const workspace = await models.Workspace.findById(id);
+          const event = await models.Event.create();
+          return workspace.update({ isStale }, { event });
+        }
+      },
       createWorkspace: {
         type: workspaceType,
         args: {
@@ -318,10 +331,12 @@ const schema = new GraphQLSchema({
             );
           }
           await scheduler.findNextWorkspace(user.user_id);
-          const workspaceId = await scheduler.getIdOfCurrentWorkspace(user.user_id);
+          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
+            user.user_id
+          );
           return { id: workspaceId };
         }
-      },
+      }
     }
   })
 });
