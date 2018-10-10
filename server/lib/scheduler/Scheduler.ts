@@ -51,19 +51,9 @@ class Scheduler {
   }
 
   private async filterByEligibility(workspaces) {
-    // use for... of instead of asyncro's filter
-    // because isWorkspaceEligible will use rootParentCache
-    // and the parallel nature of filter doesn't work with
-    // rootParentCache's caching
-    let allEligibleWorkspaces = [];
-    for (const workspace of workspaces) {
-      const isMarkedEligible = this.isWorkspaceEligible(workspace);
-      const isCurrentlyBeingWorkedOn = await this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspace.id);
-      if (isMarkedEligible && !isCurrentlyBeingWorkedOn) {
-        allEligibleWorkspaces.push(workspace);
-      }
-    }
-    return allEligibleWorkspaces;
+    const isMarkedEligible = w => this.isWorkspaceEligible(w);
+    const isCurrentlyBeingWorkedOn = w => this.schedule.isWorkspaceCurrentlyBeingWorkedOn(w.id);
+    return workspaces.filter(w => isMarkedEligible(w) && !isCurrentlyBeingWorkedOn(w));
   }
 
   /*
