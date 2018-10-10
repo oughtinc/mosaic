@@ -57,7 +57,7 @@ class Scheduler {
     // rootParentCache's caching
     let allEligibleWorkspaces = [];
     for (const workspace of workspaces) {
-      const isMarkedEligible = await this.isWorkspaceEligible(workspace);
+      const isMarkedEligible = this.isWorkspaceEligible(workspace);
       const isCurrentlyBeingWorkedOn = await this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspace.id);
       if (isMarkedEligible && !isCurrentlyBeingWorkedOn) {
         allEligibleWorkspaces.push(workspace);
