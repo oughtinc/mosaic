@@ -20,12 +20,13 @@ class Scheduler {
   public async findNextWorkspace(userId) {
     // clear cache so we don't use old eligibility info
     this.rootParentCache.clearRootParentCache();
-    const idsOfWorkspacesThatCouldBeNext = await this.getIdsOfWorkspacesThatCouldBeNext(userId);
-    const assignedWorkspaceId = pickRandomItemFromArray(idsOfWorkspacesThatCouldBeNext);
+    const workspacesThatCouldBeNext = await this.getWorkspacesThatCouldBeNext(userId);
+    const assignedWorkspace = pickRandomItemFromArray(workspacesThatCouldBeNext);
+    const assignedWorkspaceId = assignedWorkspace.id;
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspaceId);
   }
 
-  private async getIdsOfWorkspacesThatCouldBeNext(userId) {
+  private async getWorkspacesThatCouldBeNext(userId) {
     const allWorkspaces = await this.fetchAllWorkspaces();
     const allEligibleWorkspaces = await this.filterByEligibility(allWorkspaces);
     const workspacesInTreeWorkedOnLeastRecently = await this.filterByWhetherInTreeWorkedOnLeastRecently(allEligibleWorkspaces);
@@ -46,7 +47,7 @@ class Scheduler {
       return [idOfWorkspaceWorkedOnLeastRecently];
     }
 
-    return finalWorkspaces.map(w => w.id);
+    return finalWorkspaces;
   }
 
   private async filterByEligibility(workspaces) {

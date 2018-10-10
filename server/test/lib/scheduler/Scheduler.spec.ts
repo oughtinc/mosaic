@@ -170,14 +170,16 @@ describe("Scheduler class", function() {
     });
   });
 
-  describe("getIdsOfWorkspacesThatCouldBeNext", function() {
+  describe("getWorkspacesThatCouldBeNext", function() {
     it("works in a straightforward case", async function() {
       this.schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
       this.clock.tick(ONE_MINUTE / 2);
       this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
 
-      const result = await this.scheduler.getIdsOfWorkspacesThatCouldBeNext(USER_ID_1);
-      expect(result).to.have.deep.members(["3", "4", "5", "5-1", "5-2", "5-3", "5-4"]);
+      const result = await this.scheduler.getWorkspacesThatCouldBeNext(USER_ID_1);
+      expect(result).to.have.deep.members(workspaces.filter(
+        w => w.id === "3" || w.id === "4" || w.id == "5" || w.id === "5-1" || w.id === "5-2" || w.id === "5-3" || w.id === "5-4"
+      ));
     });
 
     it("works when all workspaces assigned at least once", async function() {
@@ -199,8 +201,10 @@ describe("Scheduler class", function() {
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
 
       // NOTE 5-1 is excluded because it's currently being worked on!
-      const result = await this.scheduler.getIdsOfWorkspacesThatCouldBeNext(USER_ID_1);
-      expect(result).to.have.deep.members(["5", "5-2", "5-3", "5-4"]);
+      const result = await this.scheduler.getWorkspacesThatCouldBeNext(USER_ID_1);
+      expect(result).to.have.deep.members(workspaces.filter(
+        w => w.id == "5" || w.id === "5-2" || w.id === "5-3" || w.id === "5-4"
+      ));
     });
   });
 
