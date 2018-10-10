@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import { Assignment } from "./Assignment";
 import { RootParentFinder } from "./RootParentFinder";
 
@@ -29,13 +30,7 @@ class UserSchedule {
   }
 
   public hasUserWorkedOnWorkspace(workspaceId) {
-    for (const assignment of this.userSchedule) {
-      if (assignment.getWorkspaceId() === workspaceId) {
-        return true;
-      }
-    }
-
-    return false;
+    return _.some(this.userSchedule, assignment => assignment.getWorkspaceId() === workspaceId);
   }
 
   public isUserCurrentlyWorkingOnWorkspace(workspaceId) {
