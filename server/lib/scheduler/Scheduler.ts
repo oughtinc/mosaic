@@ -81,7 +81,7 @@ class Scheduler {
   }
 
   private filterByWhetherHasRemainingBudget(workspaces) {
-    return workspaces.filter(this.hasRemainingBudgetForChildren;
+    return workspaces.filter(this.hasRemainingBudgetForChildren);
   }
 
   private isWorkspaceEligible(w) {
