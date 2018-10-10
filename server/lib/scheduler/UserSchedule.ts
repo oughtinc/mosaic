@@ -34,13 +34,20 @@ class UserSchedule {
   }
 
   public isUserCurrentlyWorkingOnWorkspace(workspaceId) {
+    return (
+      this.lastWorkedOnWorkspaceId() === workspaceId
+      &&
+      this.isActiveInLastWorkspace()
+    );
+  }
+
+  private lastWorkedOnWorkspaceId() {
     const lastWorkedOnAssignment = this.getMostRecentAssignment();
-    const didUserLastWorkOnWorkspace = lastWorkedOnAssignment.getWorkspaceId() === workspaceId;
+    return lastWorkedOnAssignment.getWorkspaceId()
+  }
 
-    if (!didUserLastWorkOnWorkspace) {
-      return false;
-    }
-
+  private isActiveInLastWorkspace() {
+    const lastWorkedOnAssignment = this.getMostRecentAssignment();
     const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
     const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < this.timeLimit;
 
