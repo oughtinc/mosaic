@@ -2,12 +2,14 @@ import { filter } from "asyncro";
 import { pickRandomItemFromArray } from "../utils/pickRandomItemFromArray";
 
 class Scheduler {
-  private fetchAllWorkspaces;
+  private fetchAllWorkspacesInTree;
+  private fetchAllRootWorkspaces;
   private rootParentCache;
   private schedule;
 
-  public constructor({ fetchAllWorkspaces, rootParentCache, schedule }) {
-    this.fetchAllWorkspaces = fetchAllWorkspaces;
+  public constructor({ fetchAllWorkspacesInTree, fetchAllRootWorkspaces, rootParentCache, schedule }) {
+    this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
+    this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
     this.rootParentCache = rootParentCache;
     this.schedule = schedule;
   }
@@ -27,27 +29,50 @@ class Scheduler {
   }
 
   private async getActionableWorkspaces() {
-    const allWorkspaces = await this.fetchAllWorkspaces();
-    const allEligibleWorkspaces = await this.filterByEligibility(allWorkspaces);
-    const workspacesInTreeWorkedOnLeastRecently = await this.filterByWhetherInTreeWorkedOnLeastRecently(allEligibleWorkspaces);
-    const notYetWorkedOnInThatTree = await this.filterByWhetherNotYetWorkedOn(workspacesInTreeWorkedOnLeastRecently);
-
-    let finalWorkspaces = notYetWorkedOnInThatTree;
+    const workspacesInTreesWorkedOnLeastRecently = await this.getWorkspacesInTreesWorkedOnLeastRecently();
+    const eligibleWorkspaces = await this.filterByEligibility(workspacesInTreesWorkedOnLeastRecently);
+    const notYetWorkedOn = await this.filterByWhetherNotYetWorkedOn(eligibleWorkspaces);
+    let finalWorkspaces = notYetWorkedOn;
 
     // if every workspace in that tree has been worked on
     // then instead look for workspaces with remaining budgets
     if (finalWorkspaces.length === 0) {
-      finalWorkspaces = await this.filterByWhetherHasRemainingBudget(workspacesInTreeWorkedOnLeastRecently);
+      finalWorkspaces = await this.filterByWhetherHasRemainingBudget(eligibleWorkspaces);
     }
 
     // if every workspace in that tree has 0 remaining budget
     // then instead look for the workspace worked on least recently
     if (finalWorkspaces.length === 0) {
-      const idOfWorkspaceWorkedOnLeastRecently = await this.schedule.getLeastRecentlyActiveWorkspace(workspacesInTreeWorkedOnLeastRecently.map(w => w.id));
+      const idOfWorkspaceWorkedOnLeastRecently = await this.schedule.getLeastRecentlyActiveWorkspace(eligibleWorkspaces.map(w => w.id));
       return [idOfWorkspaceWorkedOnLeastRecently];
     }
 
     return finalWorkspaces;
+  }
+
+  private async getTreesWorkedOnLeastRecently() {
+    const rootWorkspaces = await this.fetchAllRootWorkspaces();
+    return await filter(
+      rootWorkspaces,
+      async w => await this.schedule.isInTreeWorkedOnLeastRecently(
+        rootWorkspaces.map(w => w.id),
+        w.id
+      )
+    );
+  }
+
+  private async getWorkspacesInTreesWorkedOnLeastRecently() {
+    const treesWorkedOnLeastRecently = await this.getTreesWorkedOnLeastRecently();
+
+    let workspacesInTreesWorkedOnLeastRecently = [];
+    for (const tree of treesWorkedOnLeastRecently) {
+      const children = await this.fetchAllWorkspacesInTree(tree);
+      if (children.length > 0) {
+        workspacesInTreesWorkedOnLeastRecently.push(...children);
+      }
+    }
+
+    return workspacesInTreesWorkedOnLeastRecently;
   }
 
   private async filterByEligibility(workspaces) {

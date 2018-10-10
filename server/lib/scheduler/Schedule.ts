@@ -36,7 +36,6 @@ class Schedule {
 
     const userSchedule = this.getUserSchedule(userId);
     userSchedule.assignWorkspace(workspaceId, startAtTimestamp);
-
     const rootParentId = await this.rootParentCache.getRootParentIdOfWorkspace(workspaceId);
     this.cacheForWhenTreeLastWorkedOn[rootParentId] = startAtTimestamp;
   }

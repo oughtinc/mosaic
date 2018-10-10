@@ -31,7 +31,11 @@ const workspaces = [
   { id: "5-4", totalBudget: 100, allocatedBudget: 100 },
 ];
 
-const fetchAllWorkspacesFake = () => workspaces;
+const fetchAllRootWorkspacesFake = () => workspaces.filter(w => w.id.length === 1);
+
+const fetchAllWorkspacesInTreeFake = rootWorkspace => workspaces.filter(
+  w => w.id[0] === rootWorkspace.id
+);
 
 describe("Scheduler class", function() {
   const resetBeforeTesting = function() {
@@ -42,7 +46,8 @@ describe("Scheduler class", function() {
     });
 
     this.scheduler = new Scheduler({
-      fetchAllWorkspaces: fetchAllWorkspacesFake,
+      fetchAllRootWorkspaces: fetchAllRootWorkspacesFake,
+      fetchAllWorkspacesInTree: fetchAllWorkspacesInTreeFake,
       rootParentCache: rootParentCacheFake,
       schedule: this.schedule,
     });
@@ -183,25 +188,26 @@ describe("Scheduler class", function() {
     });
 
     it("works when all workspaces assigned at least once", async function() {
-      this.clock.tick(100);
       this.schedule.assignWorkspaceToUser(USER_ID, "1-1");
-      this.clock.tick(100);
+      this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
-      this.clock.tick(100);
+      this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, "2-1");
-      this.clock.tick(100);
+      this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, "5-1");
-      this.clock.tick(100);
+      this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, "1");
-      this.clock.tick(100);
+      this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, "4");
-      this.clock.tick(100);
+      this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, "3");
-      this.clock.tick(100);
+      this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, "2");
 
-      // NOTE 5-1 is excluded because it's currently being worked on!
+
       const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
+      expect(result.length).to.equal(4);
+      // 5-1 excluded because it's already been assigned but others haven't
       expect(result).to.have.deep.members(workspaces.filter(
         w => w.id == "5" || w.id === "5-2" || w.id === "5-3" || w.id === "5-4"
       ));
