@@ -26,7 +26,7 @@ class Scheduler {
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspaceId);
   }
 
-  private async getWorkspacesThatCouldBeNext(userId) {
+  private async getWorkspacesThatCouldBeNext() {
     const allWorkspaces = await this.fetchAllWorkspaces();
     const allEligibleWorkspaces = await this.filterByEligibility(allWorkspaces);
     const workspacesInTreeWorkedOnLeastRecently = await this.filterByWhetherInTreeWorkedOnLeastRecently(allEligibleWorkspaces);
