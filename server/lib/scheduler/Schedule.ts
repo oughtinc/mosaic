@@ -21,7 +21,7 @@ class Schedule {
     if (this.doesUserHaveASchedule(userId)) {
       return;
     }
-    
+
     this.schedule.set(userId, new UserSchedule({ timeLimit: this.timeLimit, userId }));
   }
 
@@ -57,7 +57,7 @@ class Schedule {
   public async isInTreeWorkedOnLeastRecently(workspaceIds, workspaceId) {
     const treesWorksOnLeastRecently = await this.getTreesWorkedOnLeastRecently(workspaceIds);
     const rootParentId = await this.rootParentCache.getRootParentIdOfWorkspace(workspaceId);
-    return Boolean(treesWorksOnLeastRecently.find(rootWorkspaceId => rootWorkspaceId === rootParentId));
+    return !!(treesWorksOnLeastRecently.find(rootWorkspaceId => rootWorkspaceId === rootParentId));
   }
 
   /*
