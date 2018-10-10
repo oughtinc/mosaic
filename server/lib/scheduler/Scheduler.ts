@@ -1,4 +1,5 @@
 import { filter } from "asyncro";
+import { pickRandomItemFromArray } from "../utils/pickRandomItemFromArray";
 
 class Scheduler {
   private fetchAllWorkspaces;
@@ -20,7 +21,7 @@ class Scheduler {
     // clear cache so we don't use old eligibility info
     this.rootParentCache.clearRootParentCache();
     const idsOfWorkspacesThatCouldBeNext = await this.getIdsOfWorkspacesThatCouldBeNext(userId);
-    const assignedWorkspaceId = this.pickWorkspaceIdAtRandom(idsOfWorkspacesThatCouldBeNext);
+    const assignedWorkspaceId = pickRandomItemFromArray(idsOfWorkspacesThatCouldBeNext);
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspaceId);
   }
 
@@ -46,11 +47,6 @@ class Scheduler {
     }
 
     return finalWorkspaces.map(w => w.id);
-  }
-
-  private pickWorkspaceIdAtRandom(workspaceIds) {
-    const randomIndex = Math.floor(Math.random() * (workspaceIds.length));
-    return workspaceIds[randomIndex];
   }
 
   private async filterByEligibility(workspaces) {
