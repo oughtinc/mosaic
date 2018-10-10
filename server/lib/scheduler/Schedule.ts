@@ -18,6 +18,10 @@ class Schedule {
   }
 
   private createUserSchedule(userId) {
+    if (this.doesUserHaveASchedule(userId)) {
+      return;
+    }
+    
     this.schedule.set(userId, new UserSchedule({ timeLimit: this.timeLimit, userId }));
   }
 
