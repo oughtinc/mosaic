@@ -1,9 +1,9 @@
 class Assignment {
-  private startedAt;
+  private startAtTimestamp;
   private userId;
   private workspace;
 
-  public constructor({ userId, workspace, startAtTimestamp = Date.now() }){
+  public constructor({ startAtTimestamp = Date.now(), userId, workspace }){
     this.startAtTimestamp = startAtTimestamp;
     this.userId = userId;
     this.workspace = workspace;
