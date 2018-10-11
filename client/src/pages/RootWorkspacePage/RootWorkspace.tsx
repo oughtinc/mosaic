@@ -9,6 +9,8 @@ import { Auth } from "../../auth";
 import { TOGGLE_WORKSPACE_IS_PUBLIC } from "../../graphqlQueries";
 
 import {
+  adminCheckboxBgColor,
+  adminCheckboxBorderColor,
   homepageWorkspaceBgColor,
   homepageWorkspaceScratchpadFontColor,
   blockBorderAndBoxShadow
@@ -47,8 +49,8 @@ class RootWorkspacePresentational extends React.Component<any, any> {
           >
             <Checkbox
               style={{
-                backgroundColor: "#f8f8f8",
-                border: "1px solid #ccc",
+                backgroundColor: adminCheckboxBgColor,
+                border: `1px solid ${adminCheckboxBorderColor}`,
                 borderRadius: "3px",
                 padding: "5px 5px 5px 25px",
               }}
