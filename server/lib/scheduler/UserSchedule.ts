@@ -43,7 +43,7 @@ class UserSchedule {
 
   private lastWorkedOnWorkspace() {
     const lastWorkedOnAssignment = this.getMostRecentAssignment();
-    return lastWorkedOnAssignment.getWorkspace()
+    return lastWorkedOnAssignment.getWorkspace();
   }
 
   private isActiveInLastWorkspace() {
