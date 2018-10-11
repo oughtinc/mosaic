@@ -20,7 +20,7 @@ class Scheduler {
   }
 
   public async assignNextWorkspace(userId) {
-    // clear cache so we don't use old eligibility info
+    // clear cache so we can use === for object identity, see README
     this.rootParentCache.clearRootParentCache();
     const actionableWorkspaces = await this.getActionableWorkspaces();
     const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
