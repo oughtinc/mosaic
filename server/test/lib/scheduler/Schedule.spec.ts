@@ -8,10 +8,7 @@ import {
   USER_ID,
   USER_ID_1,
   USER_ID_2,
-  WORKSPACE_ID,
-  WORKSPACE_ID_1,
-  WORKSPACE_ID_2,
-  WORKSPACE_ID_3,
+  workspaces,
   rootParentCacheFake,
 } from "./utils";
 
@@ -64,181 +61,179 @@ describe("Schedule class", function() {
 
   describe("assignWorkspaceToUser", function() {
     it("works with one assignment", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
       const assignment = this.schedule.getMostRecentAssignmentForUser(USER_ID);
-      expect(assignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
+      expect(assignment.getWorkspace()).to.equal(workspaces.get("1"));
     });
 
     it("works with two assignments", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_1);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
       const assignment1 = this.schedule.getMostRecentAssignmentForUser(USER_ID);
-      expect(assignment1.getWorkspaceId()).to.equal(WORKSPACE_ID_1);
+      expect(assignment1.getWorkspace()).to.equal(workspaces.get("1-1"));
 
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_2);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
       const assignment2 = this.schedule.getMostRecentAssignmentForUser(USER_ID);
-      expect(assignment2.getWorkspaceId()).to.equal(WORKSPACE_ID_2);
+      expect(assignment2.getWorkspace()).to.equal(workspaces.get("1-1-1"));
     });
 
     it("works with three assignments", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_1);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
       const assignment1 = this.schedule.getMostRecentAssignmentForUser(USER_ID);
-      expect(assignment1.getWorkspaceId()).to.equal(WORKSPACE_ID_1);
+      expect(assignment1.getWorkspace()).to.equal(workspaces.get("1-1"));
 
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_2);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
       const assignment2 = this.schedule.getMostRecentAssignmentForUser(USER_ID);
-      expect(assignment2.getWorkspaceId()).to.equal(WORKSPACE_ID_2);
+      expect(assignment2.getWorkspace()).to.equal(workspaces.get("1-1-1"));
 
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_3);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
       const assignment2 = this.schedule.getMostRecentAssignmentForUser(USER_ID);
-      expect(assignment2.getWorkspaceId()).to.equal(WORKSPACE_ID_3);
+      expect(assignment2.getWorkspace()).to.equal(workspaces.get("2"));
     });
 
     it("works with two users and three assignments", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, WORKSPACE_ID_1);
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
       const assignment1 = this.schedule.getMostRecentAssignmentForUser(USER_ID_1);
-      expect(assignment1.getWorkspaceId()).to.equal(WORKSPACE_ID_1);
+      expect(assignment1.getWorkspace()).to.equal(workspaces.get("1-1"));
 
-      this.schedule.assignWorkspaceToUser(USER_ID_2, WORKSPACE_ID_2);
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1-1-1"));
       const assignment2 = this.schedule.getMostRecentAssignmentForUser(USER_ID_2);
-      expect(assignment1.getWorkspaceId()).to.equal(WORKSPACE_ID_1);
-      expect(assignment2.getWorkspaceId()).to.equal(WORKSPACE_ID_2);
+      expect(assignment1.getWorkspace()).to.equal(workspaces.get("1-1"));
+      expect(assignment2.getWorkspace()).to.equal(workspaces.get("1-1-1"));
     });
   });
 
   describe("isWorkspaceCurrentlyBeingWorkedOn", function() {
     it("works in straightforward case", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID)).to.equal(true);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(true);
     });
 
     it("works in straightforward case", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID)).to.equal(true);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(true);
 
       this.clock.tick(ONE_MINUTE - 1);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID)).to.equal(true);
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(true);
 
       this.clock.tick(2);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID)).to.equal(false);
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(false);
     });
 
     it("works in re-assigned case", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_1);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID_1)).to.equal(true);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1"))).to.equal(true);
 
       this.clock.tick(ONE_MINUTE / 2);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID_1)).to.equal(true);
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1"))).to.equal(true);
 
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_2);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID_1)).to.equal(false);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID_2)).to.equal(true);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1"))).to.equal(false);
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1-1"))).to.equal(true);
 
       this.clock.tick(ONE_MINUTE - 1);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID_2)).to.equal(true);
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1-1"))).to.equal(true);
 
       this.clock.tick(2);
-      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(WORKSPACE_ID_2)).to.equal(false);
+      expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1-1"))).to.equal(false);
     });
   });
 
   describe("hasWorkspaceBeenWorkedOnYet", function() {
     it("works when hasn't", function() {
-      expect(this.schedule.hasWorkspaceBeenWorkedOnYet(WORKSPACE_ID)).to.equal(false);
+      expect(this.schedule.hasWorkspaceBeenWorkedOnYet(workspaces.get("1"))).to.equal(false);
     });
 
     it("works when has", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID_1);
-      expect(this.schedule.hasWorkspaceBeenWorkedOnYet(WORKSPACE_ID_1)).to.equal(true);
-      expect(this.schedule.hasWorkspaceBeenWorkedOnYet(WORKSPACE_ID_2)).to.equal(false);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
+      expect(this.schedule.hasWorkspaceBeenWorkedOnYet(workspaces.get("1-1"))).to.equal(true);
+      expect(this.schedule.hasWorkspaceBeenWorkedOnYet(workspaces.get("1-1-1"))).to.equal(false);
     });
   });
 
   describe("getTimestampWorkspaceLastWorkedOn", function() {
     it("works in straightforward case", function() {
       this.clock.tick(100);
-      this.schedule.assignWorkspaceToUser(USER_ID, WORKSPACE_ID);
-      expect(this.schedule.getTimestampWorkspaceLastWorkedOn(WORKSPACE_ID)).to.equal(100);
+      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
+      expect(this.schedule.getTimestampWorkspaceLastWorkedOn(workspaces.get("1"))).to.equal(100);
     });
 
     it("works in case when assigned multiple times", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, WORKSPACE_ID);
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1"));
       this.clock.tick(ONE_MINUTE);
       this.clock.tick(100);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, WORKSPACE_ID);
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1"));
 
-      expect(this.schedule.getTimestampWorkspaceLastWorkedOn(WORKSPACE_ID)).to.equal(ONE_MINUTE + 100);
+      expect(this.schedule.getTimestampWorkspaceLastWorkedOn(workspaces.get("1"))).to.equal(ONE_MINUTE + 100);
     });
   });
 
   describe("getLeastRecentlyActiveWorkspace", function() {
     it("works in straightforward case", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, WORKSPACE_ID_1);
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
       this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, WORKSPACE_ID_2);
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1-1-1"));
 
-      const result = this.schedule.getLeastRecentlyActiveWorkspace([WORKSPACE_ID_1, WORKSPACE_ID_2]);
-      expect(result).to.equal(WORKSPACE_ID_1);
+      const result = this.schedule.getLeastRecentlyActiveWorkspace([workspaces.get("1-1"), workspaces.get("1-1-1")]);
+      expect(result).to.equal(workspaces.get("1-1"));
     });
 
     it("works in case where only one has never been worked on", function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, WORKSPACE_ID_1);
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
 
-      const result = this.schedule.getLeastRecentlyActiveWorkspace([WORKSPACE_ID_1, WORKSPACE_ID_2]);
-      expect(result).to.equal(WORKSPACE_ID_2);
+      const result = this.schedule.getLeastRecentlyActiveWorkspace([workspaces.get("1-1"), workspaces.get("1-1-1")]);
+      expect(result).to.equal(workspaces.get("1-1-1"));
     });
   });
 
   describe("getTreesWorkedOnLeastRecently", function() {
     it("works in straightforward case", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
       this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
-      const result = await this.schedule.getTreesWorkedOnLeastRecently(["1-1", "2"]);
-      expect(result).to.have.deep.members(["1"]);
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
+      const result = await this.schedule.getTreesWorkedOnLeastRecently([workspaces.get("1-1"), workspaces.get("2")]);
+      expect(result).to.have.deep.members([workspaces.get("1")]);
     });
 
     it("works in more complicated case", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, "1-1");
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
       this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
       this.clock.tick(100);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "1-2");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1-1-1"));
 
-      const result = await this.schedule.getTreesWorkedOnLeastRecently(["1-1", "1-2", "2"]);
+      const result = await this.schedule.getTreesWorkedOnLeastRecently([workspaces.get("1-1"), workspaces.get("1-1-1"), workspaces.get("2")]);
       expect(result.length).to.equal(1);
-      expect(result).to.have.deep.members(["2"]);
+      expect(result).to.have.deep.members([workspaces.get("2")]);
     });
   });
 
   describe("isInTreeWorkedOnLeastRecently", function() {
     it("works in straightforward case", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, "1");
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1"));
       this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
 
-      const result = await this.schedule.isInTreeWorkedOnLeastRecently(["1-1", "1-2", "2"], "1-1");
+      const result = await this.schedule.isInTreeWorkedOnLeastRecently([workspaces.get("1-1"), workspaces.get("2")], workspaces.get("1-1"));
       expect(result).to.equal(true);
     });
 
     it("works in complicated case", async function() {
       this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_1, "1-1-1");
+      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1-1"));
       this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "2-1");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2-1"));
       this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "3");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("3"));
       this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
       this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "2-2");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2-2"));
       this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "1");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1"));
       this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "3-1");
-      this.clock.tick(1);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, "2");
+      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("3"));
 
-      const result = await this.schedule.isInTreeWorkedOnLeastRecently(["1", "2", "3"], "1-1");
+      const result = await this.schedule.isInTreeWorkedOnLeastRecently([workspaces.get("1"), workspaces.get("2"), workspaces.get("3")], workspaces.get("2-1"));
       expect(result).to.equal(true);
     });
   });

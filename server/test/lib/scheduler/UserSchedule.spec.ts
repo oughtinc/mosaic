@@ -4,9 +4,7 @@ import { UserSchedule } from "../../../lib/scheduler/UserSchedule";
 
 import {
   USER_ID,
-  WORKSPACE_ID,
-  WORKSPACE_ID_1,
-  WORKSPACE_ID_2,
+  workspaces,
 } from "./utils";
 
 describe("UserSchedule class", function() {
@@ -27,7 +25,7 @@ describe("UserSchedule class", function() {
 
     context("with a user that has been assigned to a workspace", function() {
       it("returns true", function() {
-        this.userSchedule.assignWorkspace(WORKSPACE_ID);
+        this.userSchedule.assignWorkspace(workspaces[0]);
         expect(this.userSchedule.hasUserBeenAssignedToAnyWorkspaces()).to.equal(true);
       });
     });
@@ -41,19 +39,19 @@ describe("UserSchedule class", function() {
     });
 
     context("with a user that has been assigned a workspace once", function() {
-      it("returns the id of that workspace", function() {
-        this.userSchedule.assignWorkspace(WORKSPACE_ID);
+      it("returns that workspace", function() {
+        this.userSchedule.assignWorkspace(workspaces[0]);
         const mostRecentAssignment = this.userSchedule.getMostRecentAssignment()
-        expect(mostRecentAssignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
+        expect(mostRecentAssignment.getWorkspace()).to.equal(workspaces[0]);
       });
     });
 
     context("with a user that has been assigned two workspaces", function() {
-      it("returns the id of the most recently assigned workspace", function() {
-        this.userSchedule.assignWorkspace(WORKSPACE_ID_1);
-        this.userSchedule.assignWorkspace(WORKSPACE_ID_2);
+      it("returns the most recently assigned workspace", function() {
+        this.userSchedule.assignWorkspace(workspaces[1]);
+        this.userSchedule.assignWorkspace(workspaces[2]);
         const mostRecentAssignment = this.userSchedule.getMostRecentAssignment()
-        expect(mostRecentAssignment.getWorkspaceId()).to.equal(WORKSPACE_ID_2);
+        expect(mostRecentAssignment.getWorkspace()).to.equal(workspaces[2]);
       });
     });
   });
@@ -61,28 +59,28 @@ describe("UserSchedule class", function() {
   describe("hasUserWorkedOnWorkspace method", function() {
     context("with a user that has not been assigned to any workspace", function() {
       it("returns false", function() {
-        expect(this.userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID)).to.equal(false);
+        expect(this.userSchedule.hasUserWorkedOnWorkspace(workspaces[0])).to.equal(false);
       });
     });
 
     context("with a user that has been assigned to a workspace once", function() {
       it("returns true for assigned workspace", function() {
-        this.userSchedule.assignWorkspace(WORKSPACE_ID);
-        expect(this.userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID)).to.equal(true);
+        this.userSchedule.assignWorkspace(workspaces[0]);
+        expect(this.userSchedule.hasUserWorkedOnWorkspace(workspaces[0])).to.equal(true);
       });
 
       it("returns false for other workspace", function() {
-        this.userSchedule.assignWorkspace(WORKSPACE_ID_1);
-        expect(this.userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID_2)).to.equal(false);
+        this.userSchedule.assignWorkspace(workspaces[1]);
+        expect(this.userSchedule.hasUserWorkedOnWorkspace(workspaces[2])).to.equal(false);
       });
     });
 
     context("with a user that has been assigned to two workspaces", function() {
       it("returns true for both", function() {
-        this.userSchedule.assignWorkspace(WORKSPACE_ID_1);
-        this.userSchedule.assignWorkspace(WORKSPACE_ID_2);
-        expect(this.userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID_1)).to.equal(true);
-        expect(this.userSchedule.hasUserWorkedOnWorkspace(WORKSPACE_ID_2)).to.equal(true);
+        this.userSchedule.assignWorkspace(workspaces[1]);
+        this.userSchedule.assignWorkspace(workspaces[2]);
+        expect(this.userSchedule.hasUserWorkedOnWorkspace(workspaces[1])).to.equal(true);
+        expect(this.userSchedule.hasUserWorkedOnWorkspace(workspaces[2])).to.equal(true);
       });
     });
   });

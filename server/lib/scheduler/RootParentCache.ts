@@ -1,45 +1,25 @@
 import * as models from "../models";
 
 class RootParentCache {
-  private static rootParentCache = {};
+  private static rootParentCache = new Map();
 
   public static clearRootParentCache() {
-    this.rootParentCache = {};
+    this.rootParentCache = new Map();
   }
 
-  public static async getRootParentOfWorkspace(workspaceId, workspace) {
-    if (this.rootParentCache[workspaceId]) {
-      return this.rootParentCache[workspaceId];
-    }
-
-    if (!workspace) {
-      workspace = await models.Workspace.findById(workspaceId);
+  public static async getRootParentOfWorkspace(workspace) {
+    if (this.rootParentCache.has(workspace)) {
+      return this.rootParentCache.get(workspace);
     }
 
     if (!workspace.parentId) {
-      this.rootParentCache[workspaceId] = workspace;
+      this.rootParentCache.set(workspace, workspace);
       return workspace;
     } else {
-      const rootParent = await this.getRootParentOfWorkspace(workspace.parentId);
-      this.rootParentCache[workspaceId] = rootParent;
+      const parent = models.Workspace.findById(parentId);
+      const rootParent = await RootParentCache.getRootParentOfWorkspace(parent);
+      this.rootParentCache.set(workspace, rootParent);
       return rootParent;
-    }
-  }
-
-  public static async getRootParentIdOfWorkspace(workspaceId) {
-    if (this.rootParentCache[workspaceId]) {
-      return this.rootParentCache[workspaceId].id;
-    }
-
-    const workspace = await models.Workspace.findById(workspaceId);
-
-    if (!workspace.parentId) {
-      this.rootParentCache[workspaceId] = workspace;
-      return workspace.id;
-    } else {
-      const rootParent = await this.getRootParentOfWorkspace(workspace.parentId);
-      this.rootParentCache[workspaceId] = rootParent;
-      return rootParent.id;
     }
   }
 }

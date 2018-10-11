@@ -16,10 +16,10 @@ class UserSchedule {
     return this.userSchedule.length > 0;
   }
 
-  public assignWorkspace(workspaceId, startAtTimestamp = Date.now()) {
+  public assignWorkspace(workspace, startAtTimestamp = Date.now()) {
     const assignment = new Assignment({
       userId: this.userId,
-      workspaceId,
+      workspace,
       startAtTimestamp,
     });
     this.userSchedule.push(assignment);
@@ -29,21 +29,21 @@ class UserSchedule {
     return this.userSchedule[this.userSchedule.length - 1];
   }
 
-  public hasUserWorkedOnWorkspace(workspaceId) {
-    return _.some(this.userSchedule, assignment => assignment.getWorkspaceId() === workspaceId);
+  public hasUserWorkedOnWorkspace(workspace) {
+    return _.some(this.userSchedule, assignment => assignment.getWorkspace() === workspace);
   }
 
-  public isUserCurrentlyWorkingOnWorkspace(workspaceId) {
+  public isUserCurrentlyWorkingOnWorkspace(workspace) {
     return (
-      this.lastWorkedOnWorkspaceId() === workspaceId
+      this.lastWorkedOnWorkspace() === workspace
       &&
       this.isActiveInLastWorkspace()
     );
   }
 
-  private lastWorkedOnWorkspaceId() {
+  private lastWorkedOnWorkspace() {
     const lastWorkedOnAssignment = this.getMostRecentAssignment();
-    return lastWorkedOnAssignment.getWorkspaceId()
+    return lastWorkedOnAssignment.getWorkspace()
   }
 
   private isActiveInLastWorkspace() {
@@ -58,11 +58,11 @@ class UserSchedule {
     return false;
   }
 
-  public getTimestampWorkspaceLastWorkedOn(workspaceId) {
+  public getTimestampWorkspaceLastWorkedOn(workspace) {
     let mostRecentTimestamp = -Infinity;
 
     for (const assignment of this.userSchedule) {
-      if (assignment.getWorkspaceId() === workspaceId) {
+      if (assignment.getWorkspace() === workspace) {
         const curTimestamp = assignment.getStartedAtTimestamp();
         if (mostRecentTimestamp < curTimestamp) {
           mostRecentTimestamp = curTimestamp;

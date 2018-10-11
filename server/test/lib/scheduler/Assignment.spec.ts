@@ -2,7 +2,7 @@ import * as chai from "chai";
 const { expect } = chai;
 import { Assignment } from "../../../lib/scheduler/Assignment";
 
-import { USER_ID, WORKSPACE_ID } from "./utils";
+import { USER_ID, workspaces } from "./utils";
 
 describe("Assignment class", function() {
   beforeEach(function() {
@@ -10,13 +10,13 @@ describe("Assignment class", function() {
 
     this.assignment = new Assignment({
       userId: USER_ID,
-      workspaceId: WORKSPACE_ID,
+      workspace: workspaces[0],
       startedAtTimestamp: this.startedAtTimestamp,
     });
   });
 
-  it("can retrieve workspace id", function() {
-    expect(this.assignment.getWorkspaceId()).to.equal(WORKSPACE_ID);
+  it("can retrieve workspace", function() {
+    expect(this.assignment.getWorkspace()).to.equal(workspaces[0]);
   });
 
   it("records the timestamp at which the assignment started", function() {
