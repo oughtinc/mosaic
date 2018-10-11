@@ -233,6 +233,19 @@ export class BlockEditorEditingPresentational extends React.Component<
     // so this lives here instead
     slateChangeMutations.adjustCursorIfAtEdge(c);
 
+    // make sure no two blocks are side by side
+    // assumes blocks are on same level
+    // after we update Slate, can redo this very elegantly as a schema
+    let blocks = c.value.document.getBlocks();
+    while (blocks.size > 2) {
+      const firstBlock = blocks.get(0);
+      const secondBlock = blocks.get(1);
+      const firstText = secondBlock.getFirstText();
+      c.insertTextByKey(firstText.key, 0, '\n');
+      c.mergeNodeByKey(secondBlock.key);
+      blocks = c.value.document.getBlocks();
+    } 
+
     this.onChange(c.value);
   };
 
