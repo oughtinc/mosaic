@@ -27,7 +27,6 @@ describe("Schedule class", function() {
     this.clock.restore();
   });
 
-  // tests private method, maybe remove
   describe("doesUserHaveASchedule", function () {
     context("with a user that doesn't have a schedule", function() {
       it("returns false", function () {
@@ -37,13 +36,12 @@ describe("Schedule class", function() {
 
     context("with a user that has a schedule", function() {
       it("returns true", function () {
-        this.schedule.createUserSchedule(USER_ID);
+        this.schedule.createUserScheduleIfNotCreated(USER_ID);
         expect(this.schedule.doesUserHaveASchedule(USER_ID)).to.equal(true);
       });
     });
   });
 
-  // tests private method, maybe remove
   describe("getUserSchedule", function() {
     context("with a user that doesn't have a schedule", function() {
       it("returns undefined", function() {
@@ -53,7 +51,7 @@ describe("Schedule class", function() {
 
     context("with a user that has a schedule", function() {
       it("returns user's schedule", function() {
-        this.schedule.createUserSchedule(USER_ID);
+        this.schedule.createUserScheduleIfNotCreated(USER_ID);
         expect(this.schedule.getUserSchedule(USER_ID)).to.be.a("object");
       });
     });

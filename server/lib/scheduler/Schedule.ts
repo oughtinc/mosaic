@@ -21,7 +21,7 @@ class Schedule {
     return this.schedule.has(userId);
   }
 
-  private createUserSchedule(userId) {
+  private createUserScheduleIfNotCreated(userId) {
     if (this.doesUserHaveASchedule(userId)) {
       return;
     }
@@ -35,7 +35,7 @@ class Schedule {
 
   public async assignWorkspaceToUser(userId, workspace, startAtTimestamp = Date.now()) {
     if (!this.doesUserHaveASchedule(userId)) {
-      this.createUserSchedule(userId);
+      this.createUserScheduleIfNotCreated(userId);
     }
 
     const userSchedule = this.getUserSchedule(userId);
