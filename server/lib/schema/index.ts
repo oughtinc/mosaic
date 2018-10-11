@@ -306,7 +306,29 @@ const schema = new GraphQLSchema({
             event
           });
         }
-      }
+      },
+      toggleWorkspaceIsPublic: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to toggle workspace visiblity."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to toggle workspace visiblity"
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isPublic: !workspace.isPublic });
+          return { id: workspaceId };
+        }
+      },
     }
   })
 });

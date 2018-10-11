@@ -86,3 +86,11 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
     }
   }
 `;
+
+export const TOGGLE_WORKSPACE_IS_PUBLIC = gql`
+  mutation toggleWorkspaceIsPublic($workspaceId: String) {
+      toggleWorkspaceIsPublic(workspaceId: $workspaceId) {
+        id
+      }
+    }
+`;
