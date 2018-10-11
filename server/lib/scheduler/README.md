@@ -18,10 +18,10 @@ The schedule (there's only one) is the collection of all userSchedules.
 
 #### Scheduler
 
-The scheduler is the only exposed API. It only has two public methods: `getIdOfCurrentWorkspace` and `findNextWorkspace`. The scheduler looks at all of the scheduling information and decides which workspace to assign to a user next.
+The scheduler is the only exposed API. It only has two public methods: `getIdOfCurrentWorkspace` and `assignNextWorkspace`. The scheduler looks at all of the scheduling information (via the schedule) and decides which workspace to assign to a user next.
 
 ## Implementation
 
-Some implementation notes. Except for in Scheduler, workspaces and users are always identified with their ids. Scheduler sometimes needs more information (e.g., budget information), so by default the methods in scheduler pass around full workspaces (but still just ids for users).
+There is quite a bit of reasoning about trees. Trees are identified with their root workspaces.
 
-Additionally, there is quite a bit of reasoning about trees. Trees are identified with their root workspaces.
+One gotcha to watch out for is that it doesn't appear repeated Sequelize queries preserve object identity. For example doing the following twice `await models.Workspace.findById(workspaceid)` yields distinct objects. This can cause really difficult to detect bugs when using `===` to determine object identity. Right now things are OK because the every time the scheduler finds a next workspace for a user, it clears the cache and fetches Sequelize objects once, so `===` is OK.
