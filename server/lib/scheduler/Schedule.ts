@@ -54,43 +54,36 @@ class Schedule {
   }
 
   /*
-    NOTE: this only considers the trees that at least one workspace in the
-    argument belong to
+    NOTE: this only considers the trees associated with the rootWorkspaces
+    argument
   */
-  public async isInTreeWorkedOnLeastRecently(workspaces, workspace) {
-    const treesWorksOnLeastRecently = await this.getTreesWorkedOnLeastRecently(workspaces);
+  public async isInTreeWorkedOnLeastRecently(rootWorkspaces, workspace) {
+    const treesWorksOnLeastRecently = this.getTreesWorkedOnLeastRecently(rootWorkspaces);
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
     return !!(treesWorksOnLeastRecently.find(rootWorkspace => rootWorkspace === rootParent));
   }
 
   /*
-    NOTE: this only considers the trees that at least one workspace in the
-    argument belong to
+    NOTE: this only considers the trees associated with the rootWorkspaces
+    argument
   */
-  public async getTreesWorkedOnLeastRecently(workspaces) {
-    const rootParents = await map(
-      workspaces,
-      async workspace => await this.rootParentCache.getRootParentOfWorkspace(workspace),
-    );
-
-    const uniqRootParents = _.uniqBy(rootParents, w => w.id);
-
-    const treesNotYetWorkedOn = uniqRootParents.filter(
-      rootParent => this.cacheForWhenTreeLastWorkedOn[rootParent.id] === undefined
+  public getTreesWorkedOnLeastRecently(rootWorkspaces) {
+    const treesNotYetWorkedOn = rootWorkspaces.filter(
+      rootWorkspace => this.cacheForWhenTreeLastWorkedOn[rootWorkspace.id] === undefined
     );
 
     if (treesNotYetWorkedOn.length > 0) {
       return treesNotYetWorkedOn;
     }
 
-    const lastWorkedOnTimestamps = uniqRootParents.map(
-      rootParent => this.cacheForWhenTreeLastWorkedOn[rootParent.id]
+    const lastWorkedOnTimestamps = rootWorkspaces.map(
+      rootWorkspace => this.cacheForWhenTreeLastWorkedOn[rootWorkspace.id]
     );
 
     const minTimestamp = Math.min.apply(Math, lastWorkedOnTimestamps);
 
-    const leastRecentlyWorkedOnTrees = uniqRootParents.filter(rootParent =>
-      this.cacheForWhenTreeLastWorkedOn[rootParent.id] === minTimestamp
+    const leastRecentlyWorkedOnTrees = rootWorkspaces.filter(rootWorkspace =>
+      this.cacheForWhenTreeLastWorkedOn[rootWorkspace.id] === minTimestamp
     );
 
     return leastRecentlyWorkedOnTrees;

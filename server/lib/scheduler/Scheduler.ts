@@ -31,6 +31,7 @@ class Scheduler {
     const workspacesInTreesWorkedOnLeastRecently = await this.getWorkspacesInTreesWorkedOnLeastRecently();
     const eligibleWorkspaces = await this.filterByEligibility(workspacesInTreesWorkedOnLeastRecently);
     const notYetWorkedOn = await this.filterByWhetherNotYetWorkedOn(eligibleWorkspaces);
+
     let finalWorkspaces = notYetWorkedOn;
 
     // if every workspace in that tree has been worked on
@@ -51,17 +52,12 @@ class Scheduler {
 
   private async getTreesWorkedOnLeastRecently() {
     const rootWorkspaces = await this.fetchAllRootWorkspaces();
-    return await filter(
-      rootWorkspaces,
-      async w => await this.schedule.isInTreeWorkedOnLeastRecently(
-        rootWorkspaces,
-        w
-      )
-    );
+    return this.schedule.getTreesWorkedOnLeastRecently(rootWorkspaces);
   }
 
   private async getWorkspacesInTreesWorkedOnLeastRecently() {
     const treesWorkedOnLeastRecently = await this.getTreesWorkedOnLeastRecently();
+
     let workspacesInTreesWorkedOnLeastRecently = [];
     for (const tree of treesWorkedOnLeastRecently) {
       const children = await this.fetchAllWorkspacesInTree(tree);
@@ -77,23 +73,6 @@ class Scheduler {
     const isMarkedEligible = w => this.isWorkspaceEligible(w);
     const isCurrentlyBeingWorkedOn = w => this.schedule.isWorkspaceCurrentlyBeingWorkedOn(w);
     return workspaces.filter(w => isMarkedEligible(w) && !isCurrentlyBeingWorkedOn(w));
-  }
-
-  /*
-    NOTE: this only considers the trees that at least one workspace in the
-    workspaces argument belong to
-  */
-  private async filterByWhetherInTreeWorkedOnLeastRecently(workspaces) {
-    let workspacesInTreeWorkedOnLeastRecently = [];
-
-    for (const workspace of workspaces) {
-      const shouldInclude = await this.schedule.isInTreeWorkedOnLeastRecently(workspaces, workspace);
-      if (shouldInclude) {
-        workspacesInTreeWorkedOnLeastRecently.push(workspace);
-      }
-    }
-
-    return workspacesInTreeWorkedOnLeastRecently;
   }
 
   private async filterByWhetherNotYetWorkedOn(workspaces) {
