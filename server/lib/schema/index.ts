@@ -196,15 +196,6 @@ const schema = new GraphQLSchema({
                 "Got null workspace while attempting to update blocks"
               );
             }
-            if (
-              workspace.isPublic &&
-              !user.is_admin &&
-              user.user_id !== workspace.creatorId
-            ) {
-              throw new Error(
-                "Non-admin user attempted to edit block on public workspace"
-              );
-            }
             await block.update({ ..._block }, { event });
             newBlocks = [...newBlocks, block];
           }
@@ -263,11 +254,6 @@ const schema = new GraphQLSchema({
             );
           }
           const workspace = await models.Workspace.findById(workspaceId);
-          if (!user.is_admin && workspace.creatorId !== user.user_id) {
-            throw new Error(
-              "Non-admin, non-creator user attempted to create child workspace"
-            );
-          }
           const event = await models.Event.create();
           const child = await workspace.createChild({
             event,
@@ -296,11 +282,6 @@ const schema = new GraphQLSchema({
 
           const event = await models.Event.create();
           const workspace = await models.Workspace.findById(workspaceId);
-          if (!user.is_admin && workspace.creatorId !== user.user_id) {
-            throw new Error(
-              "Non-admin, non-creator user attempted to update child workspace"
-            );
-          }
           const child = await models.Workspace.findById(childId);
           await workspace.changeAllocationToChild(child, totalBudget, {
             event
