@@ -208,10 +208,12 @@ export class FormPagePresentational extends React.Component<any, any> {
   };
 
   public render() {
-    const workspace = this.props.workspace.workspace;
-    if (!workspace) {
+    const isLoading = this.props.workspace.loading;
+    if (isLoading || !this.props.workspace.workspace) {
       return <ContentContainer>Loading...</ContentContainer>;
     }
+
+    const workspace = this.props.workspace.workspace;
 
     const importedPointers = workspace.connectedPointers;
 

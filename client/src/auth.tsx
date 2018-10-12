@@ -106,11 +106,7 @@ export class Auth {
       return false;
     }
 
-    if (workspace.isPublic) {
-      return Auth.isAdmin() || workspace.creatorId === Auth.userId();
-    } else {
-      return Auth.isAuthenticated();
-    }
+    return Auth.isAuthenticated();
   }
 
   public static isAdmin(): boolean {
