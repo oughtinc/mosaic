@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 import { RootBlock } from "./RootBlock";
 import { Auth } from "../../auth";
-import { TOGGLE_WORKSPACE_IS_PUBLIC } from "../../graphqlQueries";
+import { UPDATE_WORKSPACE_IS_PUBLIC } from "../../graphqlQueries";
 
 import {
   adminCheckboxBgColor,
@@ -30,6 +30,17 @@ const workspaceToBlock = (workspace, blockType) =>
   workspace.blocks && workspace.blocks.find(b => b.type === blockType);
 
 class RootWorkspacePresentational extends React.Component<any, any> {
+  public state = { isPublicCheckboxStatusPending: false };
+
+  public componentDidUpdate(prevProps: any, prevState: any) {
+    const isPublicDidChange = this.didIsPublicChange(prevProps, this.props);
+    if (isPublicDidChange) {
+      this.setState({
+        isPublicCheckboxStatusPending: false,
+      });
+    }
+  }
+
   public render() {
     const workspace = this.props.workspace;
 
@@ -53,15 +64,20 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                 border: `1px solid ${adminCheckboxBorderColor}`,
                 borderRadius: "3px",
                 padding: "5px 5px 5px 25px",
+                opacity: this.state.isPublicCheckboxStatusPending ? 0.75 : 1,
               }}
               inline={true}
               type="checkbox"
-              defaultChecked={workspace.isPublic}
-              onChange={() => this.props.toggleWorkspaceIsPublic({
-                variables: { workspaceId: workspace.id }
-              })}
+              checked={workspace.isPublic}
+              onChange={this.handleOnIsPublicCheckboxChange}
             >
-              appears on front page
+              {
+                this.state.isPublicCheckboxStatusPending
+                ?
+                "updating..."
+                :
+                "appears on front page"
+              }
             </Checkbox>
           </div>
         }
@@ -104,10 +120,36 @@ class RootWorkspacePresentational extends React.Component<any, any> {
       </WorkspaceContainer>
     );
   }
+
+  private handleOnIsPublicCheckboxChange = () => {
+    if (this.state.isPublicCheckboxStatusPending) {
+      return;
+    }
+
+    this.setState({ isPublicCheckboxStatusPending: true }, () => {
+      // the setTimeout here can be removed if desired
+      // it is only here so the user has a moment to see the "Updating"
+      // message if the server responds very quickly
+      setTimeout(() => {
+        this.props.updateWorkspaceIsPublic({
+          variables: {
+            isPublic: !this.props.workspace.isPublic,
+            workspaceId: this.props.workspace.id,
+          }
+        });
+      }, 200);
+    });
+  }
+
+  private didIsPublicChange = (prevProps: any, curProps: any) => {
+    const prevWorkspace = prevProps.workspace;
+    const curWorkspace = curProps.workspace;
+    return prevWorkspace.isPublic !== curWorkspace.isPublic;
+  }
 }
 
-const RootWorkspace: any = graphql(TOGGLE_WORKSPACE_IS_PUBLIC, {
-  name: "toggleWorkspaceIsPublic",
+const RootWorkspace: any = graphql(UPDATE_WORKSPACE_IS_PUBLIC, {
+  name: "updateWorkspaceIsPublic",
   options: {
     refetchQueries: ["RootWorkspacesQuery"]
   }
