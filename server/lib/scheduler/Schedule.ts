@@ -66,7 +66,7 @@ class Schedule {
   */
   public getTreesWorkedOnLeastRecently(rootWorkspaces) {
     const treesNotYetWorkedOn = rootWorkspaces.filter(
-      rootWorkspace => this.lastWorkedOnTimestampForTree[rootWorkspace.id] === undefined
+      r => this.lastWorkedOnTimestampForTree[r.id] === undefined
     );
 
     if (treesNotYetWorkedOn.length > 0) {
@@ -74,13 +74,13 @@ class Schedule {
     }
 
     const lastWorkedOnTimestamps = rootWorkspaces.map(
-      rootWorkspace => this.lastWorkedOnTimestampForTree[rootWorkspace.id]
+      r => this.lastWorkedOnTimestampForTree[r.id]
     );
 
     const minTimestamp = Math.min.apply(Math, lastWorkedOnTimestamps);
 
-    const leastRecentlyWorkedOnTrees = rootWorkspaces.filter(rootWorkspace =>
-      this.lastWorkedOnTimestampForTree[rootWorkspace.id] === minTimestamp
+    const leastRecentlyWorkedOnTrees = rootWorkspaces.filter(
+      r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp
     );
 
     return leastRecentlyWorkedOnTrees;
