@@ -20,11 +20,13 @@
     "db:reset": "yarn run db:clear; yarn run db:migrate",
     "db:clear": "yarn run db:drop; yarn run db:create",
     "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
+    "test-scheduler": "mocha --watch --watch-extensions ts -r ts-node/register test/lib/scheduler/*.spec.ts",
     "pretest": "NODE_ENV=test npm run db:reset"
   },
   "dependencies": {
     "apollo-server-express": "^1.1.7",
     "async": "^2.6.0",
+    "asyncro": "^3.0.0",
     "auth0-js": "^9.6.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
@@ -74,8 +76,10 @@
     "mocha": "^3.0.1",
     "nodemon": "^1.12.1",
     "rimraf": "^2.6.2",
+    "sinon": "^6.3.5",
     "ts-node": "^5.0.1",
     "tslint": "^5.10.0",
-    "typescript": "^2.7.2"
+    "typescript": "^2.7.2",
+    "uuid": "^3.3.2"
   }
 }

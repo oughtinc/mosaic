@@ -14,6 +14,7 @@ import thunk from "redux-thunk";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
+import { NextEpisodeShowPage } from "./pages/NextEpisodeShowPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 import { applyMiddleware, combineReducers, createStore } from "redux";
 import { blockReducer } from "./modules/blocks/reducer";
@@ -86,6 +87,7 @@ const Routes = () => (
   <div>
     <Route exact={true} path="/workspaces" render={() => <Redirect to="/" />} />
     <Route exact={true} path="/" component={RootWorkspacePage} />
+    <Route exact={true} path="/next" component={NextEpisodeShowPage} />
     <Route
       exact={true}
       path="/workspaces/:workspaceId"

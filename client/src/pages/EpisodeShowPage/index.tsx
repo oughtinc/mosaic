@@ -247,6 +247,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                   <Timer
                     durationString={durationString}
                     onTimerEnd={this.handleTimerEnd}
+                    shouldTimerReset={this.props.location.state.shouldTimerReset}
                     style={{ marginRight: "30px" }}
                     workspaceId={workspace.id}
                   />
