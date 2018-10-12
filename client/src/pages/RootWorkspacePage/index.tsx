@@ -8,6 +8,8 @@ import { ListOfRootWorkspaces } from "./ListOfRootWorkspaces";
 import { NewRootWorkspaceForm } from "./NewRootWorkspaceForm";
 import { WelcomeMessage } from "./WelcomeMessage";
 
+import { ContentContainer } from "../../components/ContentContainer";
+
 import { Auth } from "../../auth";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
 
@@ -21,31 +23,22 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     );
 
     return (
-      <div>
-        {
-          !Auth.isAuthenticated()
-          &&
-          <WelcomeMessage />
-        }
+      <ContentContainer>
+        {!Auth.isAuthenticated() && <WelcomeMessage />}
 
         <HomePageHeading>Questions</HomePageHeading>
-        <ListOfRootWorkspaces
-          isLoading={isLoading}
-          workspaces={workspaces}
-        />
+        <ListOfRootWorkspaces isLoading={isLoading} workspaces={workspaces} />
 
-        {
-          Auth.isAuthenticated()
-          &&
+        {Auth.isAuthenticated() && (
           <NewRootWorkspaceForm
             createWorkspace={this.props.createWorkspace}
             style={{
               marginBottom: "30px",
-              marginTop: "30px",
+              marginTop: "30px"
             }}
           />
-        }
-      </div>
+        )}
+      </ContentContainer>
     );
   }
 }
