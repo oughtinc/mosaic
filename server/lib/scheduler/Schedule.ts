@@ -34,10 +34,7 @@ class Schedule {
   }
 
   public async assignWorkspaceToUser(userId, workspace, startAtTimestamp = Date.now()) {
-    if (!this.doesUserHaveASchedule(userId)) {
-      this.createUserScheduleIfNotCreated(userId);
-    }
-
+    this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
     userSchedule.assignWorkspace(workspace, startAtTimestamp);
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
