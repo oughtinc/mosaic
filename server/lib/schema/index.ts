@@ -213,7 +213,7 @@ const schema = new GraphQLSchema({
           return newBlocks;
         }
       },
-      updateWorkspace: {
+      updateWorkspaceChildren: {
         type: workspaceType,
         args: {
           id: { type: GraphQLString },

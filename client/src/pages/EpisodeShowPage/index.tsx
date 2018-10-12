@@ -71,8 +71,14 @@ const WORKSPACE_QUERY = gql`
 `;
 
 const UPDATE_WORKSPACE = gql`
-  mutation updateWorkspace($id: String!, $childWorkspaceOrder: [String]) {
-    updateWorkspace(id: $id, childWorkspaceOrder: $childWorkspaceOrder) {
+  mutation updateWorkspaceChildren(
+    $id: String!
+    $childWorkspaceOrder: [String]
+  ) {
+    updateWorkspaceChildren(
+      id: $id
+      childWorkspaceOrder: $childWorkspaceOrder
+    ) {
       id
     }
   }
@@ -370,7 +376,7 @@ export class FormPagePresentational extends React.Component<any, any> {
                   workspace.totalBudget - workspace.allocatedBudget
                 }
                 changeOrder={newOrder => {
-                  this.props.updateWorkspace({
+                  this.props.updateWorkspaceChildren({
                     variables: {
                       id: workspace.id,
                       childWorkspaceOrder: newOrder
@@ -440,7 +446,7 @@ export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
   graphql(UPDATE_WORKSPACE, {
-    name: "updateWorkspace",
+    name: "updateWorkspaceChildren",
     options: {
       refetchQueries: ["workspace"]
     }
