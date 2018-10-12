@@ -1,4 +1,6 @@
 import * as React from "react";
+import * as keyboardJS from "keyboardjs";
+
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
@@ -8,6 +10,7 @@ import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 
 import { AvailableBudget } from "./AvailableBudget";
+import { EpisodeNav } from "./EpisodeNav";
 import { Timer } from "./Timer";
 import { Staleness } from "./Staleness";
 import { ChildrenSidebar } from "./ChildrenSidebar";
@@ -15,6 +18,7 @@ import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
+import { ContentContainer } from "../../components/ContentContainer";
 import {
   exportingBlocksPointersSelector,
   exportingNodes
@@ -28,7 +32,7 @@ import {
   WorkspaceWithRelations
 } from "./WorkspaceRelations";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
-import * as keyboardJS from "keyboardjs";
+import { Auth } from "../../auth";
 
 import {
   blockBorderAndBoxShadow,
@@ -206,7 +210,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   public render() {
     const workspace = this.props.workspace.workspace;
     if (!workspace) {
-      return <div> Loading </div>;
+      return <ContentContainer>Loading...</ContentContainer>;
     }
 
     const importedPointers = workspace.connectedPointers;
@@ -239,159 +243,172 @@ export class FormPagePresentational extends React.Component<any, any> {
       workspace
     ).blockEditorAttributes();
 
-    if (this.state.hasTimerEnded) {
-      return (
-        <div>Your time with this workspace is up. Thanks for contributing!</div>
-      );
-    }
-
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
     const durationString = queryParams.timer;
 
     return (
-      <div key={workspace.id}>
-        <BlockHoverMenu>
-          <Row>
-            <Col sm={12}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end"
-                }}
-              >
-                {hasTimer && (
-                  <Timer
-                    durationString={durationString}
-                    onTimerEnd={this.handleTimerEnd}
-                    style={{ marginRight: "30px" }}
-                    workspaceId={workspace.id}
-                  />
-                )}
-                <AvailableBudget
-                  allocatedBudget={workspace.allocatedBudget}
-                  style={{ marginRight: "30px" }}
-                  totalBudget={workspace.totalBudget}
-                />
-                <Staleness
-                  workspaceId={workspace.id}
-                  isStale={workspace.isStale}
-                  updateStaleness={isStale =>
-                    this.props.updateWorkspaceStaleness({
-                      variables: { id: workspace.id, isStale }
-                    })
-                  }
-                />
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={12}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-end",
-                  marginBottom: "10px"
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: workspaceViewQuestionFontSize,
-                    marginRight: "8px"
-                  }}
-                >
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    {...questionProps}
-                  />
-                </div>
-                {workspace.parentId &&
-                  !isIsolatedWorkspace && (
-                    <div style={{ paddingBottom: "8px" }}>
-                      <ParentLink parentId={workspace.parentId} />
+      <div>
+        {Auth.isAuthenticated() && (
+          <EpisodeNav
+            updateStaleness={isStale =>
+              this.props.updateWorkspaceStaleness({
+                variables: { id: workspace.id, isStale }
+              })
+            }
+          />
+        )}
+        <ContentContainer>
+          {this.state.hasTimerEnded ? (
+            <div>
+              Your time with this workspace is up. Thanks for contributing!
+            </div>
+          ) : (
+            <div key={workspace.id}>
+              <BlockHoverMenu>
+                <Row>
+                  <Col sm={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end"
+                      }}
+                    >
+                      {hasTimer && (
+                        <Timer
+                          durationString={durationString}
+                          onTimerEnd={this.handleTimerEnd}
+                          style={{ marginRight: "30px" }}
+                          workspaceId={workspace.id}
+                        />
+                      )}
+                      <AvailableBudget
+                        allocatedBudget={workspace.allocatedBudget}
+                        style={{ marginRight: "30px" }}
+                        totalBudget={workspace.totalBudget}
+                      />
+                      <Staleness
+                        workspaceId={workspace.id}
+                        isStale={workspace.isStale}
+                        updateStaleness={isStale =>
+                          this.props.updateWorkspaceStaleness({
+                            variables: { id: workspace.id, isStale }
+                          })
+                        }
+                      />
                     </div>
-                  )}
-                {workspace &&
-                  !isIsolatedWorkspace && (
-                    <div style={{ paddingBottom: "8px" }}>
-                      <SubtreeLink workspace={workspace} />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        marginBottom: "10px"
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: workspaceViewQuestionFontSize,
+                          marginRight: "8px"
+                        }}
+                      >
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          {...questionProps}
+                        />
+                      </div>
+                      {workspace.parentId &&
+                        !isIsolatedWorkspace && (
+                          <div style={{ paddingBottom: "8px" }}>
+                            <ParentLink parentId={workspace.parentId} />
+                          </div>
+                        )}
+                      {workspace &&
+                        !isIsolatedWorkspace && (
+                          <div style={{ paddingBottom: "8px" }}>
+                            <SubtreeLink workspace={workspace} />
+                          </div>
+                        )}
                     </div>
-                  )}
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={6}>
-              <BlockContainer>
-                <BlockHeader>Scratchpad</BlockHeader>
-                <BlockBody>
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    placeholder="Text for the scratchpad..."
-                    ref={this.registerEditorRef("scratchpadField")}
-                    {...scratchpadProps}
-                  />
-                </BlockBody>
-              </BlockContainer>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={6}>
+                    <BlockContainer>
+                      <BlockHeader>Scratchpad</BlockHeader>
+                      <BlockBody>
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          placeholder="Text for the scratchpad..."
+                          ref={this.registerEditorRef("scratchpadField")}
+                          {...scratchpadProps}
+                        />
+                      </BlockBody>
+                    </BlockContainer>
 
-              <BlockContainer>
-                <BlockHeader>Answer</BlockHeader>
-                <BlockBody>
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    placeholder="Text for the answer..."
-                    ref={this.registerEditorRef("answerField")}
-                    {...answerProps}
-                  />
-                </BlockBody>
-              </BlockContainer>
-            </Col>
-            <Col sm={6}>
-              <ChildrenSidebar
-                isIsolatedWorkspace={isIsolatedWorkspace}
-                workspace={workspace}
-                workspaces={workspace.childWorkspaces}
-                availablePointers={availablePointers}
-                workspaceOrder={workspace.childWorkspaceOrder}
-                onCreateChild={({ question, totalBudget }) => {
-                  this.props.createChild({
-                    variables: {
-                      workspaceId: workspace.id,
-                      question,
-                      totalBudget
-                    }
-                  });
-                }}
-                onUpdateChildTotalBudget={({ childId, totalBudget }) => {
-                  this.props.updateChildTotalBudget({
-                    variables: {
-                      workspaceId: workspace.id,
-                      childId,
-                      totalBudget
-                    }
-                  });
-                }}
-                availableBudget={
-                  workspace.totalBudget - workspace.allocatedBudget
-                }
-                changeOrder={newOrder => {
-                  this.props.updateWorkspaceChildren({
-                    variables: {
-                      id: workspace.id,
-                      childWorkspaceOrder: newOrder
-                    }
-                  });
-                }}
-                ref={input => {
-                  if (input && input.editor()) {
-                    this.newChildField = input.editor();
-                  }
-                }}
-              />
-            </Col>
-          </Row>
-        </BlockHoverMenu>
+                    <BlockContainer>
+                      <BlockHeader>Answer</BlockHeader>
+                      <BlockBody>
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          placeholder="Text for the answer..."
+                          ref={this.registerEditorRef("answerField")}
+                          {...answerProps}
+                        />
+                      </BlockBody>
+                    </BlockContainer>
+                  </Col>
+                  <Col sm={6}>
+                    <ChildrenSidebar
+                      isIsolatedWorkspace={isIsolatedWorkspace}
+                      workspace={workspace}
+                      workspaces={workspace.childWorkspaces}
+                      availablePointers={availablePointers}
+                      workspaceOrder={workspace.childWorkspaceOrder}
+                      onCreateChild={({ question, totalBudget }) => {
+                        this.props.createChild({
+                          variables: {
+                            workspaceId: workspace.id,
+                            question,
+                            totalBudget
+                          }
+                        });
+                      }}
+                      onUpdateChildTotalBudget={({ childId, totalBudget }) => {
+                        this.props.updateChildTotalBudget({
+                          variables: {
+                            workspaceId: workspace.id,
+                            childId,
+                            totalBudget
+                          }
+                        });
+                      }}
+                      availableBudget={
+                        workspace.totalBudget - workspace.allocatedBudget
+                      }
+                      changeOrder={newOrder => {
+                        this.props.updateWorkspaceChildren({
+                          variables: {
+                            id: workspace.id,
+                            childWorkspaceOrder: newOrder
+                          }
+                        });
+                      }}
+                      ref={input => {
+                        if (input && input.editor()) {
+                          this.newChildField = input.editor();
+                        }
+                      }}
+                    />
+                  </Col>
+                </Row>
+              </BlockHoverMenu>
+            </div>
+          )}
+        </ContentContainer>
       </div>
     );
   }
