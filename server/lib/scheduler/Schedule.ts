@@ -6,7 +6,7 @@ class Schedule {
   // the following object maps root workspace ids to timestamps
   // I didn't use a Map (and map a workspace object to a timestamp)
   // because Sequelize doesn't preserve object identity across queries
-  private cacheForWhenTreeLastWorkedOn = {};
+  private lastWorkedOnTimestampForTree = {};
 
   private rootParentCache;
   private schedule = new Map;
@@ -38,7 +38,7 @@ class Schedule {
     const userSchedule = this.getUserSchedule(userId);
     userSchedule.assignWorkspace(workspace, startAtTimestamp);
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
-    this.cacheForWhenTreeLastWorkedOn[rootParent.id] = startAtTimestamp;
+    this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
   }
 
   public getMostRecentAssignmentForUser(userId) {
@@ -66,7 +66,7 @@ class Schedule {
   */
   public getTreesWorkedOnLeastRecently(rootWorkspaces) {
     const treesNotYetWorkedOn = rootWorkspaces.filter(
-      rootWorkspace => this.cacheForWhenTreeLastWorkedOn[rootWorkspace.id] === undefined
+      rootWorkspace => this.lastWorkedOnTimestampForTree[rootWorkspace.id] === undefined
     );
 
     if (treesNotYetWorkedOn.length > 0) {
@@ -74,13 +74,13 @@ class Schedule {
     }
 
     const lastWorkedOnTimestamps = rootWorkspaces.map(
-      rootWorkspace => this.cacheForWhenTreeLastWorkedOn[rootWorkspace.id]
+      rootWorkspace => this.lastWorkedOnTimestampForTree[rootWorkspace.id]
     );
 
     const minTimestamp = Math.min.apply(Math, lastWorkedOnTimestamps);
 
     const leastRecentlyWorkedOnTrees = rootWorkspaces.filter(rootWorkspace =>
-      this.cacheForWhenTreeLastWorkedOn[rootWorkspace.id] === minTimestamp
+      this.lastWorkedOnTimestampForTree[rootWorkspace.id] === minTimestamp
     );
 
     return leastRecentlyWorkedOnTrees;
