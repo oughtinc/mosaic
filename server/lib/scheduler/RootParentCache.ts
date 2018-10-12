@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as models from "../models";
 
 class RootParentCache {
@@ -8,7 +9,12 @@ class RootParentCache {
   }
 
   public static async getRootParentOfWorkspace(workspace) {
-    if (this.rootParentCache.has(workspace)) {
+    const workspaceAlreadyCached = _.some(
+      [...this.rootParentCache],
+      ([w, rootParent]) => w.id === workspace.id
+    );
+
+    if (workspaceAlreadyCached) {
       return this.rootParentCache.get(workspace);
     }
 

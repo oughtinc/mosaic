@@ -60,7 +60,7 @@ class Schedule {
   public async isInTreeWorkedOnLeastRecently(rootWorkspaces, workspace) {
     const treesWorksOnLeastRecently = this.getTreesWorkedOnLeastRecently(rootWorkspaces);
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
-    return !!(treesWorksOnLeastRecently.find(rootWorkspace => rootWorkspace === rootParent));
+    return !!(treesWorksOnLeastRecently.find(rootWorkspace => rootWorkspace.id === rootParent.id));
   }
 
   /*
