@@ -22,7 +22,7 @@ class Scheduler {
   public async assignNextWorkspace(userId) {
     // clear cache so we don't rely on old rootParent information
     this.rootParentCache.clearRootParentCache();
-    
+
     const actionableWorkspaces = await this.getActionableWorkspaces();
     const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
@@ -45,7 +45,7 @@ class Scheduler {
     // then instead look for the workspace worked on least recently
     if (finalWorkspaces.length === 0) {
       const workspaceWorkedOnLeastRecently = await this.schedule.getLeastRecentlyActiveWorkspace(eligibleWorkspaces);
-      return [workspaceWorkedOnLeastRecently];
+      finalWorkspaces = [workspaceWorkedOnLeastRecently];
     }
 
     return finalWorkspaces;
