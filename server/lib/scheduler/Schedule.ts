@@ -101,31 +101,16 @@ class Schedule {
   }
 
   public getTimestampWorkspaceLastWorkedOn(workspace) {
-    let mostRecentTimestamp = -Infinity;
+    const timestampsWorkspaceLastWorkedOn =
+      [...this.schedule].map(
+        ([userId, userSchedule]) => userSchedule.getTimestampWorkspaceLastWorkedOn(workspace)
+      );
 
-    for (const [userId, userSchedule] of this.schedule) {
-      const curTimestamp = userSchedule.getTimestampWorkspaceLastWorkedOn(workspace);
-      if (mostRecentTimestamp < curTimestamp) {
-        mostRecentTimestamp = curTimestamp;
-      }
-    }
-
-    return mostRecentTimestamp;
+    return _.max(timestampsWorkspaceLastWorkedOn);
   }
 
   public getLeastRecentlyActiveWorkspace(workspaces) {
-    let workspaceWorkedOnLeastRecently;
-    let whenThisWorkspaceWasWorkedOn;
-
-    workspaces.forEach(workspace => {
-      const lastWorkedOnTimestamp = this.getTimestampWorkspaceLastWorkedOn(workspace);
-      if (!workspaceWorkedOnLeastRecently || lastWorkedOnTimestamp < whenThisWorkspaceWasWorkedOn) {
-        workspaceWorkedOnLeastRecently = workspace;
-        whenThisWorkspaceWasWorkedOn = lastWorkedOnTimestamp;
-      }
-    });
-
-    return workspaceWorkedOnLeastRecently;
+    return _.minBy(workspaces, w => this.getTimestampWorkspaceLastWorkedOn(w));
   }
 
 }
