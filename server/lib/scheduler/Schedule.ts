@@ -87,23 +87,17 @@ class Schedule {
   }
 
   public isWorkspaceCurrentlyBeingWorkedOn(workspace) {
-    for (const [userId, userSchedule] of this.schedule) {
-      if (userSchedule.isUserCurrentlyWorkingOnWorkspace(workspace)) {
-        return true;
-      }
-    }
-
-    return false;
+    return _.some(
+      [...this.schedule],
+      ([userId, userSchedule]) => userSchedule.isUserCurrentlyWorkingOnWorkspace(workspace)
+    );
   }
 
   public hasWorkspaceBeenWorkedOnYet(workspace) {
-    for (const [userId, userSchedule] of this.schedule) {
-      if (userSchedule.hasUserWorkedOnWorkspace(workspace)) {
-        return true;
-      }
-    }
-
-    return false;
+    return _.some(
+      [...this.schedule],
+      ([userId, userSchedule]) => userSchedule.hasUserWorkedOnWorkspace(workspace)
+    );
   }
 
   public getTimestampWorkspaceLastWorkedOn(workspace) {
