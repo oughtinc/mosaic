@@ -23,5 +23,3 @@ The scheduler is the only exposed API. It only has two public methods: `getIdOfC
 ## Implementation
 
 There is quite a bit of reasoning about trees. Trees are identified with their root workspaces.
-
-One gotcha to watch out for is that it doesn't appear repeated Sequelize queries preserve object identity. For example doing the following twice `await models.Workspace.findById(workspaceid)` yields distinct objects. This can cause really difficult to detect bugs when using `===` to determine object identity. Right now things are OK because the every time the scheduler finds a next workspace for a user, it clears the cache and fetches Sequelize objects once, so `===` is OK.
