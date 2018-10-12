@@ -12,7 +12,6 @@ import { parse as parseQueryString } from "query-string";
 import { AvailableBudget } from "./AvailableBudget";
 import { EpisodeNav } from "./EpisodeNav";
 import { Timer } from "./Timer";
-import { Staleness } from "./Staleness";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -250,6 +249,10 @@ export class FormPagePresentational extends React.Component<any, any> {
     const hasTimer = queryParams.timer;
     const durationString = queryParams.timer;
 
+    console.log(
+      `Workspace ${workspace.id} is ${workspace.isStale ? "" : "NOT"} stale.`
+    );
+
     return (
       <div>
         {Auth.isAuthenticated() && (
@@ -289,15 +292,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                         allocatedBudget={workspace.allocatedBudget}
                         style={{ marginRight: "30px" }}
                         totalBudget={workspace.totalBudget}
-                      />
-                      <Staleness
-                        workspaceId={workspace.id}
-                        isStale={workspace.isStale}
-                        updateStaleness={isStale =>
-                          this.props.updateWorkspaceStaleness({
-                            variables: { id: workspace.id, isStale }
-                          })
-                        }
                       />
                     </div>
                   </Col>
