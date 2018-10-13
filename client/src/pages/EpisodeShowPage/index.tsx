@@ -1,3 +1,4 @@
+import * as moment from "moment";
 import * as React from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
@@ -7,8 +8,7 @@ import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 
-import { AvailableBudget } from "./AvailableBudget";
-import { Timer } from "./Timer";
+import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -26,7 +26,7 @@ import {
   WorkspaceBlockRelation,
   WorkspaceWithRelations
 } from "./WorkspaceRelations";
-import { UPDATE_BLOCKS, UPDATE_TIME_BUDGET } from "../../graphqlQueries";
+import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import * as keyboardJS from "keyboardjs";
 
 import {
@@ -143,11 +143,11 @@ function findPointers(value: any) {
   return pointers;
 }
 
-export class FormPagePresentational extends React.Component<any, any> {
+export class WorkspaceView extends React.Component<any, any> {
   private scratchpadField;
   private answerField;
   private newChildField;
-  private tickDuration = 10;
+  private tickDuration = 1;
 
   public constructor(props: any) {
     super(props);
@@ -184,20 +184,8 @@ export class FormPagePresentational extends React.Component<any, any> {
     });
   }
 
-  public handleTimerTick = () => {
-    this.props.updateTimeBudget({
-      variables: {
-        workspaceId: this.props.workspace.workspace.id,
-        changeToBudget: -this.tickDuration,
-      }
-    });
-  }
-
   public render() {
-    const workspace = this.props.workspace.workspace;
-    if (!workspace) {
-      return <div> Loading </div>;
-    }
+    const workspace = this.props.loadedWorkspace;
 
     const importedPointers = workspace.connectedPointers;
 
@@ -236,7 +224,10 @@ export class FormPagePresentational extends React.Component<any, any> {
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
-    const durationString = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
+
+    const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
+    const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
+    const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
 
     return (
       <div key={workspace.id}>
@@ -249,22 +240,14 @@ export class FormPagePresentational extends React.Component<any, any> {
                   justifyContent: "flex-end",
                 }}
               >
-                {
-                  hasTimer
-                  &&
-                  <Timer
-                    durationString={durationString}
-                    onTimerEnd={this.handleTimerEnd}
-                    onTimerTick={this.handleTimerTick}
-                    style={{ marginRight: "30px" }}
-                    tickDuration={10}
-                    workspaceId={workspace.id}
-                  />
-                }
-                <AvailableBudget
-                  allocatedBudget={workspace.allocatedBudget}
-                  style={{ marginRight: "30px" }}
+                <TimerAndTimeBudgetInfo
+                  durationInMs={durationInMs}
+                  handleTimerEnd={this.handleTimerEnd}
+                  hasTimer={hasTimer}
+                  initialAllocatedBudget={workspace.allocatedBudget}
+                  tickDuration={this.tickDuration}
                   totalBudget={workspace.totalBudget}
+                  workspaceId={workspace.id}
                 />
               </div>
             </Col>
@@ -390,7 +373,23 @@ export class FormPagePresentational extends React.Component<any, any> {
     if (!!editor) {
       this[editorName] = editor();
     }
-  };
+  }
+}
+
+export class WorkspaceQuery extends React.Component<any, any> {
+  public render() {
+    const workspace = this.props.workspace.workspace;
+    if (!workspace) {
+      return <div> Loading </div>;
+    }
+
+    return (
+      <WorkspaceView
+        {...this.props}
+        loadedWorkspace={this.props.workspace.workspace}
+      />
+    );
+  }
 }
 
 const options: any = ({ match }) => ({
@@ -445,12 +444,6 @@ export const EpisodeShowPage = compose(
       refetchQueries: ["workspace"]
     }
   }),
-  graphql(UPDATE_TIME_BUDGET, {
-    name: "updateTimeBudget",
-    options: {
-      refetchQueries: ["workspace"]
-    }
-  }),
   graphql(UPDATE_CHILD_TOTAL_BUDGET, {
     name: "updateChildTotalBudget",
     options: {
@@ -461,4 +454,4 @@ export const EpisodeShowPage = compose(
     mapStateToProps,
     { addBlocks, saveBlocks }
   )
-)(FormPagePresentational);
+)(WorkspaceQuery);
