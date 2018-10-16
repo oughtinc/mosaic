@@ -6,7 +6,7 @@ import * as enforce from "express-sslify";
 import * as path from "path";
 import { graphqlExpress, graphiqlExpress } from "apollo-server-express";
 import * as bodyParser from "body-parser";
-var cors = require("cors");
+import * as cors from "cors";
 
 import { schema } from "./schema/index";
 

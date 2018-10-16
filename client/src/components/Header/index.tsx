@@ -16,7 +16,7 @@ import {
 
 const HeaderContainer = styled.div`
   background-color: ${headerBgColor};
-  padding: 20px;
+  padding: 25px;
 `;
 
 const Brand = styled(Link)`
@@ -75,22 +75,8 @@ const LoginLink = () => (
   </ActionLink>
 );
 
-const NextWorkspaceBtn = () => {
-  if (Auth.isAuthenticated()) {
-    return (
-      <Link to="/next">
-        <Button bsSize="small">Get Next Workspace »</Button>
-      </Link>
-    );
-  } else {
-    return null;
-  }
-};
-
 const UserControls = () => (
-  <div>
-    {Auth.isAuthenticated() ? <LogoutLink /> : <LoginLink />}
-  </div>
+  <div>{Auth.isAuthenticated() ? <LogoutLink /> : <LoginLink />}</div>
 );
 
 const Header = () => (
@@ -101,11 +87,10 @@ const Header = () => (
           alignContent: "center",
           display: "flex",
           justifyContent: "space-between",
-          padding: "0 20px",
+          padding: "0 20px"
         }}
       >
         <Brand to="/">Mosaic v0.1</Brand>
-        <NextWorkspaceBtn />
         <UserControls />
       </div>
     </div>

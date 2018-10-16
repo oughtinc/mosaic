@@ -1,4 +1,6 @@
 import * as React from "react";
+import * as keyboardJS from "keyboardjs";
+
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
@@ -8,12 +10,14 @@ import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 
 import { AvailableBudget } from "./AvailableBudget";
+import { EpisodeNav } from "./EpisodeNav";
 import { Timer } from "./Timer";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
+import { ContentContainer } from "../../components/ContentContainer";
 import {
   exportingBlocksPointersSelector,
   exportingNodes
@@ -27,13 +31,13 @@ import {
   WorkspaceWithRelations
 } from "./WorkspaceRelations";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
-import * as keyboardJS from "keyboardjs";
+import { Auth } from "../../auth";
 
 import {
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
-  workspaceViewQuestionFontSize,
+  workspaceViewQuestionFontSize
 } from "../../styles";
 
 const WORKSPACE_QUERY = gql`
@@ -43,6 +47,7 @@ const WORKSPACE_QUERY = gql`
       parentId
       creatorId
       isPublic
+      isStale
       childWorkspaceOrder
       connectedPointers
       totalBudget
@@ -69,8 +74,22 @@ const WORKSPACE_QUERY = gql`
 `;
 
 const UPDATE_WORKSPACE = gql`
-  mutation updateWorkspace($id: String!, $childWorkspaceOrder: [String]) {
-    updateWorkspace(id: $id, childWorkspaceOrder: $childWorkspaceOrder) {
+  mutation updateWorkspaceChildren(
+    $id: String!
+    $childWorkspaceOrder: [String]
+  ) {
+    updateWorkspaceChildren(
+      id: $id
+      childWorkspaceOrder: $childWorkspaceOrder
+    ) {
+      id
+    }
+  }
+`;
+
+const UPDATE_WORKSPACE_STALENESS = gql`
+  mutation updateWorkspaceStaleness($id: String!, $isStale: Boolean!) {
+    updateWorkspaceStaleness(id: $id, isStale: $isStale) {
       id
     }
   }
@@ -127,13 +146,17 @@ const BlockHeader = styled.div`
 
 const ParentLink = props => (
   <NavLink to={`/workspaces/${props.parentId}`}>
-    <Button bsStyle="default" bsSize="xsmall">Parent »</Button>
+    <Button bsStyle="default" bsSize="xsmall">
+      Parent »
+    </Button>
   </NavLink>
 );
 
 const SubtreeLink = ({ workspace }) => (
   <NavLink to={`/workspaces/${workspace.id}/subtree`}>
-    <Button bsStyle="default" bsSize="xsmall">Subtree »</Button>
+    <Button bsStyle="default" bsSize="xsmall">
+      Subtree »
+    </Button>
   </NavLink>
 );
 
@@ -151,7 +174,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
-      hasTimerEnded: false,
+      hasTimerEnded: false
     };
   }
 
@@ -179,14 +202,14 @@ export class FormPagePresentational extends React.Component<any, any> {
 
   public handleTimerEnd = () => {
     this.setState({
-      hasTimerEnded: true,
+      hasTimerEnded: true
     });
-  }
+  };
 
   public render() {
     const isLoading = this.props.workspace.loading;
-    if (isLoading) {
-      return <div>Loading...</div>;
+    if (isLoading || !this.props.workspace.workspace) {
+      return <ContentContainer>Loading...</ContentContainer>;
     }
 
     const workspace = this.props.workspace.workspace;
@@ -203,7 +226,7 @@ export class FormPagePresentational extends React.Component<any, any> {
       [
         ...this.props.exportingPointers,
         ...importedPointers,
-        ...readOnlyExportedPointers,
+        ...readOnlyExportedPointers
       ],
       p => p.data.pointerId
     );
@@ -221,157 +244,164 @@ export class FormPagePresentational extends React.Component<any, any> {
       workspace
     ).blockEditorAttributes();
 
-    if (this.state.hasTimerEnded) {
-      return <div>Your time with this workspace is up. Thanks for contributing!</div>;
-    }
-
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
     const durationString = queryParams.timer;
 
     return (
-      <div key={workspace.id}>
-        <BlockHoverMenu>
-          <Row>
-            <Col sm={12}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
-                {
-                  hasTimer
-                  &&
-                  <Timer
-                    durationString={durationString}
-                    onTimerEnd={this.handleTimerEnd}
-                    shouldTimerReset={this.props.location.state.shouldTimerReset}
-                    style={{ marginRight: "30px" }}
-                    workspaceId={workspace.id}
-                  />
-                }
-                <AvailableBudget
-                  allocatedBudget={workspace.allocatedBudget}
-                  style={{ marginRight: "30px" }}
-                  totalBudget={workspace.totalBudget}
-                />
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={12}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-end",
-                  marginBottom: "10px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: workspaceViewQuestionFontSize,
-                    marginRight: "8px",
-                  }}
-                >
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    {...questionProps}
-                  />
-                </div>
-                {
-                  workspace.parentId
-                  &&
-                  !isIsolatedWorkspace
-                  &&
-                  <div style={{ paddingBottom: "8px" }}>
-                    <ParentLink parentId={workspace.parentId} />
-                  </div>
-                }
-                {
-                  workspace
-                  &&
-                  !isIsolatedWorkspace
-                  &&
-                  <div style={{paddingBottom: "8px"}}>
-                    <SubtreeLink workspace={workspace} />
-                  </div>
-                }
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={6}>
-              <BlockContainer>
-                <BlockHeader>Scratchpad</BlockHeader>
-                <BlockBody>
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    placeholder="Text for the scratchpad..."
-                    ref={this.registerEditorRef("scratchpadField")}
-                    {...scratchpadProps}
-                  />
-                </BlockBody>
-              </BlockContainer>
+      <div>
+        {Auth.isAuthenticated() && (
+          <EpisodeNav
+            updateStaleness={isStale =>
+              this.props.updateWorkspaceStaleness({
+                variables: { id: workspace.id, isStale }
+              })
+            }
+          />
+        )}
+        <ContentContainer>
+          {this.state.hasTimerEnded ? (
+            <div>
+              Your time with this workspace is up. Thanks for contributing!
+            </div>
+          ) : (
+            <div key={workspace.id}>
+              <BlockHoverMenu>
+                <Row>
+                  <Col sm={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end"
+                      }}
+                    >
+                      {hasTimer && (
+                        <Timer
+                          durationString={durationString}
+                          onTimerEnd={this.handleTimerEnd}
+                          shouldTimerReset={this.props.location.state.shouldTimerReset}
+                          style={{ marginRight: "30px" }}
+                          workspaceId={workspace.id}
+                        />
+                      )}
+                      <AvailableBudget
+                        allocatedBudget={workspace.allocatedBudget}
+                        style={{ marginRight: "30px" }}
+                        totalBudget={workspace.totalBudget}
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        marginBottom: "10px"
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: workspaceViewQuestionFontSize,
+                          marginRight: "8px"
+                        }}
+                      >
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          {...questionProps}
+                        />
+                      </div>
+                      {workspace.parentId &&
+                        !isIsolatedWorkspace && (
+                          <div style={{ paddingBottom: "8px" }}>
+                            <ParentLink parentId={workspace.parentId} />
+                          </div>
+                        )}
+                      {workspace &&
+                        !isIsolatedWorkspace && (
+                          <div style={{ paddingBottom: "8px" }}>
+                            <SubtreeLink workspace={workspace} />
+                          </div>
+                        )}
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={6}>
+                    <BlockContainer>
+                      <BlockHeader>Scratchpad</BlockHeader>
+                      <BlockBody>
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          placeholder="Text for the scratchpad..."
+                          ref={this.registerEditorRef("scratchpadField")}
+                          {...scratchpadProps}
+                        />
+                      </BlockBody>
+                    </BlockContainer>
 
-              <BlockContainer>
-                <BlockHeader>Answer</BlockHeader>
-                <BlockBody>
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    placeholder="Text for the answer..."
-                    ref={this.registerEditorRef("answerField")}
-                    {...answerProps}
-                  />
-                </BlockBody>
-              </BlockContainer>
-            </Col>
-            <Col sm={6}>
-              <ChildrenSidebar
-                isIsolatedWorkspace={isIsolatedWorkspace}
-                workspace={workspace}
-                workspaces={workspace.childWorkspaces}
-                availablePointers={availablePointers}
-                workspaceOrder={workspace.childWorkspaceOrder}
-                onCreateChild={({ question, totalBudget }) => {
-                  this.props.createChild({
-                    variables: {
-                      workspaceId: workspace.id,
-                      question,
-                      totalBudget
-                    }
-                  });
-                }}
-                onUpdateChildTotalBudget={({ childId, totalBudget }) => {
-                  this.props.updateChildTotalBudget({
-                    variables: {
-                      workspaceId: workspace.id,
-                      childId,
-                      totalBudget
-                    }
-                  });
-                }}
-                availableBudget={
-                  workspace.totalBudget - workspace.allocatedBudget
-                }
-                changeOrder={newOrder => {
-                  this.props.updateWorkspace({
-                    variables: {
-                      id: workspace.id,
-                      childWorkspaceOrder: newOrder
-                    }
-                  });
-                }}
-                ref={input => {
-                  if (input && input.editor()) {
-                    this.newChildField = input.editor();
-                  }
-                }}
-              />
-            </Col>
-          </Row>
-        </BlockHoverMenu>
+                    <BlockContainer>
+                      <BlockHeader>Answer</BlockHeader>
+                      <BlockBody>
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          placeholder="Text for the answer..."
+                          ref={this.registerEditorRef("answerField")}
+                          {...answerProps}
+                        />
+                      </BlockBody>
+                    </BlockContainer>
+                  </Col>
+                  <Col sm={6}>
+                    <ChildrenSidebar
+                      isIsolatedWorkspace={isIsolatedWorkspace}
+                      workspace={workspace}
+                      workspaces={workspace.childWorkspaces}
+                      availablePointers={availablePointers}
+                      workspaceOrder={workspace.childWorkspaceOrder}
+                      onCreateChild={({ question, totalBudget }) => {
+                        this.props.createChild({
+                          variables: {
+                            workspaceId: workspace.id,
+                            question,
+                            totalBudget
+                          }
+                        });
+                      }}
+                      onUpdateChildTotalBudget={({ childId, totalBudget }) => {
+                        this.props.updateChildTotalBudget({
+                          variables: {
+                            workspaceId: workspace.id,
+                            childId,
+                            totalBudget
+                          }
+                        });
+                      }}
+                      availableBudget={
+                        workspace.totalBudget - workspace.allocatedBudget
+                      }
+                      changeOrder={newOrder => {
+                        this.props.updateWorkspaceChildren({
+                          variables: {
+                            id: workspace.id,
+                            childWorkspaceOrder: newOrder
+                          }
+                        });
+                      }}
+                      ref={input => {
+                        if (input && input.editor()) {
+                          this.newChildField = input.editor();
+                        }
+                      }}
+                    />
+                  </Col>
+                </Row>
+              </BlockHoverMenu>
+            </div>
+          )}
+        </ContentContainer>
       </div>
     );
   }
@@ -412,11 +442,12 @@ function getNewQuestionFormBlockId(state: any, workspace: any) {
 
 function mapStateToProps(state: any, { workspace }: any) {
   const _visibleBlockIds = visibleBlockIds(workspace.workspace);
-  const newQuestionFormBlockId = getNewQuestionFormBlockId(state, workspace.workspace);
-  const allBlockIds = [ ..._visibleBlockIds, newQuestionFormBlockId];
-  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(
-    state
+  const newQuestionFormBlockId = getNewQuestionFormBlockId(
+    state,
+    workspace.workspace
   );
+  const allBlockIds = [..._visibleBlockIds, newQuestionFormBlockId];
+  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(state);
   const { blocks } = state;
   return { blocks, exportingPointers };
 }
@@ -425,7 +456,7 @@ export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
   graphql(UPDATE_WORKSPACE, {
-    name: "updateWorkspace",
+    name: "updateWorkspaceChildren",
     options: {
       refetchQueries: ["workspace"]
     }
@@ -438,6 +469,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_CHILD_TOTAL_BUDGET, {
     name: "updateChildTotalBudget",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(UPDATE_WORKSPACE_STALENESS, {
+    name: "updateWorkspaceStaleness",
     options: {
       refetchQueries: ["workspace"]
     }
