@@ -86,3 +86,11 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
     }
   }
 `;
+
+export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
+  mutation updateWorkspaceIsPublic($isPublic: Boolean, $workspaceId: String) {
+    updateWorkspaceIsPublic(isPublic: $isPublic, workspaceId: $workspaceId) {
+      id
+    }
+  }
+`;

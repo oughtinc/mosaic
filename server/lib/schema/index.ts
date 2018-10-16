@@ -2,6 +2,7 @@ import * as models from "../models";
 import * as _ from "lodash";
 import { resolver, attributeFields } from "graphql-sequelize";
 import {
+  GraphQLBoolean,
   GraphQLObjectType,
   GraphQLNonNull,
   GraphQLFloat,
@@ -301,6 +302,29 @@ const schema = new GraphQLSchema({
           await scheduler.assignNextWorkspace(user.user_id);
           const workspaceId = await scheduler.getIdOfCurrentWorkspace(user.user_id);
           return { id: workspaceId };
+        }
+      },
+
+      updateWorkspaceIsPublic: {
+        type: workspaceType,
+        args: {
+          isPublic: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { isPublic, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to toggle workspace visiblity."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to toggle workspace visiblity"
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isPublic });
         }
       },
     }
