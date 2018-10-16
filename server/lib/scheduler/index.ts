@@ -24,6 +24,7 @@ const scheduler = new Scheduler({
   fetchAllRootWorkspaces: async () => await Workspace.findAll({
     where: {
       parentId: null,
+      isEligibleForAssignment: true,
     }
   }),
   schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: ONE_MINUTE }),

@@ -327,6 +327,25 @@ const schema = new GraphQLSchema({
           await workspace.update({ isPublic });
         }
       },
+
+      updateWorkspaceIsEligible: {
+        type: workspaceType,
+        args: {
+          isEligible: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { isEligible, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update workspace eligibility."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isEligibleForAssignment: isEligible });
+          return { id: workspaceId };
+        }
+      },
     }
   })
 });
