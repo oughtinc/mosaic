@@ -410,9 +410,17 @@ export class WorkspaceView extends React.Component<any, any> {
 
 export class WorkspaceQuery extends React.Component<any, any> {
   public render() {
-    const workspace = this.props.workspace.workspace;
-    if (!workspace) {
+    
+    const isLoading = this.props.workspace.loading;
+
+    if (isLoading) {
       return <ContentContainer>Loading...</ContentContainer>;
+    }
+
+    const workspace = this.props.workspace.workspace;
+
+    if (workspace === null) {
+      return <ContentContainer>Workspace not found...</ContentContainer>;
     }
 
     return (
