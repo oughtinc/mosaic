@@ -7,6 +7,7 @@ import { HomePageHeading } from "./HomePageHeading";
 import { ListOfRootWorkspaces } from "./ListOfRootWorkspaces";
 import { NewRootWorkspaceForm } from "./NewRootWorkspaceForm";
 import { WelcomeMessage } from "./WelcomeMessage";
+import { GetStartedNav } from "./GetStartedNav";
 
 import { ContentContainer } from "../../components/ContentContainer";
 
@@ -23,22 +24,25 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     );
 
     return (
-      <ContentContainer>
-        {!Auth.isAuthenticated() && <WelcomeMessage />}
+      <div>
+        {Auth.isAuthenticated() && <GetStartedNav />}
+        <ContentContainer>
+          {!Auth.isAuthenticated() && <WelcomeMessage />}
 
-        <HomePageHeading>Questions</HomePageHeading>
-        <ListOfRootWorkspaces isLoading={isLoading} workspaces={workspaces} />
+          <HomePageHeading>Questions</HomePageHeading>
+          <ListOfRootWorkspaces isLoading={isLoading} workspaces={workspaces} />
 
-        {Auth.isAuthenticated() && (
-          <NewRootWorkspaceForm
-            createWorkspace={this.props.createWorkspace}
-            style={{
-              marginBottom: "30px",
-              marginTop: "30px"
-            }}
-          />
-        )}
-      </ContentContainer>
+          {Auth.isAuthenticated() && (
+            <NewRootWorkspaceForm
+              createWorkspace={this.props.createWorkspace}
+              style={{
+                marginBottom: "30px",
+                marginTop: "30px"
+              }}
+            />
+          )}
+        </ContentContainer>
+      </div>
     );
   }
 }
