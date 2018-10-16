@@ -4,7 +4,7 @@ import { Glyphicon } from "react-bootstrap";
 import {
   availableBudgetHeaderFontColor,
   availableBudgetHeaderFontSize,
-} from "../../styles";
+} from "../../../styles";
 
 export class AvailableBudget extends React.Component<any,  any> {
   public render() {

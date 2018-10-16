@@ -317,7 +317,6 @@ const schema = new GraphQLSchema({
           return { id: workspaceId };
         }
       },
-
       updateWorkspaceIsPublic: {
         type: workspaceType,
         args: {
@@ -340,7 +339,6 @@ const schema = new GraphQLSchema({
           await workspace.update({ isPublic });
         }
       },
-
       updateWorkspaceIsEligible: {
         type: workspaceType,
         args: {
@@ -357,6 +355,27 @@ const schema = new GraphQLSchema({
           const workspace = await models.Workspace.findById(workspaceId);
           await workspace.update({ isEligibleForAssignment: isEligible });
           return { id: workspaceId };
+        }
+      },
+      updateAllocatedBudget: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+          changeToBudget: { type: GraphQLInt }
+        },
+        resolve: async (_, { workspaceId, changeToBudget }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update allocated budet."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          const updatedTimeBudget = Math.min(
+            workspace.totalBudget,
+            workspace.allocatedBudget + changeToBudget,
+          );
+          await workspace.update({ allocatedBudget: updatedTimeBudget });
         }
       },
     }

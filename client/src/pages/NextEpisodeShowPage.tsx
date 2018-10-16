@@ -25,7 +25,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
           to={{
             pathname: `/workspaces/${this.state.workspaceId}`,
             search: "?isolated=true&timer=0:1:0",
-            state: { shouldTimerReset: true }
           }}
         />
       );
