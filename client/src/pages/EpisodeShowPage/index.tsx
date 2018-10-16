@@ -48,6 +48,7 @@ const WORKSPACE_QUERY = gql`
       creatorId
       isPublic
       isStale
+      isEligibleForAssignment
       childWorkspaceOrder
       connectedPointers
       totalBudget
@@ -255,7 +256,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
     return (
       <div>
-        {Auth.isAuthenticated() && (
+        {Auth.isAuthenticated() && workspace.isEligibleForAssignment && (
           <EpisodeNav
             updateStaleness={isStale =>
               this.props.updateWorkspaceStaleness({
