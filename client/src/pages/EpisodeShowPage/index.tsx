@@ -208,7 +208,7 @@ export class WorkspaceView extends React.Component<any, any> {
   };
 
   public render() {
-    
+
     const isLoading = this.props.workspace.loading;
     if (isLoading || !this.props.workspace.workspace) {
       return <ContentContainer>Loading...</ContentContainer>;
@@ -342,7 +342,7 @@ export class WorkspaceView extends React.Component<any, any> {
                     </BlockContainer>
 
                     <BlockContainer>
-                      <BlockHeader>Answer</BlockHeader>
+                      <BlockHeader>Response</BlockHeader>
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}
