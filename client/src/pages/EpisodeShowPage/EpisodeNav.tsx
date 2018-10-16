@@ -19,7 +19,7 @@ const NextWorkspaceBtn = ({ label, navHook }: NextWorkspaceBtnProps) => {
 const EpisodeNavContainer = styled.div`
   padding: 10px;
   background-color: #b8ddfb;
-  box-shadow: 0 3px 3px #ccc;
+  border-bottom: 1px solid #c8c8c8;
   text-align: center;
 `;
 
