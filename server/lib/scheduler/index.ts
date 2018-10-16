@@ -1,4 +1,5 @@
 import { Workspace } from "../models";
+import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
 import { RootParentCache } from "./RootParentCache";
 import { Schedule } from "./Schedule";
 import { Scheduler } from "./Scheduler";
@@ -28,6 +29,7 @@ const scheduler = new Scheduler({
     }
   }),
   schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: ONE_MINUTE }),
+  remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,
 });
 

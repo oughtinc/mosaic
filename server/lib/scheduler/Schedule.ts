@@ -26,7 +26,12 @@ class Schedule {
       return;
     }
 
-    this.schedule.set(userId, new UserSchedule({ timeLimit: this.timeLimit, userId }));
+    const userSchedule = new UserSchedule({
+      rootParentCache: this.rootParentCache,
+      timeLimit: this.timeLimit, userId
+    });
+
+    this.schedule.set(userId, userSchedule);
   }
 
   private getUserSchedule(userId) {
@@ -36,7 +41,7 @@ class Schedule {
   public async assignWorkspaceToUser(userId, workspace, startAtTimestamp = Date.now()) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
-    userSchedule.assignWorkspace(workspace, startAtTimestamp);
+    await userSchedule.assignWorkspace(workspace, startAtTimestamp);
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
   }
@@ -84,6 +89,12 @@ class Schedule {
     );
 
     return leastRecentlyWorkedOnTrees;
+  }
+
+  public getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces, userId) {
+    this.createUserScheduleIfNotCreated(userId);
+    const userSchedule = this.getUserSchedule(userId);
+    return userSchedule.getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces);
   }
 
   public isWorkspaceCurrentlyBeingWorkedOn(workspace) {
