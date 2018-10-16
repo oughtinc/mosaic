@@ -94,6 +94,15 @@ function SlatePointers(options: any = {}) {
       if (node.type === "text") {
         return <span>{children}</span>;
       }
+      if (node.type === "link") {
+        const { data } = node;
+        const href = data.get("href");
+        return (
+          <a {...props} href={href}>
+            {children}
+          </a>
+        );
+      }
       if (node.type === "pointerImport") {
         return (
           <PointerImportNode

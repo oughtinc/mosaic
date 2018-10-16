@@ -10,6 +10,7 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
 import { SlatePointers } from "../../lib/slate-pointers";
+import { LinkifyPlugin } from "../../lib/slate-plugins/linkifyPlugin";
 import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
 
@@ -91,7 +92,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       availablePointers: newProps.availablePointers,
     };
     this.setState({
-      plugins: [SoftBreak({}), SlatePointers(SlatePointerInputs)]
+      plugins: [LinkifyPlugin(), SoftBreak({}), SlatePointers(SlatePointerInputs)]
     });
   }
 

@@ -25,6 +25,16 @@ export class InlineNode extends React.Component<any, any> {
   public render() {
     if (!this.props.blockEditor) {
       return <span>no</span>;
+    } else if (this.props.node.type === "link") {
+      const href = this.props.node.data.href;
+      return (
+        <a
+          href={href}
+          onClick={e => e.stopPropagation()/* this prevents imported pointer from toggling after the user clicks a link */} 
+        >
+          {this.props.node.nodes[0].leaves[0].text}
+        </a>
+      );
     } else {
       return (
         <PointerImportNode
