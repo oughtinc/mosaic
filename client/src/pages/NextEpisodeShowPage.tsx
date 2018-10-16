@@ -4,6 +4,8 @@ import { graphql } from "react-apollo";
 import { compose } from "recompose";
 import { Redirect } from "react-router";
 
+import { ContentContainer } from  "../components/ContentContainer";
+
 export class NextEpisodeShowPagePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
@@ -18,7 +20,11 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
 
   public render() {
     if (!this.state.workspaceId) {
-      return <div>Finding your next workspace...</div>;
+      return (
+        <ContentContainer>
+          Finding your next workspace...
+        </ContentContainer>
+      );
     } else {
       return (
         <Redirect

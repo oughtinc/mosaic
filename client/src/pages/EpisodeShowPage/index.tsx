@@ -209,11 +209,6 @@ export class WorkspaceView extends React.Component<any, any> {
   };
 
   public render() {
-
-    const isLoading = this.props.workspace.loading;
-    if (isLoading || !this.props.workspace.workspace) {
-      return <ContentContainer>Loading...</ContentContainer>;
-    }
     const workspace = this.props.workspace.workspace;
 
     const importedPointers = workspace.connectedPointers;
@@ -418,13 +413,12 @@ export class WorkspaceQuery extends React.Component<any, any> {
   public render() {
     const workspace = this.props.workspace.workspace;
     if (!workspace) {
-      return <div> Loading </div>;
+      return <ContentContainer>Loading...</ContentContainer>;
     }
 
     return (
       <WorkspaceView
         {...this.props}
-        loadedWorkspace={this.props.workspace.workspace}
       />
     );
   }
