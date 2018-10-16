@@ -175,7 +175,7 @@ class RootWorkspacePresentational extends React.Component<any, any> {
   private didIsEligibleChange = (prevProps: any, curProps: any) => {
     const prevWorkspace = prevProps.workspace;
     const curWorkspace = curProps.workspace;
-    return prevWorkspace.isEligibleForAssignment !== curWorkspace.isEligibleForAssignment
+    return prevWorkspace.isEligibleForAssignment !== curWorkspace.isEligibleForAssignment;
   }
 
   private handleOnIsPublicCheckboxChange = () => {

@@ -24,7 +24,7 @@ const EpisodeNavContainer = styled.div`
 `;
 
 interface EpisodeNavProps {
-  updateStaleness: (boolean) => void;
+  updateStaleness(isStale: boolean): void;
 }
 
 const EpisodeNav = ({ updateStaleness }: EpisodeNavProps) => (
