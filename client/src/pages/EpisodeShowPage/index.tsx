@@ -1,3 +1,4 @@
+import * as LogRocket from "logrocket";
 import * as moment from "moment";
 import * as React from "react";
 import * as keyboardJS from "keyboardjs";
@@ -215,9 +216,16 @@ export class WorkspaceView extends React.Component<any, any> {
     const allReadOnlyBlocks = new WorkspaceWithRelations(
       workspace
     ).allReadOnlyBlocks();
-    const readOnlyExportedPointers = _.flatten(
-      allReadOnlyBlocks.map(b => findPointers(b.value))
-    );
+
+    let readOnlyExportedPointers = [];
+    try {
+      readOnlyExportedPointers = _.flatten(
+        allReadOnlyBlocks.map(b => findPointers(b.value))
+      );
+    } catch (err) {
+      LogRocket.captureException(err);
+    }
+
     const availablePointers = _.uniqBy(
       [
         ...this.props.exportingPointers,
@@ -410,7 +418,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
 export class WorkspaceQuery extends React.Component<any, any> {
   public render() {
-    
+
     const isLoading = this.props.workspace.loading;
 
     if (isLoading) {
