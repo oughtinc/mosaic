@@ -8,6 +8,8 @@ function wrapLink(change: any, href: any) {
     type: "link",
     data: { href },
   });
+
+  change.collapseToEnd();
 }
 
 function LinkifyPlugin() {
