@@ -15,6 +15,24 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
     };
   }
 
+  public componentDidUpdate(prevProps) {
+    // we usually ignore graphQL changes in allocatedBudget, because are
+    // usually timer ticks, and for synchronization purposes we want exact
+    // control over the timer ticks, we don't want to be reliant on server
+    // perf issues for this
+
+    // an upshot of ignoring graphQL updates to allocatedBudget is that we miss
+    // the updates to allocatedBudget that occur after the creation of a child
+    // easiest fix here is to just assume any change < 10 is a child creation
+    // and listen to any graphQL update to allocaedBudget above this threshold
+    const initialAllocatedBudgetChange = Math.abs(prevProps.initialAllocatedBudget - this.props.initialAllocatedBudget);
+    if (initialAllocatedBudgetChange > 10) {
+      this.setState({
+        displayedAllocatedBudget: this.props.initialAllocatedBudget,
+      });
+    }
+  }
+
   public render() {
     return (
       <div
