@@ -114,7 +114,7 @@ const store = createStore(
     blocks: blockReducer,
     blockEditor: blockEditorReducer
   } as any),
-  composeWithDevTools(applyMiddleware(thunk, LogRocket.reduxMiddleware()))
+  composeWithDevTools(applyMiddleware(thunk))
 );
 
 class App extends React.Component {
