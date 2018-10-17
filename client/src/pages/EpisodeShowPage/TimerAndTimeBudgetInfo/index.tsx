@@ -15,7 +15,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
     };
   }
 
-  public componentDidUpdate(prevProps) {
+  public componentDidUpdate(prevProps: any) {
     // we usually ignore graphQL changes in allocatedBudget, because are
     // usually timer ticks, and for synchronization purposes we want exact
     // control over the timer ticks, we don't want to be reliant on server
