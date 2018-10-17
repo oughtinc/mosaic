@@ -132,7 +132,7 @@ describe("Scheduler class", function() {
 
       const result = await this.scheduler.getActionableWorkspaces(USER_ID);
       expect(result.length).to.equal(3);
-      
+
       expect(result).to.have.deep.members(workspaces.filter(
         w => w === workspaces.get("5-1") || w === workspaces.get("5-3") || w === workspaces.get("5-4")
       ));
@@ -236,14 +236,15 @@ describe("Scheduler class", function() {
       this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
       this.clock.tick(ONE_MINUTE);
 
-      await this.scheduler.assignNextWorkspace(USER_ID);
-      const result = await this.scheduler.getIdOfCurrentWorkspace(USER_ID);
+      await this.scheduler.assignNextWorkspace(USER_ID_1);
+      const result = await this.scheduler.getIdOfCurrentWorkspace(USER_ID_1);
       expect(result).to.be.oneOf([
+        "2-1",
+        "2-2",
         "3",
         "4",
         "5",
         "5-1",
-        "5-2",
         "5-3",
         "5-4",
       ]);

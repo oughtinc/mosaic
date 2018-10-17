@@ -47,13 +47,31 @@ class Scheduler {
   }
 
   private async getActionableWorkspaces(userId) {
-    const workspacesInTreesWorkedOnLeastRecentlyByUser = await this.getWorkspacesInTreesWorkedOnLeastRecentlyByUser(userId);
+    let treesToConsider = await this.fetchAllRootWorkspaces();
+
+    while (treesToConsider.length > 0) {
+      const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
+      const actionableWorkspaces = await this.getActionableWorkspacesForTheseTrees(userId, leastRecentlyWorkedOnTreesToConsider);
+
+      if (actionableWorkspaces.length > 0) {
+        return actionableWorkspaces;
+      } else {
+        treesToConsider = _.difference(
+          treesToConsider,
+          leastRecentlyWorkedOnTreesToConsider
+        );
+      }
+    }
+  }
+
+  private async getActionableWorkspacesForTheseTrees(userId, rootWorkspaces) {
+    const workspacesInTheseTrees = await this.getWorkspacesInTheseTrees(rootWorkspaces);
     console.log(
-      "workspacesInTreesWorkedOnLeastRecentlyByUser",
-      workspacesInTreesWorkedOnLeastRecentlyByUser.map(w => w.id)
+      "workspacesInTheseTrees",
+      workspacesInTheseTrees.map(w => w.id)
     );
 
-    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTreesWorkedOnLeastRecentlyByUser);
+    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTheseTrees);
     console.log(
       "workspacesNotCurrentlyBeingWorkedOn",
       workspacesNotCurrentlyBeingWorkedOn.map(w => w.id)
@@ -77,12 +95,9 @@ class Scheduler {
     if (staleWorkspaces.length > 0) {
       eligibleWorkspaces = staleWorkspaces;
     }
-
     console.log("eligibleWorkspaces", eligibleWorkspaces.map(w => w.id))
 
     const workspaceWithLeastRemainingBudgetAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
-
-
     console.log("least remaining descend budget", workspaceWithLeastRemainingBudgetAmongDescendants.map(w => w.id))
 
     const finalWorkspaces = workspaceWithLeastRemainingBudgetAmongDescendants;
@@ -126,10 +141,8 @@ class Scheduler {
     return this.schedule.getTreesWorkedOnLeastRecently(rootWorkspaces);
   }
 
-  private async getTreesWorkedOnLeastRecentlyByUser(userId) {
-    const rootWorkspaces = await this.fetchAllRootWorkspaces();
+  private async getTreesWorkedOnLeastRecentlyByUser(userId, rootWorkspaces) {
     const treesWorkedOnLeastRecentlyByUser = this.schedule.getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces, userId);
-    console.log("treesWorkedOnLeastRecentlyByUser 1", treesWorkedOnLeastRecentlyByUser.map(w => w.id));
     return treesWorkedOnLeastRecentlyByUser;
   }
 
@@ -145,6 +158,18 @@ class Scheduler {
     }
 
     return workspacesInTreesWorkedOnLeastRecently;
+  }
+
+  private async getWorkspacesInTheseTrees(rootWorkspaces) {
+    let workspacesInTheseTrees = [];
+    for (const tree of rootWorkspaces) {
+      const children = await this.fetchAllWorkspacesInTree(tree);
+      if (children.length > 0) {
+        workspacesInTheseTrees.push(...children);
+      }
+    }
+
+    return workspacesInTheseTrees;
   }
 
   private async getWorkspacesInTreesWorkedOnLeastRecentlyByUser(userId) {
