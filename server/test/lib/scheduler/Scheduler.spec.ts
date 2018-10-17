@@ -10,6 +10,7 @@ import {
   USER_ID_1,
   USER_ID_2,
   workspaces,
+  remainingBudgetAmongDescendantsCacheFake,
   rootParentCacheFake
 } from "./utils";
 
@@ -32,6 +33,7 @@ describe("Scheduler class", function() {
     this.scheduler = new Scheduler({
       fetchAllRootWorkspaces: fetchAllRootWorkspacesFake,
       fetchAllWorkspacesInTree: fetchAllWorkspacesInTreeFake,
+      remainingBudgetAmongDescendantsCache: remainingBudgetAmongDescendantsCacheFake,
       rootParentCache: rootParentCacheFake,
       schedule: this.schedule,
     });
@@ -43,11 +45,11 @@ describe("Scheduler class", function() {
     this.clock.restore();
   });
 
-  describe("filterByEligibility method", function() {
+  describe("filterByWhetherCurrentlyBeingWorkedOn method", function() {
     it("excludes workspaces currently being worked on", async function() {
       this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
 
-      const result = await this.scheduler.filterByEligibility(workspaces);
+      const result = await this.scheduler.filterByWhetherCurrentlyBeingWorkedOn(workspaces);
       expect(result).to.have.deep.members(workspaces.filter(w => w !== workspaces.get("1-1")));
     });
 
@@ -55,7 +57,7 @@ describe("Scheduler class", function() {
       this.schedule .assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
       this.clock.tick(ONE_MINUTE + 100);
 
-      const result = await this.scheduler.filterByEligibility(workspaces);
+      const result = await this.scheduler.filterByWhetherCurrentlyBeingWorkedOn(workspaces);
       expect(result).to.have.deep.members(workspaces);
     });
 
@@ -65,7 +67,7 @@ describe("Scheduler class", function() {
 
       this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
 
-      const result = await this.scheduler.filterByEligibility(workspaces);
+      const result = await this.scheduler.filterByWhetherCurrentlyBeingWorkedOn(workspaces);
       expect(result).to.have.deep.members(workspaces.filter(w => w !== workspaces.get("2")));
     });
   });
@@ -87,8 +89,7 @@ describe("Scheduler class", function() {
     it("works in straightforward case", function() {
       const result = this.scheduler.filterByWhetherHasRemainingBudget(workspaces);
       expect(result).to.have.deep.members(workspaces.filter(w => (
-        w !== workspaces.get("1") && w !== workspaces.get("1-1") && w !== workspaces.get("1-1-1")
-        && w !== workspaces.get("5-4")
+        w !== workspaces.get("5-2")
       )));
     });
   });
@@ -99,13 +100,15 @@ describe("Scheduler class", function() {
       this.clock.tick(ONE_MINUTE / 2);
       this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
 
-      const result = await this.scheduler.getActionableWorkspaces();
+      const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
       expect(result).to.have.deep.members(workspaces.filter(w =>
+        w === workspaces.get("2-1") || w === workspaces.get("2-2")
+        ||
         w === workspaces.get("3")
         ||
         w === workspaces.get("4")
         ||
-        w == workspaces.get("5") || w === workspaces.get("5-1") || w === workspaces.get("5-2") || w === workspaces.get("5-3") || w === workspaces.get("5-4")
+        w === workspaces.get("5-1") || w === workspaces.get("5-3") || w === workspaces.get("5-4")
       ));
     });
 
@@ -127,11 +130,11 @@ describe("Scheduler class", function() {
       this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
 
 
-      const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
-      expect(result.length).to.equal(4);
-      // 5-1 excluded because it's already been assigned but others haven't
+      const result = await this.scheduler.getActionableWorkspaces(USER_ID);
+      expect(result.length).to.equal(3);
+      
       expect(result).to.have.deep.members(workspaces.filter(
-        w => w == workspaces.get("5") || w === workspaces.get("5-2") || w === workspaces.get("5-3") || w === workspaces.get("5-4")
+        w => w === workspaces.get("5-1") || w === workspaces.get("5-3") || w === workspaces.get("5-4")
       ));
     });
 
@@ -162,11 +165,11 @@ describe("Scheduler class", function() {
       this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-2"));
 
-      const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
-      expect(result.length).to.equal(4);
-      // 5-4 excluded because it has no remaining budget
+      const result = await this.scheduler.getActionableWorkspaces(USER_ID);
+      expect(result.length).to.equal(3);
+
       expect(result).to.have.deep.members(workspaces.filter(
-        w => w == workspaces.get("5") || w === workspaces.get("5-1") || w === workspaces.get("5-2") || w === workspaces.get("5-3")
+        w => w === workspaces.get("5-1") || w === workspaces.get("5-3") || w === workspaces.get("5-4")
       ));
     });
 
@@ -197,11 +200,11 @@ describe("Scheduler class", function() {
       this.clock.tick(ONE_MINUTE);
       this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5"));
 
-      const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
+      const result = await this.scheduler.getActionableWorkspaces(USER_ID);
       expect(result.length).to.equal(1);
-      // 5-4 excluded because it has no remaining budget
+
       expect(result).to.have.deep.members(workspaces.filter(
-        w => w == workspaces.get("1-1")
+        w => w == workspaces.get("1-1-1")
       ));
     });
   });

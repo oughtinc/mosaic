@@ -4,16 +4,19 @@ import { UserSchedule } from "../../../lib/scheduler/UserSchedule";
 
 import {
   USER_ID,
+  rootParentCacheFake,
   workspaces,
 } from "./utils";
 
-describe("UserSchedule class", function() {
-  before(function() {
-    this.userSchedule = new UserSchedule(USER_ID);
-  });
+const ONE_MINUTE = 60 * 1000;
 
-  afterEach(function() {
-    this.userSchedule = new UserSchedule(USER_ID);
+describe("UserSchedule class", function() {
+  beforeEach(function() {
+    this.userSchedule = new UserSchedule({
+      rootParentCache: rootParentCacheFake,
+      timeLimit: ONE_MINUTE,
+      userId: USER_ID,
+    });
   });
 
   describe("hasUserBeenAssignedToAnyWorkspaces method", function() {
