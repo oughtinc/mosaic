@@ -59,16 +59,6 @@ class Schedule {
     NOTE: this only considers the trees associated with the rootWorkspaces
     argument
   */
-  public async isInTreeWorkedOnLeastRecently(rootWorkspaces, workspace) {
-    const treesWorkedOnLeastRecently = this.getTreesWorkedOnLeastRecently(rootWorkspaces);
-    const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
-    return !!(treesWorkedOnLeastRecently.find(rootWorkspace => rootWorkspace.id === rootParent.id));
-  }
-
-  /*
-    NOTE: this only considers the trees associated with the rootWorkspaces
-    argument
-  */
   public getTreesWorkedOnLeastRecently(rootWorkspaces) {
     const treesNotYetWorkedOn = rootWorkspaces.filter(
       r => this.lastWorkedOnTimestampForTree[r.id] === undefined
@@ -110,20 +100,6 @@ class Schedule {
       ([userId, userSchedule]) => userSchedule.hasUserWorkedOnWorkspace(workspace)
     );
   }
-
-  public getTimestampWorkspaceLastWorkedOn(workspace) {
-    const timestampsWorkspaceLastWorkedOn =
-      [...this.schedule].map(
-        ([userId, userSchedule]) => userSchedule.getTimestampWorkspaceLastWorkedOn(workspace)
-      );
-
-    return _.max(timestampsWorkspaceLastWorkedOn);
-  }
-
-  public getLeastRecentlyActiveWorkspace(workspaces) {
-    return _.minBy(workspaces, w => this.getTimestampWorkspaceLastWorkedOn(w));
-  }
-
 }
 
 export { Schedule };
