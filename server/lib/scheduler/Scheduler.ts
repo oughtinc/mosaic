@@ -78,15 +78,15 @@ class Scheduler {
       workspacesNotCurrentlyBeingWorkedOn.map(w => w.id)
     );
 
-    const workspacesWithRemainingBudget = await this.filterByWhetherHasRemainingBudget(workspacesNotCurrentlyBeingWorkedOn);
+    const workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(workspacesNotCurrentlyBeingWorkedOn);
     console.log(
-      "workspacesWithRemainingBudget",
-      workspacesWithRemainingBudget.map(w => w.id)
+      "workspacesWithAtLeastMinBudget",
+      workspacesWithAtLeastMinBudget.map(w => w.id)
     );
 
-    let eligibleWorkspaces = workspacesWithRemainingBudget;
+    let eligibleWorkspaces = workspacesWithAtLeastMinBudget;
 
-    const staleWorkspaces = await this.filterByStaleness(workspacesWithRemainingBudget);
+    const staleWorkspaces = await this.filterByStaleness(workspacesWithAtLeastMinBudget);
     console.log(
       "staleWorkspaces",
       staleWorkspaces.map(w => w.id)
@@ -146,8 +146,8 @@ class Scheduler {
     return workspaces.filter(w => !this.schedule.isWorkspaceCurrentlyBeingWorkedOn(w));
   }
 
-  private filterByWhetherHasRemainingBudget(workspaces) {
-    return workspaces.filter(w => this.hasRemainingBudgetForChildren(w));
+  private filterByWhetherHasMinBudget(workspaces) {
+    return workspaces.filter(w => this.hasMinRemaining(w));
   }
 
   private async filterByWhetherNotYetWorkedOn(workspaces) {
@@ -157,8 +157,8 @@ class Scheduler {
     );
   }
 
-  private hasRemainingBudgetForChildren(workspace) {
-    return workspace.totalBudget > workspace.allocatedBudget;
+  private hasMinRemaining(workspace) {
+    return (workspace.totalBudget - workspace.allocatedBudget) >= 10;
   }
 }
 
