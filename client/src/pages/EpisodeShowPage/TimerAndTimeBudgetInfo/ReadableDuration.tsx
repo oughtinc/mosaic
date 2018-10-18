@@ -1,14 +1,10 @@
 import { Duration } from "luxon";
-import * as moment from "moment";
 import * as React from "react";
-import { Glyphicon } from "react-bootstrap";
 
 class ReadableDuration extends React.Component<any,  any> {
   public render() {
-    const duration1 = Duration
-      .fromMillis(this.props.durationInMs)
-
-    const duration = duration1.shiftTo('days', 'hours', 'minutes', 'seconds');
+    const durationInMs = Duration.fromMillis(this.props.durationInMs);
+    const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
 
     return (
       <div style={this.props.style}>
@@ -21,7 +17,7 @@ class ReadableDuration extends React.Component<any,  any> {
                 fontSize: "28px",
               }}
             >
-              { Duration.fromObject({ days: duration.days }).toFormat("d") }
+              {Duration.fromObject({ days: duration.days }).toFormat("d")}
             </span>
             d
             {" "}
@@ -36,7 +32,7 @@ class ReadableDuration extends React.Component<any,  any> {
                 fontSize: "28px",
               }}
             >
-              { Duration.fromObject({ hours: duration.hours }).toFormat("h") }
+              {Duration.fromObject({ hours: duration.hours }).toFormat("h")}
             </span>
             h
             {" "}
@@ -51,7 +47,7 @@ class ReadableDuration extends React.Component<any,  any> {
                 fontSize: "28px",
               }}
             >
-              { Duration.fromObject({ minutes: duration.minutes }).toFormat("mm") }
+              {Duration.fromObject({ minutes: duration.minutes }).toFormat("mm")}
             </span>
             m
             {" "}
@@ -76,4 +72,4 @@ class ReadableDuration extends React.Component<any,  any> {
   }
 }
 
-export { ReadableDuration }
+export { ReadableDuration };
