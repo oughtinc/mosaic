@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
+import { Duration } from "luxon";
 import styled from "styled-components";
 
 import { Button, Badge } from "react-bootstrap";
@@ -50,6 +51,30 @@ export class Child extends React.Component<any, any> {
       WorkspaceRelationTypes.SubworkspaceAnswer,
       workspace
     );
+
+    const remainingBudgetInSeconds = workspace.totalBudget - workspace.allocatedBudget;
+    const remainingBudgetInMs = remainingBudgetInSeconds * 1000;
+    const durationInMs = Duration.fromMillis(remainingBudgetInMs);
+    const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
+
+    let durationString = ""
+
+    if (duration.days > 0) {
+      durationString += Duration.fromObject({days: duration.days}).toFormat("d") + "d ";
+    }
+
+    if (duration.hours > 0) {
+      durationString += Duration.fromObject({hours: duration.hours}).toFormat("h") + "h ";
+    }
+
+    if (duration.minutes > 0) {
+      durationString += Duration.fromObject({minutes: duration.minutes}).toFormat("mm") + "m ";
+    }
+
+    if (duration.seconds > 0) {
+      durationString += Duration.fromObject({seconds: duration.seconds}).toFormat("ss") + "s";
+    }
+
     return (
       <div>
         {questionRelationship.findBlock().value && (
@@ -106,8 +131,7 @@ export class Child extends React.Component<any, any> {
             )}
           <div style={{ float: "right" }}>
             <Badge>
-              {workspace.totalBudget - workspace.allocatedBudget} /{" "}
-              {workspace.totalBudget}
+              { durationString } left
             </Badge>
           </div>
         </div>
