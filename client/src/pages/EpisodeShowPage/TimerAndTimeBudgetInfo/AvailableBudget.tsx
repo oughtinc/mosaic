@@ -14,18 +14,22 @@ export class AvailableBudget extends React.Component<any,  any> {
       <span>
         <span
           style={{
+            alignItems: "center",
             color: availableBudgetHeaderFontColor,
+            display: "flex",
             fontSize: availableBudgetHeaderFontSize,
             fontVariant: "small-caps",
             fontWeight: 700,
+            justifyItems: "space-between",
           }}
         >
-          <Glyphicon glyph="piggy-bank" /> budget remaining
+          <Glyphicon glyph="time" style ={{ fontSize: "24px", marginRight: "5px" }}/>
+          <span>workspace total</span>
         </span>
-        <br />
 
         <ReadableDuration
           durationInMs={(this.props.totalBudget - this.props.allocatedBudget) * 1000}
+          style={{ textAlign: "center" }}
         />
       </span>
     );

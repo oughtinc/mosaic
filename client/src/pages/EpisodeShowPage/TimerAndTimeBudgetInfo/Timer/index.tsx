@@ -19,19 +19,22 @@ class TimerPresentational extends React.Component<any,  any> {
         <div style={this.props.style}>
           <span
             style={{
+              alignItems: "center",
               color: timerHeaderFontColor,
+              display: "flex",
               fontSize: timerHeaderFontSize,
               fontVariant: "small-caps",
               fontWeight: 700,
+              justifyItems: "space-between",
             }}
           >
-            <Glyphicon glyph="time" /> time left
+            <Glyphicon glyph="time" style ={{ fontSize: "24px", marginRight: "5px" }}/>
+            <span>this session</span>
           </span>
-
-          <br />
 
           <ReadableDuration
             durationInMs={this.props.remainingDurationInMs}
+            style={{ textAlign: "center" }}
           />
         </div>
       )
