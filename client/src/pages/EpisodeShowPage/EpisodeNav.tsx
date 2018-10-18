@@ -24,19 +24,41 @@ const EpisodeNavContainer = styled.div`
 `;
 
 interface EpisodeNavProps {
+  hasTimer: boolean;
+  hasTimerEnded: boolean;
   updateStaleness(isStale: boolean): void;
 }
 
-const EpisodeNav = ({ updateStaleness }: EpisodeNavProps) => (
+const EpisodeNav = ({ hasTimer, hasTimerEnded, updateStaleness }: EpisodeNavProps) => (
   <EpisodeNavContainer>
-    <NextWorkspaceBtn
-      label="Needs more work"
-      navHook={() => updateStaleness(true)}
-    />
-    <NextWorkspaceBtn
-      label="Done for now"
-      navHook={() => updateStaleness(false)}
-    />
+    {
+      hasTimer
+      ?
+      (
+        hasTimerEnded
+        ?
+          <NextWorkspaceBtn
+            label="Get next workspace"
+            navHook={() => {}}
+          />
+        :
+          <div>
+            <NextWorkspaceBtn
+              label="Needs more work"
+              navHook={() => updateStaleness(true)}
+            />
+            <NextWorkspaceBtn
+              label="Done for now"
+              navHook={() => updateStaleness(false)}
+            />
+          </div>
+      )
+      :
+      <NextWorkspaceBtn
+        label="Get started"
+        navHook={() => updateStaleness(true)}
+      />
+    }
   </EpisodeNavContainer>
 );
 

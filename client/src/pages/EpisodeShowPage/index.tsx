@@ -260,6 +260,8 @@ export class WorkspaceView extends React.Component<any, any> {
       <div>
         {Auth.isAuthenticated() && (
           <EpisodeNav
+            hasTimer={hasTimer}
+            hasTimerEnded={this.state.hasTimerEnded}
             updateStaleness={isStale =>
               this.props.updateWorkspaceStaleness({
                 variables: { id: workspace.id, isStale }
