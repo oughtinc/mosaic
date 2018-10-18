@@ -128,7 +128,7 @@ export class NewBlockForm extends React.Component<any, any> {
   private onSubmit = () => {
     this.props.onMutate({
       question: valueToDatabaseJSON(this.state.blockValue),
-      totalBudget: parse(this.state.totalBudget),
+      totalBudget: /^\d+$/.exec(this.state.totalBudget) ? this.state.totalBudget : (parse(this.state.totalBudget) / 1000),
     });
     // This isn't the most elegant way to reset the component. If we want to go the full redux route,
     // the state should probably eventually be moved into Redux.
