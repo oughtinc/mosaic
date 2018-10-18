@@ -5,6 +5,7 @@ import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
 import _ = require("lodash");
 import { Button, FormControl } from "react-bootstrap";
+const parse = require("parse-duration");
 
 import {
   blockBorderAndBoxShadow,
@@ -83,13 +84,11 @@ export class NewBlockForm extends React.Component<any, any> {
                 if (value === "") {
                   this.setState({ totalBudget: value });
                 }
-                const valueAsInt = parseInt(value, 10);
-                if (
-                  !!valueAsInt &&
-                  valueAsInt > 0 &&
-                  valueAsInt <= this.props.maxTotalBudget
-                ) {
-                  this.setState({ totalBudget: valueAsInt });
+
+                const isParseable = !!parse(value);
+
+                if (isParseable) {
+                  this.setState({ totalBudget: value });
                 }
               }}
             />
@@ -129,7 +128,7 @@ export class NewBlockForm extends React.Component<any, any> {
   private onSubmit = () => {
     this.props.onMutate({
       question: valueToDatabaseJSON(this.state.blockValue),
-      totalBudget: this.state.totalBudget
+      totalBudget: parse(this.state.totalBudget),
     });
     // This isn't the most elegant way to reset the component. If we want to go the full redux route,
     // the state should probably eventually be moved into Redux.

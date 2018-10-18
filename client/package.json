@@ -25,6 +25,7 @@
     "logrocket": "^0.6.10",
     "luxon": "^1.4.3",
     "moment": "^2.21.0",
+    "parse-duration": "^0.1.1",
     "query-string": "^6.1.0",
     "react": "^16.2.0",
     "react-apollo": "^2.0.4",
