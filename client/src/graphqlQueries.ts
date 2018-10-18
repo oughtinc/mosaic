@@ -68,6 +68,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
     workspace(id: $workspaceId) {
       id
       isPublic
+      isStale
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
@@ -85,6 +86,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
     workspace(id: $workspaceId) {
       id
       isPublic
+      isStale
       creatorId
       childWorkspaceOrder
       blocks {

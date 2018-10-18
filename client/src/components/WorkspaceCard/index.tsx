@@ -35,6 +35,7 @@ const CardBody = styled.div`
   margin-bottom: 1em;
   width: 40em;
   background: ${treeWorkspaceBgColor};
+  position: relative;
 `;
 
 const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
@@ -65,6 +66,7 @@ interface WorkspaceType {
   childWorkspaceOrder: string[];
   connectedPointersOfSubtree: ConnectedPointerType[];
   id: string;
+  isStale: boolean;
 }
 
 interface WorkspaceCardProps {
@@ -140,6 +142,21 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     return (
       <Container>
         <CardBody>
+          <div
+            style={{
+              color: "#666",
+              fontSize: "11px",
+              position: "absolute",
+              top: "3px",
+              right: "-40px",
+            }}
+          >
+            {
+              workspace.isStale
+              &&
+              "STALE"
+            }
+          </div>
           <BlockSection
             workspace={workspace}
             availablePointers={availablePointers}
