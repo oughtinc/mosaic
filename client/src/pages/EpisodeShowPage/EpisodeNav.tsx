@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 interface NextWorkspaceBtnProps {
   label: string;
-  navHook: () => void;
+  navHook?: () => void;
 }
 
 const NextWorkspaceBtn = ({ label, navHook }: NextWorkspaceBtnProps) => {
@@ -39,7 +39,6 @@ const EpisodeNav = ({ hasTimer, hasTimerEnded, updateStaleness }: EpisodeNavProp
         ?
           <NextWorkspaceBtn
             label="Get next workspace"
-            navHook={() => {}}
           />
         :
           <div>
