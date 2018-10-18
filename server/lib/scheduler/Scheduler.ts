@@ -51,27 +51,28 @@ class Scheduler {
 
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
-      const actionableWorkspaces = await this.getActionableWorkspacesForTheseTrees(userId, leastRecentlyWorkedOnTreesToConsider);
+      const randomlySelectedTree = pickRandomItemFromArray(leastRecentlyWorkedOnTreesToConsider);
+      const actionableWorkspaces = await this.getActionableWorkspacesForTree(userId, randomlySelectedTree);
 
       if (actionableWorkspaces.length > 0) {
         return actionableWorkspaces;
       } else {
         treesToConsider = _.difference(
           treesToConsider,
-          leastRecentlyWorkedOnTreesToConsider
+          [randomlySelectedTree]
         );
       }
     }
   }
 
-  private async getActionableWorkspacesForTheseTrees(userId, rootWorkspaces) {
-    const workspacesInTheseTrees = await this.getWorkspacesInTheseTrees(rootWorkspaces);
+  private async getActionableWorkspacesForTree(userId, rootWorkspace) {
+    const workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
     console.log(
-      "workspacesInTheseTrees",
-      workspacesInTheseTrees.map(w => w.id)
+      "workspacesInTree",
+      workspacesInTree.map(w => w.id)
     );
 
-    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTheseTrees);
+    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
     console.log(
       "workspacesNotCurrentlyBeingWorkedOn",
       workspacesNotCurrentlyBeingWorkedOn.map(w => w.id)
