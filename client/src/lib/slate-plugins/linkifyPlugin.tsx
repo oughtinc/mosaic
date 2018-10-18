@@ -1,5 +1,4 @@
-// tslint:disable-next-line
-const isUrl = require("is-url");
+import isUrl = require("is-url");
 import * as React from "react";
 import { getEventTransfer } from "slate-react";
 

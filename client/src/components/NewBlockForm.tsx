@@ -5,7 +5,7 @@ import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
 import _ = require("lodash");
 import { Button, FormControl } from "react-bootstrap";
-const parse = require("parse-duration");
+import parse = require("parse-duration");
 
 import {
   blockBorderAndBoxShadow,
