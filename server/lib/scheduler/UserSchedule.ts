@@ -14,11 +14,7 @@ class UserSchedule {
     this.timeLimit = timeLimit;
     this.userId = userId;
   }
-
-  public hasUserBeenAssignedToAnyWorkspaces() {
-    return this.userSchedule.length > 0;
-  }
-
+  
   public async assignWorkspace(workspace, startAtTimestamp = Date.now()) {
     const assignment = new Assignment({
       userId: this.userId,
@@ -35,7 +31,7 @@ class UserSchedule {
 
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
     console.log()
-    console.log(`CACHE NOW LOOKS LIKE ${this.lastWorkedOnTimestampForTree}`)
+    console.log(`CACHE NOW LOOKS LIKE ${JSON.stringify(this.lastWorkedOnTimestampForTree)}`)
     console.log()
   }
 
@@ -109,21 +105,6 @@ class UserSchedule {
     }
 
     return false;
-  }
-
-  public getTimestampWorkspaceLastWorkedOn(workspace) {
-    let mostRecentTimestamp = -Infinity;
-
-    for (const assignment of this.userSchedule) {
-      if (assignment.getWorkspace().id === workspace.id) {
-        const curTimestamp = assignment.getStartedAtTimestamp();
-        if (mostRecentTimestamp < curTimestamp) {
-          mostRecentTimestamp = curTimestamp;
-        }
-      }
-    }
-
-    return mostRecentTimestamp;
   }
 }
 
