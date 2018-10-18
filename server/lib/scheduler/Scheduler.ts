@@ -137,54 +137,9 @@ class Scheduler {
     return workspacesToReturn;
   }
 
-  private async getTreesWorkedOnLeastRecently() {
-    const rootWorkspaces = await this.fetchAllRootWorkspaces();
-    return this.schedule.getTreesWorkedOnLeastRecently(rootWorkspaces);
-  }
-
   private async getTreesWorkedOnLeastRecentlyByUser(userId, rootWorkspaces) {
     const treesWorkedOnLeastRecentlyByUser = this.schedule.getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces, userId);
     return treesWorkedOnLeastRecentlyByUser;
-  }
-
-  private async getWorkspacesInTreesWorkedOnLeastRecently() {
-    const treesWorkedOnLeastRecently = await this.getTreesWorkedOnLeastRecently();
-
-    let workspacesInTreesWorkedOnLeastRecently = [];
-    for (const tree of treesWorkedOnLeastRecently) {
-      const children = await this.fetchAllWorkspacesInTree(tree);
-      if (children.length > 0) {
-        workspacesInTreesWorkedOnLeastRecently.push(...children);
-      }
-    }
-
-    return workspacesInTreesWorkedOnLeastRecently;
-  }
-
-  private async getWorkspacesInTheseTrees(rootWorkspaces) {
-    let workspacesInTheseTrees = [];
-    for (const tree of rootWorkspaces) {
-      const children = await this.fetchAllWorkspacesInTree(tree);
-      if (children.length > 0) {
-        workspacesInTheseTrees.push(...children);
-      }
-    }
-
-    return workspacesInTheseTrees;
-  }
-
-  private async getWorkspacesInTreesWorkedOnLeastRecentlyByUser(userId) {
-    const treesWorkedOnLeastRecently = await this.getTreesWorkedOnLeastRecentlyByUser(userId);
-    console.log("treesWorkedOnLeastRecently 2", treesWorkedOnLeastRecently.map(w => w.id));
-    let workspacesInTreesWorkedOnLeastRecently = [];
-    for (const tree of treesWorkedOnLeastRecently) {
-      const children = await this.fetchAllWorkspacesInTree(tree);
-      if (children.length > 0) {
-        workspacesInTreesWorkedOnLeastRecently.push(...children);
-      }
-    }
-
-    return workspacesInTreesWorkedOnLeastRecently;
   }
 
   private async filterByWhetherCurrentlyBeingWorkedOn(workspaces) {
@@ -200,15 +155,6 @@ class Scheduler {
       workspaces,
       async w => !await this.schedule.hasWorkspaceBeenWorkedOnYet(w)
     );
-  }
-
-  private filterByWhetherHasRemainingBudget(workspaces) {
-    return workspaces.filter(this.hasRemainingBudgetForChildren);
-  }
-
-  private isWorkspaceEligible(w) {
-    // will add conditions to this later
-    return true;
   }
 
   private hasRemainingBudgetForChildren(workspace) {
