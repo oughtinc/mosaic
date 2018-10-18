@@ -101,15 +101,17 @@ describe("Scheduler class", function() {
       this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
 
       const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
-      expect(result).to.have.deep.members(workspaces.filter(w =>
-        w === workspaces.get("2-1") || w === workspaces.get("2-2")
-        ||
-        w === workspaces.get("3")
-        ||
-        w === workspaces.get("4")
-        ||
-        w === workspaces.get("5-1") || w === workspaces.get("5-3") || w === workspaces.get("5-4")
-      ));
+      expect(result[0]).to.be.oneOf([
+        workspaces.get("2"),
+        workspaces.get("2-1"),
+        workspaces.get("2-2"),
+        workspaces.get("3"),
+        workspaces.get("4"),
+        workspaces.get("5"),
+        workspaces.get("5-1"),
+        workspaces.get("5-3"),
+        workspaces.get("5-4")
+      ]);
     });
 
     it("works when all trees assigned at least once", async function() {
