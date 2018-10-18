@@ -6,7 +6,7 @@ class NewRootWorkspaceForm extends React.Component<any, any> {
     return (
       <div style={this.props.style}>
         <NewBlockForm
-          maxTotalBudget={10000}
+          maxTotalBudget={100000}
           onMutate={this.onCreateWorkspace}
         />
       </div>

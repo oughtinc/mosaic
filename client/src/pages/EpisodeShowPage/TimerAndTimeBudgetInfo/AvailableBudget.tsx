@@ -1,6 +1,8 @@
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
+import { ReadableDuration } from "./ReadableDuration";
+
 import {
   availableBudgetHeaderFontColor,
   availableBudgetHeaderFontSize,
@@ -21,23 +23,10 @@ export class AvailableBudget extends React.Component<any,  any> {
           <Glyphicon glyph="piggy-bank" /> budget remaining
         </span>
         <br />
-        <span
-          style={{
-            fontSize: "28px",
-          }}
-        >
-          {this.props.totalBudget - this.props.allocatedBudget}
-        </span>
-        {" "}
-        out of
-        {" "}
-        <span
-          style={{
-            fontSize: "28px",
-          }}
-        >
-            {this.props.totalBudget}
-        </span>
+
+        <ReadableDuration
+          durationInMs={(this.props.totalBudget - this.props.allocatedBudget) * 1000}
+        />
       </span>
     );
   }

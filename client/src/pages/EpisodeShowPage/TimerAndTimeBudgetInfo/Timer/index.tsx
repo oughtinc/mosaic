@@ -2,6 +2,8 @@ import * as moment from "moment";
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
+import { ReadableDuration } from "../ReadableDuration";
+
 import {
   timerHeaderFontColor,
   timerHeaderFontSize,
@@ -26,24 +28,12 @@ class TimerPresentational extends React.Component<any,  any> {
           >
             <Glyphicon glyph="time" /> time left
           </span>
-            <br />
-          <span
-            style={{
-              fontSize: "28px",
-            }}
-          >
-            {moment(this.props.remainingDurationInMs).format("m")}
-          </span>
-          m
-          {" "}
-          <span
-            style={{
-              fontSize: "28px",
-            }}
-          >
-            {moment(this.props.remainingDurationInMs).format("ss")}
-          </span>
-          s
+
+          <br />
+
+          <ReadableDuration
+            durationInMs={this.props.remainingDurationInMs}
+          />
         </div>
       )
     );
