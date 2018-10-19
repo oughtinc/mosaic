@@ -96,6 +96,14 @@ const UPDATE_WORKSPACE_STALENESS = gql`
   }
 `;
 
+const TRANSFER_REMAINING_BUDGET_TO_PARENT = gql`
+  mutation transferRemainingBudgetToParent($id: String!) {
+    transferRemainingBudgetToParent(id: $id) {
+      id
+    }
+  }
+`;
+
 const NEW_CHILD = gql`
   mutation createChildWorkspace(
     $workspaceId: String
@@ -260,11 +268,17 @@ export class WorkspaceView extends React.Component<any, any> {
       <div>
         {Auth.isAuthenticated() && (
           <EpisodeNav
+            hasParent={!!workspace.parentId}
             hasTimer={hasTimer}
             hasTimerEnded={this.state.hasTimerEnded}
             updateStaleness={isStale =>
               this.props.updateWorkspaceStaleness({
                 variables: { id: workspace.id, isStale }
+              })
+            }
+            transferRemainingBudgetToParent={() =>
+              this.props.transferRemainingBudgetToParent({
+                variables: { id: workspace.id }
               })
             }
           />
@@ -502,6 +516,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_STALENESS, {
     name: "updateWorkspaceStaleness",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(TRANSFER_REMAINING_BUDGET_TO_PARENT, {
+    name: "transferRemainingBudgetToParent",
     options: {
       refetchQueries: ["workspace"]
     }

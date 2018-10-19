@@ -228,6 +228,19 @@ const schema = new GraphQLSchema({
           return workspace.update({ isStale }, { event });
         }
       },
+      transferRemainingBudgetToParent: {
+        type: workspaceType,
+        args: {
+          id: { type: GraphQLString },
+        },
+        resolve: async (_, { id }) => {
+          const child = await models.Workspace.findById(id);
+          const childRemainingBudget = child.totalBudget - child.allocatedBudget;
+          const parent = await models.Workspace.findById(child.parentId);
+          await parent.update({ totalBudget: parent.totalBudget + childRemainingBudget });
+          await child.update({ totalBudget: child.allocatedBudget });
+        }
+      },
       createWorkspace: {
         type: workspaceType,
         args: {

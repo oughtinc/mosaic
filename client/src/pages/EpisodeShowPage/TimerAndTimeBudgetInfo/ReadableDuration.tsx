@@ -60,7 +60,11 @@ class ReadableDuration extends React.Component<any,  any> {
           </span>
         }
         {
-          isASecondOrMore
+          (
+            isASecondOrMore
+            ||
+            durationInMs < 1000
+          )
           &&
           <span>
             <span
