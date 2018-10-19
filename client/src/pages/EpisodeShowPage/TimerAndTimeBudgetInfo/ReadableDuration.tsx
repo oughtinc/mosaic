@@ -6,10 +6,15 @@ class ReadableDuration extends React.Component<any,  any> {
     const durationInMs = Duration.fromMillis(this.props.durationInMs);
     const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
 
+    const isADayOrMore = duration.days > 0;
+    const isAnHourOrMore = duration.hours > 0;
+    const isAMinuteOrMore = duration.minutes > 0;
+    const isExactlySixtySeconds = duration.minutes === 1  && duration.seconds === 0;
+
     return (
       <div style={this.props.style}>
         {
-          duration.days > 0
+          isADayOrMore
           &&
           <span>
             <span
@@ -24,7 +29,7 @@ class ReadableDuration extends React.Component<any,  any> {
           </span>
         }
         {
-          duration.hours > 0
+          isAnHourOrMore
           &&
           <span>
             <span
@@ -39,7 +44,7 @@ class ReadableDuration extends React.Component<any,  any> {
           </span>
         }
         {
-          duration.minutes > 0 && !(duration.minutes === 1  && duration.seconds === 0)
+          (isAMinuteOrMore && !isExactlySixtySeconds)
           &&
           <span>
             <span
@@ -59,7 +64,7 @@ class ReadableDuration extends React.Component<any,  any> {
           }}
         >
           {
-            duration.minutes === 1  && duration.seconds === 0
+            isExactlySixtySeconds
             ?
             Duration.fromObject({ seconds: 60 }).toFormat("s")
             :
