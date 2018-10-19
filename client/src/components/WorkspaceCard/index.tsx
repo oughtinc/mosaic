@@ -179,11 +179,13 @@ export class WorkspaceCardPresentational extends React.PureComponent<
 }
 
 const optionsForTopLevel = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
+  fetchPolicy: "cache-and-network",
   variables: { workspaceId },
   skip: !isTopLevelOfCurrentTree
 });
 
 const optionsForNested = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
+  fetchPolicy: "cache-and-network",
   variables: { workspaceId },
   skip: isTopLevelOfCurrentTree
 });
