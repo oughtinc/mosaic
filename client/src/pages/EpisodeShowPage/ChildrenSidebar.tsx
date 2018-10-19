@@ -126,7 +126,7 @@ export class Child extends React.Component<any, any> {
                   this.setState({ showChildBudgetForm: true });
                 }}
               >
-                Edit Time (in seconds)
+                Edit Time
               </Button>
             )}
           <div style={{ float: "right" }}>
