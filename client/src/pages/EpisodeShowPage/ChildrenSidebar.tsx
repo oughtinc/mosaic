@@ -52,9 +52,9 @@ export class Child extends React.Component<any, any> {
       workspace
     );
 
-    const remainingBudgetInSeconds = workspace.totalBudget - workspace.allocatedBudget;
-    const remainingBudgetInMs = remainingBudgetInSeconds * 1000;
-    const durationInMs = Duration.fromMillis(remainingBudgetInMs);
+    const totalBudgetInSeconds = workspace.totalBudget;
+    const totalBudgetInMs = totalBudgetInSeconds * 1000;
+    const durationInMs = Duration.fromMillis(totalBudgetInMs);
     const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
 
     let durationString = ""
