@@ -24,7 +24,7 @@ export class AvailableBudget extends React.Component<any,  any> {
           }}
         >
           <Glyphicon glyph="time" style ={{ fontSize: "24px", marginRight: "5px" }}/>
-          <span>workspace total</span>
+          <span>total remaining</span>
         </span>
 
         <ReadableDuration

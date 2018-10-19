@@ -131,7 +131,8 @@ export class Child extends React.Component<any, any> {
             )}
           <div style={{ float: "right" }}>
             <Badge>
-              { durationString }{totalBudgetInSeconds >= 1 && " left"}
+              { durationString }
+              {totalBudgetInSeconds >= 1 && " budget"}
             </Badge>
           </div>
         </div>
