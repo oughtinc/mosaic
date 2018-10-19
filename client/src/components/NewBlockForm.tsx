@@ -78,7 +78,7 @@ export class NewBlockForm extends React.Component<any, any> {
             <FormControl
               type="input"
               value={this.state.totalBudget}
-              placeholder="budget"
+              placeholder="budget (e.g., 5m10s)"
               onChange={(e: any) => {
                 const { value } = e.target;
                 if (value === "") {
