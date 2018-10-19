@@ -57,22 +57,22 @@ export class Child extends React.Component<any, any> {
     const durationInMs = Duration.fromMillis(totalBudgetInMs);
     const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
 
-    let durationString = ""
+    let durationString = "";
 
     if (duration.days > 0) {
-      durationString += Duration.fromObject({days: duration.days}).toFormat("d") + "d ";
+      durationString += `${Duration.fromObject({days: duration.days}).toFormat("d")}d `;
     }
 
     if (duration.hours > 0) {
-      durationString += Duration.fromObject({hours: duration.hours}).toFormat("h") + "h ";
+      durationString += `${Duration.fromObject({hours: duration.hours}).toFormat("h")}h `;
     }
 
     if (duration.minutes > 0) {
-      durationString += Duration.fromObject({minutes: duration.minutes}).toFormat("m") + "m ";
+      durationString += `${Duration.fromObject({minutes: duration.minutes}).toFormat("m")}m `;
     }
 
     if (duration.seconds > 0) {
-      durationString += Duration.fromObject({seconds: duration.seconds}).toFormat("s") + "s";
+      durationString += `${Duration.fromObject({seconds: duration.seconds}).toFormat("s")}s`;
     }
 
     return (
@@ -131,7 +131,7 @@ export class Child extends React.Component<any, any> {
             )}
           <div style={{ float: "right" }}>
             <Badge>
-              { durationString }
+              {durationString}
               {totalBudgetInSeconds >= 1 && " budget"}
             </Badge>
           </div>

@@ -26,7 +26,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
     // easiest fix here is to just assume any change < 10 is a child creation
     // and listen to any graphQL update to allocaedBudget above this threshold
     const initialAllocatedBudgetChange = prevProps.initialAllocatedBudget - this.props.initialAllocatedBudget;
-    console.log(initialAllocatedBudgetChange)
+    
     if (initialAllocatedBudgetChange < 0 || initialAllocatedBudgetChange > 5) {
       this.setState({
         displayedAllocatedBudget: this.props.initialAllocatedBudget,

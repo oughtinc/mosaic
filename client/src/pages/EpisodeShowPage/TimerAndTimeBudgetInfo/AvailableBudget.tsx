@@ -23,7 +23,7 @@ export class AvailableBudget extends React.Component<any,  any> {
             justifyItems: "space-between",
           }}
         >
-          <Glyphicon glyph="time" style ={{ fontSize: "24px", marginRight: "5px" }}/>
+          <Glyphicon glyph="time" style={{ fontSize: "24px", marginRight: "5px" }}/>
           <span>total remaining</span>
         </span>
 
