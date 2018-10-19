@@ -9,6 +9,7 @@ class ReadableDuration extends React.Component<any,  any> {
     const isADayOrMore = duration.days > 0;
     const isAnHourOrMore = duration.hours > 0;
     const isAMinuteOrMore = duration.minutes > 0;
+    const isASecondOrMore = duration.seconds > 0;
     const isExactlySixtySeconds = duration.minutes === 1  && duration.seconds === 0;
 
     return (
@@ -58,20 +59,26 @@ class ReadableDuration extends React.Component<any,  any> {
             {" "}
           </span>
         }
-        <span
-          style={{
-            fontSize: "28px",
-          }}
-        >
-          {
-            isExactlySixtySeconds
-            ?
-            Duration.fromObject({ seconds: 60 }).toFormat("s")
-            :
-            Duration.fromObject({ seconds: duration.seconds }).toFormat("s")
-          }
-        </span>
-        s
+        {
+          isASecondOrMore
+          &&
+          <span>
+            <span
+              style={{
+                fontSize: "28px",
+              }}
+            >
+              {
+                isExactlySixtySeconds
+                ?
+                Duration.fromObject({ seconds: 60 }).toFormat("s")
+                :
+                Duration.fromObject({ seconds: duration.seconds }).toFormat("s")
+              }
+            </span>
+            s
+          </span>
+        }
       </div>
     );
   }
