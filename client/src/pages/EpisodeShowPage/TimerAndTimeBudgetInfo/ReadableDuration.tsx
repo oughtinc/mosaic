@@ -47,7 +47,7 @@ class ReadableDuration extends React.Component<any,  any> {
                 fontSize: "28px",
               }}
             >
-              {Duration.fromObject({ minutes: duration.minutes }).toFormat("mm")}
+              {Duration.fromObject({ minutes: duration.minutes }).toFormat("m")}
             </span>
             m
             {" "}
@@ -61,9 +61,9 @@ class ReadableDuration extends React.Component<any,  any> {
           {
             duration.minutes === 1  && duration.seconds === 0
             ?
-            Duration.fromObject({ seconds: 60 }).toFormat("ss")
+            Duration.fromObject({ seconds: 60 }).toFormat("s")
             :
-            Duration.fromObject({ seconds: duration.seconds }).toFormat("ss")
+            Duration.fromObject({ seconds: duration.seconds }).toFormat("s")
           }
         </span>
         s

@@ -68,11 +68,11 @@ export class Child extends React.Component<any, any> {
     }
 
     if (duration.minutes > 0) {
-      durationString += Duration.fromObject({minutes: duration.minutes}).toFormat("mm") + "m ";
+      durationString += Duration.fromObject({minutes: duration.minutes}).toFormat("m") + "m ";
     }
 
     if (duration.seconds > 0) {
-      durationString += Duration.fromObject({seconds: duration.seconds}).toFormat("ss") + "s";
+      durationString += Duration.fromObject({seconds: duration.seconds}).toFormat("s") + "s";
     }
 
     return (
