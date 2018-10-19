@@ -195,7 +195,12 @@ const WorkspaceModel = (
       );
     }
 
-    await childWorkspace.update({ totalBudget: newTotalBudget }, { event });
+    const budgetIncreased = childWorkspace.totalBudget < newTotalBudget;
+
+    await childWorkspace.update({
+      isStale: budgetIncreased ? true : childWorkspace.isStale,
+      totalBudget: newTotalBudget
+    }, { event });
 
     await this.update(
       {
