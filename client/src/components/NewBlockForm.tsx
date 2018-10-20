@@ -126,9 +126,14 @@ export class NewBlockForm extends React.Component<any, any> {
   });
 
   private onSubmit = () => {
+    const isAStringOfNumbers = s => /^\d+$/.exec(s);
+
     this.props.onMutate({
       question: valueToDatabaseJSON(this.state.blockValue),
-      totalBudget: /^\d+$/.exec(this.state.totalBudget) ? this.state.totalBudget : (parse(this.state.totalBudget) / 1000),
+      // totalBudget is either a string of numbers, in which case it's
+      // interpreted as seconds, or a duration string, in which case it is
+      // parsed into milliseconds, and then divided by 1000 to get seconds
+      totalBudget: isAStringOfNumbers(this.state.totalBudget) ? this.state.totalBudget : (parse(this.state.totalBudget) / 1000),
     });
     // This isn't the most elegant way to reset the component. If we want to go the full redux route,
     // the state should probably eventually be moved into Redux.
