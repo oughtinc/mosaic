@@ -12,6 +12,14 @@ class ReadableDuration extends React.Component<any,  any> {
     const isASecondOrMore = duration.seconds > 0;
     const isExactlySixtySeconds = duration.minutes === 1  && duration.seconds === 0;
 
+    if (this.props.durationInMs < 0) {
+      return (
+        <span>
+          <span style={{ fontSize: "28px" }}>0</span>s
+        </span>
+      );
+    }
+
     return (
       <div style={this.props.style}>
         {
