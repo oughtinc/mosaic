@@ -237,7 +237,7 @@ const schema = new GraphQLSchema({
           const child = await models.Workspace.findById(id);
           const childRemainingBudget = child.totalBudget - child.allocatedBudget;
           const parent = await models.Workspace.findById(child.parentId);
-          await parent.update({ totalBudget: parent.totalBudget + childRemainingBudget });
+          await parent.update({ isStale: true, totalBudget: parent.totalBudget + childRemainingBudget });
           await child.update({ totalBudget: child.allocatedBudget });
         }
       },
