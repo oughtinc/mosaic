@@ -9,6 +9,8 @@ class Scheduler {
   private rootParentCache;
   private schedule;
 
+  private MIN_BUDGET_REQUIRED_FOR_ELIGIBILITY = 10;
+
   public constructor({
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
@@ -80,7 +82,7 @@ class Scheduler {
     }
 
     const workspaceWithLeastRemainingBudgetAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
-    
+
     const finalWorkspaces = workspaceWithLeastRemainingBudgetAmongDescendants;
 
     return finalWorkspaces;
@@ -138,7 +140,7 @@ class Scheduler {
   }
 
   private hasMinRemaining(workspace) {
-    return (workspace.totalBudget - workspace.allocatedBudget) >= 10;
+    return (workspace.totalBudget - workspace.allocatedBudget) >= this.MIN_BUDGET_REQUIRED_FOR_ELIGIBILITY;
   }
 }
 
