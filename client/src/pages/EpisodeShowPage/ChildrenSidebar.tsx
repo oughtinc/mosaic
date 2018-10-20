@@ -1,9 +1,8 @@
 import * as React from "react";
 import * as _ from "lodash";
-import { Duration } from "luxon";
 import styled from "styled-components";
 
-import { Button, Badge } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
@@ -11,6 +10,7 @@ import {
   WorkspaceBlockRelation,
   WorkspaceRelationTypes
 } from "./WorkspaceRelations";
+import { ChildBudgetBadge } from "./ChildBudgetBadge";
 import { ChildBudgetForm } from "./ChildBudgetForm";
 import { Auth } from "../../auth";
 
@@ -51,29 +51,6 @@ export class Child extends React.Component<any, any> {
       WorkspaceRelationTypes.SubworkspaceAnswer,
       workspace
     );
-
-    const totalBudgetInSeconds = workspace.totalBudget;
-    const totalBudgetInMs = totalBudgetInSeconds * 1000;
-    const durationInMs = Duration.fromMillis(totalBudgetInMs);
-    const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
-
-    let durationString = "";
-
-    if (duration.days > 0) {
-      durationString += `${Duration.fromObject({days: duration.days}).toFormat("d")}d `;
-    }
-
-    if (duration.hours > 0) {
-      durationString += `${Duration.fromObject({hours: duration.hours}).toFormat("h")}h `;
-    }
-
-    if (duration.minutes > 0) {
-      durationString += `${Duration.fromObject({minutes: duration.minutes}).toFormat("m")}m `;
-    }
-
-    if (duration.seconds > 0) {
-      durationString += `${Duration.fromObject({seconds: duration.seconds}).toFormat("s")}s`;
-    }
 
     return (
       <div>
@@ -130,10 +107,9 @@ export class Child extends React.Component<any, any> {
               </Button>
             )}
           <div style={{ float: "right" }}>
-            <Badge>
-              {durationString}
-              {totalBudgetInSeconds >= 1 && " budget"}
-            </Badge>
+            <ChildBudgetBadge
+              totalBudget={workspace.totalBudget}
+            />
           </div>
         </div>
         {this.state.showChildBudgetForm && (
