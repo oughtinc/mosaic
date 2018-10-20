@@ -34,10 +34,8 @@ class Scheduler {
     this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
 
     const actionableWorkspaces = await this.getActionableWorkspaces(userId);
-    console.log("actionableWorkspaces", actionableWorkspaces.map(w => w.id));
 
     const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
-    console.log("assignedWorkspace", assignedWorkspace.id);
 
     if (!assignedWorkspace) {
       throw new Error("No workspace to choose from");
@@ -67,40 +65,22 @@ class Scheduler {
 
   private async getActionableWorkspacesForTree(userId, rootWorkspace) {
     const workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
-    console.log(
-      "workspacesInTree",
-      workspacesInTree.map(w => w.id)
-    );
 
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
-    console.log(
-      "workspacesNotCurrentlyBeingWorkedOn",
-      workspacesNotCurrentlyBeingWorkedOn.map(w => w.id)
-    );
 
     const workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(workspacesNotCurrentlyBeingWorkedOn);
-    console.log(
-      "workspacesWithAtLeastMinBudget",
-      workspacesWithAtLeastMinBudget.map(w => w.id)
-    );
 
     let eligibleWorkspaces = workspacesWithAtLeastMinBudget;
 
     const staleWorkspaces = await this.filterByStaleness(workspacesWithAtLeastMinBudget);
-    console.log(
-      "staleWorkspaces",
-      staleWorkspaces.map(w => w.id)
-    );
 
     // filter by staleness IF there are some stale ones
     if (staleWorkspaces.length > 0) {
       eligibleWorkspaces = staleWorkspaces;
     }
-    console.log("eligibleWorkspaces", eligibleWorkspaces.map(w => w.id))
 
     const workspaceWithLeastRemainingBudgetAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
-    console.log("least remaining descend budget", workspaceWithLeastRemainingBudgetAmongDescendants.map(w => w.id))
-
+    
     const finalWorkspaces = workspaceWithLeastRemainingBudgetAmongDescendants;
 
     return finalWorkspaces;

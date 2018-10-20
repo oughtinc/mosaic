@@ -85,8 +85,6 @@ const BlockModel = (
   };
 
   Block.prototype.propagateStaleness = async function({ event }) {
-    console.log("propagateStaleness");
-    console.log(this.type);
     const workspaceId = this.workspaceId;
     const workspace = await sequelize.models.Workspace.findById(workspaceId);
     // 1. If block is a question, mark workspace it belongs to as stale

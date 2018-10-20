@@ -14,25 +14,19 @@ class UserSchedule {
     this.timeLimit = timeLimit;
     this.userId = userId;
   }
-  
+
   public async assignWorkspace(workspace, startAtTimestamp = Date.now()) {
     const assignment = new Assignment({
       userId: this.userId,
       workspace,
       startAtTimestamp,
     });
-    console.log()
-    console.log(`ASSIGNING ${workspace.id}`)
+
     this.userSchedule.push(assignment);
 
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
-    console.log()
-    console.log(`THIS HAS ROOT PARENT ${rootParent.id}`)
 
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
-    console.log()
-    console.log(`CACHE NOW LOOKS LIKE ${JSON.stringify(this.lastWorkedOnTimestampForTree)}`)
-    console.log()
   }
 
   public getMostRecentAssignment() {
@@ -40,14 +34,9 @@ class UserSchedule {
   }
 
   public getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces) {
-    console.log("in user schedule")
     const treesNotYetWorkedOn = rootWorkspaces.filter(
       r => this.lastWorkedOnTimestampForTree[r.id] === undefined
     );
-
-    console.log("treesNotYetWorkedOn", treesNotYetWorkedOn.length, treesNotYetWorkedOn.map(w => w.id))
-
-    console.log("this.lastWorkedOnTimestampForTree", this.lastWorkedOnTimestampForTree)
 
     if (treesNotYetWorkedOn.length > 0) {
       return treesNotYetWorkedOn;
@@ -63,7 +52,6 @@ class UserSchedule {
       r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp
     );
 
-    console.log("leaving schedule")
     return leastRecentlyWorkedOnTrees;
   }
 
