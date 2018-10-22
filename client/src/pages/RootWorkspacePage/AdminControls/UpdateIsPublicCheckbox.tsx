@@ -28,30 +28,28 @@ class UpdateIsPublicCheckboxPresentational extends React.Component<any, any> {
    }
 
   public render() {
-    const workspace = this.props.workspace;
-
     return (
-       <Checkbox
-         style={{
-           backgroundColor: adminCheckboxBgColor,
-           border: `1px solid ${adminCheckboxBorderColor}`,
-           borderRadius: "3px",
-           padding: "5px 5px 5px 25px",
-           opacity: this.state.isPublicCheckboxStatusPending ? 0.75 : 1,
-         }}
-         inline={true}
-         type="checkbox"
-         checked={workspace.isPublic}
-         onChange={this.handleOnIsPublicCheckboxChange}
-       >
-         {
+      <Checkbox
+        style={{
+         backgroundColor: adminCheckboxBgColor,
+         border: `1px solid ${adminCheckboxBorderColor}`,
+         borderRadius: "3px",
+         padding: "5px 5px 5px 25px",
+         opacity: this.state.isPublicCheckboxStatusPending ? 0.75 : 1,
+        }}
+        inline={true}
+        type="checkbox"
+        checked={this.props.workspace.isPublic}
+        onChange={this.handleOnIsPublicCheckboxChange}
+      >
+        {
            this.state.isPublicCheckboxStatusPending
            ?
            "updating..."
            :
            "appears on front page"
-         }
-       </Checkbox>
+        }
+      </Checkbox>
     );
   }
 
@@ -65,6 +63,7 @@ class UpdateIsPublicCheckboxPresentational extends React.Component<any, any> {
     if (this.state.isPublicCheckboxStatusPending) {
       return;
     }
+
     this.setState({ isPublicCheckboxStatusPending: true }, () => {
       // the setTimeout here can be removed if desired
       // it is only here so the user has a moment to see the "Updating"

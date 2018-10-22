@@ -28,30 +28,28 @@ class UpdateIsEligibleCheckboxPresentational extends React.Component<any, any> {
    }
 
   public render() {
-    const workspace = this.props.workspace;
-
     return (
-       <Checkbox
-         style={{
-           backgroundColor: adminCheckboxBgColor,
-           border: `1px solid ${adminCheckboxBorderColor}`,
-           borderRadius: "3px",
-           padding: "5px 5px 5px 25px",
-           opacity: this.state.isEligibleCheckboxStatusPending ? 0.75 : 1,
-         }}
-         inline={true}
-         type="checkbox"
-         checked={workspace.isEligibleForAssignment}
-         onChange={this.handleOnIsEligibleCheckboxChange}
-       >
-         {
+      <Checkbox
+        style={{
+         backgroundColor: adminCheckboxBgColor,
+         border: `1px solid ${adminCheckboxBorderColor}`,
+         borderRadius: "3px",
+         padding: "5px 5px 5px 25px",
+         opacity: this.state.isEligibleCheckboxStatusPending ? 0.75 : 1,
+        }}
+        inline={true}
+        type="checkbox"
+        checked={this.props.workspace.isEligibleForAssignment}
+        onChange={this.handleOnIsEligibleCheckboxChange}
+      >
+        {
            this.state.isEligibleCheckboxStatusPending
            ?
            "updating..."
            :
            "is eligible for assignment"
-         }
-       </Checkbox>
+        }
+      </Checkbox>
     );
   }
 
@@ -65,6 +63,7 @@ class UpdateIsEligibleCheckboxPresentational extends React.Component<any, any> {
     if (this.state.isEligibleCheckboxStatusPending) {
       return;
     }
+
     this.setState({ isEligibleCheckboxStatusPending: true }, () => {
       // the setTimeout here can be removed if desired
       // it is only here so the user has a moment to see the "Updating"
