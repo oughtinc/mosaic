@@ -96,7 +96,7 @@ export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
   }
 `;
 
- export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
+export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
   mutation updateWorkspaceIsEligible($isEligible: Boolean, $workspaceId: String) {
     updateWorkspaceIsEligible(isEligible: $isEligible, workspaceId: $workspaceId) {
       id
