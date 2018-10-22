@@ -46,6 +46,7 @@ export const WORKSPACES_QUERY = gql`
         type
       }
       connectedPointers
+      isEligibleForAssignment
     }
   }
 `;
@@ -83,6 +84,22 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
         value
         type
       }
+    }
+  }
+`;
+
+export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
+  mutation updateWorkspaceIsPublic($isPublic: Boolean, $workspaceId: String) {
+    updateWorkspaceIsPublic(isPublic: $isPublic, workspaceId: $workspaceId) {
+      id
+    }
+  }
+`;
+
+ export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
+  mutation updateWorkspaceIsEligible($isEligible: Boolean, $workspaceId: String) {
+    updateWorkspaceIsEligible(isEligible: $isEligible, workspaceId: $workspaceId) {
+      id
     }
   }
 `;
