@@ -29,6 +29,14 @@ export const UPDATE_BLOCKS = gql`
   }
 `;
 
+export const UPDATE_ALLOCATED_BUDGET = gql`
+  mutation updateAllocatedBudget($workspaceId: String, $changeToBudget: Int) {
+    updateAllocatedBudget(workspaceId: $workspaceId, changeToBudget: $changeToBudget) {
+      id
+    }
+  }
+`;
+
 export const WORKSPACES_QUERY = gql`
   query RootWorkspacesQuery {
     workspaces(where: { parentId: null, hasBeenDeletedByAncestor: false }) {

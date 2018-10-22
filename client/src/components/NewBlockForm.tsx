@@ -5,6 +5,7 @@ import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
 import _ = require("lodash");
 import { Button, FormControl } from "react-bootstrap";
+import parse = require("parse-duration");
 
 import {
   blockBorderAndBoxShadow,
@@ -77,19 +78,16 @@ export class NewBlockForm extends React.Component<any, any> {
             <FormControl
               type="input"
               value={this.state.totalBudget}
-              placeholder="budget"
+              placeholder="budget (e.g., 5m10s)"
               onChange={(e: any) => {
                 const { value } = e.target;
                 if (value === "") {
                   this.setState({ totalBudget: value });
                 }
-                const valueAsInt = parseInt(value, 10);
-                if (
-                  !!valueAsInt &&
-                  valueAsInt > 0 &&
-                  valueAsInt <= this.props.maxTotalBudget
-                ) {
-                  this.setState({ totalBudget: valueAsInt });
+
+                const isParseable = !!parse(value);
+                if (isParseable) {
+                  this.setState({ totalBudget: value });
                 }
               }}
             />
@@ -127,9 +125,14 @@ export class NewBlockForm extends React.Component<any, any> {
   });
 
   private onSubmit = () => {
+    const isAStringOfNumbers = s => /^\d+$/.exec(s);
+
     this.props.onMutate({
       question: valueToDatabaseJSON(this.state.blockValue),
-      totalBudget: this.state.totalBudget
+      // totalBudget is either a string of numbers, in which case it's
+      // interpreted as seconds, or a duration string, in which case it is
+      // parsed into milliseconds, and then divided by 1000 to get seconds
+      totalBudget: isAStringOfNumbers(this.state.totalBudget) ? this.state.totalBudget : (parse(this.state.totalBudget) / 1000),
     });
     // This isn't the most elegant way to reset the component. If we want to go the full redux route,
     // the state should probably eventually be moved into Redux.

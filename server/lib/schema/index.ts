@@ -289,6 +289,27 @@ const schema = new GraphQLSchema({
           });
         }
       },
+      updateAllocatedBudget: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+          changeToBudget: { type: GraphQLInt }
+        },
+        resolve: async (_, { workspaceId, changeToBudget }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update allocated budet."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          const updatedTimeBudget = Math.min(
+            workspace.totalBudget,
+            workspace.allocatedBudget + changeToBudget,
+          );
+          await workspace.update({ allocatedBudget: updatedTimeBudget });
+        }
+      },
       findNextWorkspace: {
         type: workspaceType,
         resolve: async (_, args, context) => {

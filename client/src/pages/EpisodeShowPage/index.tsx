@@ -1,3 +1,4 @@
+import * as moment from "moment";
 import * as React from "react";
 import gql from "graphql-tag";
 import styled from "styled-components";
@@ -7,8 +8,7 @@ import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 
-import { AvailableBudget } from "./AvailableBudget";
-import { Timer } from "./Timer";
+import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -147,6 +147,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   private scratchpadField;
   private answerField;
   private newChildField;
+  private tickDuration = 1;
 
   public constructor(props: any) {
     super(props);
@@ -228,7 +229,10 @@ export class FormPagePresentational extends React.Component<any, any> {
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
-    const durationString = queryParams.timer;
+
+    const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
+    const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
+    const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
 
     return (
       <div key={workspace.id}>
@@ -241,21 +245,14 @@ export class FormPagePresentational extends React.Component<any, any> {
                   justifyContent: "flex-end",
                 }}
               >
-                {
-                  hasTimer
-                  &&
-                  <Timer
-                    durationString={durationString}
-                    onTimerEnd={this.handleTimerEnd}
-                    shouldTimerReset={this.props.location.state.shouldTimerReset}
-                    style={{ marginRight: "30px" }}
-                    workspaceId={workspace.id}
-                  />
-                }
-                <AvailableBudget
-                  allocatedBudget={workspace.allocatedBudget}
-                  style={{ marginRight: "30px" }}
+                <TimerAndTimeBudgetInfo
+                  durationInMs={durationInMs}
+                  handleTimerEnd={this.handleTimerEnd}
+                  hasTimer={hasTimer}
+                  initialAllocatedBudget={workspace.allocatedBudget}
+                  tickDuration={this.tickDuration}
                   totalBudget={workspace.totalBudget}
+                  workspaceId={workspace.id}
                 />
               </div>
             </Col>
