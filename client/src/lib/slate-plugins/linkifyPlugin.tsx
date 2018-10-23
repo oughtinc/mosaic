@@ -4,9 +4,20 @@ import * as React from "react";
 import { getEventTransfer } from "slate-react";
 
 function wrapLink(change: any, href: any) {
-  change.wrapInline({
+  change.insertInline({
     type: "link",
     data: { href },
+    nodes: [
+      {
+        object: "text",
+        leaves: [
+          {
+            object: "leaf",
+            text: href,
+          }
+        ]
+      }
+    ]
   });
 
   change.collapseToEnd();
