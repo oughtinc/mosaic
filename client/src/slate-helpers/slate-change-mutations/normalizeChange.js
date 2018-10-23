@@ -1,4 +1,3 @@
-import { containingPointerExportAncestor } from "../slate-utils/containingPointerExportAncestor";
 import { hasSpacerAsFirstChar } from "../slate-utils//hasSpacerAsFirstChar";
 import { hasSpacerAsLastChar } from "../slate-utils//hasSpacerAsLastChar";
 import { isDirectlyAfterExport } from "../slate-utils//isDirectlyAfterExport";

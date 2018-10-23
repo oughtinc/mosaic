@@ -1,7 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 import { Change } from "../../components/BlockEditor/types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
-import { isSelectionAcrossPointers } from "../slate-utils/isSelectionAcrossPointers";
+import { isSelectionAcrossInlines } from "../slate-utils/isSelectionAcrossInlines";
 
 const onlyOneNodeThatIsPointerExport = nodes => {
   return (
@@ -39,8 +39,8 @@ export function insertPointerExport(change: Change) {
   }
 
   // disallow attempts to export across pointer boundaries
-  const isExportingAcrossPointers = isSelectionAcrossPointers(change.value);
-  if (isExportingAcrossPointers) {
+  const isExportingAcrossInlines = isSelectionAcrossInlines(change.value);
+  if (isExportingAcrossInlines) {
     return;
   }
 
