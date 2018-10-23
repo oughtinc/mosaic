@@ -75,18 +75,6 @@ const LoginLink = () => (
   </ActionLink>
 );
 
-const NextWorkspaceBtn = () => {
-  if (Auth.isAuthenticated()) {
-    return (
-      <Link to="/next">
-        <Button bsSize="small">Get Next Workspace »</Button>
-      </Link>
-    );
-  } else {
-    return null;
-  }
-};
-
 const UserControls = () => (
   <div>
     {Auth.isAuthenticated() ? <LogoutLink /> : <LoginLink />}
@@ -105,7 +93,6 @@ const Header = () => (
         }}
       >
         <Brand to="/">Mosaic v0.1</Brand>
-        <NextWorkspaceBtn />
         <UserControls />
       </div>
     </div>
