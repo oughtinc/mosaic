@@ -7,6 +7,8 @@ import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 
+import { EpisodeNav } from "./EpisodeNav";
+import { ContentContainer } from "../../components/ContentContainer";
 import { AvailableBudget } from "./AvailableBudget";
 import { Timer } from "./Timer";
 import { ChildrenSidebar } from "./ChildrenSidebar";
@@ -35,6 +37,8 @@ import {
   blockBodyCSS,
   workspaceViewQuestionFontSize,
 } from "../../styles";
+
+import { Auth } from "../../auth";
 
 const WORKSPACE_QUERY = gql`
   query workspace($id: String!) {
@@ -103,6 +107,14 @@ const UPDATE_CHILD_TOTAL_BUDGET = gql`
       childId: $childId
       totalBudget: $totalBudget
     ) {
+      id
+    }
+  }
+`;
+
+const UPDATE_WORKSPACE_STALENESS = gql`
+  mutation updateWorkspaceStaleness($id: String!, $isStale: Boolean!) {
+    updateWorkspaceStaleness(id: $id, isStale: $isStale) {
       id
     }
   }
@@ -186,7 +198,7 @@ export class FormPagePresentational extends React.Component<any, any> {
   public render() {
     const isLoading = this.props.workspace.loading;
     if (isLoading) {
-      return <div>Loading...</div>;
+      return <ContentContainer>Loading...</ContentContainer>;
     }
 
     const workspace = this.props.workspace.workspace;
@@ -232,146 +244,177 @@ export class FormPagePresentational extends React.Component<any, any> {
 
     return (
       <div key={workspace.id}>
-        <BlockHoverMenu>
-          <Row>
-            <Col sm={12}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
-                {
-                  hasTimer
-                  &&
-                  <Timer
-                    durationString={durationString}
-                    onTimerEnd={this.handleTimerEnd}
-                    shouldTimerReset={this.props.location.state.shouldTimerReset}
-                    style={{ marginRight: "30px" }}
-                    workspaceId={workspace.id}
-                  />
-                }
-                <AvailableBudget
-                  allocatedBudget={workspace.allocatedBudget}
-                  style={{ marginRight: "30px" }}
-                  totalBudget={workspace.totalBudget}
-                />
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={12}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-end",
-                  marginBottom: "10px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: workspaceViewQuestionFontSize,
-                    marginRight: "8px",
-                  }}
-                >
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    {...questionProps}
-                  />
-                </div>
-                {
-                  workspace.parentId
-                  &&
-                  !isIsolatedWorkspace
-                  &&
-                  <div style={{ paddingBottom: "8px" }}>
-                    <ParentLink parentId={workspace.parentId} />
-                  </div>
-                }
-                {
-                  workspace
-                  &&
-                  !isIsolatedWorkspace
-                  &&
-                  <div style={{paddingBottom: "8px"}}>
-                    <SubtreeLink workspace={workspace} />
-                  </div>
-                }
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={6}>
-              <BlockContainer>
-                <BlockHeader>Scratchpad</BlockHeader>
-                <BlockBody>
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    placeholder="Text for the scratchpad..."
-                    ref={this.registerEditorRef("scratchpadField")}
-                    {...scratchpadProps}
-                  />
-                </BlockBody>
-              </BlockContainer>
+        {Auth.isAuthenticated() && (
+          <EpisodeNav
+            hasParent={!!workspace.parentId}
+            hasTimer={hasTimer}
+            hasTimerEnded={this.state.hasTimerEnded}
+            updateStaleness={isStale =>
+              this.props.updateWorkspaceStaleness({
+                variables: { id: workspace.id, isStale }
+              })
+            }
+            transferRemainingBudgetToParent={() =>
+              this.props.transferRemainingBudgetToParent({
+                variables: { id: workspace.id }
+              })
+            }
+          />
+        )}
+        <ContentContainer>
+          {
+            this.state.hasTimerEnded
+            ?
+            (
+            <div>
+              Your time with this workspace is up. Thanks for contributing!
+            </div>
+            )
+            :
+            (
+              <BlockHoverMenu>
+                <Row>
+                  <Col sm={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      {
+                        hasTimer
+                        &&
+                        <Timer
+                          durationString={durationString}
+                          onTimerEnd={this.handleTimerEnd}
+                          shouldTimerReset={this.props.location.state.shouldTimerReset}
+                          style={{ marginRight: "30px" }}
+                          workspaceId={workspace.id}
+                        />
+                      }
+                      <AvailableBudget
+                        allocatedBudget={workspace.allocatedBudget}
+                        style={{ marginRight: "30px" }}
+                        totalBudget={workspace.totalBudget}
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={12}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: workspaceViewQuestionFontSize,
+                          marginRight: "8px",
+                        }}
+                      >
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          {...questionProps}
+                        />
+                      </div>
+                      {
+                        workspace.parentId
+                        &&
+                        !isIsolatedWorkspace
+                        &&
+                        <div style={{ paddingBottom: "8px" }}>
+                          <ParentLink parentId={workspace.parentId} />
+                        </div>
+                      }
+                      {
+                        workspace
+                        &&
+                        !isIsolatedWorkspace
+                        &&
+                        <div style={{paddingBottom: "8px"}}>
+                          <SubtreeLink workspace={workspace} />
+                        </div>
+                      }
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={6}>
+                    <BlockContainer>
+                      <BlockHeader>Scratchpad</BlockHeader>
+                      <BlockBody>
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          placeholder="Text for the scratchpad..."
+                          ref={this.registerEditorRef("scratchpadField")}
+                          {...scratchpadProps}
+                        />
+                      </BlockBody>
+                    </BlockContainer>
 
-              <BlockContainer>
-                <BlockHeader>Answer</BlockHeader>
-                <BlockBody>
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    placeholder="Text for the answer..."
-                    ref={this.registerEditorRef("answerField")}
-                    {...answerProps}
-                  />
-                </BlockBody>
-              </BlockContainer>
-            </Col>
-            <Col sm={6}>
-              <ChildrenSidebar
-                isIsolatedWorkspace={isIsolatedWorkspace}
-                workspace={workspace}
-                workspaces={workspace.childWorkspaces}
-                availablePointers={availablePointers}
-                workspaceOrder={workspace.childWorkspaceOrder}
-                onCreateChild={({ question, totalBudget }) => {
-                  this.props.createChild({
-                    variables: {
-                      workspaceId: workspace.id,
-                      question,
-                      totalBudget
-                    }
-                  });
-                }}
-                onUpdateChildTotalBudget={({ childId, totalBudget }) => {
-                  this.props.updateChildTotalBudget({
-                    variables: {
-                      workspaceId: workspace.id,
-                      childId,
-                      totalBudget
-                    }
-                  });
-                }}
-                availableBudget={
-                  workspace.totalBudget - workspace.allocatedBudget
-                }
-                changeOrder={newOrder => {
-                  this.props.updateWorkspace({
-                    variables: {
-                      id: workspace.id,
-                      childWorkspaceOrder: newOrder
-                    }
-                  });
-                }}
-                ref={input => {
-                  if (input && input.editor()) {
-                    this.newChildField = input.editor();
-                  }
-                }}
-              />
-            </Col>
-          </Row>
-        </BlockHoverMenu>
+                    <BlockContainer>
+                      <BlockHeader>Answer</BlockHeader>
+                      <BlockBody>
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          placeholder="Text for the answer..."
+                          ref={this.registerEditorRef("answerField")}
+                          {...answerProps}
+                        />
+                      </BlockBody>
+                    </BlockContainer>
+                  </Col>
+                  <Col sm={6}>
+                    <ChildrenSidebar
+                      isIsolatedWorkspace={isIsolatedWorkspace}
+                      workspace={workspace}
+                      workspaces={workspace.childWorkspaces}
+                      availablePointers={availablePointers}
+                      workspaceOrder={workspace.childWorkspaceOrder}
+                      onCreateChild={({ question, totalBudget }) => {
+                        this.props.createChild({
+                          variables: {
+                            workspaceId: workspace.id,
+                            question,
+                            totalBudget
+                          }
+                        });
+                      }}
+                      onUpdateChildTotalBudget={({ childId, totalBudget }) => {
+                        this.props.updateChildTotalBudget({
+                          variables: {
+                            workspaceId: workspace.id,
+                            childId,
+                            totalBudget
+                          }
+                        });
+                      }}
+                      availableBudget={
+                        workspace.totalBudget - workspace.allocatedBudget
+                      }
+                      changeOrder={newOrder => {
+                        this.props.updateWorkspace({
+                          variables: {
+                            id: workspace.id,
+                            childWorkspaceOrder: newOrder
+                          }
+                        });
+                      }}
+                      ref={input => {
+                        if (input && input.editor()) {
+                          this.newChildField = input.editor();
+                        }
+                      }}
+                    />
+                  </Col>
+                </Row>
+              </BlockHoverMenu>
+            )
+          }
+        </ContentContainer>
       </div>
     );
   }
@@ -438,6 +481,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_CHILD_TOTAL_BUDGET, {
     name: "updateChildTotalBudget",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(UPDATE_WORKSPACE_STALENESS, {
+    name: "updateWorkspaceStaleness",
     options: {
       refetchQueries: ["workspace"]
     }

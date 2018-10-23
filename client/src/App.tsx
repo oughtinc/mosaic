@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as LogRocket from "logrocket";
-import styled from "styled-components";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
@@ -66,18 +65,12 @@ const client: any = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-const ContentContainer = styled.div`
-  padding: 20px;
-`;
-
 export class Layout extends React.Component {
   public render() {
     return (
       <div className="Layout">
         <Header />
-        <div className="container">
-          <ContentContainer>{this.props.children}</ContentContainer>
-        </div>
+        {this.props.children}
       </div>
     );
   }
