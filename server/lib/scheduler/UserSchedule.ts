@@ -35,6 +35,8 @@ class UserSchedule {
 
   public isUserCurrentlyWorkingOnWorkspace(workspace) {
     return (
+      this.lastWorkedOnWorkspace
+      &&
       this.lastWorkedOnWorkspace().id === workspace.id
       &&
       this.isActiveInLastWorkspace()
