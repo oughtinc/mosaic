@@ -27,7 +27,6 @@ interface EpisodeNavProps {
   hasParent: boolean;
   hasTimer: boolean;
   hasTimerEnded: boolean;
-  transferRemainingBudgetToParent(): void;
   updateStaleness(isStale: boolean): void;
 }
 
