@@ -254,11 +254,6 @@ export class FormPagePresentational extends React.Component<any, any> {
                 variables: { id: workspace.id, isStale }
               })
             }
-            transferRemainingBudgetToParent={() =>
-              this.props.transferRemainingBudgetToParent({
-                variables: { id: workspace.id }
-              })
-            }
           />
         )}
         <ContentContainer>
