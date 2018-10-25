@@ -27,6 +27,7 @@
     "migrations",
     "node_modules",
     "scripts",
-    "seeders"
+    "seeders",
+    "test"
   ]
 }
