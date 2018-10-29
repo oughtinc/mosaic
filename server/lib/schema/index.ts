@@ -289,7 +289,7 @@ const schema = new GraphQLSchema({
           });
         }
       },
-      updateAllocatedBudget: {
+      increaseAllocatedBudget: {
         type: workspaceType,
         args: {
           workspaceId: { type: GraphQLString },

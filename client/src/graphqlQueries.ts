@@ -29,9 +29,9 @@ export const UPDATE_BLOCKS = gql`
   }
 `;
 
-export const UPDATE_ALLOCATED_BUDGET = gql`
-  mutation updateAllocatedBudget($workspaceId: String, $changeToBudget: Int) {
-    updateAllocatedBudget(workspaceId: $workspaceId, changeToBudget: $changeToBudget) {
+export const INCREASE_ALLOCATED_BUDGET = gql`
+  mutation increaseAllocatedBudget($workspaceId: String, $changeToBudget: Int) {
+    increaseAllocatedBudget(workspaceId: $workspaceId, changeToBudget: $changeToBudget) {
       id
     }
   }

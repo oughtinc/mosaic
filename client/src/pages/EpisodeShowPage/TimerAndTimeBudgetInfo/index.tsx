@@ -4,7 +4,7 @@ import { graphql } from "react-apollo";
 import { AvailableBudget } from "./AvailableBudget";
 import { Timer } from "./Timer";
 
-import { UPDATE_ALLOCATED_BUDGET } from "../../../graphqlQueries";
+import { INCREASE_ALLOCATED_BUDGET } from "../../../graphqlQueries";
 
 class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
   public constructor(props: any) {
@@ -65,7 +65,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
   }
 
   private handleTimerTick = () => {
-    this.props.updateAllocatedBudget({
+    this.props.increaseAllocatedBudget({
       variables: {
         changeToBudget: this.props.tickDuration,
         workspaceId: this.props.workspaceId,
@@ -90,9 +90,9 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
 }
 
 export const TimerAndTimeBudgetInfo: any = graphql(
-  UPDATE_ALLOCATED_BUDGET,
+  INCREASE_ALLOCATED_BUDGET,
   {
-    name: "updateAllocatedBudget",
+    name: "increaseAllocatedBudget",
     options: {
       refetchQueries: ["workspace"]
     }
