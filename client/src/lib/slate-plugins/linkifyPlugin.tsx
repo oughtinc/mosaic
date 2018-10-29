@@ -26,9 +26,13 @@ function wrapLink(change: any, href: any) {
 function LinkifyPlugin() {
   return {
     onPaste: (event, change) => {
+      // this gets Slate-related info concerning event
       const transfer = getEventTransfer(event);
+
+      // possible Slate types include 'fragment' , 'html' , 'node' , 'rich' , or 'text'
       const { type, text } = transfer;
 
+      // we only want to linkify text or html
       const pastedContentIsNeitherTextNorHtml =
         type !== "text" && type !== "html";
 
