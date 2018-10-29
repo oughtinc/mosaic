@@ -13,7 +13,7 @@ function wrapLink(change: any, href: any) {
         leaves: [
           {
             object: "leaf",
-            text: href,
+            text: href
           }
         ]
       }
@@ -28,21 +28,26 @@ function LinkifyPlugin() {
     onPaste: (event, change) => {
       const transfer = getEventTransfer(event);
       const { type, text } = transfer;
-      if (type !== "text" && type !== "html") {
+
+      const pastedContentIsNeitherTextNorHtml =
+        type !== "text" && type !== "html";
+
+      if (pastedContentIsNeitherTextNorHtml) {
         return;
       }
 
-      if (!isUrl(text)) {
-        return;
+      const pastedTextDoesFormsAURL = isUrl(text);
+
+      if (pastedTextDoesFormsAURL) {
+        change
+          .insertText(text)
+          .extend(-text.length)
+          .call(wrapLink, text);
+
+        return false;
       }
 
-      change
-        .insertText(text)
-        .extend(-text.length)
-        .call(wrapLink, text);
-
-      return false;
-
+      return;
     },
 
     renderNode(props: any) {
