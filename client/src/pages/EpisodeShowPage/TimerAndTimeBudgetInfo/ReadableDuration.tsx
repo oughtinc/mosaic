@@ -1,16 +1,15 @@
-import { Duration } from "luxon";
 import * as React from "react";
 
-class ReadableDuration extends React.Component<any,  any> {
-  public render() {
-    const durationInMs = Duration.fromMillis(this.props.durationInMs);
-    const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
+import { convertMsToReadableDurationInfo } from "../../../lib/convertMsToReadableDurationInfo";
 
-    const isADayOrMore = duration.days > 0;
-    const isAnHourOrMore = duration.hours > 0;
-    const isAMinuteOrMore = duration.minutes > 0;
-    const isASecondOrMore = duration.seconds > 0;
-    const isExactlySixtySeconds = duration.minutes === 1  && duration.seconds === 0;
+class ReadableDuration extends React.Component<any, any> {
+  public render() {
+    const {
+      daysToDisplay,
+      hoursToDisplay,
+      minutesToDisplay,
+      secondsToDisplay
+    } = convertMsToReadableDurationInfo(this.props.durationInMs);
 
     if (this.props.durationInMs < 0) {
       return (
@@ -22,75 +21,54 @@ class ReadableDuration extends React.Component<any,  any> {
 
     return (
       <div style={this.props.style}>
-        {
-          isADayOrMore
-          &&
+        {daysToDisplay && (
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: "28px"
               }}
             >
-              {Duration.fromObject({ days: duration.days }).toFormat("d")}
+              {daysToDisplay}
             </span>
-            d
-            {" "}
+            d{" "}
           </span>
-        }
-        {
-          isAnHourOrMore
-          &&
+        )}
+        {hoursToDisplay && (
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: "28px"
               }}
             >
-              {Duration.fromObject({ hours: duration.hours }).toFormat("h")}
+              {hoursToDisplay}
             </span>
-            h
-            {" "}
+            h{" "}
           </span>
-        }
-        {
-          (isAMinuteOrMore && !isExactlySixtySeconds)
-          &&
+        )}
+        {minutesToDisplay && (
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: "28px"
               }}
             >
-              {Duration.fromObject({ minutes: duration.minutes }).toFormat("m")}
+              {minutesToDisplay}
             </span>
-            m
-            {" "}
+            m{" "}
           </span>
-        }
-        {
-          (
-            isASecondOrMore
-            ||
-            durationInMs < 1000
-          )
-          &&
+        )}
+        {secondsToDisplay && (
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: "28px"
               }}
             >
-              {
-                isExactlySixtySeconds
-                ?
-                Duration.fromObject({ seconds: 60 }).toFormat("s")
-                :
-                Duration.fromObject({ seconds: duration.seconds }).toFormat("s")
-              }
+              {secondsToDisplay}
             </span>
             s
           </span>
-        }
+        )}
       </div>
     );
   }

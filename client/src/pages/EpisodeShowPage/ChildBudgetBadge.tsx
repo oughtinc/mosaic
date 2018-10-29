@@ -1,31 +1,37 @@
-import { Duration } from "luxon";
 import * as React from "react";
 import { Badge } from "react-bootstrap";
+
+import { convertMsToReadableDurationInfo } from "../../lib/convertMsToReadableDurationInfo";
 
 class ChildBudgetBadge extends React.Component<any, any> {
   public render() {
     const { totalBudget } = this.props;
     const totalBudgetInSeconds = totalBudget;
     const totalBudgetInMs = totalBudgetInSeconds * 1000;
-    const durationInMs = Duration.fromMillis(totalBudgetInMs);
-    const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
+
+    const {
+      daysToDisplay,
+      hoursToDisplay,
+      minutesToDisplay,
+      secondsToDisplay
+    } = convertMsToReadableDurationInfo(totalBudgetInMs);
 
     let durationString = "";
 
-    if (duration.days > 0) {
-      durationString += `${Duration.fromObject({days: duration.days}).toFormat("d")}d `;
+    if (daysToDisplay) {
+      durationString += `${daysToDisplay}d `;
     }
 
-    if (duration.hours > 0) {
-      durationString += `${Duration.fromObject({hours: duration.hours}).toFormat("h")}h `;
+    if (hoursToDisplay) {
+      durationString += `${hoursToDisplay}h `;
     }
 
-    if (duration.minutes > 0) {
-      durationString += `${Duration.fromObject({minutes: duration.minutes}).toFormat("m")}m `;
+    if (minutesToDisplay) {
+      durationString += `${minutesToDisplay}m `;
     }
 
-    if (duration.seconds > 0) {
-      durationString += `${Duration.fromObject({seconds: duration.seconds}).toFormat("s")}s`;
+    if (secondsToDisplay) {
+      durationString += `${secondsToDisplay}s`;
     }
 
     return (
