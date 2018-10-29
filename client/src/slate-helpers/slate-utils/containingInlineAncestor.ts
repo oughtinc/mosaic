@@ -4,16 +4,14 @@ function isInline(node: any) {
 
 export function containingInlineAncestor(node: any, document: any) {
   let curNode = node;
-  while (
-    !(isInline(curNode))
-    &&
-    document.getParent(curNode.key)
-  ) {
+  const closestInlineOrRoot = getClosestInlineOrRoot(node, document);
+  return isInline(closestInlineOrRoot) ? curNode : undefined;
+}
+
+export function getClosestInlineOrRoot(node: any, document: any) {
+  let curNode = node;
+  while (!isInline(curNode) && document.getParent(curNode.key)) {
     curNode = document.getParent(curNode.key);
   }
-
-  if (isInline(curNode)) {
-    return curNode;
-  }
-  return undefined;
+  return curNode;
 }
