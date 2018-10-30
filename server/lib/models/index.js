@@ -15,14 +15,14 @@ const WorkspaceModel = require("./workspace");
 if (config.use_env_variable) {
   const dbURL = process.env[config.use_env_variable] + "?ssl=true";
   console.log("Using DB URL:", dbURL);
-  var sequelize = new Sequelize(dbURL, {logging: false, ...config});
+  var sequelize = new Sequelize(dbURL, { logging: true, ...config });
 } else {
   console.log("No env variable used, using config.");
   var sequelize = new Sequelize(
     config.database,
     config.username,
     config.password,
-    {...config, logging: false}
+    { ...config, logging: true },
   );
 }
 
@@ -31,7 +31,7 @@ const models = [
   ["block", BlockModel],
   ["pointer", PointerModel],
   ["pointerImport", PointerImportModel],
-  ["workspace", WorkspaceModel]
+  ["workspace", WorkspaceModel],
 ];
 
 const db = {};

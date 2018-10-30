@@ -25,7 +25,7 @@ function lastCharactersAfterEvent(event: any, n: any) {
   }
   const text: string = wholeText.textContent.slice(
     Math.max(anchorOffset - n + 1, 0),
-    anchorOffset
+    anchorOffset,
   );
   const key: string = event.key;
   return text + key;
@@ -38,8 +38,8 @@ function inlinePointerImportJSON(pointerId: string) {
     isVoid: true,
     data: {
       pointerId: pointerId,
-      internalReferenceId: uuidv1()
-    }
+      internalReferenceId: uuidv1(),
+    },
   });
 }
 
@@ -91,7 +91,7 @@ export class BlockEditorEditingPresentational extends React.Component<
       !_.isEqual(newProps.mutationStatus, this.props.mutationStatus) ||
       !_.isEqual(
         newState.hasChangedSinceDatabaseSave,
-        this.state.hasChangedSinceDatabaseSave
+        this.state.hasChangedSinceDatabaseSave,
       )
     ) {
       return true;
@@ -104,7 +104,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentWillUnmount() {
-    this.considerSaveToDatabase();
+    this.saveToDatabase();
     this.endAutosaveInterval();
   }
 
@@ -118,8 +118,14 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentDidMount() {
-    const change = slateChangeMutations.normalizeExportSpacing(this.props.block.value.change());
-    this.props.updateBlock({ id: this.props.block.id, value: change.value, pointerChanged: false });
+    const change = slateChangeMutations.normalizeExportSpacing(
+      this.props.block.value.change(),
+    );
+    this.props.updateBlock({
+      id: this.props.block.id,
+      value: change.value,
+      pointerChanged: false,
+    });
   }
 
   public render() {
@@ -152,7 +158,7 @@ export class BlockEditorEditingPresentational extends React.Component<
       this.handlePointerNameAutocomplete(
         lastCharacters,
         pointerNameMatch,
-        event
+        event,
       );
     }
   };
@@ -188,7 +194,9 @@ export class BlockEditorEditingPresentational extends React.Component<
   private handleSquareBracketExport = () => {
     // check to see whether there are a balanced number of square brackets
     // if there are, everything within the outermost brackets gets exported
-    const { wasMutationPerformed } = slateChangeMutations.scanBlockAndConvertOuterSquareBrackets({
+    const {
+      wasMutationPerformed,
+    } = slateChangeMutations.scanBlockAndConvertOuterSquareBrackets({
       change: this.props.value.change(),
       updateBlock: this.props.updateBlock,
       exportSelection: this.props.exportSelection,
@@ -199,22 +207,16 @@ export class BlockEditorEditingPresentational extends React.Component<
     if (wasMutationPerformed) {
       setTimeout(this.handleSquareBracketExport, 10);
     }
-  }
+  };
 
   private onKeyUp = (event: any, change: any) => {
     this.handleSquareBracketExport();
-  }
+  };
 
   private onValueChange = () => {
-    const changeFromOutsideComponent = this.props.block.pointerChanged;
-
     if (this.props.shouldAutosave) {
-      if (changeFromOutsideComponent) {
-        this.saveToDatabase();
-      } else {
-        this.beginAutosaveInterval();
-        this.setState({ hasChangedSinceDatabaseSave: true });
-      }
+      this.beginAutosaveInterval();
+      this.setState({ hasChangedSinceDatabaseSave: true });
     }
   };
 
@@ -222,7 +224,8 @@ export class BlockEditorEditingPresentational extends React.Component<
     // first check to see if document changed, which we can do with !== b/c
     // Slate uses immutable objects, if it has changed then normalize wrt
     // pointer spacing
-    const documentHasChanged = c.value.document !== this.props.block.value.document;
+    const documentHasChanged =
+      c.value.document !== this.props.block.value.document;
     if (documentHasChanged) {
       slateChangeMutations.normalizeExportSpacing(c);
     }
@@ -274,7 +277,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     if (this.props.shouldAutosave && !this.autosaveInterval) {
       this.autosaveInterval = setInterval(
         this.considerSaveToDatabase,
-        AUTOSAVE_EVERY_N_SECONDS * 1000
+        AUTOSAVE_EVERY_N_SECONDS * 1000,
       );
     }
   };
@@ -297,19 +300,19 @@ export const BlockEditorEditing: any = compose(
     mapStateToProps,
     { updateBlock, exportSelection },
     null,
-    { withRef: true }
+    { withRef: true },
   ),
   graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer", withRef: true }),
   withState("mutationStatus", "setMutationStatus", {
-    status: MutationStatus.NotStarted
+    status: MutationStatus.NotStarted,
   }),
   withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
     const saveBlocksMutation = () => {
       setMutationStatus({ status: MutationStatus.Loading });
       saveBlocksToServer({
         variables: {
-          blocks: { id: block.id, value: valueToDatabaseJSON(block.value) }
-        }
+          blocks: { id: block.id, value: valueToDatabaseJSON(block.value) },
+        },
       })
         .then(() => {
           setMutationStatus({ status: MutationStatus.Complete });
@@ -320,5 +323,5 @@ export const BlockEditorEditing: any = compose(
     };
 
     return { saveBlocksMutation, status };
-  })
+  }),
 )(BlockEditorEditingPresentational);
