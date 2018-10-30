@@ -214,15 +214,9 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onValueChange = () => {
-    const changeFromOutsideComponent = this.props.block.pointerChanged;
-
     if (this.props.shouldAutosave) {
-      if (changeFromOutsideComponent) {
-        this.saveToDatabase();
-      } else {
-        this.beginAutosaveInterval();
-        this.setState({ hasChangedSinceDatabaseSave: true });
-      }
+      this.beginAutosaveInterval();
+      this.setState({ hasChangedSinceDatabaseSave: true });
     }
   };
 
