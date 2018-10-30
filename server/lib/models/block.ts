@@ -183,7 +183,7 @@ const BlockModel = (
   };
 
   // private
-  Block.prototype.exportingPointerValues = async function() {
+  Block.prototype.exportingPointerValues = async function(models) {
     if (!this.dataValues.value) {
       return {};
     }
@@ -192,8 +192,14 @@ const BlockModel = (
     const pointers = _getInlinesAsArray.filter(l => l.type === "pointerExport");
 
     const results = {};
-    for (const pointer of pointers) {
-      results[pointer.data.pointerId] = pointer;
+    for (const pointerJSON of pointers) {
+      const pointer = await sequelize.models.Pointer.findById(
+        pointerJSON.data.pointerId
+      );
+
+      if (pointer) {
+        await pointer.update({ cachedValue: pointerJSON });
+      }
     }
     return results;
   };

@@ -22,6 +22,13 @@ const PointerModel = (sequelize, DataTypes) => {
       value: {
         type: Sequelize.VIRTUAL(Sequelize.JSON, ["id", "sourceBlockId"]),
         get: async function() {
+          if (this.cachedValue !== null) {
+            return this.cachedValue;
+          }
+
+          // look into removing the rest of this method
+          // and related code (pulling in "id" and "sourceBlockId" attributes)
+          // as well as the Block cachedExportPointerValues
           const pointerId = this.get("id");
           const sourceBlockId = this.get("sourceBlockId");
           const sourceBlock = await sequelize.models.Block.findById(
@@ -30,6 +37,9 @@ const PointerModel = (sequelize, DataTypes) => {
           const { cachedExportPointerValues } = sourceBlock;
           return cachedExportPointerValues[pointerId];
         }
+      },
+      cachedValue: {
+        type: DataTypes.JSON
       }
     },
     {
@@ -66,7 +76,9 @@ const PointerModel = (sequelize, DataTypes) => {
     const allPointers: any = [...directPointers];
 
     for (const pointer of allPointers) {
-      const directImports = await pointer.newDirectContainedPointers(pointersSoFar);
+      const directImports = await pointer.newDirectContainedPointers(
+        pointersSoFar
+      );
       directImports
         .filter(p => !_.includes(allPointers.map(p => p.id), p.id))
         .forEach(p => {
@@ -115,7 +127,9 @@ const PointerModel = (sequelize, DataTypes) => {
     return pointerIds;
   };
 
-  Pointer.prototype.newDirectContainedPointerIds = async function(pointersSoFar) {
+  Pointer.prototype.newDirectContainedPointerIds = async function(
+    pointersSoFar
+  ) {
     const value = await this.value;
     if (!value) {
       return [];
@@ -126,7 +140,10 @@ const PointerModel = (sequelize, DataTypes) => {
     const pointerIds = pointerInlines.map(p => p.data.pointerId);
 
     const newPointerIds = pointerIds.filter(pointerId => {
-      const alreadyListed = _.some(pointersSoFar, pointerSoFar => pointerSoFar.id === pointerId);
+      const alreadyListed = _.some(
+        pointersSoFar,
+        pointerSoFar => pointerSoFar.id === pointerId
+      );
       return !alreadyListed;
     });
 
