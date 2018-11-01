@@ -193,7 +193,7 @@ const BlockModel = (
 
     const results = {};
     for (const pointerJSON of pointers) {
-      results[pointerJSON.data.pointerId] = pointer;
+      results[pointerJSON.data.pointerId] = pointerJSON;
 
       const pointer = await sequelize.models.Pointer.findById(
         pointerJSON.data.pointerId
