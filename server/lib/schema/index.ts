@@ -163,7 +163,41 @@ const schema = new GraphQLSchema({
       workspace: {
         type: workspaceType,
         args: { id: { type: GraphQLString } },
-        resolve: resolver(models.Workspace)
+        resolve: resolver(models.Workspace, {
+          after: async (result, args, ctx) => {
+            // On Thursday, Nov 1 2018, a workspace failed to load on the
+            // frontend. When looking into this, it was clear that this
+            // workspace only had a QUESTION block on the backend, and no
+            // ANSWER or SCRATCHPAD block and that this was the reason for the
+            // error on the frontend.
+
+            // Unclear how this could have occurred. But in order to prevent it
+            // in the future, I added this graphql-sequelize "after" hook to
+            // ensure the existence of the three required blocks.
+
+            const blocks = await result.getBlocks();
+
+            const includesQuestion = blocks.find(b => b.type === "QUESTION");
+            const includesAnswer = blocks.find(b => b.type === "ANSWER");
+            const includesScratchpad = blocks.find(
+              b => b.type === "SCRATCHPAD"
+            );
+
+            if (!includesQuestion) {
+              await result.createBlock({ type: "QUESTION" });
+            }
+
+            if (!includesAnswer) {
+              await result.createBlock({ type: "ANSWER" });
+            }
+
+            if (!includesScratchpad) {
+              await result.createBlock({ type: "SCRATCHPAD" });
+            }
+
+            return result;
+          }
+        })
       },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       pointers: modelGraphQLFields(
@@ -231,13 +265,17 @@ const schema = new GraphQLSchema({
       transferRemainingBudgetToParent: {
         type: workspaceType,
         args: {
-          id: { type: GraphQLString },
+          id: { type: GraphQLString }
         },
         resolve: async (_, { id }) => {
           const child = await models.Workspace.findById(id);
-          const childRemainingBudget = child.totalBudget - child.allocatedBudget;
+          const childRemainingBudget =
+            child.totalBudget - child.allocatedBudget;
           const parent = await models.Workspace.findById(child.parentId);
-          await parent.update({ isStale: true, totalBudget: parent.totalBudget + childRemainingBudget });
+          await parent.update({
+            isStale: true,
+            totalBudget: parent.totalBudget + childRemainingBudget
+          });
           await child.update({ totalBudget: child.allocatedBudget });
         }
       },
@@ -326,7 +364,9 @@ const schema = new GraphQLSchema({
           }
 
           await scheduler.assignNextWorkspace(user.user_id);
-          const workspaceId = await scheduler.getIdOfCurrentWorkspace(user.user_id);
+          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
+            user.user_id
+          );
           return { id: workspaceId };
         }
       },
@@ -334,7 +374,7 @@ const schema = new GraphQLSchema({
         type: workspaceType,
         args: {
           isPublic: { type: GraphQLBoolean },
-          workspaceId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
         },
         resolve: async (_, { isPublic, workspaceId }, context) => {
           const user = await userFromAuthToken(context.authorization);
@@ -356,7 +396,7 @@ const schema = new GraphQLSchema({
         type: workspaceType,
         args: {
           isEligible: { type: GraphQLBoolean },
-          workspaceId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
         },
         resolve: async (_, { isEligible, workspaceId }, context) => {
           const user = await userFromAuthToken(context.authorization);
@@ -386,11 +426,11 @@ const schema = new GraphQLSchema({
           const workspace = await models.Workspace.findById(workspaceId);
           const updatedTimeBudget = Math.min(
             workspace.totalBudget,
-            workspace.allocatedBudget + changeToBudget,
+            workspace.allocatedBudget + changeToBudget
           );
           await workspace.update({ allocatedBudget: updatedTimeBudget });
         }
-      },
+      }
     }
   })
 });
