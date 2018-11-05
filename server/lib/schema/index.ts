@@ -122,7 +122,7 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
       // update cache
       userFromAuthToken.cache[accessToken] = {
         data,
-        timestamp: Date.now(),
+        timestamp: Date.now()
       };
 
       return resolve(data);
@@ -294,7 +294,7 @@ const schema = new GraphQLSchema({
         type: workspaceType,
         args: {
           isPublic: { type: GraphQLBoolean },
-          workspaceId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
         },
         resolve: async (_, { isPublic, workspaceId }, context) => {
           const user = await userFromAuthToken(context.authorization);
@@ -316,7 +316,7 @@ const schema = new GraphQLSchema({
         type: workspaceType,
         args: {
           isEligible: { type: GraphQLBoolean },
-          workspaceId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
         },
         resolve: async (_, { isEligible, workspaceId }, context) => {
           const user = await userFromAuthToken(context.authorization);
@@ -327,7 +327,6 @@ const schema = new GraphQLSchema({
           }
           const workspace = await models.Workspace.findById(workspaceId);
           await workspace.update({ isEligibleForAssignment: isEligible });
-          return { id: workspaceId };
         }
       },
       findNextWorkspace: {
@@ -340,10 +339,12 @@ const schema = new GraphQLSchema({
             );
           }
           await scheduler.assignNextWorkspace(user.user_id);
-          const workspaceId = await scheduler.getIdOfCurrentWorkspace(user.user_id);
+          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
+            user.user_id
+          );
           return { id: workspaceId };
         }
-      },
+      }
     }
   })
 });
