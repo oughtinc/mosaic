@@ -20,7 +20,7 @@ export interface Change {
   moveToRangeOf(node: any): Change;
   removeNodeByKey(key: string): Change;
   removeTextByKey(key: string, offset: number, length: number): Change;
-  unwrapInlineByKey(key: string, properties: any): Change;
+  unwrapInlineByKey(key: string, properties?: any): Change;
 }
 
 export interface TextNode {
