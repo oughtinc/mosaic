@@ -16,6 +16,14 @@ const NextWorkspaceBtn = ({ label, navHook }: NextWorkspaceBtnProps) => {
   );
 };
 
+const TakeBreakBtn = ({ label, navHook }: NextWorkspaceBtnProps) => {
+  return (
+    <Link onClick={navHook} to="/break" style={{ margin: "0 5px" }}>
+      <Button bsSize="small">{label} »</Button>
+    </Link>
+  );
+};
+
 const EpisodeNavContainer = styled.div`
   padding: 10px;
   background-color: #b8ddfb;
@@ -27,11 +35,17 @@ interface EpisodeNavProps {
   hasParent: boolean;
   hasTimer: boolean;
   hasTimerEnded: boolean;
-  transferRemainingBudgetToParent(): void;
-  updateStaleness(isStale: boolean): void;
+  isTakingABreak?: boolean;
+  transferRemainingBudgetToParent?(): void;
+  updateStaleness?(isStale: boolean): void;
 }
 
-const EpisodeNav = ({ hasParent, hasTimer, hasTimerEnded, transferRemainingBudgetToParent, updateStaleness }: EpisodeNavProps) => (
+// Note that there in the normal functioning of the app,
+// transferRemainingBudgetToParent and updateStaleness will not be undefined
+// wherever they are called. Nevertheless, guards are included below because
+// it's possible for this situation to arise given abnormal functioning of the
+// app.
+const EpisodeNav = ({ hasParent, hasTimer, hasTimerEnded, isTakingABreak, transferRemainingBudgetToParent, updateStaleness }: EpisodeNavProps) => (
   <EpisodeNavContainer>
     {
       hasTimer
@@ -44,22 +58,27 @@ const EpisodeNav = ({ hasParent, hasTimer, hasTimerEnded, transferRemainingBudge
           />
         :
           <div>
-            <NextWorkspaceBtn
+            <TakeBreakBtn
               label="Needs more work"
-              navHook={() => updateStaleness(true)}
+              navHook={() => updateStaleness && updateStaleness(true)}
             />
-            <NextWorkspaceBtn
+            <TakeBreakBtn
               label="Done for now"
-              navHook={() => updateStaleness(false)}
+              navHook={() => updateStaleness && updateStaleness(false)}
             />
             {
               hasParent
               &&
-              <NextWorkspaceBtn
+              <TakeBreakBtn
                 label="Done, and return budget"
                 navHook={() => {
-                  transferRemainingBudgetToParent();
-                  updateStaleness(false);
+                  if (transferRemainingBudgetToParent) {
+                    transferRemainingBudgetToParent();
+                  }
+
+                  if (updateStaleness) {
+                    updateStaleness(false);
+                  }
                 }}
               />
             }
@@ -67,8 +86,8 @@ const EpisodeNav = ({ hasParent, hasTimer, hasTimerEnded, transferRemainingBudge
       )
       :
       <NextWorkspaceBtn
-        label="Get started"
-        navHook={() => updateStaleness(true)}
+        label={isTakingABreak ? "Start on next workspace" : "Get started"}
+        navHook={() => updateStaleness && updateStaleness(true)}
       />
     }
   </EpisodeNavContainer>
