@@ -4,10 +4,10 @@ import { Badge } from "react-bootstrap";
 
 class ChildBudgetBadge extends React.Component<any, any> {
   public render() {
-    const { totalBudget } = this.props;
-    const totalBudgetInSeconds = totalBudget;
-    const totalBudgetInMs = totalBudgetInSeconds * 1000;
-    const durationInMs = Duration.fromMillis(totalBudgetInMs);
+    const { budgetToDisplay } = this.props;
+    const budgetToDisplayInSeconds = budgetToDisplay;
+    const budgetToDisplayInMs = budgetToDisplayInSeconds * 1000;
+    const durationInMs = Duration.fromMillis(budgetToDisplayInMs);
     const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
 
     let durationString = "";
@@ -31,7 +31,7 @@ class ChildBudgetBadge extends React.Component<any, any> {
     return (
       <Badge>
         {durationString}
-        {totalBudgetInSeconds >= 1 && " budget"}
+        {budgetToDisplayInSeconds >= 1 && " remaining"}
       </Badge>
     );
   }
