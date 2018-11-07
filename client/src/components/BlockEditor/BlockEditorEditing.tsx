@@ -175,14 +175,14 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onKeyDown = (event: any, change: Change) => {
-    const pressedControlAndE = _event => _event.ctrlKey && _event.key === "e";
-    if (pressedControlAndE(event)) {
+    const pressedMetaAndE = _event => _event.metaKey && _event.key === "e";
+    if (pressedMetaAndE(event)) {
       this.props.exportSelection(this.props.block.id);
       event.preventDefault();
     }
 
-    const pressedControlAndR = _event => _event.ctrlKey && _event.key === "k";
-    if (pressedControlAndR(event)) {
+    const pressedMetaAndK = _event => _event.metaKey && _event.key === "k";
+    if (pressedMetaAndK(event)) {
       this.props.removeExportOfSelection(this.props.block.id);
       event.preventDefault();
     }
