@@ -181,7 +181,7 @@ export class BlockEditorEditingPresentational extends React.Component<
       event.preventDefault();
     }
 
-    const pressedControlAndR = _event => _event.metaKey && _event.key === "r";
+    const pressedControlAndR = _event => _event.ctrlKey && _event.key === "k";
     if (pressedControlAndR(event)) {
       this.props.removeExportOfSelection(this.props.block.id);
       event.preventDefault();
