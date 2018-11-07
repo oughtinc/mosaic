@@ -9,7 +9,7 @@ import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
-import { exportSelection } from "../../modules/blockEditor/actions";
+import { exportSelection, removeExportOfSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { Change } from "./types";
@@ -57,7 +57,8 @@ interface BlockEditorEditingPresentationalProps {
   updateBlock(value: any): () => {};
   onChange(value: any): () => boolean;
   saveBlocksMutation(): () => {};
-  exportSelection(): () => {};
+  exportSelection(blockId?: string): void;
+  removeExportOfSelection(blockId?: string): void;
   onKeyDown(event: any): () => {};
 }
 
@@ -182,11 +183,18 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onKeyDown = (event: any, change: Change) => {
-    const pressedControlAndE = _event => _event.metaKey && _event.key === "e";
-    if (pressedControlAndE(event)) {
-      this.props.exportSelection();
+    const pressedMetaAndE = _event => _event.metaKey && _event.key === "e";
+    if (pressedMetaAndE(event)) {
+      this.props.exportSelection(this.props.block.id);
       event.preventDefault();
     }
+
+    const pressedMetaAndK = _event => _event.metaKey && _event.key === "k";
+    if (pressedMetaAndK(event)) {
+      this.props.removeExportOfSelection(this.props.block.id);
+      event.preventDefault();
+    }
+
     this.checkAutocomplete(event);
     if (!!this.props.onKeyDown) {
       this.props.onKeyDown(event);
@@ -300,7 +308,7 @@ function mapStateToProps(state: any) {
 export const BlockEditorEditing: any = compose(
   connect(
     mapStateToProps,
-    { updateBlock, exportSelection },
+    { updateBlock, exportSelection, removeExportOfSelection },
     null,
     { withRef: true }
   ),

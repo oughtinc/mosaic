@@ -81,16 +81,20 @@ export const exportSelection = blockId => {
   };
 };
 
-export const removeExportOfSelection = () => {
+export const removeExportOfSelection = blockId => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();
     const { hoveredItem } = blockEditor;
 
-    const block = blocks.blocks.find(b => b.id === hoveredItem.blockId);
+    const block = blocks.blocks.find(b => b.id === blockId || b.id === hoveredItem.blockId);
 
     if (block) {
       const change = block.value.change();
-      slateChangeMutations.removePointerExport(change, hoveredItem);
+      slateChangeMutations.removePointerExport({
+        change,
+        hoveredItem,
+        isHoverRemoval: !blockId,
+      });
       slateChangeMutations.normalizeAfterRemoval(change);
 
       dispatch({

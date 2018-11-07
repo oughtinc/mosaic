@@ -28,7 +28,7 @@ const HoverButton = ({ children, onClick }) => (
 );
 
 const ExportedPointerMenu = ({ removeExportOfSelection }) => (
-  <HoverButton onClick={removeExportOfSelection}>Remove Pointer</HoverButton>
+  <HoverButton onClick={() => removeExportOfSelection()}>Remove Pointer</HoverButton>
 );
 
 export class MenuPresentational extends React.Component<any> {
