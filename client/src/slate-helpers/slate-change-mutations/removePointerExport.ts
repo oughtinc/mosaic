@@ -1,13 +1,12 @@
 import { containingPointerExportAncestor } from "../slate-utils/containingPointerExportAncestor";
 import { isNestedInExport } from "../slate-utils/isNestedInExport";
 import { getInlinesAsArray } from "../slate-utils/getInlinesAsArray";
-import { Change } from "../../components/BlockEditor/types";
 
 export function removePointerExport({
   change,
   hoveredItem,
   isHoverRemoval,
-}) {
+}: any) {
 
   const { value } = change;
   const { document, fragment } = value;
@@ -40,7 +39,7 @@ function getIdOfPointerToRemove({
   fragment,
   isHoverRemoval,
   hoveredItemId,
-}) {
+}: any) {
   let idOfPointerToRemove;
   if (!isHoverRemoval) {
     idOfPointerToRemove = useFragmentToFindIdOfPointerToRemove(fragment);
@@ -51,7 +50,7 @@ function getIdOfPointerToRemove({
   return idOfPointerToRemove;
 }
 
-function findNodeToRemovebyPointerId(pointerIdOfNodeToRemove, document) {
+function findNodeToRemovebyPointerId(pointerIdOfNodeToRemove: string, document: any) {
   const inlines = getInlinesAsArray(document);
 
   const matchingNodes = inlines.filter(
@@ -68,7 +67,7 @@ function findNodeToRemovebyPointerId(pointerIdOfNodeToRemove, document) {
   return nodeToRemove;
 }
 
-function useFragmentToFindIdOfPointerToRemove(fragment) {
+function useFragmentToFindIdOfPointerToRemove(fragment: any) {
   let curNode = fragment.nodes.get(0);
   while (curNode.nodes) {
     curNode = curNode.nodes.get(0);
