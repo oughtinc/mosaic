@@ -146,20 +146,22 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       return (
         <OpenPointerImport
           isSelected={isSelected}
-          onClick={e => this.handleOpenPointerClick(e, pointerId)}
+          onClick={e => console.log("alert") || this.handleOpenPointerClick(e, pointerId)}
         >
-          <span onClick={e => e.stopPropagation()} className={css(styles.OuterPointerImportStyle)}>
-            <Brackets>
-              <ShowExpandedPointer
-                blockEditor={blockEditor}
-                exportingPointer={importingPointer}
-                availablePointers={availablePointers}
-                onMouseOverExpandedPointer={this.onMouseOver}
-                onMouseOverPointerImport={this.props.onMouseOver}
-                onMouseOut={this.props.onMouseOut}
-                isHoverable={this.props.isHoverable}
-              />
-            </Brackets>
+          <span className={css(styles.OuterPointerImportStyle)}>
+            <span onClick={e => e.stopPropagation()}>
+              <Brackets>
+                <ShowExpandedPointer
+                  blockEditor={blockEditor}
+                  exportingPointer={importingPointer}
+                  availablePointers={availablePointers}
+                  onMouseOverExpandedPointer={this.onMouseOver}
+                  onMouseOverPointerImport={this.props.onMouseOver}
+                  onMouseOut={this.props.onMouseOut}
+                  isHoverable={this.props.isHoverable}
+                />
+              </Brackets>
+            </span>
           </span>
         </OpenPointerImport>
       );
