@@ -146,7 +146,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       return (
         <OpenPointerImport
           isSelected={isSelected}
-          onClick={e => console.log("alert") || this.handleOpenPointerClick(e, pointerId)}
+          onClick={e => this.handleOpenPointerClick(e, pointerId)}
         >
           <span className={css(styles.OuterPointerImportStyle)}>
             <span onClick={e => e.stopPropagation()}>
