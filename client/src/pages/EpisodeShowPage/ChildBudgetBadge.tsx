@@ -29,7 +29,7 @@ class ChildBudgetBadge extends React.Component<any, any> {
     }
 
     return (
-      <Badge style={{ backgroundColor: budgetToDisplayInSeconds < 10 ? "red" : "auto" }}>
+      <Badge style={{ backgroundColor: budgetToDisplayInSeconds < 10 ? "red" : "#777" }}>
         {durationString}
         {budgetToDisplayInSeconds >= 1 && " remaining"}
       </Badge>
