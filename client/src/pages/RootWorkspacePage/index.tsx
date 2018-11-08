@@ -3,10 +3,12 @@ import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
 
+import { ContentContainer } from "../../components/ContentContainer";
 import { HomePageHeading } from "./HomePageHeading";
 import { ListOfRootWorkspaces } from "./ListOfRootWorkspaces";
 import { NewRootWorkspaceForm } from "./NewRootWorkspaceForm";
 import { WelcomeMessage } from "./WelcomeMessage";
+import { GetStartedNav } from "./GetStartedNav";
 
 import { Auth } from "../../auth";
 import { CREATE_ROOT_WORKSPACE, WORKSPACES_QUERY } from "../../graphqlQueries";
@@ -22,29 +24,32 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
 
     return (
       <div>
-        {
-          !Auth.isAuthenticated()
-          &&
-          <WelcomeMessage />
-        }
+        {Auth.isAuthenticated() && <GetStartedNav />}
+        <ContentContainer>
+          {
+            !Auth.isAuthenticated()
+            &&
+            <WelcomeMessage />
+          }
 
-        <HomePageHeading>Questions</HomePageHeading>
-        <ListOfRootWorkspaces
-          isLoading={isLoading}
-          workspaces={workspaces}
-        />
-
-        {
-          Auth.isAuthenticated()
-          &&
-          <NewRootWorkspaceForm
-            createWorkspace={this.props.createWorkspace}
-            style={{
-              marginBottom: "30px",
-              marginTop: "30px",
-            }}
+          <HomePageHeading>Questions</HomePageHeading>
+          <ListOfRootWorkspaces
+            isLoading={isLoading}
+            workspaces={workspaces}
           />
-        }
+
+          {
+            Auth.isAuthenticated()
+            &&
+            <NewRootWorkspaceForm
+              createWorkspace={this.props.createWorkspace}
+              style={{
+                marginBottom: "30px",
+                marginTop: "30px",
+              }}
+            />
+          }
+        </ContentContainer>
       </div>
     );
   }
