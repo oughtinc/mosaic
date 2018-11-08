@@ -148,7 +148,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
           isSelected={isSelected}
           onClick={e => this.handleOpenPointerClick(e, pointerId)}
         >
-          <span className={css(styles.OuterPointerImportStyle)}>
+          <span onClick={e => e.stopPropagation()} className={css(styles.OuterPointerImportStyle)}>
             <Brackets>
               <ShowExpandedPointer
                 blockEditor={blockEditor}
