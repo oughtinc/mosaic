@@ -108,7 +108,8 @@ export class Child extends React.Component<any, any> {
             )}
           <div style={{ float: "right" }}>
             <ChildBudgetBadge
-              budgetToDisplay={workspace.totalBudget - workspace.allocatedBudget}
+              remainingBudget={workspace.totalBudget - workspace.allocatedBudget}
+              totalBudget={workspace.totalBudget}
             />
           </div>
         </div>
