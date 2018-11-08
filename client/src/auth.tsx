@@ -101,13 +101,13 @@ export class Auth {
     const expiresAt = JSON.parse(expiresJson);
     const isExpired = Date.now() > Number(expiresAt);
     if (isExpired) {
-      // Auth.logout();
-      // return false;
       LogRocket.captureMessage(`
         Attempted to logout user ${localStorage.getItem("user_id")}
         at ${Date.now()}
         with expires_at set to ${expiresAt}.
       `);
+      Auth.logout();
+      return false;
     }
 
     return true;
