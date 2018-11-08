@@ -2,7 +2,7 @@ import { Duration } from "luxon";
 import * as React from "react";
 import { Badge } from "react-bootstrap";
 
-function secondsToDurationString(seconds) {
+function secondsToDurationString(seconds: number) {
   const milliseconds = seconds * 1000;
   const durationInMs = Duration.fromMillis(milliseconds);
   const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
@@ -32,8 +32,8 @@ class ChildBudgetBadge extends React.Component<any, any> {
   public render() {
     const { remainingBudget, totalBudget } = this.props;
 
-    const remainingBudgetDurationString = secondsToDurationString(remainingBudget);
-    const totalBudgetDurationString = secondsToDurationString(totalBudget);
+    const remainingBudgetDurationString = secondsToDurationString(Number(remainingBudget));
+    const totalBudgetDurationString = secondsToDurationString(Number(totalBudget));
 
     return (
       <Badge style={{ backgroundColor: remainingBudget < 10 ? "red" : "#777" }}>
