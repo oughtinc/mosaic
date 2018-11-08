@@ -69,6 +69,8 @@ class ReadableDuration extends React.Component<any,  any> {
         }
         {
           (
+            isExactlySixtySeconds
+            ||
             isASecondOrMore
             ||
             durationInMs < 1000
