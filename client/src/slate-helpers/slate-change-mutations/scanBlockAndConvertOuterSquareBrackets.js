@@ -1,3 +1,5 @@
+import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
+
 export function scanBlockAndConvertOuterSquareBrackets ({ change, updateBlock, exportSelection, blockId }) {
   const value = change.value;
   const textNodes = value.document.getTexts();
@@ -43,7 +45,8 @@ function exportBracketedSelectionFromRange ({
     focusKey: startKey,
     focusOffset: startOffset,
   })
-  .deleteForward(1);
+  .deleteForward(1)
+  .insertText(POINTER_EDGE_SPACE);
 
   // delete closing square square bracket
   // calculating achorOffset and focusOffset is complicated
@@ -52,9 +55,9 @@ function exportBracketedSelectionFromRange ({
   // bracket will have changed the offset of the closing square bracket
   change.select({
     anchorKey: endKey,
-    anchorOffset: startKey === endKey ? endOffset - 1 : endOffset,
+    anchorOffset: endOffset,
     focusKey: endKey,
-    focusOffset: startKey === endKey ? endOffset - 1 : endOffset,
+    focusOffset: endOffset,
   })
   .deleteForward(1);
 
@@ -63,7 +66,7 @@ function exportBracketedSelectionFromRange ({
     anchorKey: startKey,
     anchorOffset: startOffset,
     focusKey: endKey,
-    focusOffset: startKey === endKey ? endOffset - 1 : endOffset,
+    focusOffset: endOffset,
   });
 
   updateBlock({ id: blockId, value: change.value, pointerChanged: false });
