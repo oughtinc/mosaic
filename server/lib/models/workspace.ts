@@ -30,6 +30,11 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      isEligibleForAssignment: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       isStale: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
