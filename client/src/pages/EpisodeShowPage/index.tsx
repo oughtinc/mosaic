@@ -21,7 +21,7 @@ import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { ContentContainer } from "../../components/ContentContainer";
 import {
   exportingBlocksPointersSelector,
-  exportingNodes
+  exportingNodes,
 } from "../../modules/blocks/exportingPointers";
 import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
@@ -29,7 +29,7 @@ import { Value } from "slate";
 import {
   WorkspaceRelationTypes,
   WorkspaceBlockRelation,
-  WorkspaceWithRelations
+  WorkspaceWithRelations,
 } from "./WorkspaceRelations";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { Auth } from "../../auth";
@@ -206,7 +206,7 @@ export class WorkspaceView extends React.Component<any, any> {
   public updateBlocks = (blocks: any) => {
     const variables = { blocks };
     this.props.updateBlocks({
-      variables
+      variables,
     });
   };
 
@@ -255,6 +255,16 @@ export class WorkspaceView extends React.Component<any, any> {
       WorkspaceRelationTypes.WorkspaceAnswer,
       workspace
     ).blockEditorAttributes();
+    const subquestionDraftProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceSubquestionDraft,
+      workspace
+    ).blockEditorAttributes();
+
+    if (this.state.hasTimerEnded) {
+      return (
+        <div>Your time with this workspace is up. Thanks for contributing!</div>
+      );
+    }
 
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
@@ -354,7 +364,6 @@ export class WorkspaceView extends React.Component<any, any> {
                         <BlockEditor
                           availablePointers={availablePointers}
                           placeholder="Text for the scratchpad..."
-                          ref={this.registerEditorRef("scratchpadField")}
                           {...scratchpadProps}
                         />
                       </BlockBody>
@@ -366,7 +375,6 @@ export class WorkspaceView extends React.Component<any, any> {
                         <BlockEditor
                           availablePointers={availablePointers}
                           placeholder="Text for the answer..."
-                          ref={this.registerEditorRef("answerField")}
                           {...answerProps}
                         />
                       </BlockBody>
@@ -374,6 +382,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      subquestionDraftProps={subquestionDraftProps}
                       isIsolatedWorkspace={isIsolatedWorkspace}
                       workspace={workspace}
                       workspaces={workspace.childWorkspaces}
@@ -423,13 +432,6 @@ export class WorkspaceView extends React.Component<any, any> {
       </div>
     );
   }
-
-  private registerEditorRef = editorName => input => {
-    const editor = _.get(input, "wrappedInstance.editor");
-    if (!!editor) {
-      this[editorName] = editor();
-    }
-  }
 }
 
 export class WorkspaceQuery extends React.Component<any, any> {
@@ -456,7 +458,8 @@ export class WorkspaceQuery extends React.Component<any, any> {
 }
 
 const options: any = ({ match }) => ({
-  variables: { id: match.params.workspaceId }
+  variables: { id: match.params.workspaceId },
+  policy: "network-only",
 });
 
 function visibleBlockIds(workspace: any) {
@@ -464,11 +467,13 @@ function visibleBlockIds(workspace: any) {
     return [];
   }
   const directBlockIds = workspace.blocks.map(b => b.id);
-  const childBlockIds = _.flatten(
-    workspace.childWorkspaces.map(w =>
-      w.blocks.filter(b => b.type !== "SCRATCHPAD")
+  const childBlockIds = _
+    .flatten(
+      workspace.childWorkspaces.map(w =>
+        w.blocks.filter(b => b.type !== "SCRATCHPAD")
+      )
     )
-  ).map((b: any) => b.id);
+    .map((b: any) => b.id);
   return [...directBlockIds, ...childBlockIds];
 }
 
@@ -499,20 +504,20 @@ export const EpisodeShowPage = compose(
   graphql(UPDATE_WORKSPACE, {
     name: "updateWorkspaceChildren",
     options: {
-      refetchQueries: ["workspace"]
-    }
+      refetchQueries: ["workspace"],
+    },
   }),
   graphql(NEW_CHILD, {
     name: "createChild",
     options: {
-      refetchQueries: ["workspace"]
-    }
+      refetchQueries: ["workspace"],
+    },
   }),
   graphql(UPDATE_CHILD_TOTAL_BUDGET, {
     name: "updateChildTotalBudget",
     options: {
-      refetchQueries: ["workspace"]
-    }
+      refetchQueries: ["workspace"],
+    },
   }),
   graphql(UPDATE_WORKSPACE_STALENESS, {
     name: "updateWorkspaceStaleness",

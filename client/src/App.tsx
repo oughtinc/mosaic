@@ -49,8 +49,8 @@ const authLink = new ApolloLink((operation, forward) => {
     ...context,
     headers: {
       ...context.headers,
-      authorization: Auth.accessToken()
-    }
+      authorization: Auth.accessToken(),
+    },
   }));
   return forward ? forward(operation) : null;
 });
@@ -58,12 +58,12 @@ const authLink = new ApolloLink((operation, forward) => {
 const link = ApolloLink.from([
   authLink,
   errorLink,
-  new HttpLink({ uri: SERVER_URL })
+  new HttpLink({ uri: SERVER_URL }),
 ]);
 
 const client: any = new ApolloClient({
   link,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
 });
 
 export class Layout extends React.Component {
@@ -107,14 +107,14 @@ const Routes = () => (
     />
   </div>
 );
-LogRocket.init(Config.logrocket_id);
+/*LogRocket.init(Config.logrocket_id);
 const environment = process.env.NODE_ENV || ""; // "development" or "production"
-LogRocket.track(environment);
+LogRocket.track(environment);*/
 
 const store = createStore(
   combineReducers({
     blocks: blockReducer,
-    blockEditor: blockEditorReducer
+    blockEditor: blockEditorReducer,
   } as any),
   composeWithDevTools(applyMiddleware(thunk))
 );

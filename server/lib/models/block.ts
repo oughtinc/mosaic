@@ -3,7 +3,7 @@ import { diff } from "deep-object-diff";
 import {
   eventRelationshipColumns,
   eventHooks,
-  addEventAssociations
+  addEventAssociations,
 } from "../eventIntegration";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 import { Value } from "slate";
@@ -24,19 +24,24 @@ const BlockModel = (
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
-        allowNull: false
+        allowNull: false,
       },
       ...eventRelationshipColumns(DataTypes),
       type: {
-        type: DataTypes.ENUM(QUESTION_TYPE, ANSWER_TYPE, SCRATCHPAD_TYPE),
-        allowNull: false
+        type: DataTypes.ENUM(
+          "QUESTION",
+          "ANSWER",
+          "SCRATCHPAD",
+          "SUBQUESTION_DRAFT"
+        ),
+        allowNull: false,
       },
       value: {
-        type: DataTypes.JSON
+        type: DataTypes.JSON,
       },
       cachedExportPointerValues: {
-        type: DataTypes.JSON
-      }
+        type: DataTypes.JSON,
+      },
     },
     {
       hooks: {
@@ -48,7 +53,7 @@ const BlockModel = (
           options.fields = item.changed();
         },
         afterSave: async (item: any, options: any) => {
-          await item.ensureAllPointersAreInDatabase({ event: options.event });
+          await item.ensureAllPointersAreInDatabase({ event: options.event, models: sequelize.models });
           if (item._previousDataValues) {
             const changes = diff(item._previousDataValues, item.dataValues);
             if (!_.isEmpty(changes.value)) {
@@ -64,22 +69,27 @@ const BlockModel = (
 
   Block.associate = function(models: any) {
     Block.Workspace = Block.belongsTo(models.Workspace, {
-      foreignKey: "workspaceId"
+      foreignKey: "workspaceId",
     });
     Block.ExportingPointers = Block.hasMany(models.Pointer, {
       as: "exportingPointers",
-      foreignKey: "sourceBlockId"
+      foreignKey: "sourceBlockId",
     });
     addEventAssociations(Block, models);
   };
 
-  Block.prototype.ensureAllPointersAreInDatabase = async function({ event }) {
+  Block.prototype.ensureAllPointersAreInDatabase = async function({ event, models }) {
     const exportingPointers = await this.getExportingPointers();
     const { cachedExportPointerValues } = this;
 
     for (const pointerId of Object.keys(cachedExportPointerValues)) {
       if (!_.includes(exportingPointers.map(p => p.id), pointerId)) {
-        await this.createExportingPointer({ id: pointerId }, { event });
+        const pointer = await models.Pointer.findById(pointerId);
+        if (!pointer) {
+          await this.createExportingPointer({ id: pointerId }, { event });
+        } else {
+          pointer.update({ sourceBlockId: this.id })
+        }
       }
     }
   };
@@ -122,7 +132,7 @@ const BlockModel = (
     for (const pointer of pointers) {
       const subPointers = await pointer.newContainedPointers([
         ...allPointers,
-        ...pointersSoFar
+        ...pointersSoFar,
       ]);
       allPointers = [...allPointers, ...subPointers];
     }

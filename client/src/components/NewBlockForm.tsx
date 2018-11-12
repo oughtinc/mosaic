@@ -1,4 +1,5 @@
 import * as React from "react";
+import { connect } from "react-redux";
 import styled from "styled-components";
 import * as uuidv1 from "uuid/v1";
 import { BlockEditor } from "./BlockEditor";
@@ -6,6 +7,7 @@ import { valueToDatabaseJSON } from "../lib/slateParser";
 import _ = require("lodash");
 import { Button, FormControl } from "react-bootstrap";
 import parse = require("parse-duration");
+import { resetBlock } from "../modules/blocks/actions";
 
 import {
   blockBorderAndBoxShadow,
@@ -28,7 +30,7 @@ const BlockHeader = styled.div`
   ${blockHeaderCSS};
 `;
 
-export class NewBlockForm extends React.Component<any, any> {
+export class NewBlockFormPresentational extends React.Component<any, any> {
   public blockEditor;
   public constructor(props: any) {
     super(props);
@@ -37,33 +39,37 @@ export class NewBlockForm extends React.Component<any, any> {
 
   public onChange = blockValue => {
     this.setState({ blockValue });
+  };
+
+  public componentWillReceiveProps() {
+    if (this.state.pending) {
+      console.log("BLOCK EDITOR", this.blockEditor);
+    }
+    this.setState({ pending: false });
   }
 
-  public editor() {
+/*  public editor() {
     const editor = _.get(this, "blockEditor.wrappedInstance.editor");
     return !!editor && editor();
   }
-
+*/
   public render() {
-    if (!this.state.id) {
-      return <div />;
-    }
     return (
-      <div key={this.state.id}>
+      <div key={this.state.id} style={{ opacity: this.state.pending ? 0.5 : 1 }}>
         <BlockContainer>
           <BlockHeader>New Question</BlockHeader>
           <BlockBody>
             <BlockEditor
               placeholder="Text of a new question..."
-              shouldAutosave={false}
+              shouldAutosave={true}
               readOnly={false}
-              blockId={this.state.id}
+              blockId={this.props.blockId ? this.props.blockId : this.state.id}
               name={`new-block-${this.state.id}`}
-              initialValue={""}
+              initialValue={this.props.initialValue || ""}
               onChange={this.onChange}
               availablePointers={this.props.availablePointers || []}
               onKeyDown={this.onKeyDown}
-              ref={input => (this.blockEditor = input)}
+              /*ref={input => (this.blockEditor = input)}*/
               workspaceId={this.props.workspaceId}
             />
           </BlockBody>
@@ -120,12 +126,13 @@ export class NewBlockForm extends React.Component<any, any> {
   };
 
   private blankState = () => ({
-    id: uuidv1(),
-    blockValue: {},
-    totalBudget: this.props.totalBudget || ""
+    pending: false,
+    totalBudget: this.props.totalBudget || "",
   });
 
   private onSubmit = () => {
+    this.setState({ pending: true });
+    this.props.resetBlock({ id: this.props.blockId });
     const isAStringOfNumbers = s => /^\d+$/.exec(s);
 
     this.props.onMutate({
@@ -135,8 +142,14 @@ export class NewBlockForm extends React.Component<any, any> {
       // parsed into milliseconds, and then divided by 1000 to get seconds
       totalBudget: isAStringOfNumbers(this.state.totalBudget) ? this.state.totalBudget : (parse(this.state.totalBudget) / 1000),
     });
-    // This isn't the most elegant way to reset the component. If we want to go the full redux route,
-    // the state should probably eventually be moved into Redux.
-    this.setState(this.blankState());
   };
 }
+
+const mapDispatchToProps = dispatch => ({
+  resetBlock: ({ id }) => dispatch(resetBlock({ id })),
+})
+
+export const NewBlockForm = connect(
+  undefined,
+  mapDispatchToProps,
+)(NewBlockFormPresentational);

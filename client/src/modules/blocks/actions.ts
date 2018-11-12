@@ -1,6 +1,7 @@
 export const ADD_BLOCKS = "ADD_BLOCKS";
 export const UPDATE_BLOCK = "UPDATE_BLOCK";
 export const REMOVE_BLOCKS = "REMOVE_BLOCKS";
+export const RESET_BLOCK = "RESET_BLOCK";
 
 // This is an action creator
 export const addBlocks = blocks => {
@@ -32,6 +33,13 @@ export const updateBlock = ({ id, value, pointerChanged }) => {
     });
   };
 };
+
+export const resetBlock = ({ id }) => {
+  return {
+    type: RESET_BLOCK,
+    id,
+  };
+}
 
 export const saveBlocks = ({ ids, updateBlocksFn }) => {
   return async (dispatch, getState) => {

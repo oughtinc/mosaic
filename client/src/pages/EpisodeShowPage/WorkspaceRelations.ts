@@ -7,18 +7,20 @@ export enum WorkspaceRelationTypes {
   WorkspaceQuestion = 0,
   WorkspaceScratchpad,
   WorkspaceAnswer,
+  WorkspaceSubquestionDraft,
   SubworkspaceQuestion,
-  SubworkspaceAnswer
+  SubworkspaceAnswer,
 }
 
 enum Permissions {
   ReadOnly = 0,
-  Editable
+  Editable,
 }
 
 const QUESTION = "QUESTION";
 const ANSWER = "ANSWER";
 const SCRATCHPAD = "SCRATCHPAD";
+const SUBQUESTION_DRAFT = "SUBQUESTION_DRAFT";
 
 const WORKSPACE = "WORKSPACE";
 const SUBWORKSPACE = "SUBWORKSPACE";
@@ -28,32 +30,38 @@ const RelationTypeAttributes = [
     name: WorkspaceRelationTypes.WorkspaceQuestion,
     source: WORKSPACE,
     blockType: QUESTION,
-    permission: Permissions.ReadOnly
+    permission: Permissions.ReadOnly,
   },
   {
     name: WorkspaceRelationTypes.WorkspaceScratchpad,
     source: WORKSPACE,
     blockType: SCRATCHPAD,
-    permission: Permissions.Editable
+    permission: Permissions.Editable,
   },
   {
     name: WorkspaceRelationTypes.WorkspaceAnswer,
     source: WORKSPACE,
     blockType: ANSWER,
-    permission: Permissions.Editable
+    permission: Permissions.Editable,
+  },
+  {
+    name: WorkspaceRelationTypes.WorkspaceSubquestionDraft,
+    source: WORKSPACE,
+    blockType: SUBQUESTION_DRAFT,
+    permission: Permissions.Editable,
   },
   {
     name: WorkspaceRelationTypes.SubworkspaceQuestion,
     source: SUBWORKSPACE,
     blockType: QUESTION,
-    permission: Permissions.Editable
+    permission: Permissions.Editable,
   },
   {
     name: WorkspaceRelationTypes.SubworkspaceAnswer,
     source: SUBWORKSPACE,
     blockType: ANSWER,
-    permission: Permissions.ReadOnly
-  }
+    permission: Permissions.ReadOnly,
+  },
 ];
 
 function outputsToInputs(value: any) {
@@ -69,8 +77,8 @@ function outputsToInputs(value: any) {
         isVoid: true,
         data: {
           pointerId: n.data.pointerId,
-          internalReferenceId: uuidv1()
-        }
+          internalReferenceId: uuidv1(),
+        },
       };
     } else {
       return n;
@@ -107,7 +115,7 @@ export class WorkspaceBlockRelation {
       blockId: id,
       readOnly: !editable,
       initialValue: editable ? value : outputsToInputs(value),
-      shouldAutosave: editable
+      shouldAutosave: editable,
     };
   }
 

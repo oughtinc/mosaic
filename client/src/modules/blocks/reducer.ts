@@ -1,5 +1,5 @@
 import { Value } from "slate";
-import { ADD_BLOCKS, UPDATE_BLOCK, REMOVE_BLOCKS } from "./actions";
+import { ADD_BLOCKS, UPDATE_BLOCK, REMOVE_BLOCKS, RESET_BLOCK } from "./actions";
 import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 
@@ -40,6 +40,20 @@ export const blockReducer = (state = { blocks: [] }, action) => {
             };
           }
         })
+      };
+    case RESET_BLOCK:
+      return {
+        ...state,
+        blocks: state.blocks.map((block: any) => {
+          if (block.id !== action.id) {
+            return block;
+          } else {
+            return {
+              ...block,
+              value: Plain.deserialize(""),
+            }
+          }
+        }),
       };
     default:
       return state;

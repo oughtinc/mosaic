@@ -3,7 +3,7 @@ import * as Sequelize from "sequelize";
 import {
   eventRelationshipColumns,
   eventHooks,
-  addEventAssociations
+  addEventAssociations,
 } from "../eventIntegration";
 const Op = Sequelize.Op;
 import * as _ from "lodash";
@@ -19,16 +19,16 @@ const WorkspaceModel = (
         type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
-        allowNull: false
+        allowNull: false,
       },
       creatorId: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: false,
       },
       isPublic: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
-        allowNull: false
+        allowNull: false,
       },
       isEligibleForAssignment: {
         type: DataTypes.BOOLEAN,
@@ -43,37 +43,37 @@ const WorkspaceModel = (
       ...eventRelationshipColumns(DataTypes),
       childWorkspaceOrder: {
         type: DataTypes.ARRAY(DataTypes.TEXT),
-        defaultValue: []
+        defaultValue: [],
       },
       hasBeenDeletedByAncestor: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
-        allowNull: false
+        allowNull: false,
       },
       totalBudget: {
         type: DataTypes.INTEGER,
         defaultValue: 1,
         allowNull: false,
         validate: {
-          min: 0
-        }
+          min: 0,
+        },
       },
       allocatedBudget: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
         allowNull: false,
         validate: {
-          min: 0
-        }
+          min: 0,
+        },
       },
       remainingBudget: {
         type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
           "totalBudget",
-          "allocatedBudget"
+          "allocatedBudget",
         ]),
         get: function() {
           return this.get("totalBudget") - this.get("allocatedBudget");
-        }
+        },
       },
       connectedPointers: {
         type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
@@ -93,7 +93,7 @@ const WorkspaceModel = (
             }
           }
           return values.filter(v => !!v);
-        }
+        },
       },
       connectedPointersOfSubtree: {
         type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
@@ -113,8 +113,8 @@ const WorkspaceModel = (
             }
           }
           return values.filter(v => !!v);
-        }
-      }
+        },
+      },
     },
     {
       hooks: {
@@ -131,26 +131,27 @@ const WorkspaceModel = (
           }
           await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
           await workspace.createBlock({ type: "ANSWER" }, { event });
-        }
-      }
+          await workspace.createBlock({ type: "SUBQUESTION_DRAFT" }, { event });
+        },
+      },
     }
   );
   Workspace.associate = function(models) {
     Workspace.ChildWorkspaces = Workspace.hasMany(models.Workspace, {
       as: "childWorkspaces",
-      foreignKey: "parentId"
+      foreignKey: "parentId",
     });
     Workspace.PointerImports = Workspace.hasMany(models.PointerImport, {
       as: "pointerImports",
-      foreignKey: "workspaceId"
+      foreignKey: "workspaceId",
     });
     Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, {
       as: "parentWorkspace",
-      foreignKey: "parentId"
+      foreignKey: "parentId",
     });
     Workspace.Blocks = Workspace.hasMany(models.Block, {
       as: "blocks",
-      foreignKey: "workspaceId"
+      foreignKey: "workspaceId",
     });
     addEventAssociations(Workspace, models);
   };
@@ -163,6 +164,7 @@ const WorkspaceModel = (
       { parentId, totalBudget, creatorId, isPublic },
       { event, questionValue: question }
     );
+    
     return _workspace;
   };
 
@@ -204,7 +206,7 @@ const WorkspaceModel = (
 
     await this.update(
       {
-        allocatedBudget: this.allocatedBudget + budgetToAddToChild
+        allocatedBudget: this.allocatedBudget + budgetToAddToChild,
       },
       { event }
     );
@@ -236,7 +238,7 @@ const WorkspaceModel = (
     question,
     totalBudget,
     creatorId,
-    isPublic
+    isPublic,
   }) {
     const child = await sequelize.models.Workspace.createAsChild(
       { parentId: this.id, question, totalBudget, creatorId, isPublic },
@@ -253,7 +255,7 @@ const WorkspaceModel = (
     await this.update(
       {
         allocatedBudget: newAllocatedBudget,
-        childWorkspaceOrder: this.workSpaceOrderAppend(child.id)
+        childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
       },
       { event }
     );
@@ -315,12 +317,12 @@ const WorkspaceModel = (
     const connectingChildBlocks = await sequelize.models.Block.findAll({
       where: {
         workspaceId: {
-          [Op.in]: this.childWorkspaceOrder
+          [Op.in]: this.childWorkspaceOrder,
         },
         type: {
-          [Op.in]: ["QUESTION", "ANSWER"]
-        }
-      }
+          [Op.in]: ["QUESTION", "ANSWER"],
+        },
+      },
     });
     blocks = [...blocks, ...connectingChildBlocks];
     return blocks;

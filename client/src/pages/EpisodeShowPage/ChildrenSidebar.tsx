@@ -8,7 +8,7 @@ import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
 import {
   WorkspaceBlockRelation,
-  WorkspaceRelationTypes
+  WorkspaceRelationTypes,
 } from "./WorkspaceRelations";
 import { ChildBudgetBadge } from "./ChildBudgetBadge";
 import { ChildBudgetForm } from "./ChildBudgetForm";
@@ -71,9 +71,7 @@ export class Child extends React.Component<any, any> {
         </div>
 
         <div style={{ marginTop: "0.5em" }}>
-          {
-            !this.props.isIsolatedWorkspace
-            &&
+          {!this.props.isIsolatedWorkspace && (
             <Link to={`/workspaces/${workspace.id}`}>
               <Button
                 bsSize="xsmall"
@@ -83,7 +81,7 @@ export class Child extends React.Component<any, any> {
                 Open »
               </Button>
             </Link>
-          }
+          )}
           {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
             <Button
               bsSize="xsmall"
@@ -124,7 +122,7 @@ export class Child extends React.Component<any, any> {
             onSubmit={totalBudget => {
               this.props.onUpdateChildTotalBudget({
                 childId: workspace.id,
-                totalBudget
+                totalBudget,
               });
             }}
             onClose={() => this.setState({ showChildBudgetForm: false })}
@@ -169,7 +167,10 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 <BlockBody
                   key={workspace.id}
                   style={{
-                    borderBottom: i !== arr.length - 1 ? `1px solid ${blockBorderColor}` : "none",
+                    borderBottom:
+                      i !== arr.length - 1
+                        ? `1px solid ${blockBorderColor}`
+                        : "none",
                   }}
                 >
                   <Child
@@ -178,12 +179,16 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     key={workspace.id}
                     onDelete={() => {
                       this.props.changeOrder(
-                        this.props.workspaceOrder.filter(w => w !== workspace.id)
+                        this.props.workspaceOrder.filter(
+                          w => w !== workspace.id
+                        )
                       );
                     }}
                     availablePointers={this.props.availablePointers}
                     parentAvailableBudget={this.props.availableBudget}
-                    onUpdateChildTotalBudget={this.props.onUpdateChildTotalBudget}
+                    onUpdateChildTotalBudget={
+                      this.props.onUpdateChildTotalBudget
+                    }
                   />
                 </BlockBody>
               );
@@ -192,13 +197,11 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            {...this.props.subquestionDraftProps}
             workspaceId={this.props.workspace.id}
             maxTotalBudget={this.props.availableBudget}
             onMutate={this.props.onCreateChild}
             availablePointers={this.props.availablePointers}
-            ref={input => {
-              this.newChildField = input;
-            }}
           />
         )}
       </div>
