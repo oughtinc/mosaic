@@ -88,6 +88,9 @@ const BlockModel = (
         if (!pointer) {
           await this.createExportingPointer({ id: pointerId }, { event });
         } else {
+          // if the pointer already exists,
+          // then it was present in the subquestion draft block,
+          // and we need to "move" it to the newly created question block
           pointer.update({ sourceBlockId: this.id })
         }
       }
