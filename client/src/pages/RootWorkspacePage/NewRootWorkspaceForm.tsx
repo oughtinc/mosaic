@@ -8,6 +8,7 @@ class NewRootWorkspaceForm extends React.Component<any, any> {
         <NewBlockForm
           maxTotalBudget={100000}
           onMutate={this.onCreateWorkspace}
+          shouldAutosave={false}
         />
       </div>
     );

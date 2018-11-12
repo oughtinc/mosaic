@@ -61,7 +61,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
           <BlockBody>
             <BlockEditor
               placeholder="Text of a new question..."
-              shouldAutosave={true}
+              shouldAutosave={this.props.shouldAutosave}
               readOnly={false}
               blockId={this.props.blockId ? this.props.blockId : this.state.id}
               name={`new-block-${this.state.id}`}

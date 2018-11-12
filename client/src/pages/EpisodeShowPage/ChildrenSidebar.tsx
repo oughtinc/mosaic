@@ -202,6 +202,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
             maxTotalBudget={this.props.availableBudget}
             onMutate={this.props.onCreateChild}
             availablePointers={this.props.availablePointers}
+            shouldAutosave={true}
           />
         )}
       </div>
