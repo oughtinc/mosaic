@@ -260,12 +260,6 @@ export class WorkspaceView extends React.Component<any, any> {
       workspace
     ).blockEditorAttributes();
 
-    if (this.state.hasTimerEnded) {
-      return (
-        <div>Your time with this workspace is up. Thanks for contributing!</div>
-      );
-    }
-
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
