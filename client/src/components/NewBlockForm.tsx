@@ -43,7 +43,11 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
   };
 
   public componentWillReceiveProps() {
-    this.setState({ pending: false });
+    if (this.state.pending) {
+      this.setState({ pending: false, totalBudget: "" }, () => {
+        this.props.resetBlock({ id: this.props.blockId });
+      });        
+    }
   }
 
   public render() {
@@ -119,8 +123,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
   };
 
   private onSubmit = () => {
-    this.setState({ pending: true, totalBudget: "" });
-    this.props.resetBlock({ id: this.props.blockId });
+    this.setState({ pending: true });
     const isAStringOfNumbers = s => /^\d+$/.exec(s);
 
     this.props.onMutate({
