@@ -107,9 +107,10 @@ const Routes = () => (
     />
   </div>
 );
-/*LogRocket.init(Config.logrocket_id);
+
+LogRocket.init(Config.logrocket_id);
 const environment = process.env.NODE_ENV || ""; // "development" or "production"
-LogRocket.track(environment);*/
+LogRocket.track(environment);
 
 const store = createStore(
   combineReducers({
