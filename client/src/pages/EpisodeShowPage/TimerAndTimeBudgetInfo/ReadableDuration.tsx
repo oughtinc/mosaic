@@ -10,7 +10,8 @@ class ReadableDuration extends React.Component<any,  any> {
     const isAnHourOrMore = duration.hours > 0;
     const isAMinuteOrMore = duration.minutes > 0;
     const isASecondOrMore = duration.seconds > 0;
-    const isExactlySixtySeconds = duration.minutes === 1  && duration.seconds === 0;
+    const isExactlySixtySeconds = (durationInMs / 1000 === 60);
+    const isSixtySecondsOrLess = (durationInMs / 1000 <= 60);
 
     if (this.props.durationInMs < 0) {
       return (
@@ -69,11 +70,9 @@ class ReadableDuration extends React.Component<any,  any> {
         }
         {
           (
-            isExactlySixtySeconds
+            (this.props.shouldShowSeconds && isASecondOrMore)
             ||
-            isASecondOrMore
-            ||
-            durationInMs < 1000
+            isSixtySecondsOrLess
           )
           &&
           <span>

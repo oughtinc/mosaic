@@ -29,6 +29,7 @@ export class AvailableBudget extends React.Component<any,  any> {
 
         <ReadableDuration
           durationInMs={(this.props.totalBudget - this.props.allocatedBudget) * 1000}
+          shouldShowSeconds={false}
           style={{ textAlign: "center" }}
         />
       </span>

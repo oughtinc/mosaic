@@ -34,6 +34,7 @@ class TimerPresentational extends React.Component<any,  any> {
 
           <ReadableDuration
             durationInMs={this.props.remainingDurationInMs}
+            shouldShowSeconds={true}
             style={{ textAlign: "center" }}
           />
         </div>
