@@ -92,6 +92,21 @@ export class Child extends React.Component<any, any> {
               Archive
             </Button>
           )}
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
+            <Button
+              bsSize="xsmall"
+              bsStyle="default"
+              style={{ marginRight: "5px" }}
+              onClick={() => {
+                this.props.onUpdateChildTotalBudget({
+                  childId: workspace.id,
+                  totalBudget: Number(workspace.totalBudget) + 90,
+                });
+              }}
+            >
+              +90s
+            </Button>
+          )}
           {!this.state.showChildBudgetForm &&
             Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
               <Button
