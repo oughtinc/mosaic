@@ -31,6 +31,7 @@ const scheduler = new Scheduler({
   schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: NINETY_SECONDS }),
   remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,
+  timeLimit: NINETY_SECONDS,
 });
 
 export { scheduler };

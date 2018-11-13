@@ -9,20 +9,20 @@ class Scheduler {
   private rootParentCache;
   private schedule;
 
-  private MIN_BUDGET_REQUIRED_FOR_ELIGIBILITY = 10;
-
   public constructor({
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
     remainingBudgetAmongDescendantsCache,
     rootParentCache,
     schedule,
+    timeLimit,
   }) {
     this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
     this.remainingBudgetAmongDescendantsCache = remainingBudgetAmongDescendantsCache;
     this.rootParentCache = rootParentCache;
     this.schedule = schedule;
+    this.timeLimit = timeLimit;
   }
 
   public async getIdOfCurrentWorkspace(userId) {
@@ -140,7 +140,7 @@ class Scheduler {
   }
 
   private hasMinRemaining(workspace) {
-    return (workspace.totalBudget - workspace.allocatedBudget) >= this.MIN_BUDGET_REQUIRED_FOR_ELIGIBILITY;
+    return (workspace.totalBudget - workspace.allocatedBudget) >= (this.timeLimit / 1000);
   }
 }
 

@@ -36,7 +36,7 @@ class ChildBudgetBadge extends React.Component<any, any> {
     const totalBudgetDurationString = secondsToDurationString(Number(totalBudget));
 
     return (
-      <Badge style={{ backgroundColor: remainingBudget < 10 ? "red" : "#777" }}>
+      <Badge style={{ backgroundColor: remainingBudget < 90 ? "red" : "#777" }}>
         {remainingBudgetDurationString}
         {" of "}
         {totalBudgetDurationString}
