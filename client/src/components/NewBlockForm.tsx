@@ -43,9 +43,6 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
   };
 
   public componentWillReceiveProps() {
-    if (this.state.pending) {
-      console.log("BLOCK EDITOR", this.blockEditor);
-    }
     this.setState({ pending: false });
   }
 
