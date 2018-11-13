@@ -1,7 +1,6 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
-import * as uuidv1 from "uuid/v1";
 import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
 import _ = require("lodash");
@@ -34,7 +33,10 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
   public blockEditor;
   public constructor(props: any) {
     super(props);
-    this.state = this.blankState();
+    this.state = {
+      pending: false,
+      totalBudget: this.props.totalBudget || "",
+    };
   }
 
   public onChange = blockValue => {
@@ -48,11 +50,6 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     this.setState({ pending: false });
   }
 
-/*  public editor() {
-    const editor = _.get(this, "blockEditor.wrappedInstance.editor");
-    return !!editor && editor();
-  }
-*/
   public render() {
     return (
       <div key={this.state.id} style={{ opacity: this.state.pending ? 0.5 : 1 }}>
@@ -125,13 +122,8 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     }
   };
 
-  private blankState = () => ({
-    pending: false,
-    totalBudget: this.props.totalBudget || "",
-  });
-
   private onSubmit = () => {
-    this.setState({ pending: true });
+    this.setState({ pending: true, totalBudget: "" });
     this.props.resetBlock({ id: this.props.blockId });
     const isAStringOfNumbers = s => /^\d+$/.exec(s);
 
