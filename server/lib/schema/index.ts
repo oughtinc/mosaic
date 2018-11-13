@@ -182,6 +182,9 @@ const schema = new GraphQLSchema({
             const includesScratchpad = blocks.find(
               b => b.type === "SCRATCHPAD"
             );
+            const includesSubquestionDraft = blocks.find(
+              b => b.type === "SUBQUESTION_DRAFT"
+            );
 
             if (!includesQuestion) {
               await result.createBlock({ type: "QUESTION" });
@@ -193,6 +196,10 @@ const schema = new GraphQLSchema({
 
             if (!includesScratchpad) {
               await result.createBlock({ type: "SCRATCHPAD" });
+            }
+
+            if (!includesSubquestionDraft) {
+              await result.createBlock({ type: "SUBQUESTION_DRAFT" });
             }
 
             return result;
