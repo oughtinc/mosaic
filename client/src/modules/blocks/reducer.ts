@@ -51,7 +51,7 @@ export const blockReducer = (state = { blocks: [] }, action) => {
             return {
               ...block,
               value: Plain.deserialize(""),
-            }
+            };
           }
         }),
       };

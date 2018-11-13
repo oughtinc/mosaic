@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
-import _ = require("lodash");
 import { Button, FormControl } from "react-bootstrap";
 import parse = require("parse-duration");
 import { resetBlock } from "../modules/blocks/actions";
@@ -139,7 +138,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
 
 const mapDispatchToProps = dispatch => ({
   resetBlock: ({ id }) => dispatch(resetBlock({ id })),
-})
+});
 
 export const NewBlockForm = connect(
   undefined,

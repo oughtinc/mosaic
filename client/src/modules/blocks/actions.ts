@@ -39,7 +39,7 @@ export const resetBlock = ({ id }) => {
     type: RESET_BLOCK,
     id,
   };
-}
+};
 
 export const saveBlocks = ({ ids, updateBlocksFn }) => {
   return async (dispatch, getState) => {
