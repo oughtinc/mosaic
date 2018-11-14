@@ -46,13 +46,18 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     if (this.state.pending) {
       this.setState({ pending: false, totalBudget: "" }, () => {
         this.props.resetBlock({ id: this.props.blockId });
-      });        
+      });
     }
   }
 
   public render() {
+    // front page doesn't receive a prop when workspaces reload
+    // so for now I'm not putting in a pending state, because it would be
+    // pretty involved telling it to go out of the pending state
+    const isOnFrontPage = !this.props.shouldAutosave;
+
     return (
-      <div key={this.state.id} style={{ opacity: this.state.pending ? 0.5 : 1 }}>
+      <div key={this.state.id} style={{ opacity: isOnFrontPage ? 1 : (this.state.pending ? 0.5 : 1) }}>
         <BlockContainer>
           <BlockHeader>New Question</BlockHeader>
           <BlockBody>
@@ -123,7 +128,19 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
   };
 
   private onSubmit = () => {
-    this.setState({ pending: true });
+    const isOnFrontPage = !this.props.shouldAutosave;
+
+    // front page doesn't receive a prop when workspaces reload
+    // so for now I'm not putting in a pending state, because it would be
+    // pretty involved telling it to go out of the pending state
+    if (isOnFrontPage) {
+      this.setState({ totalBudget: "" }, () => {
+        this.props.resetBlock({ id: this.props.blockId });
+      });
+    } else {
+      this.setState({ pending: true });
+    }
+
     const isAStringOfNumbers = s => /^\d+$/.exec(s);
 
     this.props.onMutate({
