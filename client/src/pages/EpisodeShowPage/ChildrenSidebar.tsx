@@ -107,7 +107,22 @@ export class Child extends React.Component<any, any> {
               +90s
             </Button>
           )}
-          {!this.state.showChildBudgetForm &&
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
+            <Button
+              bsSize="xsmall"
+              bsStyle="default"
+              style={{ marginRight: "5px" }}
+              onClick={() => {
+                this.props.onUpdateChildTotalBudget({
+                  childId: workspace.id,
+                  totalBudget: Number(workspace.totalBudget) * 2,
+                });
+              }}
+            >
+              x2 time
+            </Button>
+          )}
+          {/*!this.state.showChildBudgetForm &&
             Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
               <Button
                 bsSize="xsmall"
@@ -118,7 +133,7 @@ export class Child extends React.Component<any, any> {
               >
                 Edit Time
               </Button>
-            )}
+            )*/}
           <div style={{ float: "right" }}>
             <ChildBudgetBadge
               remainingBudget={workspace.totalBudget - workspace.allocatedBudget}
@@ -126,7 +141,7 @@ export class Child extends React.Component<any, any> {
             />
           </div>
         </div>
-        {this.state.showChildBudgetForm && (
+        {/*this.state.showChildBudgetForm && (
           <ChildBudgetForm
             initialValue={workspace.totalBudget}
             min={workspace.allocatedBudget}
@@ -142,7 +157,7 @@ export class Child extends React.Component<any, any> {
             }}
             onClose={() => this.setState({ showChildBudgetForm: false })}
           />
-        )}
+        )*/}
       </div>
     );
   }
