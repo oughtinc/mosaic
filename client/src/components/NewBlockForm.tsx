@@ -3,9 +3,9 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
-import { Button, FormControl } from "react-bootstrap";
-import parse = require("parse-duration");
+import { Button } from "react-bootstrap";
 import { resetBlock } from "../modules/blocks/actions";
+import { ChildBudgetBadge } from "../pages/EpisodeShowPage/ChildBudgetBadge";
 
 import {
   blockBorderAndBoxShadow,
@@ -34,7 +34,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     super(props);
     this.state = {
       pending: false,
-      totalBudget: this.props.totalBudget || "",
+      totalBudget: this.props.totalBudget || 90,
     };
   }
 
@@ -44,7 +44,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
 
   public componentWillReceiveProps() {
     if (this.state.pending) {
-      this.setState({ pending: false, totalBudget: "" }, () => {
+      this.setState({ pending: false, totalBudget: 90 }, () => {
         this.props.resetBlock({ id: this.props.blockId });
       });
     }
@@ -83,30 +83,50 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               padding: "10px",
             }}
           >
-            <FormControl
-              type="input"
-              value={this.state.totalBudget}
-              placeholder="budget (e.g., 5m10s)"
-              onChange={(e: any) => {
-                const { value } = e.target;
-                if (value === "") {
-                  this.setState({ totalBudget: value });
-                }
-
-                const isParseable = !!parse(value);
-
-                if (isParseable) {
-                  this.setState({ totalBudget: value });
-                }
-              }}
-            />
-            <div className="buttons">
+            <div>
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  marginRight: "5px",
+                }}
+              >
+                Budget
+              </span>
+              <ChildBudgetBadge
+                totalBudget={this.state.totalBudget}
+              />
+              <br />
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                style={{ marginRight: "5px", marginTop: "10px" }}
+                onClick={() => {
+                  this.setState({
+                    totalBudget: Number(this.state.totalBudget) + 90,
+                  });
+                }}
+              >
+                +90s
+              </Button>
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                style={{ marginRight: "5px", marginTop: "10px" }}
+                onClick={() => {
+                  this.setState({
+                    totalBudget: this.state.totalBudget * 2,
+                  });
+                }}
+              >
+                x2 time
+              </Button>
               <Button
                 bsSize="xsmall"
                 bsStyle="primary"
                 type="submit"
                 onClick={this.onSubmit}
-                style={{ marginTop: "5px" }}
+                style={{ marginTop: "10px" }}
               >
                 Submit
               </Button>
@@ -134,21 +154,16 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     // so for now I'm not putting in a pending state, because it would be
     // pretty involved telling it to go out of the pending state
     if (isOnFrontPage) {
-      this.setState({ totalBudget: "" }, () => {
+      this.setState({ totalBudget: 90 }, () => {
         this.props.resetBlock({ id: this.props.blockId });
       });
     } else {
       this.setState({ pending: true });
     }
 
-    const isAStringOfNumbers = s => /^\d+$/.exec(s);
-
     this.props.onMutate({
       question: valueToDatabaseJSON(this.state.blockValue),
-      // totalBudget is either a string of numbers, in which case it's
-      // interpreted as seconds, or a duration string, in which case it is
-      // parsed into milliseconds, and then divided by 1000 to get seconds
-      totalBudget: isAStringOfNumbers(this.state.totalBudget) ? this.state.totalBudget : (parse(this.state.totalBudget) / 1000),
+      totalBudget: this.state.totalBudget,
     });
   };
 }
