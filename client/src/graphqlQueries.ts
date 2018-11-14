@@ -44,6 +44,7 @@ export const WORKSPACES_QUERY = gql`
       parentId
       creatorId
       isPublic
+      isStale
       childWorkspaceOrder
       totalBudget
       createdAt
@@ -54,6 +55,7 @@ export const WORKSPACES_QUERY = gql`
         type
       }
       connectedPointers
+      isEligibleForAssignment
     }
   }
 `;
@@ -67,6 +69,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
     workspace(id: $workspaceId) {
       id
       isPublic
+      isStale
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
@@ -84,6 +87,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
     workspace(id: $workspaceId) {
       id
       isPublic
+      isStale
       creatorId
       childWorkspaceOrder
       blocks {
@@ -91,6 +95,22 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
         value
         type
       }
+    }
+  }
+`;
+
+export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
+  mutation updateWorkspaceIsPublic($isPublic: Boolean, $workspaceId: String) {
+    updateWorkspaceIsPublic(isPublic: $isPublic, workspaceId: $workspaceId) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
+  mutation updateWorkspaceIsEligible($isEligible: Boolean, $workspaceId: String) {
+    updateWorkspaceIsEligible(isEligible: $isEligible, workspaceId: $workspaceId) {
+      id
     }
   }
 `;

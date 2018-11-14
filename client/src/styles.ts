@@ -10,6 +10,8 @@ export const VERY_LIGHT_BLUE = "#f0f8ff";
 export const DARK_BLUE = "#337ab7";
 export const VERY_DARK_BLUE = "#26a";
 
+export const adminCheckboxBgColor = VERY_LIGHT_GRAY;
+export const adminCheckboxBorderColor = GRAY;
 export const availableBudgetHeaderFontColor = DARK_BLUE;
 export const blockBodyBgColor = WHITE;
 export const blockBorderColor = LIGHT_GRAY;

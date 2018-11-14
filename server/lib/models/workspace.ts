@@ -30,6 +30,16 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      isEligibleForAssignment: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
+      isStale: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false
+      },
       ...eventRelationshipColumns(DataTypes),
       childWorkspaceOrder: {
         type: DataTypes.ARRAY(DataTypes.TEXT),
@@ -185,7 +195,11 @@ const WorkspaceModel = (
       );
     }
 
-    await childWorkspace.update({ totalBudget: newTotalBudget }, { event });
+    const budgetIncreased = childWorkspace.totalBudget < newTotalBudget;
+    await childWorkspace.update({
+      isStale: budgetIncreased ? true : childWorkspace.isStale,
+      totalBudget: newTotalBudget
+    }, { event });
 
     await this.update(
       {

@@ -1,4 +1,5 @@
 import * as Sequelize from "sequelize";
+import { diff } from "deep-object-diff";
 import {
   eventRelationshipColumns,
   eventHooks,
@@ -7,6 +8,10 @@ import {
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 import { Value } from "slate";
 import * as _ from "lodash";
+
+const QUESTION_TYPE = "QUESTION"; // move elsewhere?
+const ANSWER_TYPE = "ANSWER";
+const SCRATCHPAD_TYPE = "SCRATCHPAD";
 
 const BlockModel = (
   sequelize: Sequelize.Sequelize,
@@ -23,7 +28,7 @@ const BlockModel = (
       },
       ...eventRelationshipColumns(DataTypes),
       type: {
-        type: DataTypes.ENUM("QUESTION", "ANSWER", "SCRATCHPAD"),
+        type: DataTypes.ENUM(QUESTION_TYPE, ANSWER_TYPE, SCRATCHPAD_TYPE),
         allowNull: false
       },
       value: {
@@ -44,6 +49,14 @@ const BlockModel = (
         },
         afterSave: async (item: any, options: any) => {
           await item.ensureAllPointersAreInDatabase({ event: options.event });
+          if (item._previousDataValues) {
+            const changes = diff(item._previousDataValues, item.dataValues);
+            if (!_.isEmpty(changes.value)) {
+              // The content of the block changed, so we need to mark any
+              // workspaces that contain the block as stale.
+              await item.propagateStaleness({ event: options.event });
+            }
+          }
         }
       }
     }
@@ -69,6 +82,25 @@ const BlockModel = (
         await this.createExportingPointer({ id: pointerId }, { event });
       }
     }
+  };
+
+  Block.prototype.propagateStaleness = async function({ event }) {
+    const workspaceId = this.workspaceId;
+    const workspace = await sequelize.models.Workspace.findById(workspaceId);
+    // 1. If block is a question, mark workspace it belongs to as stale
+    if (this.type === QUESTION_TYPE) {
+      return workspace.update({ isStale: true }, { event });
+    }
+    // 2. If block is an answer, mark parent as stale (if there is a parent)
+    if (this.type === ANSWER_TYPE && workspace.parentId) {
+      const parentId = workspace.parentId;
+      const parentWorkspace = await sequelize.models.Workspace.findById(
+        parentId
+      );
+      return parentWorkspace.update({ isStale: true }, { event });
+    }
+    // 3. TODO If edit was to a pointer exported within this block, mark all
+    //    workspaces that import and expand that pointer as stale.
   };
 
   Block.prototype.connectedPointers = async function() {
