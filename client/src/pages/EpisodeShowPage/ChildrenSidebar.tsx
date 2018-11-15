@@ -95,6 +95,7 @@ export class Child extends React.Component<any, any> {
             <Button
               bsSize="xsmall"
               bsStyle="default"
+              disabled={this.props.availableBudget < 90 ? true : false}
               style={{ marginRight: "5px" }}
               onClick={() => {
                 this.props.onUpdateChildTotalBudget({
@@ -110,6 +111,7 @@ export class Child extends React.Component<any, any> {
             <Button
               bsSize="xsmall"
               bsStyle="default"
+              disabled={this.props.availableBudget < Number(workspace.totalBudget) ? true : false}
               style={{ marginRight: "5px" }}
               onClick={() => {
                 this.props.onUpdateChildTotalBudget({
@@ -204,6 +206,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 >
                   <Child
                     isIsolatedWorkspace={this.props.isIsolatedWorkspace}
+                    availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
                     workspace={workspace}
                     key={workspace.id}
                     onDelete={() => {
@@ -227,6 +230,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
             {...this.props.subquestionDraftProps}
+            availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
             workspaceId={this.props.workspace.id}
             maxTotalBudget={this.props.availableBudget}
             onMutate={this.props.onCreateChild}

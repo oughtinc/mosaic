@@ -57,7 +57,10 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     const isOnFrontPage = !this.props.shouldAutosave;
 
     return (
-      <div key={this.state.id} style={{ opacity: isOnFrontPage ? 1 : (this.state.pending ? 0.5 : 1) }}>
+      <div
+        key={this.state.id}
+        style={{
+          opacity: isOnFrontPage ? 1 : (this.state.pending || this.props.availableBudget < 90 ? 0.5 : 1) }}>
         <BlockContainer>
           <BlockHeader>New Question</BlockHeader>
           <BlockBody>
@@ -100,6 +103,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               <Button
                 bsSize="xsmall"
                 bsStyle="default"
+                disabled={this.props.availableBudget < 90 ? true : false}
                 style={{ marginRight: "5px", marginTop: "10px" }}
                 onClick={() => {
                   this.setState({
@@ -112,6 +116,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               <Button
                 bsSize="xsmall"
                 bsStyle="default"
+                disabled={this.props.availableBudget < Number(this.state.totalBudget) ? true : false}
                 style={{ marginRight: "5px", marginTop: "10px" }}
                 onClick={() => {
                   this.setState({
