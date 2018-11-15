@@ -287,7 +287,13 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               <Button
                 bsSize="xsmall"
                 bsStyle="primary"
-                disabled={this.props.availableBudget < Number(this.state.totalBudget) ? true : false}
+                disabled={
+                  this.props.availableBudget - 90 < Number(this.state.totalBudget)
+                  ?
+                  true
+                  :
+                  false
+                }
                 type="submit"
                 onClick={this.onSubmit}
                 style={{ marginTop: "10px" }}
