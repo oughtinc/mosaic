@@ -2,7 +2,7 @@ import { Duration } from "luxon";
 import * as React from "react";
 import { Badge } from "react-bootstrap";
 
-function secondsToDurationString(seconds: number) {
+function secondsToDurationString(seconds: number, shouldShowSeconds: boolean) {
   const milliseconds = seconds * 1000;
   const durationInMs = Duration.fromMillis(milliseconds);
   const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
@@ -21,7 +21,7 @@ function secondsToDurationString(seconds: number) {
     durationString += `${Duration.fromObject({minutes: duration.minutes}).toFormat("m")}m`;
   }
 
-  if (duration.seconds > 0 || seconds === 0) {
+  if ((shouldShowSeconds || seconds < 10 * 60) && (duration.seconds > 0 || seconds === 0)) {
     durationString += `${Duration.fromObject({seconds: duration.seconds}).toFormat("s")}s`;
   }
 
@@ -30,9 +30,9 @@ function secondsToDurationString(seconds: number) {
 
 class ChildBudgetBadge extends React.Component<any, any> {
   public render() {
-    const { remainingBudget, totalBudget } = this.props;
+    const { remainingBudget, shouldShowSeconds = true, totalBudget } = this.props;
 
-    const totalBudgetDurationString = secondsToDurationString(Number(totalBudget));
+    const totalBudgetDurationString = secondsToDurationString(Number(totalBudget), shouldShowSeconds);
 
     if (remainingBudget === undefined) {
       return (
@@ -42,7 +42,7 @@ class ChildBudgetBadge extends React.Component<any, any> {
       );
     }
 
-    const remainingBudgetDurationString = secondsToDurationString(Number(remainingBudget));
+    const remainingBudgetDurationString = secondsToDurationString(Number(remainingBudget), shouldShowSeconds);
 
     return (
       <Badge style={{ backgroundColor: remainingBudget < 90 ? "red" : "#777" }}>
