@@ -157,7 +157,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                     });
                   }}
                 >
-                  ÷2
+                  /2
                 </Button>
                 <Button
                   bsSize="xsmall"

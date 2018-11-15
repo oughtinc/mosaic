@@ -93,7 +93,7 @@ export class ChildBudgetForm extends React.Component<
             });
           }}
         >
-          ÷2
+          /2
         </Button>
         <Button
           bsSize="xsmall"
