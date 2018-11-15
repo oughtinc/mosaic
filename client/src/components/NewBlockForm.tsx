@@ -131,7 +131,13 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 <Button
                   bsSize="xsmall"
                   bsStyle="default"
-                  disabled={this.props.childAllocatedBudget > Math.ceil(Number(this.props.childTotalBudget) / 2) ? true : false}
+                  disabled={
+                    Math.floor(this.state.totalBudget / 2) < 90
+                    ?
+                    true
+                    :
+                    false
+                  }
                   style={{ marginRight: "5px", marginTop: "10px" }}
                   onClick={() => {
                     this.setState({
@@ -144,7 +150,13 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 <Button
                   bsSize="xsmall"
                   bsStyle="default"
-                  disabled={this.props.childAllocatedBudget > Number(this.props.childTotalBudget) - 90 ? true : false}
+                  disabled={
+                    this.state.totalBudget - 90 < 90
+                    ?
+                    true
+                    :
+                    false
+                  }
                   style={{ marginTop: "10px" }}
                   onClick={() => {
                     this.setState({
@@ -185,7 +197,9 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                       bsSize="xsmall"
                       bsStyle="default"
                       disabled={
-                        this.props.availableBudget < Math.floor(Number(this.props.parentTotalBudget) * 0.2)
+                        this.props.availableBudget - 90 < Math.floor(Number(this.props.parentTotalBudget) * 0.2)
+                        ||
+                        Math.floor(Number(this.props.parentTotalBudget) * 0.2) < 90
                         ?
                         true
                         :
@@ -198,13 +212,15 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                         });
                       }}
                     >
-                      %20
+                      20%
                     </Button>
                     <Button
                       bsSize="xsmall"
                       bsStyle="default"
                       disabled={
-                        this.props.availableBudget < Math.floor(Number(this.props.parentTotalBudget) * 0.4)
+                        this.props.availableBudget - 90 < Math.floor(Number(this.props.parentTotalBudget) * 0.4)
+                        ||
+                        Math.floor(Number(this.props.parentTotalBudget) * 0.4) < 90
                         ?
                         true
                         :
@@ -217,13 +233,15 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                         });
                       }}
                     >
-                      %40
+                      40%
                     </Button>
                     <Button
                       bsSize="xsmall"
                       bsStyle="default"
                       disabled={
-                        this.props.availableBudget < Math.floor(Number(this.props.parentTotalBudget) * 0.8)
+                        this.props.availableBudget - 90 < Math.floor(Number(this.props.parentTotalBudget) * 0.8)
+                        ||
+                        Math.floor(Number(this.props.parentTotalBudget) * 0.8) < 90
                         ?
                         true
                         :
@@ -236,16 +254,16 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                         });
                       }}
                     >
-                      %80
+                      80%
                     </Button>
                     <Button
                       bsSize="xsmall"
                       bsStyle="default"
-                      disabled={this.props.availableBudget < 3 * 60 ? true : false}
+                      disabled={this.props.availableBudget < 90 ? true : false}
                       style={{ marginTop: "10px" }}
                       onClick={() => {
                         this.setState({
-                          totalBudget: Math.max(0, this.props.availableBudget - 3 * 60),
+                          totalBudget: Math.max(0, this.props.availableBudget - 90),
                         });
                       }}
                     >
