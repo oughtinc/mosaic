@@ -50,8 +50,20 @@ export class ChildBudgetForm extends React.Component<
           }}
           style={{ display: "inline-block", width: "80px" }}
         />
-        <span style={{ color: "#999", margin: "0 5px" }}>
-           {this.props.min} to {this.props.max}
+        <span style={{ color: "#999", margin: "0 5px", position: "relative" }}>
+          {this.props.min} to {this.props.max}
+          <span
+            style={{
+              fontSize: "10px",
+              position: "absolute",
+              bottom: "-12px",
+              left: 0,
+              right: 0,
+              textAlign: "center",
+            }}
+          >
+            (in seconds)
+          </span>
        </span>
         <Button
           bsSize="xsmall"

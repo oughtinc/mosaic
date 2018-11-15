@@ -60,7 +60,7 @@ const WorkspaceModel = (
       },
       allocatedBudget: {
         type: DataTypes.INTEGER,
-        defaultValue: 1,
+        defaultValue: 0,
         allowNull: false,
         validate: {
           min: 0

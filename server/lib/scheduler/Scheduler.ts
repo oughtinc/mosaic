@@ -24,7 +24,12 @@ class Scheduler {
     this.rootParentCache.clearRootParentCache();
 
     const actionableWorkspaces = await this.getActionableWorkspaces();
+    console.log("actionableWorkspaces", actionableWorkspaces);
+    if (actionableWorkspaces.length === 0) {
+      return;
+    }
     const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
+    console.log("assignedWorkspace", assignedWorkspace && assignedWorkspace.id);
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
   }
 
@@ -45,7 +50,9 @@ class Scheduler {
     // then instead look for the workspace worked on least recently
     if (finalWorkspaces.length === 0) {
       const workspaceWorkedOnLeastRecently = await this.schedule.getLeastRecentlyActiveWorkspace(eligibleWorkspaces);
-      finalWorkspaces = [workspaceWorkedOnLeastRecently];
+      if (workspaceWorkedOnLeastRecently) {
+        finalWorkspaces = [workspaceWorkedOnLeastRecently];  
+      }
     }
 
     return finalWorkspaces;

@@ -30,6 +30,7 @@ class UserSchedule {
   }
 
   public hasUserWorkedOnWorkspace(workspace) {
+    console.log("this.userSchedule", this.userSchedule);
     return _.some(this.userSchedule, assignment => assignment.getWorkspace().id === workspace.id);
   }
 

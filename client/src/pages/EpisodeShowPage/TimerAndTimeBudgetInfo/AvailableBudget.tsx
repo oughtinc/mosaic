@@ -1,10 +1,12 @@
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
+import { ReadableDuration } from "./ReadableDuration";
+
 import {
   availableBudgetHeaderFontColor,
   availableBudgetHeaderFontSize,
-} from "../../styles";
+} from "../../../styles";
 
 export class AvailableBudget extends React.Component<any,  any> {
   public render() {
@@ -12,32 +14,23 @@ export class AvailableBudget extends React.Component<any,  any> {
       <span>
         <span
           style={{
+            alignItems: "center",
             color: availableBudgetHeaderFontColor,
+            display: "flex",
             fontSize: availableBudgetHeaderFontSize,
             fontVariant: "small-caps",
             fontWeight: 700,
+            justifyItems: "space-between",
           }}
         >
-          <Glyphicon glyph="piggy-bank" /> budget remaining
+          <Glyphicon glyph="time" style={{ fontSize: "24px", marginRight: "5px" }}/>
+          <span>total remaining</span>
         </span>
-        <br />
-        <span
-          style={{
-            fontSize: "28px",
-          }}
-        >
-          {this.props.totalBudget - this.props.allocatedBudget}
-        </span>
-        {" "}
-        out of
-        {" "}
-        <span
-          style={{
-            fontSize: "28px",
-          }}
-        >
-            {this.props.totalBudget}
-        </span>
+
+        <ReadableDuration
+          durationInMs={(this.props.totalBudget - this.props.allocatedBudget) * 1000}
+          style={{ textAlign: "center" }}
+        />
       </span>
     );
   }
