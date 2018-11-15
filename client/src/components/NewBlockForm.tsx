@@ -105,7 +105,13 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 <Button
                   bsSize="xsmall"
                   bsStyle="default"
-                  disabled={this.props.availableBudget < (Number(this.state.totalBudget) + 90) ? true : false}
+                  disabled={
+                    (this.props.availableBudget - 90) < (Number(this.state.totalBudget) + 90)
+                    ?
+                    true
+                    :
+                    false
+                  }
                   style={{ marginRight: "5px", marginTop: "10px" }}
                   onClick={() => {
                     this.setState({
@@ -118,7 +124,13 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 <Button
                   bsSize="xsmall"
                   bsStyle="default"
-                  disabled={this.props.availableBudget < (Number(this.state.totalBudget) * 2) ? true : false}
+                  disabled={
+                    (this.props.availableBudget - 90) < (Number(this.state.totalBudget) * 2)
+                    ?
+                    true
+                    :
+                    false
+                  }
                   style={{ marginRight: "5px", marginTop: "10px" }}
                   onClick={() => {
                     this.setState({
