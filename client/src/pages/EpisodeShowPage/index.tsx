@@ -403,6 +403,9 @@ export class WorkspaceView extends React.Component<any, any> {
                       availableBudget={
                         workspace.totalBudget - workspace.allocatedBudget
                       }
+                      parentTotalBudget={
+                        workspace.totalBudget
+                      }
                       changeOrder={newOrder => {
                         this.props.updateWorkspaceChildren({
                           variables: {
