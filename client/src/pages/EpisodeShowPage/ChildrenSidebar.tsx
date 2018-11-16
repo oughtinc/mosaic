@@ -96,13 +96,7 @@ export class Child extends React.Component<any, any> {
             <Button
               bsSize="xsmall"
               bsStyle="default"
-              disabled={
-                this.props.availableBudget - 90 < 90
-                ?
-                true
-                :
-                false
-              }
+              disabled={this.props.availableBudget - 90 < 90}
               style={{ marginRight: "5px" }}
               onClick={() => {
                 this.props.onUpdateChildTotalBudget({
@@ -118,18 +112,12 @@ export class Child extends React.Component<any, any> {
             <Button
               bsSize="xsmall"
               bsStyle="default"
-              disabled={
-                this.props.availableBudget - Number(this.props.workspace.totalBudget) < 90
-                ?
-                true
-                :
-                false
-              }
+              disabled={this.props.availableBudget - this.props.workspace.totalBudget < 90}
               style={{ marginRight: "5px" }}
               onClick={() => {
                 this.props.onUpdateChildTotalBudget({
                   childId: workspace.id,
-                  totalBudget: Number(workspace.totalBudget) * 2,
+                  totalBudget: workspace.totalBudget * 2,
                 });
               }}
             >
