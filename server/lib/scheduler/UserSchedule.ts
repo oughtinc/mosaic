@@ -30,11 +30,14 @@ class UserSchedule {
   }
 
   public hasUserWorkedOnWorkspace(workspace) {
+    console.log("this.userSchedule", this.userSchedule);
     return _.some(this.userSchedule, assignment => assignment.getWorkspace().id === workspace.id);
   }
 
   public isUserCurrentlyWorkingOnWorkspace(workspace) {
     return (
+      this.lastWorkedOnWorkspace()
+      &&
       this.lastWorkedOnWorkspace().id === workspace.id
       &&
       this.isActiveInLastWorkspace()

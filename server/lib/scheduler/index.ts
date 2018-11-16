@@ -23,6 +23,7 @@ const scheduler = new Scheduler({
   fetchAllWorkspacesInTree,
   fetchAllRootWorkspaces: async () => await Workspace.findAll({
     where: {
+      isEligibleForAssignment: true,
       parentId: null,
     }
   }),

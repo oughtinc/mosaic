@@ -2,7 +2,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import styled from "styled-components";
 
-import { Button, Badge } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
@@ -10,6 +10,7 @@ import {
   WorkspaceBlockRelation,
   WorkspaceRelationTypes
 } from "./WorkspaceRelations";
+import { ChildBudgetBadge } from "./ChildBudgetBadge";
 import { ChildBudgetForm } from "./ChildBudgetForm";
 import { Auth } from "../../auth";
 
@@ -101,14 +102,13 @@ export class Child extends React.Component<any, any> {
                   this.setState({ showChildBudgetForm: true });
                 }}
               >
-                Edit Allocation
+                Edit Time
               </Button>
             )}
           <div style={{ float: "right" }}>
-            <Badge>
-              {workspace.totalBudget - workspace.allocatedBudget} /{" "}
-              {workspace.totalBudget}
-            </Badge>
+            <ChildBudgetBadge
+              totalBudget={workspace.totalBudget}
+            />
           </div>
         </div>
         {this.state.showChildBudgetForm && (

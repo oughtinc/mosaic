@@ -2,6 +2,7 @@ import * as models from "../models";
 import * as _ from "lodash";
 import { resolver, attributeFields } from "graphql-sequelize";
 import {
+  GraphQLBoolean,
   GraphQLObjectType,
   GraphQLNonNull,
   GraphQLFloat,
@@ -121,7 +122,7 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
       // update cache
       userFromAuthToken.cache[accessToken] = {
         data,
-        timestamp: Date.now(),
+        timestamp: Date.now()
       };
 
       return resolve(data);
@@ -215,6 +216,18 @@ const schema = new GraphQLSchema({
           return workspace.update({ childWorkspaceOrder }, { event });
         }
       },
+      updateWorkspaceStaleness: {
+        type: workspaceType,
+        args: {
+          id: { type: GraphQLString },
+          isStale: { type: GraphQLBoolean }
+        },
+        resolve: async (_, { id, isStale }) => {
+          const workspace = await models.Workspace.findById(id);
+          const event = await models.Event.create();
+          return workspace.update({ isStale }, { event });
+        }
+      },
       createWorkspace: {
         type: workspaceType,
         args: {
@@ -289,6 +302,66 @@ const schema = new GraphQLSchema({
           });
         }
       },
+      increaseAllocatedBudget: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+          changeToBudget: { type: GraphQLInt }
+        },
+        resolve: async (_, { workspaceId, changeToBudget }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update allocated budet."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          const updatedTimeBudget = Math.min(
+            workspace.totalBudget,
+            workspace.allocatedBudget + changeToBudget,
+          );
+          await workspace.update({ allocatedBudget: updatedTimeBudget });
+        }
+      },
+      updateWorkspaceIsPublic: {
+        type: workspaceType,
+        args: {
+          isPublic: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { isPublic, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to toggle workspace visiblity."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to toggle workspace visiblity"
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isPublic });
+        }
+      },
+      updateWorkspaceIsEligible: {
+        type: workspaceType,
+        args: {
+          isEligible: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { isEligible, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update workspace eligibility."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isEligibleForAssignment: isEligible });
+        }
+      },
       findNextWorkspace: {
         type: workspaceType,
         resolve: async (_, args, context) => {
@@ -299,10 +372,12 @@ const schema = new GraphQLSchema({
             );
           }
           await scheduler.assignNextWorkspace(user.user_id);
-          const workspaceId = await scheduler.getIdOfCurrentWorkspace(user.user_id);
+          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
+            user.user_id
+          );
           return { id: workspaceId };
         }
-      },
+      }
     }
   })
 });
