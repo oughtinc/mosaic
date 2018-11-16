@@ -196,6 +196,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                     <Button
                       bsSize="xsmall"
                       bsStyle="default"
+                      disabled={this.props.availableBudget - 90 < 90}
                       style={{ marginRight: "5px", marginTop: "10px" }}
                       onClick={() => {
                         this.setState({
@@ -271,7 +272,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                     <Button
                       bsSize="xsmall"
                       bsStyle="default"
-                      disabled={this.props.availableBudget < 90 ? true : false}
+                      disabled={this.props.availableBudget - 90 < 90}
                       style={{ marginTop: "10px" }}
                       onClick={() => {
                         this.setState({
@@ -287,13 +288,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               <Button
                 bsSize="xsmall"
                 bsStyle="primary"
-                disabled={
-                  this.props.availableBudget - 90 < Number(this.state.totalBudget)
-                  ?
-                  true
-                  :
-                  false
-                }
+                disabled={this.props.availableBudget - 90 < this.state.totalBudget}
                 type="submit"
                 onClick={this.onSubmit}
                 style={{ marginTop: "10px" }}
