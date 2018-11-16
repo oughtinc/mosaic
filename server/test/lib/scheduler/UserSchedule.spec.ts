@@ -16,21 +16,6 @@ describe("UserSchedule class", function() {
     this.userSchedule = new UserSchedule(USER_ID);
   });
 
-  describe("hasUserBeenAssignedToAnyWorkspaces method", function() {
-    context("with a user that has not been assigned to workspace", function() {
-      it("returns false", function() {
-        expect(this.userSchedule.hasUserBeenAssignedToAnyWorkspaces()).to.equal(false);
-      });
-    });
-
-    context("with a user that has been assigned to a workspace", function() {
-      it("returns true", function() {
-        this.userSchedule.assignWorkspace(workspaces[0]);
-        expect(this.userSchedule.hasUserBeenAssignedToAnyWorkspaces()).to.equal(true);
-      });
-    });
-  });
-
   describe("getMostRecentAssignment method", function() {
     context("with a user that has not been assigned to workspace", function() {
       it("returns undefined", function() {

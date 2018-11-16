@@ -43,33 +43,6 @@ describe("Scheduler class", function() {
     this.clock.restore();
   });
 
-  describe("filterByEligibility method", function() {
-    it("excludes workspaces currently being worked on", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
-
-      const result = await this.scheduler.filterByEligibility(workspaces);
-      expect(result).to.have.deep.members(workspaces.filter(w => w !== workspaces.get("1-1")));
-    });
-
-    it("doesn't exclude a workspace that was worked on but time limit has passed", async function() {
-      this.schedule .assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE + 100);
-
-      const result = await this.scheduler.filterByEligibility(workspaces);
-      expect(result).to.have.deep.members(workspaces);
-    });
-
-    it("doesn't exclude a workspace that was worked on but user has started different workspace", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE / 2);
-
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
-
-      const result = await this.scheduler.filterByEligibility(workspaces);
-      expect(result).to.have.deep.members(workspaces.filter(w => w !== workspaces.get("2")));
-    });
-  });
-
   describe("filterByWhetherNotYetWorkedOn", function() {
     it("works in straightforward case", async function() {
       this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
@@ -79,16 +52,6 @@ describe("Scheduler class", function() {
       const result = await this.scheduler.filterByWhetherNotYetWorkedOn(workspaces);
       expect(result).to.have.deep.members(workspaces.filter(w => (
         w !== workspaces.get("1-1") && w !== workspaces.get("2")
-      )));
-    });
-  });
-
-  describe("filterByWhetherHasRemainingBudget", function() {
-    it("works in straightforward case", function() {
-      const result = this.scheduler.filterByWhetherHasRemainingBudget(workspaces);
-      expect(result).to.have.deep.members(workspaces.filter(w => (
-        w !== workspaces.get("1") && w !== workspaces.get("1-1") && w !== workspaces.get("1-1-1")
-        && w !== workspaces.get("5-4")
       )));
     });
   });

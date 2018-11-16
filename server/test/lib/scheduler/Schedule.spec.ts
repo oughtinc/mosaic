@@ -148,41 +148,6 @@ describe("Schedule class", function() {
     });
   });
 
-  describe("getTimestampWorkspaceLastWorkedOn", function() {
-    it("works in straightforward case", async function() {
-      this.clock.tick(100);
-      await this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
-      expect(this.schedule.getTimestampWorkspaceLastWorkedOn(workspaces.get("1"))).to.equal(100);
-    });
-
-    it("works in case when assigned multiple times", async function() {
-      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1"));
-      this.clock.tick(ONE_MINUTE);
-      this.clock.tick(100);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1"));
-
-      expect(this.schedule.getTimestampWorkspaceLastWorkedOn(workspaces.get("1"))).to.equal(ONE_MINUTE + 100);
-    });
-  });
-
-  describe("getLeastRecentlyActiveWorkspace", function() {
-    it("works in straightforward case", async function() {
-      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1-1-1"));
-
-      const result = this.schedule.getLeastRecentlyActiveWorkspace([workspaces.get("1-1"), workspaces.get("1-1-1")]);
-      expect(result).to.equal(workspaces.get("1-1"));
-    });
-
-    it("works in case where only one has never been worked on", async function() {
-      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
-
-      const result = this.schedule.getLeastRecentlyActiveWorkspace([workspaces.get("1-1"), workspaces.get("1-1-1")]);
-      expect(result).to.equal(workspaces.get("1-1-1"));
-    });
-  });
-
   describe("getTreesWorkedOnLeastRecently", function() {
     it("works in straightforward case", async function() {
       await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
@@ -202,37 +167,6 @@ describe("Schedule class", function() {
       const result = await this.schedule.getTreesWorkedOnLeastRecently([workspaces.get("1"), workspaces.get("2")]);
       expect(result.length).to.equal(1);
       expect(result).to.have.deep.members([workspaces.get("2")]);
-    });
-  });
-
-  describe("isInTreeWorkedOnLeastRecently", function() {
-    it("works in straightforward case", async function() {
-      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1"));
-      this.clock.tick(ONE_MINUTE);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
-
-      const result = await this.schedule.isInTreeWorkedOnLeastRecently([workspaces.get("1"), workspaces.get("2")], workspaces.get("1-1"));
-      expect(result).to.equal(true);
-    });
-
-    it("works in complicated case", async function() {
-      this.clock.tick(1);
-      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1-1"));
-      this.clock.tick(1);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2-1"));
-      this.clock.tick(1);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("3"));
-      this.clock.tick(1);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
-      this.clock.tick(1);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2-2"));
-      this.clock.tick(1);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1"));
-      this.clock.tick(1);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("3"));
-
-      const result = await this.schedule.isInTreeWorkedOnLeastRecently([workspaces.get("1"), workspaces.get("2"), workspaces.get("3")], workspaces.get("2-1"));
-      expect(result).to.equal(true);
     });
   });
 });
