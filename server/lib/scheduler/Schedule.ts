@@ -26,7 +26,12 @@ class Schedule {
       return;
     }
 
-    this.schedule.set(userId, new UserSchedule({ timeLimit: this.timeLimit, userId }));
+    const userSchedule = new UserSchedule({
+      rootParentCache: this.rootParentCache,
+      timeLimit: this.timeLimit, userId
+    });
+
+    this.schedule.set(userId, userSchedule);
   }
 
   private getUserSchedule(userId) {
@@ -36,7 +41,7 @@ class Schedule {
   public async assignWorkspaceToUser(userId, workspace, startAtTimestamp = Date.now()) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
-    userSchedule.assignWorkspace(workspace, startAtTimestamp);
+    await userSchedule.assignWorkspace(workspace, startAtTimestamp);
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
   }
@@ -48,16 +53,6 @@ class Schedule {
 
     const userSchedule = this.getUserSchedule(userId);
     return userSchedule.getMostRecentAssignment();
-  }
-
-  /*
-    NOTE: this only considers the trees associated with the rootWorkspaces
-    argument
-  */
-  public async isInTreeWorkedOnLeastRecently(rootWorkspaces, workspace) {
-    const treesWorkedOnLeastRecently = this.getTreesWorkedOnLeastRecently(rootWorkspaces);
-    const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
-    return !!(treesWorkedOnLeastRecently.find(rootWorkspace => rootWorkspace.id === rootParent.id));
   }
 
   /*
@@ -86,6 +81,12 @@ class Schedule {
     return leastRecentlyWorkedOnTrees;
   }
 
+  public getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces, userId) {
+    this.createUserScheduleIfNotCreated(userId);
+    const userSchedule = this.getUserSchedule(userId);
+    return userSchedule.getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces);
+  }
+
   public isWorkspaceCurrentlyBeingWorkedOn(workspace) {
     return _.some(
       [...this.schedule],
@@ -99,20 +100,6 @@ class Schedule {
       ([userId, userSchedule]) => userSchedule.hasUserWorkedOnWorkspace(workspace)
     );
   }
-
-  public getTimestampWorkspaceLastWorkedOn(workspace) {
-    const timestampsWorkspaceLastWorkedOn =
-      [...this.schedule].map(
-        ([userId, userSchedule]) => userSchedule.getTimestampWorkspaceLastWorkedOn(workspace)
-      );
-
-    return _.max(timestampsWorkspaceLastWorkedOn);
-  }
-
-  public getLeastRecentlyActiveWorkspace(workspaces) {
-    return _.minBy(workspaces, w => this.getTimestampWorkspaceLastWorkedOn(w));
-  }
-
 }
 
 export { Schedule };
