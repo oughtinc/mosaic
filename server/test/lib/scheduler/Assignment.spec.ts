@@ -10,13 +10,13 @@ describe("Assignment class", function() {
 
     this.assignment = new Assignment({
       userId: USER_ID,
-      workspace: workspaces[0],
+      workspace: workspaces.get("1"),
       startedAtTimestamp: this.startedAtTimestamp,
     });
   });
 
   it("can retrieve workspace", function() {
-    expect(this.assignment.getWorkspace()).to.equal(workspaces[0]);
+    expect(this.assignment.getWorkspace()).to.equal(workspaces.get("1"));
   });
 
   it("records the timestamp at which the assignment started", function() {

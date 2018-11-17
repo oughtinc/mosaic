@@ -6,10 +6,12 @@ import { Schedule } from "../../../lib/scheduler/Schedule";
 import { Scheduler } from "../../../lib/scheduler/Scheduler";
 
 import {
+  timeLimit,
   USER_ID,
   USER_ID_1,
   USER_ID_2,
   workspaces,
+  remainingBudgetAmongDescendantsCacheFake,
   rootParentCacheFake
 } from "./utils";
 
@@ -26,14 +28,16 @@ describe("Scheduler class", function() {
     this.clock = sinon.useFakeTimers();
     this.schedule = new Schedule({
       rootParentCache: rootParentCacheFake,
-      timeLimit: ONE_MINUTE,
+      timeLimit,
     });
 
     this.scheduler = new Scheduler({
       fetchAllRootWorkspaces: fetchAllRootWorkspacesFake,
       fetchAllWorkspacesInTree: fetchAllWorkspacesInTreeFake,
+      remainingBudgetAmongDescendantsCache: remainingBudgetAmongDescendantsCacheFake,
       rootParentCache: rootParentCacheFake,
       schedule: this.schedule,
+      timeLimit,
     });
   };
 
@@ -62,7 +66,8 @@ describe("Scheduler class", function() {
       this.clock.tick(ONE_MINUTE / 2);
       this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
 
-      const result = await this.scheduler.getActionableWorkspaces();
+      const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
+
       expect(result).to.have.deep.members(workspaces.filter(w =>
         w === workspaces.get("3")
         ||
