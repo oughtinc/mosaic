@@ -27,7 +27,7 @@ const fetchAllWorkspacesInTreeFake = rootWorkspace => workspaces.filter(
   w => w.id[0] === rootWorkspace.id
 );
 
-describe.only("Scheduler class", function() {
+describe("Scheduler class", function() {
   const resetBeforeTesting = function() {
     this.clock = sinon.useFakeTimers();
     this.schedule = new Schedule({

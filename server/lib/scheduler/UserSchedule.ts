@@ -60,20 +60,20 @@ class UserSchedule {
   }
 
   public isUserCurrentlyWorkingOnWorkspace(workspace) {
-    const lastWorkedOnWorkspace = this.lastWorkedOnWorkspace();
+    const getLastWorkedOnWorkspace = this.getLastWorkedOnWorkspace();
 
-    if (!lastWorkedOnWorkspace) {
+    if (!getLastWorkedOnWorkspace) {
       return false;
     }
 
     return (
-      this.lastWorkedOnWorkspace().id === workspace.id
+      getLastWorkedOnWorkspace.id === workspace.id
       &&
       this.isActiveInLastWorkspace()
     );
   }
 
-  private lastWorkedOnWorkspace() {
+  private getLastWorkedOnWorkspace() {
     const lastWorkedOnAssignment = this.getMostRecentAssignment();
 
     if (lastWorkedOnAssignment) {
