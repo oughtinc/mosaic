@@ -100,6 +100,72 @@ describe("Schedule class", function() {
     });
   });
 
+  describe("getTreesWorkedOnLeastRecently", function() {
+    const rootWorkspaces = [
+      workspaces.get("1"),
+      workspaces.get("2"),
+      workspaces.get("3"),
+      workspaces.get("4"),
+      workspaces.get("5"),
+    ];
+
+    it("works in straightforward case", async function() {
+      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
+      this.clock.tick(ONE_MINUTE);
+      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
+      const result = await this.schedule.getTreesWorkedOnLeastRecently(rootWorkspaces);
+      expect(result.length).to.equal(3);
+      expect(result).to.have.deep.members([workspaces.get("3"), workspaces.get("4"), workspaces.get("5")]);
+    });
+
+    it("works in more complicated case", async function() {
+      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
+      this.clock.tick(ONE_MINUTE);
+      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
+      this.clock.tick(100);
+      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1-1-1"));
+      this.clock.tick(100);
+      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("5-1"));
+
+      const result = await this.schedule.getTreesWorkedOnLeastRecently(rootWorkspaces);
+      expect(result.length).to.equal(2);
+      expect(result).to.have.deep.members([workspaces.get("3"), workspaces.get("4")]);
+    });
+  });
+
+  describe("getTreesWorkedOnLeastRecentlyByUser", function() {
+    const rootWorkspaces = [
+      workspaces.get("1"),
+      workspaces.get("2"),
+      workspaces.get("3"),
+      workspaces.get("4"),
+      workspaces.get("5"),
+    ];
+
+    it("works in straightforward case", async function() {
+      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
+      this.clock.tick(ONE_MINUTE);
+      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
+      const result = await this.schedule.getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces, USER_ID_1);
+      expect(result.length).to.equal(4);
+      expect(result).to.have.deep.members([workspaces.get("2"), workspaces.get("3"), workspaces.get("4"), workspaces.get("5")]);
+    });
+
+    it("works in more complicated case", async function() {
+      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
+      this.clock.tick(ONE_MINUTE);
+      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
+      this.clock.tick(100);
+      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1-1-1"));
+      this.clock.tick(100);
+      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("5-1"));
+
+      const result = await this.schedule.getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces, USER_ID_1);
+      expect(result.length).to.equal(3);
+      expect(result).to.have.deep.members([workspaces.get("2"), workspaces.get("3"), workspaces.get("4")]);
+    });
+  });
+
   describe("isWorkspaceCurrentlyBeingWorkedOn", function() {
     it("works in straightforward case", async function() {
       await this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
@@ -148,25 +214,4 @@ describe("Schedule class", function() {
     });
   });
 
-  describe("getTreesWorkedOnLeastRecently", function() {
-    it("works in straightforward case", async function() {
-      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
-      const result = await this.schedule.getTreesWorkedOnLeastRecently([workspaces.get("1"), workspaces.get("2")]);
-      expect(result).to.have.deep.members([workspaces.get("1")]);
-    });
-
-    it("works in more complicated case", async function() {
-      await this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
-      this.clock.tick(100);
-      await this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("1-1-1"));
-
-      const result = await this.schedule.getTreesWorkedOnLeastRecently([workspaces.get("1"), workspaces.get("2")]);
-      expect(result.length).to.equal(1);
-      expect(result).to.have.deep.members([workspaces.get("2")]);
-    });
-  });
 });
