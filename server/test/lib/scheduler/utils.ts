@@ -23,7 +23,9 @@ export const rootParentCacheFake = {
 export const remainingBudgetAmongDescendantsCacheFake = {
   clearRemainingBudgetAmongDescendantsCache() {},
 
-  getRemainingBudgetAmongDescendants(id){
+  getRemainingBudgetAmongDescendants(workspace){
+    const id = workspace.id;
+    
     if (id === "1") return 290 + 190;
     if (id === "1-1") return 190;
     if (id === "1-1-1") return 0;
