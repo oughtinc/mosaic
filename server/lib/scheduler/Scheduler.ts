@@ -51,11 +51,8 @@ class Scheduler {
 
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
-      console.log("leastRecentlyWorkedOnTreesToConsider", leastRecentlyWorkedOnTreesToConsider);
       const randomlySelectedTree = pickRandomItemFromArray(leastRecentlyWorkedOnTreesToConsider);
-      console.log("randomlySelectedTree", randomlySelectedTree);
       const actionableWorkspaces = await this.getActionableWorkspacesForTree(userId, randomlySelectedTree);
-      console.log("actionableWorkspaces", actionableWorkspaces);
 
       if (actionableWorkspaces.length > 0) {
         return actionableWorkspaces;
@@ -70,11 +67,9 @@ class Scheduler {
 
   private async getActionableWorkspacesForTree(userId, rootWorkspace) {
     const workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
-    console.log("--  workspacesInTree", workspacesInTree);
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
-    console.log("--  workspacesNotCurrentlyBeingWorkedOn", workspacesNotCurrentlyBeingWorkedOn);
     const workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(workspacesNotCurrentlyBeingWorkedOn);
-    console.log("--  workspacesWithAtLeastMinBudget", workspacesWithAtLeastMinBudget);
+
     let eligibleWorkspaces = workspacesWithAtLeastMinBudget;
 
     const staleWorkspaces = await this.filterByStaleness(workspacesWithAtLeastMinBudget);
@@ -85,7 +80,6 @@ class Scheduler {
     }
 
     const workspaceWithLeastRemainingBudgetAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
-    console.log("--  workspaceWithLeastRemainingBudgetAmongDescendants", workspaceWithLeastRemainingBudgetAmongDescendants);
 
     const finalWorkspaces = workspaceWithLeastRemainingBudgetAmongDescendants;
 
@@ -104,7 +98,6 @@ class Scheduler {
       workspaces,
       async w => {
         const remainingBudgetAmongDescendants = await this.remainingBudgetAmongDescendantsCache.getRemainingBudgetAmongDescendants(w);
-        console.log("-- -- remainingBudgetAmongDescendants", w.id, remainingBudgetAmongDescendants);
         return {
             remainingBudgetAmongDescendants,
             workspace: w,
@@ -144,7 +137,6 @@ class Scheduler {
   }
 
   private hasMinRemaining(workspace) {
-    console.log("-- -- ", workspace.totalBudget - workspace.allocatedBudget, this.timeLimit / 1000);
     return (workspace.totalBudget - workspace.allocatedBudget) >= (this.timeLimit / 1000);
   }
 }

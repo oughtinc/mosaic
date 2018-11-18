@@ -6,7 +6,9 @@ import * as sinon from "sinon";
 import { Schedule } from "../../../lib/scheduler/Schedule";
 
 const { Scheduler } = proxquire("../../../lib/scheduler/Scheduler", {
-  "../utils/pickRandomItemFromArray": {pickRandomItemFromArray: arr => console.log("pickRandomItemFromArray", arr) || arr.concat().sort()[0]},
+  "../utils/pickRandomItemFromArray": {
+    pickRandomItemFromArray: arr => arr.concat().sort()[0],
+  },
 });
 
 import {
@@ -50,6 +52,10 @@ describe("Scheduler class", function() {
   after(function() {
     this.clock.restore();
   });
+
+  // TODO: Add more tests for other Scheduler class methods
+  // As it is, by testing getActionableWorkspaces, we indirectly test the
+  // other Scheduler class methods
 
   describe("filterByWhetherNotYetWorkedOn", function() {
     it("works in straightforward case", async function() {
