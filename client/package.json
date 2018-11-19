@@ -68,7 +68,7 @@
     "@types/react": "^16.0.40",
     "@types/react-bootstrap": "^0.32.6",
     "@types/react-dom": "^16.0.4",
-    "@types/react-router": "^4.0.22",
+    "@types/react-router": "^4.4.1",
     "@types/react-router-dom": "^4.2.4",
     "@types/recompose": "^0.24.5",
     "immutable": "^3.8.2",
