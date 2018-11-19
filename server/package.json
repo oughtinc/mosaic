@@ -71,7 +71,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "babel-preset-typescript": "^7.0.0-alpha.19",
     "babel-register": "^6.11.6",
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "concurrently": "^4.0.1",
     "immutable": "^3.8.2",
     "mocha": "^3.0.1",
