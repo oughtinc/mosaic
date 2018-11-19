@@ -10,6 +10,7 @@ import {
   USER_ID_2,
   workspaces,
   rootParentCacheFake,
+  timeLimit,
 } from "./utils";
 
 const ONE_MINUTE = 60 * 1000;
@@ -19,7 +20,7 @@ describe("Schedule class", function() {
     this.clock = sinon.useFakeTimers();
     this.schedule = new Schedule({
       rootParentCache: rootParentCacheFake,
-      timeLimit: ONE_MINUTE,
+      timeLimit,
     });
   });
 
@@ -169,6 +170,7 @@ describe("Schedule class", function() {
   describe("isWorkspaceCurrentlyBeingWorkedOn", function() {
     it("works in straightforward case", async function() {
       await this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
+      this.clock.tick(ONE_MINUTE);
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(true);
     });
 
@@ -176,10 +178,10 @@ describe("Schedule class", function() {
       await this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(true);
 
-      this.clock.tick(ONE_MINUTE - 1);
+      this.clock.tick(ONE_MINUTE);
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(true);
 
-      this.clock.tick(2);
+      this.clock.tick(ONE_MINUTE);
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1"))).to.equal(false);
     });
 
@@ -187,17 +189,17 @@ describe("Schedule class", function() {
       await this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1"))).to.equal(true);
 
-      this.clock.tick(ONE_MINUTE / 2);
+      this.clock.tick(ONE_MINUTE);
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1"))).to.equal(true);
 
       await this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1"))).to.equal(false);
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1-1"))).to.equal(true);
 
-      this.clock.tick(ONE_MINUTE - 1);
+      this.clock.tick(ONE_MINUTE);
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1-1"))).to.equal(true);
 
-      this.clock.tick(2);
+      this.clock.tick(ONE_MINUTE);
       expect(this.schedule.isWorkspaceCurrentlyBeingWorkedOn(workspaces.get("1-1-1"))).to.equal(false);
     });
   });
