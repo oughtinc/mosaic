@@ -18,7 +18,7 @@ export function removePointerExport({
   });
 
   if (!idOfPointerToRemove) {
-    console.error("Text cursor is not currently in an export");
+    console.error("Could not determine id of pointer to remove");
     return;
   }
 
@@ -75,6 +75,7 @@ function useFragmentToFindIdOfPointerToRemove(fragment: any) {
 
   const containingExport = containingPointerExportAncestor(curNode, fragment);
   if (!containingExport) {
+    console.error("Text cursor is not currently in an export");
     return undefined;
   }
 
