@@ -3,9 +3,8 @@ function isPointerExport(node: any) {
 }
 
 export function containingPointerExport(node: any, document: any) {
-  let curNode = node;
   const closestExportOrRoot = getClosestExportOrRoot(node, document);
-  return isPointerExport(closestExportOrRoot) ? curNode : undefined;
+  return isPointerExport(closestExportOrRoot) ? closestExportOrRoot : undefined;
 }
 
 export function getClosestExportOrRoot(node: any, document: any) {

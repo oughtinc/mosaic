@@ -3,9 +3,8 @@ function isInline(node: any) {
 }
 
 export function containingInlineAncestor(node: any, document: any) {
-  let curNode = node;
   const closestInlineOrRoot = getClosestInlineOrRoot(node, document);
-  return isInline(closestInlineOrRoot) ? curNode : undefined;
+  return isInline(closestInlineOrRoot) ? closestInlineOrRoot : undefined;
 }
 
 export function getClosestInlineOrRoot(node: any, document: any) {
