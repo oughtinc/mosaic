@@ -79,6 +79,14 @@ const UPDATE_WORKSPACE = gql`
   }
 `;
 
+const TRANSFER_REMAINING_BUDGET_TO_PARENT = gql`
+  mutation transferRemainingBudgetToParent($id: String!) {
+    transferRemainingBudgetToParent(id: $id) {
+      id
+    }
+  }
+`;
+
 const NEW_CHILD = gql`
   mutation createChildWorkspace(
     $workspaceId: String
@@ -251,6 +259,11 @@ export class FormPagePresentational extends React.Component<any, any> {
             hasParent={!!workspace.parentId}
             hasTimer={hasTimer}
             hasTimerEnded={this.state.hasTimerEnded}
+            transferRemainingBudgetToParent={() =>
+              this.props.transferRemainingBudgetToParent({
+                variables: { id: workspace.id }
+              })
+            }
             updateStaleness={isStale =>
               this.props.updateWorkspaceStaleness({
                 variables: { id: workspace.id, isStale }
@@ -480,6 +493,12 @@ export const EpisodeShowPage = compose(
     options: {
       refetchQueries: ["workspace"]
     }
+  }),
+  graphql(TRANSFER_REMAINING_BUDGET_TO_PARENT, {
+   name: "transferRemainingBudgetToParent",
+   options: {
+     refetchQueries: ["workspace"]
+   }
   }),
   connect(
     mapStateToProps,

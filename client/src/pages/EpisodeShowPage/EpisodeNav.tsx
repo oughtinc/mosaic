@@ -27,10 +27,17 @@ interface EpisodeNavProps {
   hasParent: boolean;
   hasTimer: boolean;
   hasTimerEnded: boolean;
+  transferRemainingBudgetToParent(): void;
   updateStaleness(isStale: boolean): void;
 }
 
-const EpisodeNav = ({ hasParent, hasTimer, hasTimerEnded, updateStaleness }: EpisodeNavProps) => (
+const EpisodeNav = ({
+  hasParent,
+  hasTimer,
+  hasTimerEnded,
+  transferRemainingBudgetToParent,
+  updateStaleness,
+ }: EpisodeNavProps) => (
   <EpisodeNavContainer>
     {
       hasTimer
@@ -51,6 +58,17 @@ const EpisodeNav = ({ hasParent, hasTimer, hasTimerEnded, updateStaleness }: Epi
               label="Done for now"
               navHook={() => updateStaleness(false)}
             />
+            {
+             hasParent
+             &&
+             <NextWorkspaceBtn
+               label="Done, and return budget"
+               navHook={() => {
+                 transferRemainingBudgetToParent();
+                 updateStaleness(false);
+               }}
+             />
+            }
           </div>
       )
       :
