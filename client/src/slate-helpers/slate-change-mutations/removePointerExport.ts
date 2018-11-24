@@ -1,4 +1,4 @@
-import { containingPointerExportAncestor } from "../slate-utils/containingPointerExportAncestor";
+import { containingPointerExport } from "../slate-utils/containingPointerExport";
 import { isNestedInExport } from "../slate-utils/isNestedInExport";
 import { getInlinesAsArray } from "../slate-utils/getInlinesAsArray";
 
@@ -73,7 +73,7 @@ function useFragmentToFindIdOfPointerToRemove(fragment: any) {
     curNode = curNode.nodes.get(0);
   }
 
-  const containingExport = containingPointerExportAncestor(curNode, fragment);
+  const containingExport = containingPointerExport(curNode, fragment);
   if (!containingExport) {
     console.error("Text cursor is not currently in an export");
     return undefined;
