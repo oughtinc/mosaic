@@ -1,16 +1,7 @@
-import gql from "graphql-tag";
 import * as React from "react";
-import { graphql } from "react-apollo";
-import { compose } from "recompose";
 import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
-const ORACLE_MODE_QUERY = gql`
-  query oracleModeQuery {
-    oracleMode
-  }
-`;
 
 interface NextWorkspaceBtnProps {
   label: string;
@@ -44,12 +35,12 @@ interface EpisodeNavProps {
   hasParent: boolean;
   hasTimer: boolean;
   hasTimerEnded: boolean;
+  isInOracleMode: boolean;
   isTakingABreak?: boolean;
-  oracleModeQuery: any;
-  depleteBudget?(): void;
+  depleteBudget(): void;
   transferRemainingBudgetToParent?(): void;
   updateStaleness?(isStale: boolean): void;
-  updateIsEligibleForOracle?(isStale: boolean): void;
+  updateIsEligibleForOracle(isStale: boolean): void;
 }
 
 // Note that there in the normal functioning of the app,
@@ -63,6 +54,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       hasParent,
       hasTimer,
       hasTimerEnded,
+      isInOracleMode,
       isTakingABreak,
       depleteBudget,
       transferRemainingBudgetToParent,
@@ -70,22 +62,20 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       updateIsEligibleForOracle,
     } = this.props;
 
-    console.log("episode nav props", this.props.oracleModeQuery, this.props.oracleModeQuery.oracleMode);
-
-    if (this.props.oracleModeQuery.oracleMode) {
+    if (isInOracleMode) {
       return (
         <EpisodeNavContainer style={{ backgroundColor: "#ffe8e8" }}>
           <NextWorkspaceBtn
             label="Done (leave budget)"
             navHook={() => {
-              updateIsEligibleForOracle && updateIsEligibleForOracle(false);
+              updateIsEligibleForOracle(false);
             }}
           />
           <NextWorkspaceBtn
             label="Done (take budget)"
             navHook={() => {
-              depleteBudget && depleteBudget();
-              updateIsEligibleForOracle && updateIsEligibleForOracle(false);
+              depleteBudget();
+              updateIsEligibleForOracle(false);
             }}
           />
         </EpisodeNavContainer>
@@ -142,10 +132,6 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
   }
 }
 
-const EpisodeNav: any = compose(
-  graphql(ORACLE_MODE_QUERY, {
-    name: "oracleModeQuery",
-  }),
-)(EpisodeNavPresentational);
+const EpisodeNav: any = EpisodeNavPresentational;
 
 export { EpisodeNav };

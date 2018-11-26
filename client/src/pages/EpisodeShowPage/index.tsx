@@ -41,6 +41,12 @@ import {
   workspaceViewQuestionFontSize
 } from "../../styles";
 
+const ORACLE_MODE_QUERY = gql`
+  query oracleModeQuery {
+    oracleMode
+  }
+`;
+
 const WORKSPACE_QUERY = gql`
   query workspace($id: String!) {
     workspace(id: $id) {
@@ -49,6 +55,7 @@ const WORKSPACE_QUERY = gql`
       creatorId
       isPublic
       isStale
+      isEligibleForOracle
       childWorkspaceOrder
       connectedPointers
       totalBudget
@@ -57,6 +64,7 @@ const WORKSPACE_QUERY = gql`
         id
         totalBudget
         creatorId
+        isEligibleForOracle
         isPublic
         allocatedBudget
         blocks {
@@ -288,6 +296,7 @@ export class WorkspaceView extends React.Component<any, any> {
       <div>
         {Auth.isAuthenticated() && (
           <EpisodeNav
+            isInOracleMode={this.props.oracleModeQuery.oracleMode}
             hasParent={!!workspace.parentId}
             hasTimer={hasTimer}
             hasTimerEnded={this.state.hasTimerEnded}
@@ -402,6 +411,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      isInOracleMode={this.props.oracleModeQuery.oracleMode}
                       subquestionDraftProps={subquestionDraftProps}
                       isIsolatedWorkspace={isIsolatedWorkspace}
                       workspace={workspace}
@@ -440,6 +450,11 @@ export class WorkspaceView extends React.Component<any, any> {
                           }
                         });
                       }}
+                      updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) =>
+                        this.props.updateWorkspaceIsEligibleForOracle({
+                          variables: { workspaceId, isEligibleForOracle }
+                        })
+                      }
                       ref={input => {
                         if (input && input.editor()) {
                           this.newChildField = input.editor();
@@ -565,6 +580,9 @@ export const EpisodeShowPage = compose(
     options: {
       refetchQueries: ["workspace"]
     }
+  }),
+  graphql(ORACLE_MODE_QUERY, {
+    name: "oracleModeQuery",
   }),
   connect(
     mapStateToProps,

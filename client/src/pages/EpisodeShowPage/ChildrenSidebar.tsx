@@ -145,6 +145,33 @@ export class Child extends React.Component<any, any> {
             />
           </div>
         </div>
+        <div>
+          {
+            Auth.isOracle()
+            &&
+            this.props.isInOracleMode
+            &&
+            <Button
+              bsSize="xsmall"
+              bsStyle={ workspace.isEligibleForOracle ? "info" : "danger" }
+              style={{ marginTop: "5px" }}
+              onClick={() => {
+                this.props.updateIsEligibleForOracle({
+                  isEligibleForOracle: !workspace.isEligibleForOracle,
+                  workspaceId: workspace.id,
+                });
+              }}
+            >
+              {
+                workspace.isEligibleForOracle
+                ?
+                "Make Available to Everyone"
+                :
+                "Restrict Only to Oracles"
+              }
+            </Button>
+          }
+        </div>
         {this.state.showChildBudgetForm && (
           <ChildBudgetForm
             availableBudget={this.props.availableBudget}
@@ -203,6 +230,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
                   }}
                 >
                   <Child
+                    isInOracleMode={this.props.isInOracleMode}
+                    updateIsEligibleForOracle={this.props.updateIsEligibleForOracle}
                     isIsolatedWorkspace={this.props.isIsolatedWorkspace}
                     availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
                     workspace={workspace}
