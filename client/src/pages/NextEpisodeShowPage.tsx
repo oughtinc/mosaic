@@ -4,6 +4,7 @@ import { graphql } from "react-apollo";
 import { compose } from "recompose";
 import { Redirect } from "react-router";
 
+import { Auth } from "../auth";
 import { ContentContainer } from  "../components/ContentContainer";
 
 export class NextEpisodeShowPagePresentational extends React.Component<any, any> {
@@ -30,13 +31,19 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
         <Redirect
           to={{
             pathname: `/workspaces/${this.state.workspaceId}`,
-            search: "?isolated=true&timer=0:1:30",
+            search: (Auth.isOracle() && this.props.oracleModeQuery.oracleMode) ? "" : "?isolated=true&timer=0:1:30",
           }}
         />
       );
     }
   }
 }
+
+const ORACLE_MODE_QUERY = gql`
+  query oracleModeQuery {
+    oracleMode
+  }
+`;
 
 const FIND_NEXT_WORKSPACE_MUTATION = gql`
   mutation findNextWorkspace {
@@ -47,5 +54,8 @@ const FIND_NEXT_WORKSPACE_MUTATION = gql`
 `;
 
 export const NextEpisodeShowPage = compose(
-  graphql(FIND_NEXT_WORKSPACE_MUTATION, { name: "findNextWorkspaceMutation" })
+  graphql(FIND_NEXT_WORKSPACE_MUTATION, { name: "findNextWorkspaceMutation" }),
+  graphql(ORACLE_MODE_QUERY, {
+    name: "oracleModeQuery",
+  })
 )(NextEpisodeShowPagePresentational);

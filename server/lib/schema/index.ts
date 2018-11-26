@@ -125,7 +125,13 @@ function userFromAuthToken(accessToken: string | null): Promise<any | null> {
       }
       const metadataKey = "https://mosaic:auth0:com/app_metadata";
       const isAdmin = user[metadataKey] ? user[metadataKey].is_admin : false;
-      const data = { user_id: user.sub, is_admin: isAdmin };
+      const isOracle = user[metadataKey] ? user[metadataKey].is_oracle : false;
+
+      const data = {
+        user_id: user.sub,
+        is_admin: isAdmin,
+        is_oracle: isOracle,
+       };
 
       // update cache
       userFromAuthToken.cache[accessToken] = {
@@ -401,11 +407,21 @@ const schema = new GraphQLSchema({
             );
           }
 
-          await scheduler.assignNextWorkspace(user.user_id);
-          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
-            user.user_id
-          );
-          return { id: workspaceId };
+          if (user.is_oracle && isInOracleMode.getValue()) {
+            const workspace = await models.Workspace.findOne({
+              where: {
+                isEligibleForAssignment: true,
+                isEligibleForOracle: true,
+              }
+            });
+            return { id: workspace.id };
+          } else {
+            await scheduler.assignNextWorkspace(user.user_id);
+            const workspaceId = await scheduler.getIdOfCurrentWorkspace(
+              user.user_id
+            );
+            return { id: workspaceId };
+          }
         }
       },
       updateWorkspaceIsPublic: {

@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
+import { Auth } from "../../auth";
+
 interface NextWorkspaceBtnProps {
   label: string;
   navHook?: () => void;
@@ -62,7 +64,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       updateIsEligibleForOracle,
     } = this.props;
 
-    if (isInOracleMode) {
+    if (Auth.isOracle() && isInOracleMode) {
       return (
         <EpisodeNavContainer style={{ backgroundColor: "#ffe8e8" }}>
           <NextWorkspaceBtn

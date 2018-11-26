@@ -13,7 +13,6 @@ const NINETY_SECONDS = 90 * 1000;
 
 const fetchAllWorkspacesInTree = async rootWorkspace => {
   let result, children;
-
   if (isInOracleMode.getValue()) {
     result = rootWorkspace.isEligibleForOracle ? [] : [rootWorkspace];
     children = await rootWorkspace.getChildWorkspaces({
