@@ -8,6 +8,7 @@ import { ListOfRootWorkspaces } from "./ListOfRootWorkspaces";
 import { NewRootWorkspaceForm } from "./NewRootWorkspaceForm";
 import { WelcomeMessage } from "./WelcomeMessage";
 import { GetStartedNav } from "./GetStartedNav";
+import { OracleHeader } from "./OracleHeader";
 
 import { ContentContainer } from "../../components/ContentContainer";
 
@@ -26,6 +27,9 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
     return (
       <div>
         {Auth.isAuthenticated() && <GetStartedNav />}
+        {Auth.isOracle() &&
+          <OracleHeader />
+        }
         <ContentContainer>
           {!Auth.isAuthenticated() && <WelcomeMessage />}
 

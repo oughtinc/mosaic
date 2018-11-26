@@ -1,4 +1,5 @@
 import * as models from "../models";
+import { isInOracleMode } from "../globals/isInOracleMode";
 import * as _ from "lodash";
 import { resolver, attributeFields } from "graphql-sequelize";
 import {
@@ -80,6 +81,13 @@ const pointerImportType = makeObjectType(models.PointerImport, [
   ["pointer", () => pointerType, "Pointer"]
 ]);
 
+const oracleModeType = new GraphQLObjectType({
+  name: "OracleMode",
+  fields: {
+    value: { type: GraphQLBoolean },
+  }
+});
+
 const BlockInput = new GraphQLInputObjectType({
   name: "blockInput",
   fields: _.pick(attributeFields(models.Block), "value", "id")
@@ -136,6 +144,12 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
+      oracleMode: {
+        type: GraphQLBoolean,
+        resolve: function () {
+          return isInOracleMode.getValue();
+        },
+      },
       workspaces: {
         type: new GraphQLList(workspaceType),
         args: { where: { type: GraphQLJSON } },
@@ -217,6 +231,13 @@ const schema = new GraphQLSchema({
   mutation: new GraphQLObjectType({
     name: "RootMutationType",
     fields: {
+      updateOracleMode: {
+        type: GraphQLBoolean,
+        args: { oracleMode: { type: GraphQLBoolean } },
+        resolve: function (_, { oracleMode }) {
+          isInOracleMode.setValue(oracleMode);
+        },
+      },
       updateBlocks: {
         type: new GraphQLList(blockType),
         args: { blocks: { type: new GraphQLList(BlockInput) } },
