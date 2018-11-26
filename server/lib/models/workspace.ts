@@ -35,6 +35,11 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      isEligibleForOracle: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false
+      },
       isStale: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
@@ -164,7 +169,7 @@ const WorkspaceModel = (
       { parentId, totalBudget, creatorId, isPublic },
       { event, questionValue: question }
     );
-    
+
     return _workspace;
   };
 

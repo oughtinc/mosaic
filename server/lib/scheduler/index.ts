@@ -1,3 +1,4 @@
+import { isInOracleMode } from "../globals/isInOracleMode";
 import { Workspace } from "../models";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
 import { RootParentCache } from "./RootParentCache";
@@ -11,8 +12,20 @@ const NINETY_SECONDS = 90 * 1000;
 //  Assignment classes) from Sequelize & Postgres
 
 const fetchAllWorkspacesInTree = async rootWorkspace => {
-  const result = [rootWorkspace];
-  const children = await rootWorkspace.getChildWorkspaces();
+  let result, children;
+
+  if (isInOracleMode.getValue()) {
+    result = rootWorkspace.isEligibleForOracle ? [] : [rootWorkspace];
+    children = await rootWorkspace.getChildWorkspaces({
+      where: {
+        isEligibleForOracle: false,
+      }
+    });
+  } else {
+    result = [rootWorkspace];
+    children = await rootWorkspace.getChildWorkspaces();
+  }
+
   for (const child of children) {
     const allWorkspacesInChildsTree = await fetchAllWorkspacesInTree(child);
     result.push(...allWorkspacesInChildsTree);
