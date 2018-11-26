@@ -1,7 +1,16 @@
+import gql from "graphql-tag";
 import * as React from "react";
+import { graphql } from "react-apollo";
+import { compose } from "recompose";
 import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+
+const ORACLE_MODE_QUERY = gql`
+  query oracleModeQuery {
+    oracleMode
+  }
+`;
 
 interface NextWorkspaceBtnProps {
   label: string;
@@ -36,8 +45,11 @@ interface EpisodeNavProps {
   hasTimer: boolean;
   hasTimerEnded: boolean;
   isTakingABreak?: boolean;
+  oracleModeQuery: any;
+  depleteBudget?(): void;
   transferRemainingBudgetToParent?(): void;
   updateStaleness?(isStale: boolean): void;
+  updateIsEligibleForOracle?(isStale: boolean): void;
 }
 
 // Note that there in the normal functioning of the app,
@@ -45,52 +57,95 @@ interface EpisodeNavProps {
 // wherever they are called. Nevertheless, guards are included below because
 // it's possible for this situation to arise given abnormal functioning of the
 // app.
-const EpisodeNav = ({ hasParent, hasTimer, hasTimerEnded, isTakingABreak, transferRemainingBudgetToParent, updateStaleness }: EpisodeNavProps) => (
-  <EpisodeNavContainer>
-    {
-      hasTimer
-      ?
-      (
-        hasTimerEnded
-        ?
-          <NextWorkspaceBtn
-            label="Get next workspace"
-          />
-        :
-          <div>
-            <TakeBreakBtn
-              label="Needs more work"
-              navHook={() => updateStaleness && updateStaleness(true)}
-            />
-            <TakeBreakBtn
-              label="Done for now"
-              navHook={() => updateStaleness && updateStaleness(false)}
-            />
-            {
-              hasParent
-              &&
-              <TakeBreakBtn
-                label="Done, and return budget"
-                navHook={() => {
-                  if (transferRemainingBudgetToParent) {
-                    transferRemainingBudgetToParent();
-                  }
+class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
+  public render() {
+    const {
+      hasParent,
+      hasTimer,
+      hasTimerEnded,
+      isTakingABreak,
+      depleteBudget,
+      transferRemainingBudgetToParent,
+      updateStaleness,
+      updateIsEligibleForOracle,
+    } = this.props;
 
-                  if (updateStaleness) {
-                    updateStaleness(false);
-                  }
-                }}
-              />
-            }
-          </div>
-      )
-      :
-      <NextWorkspaceBtn
-        label={isTakingABreak ? "Start on next workspace" : "Get started"}
-        navHook={() => updateStaleness && updateStaleness(true)}
-      />
+    console.log("episode nav props", this.props.oracleModeQuery, this.props.oracleModeQuery.oracleMode);
+
+    if (this.props.oracleModeQuery.oracleMode) {
+      return (
+        <EpisodeNavContainer style={{ backgroundColor: "#ffe8e8" }}>
+          <NextWorkspaceBtn
+            label="Done (leave budget)"
+            navHook={() => {
+              updateIsEligibleForOracle && updateIsEligibleForOracle(false);
+            }}
+          />
+          <NextWorkspaceBtn
+            label="Done (take budget)"
+            navHook={() => {
+              depleteBudget && depleteBudget();
+              updateIsEligibleForOracle && updateIsEligibleForOracle(false);
+            }}
+          />
+        </EpisodeNavContainer>
+      );
     }
-  </EpisodeNavContainer>
-);
+
+    return (
+      <EpisodeNavContainer>
+        {
+          hasTimer
+          ?
+          (
+            hasTimerEnded
+            ?
+              <NextWorkspaceBtn
+                label="Get next workspace"
+              />
+            :
+              <div>
+                <TakeBreakBtn
+                  label="Needs more work"
+                  navHook={() => updateStaleness && updateStaleness(true)}
+                />
+                <TakeBreakBtn
+                  label="Done for now"
+                  navHook={() => updateStaleness && updateStaleness(false)}
+                />
+                {
+                  hasParent
+                  &&
+                  <TakeBreakBtn
+                    label="Done, and return budget"
+                    navHook={() => {
+                      if (transferRemainingBudgetToParent) {
+                        transferRemainingBudgetToParent();
+                      }
+
+                      if (updateStaleness) {
+                        updateStaleness(false);
+                      }
+                    }}
+                  />
+                }
+              </div>
+          )
+          :
+          <NextWorkspaceBtn
+            label={isTakingABreak ? "Start on next workspace" : "Get started"}
+            navHook={() => updateStaleness && updateStaleness(true)}
+          />
+        }
+      </EpisodeNavContainer>
+    );
+  }
+}
+
+const EpisodeNav: any = compose(
+  graphql(ORACLE_MODE_QUERY, {
+    name: "oracleModeQuery",
+  }),
+)(EpisodeNavPresentational);
 
 export { EpisodeNav };

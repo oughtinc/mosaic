@@ -96,9 +96,25 @@ const UPDATE_WORKSPACE_STALENESS = gql`
   }
 `;
 
+const UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE = gql`
+  mutation updateWorkspaceIsEligibleForOracle($workspaceId: String!, $isEligibleForOracle: Boolean!) {
+    updateWorkspaceIsEligibleForOracle(workspaceId: $workspaceId, isEligibleForOracle: $isEligibleForOracle) {
+      id
+    }
+  }
+`;
+
 const TRANSFER_REMAINING_BUDGET_TO_PARENT = gql`
   mutation transferRemainingBudgetToParent($id: String!) {
     transferRemainingBudgetToParent(id: $id) {
+      id
+    }
+  }
+`;
+
+const DEPLETE_BUDGET = gql`
+  mutation depleteBudget($id: String!) {
+    depleteBudget(id: $id) {
       id
     }
   }
@@ -280,8 +296,18 @@ export class WorkspaceView extends React.Component<any, any> {
                 variables: { id: workspace.id, isStale }
               })
             }
+            updateIsEligibleForOracle={isEligibleForOracle =>
+              this.props.updateWorkspaceIsEligibleForOracle({
+                variables: { workspaceId: workspace.id, isEligibleForOracle }
+              })
+            }
             transferRemainingBudgetToParent={() =>
               this.props.transferRemainingBudgetToParent({
+                variables: { id: workspace.id }
+              })
+            }
+            depleteBudget={() =>
+              this.props.depleteBudget({
                 variables: { id: workspace.id }
               })
             }
@@ -522,8 +548,20 @@ export const EpisodeShowPage = compose(
       refetchQueries: ["workspace"]
     }
   }),
+  graphql(UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE, {
+    name: "updateWorkspaceIsEligibleForOracle",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
   graphql(TRANSFER_REMAINING_BUDGET_TO_PARENT, {
     name: "transferRemainingBudgetToParent",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(DEPLETE_BUDGET, {
+    name: "depleteBudget",
     options: {
       refetchQueries: ["workspace"]
     }

@@ -307,6 +307,16 @@ const schema = new GraphQLSchema({
           await child.update({ totalBudget: child.allocatedBudget });
         }
       },
+      depleteBudget: {
+        type: workspaceType,
+        args: {
+          id: { type: GraphQLString }
+        },
+        resolve: async (_, { id }) => {
+          const workspace = await models.Workspace.findById(id);
+          await workspace.update({ allocatedBudget: workspace.totalBudget });
+        }
+      },
       createWorkspace: {
         type: workspaceType,
         args: {
@@ -436,6 +446,36 @@ const schema = new GraphQLSchema({
           const workspace = await models.Workspace.findById(workspaceId);
           await workspace.update({ isEligibleForAssignment: isEligible });
           return { id: workspaceId };
+        }
+      },
+      updateWorkspaceIsEligibleForOracle: {
+        type: workspaceType,
+        args: {
+          isEligibleForOracle: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { isEligibleForOracle, workspaceId }, context) => {
+          console.log(`
+
+
+
+
+
+            HERE~~
+
+
+
+
+
+          `)
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update oracle eligibility."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ isEligibleForOracle });
         }
       },
       updateAllocatedBudget: {
