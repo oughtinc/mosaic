@@ -153,7 +153,7 @@ export class Child extends React.Component<any, any> {
             &&
             <Button
               bsSize="xsmall"
-              bsStyle={ workspace.isEligibleForOracle ? "info" : "danger" }
+              bsStyle={workspace.isEligibleForOracle ? "info" : "danger"}
               style={{ marginTop: "5px" }}
               onClick={() => {
                 this.props.updateIsEligibleForOracle({

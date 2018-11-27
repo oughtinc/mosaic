@@ -450,11 +450,11 @@ export class WorkspaceView extends React.Component<any, any> {
                           }
                         });
                       }}
-                      updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) =>
+                      updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) => {
                         this.props.updateWorkspaceIsEligibleForOracle({
-                          variables: { workspaceId, isEligibleForOracle }
-                        })
-                      }
+                          variables: {workspaceId, isEligibleForOracle}
+                        });  
+                      }}
                       ref={input => {
                         if (input && input.editor()) {
                           this.newChildField = input.editor();

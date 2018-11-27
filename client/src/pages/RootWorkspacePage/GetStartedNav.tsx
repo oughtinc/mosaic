@@ -31,7 +31,13 @@ const GetStartedNav = ({ isInOracleMode }) => (
     }}
   >
     <NextWorkspaceBtn
-      label={ (Auth.isOracle() && isInOracleMode) ? "Get Started! (Oracle Mode)": "Get started!"}
+      label={
+        (Auth.isOracle() && isInOracleMode)
+        ?
+        "Get Started! (Oracle Mode)"
+        :
+        "Get started!"
+      }
     />
   </GetStartedNavContainer>
 );

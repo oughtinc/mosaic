@@ -1,19 +1,10 @@
 import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
-import { Alert, Button, Checkbox } from "react-bootstrap";
+import { Alert, Button } from "react-bootstrap";
 import { compose } from "recompose";
-import styled from "styled-components";
 
 import { ContentContainer } from "../../components/ContentContainer";
-
-import {
-  adminCheckboxBgColor,
-  adminCheckboxBorderColor,
-  homepageWorkspaceBgColor,
-  homepageWorkspaceScratchpadFontColor,
-  blockBorderAndBoxShadow
-} from "../../styles";
 
 const ORACLE_MODE_QUERY = gql`
   query oracleModeQuery {
@@ -39,7 +30,7 @@ class OracleHeaderPresentational extends React.Component<any, any> {
           <br />
           <br />
           Oracle mode is currently
-          { this.props.oracleModeQuery.oracleMode ? " ON" : " OFF" }.
+          {this.props.oracleModeQuery.oracleMode ? " ON" : " OFF"}.
           <br />
           <br />
           <Button
@@ -51,7 +42,7 @@ class OracleHeaderPresentational extends React.Component<any, any> {
               });
             }}
           >
-            Toggle Oracle Mode { !this.props.oracleModeQuery.oracleMode ? "ON" : "OFF" }
+            Toggle Oracle Mode {!this.props.oracleModeQuery.oracleMode ? "ON" : "OFF"}
           </Button>
         </Alert>
       </ContentContainer>
