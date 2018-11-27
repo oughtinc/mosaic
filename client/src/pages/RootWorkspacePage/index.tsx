@@ -1,3 +1,4 @@
+import gql from "graphql-tag";
 import * as _ from "lodash";
 import * as React from "react";
 import { graphql } from "react-apollo";
@@ -26,7 +27,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
 
     return (
       <div>
-        {Auth.isAuthenticated() && <GetStartedNav />}
+        {Auth.isAuthenticated() && <GetStartedNav isInOracleMode={this.props.oracleModeQuery.oracleMode}/>}
         {Auth.isOracle() &&
           <OracleHeader />
         }
@@ -51,6 +52,12 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
   }
 }
 
+const ORACLE_MODE_QUERY = gql`
+  query oracleModeQuery {
+    oracleMode
+  }
+`;
+
 export const RootWorkspacePage = compose(
   graphql(WORKSPACES_QUERY, { name: "rootWorkspacesQuery" }),
   graphql(CREATE_ROOT_WORKSPACE, {
@@ -58,5 +65,8 @@ export const RootWorkspacePage = compose(
     options: {
       refetchQueries: ["RootWorkspacesQuery"]
     }
-  })
+  }),
+  graphql(ORACLE_MODE_QUERY, {
+    name: "oracleModeQuery",
+  }),
 )(RootWorkspacePagePresentational);

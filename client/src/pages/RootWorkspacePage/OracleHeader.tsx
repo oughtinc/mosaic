@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
-import { Button, Checkbox } from "react-bootstrap";
+import { Alert, Button, Checkbox } from "react-bootstrap";
 import { compose } from "recompose";
 import styled from "styled-components";
 
@@ -29,21 +29,31 @@ const UPDATE_ORACLE_MODE = gql`
 
 class OracleHeaderPresentational extends React.Component<any, any> {
   public render() {
-    console.log("oracle header props", this.props);
     return (
       <ContentContainer>
-      { this.props.oracleModeQuery.oracleMode ? "Oracle Mode ON" : "Oracle Mode OFF" }
-      <Button
-        onClick={() => {
-          this.props.updateOracleMode({
-            variables: {
-              oracleMode: !this.props.oracleModeQuery.oracleMode,
-            }
-          });
-        }}
-      >
-        Toggle Oracle Mode
-      </Button>
+        <Alert
+          bsStyle="danger"
+          style={{ marginBottom: 0 }}
+        >
+          You are currently logged on as an oracle.
+          <br />
+          <br />
+          Oracle mode is currently
+          { this.props.oracleModeQuery.oracleMode ? " ON" : " OFF" }.
+          <br />
+          <br />
+          <Button
+            onClick={() => {
+              this.props.updateOracleMode({
+                variables: {
+                  oracleMode: !this.props.oracleModeQuery.oracleMode,
+                }
+              });
+            }}
+          >
+            Toggle Oracle Mode { !this.props.oracleModeQuery.oracleMode ? "ON" : "OFF" }
+          </Button>
+        </Alert>
       </ContentContainer>
     );
   }

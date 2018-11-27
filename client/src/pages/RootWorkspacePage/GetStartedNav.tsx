@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
+import { Auth } from "../../auth";
+
 interface NextWorkspaceBtnProps {
   label: string;
 }
@@ -22,10 +24,14 @@ const GetStartedNavContainer = styled.div`
   text-align: center;
 `;
 
-const GetStartedNav = () => (
-  <GetStartedNavContainer>
+const GetStartedNav = ({ isInOracleMode }) => (
+  <GetStartedNavContainer
+    style={{
+      backgroundColor: (Auth.isOracle() && isInOracleMode) && "#f8e8e8",
+    }}
+  >
     <NextWorkspaceBtn
-      label="Get started!"
+      label={ (Auth.isOracle() && isInOracleMode) ? "Get Started! (Oracle Mode)": "Get started!"}
     />
   </GetStartedNavContainer>
 );

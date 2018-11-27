@@ -30,6 +30,37 @@ class Scheduler {
     return assignment.getWorkspace().id;
   }
 
+  public async assignNextWorkspaceForOracle(userId) {
+    // clear caches so we don't rely on old information
+    this.rootParentCache.clearRootParentCache();
+    this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
+
+    const treesToConsider = await this.fetchAllRootWorkspaces();
+
+    let workspacesInTrees = [];
+    await map(
+      treesToConsider,
+      async w => {
+        const allWorkspacesInTreeToConsider = await this.fetchAllWorkspacesInTree(w, true);
+        workspacesInTrees.push(...allWorkspacesInTreeToConsider);
+      }
+    );
+
+    const workspacesToConsider = workspacesInTrees
+      .filter(w => w.isEligibleForOracle);
+
+    // we want to prioritize older workspaces
+    workspacesToConsider.sort((w1, w2) => w1 - w2);
+
+    const assignedWorkspace = workspacesToConsider[0];
+
+    if (!assignedWorkspace) {
+      throw new Error("No workspace to choose from");
+    }
+
+    await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
+  }
+
   public async assignNextWorkspace(userId) {
     // clear caches so we don't rely on old information
     this.rootParentCache.clearRootParentCache();
@@ -68,7 +99,9 @@ class Scheduler {
   private async getActionableWorkspacesForTree(userId, rootWorkspace) {
     const workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
 
-    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
+    const workspacesForNonOracles = workspacesInTree.filter(w => !w.isEligibleForOracle);
+
+    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesForNonOracles);
 
     const workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(workspacesNotCurrentlyBeingWorkedOn);
 

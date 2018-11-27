@@ -11,19 +11,9 @@ const NINETY_SECONDS = 90 * 1000;
 //  the rest of the scheduling code (Scheduler, Schedule, UserSchedule, and
 //  Assignment classes) from Sequelize & Postgres
 
-const fetchAllWorkspacesInTree = async rootWorkspace => {
-  let result, children;
-  if (isInOracleMode.getValue()) {
-    result = rootWorkspace.isEligibleForOracle ? [] : [rootWorkspace];
-    children = await rootWorkspace.getChildWorkspaces({
-      where: {
-        isEligibleForOracle: false,
-      }
-    });
-  } else {
-    result = [rootWorkspace];
-    children = await rootWorkspace.getChildWorkspaces();
-  }
+const fetchAllWorkspacesInTree = async (rootWorkspace) => {
+  const result = [rootWorkspace];
+  const children = await rootWorkspace.getChildWorkspaces();
 
   for (const child of children) {
     const allWorkspacesInChildsTree = await fetchAllWorkspacesInTree(child);

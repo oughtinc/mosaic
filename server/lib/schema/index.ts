@@ -371,6 +371,7 @@ const schema = new GraphQLSchema({
             creatorId: user.user_id,
             isPublic: user.is_admin
           });
+          await workspace.update({ isEligibleForOracle: true });
           return child;
         }
       },
@@ -408,20 +409,15 @@ const schema = new GraphQLSchema({
           }
 
           if (user.is_oracle && isInOracleMode.getValue()) {
-            const workspace = await models.Workspace.findOne({
-              where: {
-                isEligibleForAssignment: true,
-                isEligibleForOracle: true,
-              }
-            });
-            return { id: workspace.id };
+            await scheduler.assignNextWorkspaceForOracle(user.user_id);
           } else {
             await scheduler.assignNextWorkspace(user.user_id);
-            const workspaceId = await scheduler.getIdOfCurrentWorkspace(
-              user.user_id
-            );
-            return { id: workspaceId };
           }
+
+          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
+            user.user_id
+          );
+          return { id: workspaceId };
         }
       },
       updateWorkspaceIsPublic: {
