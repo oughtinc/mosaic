@@ -2,7 +2,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import styled from "styled-components";
 
-import { Button } from "react-bootstrap";
+import { Button, Checkbox } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { BlockEditor } from "../../components/BlockEditor";
 import { NewBlockForm } from "../../components/NewBlockForm";
@@ -15,6 +15,8 @@ import { ChildBudgetForm } from "./ChildBudgetForm";
 import { Auth } from "../../auth";
 
 import {
+  adminCheckboxBgColor,
+  adminCheckboxBorderColor,
   blockBorderAndBoxShadow,
   blockBorderColor,
   blockHeaderCSS,
@@ -29,6 +31,7 @@ const BlockContainer = styled.div`
 
 const BlockBody = styled.div`
   ${blockBodyCSS};
+  padding: 0;
 `;
 
 const BlockHeader = styled.div`
@@ -53,7 +56,12 @@ export class Child extends React.Component<any, any> {
     );
 
     return (
-      <div>
+      <div
+        style={{
+          backgroundColor: (Auth.isOracle() && workspace.isEligibleForOracle) && "#ffe8e8",
+          padding: "10px",
+        }}
+      >
         {questionRelationship.findBlock().value && (
           <BlockEditor
             {...questionRelationship.blockEditorAttributes()}
@@ -145,31 +153,31 @@ export class Child extends React.Component<any, any> {
             />
           </div>
         </div>
-        <div>
+        <div style={{ marginTop: "10px" }}>
           {
             Auth.isOracle()
             &&
             this.props.isInOracleMode
             &&
-            <Button
-              bsSize="xsmall"
-              bsStyle={workspace.isEligibleForOracle ? "info" : "danger"}
-              style={{ marginTop: "5px" }}
-              onClick={() => {
+            <Checkbox
+              style={{
+                backgroundColor: adminCheckboxBgColor,
+                border: `1px solid ${adminCheckboxBorderColor}`,
+                borderRadius: "3px",
+                padding: "5px 5px 5px 25px",
+              }}
+              inline={true}
+              type="checkbox"
+              checked={workspace.isEligibleForOracle}
+              onChange={() => {
                 this.props.updateIsEligibleForOracle({
                   isEligibleForOracle: !workspace.isEligibleForOracle,
                   workspaceId: workspace.id,
                 });
               }}
             >
-              {
-                workspace.isEligibleForOracle
-                ?
-                "Make Available to Everyone"
-                :
-                "Restrict Only to Oracles"
-              }
-            </Button>
+              is oracle only
+            </Checkbox>
           }
         </div>
         {this.state.showChildBudgetForm && (
