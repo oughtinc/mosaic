@@ -55,7 +55,7 @@ class Scheduler {
     const assignedWorkspace = workspacesToConsider[0];
 
     if (!assignedWorkspace) {
-      throw new Error("No workspace to choose from");
+      throw new Error("No eligible workspace for oracle");
     }
 
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
@@ -68,11 +68,11 @@ class Scheduler {
 
     const actionableWorkspaces = await this.getActionableWorkspaces(userId);
 
-    const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
-
-    if (!assignedWorkspace) {
-      throw new Error("No workspace to choose from");
+    if (!actionableWorkspaces || !(actionableWorkspaces.length > 0)) {
+      throw new Error("No eligible workspace");
     }
+
+    const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
 
     await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
   }
