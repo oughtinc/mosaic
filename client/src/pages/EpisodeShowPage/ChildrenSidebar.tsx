@@ -58,7 +58,7 @@ export class Child extends React.Component<any, any> {
     return (
       <div
         style={{
-          backgroundColor: (Auth.isOracle() && workspace.isEligibleForOracle) && "#ffe8e8",
+          backgroundColor: (Auth.isOracle() && this.props.isInOracleMode && workspace.isEligibleForOracle) && "#ffe8e8",
           padding: "10px",
         }}
       >

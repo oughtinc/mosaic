@@ -193,6 +193,14 @@ const SubtreeLink = ({ workspace }) => (
   </NavLink>
 );
 
+const TakeBreakBtn = ({ label, navHook, style }: any) => {
+  return (
+    <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
+      <Button bsSize="small" bsStyle="default">{label} »</Button>
+    </Link>
+  );
+};
+
 function findPointers(value: any) {
   const _value = value ? Value.fromJSON(value) : Plain.deserialize("");
   const pointers = exportingNodes(_value.document);
@@ -408,8 +416,45 @@ export class WorkspaceView extends React.Component<any, any> {
                         />
                       </BlockBody>
                     </BlockContainer>
+                    {
+                      !!workspace.parentId
+                      &&
+                      !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                      &&
+                      hasTimer
+                      &&
+                      Auth.isAuthenticated()
+                      &&
+                      <TakeBreakBtn
+                        label="Done! (returns budget)"
+                        navHook={() => {
+                          this.props.transferRemainingBudgetToParent({
+                            variables: { id: workspace.id }
+                          });
+
+                          this.props.updateWorkspaceStaleness({
+                            variables: { id: workspace.id, isStale: false }
+                          });
+                        }}
+                      />
+                    }
                   </Col>
                   <Col sm={6}>
+                    {
+                      workspace.childWorkspaces.length > 0
+                      &&
+                      !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                      &&
+                      hasTimer
+                      &&
+                      Auth.isAuthenticated()
+                      &&
+                      <TakeBreakBtn
+                        label="Wait for answer"
+                        navHook={() => undefined}
+                        style={{ marginBottom: "25px" }}
+                      />
+                    }
                     <ChildrenSidebar
                       isInOracleMode={this.props.oracleModeQuery.oracleMode}
                       subquestionDraftProps={subquestionDraftProps}
@@ -453,7 +498,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) => {
                         this.props.updateWorkspaceIsEligibleForOracle({
                           variables: {workspaceId, isEligibleForOracle}
-                        });  
+                        });
                       }}
                       ref={input => {
                         if (input && input.editor()) {

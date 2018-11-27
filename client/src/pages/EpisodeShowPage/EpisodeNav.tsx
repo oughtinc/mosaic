@@ -101,26 +101,6 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                   label="Needs more work"
                   navHook={() => updateStaleness && updateStaleness(true)}
                 />
-                <TakeBreakBtn
-                  label="Done for now"
-                  navHook={() => updateStaleness && updateStaleness(false)}
-                />
-                {
-                  hasParent
-                  &&
-                  <TakeBreakBtn
-                    label="Done, and return budget"
-                    navHook={() => {
-                      if (transferRemainingBudgetToParent) {
-                        transferRemainingBudgetToParent();
-                      }
-
-                      if (updateStaleness) {
-                        updateStaleness(false);
-                      }
-                    }}
-                  />
-                }
               </div>
           )
           :
