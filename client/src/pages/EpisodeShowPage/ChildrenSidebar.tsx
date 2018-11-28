@@ -22,6 +22,8 @@ import {
   blockHeaderCSS,
   blockBodyCSS,
   subQuestionAnswerFontColor,
+  subquestionsFooterBgColor,
+  subquestionsFooterBorderTopColor,
 } from "../../styles";
 
 const BlockContainer = styled.div`
@@ -37,6 +39,14 @@ const BlockBody = styled.div`
 const BlockHeader = styled.div`
   ${blockHeaderCSS};
 `;
+
+const TakeBreakBtn = ({ label, navHook, style }: any) => {
+  return (
+    <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
+      <Button bsSize="xsmall" bsStyle="primary">{label} »</Button>
+    </Link>
+  );
+};
 
 export class Child extends React.Component<any, any> {
   public constructor(props: any) {
@@ -261,6 +271,33 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 </BlockBody>
               );
             })}
+            {
+              this.props.workspaceOrder.length > 0
+              &&
+              !(Auth.isOracle() && this.props.isInOracleMode)
+              &&
+              this.props.hasTimer
+              &&
+              Auth.isAuthenticated()
+              &&
+              <div
+                style={{
+                  backgroundColor: subquestionsFooterBgColor,
+                  borderRadius: "0 0 3px 3px",
+                  borderTop: `1px solid ${subquestionsFooterBorderTopColor}`,
+                  padding: "10px",
+                }}
+              >
+                <TakeBreakBtn
+                  label="Wait for an answer"
+                  navHook={() => {
+                    this.props.updateWorkspaceStaleness({
+                      variables: { id: this.props.workspace.id, isStale: false }
+                    });
+                  }}
+                />
+              </div>
+            }
           </BlockContainer>
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (

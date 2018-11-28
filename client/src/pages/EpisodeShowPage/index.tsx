@@ -31,13 +31,15 @@ import {
   WorkspaceBlockRelation,
   WorkspaceWithRelations,
 } from "./WorkspaceRelations";
-import { UPDATE_BLOCKS } from "../../graphqlQueries";
+import { UPDATE_BLOCKS, UPDATE_WORKSPACE_IS_ELIGIBLE } from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
 import {
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
+  responseFooterBgColor,
+  responseFormBorderTopColor,
   workspaceViewQuestionFontSize
 } from "../../styles";
 
@@ -196,7 +198,7 @@ const SubtreeLink = ({ workspace }) => (
 const TakeBreakBtn = ({ label, navHook, style }: any) => {
   return (
     <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
-      <Button bsSize="small" bsStyle="default">{label} »</Button>
+      <Button bsSize="xsmall" bsStyle="primary">{label} »</Button>
     </Link>
   );
 };
@@ -415,47 +417,56 @@ export class WorkspaceView extends React.Component<any, any> {
                           {...answerProps}
                         />
                       </BlockBody>
-                    </BlockContainer>
-                    {
-                      !!workspace.parentId
-                      &&
-                      !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
-                      &&
-                      hasTimer
-                      &&
-                      Auth.isAuthenticated()
-                      &&
-                      <TakeBreakBtn
-                        label="Done! (returns budget)"
-                        navHook={() => {
-                          this.props.transferRemainingBudgetToParent({
-                            variables: { id: workspace.id }
-                          });
+                      {
+                        !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                        &&
+                        hasTimer
+                        &&
+                        Auth.isAuthenticated()
+                        &&
+                        <div
+                          style={{
+                            backgroundColor: responseFooterBgColor,
+                            borderRadius: "0 0 3px 3px",
+                            borderTop: `1px solid ${responseFormBorderTopColor}`,
+                            padding: "10px",
+                          }}
+                        >
+                          {
+                            !!workspace.parentId
+                            ?
+                              <TakeBreakBtn
+                                label="Done! (returns budget)"
+                                navHook={() => {
+                                  this.props.transferRemainingBudgetToParent({
+                                    variables: { id: workspace.id }
+                                  });
 
-                          this.props.updateWorkspaceStaleness({
-                            variables: { id: workspace.id, isStale: false }
-                          });
-                        }}
-                      />
-                    }
+                                  this.props.updateWorkspaceStaleness({
+                                    variables: { id: workspace.id, isStale: false }
+                                  });
+                                }}
+                              />
+                            :
+                              <TakeBreakBtn
+                                label="Done!"
+                                navHook={() => {
+                                  this.props.updateWorkspaceIsEligible({
+                                    variables: {
+                                      isEligible: false,
+                                      workspaceId: workspace.id,
+                                    }
+                                  });
+                                }}
+                              />
+                          }
+                        </div>
+                      }
+                    </BlockContainer>
                   </Col>
                   <Col sm={6}>
-                    {
-                      workspace.childWorkspaces.length > 0
-                      &&
-                      !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
-                      &&
-                      hasTimer
-                      &&
-                      Auth.isAuthenticated()
-                      &&
-                      <TakeBreakBtn
-                        label="Wait for answer"
-                        navHook={() => undefined}
-                        style={{ marginBottom: "25px" }}
-                      />
-                    }
                     <ChildrenSidebar
+                      hasTimer={hasTimer}
                       isInOracleMode={this.props.oracleModeQuery.oracleMode}
                       subquestionDraftProps={subquestionDraftProps}
                       isIsolatedWorkspace={isIsolatedWorkspace}
@@ -500,6 +511,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           variables: {workspaceId, isEligibleForOracle}
                         });
                       }}
+                      updateWorkspaceStaleness={this.props.updateWorkspaceStaleness}
                       ref={input => {
                         if (input && input.editor()) {
                           this.newChildField = input.editor();
@@ -628,6 +640,9 @@ export const EpisodeShowPage = compose(
   }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
+  }),
+  graphql(UPDATE_WORKSPACE_IS_ELIGIBLE, {
+    name: "updateWorkspaceIsEligible",
   }),
   connect(
     mapStateToProps,
