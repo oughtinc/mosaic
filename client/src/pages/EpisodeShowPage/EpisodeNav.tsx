@@ -35,6 +35,7 @@ const EpisodeNavContainer = styled.div`
 
 interface EpisodeNavProps {
   hasParent: boolean;
+  hasSubquestions: boolean;
   hasTimer: boolean;
   hasTimerEnded: boolean;
   isInOracleMode: boolean;
@@ -68,18 +69,21 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       return (
         <EpisodeNavContainer style={{ backgroundColor: "#ffe8e8" }}>
           <NextWorkspaceBtn
-            label="Done (leave budget)"
+            label="Skip and go to next workspace"
             navHook={() => {
-              updateIsEligibleForOracle(false);
+            
             }}
           />
-          <NextWorkspaceBtn
-            label="Done (take budget)"
-            navHook={() => {
-              depleteBudget();
-              updateIsEligibleForOracle(false);
-            }}
-          />
+          {
+            !this.props.hasSubquestions
+            &&
+            <NextWorkspaceBtn
+              label="Done (leave budget)"
+              navHook={() => {
+                updateIsEligibleForOracle(false);
+              }}
+            />
+          }
         </EpisodeNavContainer>
       );
     }

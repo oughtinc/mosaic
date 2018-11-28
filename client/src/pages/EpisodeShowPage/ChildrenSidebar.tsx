@@ -40,6 +40,14 @@ const BlockHeader = styled.div`
   ${blockHeaderCSS};
 `;
 
+const NextWorkspaceBtn = ({ label, navHook }: any) => {
+  return (
+    <Link onClick={navHook} to="/next" style={{ margin: "0 5px" }}>
+      <Button bsSize="xsmall" bsStyle="danger">{label} »</Button>
+    </Link>
+  );
+};
+
 const TakeBreakBtn = ({ label, navHook, style }: any) => {
   return (
     <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
@@ -272,13 +280,15 @@ export class ChildrenSidebar extends React.Component<any, any> {
               );
             })}
             {
+              Auth.isAuthenticated()
+              &&
               this.props.workspaceOrder.length > 0
               &&
-              !(Auth.isOracle() && this.props.isInOracleMode)
-              &&
-              this.props.hasTimer
-              &&
-              Auth.isAuthenticated()
+              (
+                (Auth.isOracle() && this.props.isInOracleMode)
+                ||
+                this.props.hasTimer
+              )
               &&
               <div
                 style={{
@@ -288,14 +298,28 @@ export class ChildrenSidebar extends React.Component<any, any> {
                   padding: "10px",
                 }}
               >
-                <TakeBreakBtn
-                  label="Wait for an answer"
-                  navHook={() => {
-                    this.props.updateWorkspaceStaleness({
-                      variables: { id: this.props.workspace.id, isStale: false }
-                    });
-                  }}
-                />
+                {
+                  !(Auth.isOracle() && this.props.isInOracleMode)
+                  ?
+                    <TakeBreakBtn
+                      label="Wait for an answer"
+                      navHook={() => {
+                        this.props.updateWorkspaceStaleness({
+                          variables: { id: this.props.workspace.id, isStale: false }
+                        });
+                      }}
+                    />
+                  :
+                    <NextWorkspaceBtn
+                      label="Done! (leave budget)"
+                      navHook={() => {
+                        this.props.updateIsEligibleForOracle({
+                          isEligibleForOracle: false,
+                          workspaceId: this.props.workspace.id,
+                        });
+                      }}
+                    />
+                }
               </div>
             }
           </BlockContainer>

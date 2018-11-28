@@ -35,30 +35,38 @@ class Scheduler {
     this.rootParentCache.clearRootParentCache();
     this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
 
-    const treesToConsider = await this.fetchAllRootWorkspaces();
+    let treesToConsider = await this.fetchAllRootWorkspaces();
+    let wasWorkspaceAssigned = false;
 
-    let workspacesInTrees = [];
-    await map(
-      treesToConsider,
-      async w => {
-        const allWorkspacesInTreeToConsider = await this.fetchAllWorkspacesInTree(w, true);
-        workspacesInTrees.push(...allWorkspacesInTreeToConsider);
+    while (treesToConsider.length > 0) {
+      const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
+      const randomlySelectedTree = pickRandomItemFromArray(leastRecentlyWorkedOnTreesToConsider);
+
+      const workspacesInTree = await this.fetchAllWorkspacesInTree(randomlySelectedTree);
+
+      const workspacesToConsider = workspacesInTree
+        .filter(w => w.isEligibleForOracle);
+
+      // we want to prioritize older workspaces
+      workspacesToConsider.sort((w1, w2) => w1 - w2);
+
+      const assignedWorkspace = workspacesToConsider[0];
+
+      if (!assignedWorkspace) {
+        treesToConsider = _.difference(
+          treesToConsider,
+          [randomlySelectedTree]
+        );
+      } else {
+        await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
+        wasWorkspaceAssigned = true;
+        break;
       }
-    );
-
-    const workspacesToConsider = workspacesInTrees
-      .filter(w => w.isEligibleForOracle);
-
-    // we want to prioritize older workspaces
-    workspacesToConsider.sort((w1, w2) => w1 - w2);
-
-    const assignedWorkspace = workspacesToConsider[0];
-
-    if (!assignedWorkspace) {
-      throw new Error("No eligible workspace for oracle");
     }
 
-    await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
+    if (!wasWorkspaceAssigned) {
+      throw new Error("No eligible workspace for oracle");
+    }
   }
 
   public async assignNextWorkspace(userId) {

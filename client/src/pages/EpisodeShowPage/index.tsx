@@ -195,6 +195,14 @@ const SubtreeLink = ({ workspace }) => (
   </NavLink>
 );
 
+const NextWorkspaceBtn = ({ label, navHook }: any) => {
+  return (
+    <Link onClick={navHook} to="/next" style={{ margin: "0 5px" }}>
+      <Button bsSize="xsmall" bsStyle="danger">{label} »</Button>
+    </Link>
+  );
+};
+
 const TakeBreakBtn = ({ label, navHook, style }: any) => {
   return (
     <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
@@ -306,6 +314,7 @@ export class WorkspaceView extends React.Component<any, any> {
       <div>
         {Auth.isAuthenticated() && (
           <EpisodeNav
+            hasSubquestions={workspace.childWorkspaceOrder.length > 0}
             isInOracleMode={this.props.oracleModeQuery.oracleMode}
             hasParent={!!workspace.parentId}
             hasTimer={hasTimer}
@@ -418,11 +427,13 @@ export class WorkspaceView extends React.Component<any, any> {
                         />
                       </BlockBody>
                       {
-                        !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
-                        &&
-                        hasTimer
-                        &&
                         Auth.isAuthenticated()
+                        &&
+                        (
+                          (Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                          ||
+                          hasTimer
+                        )
                         &&
                         <div
                           style={{
@@ -433,6 +444,8 @@ export class WorkspaceView extends React.Component<any, any> {
                           }}
                         >
                           {
+                            !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                            &&
                             !!workspace.parentId
                             ?
                               <TakeBreakBtn
@@ -448,17 +461,37 @@ export class WorkspaceView extends React.Component<any, any> {
                                 }}
                               />
                             :
-                              <TakeBreakBtn
-                                label="Done!"
-                                navHook={() => {
-                                  this.props.updateWorkspaceIsEligible({
-                                    variables: {
-                                      isEligible: false,
-                                      workspaceId: workspace.id,
-                                    }
-                                  });
-                                }}
-                              />
+                              (
+                                !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                                ?
+                                <TakeBreakBtn
+                                  label="Done!"
+                                  navHook={() => {
+                                    this.props.updateWorkspaceIsEligible({
+                                      variables: {
+                                        isEligible: false,
+                                        workspaceId: workspace.id,
+                                      }
+                                    });
+                                  }}
+                                />
+                                :
+                                <NextWorkspaceBtn
+                                  label="Done! (take budget)"
+                                  navHook={() => {
+                                    this.props.updateWorkspaceIsEligibleForOracle({
+                                      variables: {
+                                        workspaceId: workspace.id,
+                                        isEligibleForOracle: false,
+                                      }
+                                    });
+
+                                    this.props.depleteBudget({
+                                      variables: { id: workspace.id }
+                                    });
+                                  }}
+                                />
+                              )
                           }
                         </div>
                       }
