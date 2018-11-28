@@ -205,6 +205,7 @@ const WorkspaceModel = (
     const budgetIncreased = childWorkspace.totalBudget < newTotalBudget;
 
     await childWorkspace.update({
+      isEligibleForOracle: true,
       isStale: budgetIncreased ? true : childWorkspace.isStale,
       totalBudget: newTotalBudget
     }, { event });
