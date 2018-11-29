@@ -44,8 +44,10 @@ class Scheduler {
 
       const workspacesInTree = await this.fetchAllWorkspacesInTree(randomlySelectedTree);
 
-      const workspacesToConsider = workspacesInTree
+      const oracleEligibleWorkspaces = workspacesInTree
         .filter(w => w.isEligibleForOracle);
+
+      const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(oracleEligibleWorkspaces);
 
       // we want to prioritize older workspaces
       workspacesToConsider.sort((w1, w2) => w1 - w2);
