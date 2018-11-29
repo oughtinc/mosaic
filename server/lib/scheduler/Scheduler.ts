@@ -78,6 +78,7 @@ class Scheduler {
     }
 
     if (!wasWorkspaceAssigned) {
+      this.schedule.leaveCurrentWorkspace(userId);
       throw new Error("No eligible workspace for oracle");
     }
   }
@@ -90,6 +91,7 @@ class Scheduler {
     const actionableWorkspaces = await this.getActionableWorkspaces(userId);
 
     if (!actionableWorkspaces || !(actionableWorkspaces.length > 0)) {
+      this.schedule.leaveCurrentWorkspace(userId);
       throw new Error("No eligible workspace");
     }
 
