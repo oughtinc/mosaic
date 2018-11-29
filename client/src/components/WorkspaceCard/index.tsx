@@ -67,6 +67,7 @@ interface WorkspaceType {
   connectedPointersOfSubtree: ConnectedPointerType[];
   id: string;
   isStale: boolean;
+  isEligibleForOracle: boolean;
 }
 
 interface WorkspaceCardProps {
@@ -145,16 +146,22 @@ export class WorkspaceCardPresentational extends React.PureComponent<
           <div
             style={{
               color: "#666",
-              fontSize: "11px",
+              fontSize: "10px",
               position: "absolute",
-              top: "3px",
-              right: "-40px",
+              top: "1px",
+              left: "56.5em",
+              width: "100px",
             }}
           >
             {
               workspace.isStale
               &&
-              "STALE"
+              <span>STALE<br/></span>
+            }
+            {
+              workspace.isEligibleForOracle
+              &&
+              "ORACLE ONLY"
             }
           </div>
           <BlockSection

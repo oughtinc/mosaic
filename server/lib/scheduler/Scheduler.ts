@@ -27,7 +27,14 @@ class Scheduler {
 
   public async getIdOfCurrentWorkspace(userId) {
     const assignment = this.schedule.getMostRecentAssignmentForUser(userId);
-    return assignment.getWorkspace().id;
+
+    if (!assignment) {
+      return undefined;
+    }
+
+    const workspace = assignment.getWorkspace();
+
+    return workspace.id;
   }
 
   public async assignNextWorkspaceForOracle(userId) {
@@ -60,7 +67,11 @@ class Scheduler {
           [randomlySelectedTree]
         );
       } else {
-        await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
+        await this.schedule.assignWorkspaceToUser({
+          userId,
+          workspace: assignedWorkspace,
+          isOracle: true,
+        });
         wasWorkspaceAssigned = true;
         break;
       }
@@ -84,7 +95,15 @@ class Scheduler {
 
     const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
 
-    await this.schedule.assignWorkspaceToUser(userId, assignedWorkspace);
+    await this.schedule.assignWorkspaceToUser({
+      userId,
+      workspace: assignedWorkspace,
+      isOracle: false,
+    });
+  }
+
+  public leaveCurrentWorkspace(userId) {
+    this.schedule.leaveCurrentWorkspace(userId);
   }
 
   private async getActionableWorkspaces(userId) {

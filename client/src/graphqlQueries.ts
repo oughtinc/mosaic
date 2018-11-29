@@ -69,6 +69,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       id
       isPublic
       isStale
+      isEligibleForOracle
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
@@ -87,6 +88,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       id
       isPublic
       isStale
+      isEligibleForOracle
       creatorId
       childWorkspaceOrder
       blocks {

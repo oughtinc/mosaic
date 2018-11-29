@@ -2,12 +2,16 @@ import * as _ from "lodash";
 import { Assignment } from "./Assignment";
 import { RootParentFinder } from "./RootParentFinder";
 
+const ORACLE_TIME_LIMIT = 1000 * 60 * 15;
+
 class UserSchedule {
   private lastWorkedOnTimestampForTree = {};
   private rootParentCache;
   private timeLimit;
   private userId;
   private userSchedule = [];
+  private hasUserLeftLastAssignment = false;
+  private isLastAssignmentOracle = false;
 
   public constructor({ rootParentCache, timeLimit, userId }) {
     this.rootParentCache = rootParentCache;
@@ -15,7 +19,7 @@ class UserSchedule {
     this.userId = userId;
   }
 
-  public async assignWorkspace(workspace, startAtTimestamp = Date.now()) {
+  public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false) {
     const assignment = new Assignment({
       userId: this.userId,
       workspace,
@@ -24,9 +28,16 @@ class UserSchedule {
 
     this.userSchedule.push(assignment);
 
+    this.hasUserLeftLastAssignment = false;
+    this.isLastAssignmentOracle = isOracle;
+
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
 
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
+  }
+
+  public leaveCurrentWorkspace() {
+    this.hasUserLeftLastAssignment = true;
   }
 
   public getMostRecentAssignment() {
@@ -84,9 +95,16 @@ class UserSchedule {
   }
 
   private isActiveInLastWorkspace() {
+    if (this.hasUserLeftLastAssignment) {
+      return false;
+    }
+
     const lastWorkedOnAssignment = this.getMostRecentAssignment();
     const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
-    const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < this.timeLimit;
+
+
+    const timeLimit = this.isLastAssignmentOracle ? ORACLE_TIME_LIMIT : this.timeLimit;
+    const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < timeLimit;
 
     if (didUserStartWorkingOnItWithinTimeLimit) {
       return true;

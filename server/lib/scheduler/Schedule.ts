@@ -38,12 +38,19 @@ class Schedule {
     return this.schedule.get(userId);
   }
 
-  public async assignWorkspaceToUser(userId, workspace, startAtTimestamp = Date.now()) {
+  public async assignWorkspaceToUser({userId, workspace, startAtTimestamp = Date.now(), isOracle = false}) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
-    await userSchedule.assignWorkspace(workspace, startAtTimestamp);
+    await userSchedule.assignWorkspace(workspace, startAtTimestamp, isOracle);
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
+  }
+
+  public leaveCurrentWorkspace(userId) {
+    if (this.doesUserHaveASchedule(userId)) {
+      const userSchedule = this.getUserSchedule(userId);
+      userSchedule.leaveCurrentWorkspace();  
+    }
   }
 
   public getMostRecentAssignmentForUser(userId) {

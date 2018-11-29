@@ -420,6 +420,19 @@ const schema = new GraphQLSchema({
           return { id: workspaceId };
         }
       },
+      leaveCurrentWorkspace: {
+        type: GraphQLBoolean,
+        resolve: async (_, args, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to leave current workspace."
+            );
+          }
+          await scheduler.leaveCurrentWorkspace(user.user_id);
+          return true;
+        }
+      },
       updateWorkspaceIsPublic: {
         type: workspaceType,
         args: {

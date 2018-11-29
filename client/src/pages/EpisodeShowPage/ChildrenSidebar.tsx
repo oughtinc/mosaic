@@ -48,10 +48,10 @@ const NextWorkspaceBtn = ({ label, navHook }: any) => {
   );
 };
 
-const TakeBreakBtn = ({ label, navHook, style }: any) => {
+const TakeBreakBtn = ({ bsStyle, label, navHook, style }: any) => {
   return (
     <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
-      <Button bsSize="xsmall" bsStyle="primary">{label} »</Button>
+      <Button bsSize="xsmall" bsStyle={bsStyle || "primary"}>{label} »</Button>
     </Link>
   );
 };
@@ -310,7 +310,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
                       }}
                     />
                   :
-                    <NextWorkspaceBtn
+                    <TakeBreakBtn
+                      bsStyle="danger"
                       label="Done! (leave budget)"
                       navHook={() => {
                         this.props.updateIsEligibleForOracle({
