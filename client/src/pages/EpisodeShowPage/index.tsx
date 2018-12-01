@@ -304,6 +304,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const hasParent = !!workspace.parentId;
 
+    const isUserOracle = Auth.isOracle();
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
 
     const queryParams = parseQueryString(window.location.search);
@@ -434,14 +435,14 @@ export class WorkspaceView extends React.Component<any, any> {
                         Auth.isAuthenticated()
                         &&
                         (
-                          (Auth.isOracle() && isInOracleMode)
+                          (isUserOracle && isInOracleMode)
                           ||
                           hasTimer
                         )
                         &&
                         (
                           !(
-                            (Auth.isOracle() && isInOracleMode)
+                            (isUserOracle && isInOracleMode)
                             &&
                             !hasParent
                           )
@@ -456,7 +457,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           }}
                         >
                           {
-                            !(Auth.isOracle() && isInOracleMode)
+                            !(isUserOracle && isInOracleMode)
                             &&
                             hasParent
                             ?
@@ -474,7 +475,7 @@ export class WorkspaceView extends React.Component<any, any> {
                               />
                             :
                               (
-                                !(Auth.isOracle() && isInOracleMode)
+                                !(isUserOracle && isInOracleMode)
                                 ?
                                 <TakeBreakBtn
                                   label="Done!"
