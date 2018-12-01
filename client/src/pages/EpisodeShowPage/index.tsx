@@ -304,6 +304,8 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const hasParent = !!workspace.parentId;
 
+    const isInOracleMode = this.props.oracleModeQuery.oracleMode;
+
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
@@ -317,7 +319,7 @@ export class WorkspaceView extends React.Component<any, any> {
         {Auth.isAuthenticated() && (
           <EpisodeNav
             hasSubquestions={workspace.childWorkspaceOrder.length > 0}
-            isInOracleMode={this.props.oracleModeQuery.oracleMode}
+            isInOracleMode={isInOracleMode}
             hasParent={hasParent}
             hasTimer={hasTimer}
             hasTimerEnded={this.state.hasTimerEnded}
@@ -432,14 +434,14 @@ export class WorkspaceView extends React.Component<any, any> {
                         Auth.isAuthenticated()
                         &&
                         (
-                          (Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                          (Auth.isOracle() && isInOracleMode)
                           ||
                           hasTimer
                         )
                         &&
                         (
                           !(
-                            (Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                            (Auth.isOracle() && isInOracleMode)
                             &&
                             !hasParent
                           )
@@ -454,7 +456,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           }}
                         >
                           {
-                            !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                            !(Auth.isOracle() && isInOracleMode)
                             &&
                             hasParent
                             ?
@@ -472,7 +474,7 @@ export class WorkspaceView extends React.Component<any, any> {
                               />
                             :
                               (
-                                !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
+                                !(Auth.isOracle() && isInOracleMode)
                                 ?
                                 <TakeBreakBtn
                                   label="Done!"
@@ -511,7 +513,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   <Col sm={6}>
                     <ChildrenSidebar
                       hasTimer={hasTimer}
-                      isInOracleMode={this.props.oracleModeQuery.oracleMode}
+                      isInOracleMode={isInOracleMode}
                       subquestionDraftProps={subquestionDraftProps}
                       isIsolatedWorkspace={isIsolatedWorkspace}
                       workspace={workspace}
