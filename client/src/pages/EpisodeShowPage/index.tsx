@@ -303,13 +303,14 @@ export class WorkspaceView extends React.Component<any, any> {
     ).blockEditorAttributes();
 
     const hasParent = !!workspace.parentId;
-
+    const hasSubquestions = workspace.childWorkspaceOrder.length > 0;
     const isUserOracle = Auth.isOracle();
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
 
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
+    const hasTimerEnded = this.state.hasTimerEnded;
 
     const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
     const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
@@ -319,11 +320,11 @@ export class WorkspaceView extends React.Component<any, any> {
       <div>
         {Auth.isAuthenticated() && (
           <EpisodeNav
-            hasSubquestions={workspace.childWorkspaceOrder.length > 0}
+            hasSubquestions={hasSubquestions}
             isInOracleMode={isInOracleMode}
             hasParent={hasParent}
             hasTimer={hasTimer}
-            hasTimerEnded={this.state.hasTimerEnded}
+            hasTimerEnded={hasTimerEnded}
             updateStaleness={isStale =>
               this.props.updateWorkspaceStaleness({
                 variables: { id: workspace.id, isStale }
@@ -347,7 +348,7 @@ export class WorkspaceView extends React.Component<any, any> {
           />
         )}
         <ContentContainer>
-          {this.state.hasTimerEnded ? (
+          {hasTimerEnded ? (
             <div>
               Your time with this workspace is up. Thanks for contributing!
             </div>
