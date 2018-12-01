@@ -302,6 +302,8 @@ export class WorkspaceView extends React.Component<any, any> {
       workspace
     ).blockEditorAttributes();
 
+    const hasParent = !!workspace.parentId;
+
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
@@ -316,7 +318,7 @@ export class WorkspaceView extends React.Component<any, any> {
           <EpisodeNav
             hasSubquestions={workspace.childWorkspaceOrder.length > 0}
             isInOracleMode={this.props.oracleModeQuery.oracleMode}
-            hasParent={!!workspace.parentId}
+            hasParent={hasParent}
             hasTimer={hasTimer}
             hasTimerEnded={this.state.hasTimerEnded}
             updateStaleness={isStale =>
@@ -389,7 +391,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           {...questionProps}
                         />
                       </div>
-                      {workspace.parentId &&
+                      {hasParent &&
                         !isIsolatedWorkspace && (
                           <div style={{ paddingBottom: "8px" }}>
                             <ParentLink parentId={workspace.parentId} />
@@ -439,7 +441,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           !(
                             (Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
                             &&
-                            !workspace.parentId
+                            !hasParent
                           )
                         )
                         &&
@@ -454,7 +456,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           {
                             !(Auth.isOracle() && this.props.oracleModeQuery.oracleMode)
                             &&
-                            !!workspace.parentId
+                            hasParent
                             ?
                               <TakeBreakBtn
                                 label="Done! (returns budget)"
