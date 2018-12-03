@@ -69,6 +69,8 @@ interface WorkspaceType {
   isStale: boolean;
   isEligibleForOracle: boolean;
   budgetUsedWorkingOnThisWorkspace: number;
+  totalBudget: number;
+  allocatedBudget: number;
 }
 
 interface WorkspaceCardProps {
@@ -159,7 +161,11 @@ export class WorkspaceCardPresentational extends React.PureComponent<
             }}
           >
             <span style={{ padding: "0 10px"}}>
-              time spent {workspace.budgetUsedWorkingOnThisWorkspace}s
+            total time {workspace.totalBudget}s
+            ---
+            allocated time {workspace.allocatedBudget}s
+            ---
+            time spent {workspace.budgetUsedWorkingOnThisWorkspace}s
             </span>
             <span>
               {

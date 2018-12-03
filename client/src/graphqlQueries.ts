@@ -73,6 +73,8 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
+      totalBudget
+      allocatedBudget
       budgetUsedWorkingOnThisWorkspace
       blocks {
         id
@@ -92,6 +94,8 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       isEligibleForOracle
       creatorId
       childWorkspaceOrder
+      totalBudget
+      allocatedBudget
       budgetUsedWorkingOnThisWorkspace
       blocks {
         id
