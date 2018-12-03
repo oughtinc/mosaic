@@ -68,6 +68,7 @@ interface WorkspaceType {
   id: string;
   isStale: boolean;
   isEligibleForOracle: boolean;
+  budgetUsedWorkingOnThisWorkspace: number;
 }
 
 interface WorkspaceCardProps {
@@ -153,6 +154,9 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               width: "100px",
             }}
           >
+            {
+              <span>{workspace.budgetUsedWorkingOnThisWorkspace}<br/></span>
+            }
             {
               workspace.isStale
               &&

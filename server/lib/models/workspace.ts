@@ -80,6 +80,20 @@ const WorkspaceModel = (
           return this.get("totalBudget") - this.get("allocatedBudget");
         },
       },
+      budgetUsedWorkingOnThisWorkspace: {
+        type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
+          "allocatedBudget",
+          "childWorkspaceOrder",
+        ]),
+        get: async function() {
+          let howMuchSpentOnChildren = 0;
+          for (const childId of this.get("childWorkspaceOrder")) {
+            const child = await sequelize.models.Workspace.findById(childId);
+            howMuchSpentOnChildren += child.totalBudget;
+          }
+          return this.get("allocatedBudget") - howMuchSpentOnChildren;
+        },
+      },
       connectedPointers: {
         type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
         get: async function() {
