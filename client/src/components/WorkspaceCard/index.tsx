@@ -143,30 +143,36 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     }
     return (
       <Container>
+        <div>
+        </div>
         <CardBody>
           <div
             style={{
-              color: "#666",
-              fontSize: "10px",
-              position: "absolute",
-              top: "1px",
-              left: "56.5em",
-              width: "100px",
+              alignItems: "center",
+              backgroundColor: "#f8f8f8",
+              borderBottom: "1px solid #ddd",
+              color: "#999",
+              fontSize: "11px",
+              display: "flex",
+              height: "30px",
+              justifyContent: "space-between",
             }}
           >
-            {
-              <span>{workspace.budgetUsedWorkingOnThisWorkspace}<br/></span>
-            }
-            {
-              workspace.isStale
-              &&
-              <span>STALE<br/></span>
-            }
-            {
-              workspace.isEligibleForOracle
-              &&
-              "ORACLE ONLY"
-            }
+            <span style={{ padding: "0 10px"}}>
+              time spent {workspace.budgetUsedWorkingOnThisWorkspace}s
+            </span>
+            <span>
+              {
+                workspace.isStale
+                &&
+                <span style={{ padding: "0 10px"}}>STALE</span>
+              }
+              {
+                workspace.isEligibleForOracle
+                &&
+                <span style={{ padding: "0 10px"}}>ORACLE ONLY</span>
+              }
+            </span>
           </div>
           <BlockSection
             workspace={workspace}
