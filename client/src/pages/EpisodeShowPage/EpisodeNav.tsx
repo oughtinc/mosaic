@@ -34,14 +34,11 @@ const EpisodeNavContainer = styled.div`
 `;
 
 interface EpisodeNavProps {
-  hasParent: boolean;
   hasSubquestions: boolean;
   hasTimer: boolean;
   hasTimerEnded: boolean;
   isInOracleMode: boolean;
   isTakingABreak?: boolean;
-  depleteBudget(): void;
-  transferRemainingBudgetToParent?(): void;
   updateStaleness?(isStale: boolean): void;
   updateIsEligibleForOracle(isStale: boolean): void;
 }
@@ -54,13 +51,10 @@ interface EpisodeNavProps {
 class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
   public render() {
     const {
-      hasParent,
       hasTimer,
       hasTimerEnded,
       isInOracleMode,
       isTakingABreak,
-      depleteBudget,
-      transferRemainingBudgetToParent,
       updateStaleness,
       updateIsEligibleForOracle,
     } = this.props;
@@ -73,16 +67,12 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
             ?
               <NextWorkspaceBtn
                 label={"Start on next workspace (Oracle Mode)"}
-                navHook={() => {}}
               />
             :
               (
                 <div>
                   <TakeBreakBtn
                     label="Skip and go to next workspace"
-                    navHook={() => {
-
-                    }}
                   />
                   {
                     !this.props.hasSubquestions

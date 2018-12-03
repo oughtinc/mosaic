@@ -12,6 +12,7 @@ import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 
 import { EpisodeNav } from "./EpisodeNav";
+import { ResponseFooter } from "./ResponseFooter";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
@@ -38,8 +39,6 @@ import {
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
-  responseFooterBgColor,
-  responseFormBorderTopColor,
   workspaceViewQuestionFontSize
 } from "../../styles";
 
@@ -195,22 +194,6 @@ const SubtreeLink = ({ workspace }) => (
   </NavLink>
 );
 
-const NextWorkspaceBtn = ({ label, navHook }: any) => {
-  return (
-    <Link onClick={navHook} to="/next" style={{ margin: "0 5px" }}>
-      <Button bsSize="xsmall" bsStyle="danger">{label} »</Button>
-    </Link>
-  );
-};
-
-const TakeBreakBtn = ({ bsStyle, label, navHook, style }: any) => {
-  return (
-    <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
-      <Button bsSize="xsmall" bsStyle={bsStyle || "primary"}>{label} »</Button>
-    </Link>
-  );
-};
-
 function findPointers(value: any) {
   const _value = value ? Value.fromJSON(value) : Plain.deserialize("");
   const pointers = exportingNodes(_value.document);
@@ -322,7 +305,6 @@ export class WorkspaceView extends React.Component<any, any> {
           <EpisodeNav
             hasSubquestions={hasSubquestions}
             isInOracleMode={isInOracleMode}
-            hasParent={hasParent}
             hasTimer={hasTimer}
             hasTimerEnded={hasTimerEnded}
             updateStaleness={isStale =>
@@ -333,16 +315,6 @@ export class WorkspaceView extends React.Component<any, any> {
             updateIsEligibleForOracle={isEligibleForOracle =>
               this.props.updateWorkspaceIsEligibleForOracle({
                 variables: { workspaceId: workspace.id, isEligibleForOracle }
-              })
-            }
-            transferRemainingBudgetToParent={() =>
-              this.props.transferRemainingBudgetToParent({
-                variables: { id: workspace.id }
-              })
-            }
-            depleteBudget={() =>
-              this.props.depleteBudget({
-                variables: { id: workspace.id }
               })
             }
           />
@@ -435,80 +407,47 @@ export class WorkspaceView extends React.Component<any, any> {
                       {
                         Auth.isAuthenticated()
                         &&
-                        (
-                          (isUserOracle && isInOracleMode)
-                          ||
-                          hasTimer
-                        )
+                        ((isUserOracle && isInOracleMode) || hasTimer)
                         &&
-                        (
-                          !(
-                            (isUserOracle && isInOracleMode)
-                            &&
-                            !hasParent
-                          )
-                        )
+                        (!((isUserOracle && isInOracleMode) && !hasParent))
                         &&
-                        <div
-                          style={{
-                            backgroundColor: responseFooterBgColor,
-                            borderRadius: "0 0 3px 3px",
-                            borderTop: `1px solid ${responseFormBorderTopColor}`,
-                            padding: "10px",
-                          }}
-                        >
-                          {
-                            !(isUserOracle && isInOracleMode)
-                            &&
-                            hasParent
-                            ?
-                              <TakeBreakBtn
-                                label="Done! (returns budget)"
-                                navHook={() => {
-                                  this.props.transferRemainingBudgetToParent({
-                                    variables: { id: workspace.id }
-                                  });
-
-                                  this.props.updateWorkspaceStaleness({
-                                    variables: { id: workspace.id, isStale: false }
-                                  });
-                                }}
-                              />
-                            :
-                              (
-                                !(isUserOracle && isInOracleMode)
-                                ?
-                                <TakeBreakBtn
-                                  label="Done!"
-                                  navHook={() => {
-                                    this.props.updateWorkspaceIsEligible({
-                                      variables: {
-                                        isEligible: false,
-                                        workspaceId: workspace.id,
-                                      }
-                                    });
-                                  }}
-                                />
-                                :
-                                <TakeBreakBtn
-                                  bsStyle="danger"
-                                  label="Done! (take budget)"
-                                  navHook={() => {
-                                    this.props.updateWorkspaceIsEligibleForOracle({
-                                      variables: {
-                                        workspaceId: workspace.id,
-                                        isEligibleForOracle: false,
-                                      }
-                                    });
-
-                                    this.props.depleteBudget({
-                                      variables: { id: workspace.id }
-                                    });
-                                  }}
-                                />
-                              )
+                        <ResponseFooter
+                          depleteBudget={() =>
+                            this.props.depleteBudget({
+                              variables: { id: workspace.id },
+                            })
                           }
-                        </div>
+                          hasParent={hasParent}
+                          isInOracleMode={isInOracleMode}
+                          isUserOracle={isUserOracle}
+                          markAsNotEligible={() =>
+                            this.props.updateWorkspaceIsEligible({
+                              variables: {
+                                isEligible: false,
+                                workspaceId: workspace.id,
+                              }
+                            })
+                          }
+                          markAsNotEligibleForOracle={() =>
+                            this.props.updateWorkspaceIsEligibleForOracle({
+                              variables: {
+                                isEligibleForOracle: false,
+                                workspaceId: workspace.id,
+                              }
+                            })
+                          }
+                          markAsNotStale={() =>
+                            this.props.updateWorkspaceStaleness({
+                              variables: { id: workspace.id, isStale: false }
+                            })
+                          }
+                          transferRemainingBudgetToParent={() =>
+                            this.props.transferRemainingBudgetToParent({
+                              variables: { id: workspace.id },
+                            })
+                          }
+                          workspaceId={workspace.id}
+                        />
                       }
                     </BlockContainer>
                   </Col>

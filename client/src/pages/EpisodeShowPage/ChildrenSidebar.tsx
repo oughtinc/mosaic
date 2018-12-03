@@ -40,14 +40,6 @@ const BlockHeader = styled.div`
   ${blockHeaderCSS};
 `;
 
-const NextWorkspaceBtn = ({ label, navHook }: any) => {
-  return (
-    <Link onClick={navHook} to="/next" style={{ margin: "0 5px" }}>
-      <Button bsSize="xsmall" bsStyle="danger">{label} »</Button>
-    </Link>
-  );
-};
-
 const TakeBreakBtn = ({ bsStyle, label, navHook, style }: any) => {
   return (
     <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>

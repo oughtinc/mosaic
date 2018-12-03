@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Glyphicon } from "react-bootstrap";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
@@ -56,7 +55,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
             There is no eligible workspace at this time. Please wait a minute and then refresh this page to try again.
-          </span>  
+          </span>
         </ContentContainer>
       );
     } else if (this.state.oracleSchedulingFailed) {
