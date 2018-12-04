@@ -65,6 +65,7 @@ const WORKSPACE_QUERY = gql`
         id
         totalBudget
         creatorId
+        isArchived
         isEligibleForOracle
         isPublic
         allocatedBudget
@@ -100,6 +101,14 @@ const UPDATE_WORKSPACE = gql`
 const UPDATE_WORKSPACE_STALENESS = gql`
   mutation updateWorkspaceStaleness($id: String!, $isStale: Boolean!) {
     updateWorkspaceStaleness(id: $id, isStale: $isStale) {
+      id
+    }
+  }
+`;
+
+const UPDATE_WORKSPACE_IS_ARCHIVED = gql`
+  mutation updateWorkspaceIsArchived($id: String!, $isArchived: Boolean!) {
+    updateWorkspaceIsArchived(id: $id, isArchived: $isArchived) {
       id
     }
   }
@@ -485,11 +494,11 @@ export class WorkspaceView extends React.Component<any, any> {
                       parentTotalBudget={
                         workspace.totalBudget
                       }
-                      changeOrder={newOrder => {
-                        this.props.updateWorkspaceChildren({
+                      updateWorkspaceIsArchived={({ isArchived, workspaceId }) => {
+                        this.props.updateWorkspaceIsArchived({
                           variables: {
-                            id: workspace.id,
-                            childWorkspaceOrder: newOrder
+                            id: workspaceId,
+                            isArchived,
                           }
                         });
                       }}
@@ -603,6 +612,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_STALENESS, {
     name: "updateWorkspaceStaleness",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(UPDATE_WORKSPACE_IS_ARCHIVED, {
+    name: "updateWorkspaceIsArchived",
     options: {
       refetchQueries: ["workspace"]
     }

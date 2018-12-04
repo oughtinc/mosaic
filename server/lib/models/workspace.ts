@@ -45,6 +45,11 @@ const WorkspaceModel = (
         defaultValue: true,
         allowNull: false
       },
+      isArchived: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       ...eventRelationshipColumns(DataTypes),
       childWorkspaceOrder: {
         type: DataTypes.ARRAY(DataTypes.TEXT),

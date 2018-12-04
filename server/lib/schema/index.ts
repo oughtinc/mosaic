@@ -296,6 +296,18 @@ const schema = new GraphQLSchema({
           return workspace.update({ isStale }, { event });
         }
       },
+      updateWorkspaceIsArchived: {
+        type: workspaceType,
+        args: {
+          id: { type: GraphQLString },
+          isArchived: { type: GraphQLBoolean }
+        },
+        resolve: async (_, { id, isArchived }) => {
+          const workspace = await models.Workspace.findById(id);
+          const event = await models.Event.create();
+          return workspace.update({ isArchived }, { event });
+        }
+      },
       transferRemainingBudgetToParent: {
         type: workspaceType,
         args: {

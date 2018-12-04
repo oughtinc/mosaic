@@ -65,6 +65,47 @@ export class Child extends React.Component<any, any> {
       workspace
     );
 
+    if (workspace.isArchived) {
+      return (
+        <div
+          style={{
+            backgroundColor: "#f0f0f0",
+            padding: "10px",
+          }}
+        >
+          <div style={{ opacity: 0.5 }}>
+            {questionRelationship.findBlock().value && (
+              <BlockEditor
+                {...questionRelationship.blockEditorAttributes()}
+                availablePointers={availablePointers}
+              />
+            )}
+          </div>
+
+          <div style={{ marginTop: "0.5em" }}>
+            {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                onClick={this.props.onDelete}
+                style={{ marginRight: "5px" }}
+              >
+                Unarchive
+              </Button>
+            )}
+            <div style={{ float: "right", opacity: 0.5 }}>
+              <ChildBudgetBadge
+                shouldShowSeconds={false}
+                remainingBudget={workspace.totalBudget - workspace.allocatedBudget}
+                totalBudget={workspace.totalBudget}
+              />
+            </div>
+          </div>
+          <div style={{ clear: "both "}} />
+        </div>
+      );
+    }
+
     return (
       <div
         style={{
@@ -78,7 +119,6 @@ export class Child extends React.Component<any, any> {
             availablePointers={availablePointers}
           />
         )}
-
         <div style={{ color: subQuestionAnswerFontColor, marginTop: "8px" }}>
           {answerRelationship.findBlock().value && (
             <BlockEditor
@@ -233,44 +273,46 @@ export class ChildrenSidebar extends React.Component<any, any> {
         {!!this.props.workspaceOrder.length && (
           <BlockContainer>
             <BlockHeader>Subquestions</BlockHeader>
-            {this.props.workspaceOrder.map((workspaceId, i, arr) => {
-              const workspace = this.props.workspaces.find(
+            {this.props.workspaceOrder
+              .map((workspaceId, i, arr) => this.props.workspaces.find(
                 w => w.id === workspaceId
-              );
-              return (
-                <BlockBody
-                  key={workspace.id}
-                  style={{
-                    borderBottom:
-                      i !== arr.length - 1
-                        ? `1px solid ${blockBorderColor}`
-                        : "none",
-                  }}
-                >
-                  <Child
-                    isInOracleMode={this.props.isInOracleMode}
-                    updateIsEligibleForOracle={this.props.updateIsEligibleForOracle}
-                    isIsolatedWorkspace={this.props.isIsolatedWorkspace}
-                    availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
-                    workspace={workspace}
+              ))
+              .map((workspace, i, arr) => {
+                return (
+                  <BlockBody
                     key={workspace.id}
-                    onDelete={() => {
-                      this.props.changeOrder(
-                        this.props.workspaceOrder.filter(
-                          w => w !== workspace.id
-                        )
-                      );
+                    style={{
+                      borderBottom:
+                        i !== arr.length - 1
+                          ? `1px solid ${blockBorderColor}`
+                          : "none",
                     }}
-                    availablePointers={this.props.availablePointers}
-                    parentAvailableBudget={this.props.availableBudget}
-                    parentTotalBudget={this.props.parentTotalBudget}
-                    onUpdateChildTotalBudget={
-                      this.props.onUpdateChildTotalBudget
-                    }
-                  />
-                </BlockBody>
-              );
-            })}
+                  >
+                    <Child
+                      isArchived={this.props.isArchived}
+                      isInOracleMode={this.props.isInOracleMode}
+                      updateIsEligibleForOracle={this.props.updateIsEligibleForOracle}
+                      isIsolatedWorkspace={this.props.isIsolatedWorkspace}
+                      availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
+                      workspace={workspace}
+                      key={workspace.id}
+                      onDelete={() => {
+                        this.props.updateWorkspaceIsArchived({
+                          workspaceId: workspace.id,
+                          isArchived: !workspace.isArchived,
+                        });
+                      }}
+                      availablePointers={this.props.availablePointers}
+                      parentAvailableBudget={this.props.availableBudget}
+                      parentTotalBudget={this.props.parentTotalBudget}
+                      onUpdateChildTotalBudget={
+                        this.props.onUpdateChildTotalBudget
+                      }
+                    />
+                  </BlockBody>
+                );
+              })
+            }
             {
               Auth.isAuthenticated()
               &&
