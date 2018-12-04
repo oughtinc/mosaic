@@ -30,13 +30,21 @@ function secondsToDurationString(seconds: number, shouldShowSeconds: boolean) {
 
 class ChildBudgetBadge extends React.Component<any, any> {
   public render() {
-    const { remainingBudget, shouldShowSeconds = true, totalBudget } = this.props;
+    const { noBadge, remainingBudget, shouldShowSeconds = true, style, totalBudget } = this.props;
 
     const totalBudgetDurationString = secondsToDurationString(Number(totalBudget), shouldShowSeconds);
 
+    if (noBadge) {
+      return (
+        <span style={style}>
+          {totalBudgetDurationString}
+        </span>
+      );
+    }
+
     if (remainingBudget === undefined) {
       return (
-        <Badge style={{ backgroundColor: remainingBudget < 90 ? "red" : "#777" }}>
+        <Badge style={{ ...style, backgroundColor: remainingBudget < 90 ? "red" : "#777" }}>
           {totalBudgetDurationString}
         </Badge>
       );

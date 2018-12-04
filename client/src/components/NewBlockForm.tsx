@@ -5,7 +5,7 @@ import { BlockEditor } from "./BlockEditor";
 import { valueToDatabaseJSON } from "../lib/slateParser";
 import { Button } from "react-bootstrap";
 import { resetBlock } from "../modules/blocks/actions";
-import { ChildBudgetBadge } from "../pages/EpisodeShowPage/ChildBudgetBadge";
+import { ChildBudgetBadge } from "./ChildBudgetBadge";
 
 import {
   blockBorderAndBoxShadow,

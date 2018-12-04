@@ -9,6 +9,7 @@ import {
   ROOT_WORKSPACE_SUBTREE_QUERY,
   CHILD_WORKSPACE_SUBTREE_QUERY,
 } from "../../graphqlQueries";
+import { ChildBudgetBadge } from "../ChildBudgetBadge";
 
 import { Auth } from "../../auth";
 
@@ -72,6 +73,7 @@ interface WorkspaceType {
   totalBudget: number;
   allocatedBudget: number;
   wasAnsweredByOracle: boolean;
+  isArchived: boolean;
 }
 
 interface WorkspaceCardProps {
@@ -145,9 +147,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
       return <LoadingMsg isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}/>;
     }
     return (
-      <Container>
-        <div>
-        </div>
+      <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
         <CardBody>
           <div
             style={{
@@ -157,16 +157,31 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               color: "#999",
               fontSize: "11px",
               display: "flex",
-              height: "30px",
+              height: "70px",
               justifyContent: "space-between",
             }}
           >
             <span style={{ padding: "0 10px"}}>
-            total time {workspace.totalBudget}s
-            ---
-            allocated time {workspace.allocatedBudget}s
-            ---
-            time spent {workspace.budgetUsedWorkingOnThisWorkspace}s
+              <ChildBudgetBadge
+                noBadge={true}
+                style={{ color: "#555", fontSize: "10px" }}
+                totalBudget={workspace.totalBudget}
+              />
+              {" "}available
+              <br />
+              <ChildBudgetBadge
+                noBadge={true}
+                style={{ color: "#555", fontSize: "10px" }}
+                totalBudget={workspace.allocatedBudget - workspace.budgetUsedWorkingOnThisWorkspace}
+              />
+              {" "}subquestions
+              <br />
+              <ChildBudgetBadge
+                noBadge={true}
+                style={{ color: "#555", fontSize: "10px" }}
+                totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
+              />
+              {" "}direct work
             </span>
             {
               workspace.wasAnsweredByOracle

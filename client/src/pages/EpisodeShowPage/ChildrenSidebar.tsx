@@ -10,7 +10,7 @@ import {
   WorkspaceBlockRelation,
   WorkspaceRelationTypes,
 } from "./WorkspaceRelations";
-import { ChildBudgetBadge } from "./ChildBudgetBadge";
+import { ChildBudgetBadge } from "../../components/ChildBudgetBadge";
 import { ChildBudgetForm } from "./ChildBudgetForm";
 import { Auth } from "../../auth";
 
