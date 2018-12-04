@@ -77,6 +77,7 @@ export class Child extends React.Component<any, any> {
             {questionRelationship.findBlock().value && (
               <BlockEditor
                 {...questionRelationship.blockEditorAttributes()}
+                readOnly={true}
                 availablePointers={availablePointers}
               />
             )}
