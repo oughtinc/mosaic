@@ -71,6 +71,7 @@ interface WorkspaceType {
   budgetUsedWorkingOnThisWorkspace: number;
   totalBudget: number;
   allocatedBudget: number;
+  wasAnsweredByOracle: boolean;
 }
 
 interface WorkspaceCardProps {
@@ -167,6 +168,13 @@ export class WorkspaceCardPresentational extends React.PureComponent<
             ---
             time spent {workspace.budgetUsedWorkingOnThisWorkspace}s
             </span>
+            {
+              workspace.wasAnsweredByOracle
+              &&
+              <span style={{ color: "darkRed"}}>
+                WAS ANSWERED BY ORACLE
+              </span>
+            }
             <span>
               {
                 workspace.isStale

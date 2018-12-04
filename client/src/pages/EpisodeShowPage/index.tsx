@@ -114,6 +114,14 @@ const UPDATE_WORKSPACE_IS_ARCHIVED = gql`
   }
 `;
 
+const UPDATE_WORKSPACE_WAS_ANSWERED_BY_ORACLE = gql`
+  mutation updateWorkspaceWasAnsweredByOracle($id: String!, $wasAnsweredByOracle: Boolean!) {
+    updateWorkspaceWasAnsweredByOracle(id: $id, wasAnsweredByOracle: $wasAnsweredByOracle) {
+      id
+    }
+  }
+`;
+
 const UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE = gql`
   mutation updateWorkspaceIsEligibleForOracle($workspaceId: String!, $isEligibleForOracle: Boolean!) {
     updateWorkspaceIsEligibleForOracle(workspaceId: $workspaceId, isEligibleForOracle: $isEligibleForOracle) {
@@ -429,6 +437,11 @@ export class WorkspaceView extends React.Component<any, any> {
                           hasParent={hasParent}
                           isInOracleMode={isInOracleMode}
                           isUserOracle={isUserOracle}
+                          markAsAnsweredByOracle={() =>
+                            this.props.updateWorkspaceWasAnsweredByOracle({
+                              variables: { id: workspace.id, wasAnsweredByOracle: true }
+                            })
+                          }
                           markAsNotEligible={() =>
                             this.props.updateWorkspaceIsEligible({
                               variables: {
@@ -536,7 +549,7 @@ export class WorkspaceQuery extends React.Component<any, any> {
 
     const workspace = this.props.workspace.workspace;
 
-    if (workspace === null) {
+    if (!workspace) {
       return <ContentContainer>Workspace not found...</ContentContainer>;
     }
 
@@ -618,6 +631,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_ARCHIVED, {
     name: "updateWorkspaceIsArchived",
+    options: {
+      refetchQueries: ["workspace"]
+    }
+  }),
+  graphql(UPDATE_WORKSPACE_WAS_ANSWERED_BY_ORACLE, {
+    name: "updateWorkspaceWasAnsweredByOracle",
     options: {
       refetchQueries: ["workspace"]
     }

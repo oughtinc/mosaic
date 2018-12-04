@@ -22,6 +22,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       hasParent,
       isInOracleMode,
       isUserOracle,
+      markAsAnsweredByOracle,
       markAsNotEligible,
       markAsNotEligibleForOracle,
       markAsNotStale,
@@ -63,6 +64,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                 label="Done! (take budget)"
                 navHook={() => {
                   depleteBudget();
+                  markAsAnsweredByOracle();
                   markAsNotEligibleForOracle();
                 }}
               />

@@ -50,6 +50,11 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      wasAnsweredByOracle: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       ...eventRelationshipColumns(DataTypes),
       childWorkspaceOrder: {
         type: DataTypes.ARRAY(DataTypes.TEXT),

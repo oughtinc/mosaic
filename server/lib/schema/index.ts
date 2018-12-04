@@ -308,6 +308,18 @@ const schema = new GraphQLSchema({
           return workspace.update({ isArchived }, { event });
         }
       },
+      updateWorkspaceWasAnsweredByOracle: {
+        type: workspaceType,
+        args: {
+          id: { type: GraphQLString },
+          wasAnsweredByOracle: { type: GraphQLBoolean }
+        },
+        resolve: async (_, { id, wasAnsweredByOracle }) => {
+          const workspace = await models.Workspace.findById(id);
+          const event = await models.Event.create();
+          return workspace.update({ wasAnsweredByOracle }, { event });
+        }
+      },
       transferRemainingBudgetToParent: {
         type: workspaceType,
         args: {

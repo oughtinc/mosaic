@@ -76,6 +76,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       totalBudget
       allocatedBudget
       budgetUsedWorkingOnThisWorkspace
+      wasAnsweredByOracle
       blocks {
         id
         value
@@ -97,6 +98,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       totalBudget
       allocatedBudget
       budgetUsedWorkingOnThisWorkspace
+      wasAnsweredByOracle
       blocks {
         id
         value
