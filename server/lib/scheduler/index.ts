@@ -13,7 +13,7 @@ const NINETY_SECONDS = 90 * 1000;
 
 const fetchAllWorkspacesInTree = async (rootWorkspace) => {
   const result = [rootWorkspace];
-  const children = await rootWorkspace.getChildWorkspaces();
+  const children = await rootWorkspace.getChildWorkspaces({ where: { isArchived: false } });
 
   for (const child of children) {
     const allWorkspacesInChildsTree = await fetchAllWorkspacesInTree(child);
@@ -27,6 +27,7 @@ const scheduler = new Scheduler({
   fetchAllRootWorkspaces: async () => await Workspace.findAll({
     where: {
       parentId: null,
+      isArchived: false,
       isEligibleForAssignment: true,
     }
   }),
