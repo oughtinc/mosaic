@@ -69,8 +69,8 @@ interface WorkspaceType {
   id: string;
   isStale: boolean;
   isEligibleForOracle: boolean;
-  budgetUsedWorkingOnThisWorkspace: number;
-  totalBudget: number;
+  secondsThatHaveCountedDown: number;
+  secondsThatHaveCountedDownInEntireSubtree: number;
   allocatedBudget: number;
   wasAnsweredByOracle: boolean;
   isArchived: boolean;
@@ -165,23 +165,16 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               <ChildBudgetBadge
                 noBadge={true}
                 style={{ color: "#555", fontSize: "10px" }}
-                totalBudget={workspace.totalBudget}
+                totalBudget={workspace.secondsThatHaveCountedDown}
               />
-              {" "}available
+              {" "}work on this workspace
               <br />
               <ChildBudgetBadge
                 noBadge={true}
                 style={{ color: "#555", fontSize: "10px" }}
-                totalBudget={workspace.allocatedBudget - workspace.budgetUsedWorkingOnThisWorkspace}
+                totalBudget={workspace.secondsThatHaveCountedDownInEntireSubtree}
               />
-              {" "}subquestions
-              <br />
-              <ChildBudgetBadge
-                noBadge={true}
-                style={{ color: "#555", fontSize: "10px" }}
-                totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
-              />
-              {" "}direct work
+              {" "}work on this entire subtree
             </span>
             {
               workspace.wasAnsweredByOracle

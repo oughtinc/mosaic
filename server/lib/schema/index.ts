@@ -518,9 +518,10 @@ const schema = new GraphQLSchema({
         type: workspaceType,
         args: {
           workspaceId: { type: GraphQLString },
-          changeToBudget: { type: GraphQLInt }
+          changeToBudget: { type: GraphQLInt },
+          isResultOfTimerCountdown: { type: GraphQLBoolean },
         },
-        resolve: async (_, { workspaceId, changeToBudget }, context) => {
+        resolve: async (_, { workspaceId, changeToBudget, isResultOfTimerCountdown }, context) => {
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error(
@@ -533,6 +534,19 @@ const schema = new GraphQLSchema({
             workspace.allocatedBudget + changeToBudget
           );
           await workspace.update({ allocatedBudget: updatedTimeBudget });
+          if (isResultOfTimerCountdown) {
+            await workspace.update({
+              secondsThatHaveCountedDown: workspace.secondsThatHaveCountedDown + 1,
+              secondsThatHaveCountedDownInEntireSubtree: workspace.secondsThatHaveCountedDownInEntireSubtree + 1,
+             });
+
+            let curWorkspace = workspace;
+            while (curWorkspace.parentId) {
+              const parent = await models.Workspace.findById(curWorkspace.parentId);
+              await parent.update({ secondsThatHaveCountedDownInEntireSubtree: parent.secondsThatHaveCountedDownInEntireSubtree + 1 });
+              curWorkspace = parent;
+            }
+          }
         }
       }
     }

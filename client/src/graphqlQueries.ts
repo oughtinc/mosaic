@@ -30,8 +30,8 @@ export const UPDATE_BLOCKS = gql`
 `;
 
 export const UPDATE_ALLOCATED_BUDGET = gql`
-  mutation updateAllocatedBudget($workspaceId: String, $changeToBudget: Int) {
-    updateAllocatedBudget(workspaceId: $workspaceId, changeToBudget: $changeToBudget) {
+  mutation updateAllocatedBudget($workspaceId: String, $changeToBudget: Int, $isResultOfTimerCountdown: Boolean) {
+    updateAllocatedBudget(workspaceId: $workspaceId, changeToBudget: $changeToBudget, isResultOfTimerCountdown: $isResultOfTimerCountdown) {
       id
     }
   }
@@ -73,9 +73,8 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
-      totalBudget
-      allocatedBudget
-      budgetUsedWorkingOnThisWorkspace
+      secondsThatHaveCountedDown
+      secondsThatHaveCountedDownInEntireSubtree
       isArchived
       wasAnsweredByOracle
       blocks {
@@ -96,9 +95,8 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       isEligibleForOracle
       creatorId
       childWorkspaceOrder
-      totalBudget
-      allocatedBudget
-      budgetUsedWorkingOnThisWorkspace
+      secondsThatHaveCountedDown
+      secondsThatHaveCountedDownInEntireSubtree
       isArchived
       wasAnsweredByOracle
       blocks {
