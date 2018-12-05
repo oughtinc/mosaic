@@ -504,19 +504,6 @@ const schema = new GraphQLSchema({
           workspaceId: { type: GraphQLString }
         },
         resolve: async (_, { isEligibleForOracle, workspaceId }, context) => {
-          console.log(`
-
-
-
-
-
-            HERE~~
-
-
-
-
-
-          `)
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error(
