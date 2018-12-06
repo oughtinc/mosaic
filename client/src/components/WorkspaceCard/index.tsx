@@ -181,6 +181,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
             <span style={{ padding: "0 10px"}}>
               <ChildBudgetBadge
                 noBadge={true}
+                shouldShowSeconds={false}
                 style={{ color: "#555", fontSize: "10px" }}
                 totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
               />
@@ -188,6 +189,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               <br />
               <ChildBudgetBadge
                 noBadge={true}
+                shouldShowSeconds={false}
                 style={{ color: "#555", fontSize: "10px" }}
                 totalBudget={subtreeTimeSpentData[workspace.id]}
               />
