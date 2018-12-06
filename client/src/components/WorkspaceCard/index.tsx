@@ -27,6 +27,12 @@ export enum toggleTypes {
   CHILDREN
 }
 
+const ORACLE_MODE_QUERY = gql`
+  query oracleModeQuery {
+    oracleMode
+  }
+`;
+
 const SUBTREE_TIME_SPENT_QUERY = gql`
 query subtreeTimeSpentQuery($id: String!) {
   subtreeTimeSpent(id: $id)
@@ -90,6 +96,7 @@ interface WorkspaceCardProps {
   subtreeQuery: SubtreeQuery;
   subtreeTimeSpentQuery: any;
   subtreeTimeSpentData: any;
+  oracleModeQuery: any;
 }
 
 interface SubtreeQuery {
@@ -163,6 +170,8 @@ export class WorkspaceCardPresentational extends React.PureComponent<
       :
       this.props.subtreeTimeSpentData;
 
+    const isInOracleMode = this.props.oracleModeQuery.oracleMode;
+
     return (
       <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
         <CardBody>
@@ -198,6 +207,8 @@ export class WorkspaceCardPresentational extends React.PureComponent<
             {
               workspace.wasAnsweredByOracle
               &&
+              isInOracleMode
+              &&
               <span style={{ color: "darkRed"}}>
                 WAS ANSWERED BY ORACLE
               </span>
@@ -210,6 +221,8 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               }
               {
                 workspace.isEligibleForOracle
+                &&
+                isInOracleMode
                 &&
                 <span style={{ padding: "0 10px"}}>ORACLE ONLY</span>
               }
@@ -267,5 +280,8 @@ export const WorkspaceCard: any = compose(
   graphql(SUBTREE_TIME_SPENT_QUERY, {
     name: "subtreeTimeSpentQuery",
     options: optionsForSubtreeTimeSpentQuery,
+  }),
+  graphql(ORACLE_MODE_QUERY, {
+    name: "oracleModeQuery",
   }),
 )(WorkspaceCardPresentational);
