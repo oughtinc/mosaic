@@ -59,21 +59,8 @@ export const ChildrenSection = ({
     return (
       <ChildrenContainer>
         <Bullet isActive={childrenToggle} onClick={onChangeToggle}>
-          {childrenToggle ? "hide" : "show"}
+          {childrenToggle ? "hide" : `show ${childrenIds.length} subtree${childrenIds.length !== 1 ? "s" : ""}`}
         </Bullet>
-        {!childrenToggle && (
-          <Collection>
-            <span
-              style={{
-                color: "#777",
-                fontSize: "12px",
-                paddingTop: "7px",
-              }}
-            >
-              {childrenIds.length}{" "}subtree{childrenIds.length !== 1 ? "s" : ""}
-            </span>
-          </Collection>
-        )}
         {childrenToggle && (
           <Collection>
             {childrenIds.map(childId => (
