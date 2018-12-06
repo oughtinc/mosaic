@@ -31,6 +31,7 @@ const scheduler = new Scheduler({
       isEligibleForAssignment: true,
     }
   }),
+  isInOracleMode,
   schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: NINETY_SECONDS }),
   remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,

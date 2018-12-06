@@ -12,6 +12,7 @@ class Scheduler {
   public constructor({
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
+    isInOracleMode,
     remainingBudgetAmongDescendantsCache,
     rootParentCache,
     schedule,
@@ -128,11 +129,13 @@ class Scheduler {
   }
 
   private async getActionableWorkspacesForTree(userId, rootWorkspace) {
-    const workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
+    let workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
 
-    const workspacesForNonOracles = workspacesInTree.filter(w => !w.isEligibleForOracle);
+    if (this.isInOracleMode) {
+      workspacesInTree = workspacesInTree.filter(w => !w.isEligibleForOracle);
+    }
 
-    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesForNonOracles);
+    const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
 
     const workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(workspacesNotCurrentlyBeingWorkedOn);
 
