@@ -172,7 +172,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               backgroundColor: "#f8f8f8",
               borderBottom: "1px solid #ddd",
               color: "#999",
-              fontSize: "11px",
+              fontSize: "12px",
               display: "flex",
               height: "40px",
               justifyContent: "space-between",
@@ -182,18 +182,18 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               <ChildBudgetBadge
                 noBadge={true}
                 shouldShowSeconds={false}
-                style={{ color: "#555", fontSize: "10px" }}
-                totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
+                style={{ color: "#555", fontSize: "12px" }}
+                totalBudget={subtreeTimeSpentData[workspace.id]}
               />
-              {" "}work on this workspace
+              {" "}work on this entire subtree
               <br />
               <ChildBudgetBadge
                 noBadge={true}
                 shouldShowSeconds={false}
-                style={{ color: "#555", fontSize: "10px" }}
-                totalBudget={subtreeTimeSpentData[workspace.id]}
+                style={{ color: "#555", fontSize: "12px" }}
+                totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
               />
-              {" "}work on this entire subtree
+              {" "}work on this workspace
             </span>
             {
               workspace.wasAnsweredByOracle
