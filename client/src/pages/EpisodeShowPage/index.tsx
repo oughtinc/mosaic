@@ -284,11 +284,11 @@ export class WorkspaceView extends React.Component<any, any> {
       ],
       p => p.data.pointerId
     );
-    
+
     const availablePointers = _.orderBy(
       unsortedAvailablePointers,
-      ['data.pointerId'],
-      ['asc']
+      ["data.pointerId"],
+      ["asc"]
     );
 
     const questionProps = new WorkspaceBlockRelation(
