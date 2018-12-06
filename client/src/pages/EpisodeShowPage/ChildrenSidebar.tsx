@@ -43,7 +43,7 @@ const BlockHeader = styled.div`
 const TakeBreakBtn = ({ bsStyle, label, navHook, style }: any) => {
   return (
     <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
-      <Button bsSize="xsmall" bsStyle={bsStyle || "primary"}>{label} »</Button>
+      <Button bsSize="small" bsStyle={bsStyle || "primary"}>{label} »</Button>
     </Link>
   );
 };

@@ -6,22 +6,23 @@ import { Link } from "react-router-dom";
 import { Auth } from "../../auth";
 
 interface NextWorkspaceBtnProps {
+  bsStyle: string;
   label: string;
   navHook?: () => void;
 }
 
-const NextWorkspaceBtn = ({ label, navHook }: NextWorkspaceBtnProps) => {
+const NextWorkspaceBtn = ({ bsStyle, label, navHook }: NextWorkspaceBtnProps) => {
   return (
     <Link onClick={navHook} to="/next" style={{ margin: "0 5px" }}>
-      <Button bsSize="small">{label} »</Button>
+      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
     </Link>
   );
 };
 
-const TakeBreakBtn = ({ label, navHook }: NextWorkspaceBtnProps) => {
+const TakeBreakBtn = ({ bsStyle, label, navHook }: NextWorkspaceBtnProps) => {
   return (
     <Link onClick={navHook} to="/break" style={{ margin: "0 5px" }}>
-      <Button bsSize="small">{label} »</Button>
+      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
     </Link>
   );
 };
@@ -66,18 +67,21 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
             isTakingABreak
             ?
               <NextWorkspaceBtn
+                bsStyle="default"
                 label={"Start on next workspace (Oracle Mode)"}
               />
             :
               (
                 <div>
                   <TakeBreakBtn
+                    bsStyle="default"
                     label="Skip and go to next workspace"
                   />
                   {
                     !this.props.hasSubquestions
                     &&
                     <TakeBreakBtn
+                      bsStyle="default"
                       label="Done (leave budget)"
                       navHook={() => {
                         updateIsEligibleForOracle(false);
@@ -100,11 +104,13 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
             hasTimerEnded
             ?
               <NextWorkspaceBtn
+                bsStyle="primary"
                 label="Get next workspace"
               />
             :
               <div>
                 <TakeBreakBtn
+                  bsStyle="primary"
                   label="Needs more work"
                   navHook={() => updateStaleness && updateStaleness(true)}
                 />
@@ -112,6 +118,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
           )
           :
           <NextWorkspaceBtn
+            bsStyle="primary"
             label={isTakingABreak ? "Start on next workspace" : "Get started"}
             navHook={() => updateStaleness && updateStaleness(true)}
           />

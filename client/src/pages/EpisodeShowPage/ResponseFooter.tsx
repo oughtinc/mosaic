@@ -10,7 +10,7 @@ import {
 const TakeBreakBtn = ({ label, navHook }: any) => {
   return (
     <Link onClick={navHook} to="/break" style={{ margin: "0 5px" }}>
-      <Button bsSize="small">{label} »</Button>
+      <Button bsSize="small" bsStyle="primary">{label} »</Button>
     </Link>
   );
 };
