@@ -174,7 +174,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               color: "#999",
               fontSize: "11px",
               display: "flex",
-              height: "70px",
+              height: "40px",
               justifyContent: "space-between",
             }}
           >
