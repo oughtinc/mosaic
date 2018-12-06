@@ -21,7 +21,7 @@ const Bullet: any = styled.span`
   float: left;
   background: ${treeBulletBgColor};
   padding: 5px;
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
   margin-left: 9px;
   margin-bottom: 10px;
