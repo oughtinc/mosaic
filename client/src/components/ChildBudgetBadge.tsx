@@ -3,6 +3,9 @@ import * as React from "react";
 import { Badge } from "react-bootstrap";
 
 function secondsToDurationString(seconds: number, shouldShowSeconds: boolean) {
+  if (seconds < 0) {
+    return "0s";
+  }
   const milliseconds = seconds * 1000;
   const durationInMs = Duration.fromMillis(milliseconds);
   const duration = durationInMs.shiftTo("days", "hours", "minutes", "seconds");
