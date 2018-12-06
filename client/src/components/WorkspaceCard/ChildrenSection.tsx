@@ -1,7 +1,5 @@
 import styled from "styled-components";
 import * as React from "react";
-import FontAwesomeIcon = require("@fortawesome/react-fontawesome");
-import faLongArrowAltRight = require("@fortawesome/fontawesome-free-solid/faLongArrowAltRight");
 
 import { WorkspaceCard } from "./index";
 
@@ -18,10 +16,13 @@ const ChildrenContainer = styled.div`
   width: 100%;
 `;
 
-const Bullet: any = styled.a`
+const Bullet: any = styled.span`
   ${blockBorderAndBoxShadow};
   float: left;
   background: ${treeBulletBgColor};
+  padding: 5px;
+  font-size: 10px;
+  cursor: pointer;
   margin-left: 9px;
   margin-bottom: 10px;
   border-radius: 2px;
@@ -57,9 +58,22 @@ export const ChildrenSection = ({
   if (!!childrenIds.length) {
     return (
       <ChildrenContainer>
-        <Bullet href="#!" isActive={childrenToggle} onClick={onChangeToggle}>
-          <FontAwesomeIcon icon={faLongArrowAltRight} />
+        <Bullet isActive={childrenToggle} onClick={onChangeToggle}>
+          {childrenToggle ? "hide" : "show"}
         </Bullet>
+        {!childrenToggle && (
+          <Collection>
+            <span
+              style={{
+                color: "#777",
+                fontSize: "12px",
+                paddingTop: "7px",
+              }}
+            >
+              {childrenIds.length}{" "}subtree{childrenIds.length !== 1 ? "s" : ""}
+            </span>
+          </Collection>
+        )}
         {childrenToggle && (
           <Collection>
             {childrenIds.map(childId => (

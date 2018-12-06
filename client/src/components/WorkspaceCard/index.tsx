@@ -115,7 +115,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     this.state = {
       toggles: {
         [toggleTypes.SCRATCHPAD]: true,
-        [toggleTypes.CHILDREN]: true
+        [toggleTypes.CHILDREN]: false
       }
     };
   }
