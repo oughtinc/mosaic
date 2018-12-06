@@ -73,22 +73,6 @@ const WorkspaceModel = (
           min: 0,
         },
       },
-      secondsThatHaveCountedDown: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-        validate: {
-          min: 0,
-        },
-      },
-      secondsThatHaveCountedDownInEntireSubtree: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-        validate: {
-          min: 0,
-        },
-      },
       allocatedBudget: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

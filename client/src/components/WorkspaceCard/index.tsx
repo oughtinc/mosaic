@@ -1,3 +1,4 @@
+import gql from "graphql-tag";
 import styled from "styled-components";
 import * as React from "react";
 import { BlockSection } from "./BlockSection";
@@ -25,6 +26,12 @@ export enum toggleTypes {
   SCRATCHPAD,
   CHILDREN
 }
+
+const SUBTREE_TIME_SPENT_QUERY = gql`
+query subtreeTimeSpentQuery($id: String!) {
+  subtreeTimeSpent(id: $id)
+}
+`;
 
 const Container = styled.div`
   float: left;
@@ -69,11 +76,11 @@ interface WorkspaceType {
   id: string;
   isStale: boolean;
   isEligibleForOracle: boolean;
-  secondsThatHaveCountedDown: number;
-  secondsThatHaveCountedDownInEntireSubtree: number;
+  budgetUsedWorkingOnThisWorkspace: number;
   allocatedBudget: number;
   wasAnsweredByOracle: boolean;
   isArchived: boolean;
+  subtreeTimeSpentData: any;
 }
 
 interface WorkspaceCardProps {
@@ -81,6 +88,8 @@ interface WorkspaceCardProps {
   parentPointers: ConnectedPointerType[];
   workspaceId: string;
   subtreeQuery: SubtreeQuery;
+  subtreeTimeSpentQuery: any;
+  subtreeTimeSpentData: any;
 }
 
 interface SubtreeQuery {
@@ -146,6 +155,14 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     if (!workspace) {
       return <LoadingMsg isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}/>;
     }
+
+    const subtreeTimeSpentData =
+      this.props.isTopLevelOfCurrentTree
+      ?
+      JSON.parse(this.props.subtreeTimeSpentQuery.subtreeTimeSpent)
+      :
+      this.props.subtreeTimeSpentData;
+
     return (
       <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
         <CardBody>
@@ -165,14 +182,14 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               <ChildBudgetBadge
                 noBadge={true}
                 style={{ color: "#555", fontSize: "10px" }}
-                totalBudget={workspace.secondsThatHaveCountedDown}
+                totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
               />
               {" "}work on this workspace
               <br />
               <ChildBudgetBadge
                 noBadge={true}
                 style={{ color: "#555", fontSize: "10px" }}
-                totalBudget={workspace.secondsThatHaveCountedDownInEntireSubtree}
+                totalBudget={subtreeTimeSpentData[workspace.id]}
               />
               {" "}work on this entire subtree
             </span>
@@ -211,6 +228,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               !this.state.toggles[toggleTypes.CHILDREN]
             )
           }
+          subtreeTimeSpentData={subtreeTimeSpentData}
         />
       </Container>
     );
@@ -229,6 +247,12 @@ const optionsForNested = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
   skip: isTopLevelOfCurrentTree
 });
 
+const optionsForSubtreeTimeSpentQuery = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
+  fetchPolicy: "cache-and-network",
+  variables: { id: workspaceId },
+  skip: !isTopLevelOfCurrentTree
+});
+
 export const WorkspaceCard: any = compose(
   graphql(ROOT_WORKSPACE_SUBTREE_QUERY, {
     name: "subtreeQuery",
@@ -237,5 +261,9 @@ export const WorkspaceCard: any = compose(
   graphql(CHILD_WORKSPACE_SUBTREE_QUERY, {
     name: "subtreeQuery",
     options: optionsForNested,
+  }),
+  graphql(SUBTREE_TIME_SPENT_QUERY, {
+    name: "subtreeTimeSpentQuery",
+    options: optionsForSubtreeTimeSpentQuery,
   }),
 )(WorkspaceCardPresentational);

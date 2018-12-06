@@ -50,7 +50,8 @@ export const ChildrenSection = ({
   workspace,
   childrenToggle,
   onChangeToggle,
-  parentPointers
+  parentPointers,
+  subtreeTimeSpentData
 }) => {
   const childrenIds = workspace.childWorkspaceOrder;
   if (!!childrenIds.length) {
@@ -67,6 +68,7 @@ export const ChildrenSection = ({
                   isTopLevelOfCurrentTree={false}
                   workspaceId={childId}
                   parentPointers={parentPointers}
+                  subtreeTimeSpentData={subtreeTimeSpentData}
                 />
               </ChildContainer>
             ))}

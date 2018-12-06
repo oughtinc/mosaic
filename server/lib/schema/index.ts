@@ -231,7 +231,29 @@ const schema = new GraphQLSchema({
         new GraphQLList(pointerType),
         models.Pointer
       ),
-      events: modelGraphQLFields(new GraphQLList(eventType), models.Event)
+      events: modelGraphQLFields(new GraphQLList(eventType), models.Event),
+      subtreeTimeSpent: {
+        type: GraphQLString, // is JSON stringified
+        args: { id: { type: GraphQLString } },
+        resolve: async function(obj, { id }) {
+          const cacheForTimeSpentOnWorkspace = {};
+
+          const loadDataForEachWorkspaceInSubtree = async workspace => {
+            let timespentOnWorkspace = await workspace.budgetUsedWorkingOnThisWorkspace;
+            for (const childId of workspace.childWorkspaceOrder) {
+              const child = await models.Workspace.findById(childId);
+              timespentOnWorkspace += await loadDataForEachWorkspaceInSubtree(child);
+            }
+            cacheForTimeSpentOnWorkspace[workspace.id] = timespentOnWorkspace
+            return timespentOnWorkspace;
+          }
+
+          const workspace = await models.Workspace.findById(id);
+          await loadDataForEachWorkspaceInSubtree(workspace);
+          
+          return JSON.stringify(cacheForTimeSpentOnWorkspace);
+        },
+      },
     }
   }),
   mutation: new GraphQLObjectType({
@@ -534,19 +556,6 @@ const schema = new GraphQLSchema({
             workspace.allocatedBudget + changeToBudget
           );
           await workspace.update({ allocatedBudget: updatedTimeBudget });
-          if (isResultOfTimerCountdown) {
-            await workspace.update({
-              secondsThatHaveCountedDown: workspace.secondsThatHaveCountedDown + 1,
-              secondsThatHaveCountedDownInEntireSubtree: workspace.secondsThatHaveCountedDownInEntireSubtree + 1,
-             });
-
-            let curWorkspace = workspace;
-            while (curWorkspace.parentId) {
-              const parent = await models.Workspace.findById(curWorkspace.parentId);
-              await parent.update({ secondsThatHaveCountedDownInEntireSubtree: parent.secondsThatHaveCountedDownInEntireSubtree + 1 });
-              curWorkspace = parent;
-            }
-          }
         }
       }
     }

@@ -73,8 +73,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
-      secondsThatHaveCountedDown
-      secondsThatHaveCountedDownInEntireSubtree
+      budgetUsedWorkingOnThisWorkspace
       isArchived
       wasAnsweredByOracle
       blocks {
@@ -95,8 +94,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       isEligibleForOracle
       creatorId
       childWorkspaceOrder
-      secondsThatHaveCountedDown
-      secondsThatHaveCountedDownInEntireSubtree
+      budgetUsedWorkingOnThisWorkspace
       isArchived
       wasAnsweredByOracle
       blocks {
