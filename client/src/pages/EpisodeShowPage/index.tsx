@@ -276,13 +276,19 @@ export class WorkspaceView extends React.Component<any, any> {
       LogRocket.captureException(err);
     }
 
-    const availablePointers = _.uniqBy(
+    const unsortedAvailablePointers = _.uniqBy(
       [
         ...this.props.exportingPointers,
         ...importedPointers,
         ...readOnlyExportedPointers
       ],
       p => p.data.pointerId
+    );
+    
+    const availablePointers = _.orderBy(
+      unsortedAvailablePointers,
+      ['data.pointerId'],
+      ['asc']
     );
 
     const questionProps = new WorkspaceBlockRelation(
