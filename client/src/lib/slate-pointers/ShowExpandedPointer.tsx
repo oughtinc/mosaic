@@ -49,6 +49,7 @@ export class InlineNode extends React.Component<any, any> {
           isHoverable={this.props.isHoverable}
           onMouseOver={this.props.onMouseOver}
           exportLockStatusInfo={this.props.exportLockStatusInfo}
+          visibleExportIds={this.props.visibleExportIds}
           unlockPointer={this.props.unlockPointer}
         />
       );
@@ -63,13 +64,13 @@ export class ShowExpandedPointer extends React.Component<any, any> {
 
     if (
       !_.isEqual(newProps.availablePointers.nodes, this.props.availablePointers) ||
-      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo)
+      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
     ) {
       return true;
     }
     return false;
   }
-
 
   public render() {
     return (
@@ -88,6 +89,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                   pointerId={this.props.exportingPointer.pointerId}
                   onMouseOver={this.props.onMouseOverPointerImport}
                   isHoverable={this.props.isHoverable}
+                  visibleExportIds={this.props.visibleExportIds}
                   exportLockStatusInfo={this.props.exportLockStatusInfo}
                   unlockPointer={this.props.unlockPointer}
                 />

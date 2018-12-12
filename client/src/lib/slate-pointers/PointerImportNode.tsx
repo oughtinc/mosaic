@@ -71,7 +71,8 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     } else {
       const exportPointerId = props.nodeAsJson.data.pointerId;
       const isLockedRelation = props.exportLockStatusInfo && props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
-      const isLocked = !isLockedRelation || isLockedRelation.isLocked;
+      const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
+      const isLocked = !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
 
       this.state = {
         isLocked,
@@ -121,12 +122,19 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 
     const exportPointerId = this.props.nodeAsJson.data.pointerId;
     const isLockedRelation = this.props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
-    const isLocked = !isLockedRelation || isLockedRelation.isLocked;
+    const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
+    const isLocked = !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
+
     return isLocked;
   }
 
   public render() {
-    const { blockEditor, availablePointers, nodeAsJson } = this.props;
+    const {
+      availablePointers,
+      blockEditor,
+      visibleExportIds,
+      nodeAsJson,
+    } = this.props;
 
     const {
       importingPointer,
@@ -196,6 +204,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
                   onMouseOverPointerImport={this.props.onMouseOver}
                   onMouseOut={this.props.onMouseOut}
                   isHoverable={this.props.isHoverable}
+                  visibleExportIds={visibleExportIds}
                   exportLockStatusInfo={this.props.exportLockStatusInfo}
                   unlockPointer={this.props.unlockPointer}
                 />

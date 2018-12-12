@@ -108,6 +108,7 @@ function SlatePointers(options: any = {}) {
 
         return (
           <PointerImportNode
+            visibleExportIds={options.visibleExportIds}
             exportLockStatusInfo={options.exportLockStatusInfo}
             unlockPointer={options.unlockPointer}
             nodeAsJson={node.toJSON()}

@@ -331,6 +331,8 @@ export class WorkspaceView extends React.Component<any, any> {
       }
     });
 
+    const visibleExportIds = this.props.exportingPointers.map(p => p.data.pointerId);
+
     return (
       <div>
         {Auth.isAuthenticated() && (
@@ -397,6 +399,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         <BlockEditor
                           availablePointers={availablePointers}
                           exportLockStatusInfo={exportLockStatusInfo}
+                          visibleExportIds={visibleExportIds}
                           unlockPointer={unlockPointer}
                           {...questionProps}
                         />
@@ -423,6 +426,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}
+                          visibleExportIds={visibleExportIds}
                           exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the scratchpad..."
                           unlockPointer={unlockPointer}
@@ -436,6 +440,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}
+                          visibleExportIds={visibleExportIds}
                           exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the answer..."
                           unlockPointer={unlockPointer}
@@ -496,6 +501,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      visibleExportIds={visibleExportIds}
                       exportLockStatusInfo={exportLockStatusInfo}
                       unlockPointer={unlockPointer}
                       hasTimer={hasTimer}
