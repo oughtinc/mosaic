@@ -13,6 +13,7 @@ import { parse as parseQueryString } from "query-string";
 
 import { EpisodeNav } from "./EpisodeNav";
 import { ResponseFooter } from "./ResponseFooter";
+import { CharCountDisplays } from "./CharCountDisplays";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
@@ -24,6 +25,10 @@ import {
   exportingBlocksPointersSelector,
   exportingNodes,
 } from "../../modules/blocks/exportingPointers";
+import {
+  inputCharCountSelector,
+  outputCharCountSelector,
+} from "../../modules/blocks/charCounts";
 import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 import { Value } from "slate";
@@ -366,9 +371,13 @@ export class WorkspaceView extends React.Component<any, any> {
                     <div
                       style={{
                         display: "flex",
-                        justifyContent: "flex-end",
+                        justifyContent: "space-between",
                       }}
                     >
+                      <CharCountDisplays
+                        inputCharCount={this.props.inputCharCount}
+                        outputCharCount={this.props.outputCharCount}
+                      />
                       <TimerAndTimeBudgetInfo
                         durationInMs={durationInMs}
                         handleTimerEnd={this.handleTimerEnd}
@@ -626,9 +635,48 @@ function mapStateToProps(state: any, { workspace }: any) {
     workspace.workspace
   );
   const allBlockIds = [..._visibleBlockIds, newQuestionFormBlockId];
-  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(state);
+  const exportingPointers: any = exportingBlocksPointersSelector(allBlockIds)(state);
+
+  let inputCharCount, outputCharCount;
+  if (workspace.workspace) {
+
+    const visibleExportIds = exportingPointers.map(p => p.data.pointerId);
+    const exportLockStatusInfo = workspace.workspace.exportLockStatusInfo;
+    const connectedPointers = _.uniqBy(
+      workspace.workspace.connectedPointers,
+      (p: any) => p.data.pointerId
+    );
+
+    const inputBlockIds = workspace.workspace.blocks.filter(b =>
+      b.type === "QUESTION"
+    ).concat(
+      _.flatten(
+        workspace.workspace.childWorkspaces.map(w =>
+          w.blocks.filter(b => b.type === "ANSWER")
+        )
+      )
+    )
+    .map((b: any) => b.id);
+
+
+    inputCharCount = inputCharCountSelector(state, inputBlockIds, connectedPointers, exportingPointers, visibleExportIds, exportLockStatusInfo);
+
+    const outputBlockIds = workspace.workspace.blocks.filter(b =>
+      b.type === "SCRATCHPAD" || b.type === "ANSWER" || b.type === "SUBQUESTION_DRAFT"
+    ).concat(
+      _.flatten(
+        workspace.workspace.childWorkspaces.map(w =>
+          w.blocks.filter(b => b.type === "QUESTION")
+        )
+      )
+    )
+    .map((b: any) => b.id);
+
+    outputCharCount = outputCharCountSelector(state, outputBlockIds);
+  }
+
   const { blocks } = state;
-  return { blocks, exportingPointers };
+  return { blocks, exportingPointers, inputCharCount, outputCharCount };
 }
 
 const UNLOCK_POINTER_MUTATION = gql`
