@@ -250,7 +250,7 @@ const schema = new GraphQLSchema({
 
           const workspace = await models.Workspace.findById(id);
           await loadDataForEachWorkspaceInSubtree(workspace);
-          
+
           return JSON.stringify(cacheForTimeSpentOnWorkspace);
         },
       },
@@ -556,6 +556,40 @@ const schema = new GraphQLSchema({
             workspace.allocatedBudget + changeToBudget
           );
           await workspace.update({ allocatedBudget: updatedTimeBudget });
+        }
+      },
+      unlockPointer: {
+        type: GraphQLBoolean,
+        args: {
+          pointerId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { pointerId, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to unlock pointer."
+            );
+          }
+
+          const exportWorkspaceLockRelation = await models.ExportWorkspaceLockRelation.findOne({
+            where: {
+              pointerId,
+              workspaceId,
+            }
+          });
+
+          if (exportWorkspaceLockRelation) {
+            await exportWorkspaceLockRelation.update({ isLocked: false });
+          } else {
+            await models.ExportWorkspaceLockRelation.create({
+              isLocked: false,
+              pointerId,
+              workspaceId,
+            });
+          }
+
+          return true;
         }
       }
     }

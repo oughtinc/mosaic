@@ -79,6 +79,8 @@ export class Child extends React.Component<any, any> {
                 {...questionRelationship.blockEditorAttributes()}
                 readOnly={true}
                 availablePointers={availablePointers}
+                exportLockStatusInfo={this.props.exportLockStatusInfo}
+                unlockPointer={this.props.unlockPointer}
               />
             )}
           </div>
@@ -118,6 +120,8 @@ export class Child extends React.Component<any, any> {
           <BlockEditor
             {...questionRelationship.blockEditorAttributes()}
             availablePointers={availablePointers}
+            exportLockStatusInfo={this.props.exportLockStatusInfo}
+            unlockPointer={this.props.unlockPointer}
           />
         )}
         <div style={{ color: subQuestionAnswerFontColor, marginTop: "8px" }}>
@@ -125,6 +129,8 @@ export class Child extends React.Component<any, any> {
             <BlockEditor
               {...answerRelationship.blockEditorAttributes()}
               availablePointers={availablePointers}
+              exportLockStatusInfo={this.props.exportLockStatusInfo}
+              unlockPointer={this.props.unlockPointer}
             />
           )}
         </div>
@@ -261,7 +267,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
       !_.isEqual(newProps.block, this.props.block) ||
       !_.isEqual(newProps.workspaceOrder, this.props.workspaceOrder) ||
-      !_.isEqual(newProps.workspaces, this.props.workspaces)
+      !_.isEqual(newProps.workspaces, this.props.workspaces) ||
+      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo)
     ) {
       return true;
     }
@@ -309,6 +316,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
                       onUpdateChildTotalBudget={
                         this.props.onUpdateChildTotalBudget
                       }
+                      exportLockStatusInfo={this.props.exportLockStatusInfo}
+                      unlockPointer={this.props.unlockPointer}
                     />
                   </BlockBody>
                 );
@@ -370,6 +379,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
             onMutate={this.props.onCreateChild}
             availablePointers={this.props.availablePointers}
             shouldAutosave={true}
+            exportLockStatusInfo={this.props.exportLockStatusInfo}
+            unlockPointer={this.props.unlockPointer}
           />
         )}
       </div>

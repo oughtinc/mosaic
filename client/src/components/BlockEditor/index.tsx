@@ -34,7 +34,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if (
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
-      !_.isEqual(newProps.block, this.props.block)
+      !_.isEqual(newProps.block, this.props.block) ||
+      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo)
     ) {
       return true;
     }
@@ -48,7 +49,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public componentWillReceiveProps(newProps: any) {
     if (
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
-      !_.isEqual(newProps.availablePointers, this.props.availablePointers)
+      !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
+      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo)
     ) {
       this.resetPlugins(newProps);
     }
@@ -91,6 +93,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
       },
       blockEditor: newProps.blockEditor,
       availablePointers: newProps.availablePointers,
+      exportLockStatusInfo: newProps.exportLockStatusInfo,
+      unlockPointer: newProps.unlockPointer,
     };
     this.setState({
       plugins: [LinkifyPlugin(), CopyPastePlugin(), SoftBreak({}), SlatePointers(SlatePointerInputs)]
@@ -152,6 +156,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         shouldAutosave={!!this.props.shouldAutosave}
         block={this.props.block}
         availablePointers={this.props.availablePointers}
+        exportLockStatusInfo={this.props.exportLockStatusInfo}
         plugins={plugins}
         onChange={this.props.onChange}
         onKeyDown={this.props.onKeyDown}

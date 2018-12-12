@@ -61,6 +61,7 @@ const WORKSPACE_QUERY = gql`
       connectedPointers
       totalBudget
       allocatedBudget
+      exportLockStatusInfo
       childWorkspaces {
         id
         totalBudget
@@ -322,6 +323,14 @@ export class WorkspaceView extends React.Component<any, any> {
     const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
     const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
 
+    const exportLockStatusInfo = workspace.exportLockStatusInfo;
+    const unlockPointer = pointerId => this.props.unlockPointerMutation({
+      variables: {
+        pointerId,
+        workspaceId: workspace.id,
+      }
+    });
+
     return (
       <div>
         {Auth.isAuthenticated() && (
@@ -387,6 +396,8 @@ export class WorkspaceView extends React.Component<any, any> {
                       >
                         <BlockEditor
                           availablePointers={availablePointers}
+                          exportLockStatusInfo={exportLockStatusInfo}
+                          unlockPointer={unlockPointer}
                           {...questionProps}
                         />
                       </div>
@@ -412,7 +423,9 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}
+                          exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the scratchpad..."
+                          unlockPointer={unlockPointer}
                           {...scratchpadProps}
                         />
                       </BlockBody>
@@ -423,7 +436,9 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}
+                          exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the answer..."
+                          unlockPointer={unlockPointer}
                           {...answerProps}
                         />
                       </BlockBody>
@@ -481,6 +496,8 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      exportLockStatusInfo={exportLockStatusInfo}
+                      unlockPointer={unlockPointer}
                       hasTimer={hasTimer}
                       isInOracleMode={isInOracleMode}
                       subquestionDraftProps={subquestionDraftProps}
@@ -608,6 +625,12 @@ function mapStateToProps(state: any, { workspace }: any) {
   return { blocks, exportingPointers };
 }
 
+const UNLOCK_POINTER_MUTATION = gql`
+  mutation unlockPointerMutation($pointerId: String, $workspaceId: String) {
+    unlockPointer(pointerId: $pointerId, workspaceId: $workspaceId)
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -670,6 +693,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_ELIGIBLE, {
     name: "updateWorkspaceIsEligible",
+  }),
+  graphql(UNLOCK_POINTER_MUTATION, {
+    name: "unlockPointerMutation",
+    options: {
+      refetchQueries: ["workspace"]
+    }
   }),
   connect(
     mapStateToProps,

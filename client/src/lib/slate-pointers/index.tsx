@@ -66,6 +66,7 @@ function SlatePointers(options: any = {}) {
 
     renderNode(props: any) {
       const { children, node } = props; // { attributes, isSelected }
+
       if (node.type === "pointerExport") {
         const nodeAsJson = node.toJSON();
         const pointer =
@@ -104,8 +105,11 @@ function SlatePointers(options: any = {}) {
         );
       }
       if (node.type === "pointerImport") {
+
         return (
           <PointerImportNode
+            exportLockStatusInfo={options.exportLockStatusInfo}
+            unlockPointer={options.unlockPointer}
             nodeAsJson={node.toJSON()}
             blockEditor={options.blockEditor}
             availablePointers={options.availablePointers}

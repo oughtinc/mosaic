@@ -78,6 +78,8 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               onKeyDown={this.onKeyDown}
               /*ref={input => (this.blockEditor = input)}*/
               workspaceId={this.props.workspaceId}
+              exportLockStatusInfo={this.props.exportLockStatusInfo}
+              unlockPointer={this.props.unlockPointer}
             />
           </BlockBody>
           <div

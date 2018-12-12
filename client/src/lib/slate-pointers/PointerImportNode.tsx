@@ -62,6 +62,21 @@ const Brackets: any = styled.span`
 class PointerImportNodePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
+
+    const onHomepageOrTreeView = !props.exportLockStatusInfo;
+    if (onHomepageOrTreeView) {
+      this.state = {
+        isLocked: false,
+      };
+    } else {
+      const exportPointerId = props.nodeAsJson.data.pointerId;
+      const isLockedRelation = props.exportLockStatusInfo && props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
+      const isLocked = !isLockedRelation || isLockedRelation.isLocked;
+
+      this.state = {
+        isLocked,
+      };
+    }
   }
 
   public getLocation = () => {
@@ -83,14 +98,31 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     }
   };
 
-  public handleClosedPointerClick = (e: Event, pointerId: string) => {
-    this.props.openClosedPointer(pointerId);
+  public handleClosedPointerClick = (e: Event, pointerId: string, exportPointerId: string) => {
+    if (this.isLocked() && this.state.isLocked) {
+      this.setState({ isLocked: false });
+      this.props.unlockPointer(exportPointerId);
+    } else {
+      this.props.openClosedPointer(pointerId);
+    }
     e.stopPropagation( );
   }
 
   public handleOpenPointerClick = (e: Event, pointerId: string) => {
     this.props.closeOpenPointer(pointerId);
     e.stopPropagation();
+  }
+
+  public isLocked() {
+    const onHomepageOrTreeView = !this.props.exportLockStatusInfo;
+    if (onHomepageOrTreeView) {
+      return false;
+    }
+
+    const exportPointerId = this.props.nodeAsJson.data.pointerId;
+    const isLockedRelation = this.props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
+    const isLocked = !isLockedRelation || isLockedRelation.isLocked;
+    return isLocked;
   }
 
   public render() {
@@ -120,6 +152,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     });
 
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
+    const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
 
     if (!importingPointer) {
       return (
@@ -135,11 +168,15 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     if (!isOpen) {
       return (
         <ClosedPointerImport
-          onClick={e => this.handleClosedPointerClick(e, pointerId)}
+          onClick={e => this.handleClosedPointerClick(e, pointerId, exportPointerId)}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.props.onMouseOut}
+          style={{
+            whiteSpace: "nowrap",
+          }}
         >
-          {`$${pointerIndex + 1}`}
+          {this.state.isLocked && this.isLocked() ? "🔒$" : "$"}
+          {`${pointerIndex + 1}`}
         </ClosedPointerImport>
       );
     } else {
@@ -159,6 +196,8 @@ class PointerImportNodePresentational extends React.Component<any, any> {
                   onMouseOverPointerImport={this.props.onMouseOver}
                   onMouseOut={this.props.onMouseOut}
                   isHoverable={this.props.isHoverable}
+                  exportLockStatusInfo={this.props.exportLockStatusInfo}
+                  unlockPointer={this.props.unlockPointer}
                 />
               </Brackets>
             </span>

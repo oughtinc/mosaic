@@ -124,6 +124,17 @@ const WorkspaceModel = (
           return values.filter(v => !!v);
         },
       },
+      exportLockStatusInfo: {
+        type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
+        get: async function() {
+          const exportWorkspaceLockRelations = await sequelize.models.ExportWorkspaceLockRelation.findAll({
+            where: {
+              workspaceId: this.get("id"),
+            }
+          });
+          return exportWorkspaceLockRelations;
+        },
+      },
       connectedPointersOfSubtree: {
         type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
         get: async function() {
