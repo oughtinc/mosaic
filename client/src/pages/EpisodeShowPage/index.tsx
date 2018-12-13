@@ -1,5 +1,4 @@
 import * as LogRocket from "logrocket";
-import * as moment from "moment";
 import * as React from "react";
 import * as keyboardJS from "keyboardjs";
 
@@ -656,7 +655,6 @@ function mapStateToProps(state: any, { workspace }: any) {
       )
     )
     .map((b: any) => b.id);
-
 
     inputCharCount = inputCharCountSelector(state, inputBlockIds, connectedPointers, exportingPointers, visibleExportIds, exportLockStatusInfo);
 

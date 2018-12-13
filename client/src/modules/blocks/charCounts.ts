@@ -1,16 +1,26 @@
 import * as _ from "lodash";
 import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
 
-export function inputCharCountSelector(state, blockIds, connectedPointers, exportingPointers, visibleExportIds, exportLockStatusInfo) {
+export function inputCharCountSelector(
+  state: any,
+  blockIds: string[],
+  connectedPointers: any[],
+  exportingPointers: any[],
+  visibleExportIds: string[],
+  exportLockStatusInfo: any
+) {
   const blocks = state.blocks.blocks;
   const relevantBlocks = blocks.filter(b => _.includes(blockIds, b.id));
-  const charCount = relevantBlocks.reduce((acc, b) => {
+
+  const charCount: number = relevantBlocks.reduce((acc: number, b) => {
     return acc + getInputCharCount(b.value.document.toJSON());
   }, 0);
 
   connectedPointers = connectedPointers.filter(p => {
     const e = exportingPointers.find(e => e.data.pointerId === p.data.pointerId);
-    if (e) return false;
+    if (e) {
+      return false;
+    }
     return true;
   });
 
@@ -22,24 +32,25 @@ export function inputCharCountSelector(state, blockIds, connectedPointers, expor
     )
   );
 
-  const unlockedExportsCharCount = unlockedExports.reduce((acc, e) => {
+  const unlockedExportsCharCount: number = unlockedExports.reduce((acc: number, e) => {
     return acc + getInputCharCount(e);
   }, 0);
 
   return charCount + unlockedExportsCharCount;
 }
 
-export function outputCharCountSelector(state, blockIds) {
+export function outputCharCountSelector(state: any, blockIds: string[]) {
   const blocks = state.blocks.blocks;
   const relevantBlocks = blocks.filter(b => _.includes(blockIds, b.id));
-  const charCount = relevantBlocks.reduce((acc, b) => {
+
+  const charCount: number = relevantBlocks.reduce((acc: number, b) => {
     return acc + getOutputCharCount(b.value.document.toJSON());
   }, 0);
 
   return charCount;
 }
 
-function getInputCharCount(nodeOrNodes) {
+export function getInputCharCount(nodeOrNodes: any): number {
   let nodes;
   if (Array.isArray(nodeOrNodes)) {
     nodes = nodeOrNodes;
@@ -53,8 +64,8 @@ function getInputCharCount(nodeOrNodes) {
     if (node.object === "text") {
       result += node
         .leaves
-        .reduce((acc, val) => { return acc + val.text}, "")
-        .split('')
+        .reduce((acc: string, val) => { return `${acc}${val.text}`; }, "")
+        .split("")
         .filter(char => char !== POINTER_EDGE_SPACE)
         .length;
     } else if (node.type === "pointerImport") {
@@ -71,7 +82,7 @@ function getInputCharCount(nodeOrNodes) {
   return result;
 }
 
-function getOutputCharCount(nodeOrNodes) {
+function getOutputCharCount(nodeOrNodes: any) {
   let nodes;
   if (Array.isArray(nodeOrNodes)) {
     nodes = nodeOrNodes;
@@ -85,8 +96,8 @@ function getOutputCharCount(nodeOrNodes) {
     if (node.object === "text") {
       result += node
         .leaves
-        .reduce((acc, val) => { return acc + val.text}, "")
-        .split('')
+        .reduce((acc: string, val) => { return `${acc}${val.text}`; }, "")
+        .split("")
         .filter(char => char !== POINTER_EDGE_SPACE)
         .length;
     } else if (node.type === "pointerImport") {
