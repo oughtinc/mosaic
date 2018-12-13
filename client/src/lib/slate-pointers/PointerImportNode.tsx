@@ -7,8 +7,10 @@ import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
 import { changePointerReference } from "../../modules/blockEditor/actions";
 import {
-  pointerImportNameColor,
-  pointerImportNameColorOnHover,
+  lockedPointerImportBgColor,
+  lockedPointerImportBgColorOnHover,
+  unlockedImportBgColor,
+  unlockedImportBgColorOnHover,
 } from "../../styles";
 
 const RemovedPointer = styled.span`
@@ -22,15 +24,7 @@ const RemovedPointer = styled.span`
 const bracketFont = "800 1.2em sans-serif";
 
 const ClosedPointerImport: any = styled.span`
-  background-color: ${pointerImportNameColor};
-  color: rgb(233, 239, 233);
-  cursor: pointer;
-  padding: 0 4px;
-  border-radius: 4px;
-  transition: background-color color 0.8s;
-  &:hover {
-    background-color: ${pointerImportNameColorOnHover};
-  }
+
 `;
 
 const OpenPointerImport: any = styled.span`
@@ -47,13 +41,13 @@ const OpenPointerImport: any = styled.span`
 
 const Brackets: any = styled.span`
   &:before {
-    color: ${pointerImportNameColor};
+    color: ${unlockedImportBgColor};
     content: "[";
     font: ${bracketFont};
   }
 
   &:after {
-    color: ${pointerImportNameColor};
+    color: ${unlockedImportBgColor};
     content: "]";
     font: ${bracketFont};
   }
@@ -147,15 +141,29 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       nodeAsJson
     });
 
+    const isLocked = this.state.isLocked && this.isLocked();
+
     const styles = StyleSheet.create({
       OuterPointerImportStyle: {
         ":before": {
-          backgroundColor: pointerImportNameColor,
+          backgroundColor: isLocked ? lockedPointerImportBgColor : unlockedImportBgColor,
           color: "rgb(233, 239, 233)",
           content: `"$${pointerIndex + 1}"`,
           borderRadius: "4px 0px 0px 4px",
           padding: "0px 3px",
         },
+      },
+      ClosedPointerImportStyle: {
+        backgroundColor: isLocked ? lockedPointerImportBgColor : unlockedImportBgColor,
+        color: "rgb(233, 239, 233)",
+        cursor: "pointer",
+        padding: "0 4px",
+        borderRadius: "4px",
+        transition: "background-color color 0.8s",
+        whiteSpace: "nowrap",
+        ":hover": {
+          backgroundColor: isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover,
+        }
       },
     });
 
@@ -176,15 +184,25 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     if (!isOpen) {
       return (
         <ClosedPointerImport
+          className={css(styles.ClosedPointerImportStyle)}
           onClick={e => this.handleClosedPointerClick(e, pointerId, exportPointerId)}
           onMouseOver={this.onMouseOver}
           onMouseOut={this.props.onMouseOut}
-          style={{
-            whiteSpace: "nowrap",
-          }}
         >
-          {this.state.isLocked && this.isLocked() ? "🔒$" : "$"}
-          {`${pointerIndex + 1}`}
+          <span
+            style={{
+              display: "inline-block",
+              filter: "brightness(110%) saturate(400%)",
+              fontSize: "smaller",
+              transform: !isLocked && "scale(0, 0)",
+              transition: "all 0.5s",
+              maxWidth: isLocked ? "90px" : 0,
+              verticalAlign: "middle",
+            }}
+          >
+            🔒
+          </span>
+          {`$${pointerIndex + 1}`}
         </ClosedPointerImport>
       );
     } else {
