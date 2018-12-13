@@ -1,4 +1,5 @@
-import { CHANGE_HOVERED_ITEM, CHANGE_POINTER_REFERENCE } from "./actions";
+import { mapValues } from "lodash";
+import { CHANGE_HOVERED_ITEM, CHANGE_POINTER_REFERENCE, CLOSE_ALL_POINTER_REFERENCES } from "./actions";
 
 const initialState = {
   hoveredItem: {
@@ -26,6 +27,11 @@ export const blockEditorReducer = (state = initialState, action) => {
           ...state.pointerReferences,
           ...{ [action.id]: action.reference }
         }
+      };
+    case CLOSE_ALL_POINTER_REFERENCES:
+      return {
+        ...state,
+        pointerReferences: mapValues(state.pointerReferences, (ref: object) => { return {...ref, isOpen: false }; })
       };
     default:
       return state;

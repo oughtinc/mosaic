@@ -3,6 +3,7 @@ import * as slateChangeMutations from "../../slate-helpers/slate-change-mutation
 
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
+export const CLOSE_ALL_POINTER_REFERENCES = "CLOSE_ALL_POINTER_REFERENCES";
 
 export const HOVER_ITEM_TYPES = {
   NONE: "NONE",
@@ -52,6 +53,14 @@ export const changePointerReference = ({ id, reference }) => {
       type: CHANGE_POINTER_REFERENCE,
       id,
       reference
+    });
+  };
+};
+
+export const closeAllPointerReferences = () => {
+  return (dispatch, getState) => {
+    dispatch({
+      type: CLOSE_ALL_POINTER_REFERENCES
     });
   };
 };

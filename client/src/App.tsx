@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as LogRocket from "logrocket";
-import { BrowserRouter, Route, Redirect } from "react-router-dom";
+import { BrowserRouter, Route, Redirect, withRouter } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
@@ -18,6 +18,7 @@ import { BetweenEpisodesPage } from "./pages/BetweenEpisodesPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 import { applyMiddleware, combineReducers, createStore } from "redux";
 import { blockReducer } from "./modules/blocks/reducer";
+import { closeAllPointerReferences } from "./modules/blockEditor/actions";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 import { Header } from "./components/Header";
@@ -66,6 +67,14 @@ const client: any = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const store = createStore(
+  combineReducers({
+    blocks: blockReducer,
+    blockEditor: blockEditorReducer,
+  } as any),
+  composeWithDevTools(applyMiddleware(thunk))
+);
+
 export class Layout extends React.Component {
   public render() {
     return (
@@ -76,6 +85,33 @@ export class Layout extends React.Component {
     );
   }
 }
+
+function onRouteChange(route: string) {
+  // Close all pointers on route change, so that shared pointers do not remain open.
+  store.dispatch(closeAllPointerReferences());
+}
+
+// Component used to instantiate a unique listener on the history object.
+class HistoryListener extends React.Component<any, any> {
+  public constructor(props: any) {
+    super(props);
+    this.state = {
+      unlisten: this.props.history.listen(onRouteChange)
+    };
+  }
+
+  public componentWillUnmount() {
+    this.state.unlisten();
+  }
+
+  public render() {
+    return (
+      <div />
+    );
+  }
+}
+
+const HistoryListenerWithRouter = withRouter(HistoryListener);
 
 const Routes = () => (
   <div>
@@ -105,20 +141,13 @@ const Routes = () => (
         return <Redirect to="/" />;
       }}
     />
+    <HistoryListenerWithRouter />
   </div>
 );
 
 LogRocket.init(Config.logrocket_id);
 const environment = process.env.NODE_ENV || ""; // "development" or "production"
 LogRocket.track(environment);
-
-const store = createStore(
-  combineReducers({
-    blocks: blockReducer,
-    blockEditor: blockEditorReducer,
-  } as any),
-  composeWithDevTools(applyMiddleware(thunk))
-);
 
 class App extends React.Component {
   public render() {
