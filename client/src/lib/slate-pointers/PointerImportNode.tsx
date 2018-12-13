@@ -1,11 +1,14 @@
 import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import * as ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
 import { changePointerReference } from "../../modules/blockEditor/actions";
+import { getInputCharCount } from "../../modules/blocks/charCounts";
+
 import {
   lockedPointerImportBgColor,
   lockedPointerImportBgColorOnHover,
@@ -23,9 +26,11 @@ const RemovedPointer = styled.span`
 
 const bracketFont = "800 1.2em sans-serif";
 
-const ClosedPointerImport: any = styled.span`
-
-`;
+// getting rid fo this and putting ClosedPointerImport's props onto the nested
+// span leads to a Typescript error, seems to be a known TS bug, maybe
+// upgrading TS will fix it, looking into it wasn't a priority, so just keeping
+// this for now
+const ClosedPointerImport: any = styled.span``;
 
 const OpenPointerImport: any = styled.span`
   background: ${(props: any) =>
@@ -170,6 +175,10 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
     const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
 
+    const exportPointer = availablePointers.find(p => p.data.pointerId === exportPointerId);
+
+    const exportPointerInputCharCount = exportPointer && getInputCharCount(exportPointer);
+
     if (!importingPointer) {
       return (
         <RemovedPointer
@@ -181,29 +190,38 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       );
     }
 
+    const tooltip = (
+      <Tooltip id="tooltip" style={{ display: !isLocked && "none" }}>
+        <strong>+{exportPointerInputCharCount}</strong> char{exportPointerInputCharCount === 1 ? "" : "s"}
+      </Tooltip>
+    );
+
     if (!isOpen) {
       return (
-        <ClosedPointerImport
-          className={css(styles.ClosedPointerImportStyle)}
-          onClick={e => this.handleClosedPointerClick(e, pointerId, exportPointerId)}
-          onMouseOver={this.onMouseOver}
-          onMouseOut={this.props.onMouseOut}
-        >
-          <span
-            style={{
-              display: "inline-block",
-              filter: "brightness(110%) saturate(400%)",
-              fontSize: "smaller",
-              transform: !isLocked && "scale(0, 0)",
-              transition: "all 0.5s",
-              maxWidth: isLocked ? "90px" : 0,
-              verticalAlign: "middle",
-            }}
+        <OverlayTrigger placement="top" overlay={tooltip}>
+          <ClosedPointerImport
+            className={css(styles.ClosedPointerImportStyle)}
+            onClick={e => this.handleClosedPointerClick(e, pointerId, exportPointerId)}
+            onMouseOver={this.onMouseOver}
+            onMouseOut={this.props.onMouseOut}
           >
-            🔒
-          </span>
-          {`$${pointerIndex + 1}`}
-        </ClosedPointerImport>
+            <span
+              key={exportPointerId}
+              style={{
+                display: "inline-block",
+                filter: "brightness(110%) saturate(400%)",
+                fontSize: "smaller",
+                transform: !isLocked && "scale(0, 0)",
+                transition: "all 0.5s",
+                maxWidth: isLocked ? "90px" : 0,
+                verticalAlign: "middle",
+              }}
+            >
+              🔒
+            </span>
+            {`$${pointerIndex + 1}`}
+          </ClosedPointerImport>
+        </OverlayTrigger>
       );
     } else {
       return (
