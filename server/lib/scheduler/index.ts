@@ -5,7 +5,7 @@ import { RootParentCache } from "./RootParentCache";
 import { Schedule } from "./Schedule";
 import { Scheduler } from "./Scheduler";
 
-const NINETY_SECONDS = 90 * 1000;
+const ONE_HUNDRED_HOURS = 1000 * 60 * 60 * 100;
 
 //  By separating out fetchAllWorkspaces and rootParentCache, we 100% isolate
 //  the rest of the scheduling code (Scheduler, Schedule, UserSchedule, and
@@ -32,10 +32,10 @@ const scheduler = new Scheduler({
     }
   }),
   isInOracleMode,
-  schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: NINETY_SECONDS }),
+  schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: ONE_HUNDRED_HOURS }),
   remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,
-  timeLimit: NINETY_SECONDS,
+  timeLimit: ONE_HUNDRED_HOURS,
 });
 
 export { scheduler };

@@ -16,7 +16,7 @@ class TimerPresentational extends React.Component<any,  any> {
       timerRunning
       &&
       (
-        <div style={this.props.style}>
+        <div style={{...this.props.style, display: "none"}}>
           <span
             style={{
               alignItems: "center",

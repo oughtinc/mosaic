@@ -325,8 +325,7 @@ export class WorkspaceView extends React.Component<any, any> {
     const hasTimerEnded = this.state.hasTimerEnded;
 
     const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
-    const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
-    const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
+    const durationInMs = durationInMsGivenRemainingBudget;
 
     const exportLockStatusInfo = workspace.exportLockStatusInfo;
     const unlockPointer = pointerId => this.props.unlockPointerMutation({

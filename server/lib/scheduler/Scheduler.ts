@@ -207,7 +207,7 @@ class Scheduler {
   }
 
   private hasMinRemaining(workspace) {
-    return (workspace.totalBudget - workspace.allocatedBudget) >= (this.timeLimit / 1000);
+    return (workspace.totalBudget - workspace.allocatedBudget) >= 90;
   }
 }
 
