@@ -1,16 +1,16 @@
 import * as _ from "lodash";
 import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
 
-export function inputCharCountSelector(
-  state: any,
-  blockIds: string[],
-  connectedPointers: any[],
-  exportingPointers: any[],
-  visibleExportIds: string[],
-  exportLockStatusInfo: any
-) {
+export function inputCharCountSelector({
+  state,
+  inputBlockIds,
+  connectedPointers,
+  exportingPointers,
+  visibleExportIds,
+  exportLockStatusInfo,
+}: any) {
   const blocks = state.blocks.blocks;
-  const relevantBlocks = blocks.filter(b => _.includes(blockIds, b.id));
+  const relevantBlocks = blocks.filter(b => _.includes(inputBlockIds, b.id));
 
   const charCount: number = relevantBlocks.reduce((acc: number, b) => {
     return acc + getInputCharCount(b.value.document.toJSON());

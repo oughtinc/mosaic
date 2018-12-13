@@ -656,7 +656,14 @@ function mapStateToProps(state: any, { workspace }: any) {
     )
     .map((b: any) => b.id);
 
-    inputCharCount = inputCharCountSelector(state, inputBlockIds, connectedPointers, exportingPointers, visibleExportIds, exportLockStatusInfo);
+    inputCharCount = inputCharCountSelector({
+      state,
+      inputBlockIds,
+      connectedPointers,
+      exportingPointers,
+      visibleExportIds,
+      exportLockStatusInfo
+    });
 
     const outputBlockIds = workspace.workspace.blocks.filter(b =>
       b.type === "SCRATCHPAD" || b.type === "ANSWER" || b.type === "SUBQUESTION_DRAFT"
