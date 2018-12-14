@@ -23,8 +23,7 @@ const RootBlock = ({ availablePointers = [], block, defaultText = ""}) => {
         }}
       >{displayText}</div>
     );
-  }
-  else {
+  } else {
     return null;
   }
 };
