@@ -52,7 +52,7 @@ const CardBody = styled.div`
   ${blockBorderAndBoxShadow};
   float: left;
   margin-bottom: 1em;
-  width: 40em;
+  width: 42em;
   background: ${treeWorkspaceBgColor};
   position: relative;
 `;
@@ -247,7 +247,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
             {
               Auth.isAdmin()
               &&
-              <span>
+              <span style={{ padding: "0 10px"}}>
                 <Checkbox
                   style={{
                     backgroundColor: adminCheckboxBgColor,
