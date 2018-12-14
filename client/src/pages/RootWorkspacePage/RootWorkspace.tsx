@@ -24,6 +24,8 @@ const WorkspaceContainer = styled.div`
   ${blockBorderAndBoxShadow};
   background-color: ${homepageWorkspaceBgColor};
   padding: 10px;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const ScratchpadContainer = styled.div`
@@ -60,94 +62,93 @@ class RootWorkspacePresentational extends React.Component<any, any> {
 
     return (
       <WorkspaceContainer style={this.props.style}>
-        {
-          Auth.isAdmin()
-          &&
-          <div
-            style={{
-              marginBottom: "5px",
-            }}
-          >
-            <Checkbox
-              style={{
-                backgroundColor: adminCheckboxBgColor,
-                border: `1px solid ${adminCheckboxBorderColor}`,
-                borderRadius: "3px",
-                padding: "5px 5px 5px 25px",
-                opacity: this.state.isPublicCheckboxStatusPending ? 0.75 : 1,
-              }}
-              inline={true}
-              type="checkbox"
-              checked={workspace.isPublic}
-              onChange={this.handleOnIsPublicCheckboxChange}
-            >
-              {
-                this.state.isPublicCheckboxStatusPending
-                ?
-                "updating..."
-                :
-                "appears on front page"
-              }
-            </Checkbox>
-            <Checkbox
-              style={{
-                backgroundColor: adminCheckboxBgColor,
-                border: `1px solid ${adminCheckboxBorderColor}`,
-                borderRadius: "3px",
-                padding: "5px 5px 5px 25px",
-                opacity: this.state.isEligibleCheckboxStatusPending ? 0.75 : 1,
-              }}
-              inline={true}
-              type="checkbox"
-              checked={workspace.isEligibleForAssignment}
-              onChange={this.handleOnIsEligibleCheckboxChange}
-            >
-              {
-                this.state.isEligibleCheckboxStatusPending
-                ?
-                "updating..."
-                :
-                "is eligible for assignment"
-              }
-            </Checkbox>
-          </div>
-        }
-        <Link to={`/workspaces/${workspace.id}`}>
+        <div style={{flex: "1 0 0px", minWidth: 0}}>
+          <Link to={`/workspaces/${workspace.id}`}>
+            <RootBlock
+              availablePointers={workspace.connectedPointers}
+              block={question}
+            />
+          </Link>
+          <br />
+          <ScratchpadContainer>
+            <RootBlock
+              availablePointers={workspace.connectedPointers}
+              block={scratchpad}
+              defaultText="(no description)"
+            />
+          </ScratchpadContainer>
           <RootBlock
             availablePointers={workspace.connectedPointers}
-            block={question}
+            block={answer}
           />
-        </Link>
-
-        {" "}
-
-        <RootBlock
-          availablePointers={workspace.connectedPointers}
-          block={answer}
-        />
-
-        <Link to={`/workspaces/${workspace.id}/subtree`}>
-          <Button
-            bsSize="xsmall"
-            bsStyle="default"
-            className="pull-right"
-            style={{
-              margin: "5px 1px",
-              padding: "1px 4px",
-            }}
-          >
-            Tree »
-          </Button>
-        </Link>
-
-        <ScratchpadContainer>
-          <RootBlock
-            availablePointers={workspace.connectedPointers}
-            block={scratchpad}
-          />
-        </ScratchpadContainer>
-
-        <div style={{ clear: "both" }} />
+        </div>
+        <div style={{flexShrink: 0, flexGrow: 0, display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+          {
+            Auth.isAdmin()
+            &&
+            <div
+              style={{
+                marginBottom: "5px",
+              }}
+            >
+              <Checkbox
+                style={{
+                  backgroundColor: adminCheckboxBgColor,
+                  border: `1px solid ${adminCheckboxBorderColor}`,
+                  borderRadius: "3px",
+                  padding: "5px 5px 5px 25px",
+                  opacity: this.state.isPublicCheckboxStatusPending ? 0.75 : 1,
+                }}
+                inline={true}
+                type="checkbox"
+                checked={workspace.isPublic}
+                onChange={this.handleOnIsPublicCheckboxChange}
+              >
+                {
+                  this.state.isPublicCheckboxStatusPending
+                  ?
+                  "updating..."
+                  :
+                  "appears on front page"
+                }
+              </Checkbox>
+              <Checkbox
+                style={{
+                  backgroundColor: adminCheckboxBgColor,
+                  border: `1px solid ${adminCheckboxBorderColor}`,
+                  borderRadius: "3px",
+                  padding: "5px 5px 5px 25px",
+                  opacity: this.state.isEligibleCheckboxStatusPending ? 0.75 : 1,
+                }}
+                inline={true}
+                type="checkbox"
+                checked={workspace.isEligibleForAssignment}
+                onChange={this.handleOnIsEligibleCheckboxChange}
+              >
+                {
+                  this.state.isEligibleCheckboxStatusPending
+                  ?
+                  "updating..."
+                  :
+                  "is eligible for assignment"
+                }
+              </Checkbox>
+            </div>
+          }
+          <Link to={`/workspaces/${workspace.id}/subtree`}>
+            <Button
+              bsSize="xsmall"
+              bsStyle="default"
+              className="pull-right"
+              style={{
+                margin: "5px 1px",
+                padding: "1px 4px",
+              }}
+            >
+              Tree »
+            </Button>
+          </Link>
+        </div>
       </WorkspaceContainer>
     );
   }
