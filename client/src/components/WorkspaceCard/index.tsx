@@ -244,75 +244,73 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                 WAS ANSWERED BY ORACLE
               </span>
             }           
-            <span>
-              {
-                workspace.isStale
-                &&
-                <span style={{ padding: "0 10px"}}>STALE</span>
+            {
+              Auth.isAdmin()
+              &&
+              <span>
+                <Checkbox
+                  style={{
+                    backgroundColor: adminCheckboxBgColor,
+                    border: `1px solid ${adminCheckboxBorderColor}`,
+                    borderRadius: "3px",
+                    padding: "5px 5px 5px 25px",
+                    opacity: this.state.isStaleCheckboxStatusPending ? 0.75 : 1,
+                  }}
+                  inline={true}
+                  type="checkbox"
+                  checked={workspace.isStale}
+                  onChange={this.handleOnIsStaleCheckboxChange}
+                >
+                  {
+                    this.state.isStaleCheckboxStatusPending
+                    ?
+                    "updating..."
+                    :
+                    "is stale"
+                  }
+                </Checkbox>
+                <Checkbox
+                  style={{
+                    backgroundColor: adminCheckboxBgColor,
+                    border: `1px solid ${adminCheckboxBorderColor}`,
+                    borderRadius: "3px",
+                    padding: "5px 5px 5px 25px",
+                    opacity: this.state.isEligibleForOracleCheckboxStatusPending ? 0.75 : 1,
+                  }}
+                  inline={true}
+                  type="checkbox"
+                  checked={workspace.isEligibleForOracle}
+                  onChange={this.handleOnIsEligibleForOracleCheckboxChange}
+                >
+                  {
+                    this.state.isEligibleForOracleCheckboxStatusPending
+                    ?
+                    "updating..."
+                    :
+                    "is eligible for oracle"
+                  }
+                </Checkbox>
+              </span>                
               }
               {
-                workspace.isEligibleForOracle
+                !Auth.isAdmin()
                 &&
-                isInOracleMode
-                &&
-                <span style={{ padding: "0 10px"}}>ORACLE ONLY</span>
-              }
-            </span>
-          </div>
-          {
-            Auth.isAdmin()
-            &&
-            <div
-              style={{
-                marginTop: "10px",
-                marginLeft: "10px",
-                marginBottom: "3px"
-              }}
-            >
-              <Checkbox
-                style={{
-                  backgroundColor: adminCheckboxBgColor,
-                  border: `1px solid ${adminCheckboxBorderColor}`,
-                  borderRadius: "3px",
-                  padding: "5px 5px 5px 25px",
-                  opacity: this.state.isStaleCheckboxStatusPending ? 0.75 : 1,
-                }}
-                inline={true}
-                type="checkbox"
-                checked={workspace.isStale}
-                onChange={this.handleOnIsStaleCheckboxChange}
-              >
-                {
-                  this.state.isStaleCheckboxStatusPending
-                  ?
-                  "updating..."
-                  :
-                  "is stale"
-                }
-              </Checkbox>
-              <Checkbox
-                style={{
-                  backgroundColor: adminCheckboxBgColor,
-                  border: `1px solid ${adminCheckboxBorderColor}`,
-                  borderRadius: "3px",
-                  padding: "5px 5px 5px 25px",
-                  opacity: this.state.isEligibleForOracleCheckboxStatusPending ? 0.75 : 1,
-                }}
-                inline={true}
-                type="checkbox"
-                checked={workspace.isEligibleForOracle}
-                onChange={this.handleOnIsEligibleForOracleCheckboxChange}
-              >
-                {
-                  this.state.isEligibleForOracleCheckboxStatusPending
-                  ?
-                  "updating..."
-                  :
-                  "is eligible for oracle"
-                }
-              </Checkbox>            
-            </div>          
-          }            
+                <span>
+                  {
+                    workspace.isStale
+                    &&
+                    <span style={{ padding: "0 10px"}}>STALE</span>
+                  }
+                  {
+                    workspace.isEligibleForOracle
+                    &&
+                    isInOracleMode
+                    &&
+                    <span style={{ padding: "0 10px"}}>ORACLE ONLY</span>
+                  }
+                </span>                  
+              }                
+          </div>          
           <BlockSection
             workspace={workspace}
             availablePointers={availablePointers}
