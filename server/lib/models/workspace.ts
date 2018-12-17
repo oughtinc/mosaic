@@ -98,7 +98,7 @@ const WorkspaceModel = (
         get: async function() {
           let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
           while (curWorkspace.parentId) {
-            curWorkspace = await sequelizemodels.Workspace.findById(curWorkspace.parentId);
+            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
           }
 
           return curWorkspace.hasTimeBudget;

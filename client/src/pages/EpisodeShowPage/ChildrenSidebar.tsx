@@ -65,6 +65,8 @@ export class Child extends React.Component<any, any> {
       workspace
     );
 
+    const hasTimeBudget= this.props.hasTimeBudget;
+
     if (workspace.isArchived) {
       return (
         <div
@@ -98,11 +100,11 @@ export class Child extends React.Component<any, any> {
               </Button>
             )}
             <div style={{ float: "right", opacity: 0.5 }}>
-              <ChildBudgetBadge
+              {hasTimeBudget && <ChildBudgetBadge
                 shouldShowSeconds={false}
                 remainingBudget={workspace.totalBudget - workspace.allocatedBudget}
                 totalBudget={workspace.totalBudget}
-              />
+              />}
             </div>
           </div>
           <div style={{ clear: "both "}} />
@@ -160,7 +162,7 @@ export class Child extends React.Component<any, any> {
               Archive
             </Button>
           )}
-          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && hasTimeBudget && (
             <Button
               bsSize="xsmall"
               bsStyle="default"
@@ -176,7 +178,7 @@ export class Child extends React.Component<any, any> {
               +90s
             </Button>
           )}
-          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && hasTimeBudget && (
             <Button
               bsSize="xsmall"
               bsStyle="default"
@@ -193,7 +195,7 @@ export class Child extends React.Component<any, any> {
             </Button>
           )}
           {!this.state.showChildBudgetForm &&
-            Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
+            Auth.isAuthorizedToEditWorkspace(this.props.workspace) && hasTimeBudget && (
               <Button
                 bsSize="xsmall"
                 bsStyle="default"
@@ -206,11 +208,11 @@ export class Child extends React.Component<any, any> {
               </Button>
             )}
           <div style={{ float: "right" }}>
-            <ChildBudgetBadge
+            {hasTimeBudget && <ChildBudgetBadge
               shouldShowSeconds={false}
               remainingBudget={workspace.totalBudget - workspace.allocatedBudget}
               totalBudget={workspace.totalBudget}
-            />
+            />}
           </div>
         </div>
         <div style={{ marginTop: "10px" }}>
@@ -240,7 +242,7 @@ export class Child extends React.Component<any, any> {
             </Checkbox>
           }
         </div>
-        {this.state.showChildBudgetForm && (
+        {this.state.showChildBudgetForm && hasTimeBudget && (
           <ChildBudgetForm
             availableBudget={this.props.availableBudget}
             childAllocatedBudget={workspace.allocatedBudget}
@@ -302,6 +304,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     }}
                   >
                     <Child
+                      hasTimeBudget={this.props.hasTimeBudget}
                       isArchived={this.props.isArchived}
                       isInOracleMode={this.props.isInOracleMode}
                       updateIsEligibleForOracle={this.props.updateIsEligibleForOracle}
@@ -377,6 +380,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            hasTimeBudget={this.props.hasTimeBudget}
             {...this.props.subquestionDraftProps}
             availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
             parentTotalBudget={this.props.parentTotalBudget}

@@ -528,6 +528,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      hasTimeBudget={hasTimeBudget}
                       visibleExportIds={visibleExportIds}
                       exportLockStatusInfo={exportLockStatusInfo}
                       unlockPointer={unlockPointer}
