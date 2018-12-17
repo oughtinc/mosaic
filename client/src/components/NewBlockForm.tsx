@@ -60,7 +60,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       <div
         key={this.state.id}
         style={{
-          opacity: isOnFrontPage ? 1 : (this.state.pending || this.props.availableBudget < 90 ? 0.5 : 1)
+          opacity: isOnFrontPage ? 1 : (this.state.pending || (this.props.hasTimeBudget && this.props.availableBudget < 90) ? 0.5 : 1)
         }}
       >
         <BlockContainer>
@@ -295,7 +295,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
             <Button
               bsSize="xsmall"
               bsStyle="primary"
-              disabled={this.props.availableBudget - 90 < this.state.totalBudget}
+              disabled={this.props.hasTimeBudget && this.props.availableBudget - 90 < this.state.totalBudget}
               type="submit"
               onClick={this.onSubmit}
               style={{ marginTop: this.props.hasTimeBudget ? "10px" : "0px" }}
