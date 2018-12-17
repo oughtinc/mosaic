@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as LogRocket from "logrocket";
-import { BrowserRouter, Route, Redirect, withRouter } from "react-router-dom";
+import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
@@ -18,9 +18,9 @@ import { BetweenEpisodesPage } from "./pages/BetweenEpisodesPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 import { applyMiddleware, combineReducers, createStore } from "redux";
 import { blockReducer } from "./modules/blocks/reducer";
-import { closeAllPointerReferences } from "./modules/blockEditor/actions";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
+import { ClosePointerListener } from "./components/ClosePointerListener";
 import { Header } from "./components/Header";
 
 import { Config } from "./config";
@@ -86,33 +86,6 @@ export class Layout extends React.Component {
   }
 }
 
-function onRouteChange(route: string) {
-  // Close all pointers on route change, so that shared pointers do not remain open.
-  store.dispatch(closeAllPointerReferences());
-}
-
-// Component used to instantiate a unique listener on the history object.
-class HistoryListener extends React.Component<any, any> {
-  public constructor(props: any) {
-    super(props);
-    this.state = {
-      unlisten: this.props.history.listen(onRouteChange)
-    };
-  }
-
-  public componentWillUnmount() {
-    this.state.unlisten();
-  }
-
-  public render() {
-    return (
-      <div />
-    );
-  }
-}
-
-const HistoryListenerWithRouter = withRouter(HistoryListener);
-
 const Routes = () => (
   <div>
     <Route exact={true} path="/workspaces" render={() => <Redirect to="/" />} />
@@ -141,7 +114,7 @@ const Routes = () => (
         return <Redirect to="/" />;
       }}
     />
-    <HistoryListenerWithRouter />
+    <ClosePointerListener />
   </div>
 );
 

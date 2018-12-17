@@ -57,13 +57,10 @@ export const changePointerReference = ({ id, reference }) => {
   };
 };
 
-export const closeAllPointerReferences = () => {
-  return (dispatch, getState) => {
-    dispatch({
-      type: CLOSE_ALL_POINTER_REFERENCES
-    });
-  };
-};
+export const closeAllPointerReferences = () => ({
+  type: CLOSE_ALL_POINTER_REFERENCES
+});
+
 
 export const exportSelection = blockId => {
   return async (dispatch, getState) => {
