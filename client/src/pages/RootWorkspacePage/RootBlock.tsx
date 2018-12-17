@@ -5,7 +5,7 @@ import { listOfSlateNodesToText } from "../../lib/slateParser";
 const RootBlock = ({ availablePointers = [], block, defaultText = ""}) => {
   let displayText = defaultText;
   if (block && block.value) {
-    let blockText = listOfSlateNodesToText(block.value);
+    const blockText = listOfSlateNodesToText(block.value, availablePointers);
     if (_.trim(blockText) !== "") {
       displayText = blockText;
     }
@@ -21,7 +21,9 @@ const RootBlock = ({ availablePointers = [], block, defaultText = ""}) => {
           textOverflow: "ellipsis",
           minWidth: 0
         }}
-      >{displayText}</div>
+      >
+      {displayText}
+      </div>
     );
   } else {
     return null;

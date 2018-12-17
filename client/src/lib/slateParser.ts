@@ -20,26 +20,26 @@ export function databaseJSONToValue(databaseJson: any) {
   }
 }
 
-export function listOfSlateNodesToText(list: Array<any>) {
-  return _.map(_.map(list, slateNodeToText), _.trim).join(" ");
+export function listOfSlateNodesToText(list: Array<any>, availablePointers: Array<any>) {
+  return _.map(_.map(list, x => slateNodeToText(x, availablePointers)), _.trim).join(" ");
 }
 
-export function slateNodeToText(node: any) {
+export function slateNodeToText(node: any, availablePointers: Array<any>) {
   let prefix = "";
   let mid = "";
   let suffix = "";
-  if (node.type === "pointerExport") {
+  if (node.type === "pointerImport") {
+    const exportPointer = _.find(availablePointers, x => x.data.pointerId === node.data.pointerId);
+    return slateNodeToText(exportPointer, availablePointers);
+  } else if (node.type === "pointerExport") {
     prefix = "[";
     suffix = "]";
-  } else {
-    prefix = "";
-    suffix = "";
   }
 
   if (_.has(node, "nodes")) {
-    mid = listOfSlateNodesToText(node.nodes);
+    mid = listOfSlateNodesToText(node.nodes, availablePointers);
   } else if (_.has(node, "leaves")) {
-    mid = listOfSlateNodesToText(node.leaves);
+    mid = listOfSlateNodesToText(node.leaves, availablePointers);
   } else if (_.has(node, "text")) {
     mid = node.text;
   }
