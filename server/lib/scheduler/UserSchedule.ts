@@ -12,6 +12,7 @@ class UserSchedule {
   private userSchedule = [];
   private hasUserLeftLastAssignment = false;
   private isLastAssignmentOracle = false;
+  private isLastAssignmentTimed = true;
 
   public constructor({ rootParentCache, timeLimit, userId }) {
     this.rootParentCache = rootParentCache;
@@ -19,7 +20,7 @@ class UserSchedule {
     this.userId = userId;
   }
 
-  public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false) {
+  public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false, isLastAssignmentTimed = true) {
     const assignment = new Assignment({
       userId: this.userId,
       workspace,
@@ -30,6 +31,7 @@ class UserSchedule {
 
     this.hasUserLeftLastAssignment = false;
     this.isLastAssignmentOracle = isOracle;
+    this.isLastAssignmentTimed = isLastAssignmentTimed;
 
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
 
@@ -97,6 +99,10 @@ class UserSchedule {
   private isActiveInLastWorkspace() {
     if (this.hasUserLeftLastAssignment) {
       return false;
+    }
+
+    if (!this.hasUserLeftLastAssignment && !this.isLastAssignmentTimed) {
+      return true;
     }
 
     const lastWorkedOnAssignment = this.getMostRecentAssignment();

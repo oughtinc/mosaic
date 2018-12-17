@@ -72,6 +72,7 @@ class Scheduler {
           userId,
           workspace: assignedWorkspace,
           isOracle: true,
+          isLastAssignmentTimed: true,
         });
         wasWorkspaceAssigned = true;
         break;
@@ -97,11 +98,13 @@ class Scheduler {
     }
 
     const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
+    const isThisAssignmentTimed = await assignedWorkspace.hasTimeBudgetOfRootParent;
 
     await this.schedule.assignWorkspaceToUser({
       userId,
       workspace: assignedWorkspace,
       isOracle: false,
+      isLastAssignmentTimed: isThisAssignmentTimed,
     });
   }
 
@@ -137,7 +140,10 @@ class Scheduler {
 
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
 
-    const workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(workspacesNotCurrentlyBeingWorkedOn);
+    let workspacesWithAtLeastMinBudget = workspacesNotCurrentlyBeingWorkedOn;
+    if (rootWorkspace.hasTimeBudget) {
+      workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(workspacesNotCurrentlyBeingWorkedOn);
+    }
 
     let eligibleWorkspaces = workspacesWithAtLeastMinBudget;
 
@@ -148,7 +154,10 @@ class Scheduler {
       eligibleWorkspaces = staleWorkspaces;
     }
 
-    const workspaceWithLeastRemainingBudgetAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
+    let workspaceWithLeastRemainingBudgetAmongDescendants = eligibleWorkspaces;
+    if (rootWorkspace.hasTimeBudget) {
+      workspaceWithLeastRemainingBudgetAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
+    }
 
     const finalWorkspaces = workspaceWithLeastRemainingBudgetAmongDescendants;
 
