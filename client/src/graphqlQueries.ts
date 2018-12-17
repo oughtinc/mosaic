@@ -70,6 +70,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       isPublic
       isStale
       isEligibleForOracle
+      hasTimeBudget
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
