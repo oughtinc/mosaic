@@ -639,22 +639,27 @@ function mapStateToProps(state: any, { workspace }: any) {
   if (workspace.workspace) {
 
     const visibleExportIds = exportingPointers.map(p => p.data.pointerId);
+
     const exportLockStatusInfo = workspace.workspace.exportLockStatusInfo;
+
     const connectedPointers = _.uniqBy(
       workspace.workspace.connectedPointers,
       (p: any) => p.data.pointerId
     );
 
-    const inputBlockIds = workspace.workspace.blocks.filter(b =>
+    const question = workspace.workspace.blocks.find(b =>
       b.type === "QUESTION"
-    ).concat(
-      _.flatten(
-        workspace.workspace.childWorkspaces.map(w =>
-          w.blocks.filter(b => b.type === "ANSWER")
-        )
+    );
+
+    const subquestionAnswers = _.flatten(
+      workspace.workspace.childWorkspaces.map(w =>
+        w.blocks.filter(b => b.type === "ANSWER")
       )
-    )
-    .map((b: any) => b.id);
+    );
+
+    const inputBlocks = [question, ...subquestionAnswers];
+
+    const inputBlockIds = inputBlocks.map((b: any) => b.id);
 
     inputCharCount = inputCharCountSelector({
       state,
@@ -665,16 +670,24 @@ function mapStateToProps(state: any, { workspace }: any) {
       exportLockStatusInfo
     });
 
-    const outputBlockIds = workspace.workspace.blocks.filter(b =>
-      b.type === "SCRATCHPAD" || b.type === "ANSWER" || b.type === "SUBQUESTION_DRAFT"
-    ).concat(
-      _.flatten(
-        workspace.workspace.childWorkspaces.map(w =>
-          w.blocks.filter(b => b.type === "QUESTION")
-        )
+    const scratchpad = workspace.workspace.blocks.find(b => b.type === "SCRATCHPAD");
+    const answer = workspace.workspace.blocks.find(b => b.type === "ANSWER");
+    const subquestionDraft = workspace.workspace.blocks.find(b => b.type === "SUBQUESTION_DRAFT");
+
+    const subquestionQuestions = _.flatten(
+      workspace.workspace.childWorkspaces.map(w =>
+        w.blocks.filter(b => b.type === "QUESTION")
       )
-    )
-    .map((b: any) => b.id);
+    );
+
+    const outputBlocks = [
+      scratchpad,
+      answer,
+      subquestionDraft,
+      ...subquestionQuestions
+    ];
+
+    const outputBlockIds = outputBlocks.map((b: any) => b.id);
 
     outputCharCount = outputCharCountSelector(state, outputBlockIds);
   }
