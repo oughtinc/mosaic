@@ -482,6 +482,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         (!((isUserOracle && isInOracleMode) && !hasParent))
                         &&
                         <ResponseFooter
+                          hasTimeBudget={hasTimeBudget}
                           depleteBudget={() =>
                             this.props.depleteBudget({
                               variables: { id: workspace.id },
