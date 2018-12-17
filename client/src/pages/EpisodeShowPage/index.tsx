@@ -1,4 +1,5 @@
 import * as LogRocket from "logrocket";
+import * as moment from "moment";
 import * as React from "react";
 import * as keyboardJS from "keyboardjs";
 
@@ -61,6 +62,8 @@ const WORKSPACE_QUERY = gql`
       isPublic
       isStale
       isEligibleForOracle
+      hasIOConstraintsOfRootParent
+      hasTimeBudgetOfRootParent
       childWorkspaceOrder
       connectedPointers
       totalBudget
@@ -318,13 +321,18 @@ export class WorkspaceView extends React.Component<any, any> {
     const isUserOracle = Auth.isOracle();
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
 
+    const hasTimeBudget = workspace.hasTimeBudgetOfRootParent;
+    const hasIOConstraints = workspace.hasIOConstraintsOfRootParent;
+
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
     const hasTimerEnded = this.state.hasTimerEnded;
 
     const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
-    const durationInMs = durationInMsGivenRemainingBudget;
+    const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
+
+    const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
 
     const exportLockStatusInfo = workspace.exportLockStatusInfo;
     const unlockPointer = pointerId => this.props.unlockPointerMutation({
@@ -372,19 +380,31 @@ export class WorkspaceView extends React.Component<any, any> {
                         justifyContent: "space-between",
                       }}
                     >
-                      <CharCountDisplays
-                        inputCharCount={this.props.inputCharCount}
-                        outputCharCount={this.props.outputCharCount}
-                      />
-                      <TimerAndTimeBudgetInfo
-                        durationInMs={durationInMs}
-                        handleTimerEnd={this.handleTimerEnd}
-                        hasTimer={hasTimer}
-                        initialAllocatedBudget={workspace.allocatedBudget}
-                        tickDuration={this.tickDuration}
-                        totalBudget={workspace.totalBudget}
-                        workspaceId={workspace.id}
-                      />
+                      {
+                        hasIOConstraints
+                        ?
+                        <CharCountDisplays
+                          inputCharCount={this.props.inputCharCount}
+                          outputCharCount={this.props.outputCharCount}
+                        />
+                        :
+                        <div />
+                      }
+                      {
+                        hasTimeBudget
+                        ?
+                        <TimerAndTimeBudgetInfo
+                          durationInMs={durationInMs}
+                          handleTimerEnd={this.handleTimerEnd}
+                          hasTimer={hasTimer}
+                          initialAllocatedBudget={workspace.allocatedBudget}
+                          tickDuration={this.tickDuration}
+                          totalBudget={workspace.totalBudget}
+                          workspaceId={workspace.id}
+                        />
+                        :
+                        <div style={{ height: "70px" }} />
+                      }
                     </div>
                   </Col>
                 </Row>

@@ -78,7 +78,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
         <Redirect
           to={{
             pathname: `/workspaces/${this.state.workspaceId}`,
-            search: (Auth.isOracle() && this.props.oracleModeQuery.oracleMode) ? "" : "?isolated=true&timer=true",
+            search: (Auth.isOracle() && this.props.oracleModeQuery.oracleMode) ? "" : "?isolated=true&timer=0:1:30",
           }}
         />
       );

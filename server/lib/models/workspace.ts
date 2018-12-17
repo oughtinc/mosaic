@@ -50,6 +50,16 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      hasTimeBudget: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+      hasIOConstraints: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
       wasAnsweredByOracle: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -79,6 +89,32 @@ const WorkspaceModel = (
         allowNull: false,
         validate: {
           min: 0,
+        },
+      },
+      hasTimeBudgetOfRootParent: {
+        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
+          "id",
+        ]),
+        get: async function() {
+          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          while (curWorkspace.parentId) {
+            curWorkspace = await sequelizemodels.Workspace.findById(curWorkspace.parentId);
+          }
+
+          return curWorkspace.hasTimeBudget;
+        },
+      },
+      hasIOConstraintsOfRootParent: {
+        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
+          "id",
+        ]),
+        get: async function() {
+          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          while (curWorkspace.parentId) {
+            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+          }
+
+          return curWorkspace.hasIOConstraints;
         },
       },
       remainingBudget: {
