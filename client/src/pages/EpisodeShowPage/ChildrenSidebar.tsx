@@ -65,7 +65,7 @@ export class Child extends React.Component<any, any> {
       workspace
     );
 
-    const hasTimeBudget= this.props.hasTimeBudget;
+    const hasTimeBudget = this.props.hasTimeBudget;
 
     if (workspace.isArchived) {
       return (

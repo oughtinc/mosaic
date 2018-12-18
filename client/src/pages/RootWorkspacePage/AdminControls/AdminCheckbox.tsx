@@ -1,7 +1,5 @@
 import * as React from "react";
-import { graphql } from "react-apollo";
 import { Checkbox } from "react-bootstrap";
-import { compose } from "recompose";
 
 import {
   adminCheckboxBgColor,
