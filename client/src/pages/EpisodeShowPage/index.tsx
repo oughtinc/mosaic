@@ -499,7 +499,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           markAsNotEligible={() =>
                             this.props.updateWorkspaceIsEligible({
                               variables: {
-                                isEligible: false,
+                                isEligibleForAssignment: false,
                                 workspaceId: workspace.id,
                               }
                             })
