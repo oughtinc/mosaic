@@ -102,6 +102,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     if (this.isLocked() && this.state.isLocked) {
       this.setState({ isLocked: false });
       this.props.unlockPointer(exportPointerId);
+      setTimeout(() => { this.props.openClosedPointer(pointerId); }, 400);
     } else {
       this.props.openClosedPointer(pointerId);
     }
