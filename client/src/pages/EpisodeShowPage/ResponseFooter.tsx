@@ -56,7 +56,10 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               ?
               <TakeBreakBtn
                 label="Done!"
-                navHook={markAsNotEligible}
+                navHook={() => {
+                  markAsNotStale();
+                  markAsNotEligible();
+                }}
               />
               :
               <TakeBreakBtn
