@@ -494,7 +494,7 @@ const schema = new GraphQLSchema({
           }
           if (!user.is_admin) {
             throw new Error(
-              "Non-admin attempted to toggle workspace visiblity"
+              "Non-admin attempted to toggle workspace visiblity."
             );
           }
           const workspace = await models.Workspace.findById(workspaceId);
@@ -504,10 +504,10 @@ const schema = new GraphQLSchema({
       updateWorkspaceIsEligible: {
         type: workspaceType,
         args: {
-          isEligible: { type: GraphQLBoolean },
+          isEligibleForAssignment: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { isEligible, workspaceId }, context) => {
+        resolve: async (_, { isEligibleForAssignment, workspaceId }, context) => {
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error(
@@ -515,7 +515,53 @@ const schema = new GraphQLSchema({
             );
           }
           const workspace = await models.Workspace.findById(workspaceId);
-          await workspace.update({ isEligibleForAssignment: isEligible });
+          await workspace.update({ isEligibleForAssignment });
+          return { id: workspaceId };
+        }
+      },
+      updateWorkspaceHasTimeBudget: {
+        type: workspaceType,
+        args: {
+          hasTimeBudget: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { hasTimeBudget, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update workspace time budget status."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to workspace time budget status."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ hasTimeBudget });
+          return { id: workspaceId };
+        }
+      },
+      updateWorkspaceHasIOConstraints: {
+        type: workspaceType,
+        args: {
+          hasIOConstraints: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { hasIOConstraints, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update workspace i/o constraint status."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to update workspace i/o constraint status."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ hasIOConstraints });
           return { id: workspaceId };
         }
       },

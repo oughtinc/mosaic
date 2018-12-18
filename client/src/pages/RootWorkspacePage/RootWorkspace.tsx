@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import styled from "styled-components";
 
+import { AdminControls } from "./AdminControls";
 import { RootBlock } from "./RootBlock";
 import { Auth } from "../../auth";
 import {
@@ -63,54 +64,7 @@ class RootWorkspacePresentational extends React.Component<any, any> {
         {
           Auth.isAdmin()
           &&
-          <div
-            style={{
-              marginBottom: "5px",
-            }}
-          >
-            <Checkbox
-              style={{
-                backgroundColor: adminCheckboxBgColor,
-                border: `1px solid ${adminCheckboxBorderColor}`,
-                borderRadius: "3px",
-                padding: "5px 5px 5px 25px",
-                opacity: this.state.isPublicCheckboxStatusPending ? 0.75 : 1,
-              }}
-              inline={true}
-              type="checkbox"
-              checked={workspace.isPublic}
-              onChange={this.handleOnIsPublicCheckboxChange}
-            >
-              {
-                this.state.isPublicCheckboxStatusPending
-                ?
-                "updating..."
-                :
-                "appears on front page"
-              }
-            </Checkbox>
-            <Checkbox
-              style={{
-                backgroundColor: adminCheckboxBgColor,
-                border: `1px solid ${adminCheckboxBorderColor}`,
-                borderRadius: "3px",
-                padding: "5px 5px 5px 25px",
-                opacity: this.state.isEligibleCheckboxStatusPending ? 0.75 : 1,
-              }}
-              inline={true}
-              type="checkbox"
-              checked={workspace.isEligibleForAssignment}
-              onChange={this.handleOnIsEligibleCheckboxChange}
-            >
-              {
-                this.state.isEligibleCheckboxStatusPending
-                ?
-                "updating..."
-                :
-                "is eligible for assignment"
-              }
-            </Checkbox>
-          </div>
+          <AdminControls workspace={workspace} />
         }
         <Link to={`/workspaces/${workspace.id}`}>
           <RootBlock
