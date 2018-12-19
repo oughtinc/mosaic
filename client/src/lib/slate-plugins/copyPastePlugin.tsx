@@ -6,9 +6,18 @@ function CopyPastePlugin() {
   return {
     onPaste: (event, change) => {
       const transfer = getEventTransfer(event);
-      const { text } = transfer;
-      const strippedText = text.split("").filter(c => c !== POINTER_EDGE_SPACE).join("");
-      change.insertText(strippedText);
+      let { text } = transfer;
+
+      text = text
+        .split(POINTER_EDGE_SPACE)
+        .join("");
+
+      text = text
+        .split("🔒")
+        .join("");
+
+      change.insertText(text);
+
       return false;
     },
   };
