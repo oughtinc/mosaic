@@ -72,7 +72,6 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       isPublic
       isStale
       isEligibleForOracle
-      hasTimeBudget
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
@@ -138,5 +137,11 @@ export const UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS = gql`
     updateWorkspaceHasIOConstraints(hasIOConstraints: $hasIOConstraints, workspaceId: $workspaceId) {
       id
     }
+  }
+`;
+
+export const UPDATE_TIME_SPENT_ON_WORKSPACE = gql`
+  mutation updateTimeSpentOnWorkspace($doesAffectAllocatedBudget: Boolean, $secondsSpent: Int, $workspaceId: String) {
+    updateTimeSpentOnWorkspace(doesAffectAllocatedBudget: $doesAffectAllocatedBudget, secondsSpent: $secondsSpent, workspaceId: $workspaceId)
   }
 `;

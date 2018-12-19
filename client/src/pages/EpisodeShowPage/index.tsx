@@ -15,6 +15,7 @@ import { EpisodeNav } from "./EpisodeNav";
 import { ResponseFooter } from "./ResponseFooter";
 import { CharCountDisplays } from "./CharCountDisplays";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
+import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -229,8 +230,9 @@ export class WorkspaceView extends React.Component<any, any> {
   private scratchpadField;
   private answerField;
   private newChildField;
-  private tickDuration = 1;
-
+  private tickDurationForCountdownTimer = 1;
+  private tickDurationForUpdatingTimeSpentWhenNoTimeBudget = 5;
+  
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -398,12 +400,15 @@ export class WorkspaceView extends React.Component<any, any> {
                           handleTimerEnd={this.handleTimerEnd}
                           hasTimer={hasTimer}
                           initialAllocatedBudget={workspace.allocatedBudget}
-                          tickDuration={this.tickDuration}
+                          tickDuration={this.tickDurationForCountdownTimer}
                           totalBudget={workspace.totalBudget}
                           workspaceId={workspace.id}
                         />
                         :
-                        <div style={{ height: "70px" }} />
+                        <TimerWhenNoTimeBudget
+                          tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
+                          workspaceId={workspace.id}
+                        />
                       }
                     </div>
                   </Col>

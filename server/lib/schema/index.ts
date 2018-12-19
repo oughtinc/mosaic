@@ -587,9 +587,8 @@ const schema = new GraphQLSchema({
         args: {
           workspaceId: { type: GraphQLString },
           changeToBudget: { type: GraphQLInt },
-          isResultOfTimerCountdown: { type: GraphQLBoolean },
         },
-        resolve: async (_, { workspaceId, changeToBudget, isResultOfTimerCountdown }, context) => {
+        resolve: async (_, { workspaceId, changeToBudget }, context) => {
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error(
@@ -602,6 +601,47 @@ const schema = new GraphQLSchema({
             workspace.allocatedBudget + changeToBudget
           );
           await workspace.update({ allocatedBudget: updatedTimeBudget });
+        }
+      },
+      updateTimeSpentOnWorkspace: {
+        type: GraphQLBoolean,
+        args: {
+          doesAffectAllocatedBudget: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString },
+          secondsSpent: { type: GraphQLInt },
+        },
+        resolve: async (_, { doesAffectAllocatedBudget, workspaceId, secondsSpent }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update time spent on workspace."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+
+          if (doesAffectAllocatedBudget) {
+
+            const changeToBudget = secondsSpent;
+
+            const updatedTimeBudget = Math.min(
+              workspace.totalBudget,
+              workspace.allocatedBudget + changeToBudget
+            );
+
+            await workspace.update({
+              allocatedBudget: updatedTimeBudget,
+              timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent
+            });
+
+          } else {
+
+            await workspace.update({
+              timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent,
+            });
+
+          }
+
+          return true;
         }
       },
       unlockPointer: {

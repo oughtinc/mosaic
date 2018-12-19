@@ -83,6 +83,14 @@ const WorkspaceModel = (
           min: 0,
         },
       },
+      timeSpentOnThisWorkspace: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+        validate: {
+          min: 0,
+        },
+      },
       allocatedBudget: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
@@ -130,8 +138,13 @@ const WorkspaceModel = (
         type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
           "allocatedBudget",
           "childWorkspaceOrder",
+          "timeSpentOnThisWorkspace",
         ]),
         get: async function() {
+          if (this.get("timeSpentOnThisWorkspace") > 0) {
+            return this.get("timeSpentOnThisWorkspace");
+          }
+          
           let howMuchSpentOnChildren = 0;
           for (const childId of this.get("childWorkspaceOrder")) {
             const child = await sequelize.models.Workspace.findById(childId);

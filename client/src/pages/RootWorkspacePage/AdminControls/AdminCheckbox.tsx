@@ -56,13 +56,6 @@ class AdminCheckbox extends React.Component<any, any> {
     }
 
     this.setState({ isStatusPending: true }, () =>
-      console.log({
-        variables: {
-          [this.props.workspaceFieldToUpdate]: !this.props.workspace[this.props.workspaceFieldToUpdate],
-          workspaceId: this.props.workspace.id
-        }
-      })
-      ||
       this.props.updateMutation({
         variables: {
           [this.props.workspaceFieldToUpdate]: !this.props.workspace[this.props.workspaceFieldToUpdate],

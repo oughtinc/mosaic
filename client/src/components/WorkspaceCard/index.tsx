@@ -82,7 +82,6 @@ interface WorkspaceType {
   id: string;
   isStale: boolean;
   isEligibleForOracle: boolean;
-  hasTimeBudget: boolean;
   budgetUsedWorkingOnThisWorkspace: number;
   allocatedBudget: number;
   wasAnsweredByOracle: boolean;
@@ -184,31 +183,26 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               color: "#999",
               fontSize: "12px",
               display: "flex",
-              height: workspace.hasTimeBudget ? "40px" : "25px",
+              height: "40px",
               justifyContent: "space-between",
             }}
           >
-            <span>
-              {
-                workspace.hasTimeBudget &&
-                  <span style={{ padding: "0 10px"}}>
-                    <ChildBudgetBadge
-                      noBadge={true}
-                      shouldShowSeconds={false}
-                      style={{ color: "#555", fontSize: "12px" }}
-                      totalBudget={subtreeTimeSpentData[workspace.id]}
-                    />
-                    {" "}work on this entire subtree
-                    <br />
-                    <ChildBudgetBadge
-                      noBadge={true}
-                      shouldShowSeconds={false}
-                      style={{ color: "#555", fontSize: "12px" }}
-                      totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
-                    />
-                    {" "}work on this workspace
-                  </span>
-              }
+            <span style={{ padding: "0 10px"}}>
+              <ChildBudgetBadge
+                noBadge={true}
+                shouldShowSeconds={false}
+                style={{ color: "#555", fontSize: "12px" }}
+                totalBudget={subtreeTimeSpentData[workspace.id]}
+              />
+              {" "}work on this entire subtree
+              <br />
+              <ChildBudgetBadge
+                noBadge={true}
+                shouldShowSeconds={false}
+                style={{ color: "#555", fontSize: "12px" }}
+                totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
+              />
+              {" "}work on this workspace
             </span>
             {
               workspace.wasAnsweredByOracle
