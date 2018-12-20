@@ -232,7 +232,7 @@ export class WorkspaceView extends React.Component<any, any> {
   private newChildField;
   private tickDurationForCountdownTimer = 1;
   private tickDurationForUpdatingTimeSpentWhenNoTimeBudget = 5;
-  
+
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -380,6 +380,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
+                        minHeight: "60px",
                       }}
                     >
                       {
