@@ -124,6 +124,22 @@ export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
   }
 `;
 
+export const UPDATE_WORKSPACE_STALENESS = gql`
+  mutation updateWorkspaceStaleness($isStale: Boolean, $workspaceId: String) {
+    updateWorkspaceStaleness(isStale: $isStale, id: $workspaceId) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE = gql`
+  mutation updateWorkspaceIsEligibleForOracle($isEligibleForOracle: Boolean, $workspaceId: String) {
+    updateWorkspaceIsEligibleForOracle(isEligibleForOracle: $isEligibleForOracle, workspaceId: $workspaceId) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_WORKSPACE_HAS_TIME_BUDGET = gql`
   mutation updateWorkspaceHasTimeBudget($hasTimeBudget: Boolean, $workspaceId: String) {
     updateWorkspaceHasTimeBudget(hasTimeBudget: $hasTimeBudget, workspaceId: $workspaceId) {
