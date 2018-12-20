@@ -193,7 +193,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 
     const tooltip = (
       <Tooltip id="tooltip" style={{ display: !isLocked && "none" }}>
-        <strong>+{exportPointerInputCharCount}</strong> char{exportPointerInputCharCount === 1 ? "" : "s"}
+        <strong>{exportPointerInputCharCount}</strong> char{exportPointerInputCharCount === 1 ? "" : "s"}
       </Tooltip>
     );
 
