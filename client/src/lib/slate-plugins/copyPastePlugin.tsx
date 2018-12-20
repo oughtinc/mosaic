@@ -23,12 +23,12 @@ export function CopyPastePlugin() {
   };
 }
 
-function processDocumentJSONIntoInlineJSON(document) {
+function processDocumentJSONIntoInlineJSON(document: any) {
   let i = 0;
   let curBlock = document.nodes[i];
   let nodes = [];
 
-  while(curBlock = document.nodes[i++]) {
+  while (curBlock = document.nodes[i++]) {
     nodes = nodes.concat(curBlock.nodes.map(processNode));
   }
 
@@ -53,26 +53,26 @@ export function processNode(node: any) {
       object: "inline",
       type: "pasted",
       nodes: node.nodes.map(processNode),
-    }
+    };
   } else if (node.object === "text") {
     return {
       object: "text",
       leaves: node.leaves.map(processNode)
-    }
+    };
   } else if (node.object === "leaf") {
     return {
       object: "leaf",
       text: processText(node.text),
-    }
+    };
   } else {
     return {
       ...node,
       nodes: node.nodes.map(processNode),
-    }
+    };
   }
 }
 
-function processText(text) {
+function processText(text: string) {
   text = text
     .split(POINTER_EDGE_SPACE)
     .join("");
