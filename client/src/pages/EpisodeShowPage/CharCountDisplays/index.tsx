@@ -39,7 +39,7 @@ class CharCountDisplaysPresentational extends React.Component<any,  any> {
                 textShadow: this.props.inputCharCount >= 300 && this.props.inputCharCount < 400 && "0 0 1px #333",
               }}
             >
-              {this.props.inputCharCount}
+              {400 - this.props.inputCharCount}
             </div>
           </span>
         </span>
@@ -66,7 +66,7 @@ class CharCountDisplaysPresentational extends React.Component<any,  any> {
               textShadow: this.props.outputCharCount >= 300 && this.props.outputCharCount < 400 && "0 0 1px #333",
             }}
           >
-            {this.props.outputCharCount}
+            {400 - this.props.outputCharCount}
           </div>
         </span>
       </span>
