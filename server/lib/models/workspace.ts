@@ -50,6 +50,16 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      hasTimeBudget: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+      hasIOConstraints: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
       wasAnsweredByOracle: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -73,12 +83,46 @@ const WorkspaceModel = (
           min: 0,
         },
       },
+      timeSpentOnThisWorkspace: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+        validate: {
+          min: 0,
+        },
+      },
       allocatedBudget: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
         allowNull: false,
         validate: {
           min: 0,
+        },
+      },
+      hasTimeBudgetOfRootParent: {
+        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
+          "id",
+        ]),
+        get: async function() {
+          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          while (curWorkspace.parentId) {
+            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+          }
+
+          return curWorkspace.hasTimeBudget;
+        },
+      },
+      hasIOConstraintsOfRootParent: {
+        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
+          "id",
+        ]),
+        get: async function() {
+          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          while (curWorkspace.parentId) {
+            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+          }
+
+          return curWorkspace.hasIOConstraints;
         },
       },
       remainingBudget: {
@@ -94,8 +138,13 @@ const WorkspaceModel = (
         type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
           "allocatedBudget",
           "childWorkspaceOrder",
+          "timeSpentOnThisWorkspace",
         ]),
         get: async function() {
+          if (this.get("timeSpentOnThisWorkspace") > 0) {
+            return this.get("timeSpentOnThisWorkspace");
+          }
+          
           let howMuchSpentOnChildren = 0;
           for (const childId of this.get("childWorkspaceOrder")) {
             const child = await sequelize.models.Workspace.findById(childId);
@@ -122,6 +171,17 @@ const WorkspaceModel = (
             }
           }
           return values.filter(v => !!v);
+        },
+      },
+      exportLockStatusInfo: {
+        type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
+        get: async function() {
+          const exportWorkspaceLockRelations = await sequelize.models.ExportWorkspaceLockRelation.findAll({
+            where: {
+              workspaceId: this.get("id"),
+            }
+          });
+          return exportWorkspaceLockRelations;
         },
       },
       connectedPointersOfSubtree: {

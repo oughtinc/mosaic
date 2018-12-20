@@ -48,6 +48,8 @@ interface BlockEditorEditingPresentationalProps {
   placeholder?: string;
   block: any;
   availablePointers: any[];
+  visibleExportIds: string[];
+  exportLockStatusInfo: any;
   value: any;
   mutationStatus: any;
   blockEditor: any;
@@ -93,7 +95,9 @@ export class BlockEditorEditingPresentational extends React.Component<
       !_.isEqual(
         newState.hasChangedSinceDatabaseSave,
         this.state.hasChangedSinceDatabaseSave
-      )
+      ) ||
+      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
     ) {
       return true;
     }

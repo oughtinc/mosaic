@@ -1,14 +1,19 @@
 import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import * as ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
 import { changePointerReference } from "../../modules/blockEditor/actions";
+import { getInputCharCount } from "../../modules/blocks/charCounts";
+
 import {
-  pointerImportNameColor,
-  pointerImportNameColorOnHover,
+  lockedPointerImportBgColor,
+  lockedPointerImportBgColorOnHover,
+  unlockedImportBgColor,
+  unlockedImportBgColorOnHover,
 } from "../../styles";
 
 const RemovedPointer = styled.span`
@@ -21,17 +26,11 @@ const RemovedPointer = styled.span`
 
 const bracketFont = "800 1.2em sans-serif";
 
-const ClosedPointerImport: any = styled.span`
-  background-color: ${pointerImportNameColor};
-  color: rgb(233, 239, 233);
-  cursor: pointer;
-  padding: 0 4px;
-  border-radius: 4px;
-  transition: background-color color 0.8s;
-  &:hover {
-    background-color: ${pointerImportNameColorOnHover};
-  }
-`;
+// getting rid fo this and putting ClosedPointerImport's props onto the nested
+// span leads to a Typescript error, seems to be a known TS bug, maybe
+// upgrading TS will fix it, looking into it wasn't a priority, so just keeping
+// this for now
+const ClosedPointerImport: any = styled.span``;
 
 const OpenPointerImport: any = styled.span`
   background: ${(props: any) =>
@@ -47,13 +46,13 @@ const OpenPointerImport: any = styled.span`
 
 const Brackets: any = styled.span`
   &:before {
-    color: ${pointerImportNameColor};
+    color: ${unlockedImportBgColor};
     content: "[";
     font: ${bracketFont};
   }
 
   &:after {
-    color: ${pointerImportNameColor};
+    color: ${unlockedImportBgColor};
     content: "]";
     font: ${bracketFont};
   }
@@ -62,6 +61,22 @@ const Brackets: any = styled.span`
 class PointerImportNodePresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
+
+    const onHomepageOrTreeView = !props.exportLockStatusInfo;
+    if (onHomepageOrTreeView) {
+      this.state = {
+        isLocked: false,
+      };
+    } else {
+      const exportPointerId = props.nodeAsJson.data.pointerId;
+      const isLockedRelation = props.exportLockStatusInfo && props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
+      const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
+      const isLocked = !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
+
+      this.state = {
+        isLocked,
+      };
+    }
   }
 
   public getLocation = () => {
@@ -83,8 +98,14 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     }
   };
 
-  public handleClosedPointerClick = (e: Event, pointerId: string) => {
-    this.props.openClosedPointer(pointerId);
+  public handleClosedPointerClick = (e: Event, pointerId: string, exportPointerId: string) => {
+    if (this.isLocked() && this.state.isLocked) {
+      this.setState({ isLocked: false });
+      this.props.unlockPointer(exportPointerId);
+      setTimeout(() => { this.props.openClosedPointer(pointerId); }, 400);
+    } else {
+      this.props.openClosedPointer(pointerId);
+    }
     e.stopPropagation( );
   }
 
@@ -93,8 +114,27 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     e.stopPropagation();
   }
 
+  public isLocked() {
+    const onHomepageOrTreeView = !this.props.exportLockStatusInfo;
+    if (onHomepageOrTreeView) {
+      return false;
+    }
+
+    const exportPointerId = this.props.nodeAsJson.data.pointerId;
+    const isLockedRelation = this.props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
+    const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
+    const isLocked = !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
+
+    return isLocked;
+  }
+
   public render() {
-    const { blockEditor, availablePointers, nodeAsJson } = this.props;
+    const {
+      availablePointers,
+      blockEditor,
+      visibleExportIds,
+      nodeAsJson,
+    } = this.props;
 
     const {
       importingPointer,
@@ -107,19 +147,38 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       nodeAsJson
     });
 
+    const isLocked = this.state.isLocked && this.isLocked();
+
     const styles = StyleSheet.create({
       OuterPointerImportStyle: {
         ":before": {
-          backgroundColor: pointerImportNameColor,
+          backgroundColor: isLocked ? lockedPointerImportBgColor : unlockedImportBgColor,
           color: "rgb(233, 239, 233)",
           content: `"$${pointerIndex + 1}"`,
           borderRadius: "4px 0px 0px 4px",
           padding: "0px 3px",
         },
       },
+      ClosedPointerImportStyle: {
+        backgroundColor: isLocked ? lockedPointerImportBgColor : unlockedImportBgColor,
+        color: "rgb(233, 239, 233)",
+        cursor: "pointer",
+        padding: "0 4px",
+        borderRadius: "4px",
+        transition: "background-color color 0.8s",
+        whiteSpace: "nowrap",
+        ":hover": {
+          backgroundColor: isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover,
+        }
+      },
     });
 
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
+    const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
+
+    const exportPointer = availablePointers.find(p => p.data.pointerId === exportPointerId);
+
+    const exportPointerInputCharCount = exportPointer && getInputCharCount(exportPointer);
 
     if (!importingPointer) {
       return (
@@ -132,15 +191,38 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       );
     }
 
+    const tooltip = (
+      <Tooltip id="tooltip" style={{ display: !isLocked && "none" }}>
+        <strong>{exportPointerInputCharCount}</strong> char{exportPointerInputCharCount === 1 ? "" : "s"}
+      </Tooltip>
+    );
+
     if (!isOpen) {
       return (
-        <ClosedPointerImport
-          onClick={e => this.handleClosedPointerClick(e, pointerId)}
-          onMouseOver={this.onMouseOver}
-          onMouseOut={this.props.onMouseOut}
-        >
-          {`$${pointerIndex + 1}`}
-        </ClosedPointerImport>
+        <OverlayTrigger placement="top" overlay={tooltip}>
+          <ClosedPointerImport
+            className={css(styles.ClosedPointerImportStyle)}
+            onClick={e => this.handleClosedPointerClick(e, pointerId, exportPointerId)}
+            onMouseOver={this.onMouseOver}
+            onMouseOut={this.props.onMouseOut}
+          >
+            <span
+              key={exportPointerId}
+              style={{
+                display: "inline-block",
+                filter: "brightness(110%) saturate(400%)",
+                fontSize: "smaller",
+                transform: !isLocked && "scale(0, 0)",
+                transition: "all 0.5s",
+                maxWidth: isLocked ? "90px" : 0,
+                verticalAlign: "middle",
+              }}
+            >
+              🔒
+            </span>
+            {`$${pointerIndex + 1}`}
+          </ClosedPointerImport>
+        </OverlayTrigger>
       );
     } else {
       return (
@@ -159,6 +241,9 @@ class PointerImportNodePresentational extends React.Component<any, any> {
                   onMouseOverPointerImport={this.props.onMouseOver}
                   onMouseOut={this.props.onMouseOut}
                   isHoverable={this.props.isHoverable}
+                  visibleExportIds={visibleExportIds}
+                  exportLockStatusInfo={this.props.exportLockStatusInfo}
+                  unlockPointer={this.props.unlockPointer}
                 />
               </Brackets>
             </span>

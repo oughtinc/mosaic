@@ -44,7 +44,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
           hasParent
           ?
             <TakeBreakBtn
-              label="Done! (returns budget)"
+              label={`Done!${this.props.hasTimeBudget ? " (returns budget)" : ""}`}
               navHook={() => {
                 transferRemainingBudgetToParent();
                 markAsNotStale();
@@ -56,12 +56,15 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               ?
               <TakeBreakBtn
                 label="Done!"
-                navHook={markAsNotEligible}
+                navHook={() => {
+                  markAsNotStale();
+                  markAsNotEligible();
+                }}
               />
               :
               <TakeBreakBtn
                 bsStyle="danger"
-                label="Done! (take budget)"
+                label={`Done!${this.props.hasTimeBudget ? " (take budget)" : ""}`}
                 navHook={() => {
                   depleteBudget();
                   markAsAnsweredByOracle();

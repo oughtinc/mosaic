@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Glyphicon } from "react-bootstrap";
 
-import { ReadableDuration } from "./ReadableDuration";
+import { ReadableDuration } from "../../../components/ReadableDuration";
 
 import {
   availableBudgetHeaderFontColor,

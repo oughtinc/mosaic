@@ -60,7 +60,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       <div
         key={this.state.id}
         style={{
-          opacity: isOnFrontPage ? 1 : (this.state.pending || this.props.availableBudget < 90 ? 0.5 : 1)
+          opacity: isOnFrontPage ? 1 : (this.state.pending || (this.props.hasTimeBudget && this.props.availableBudget < 90) ? 0.5 : 1)
         }}
       >
         <BlockContainer>
@@ -78,6 +78,9 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               onKeyDown={this.onKeyDown}
               /*ref={input => (this.blockEditor = input)}*/
               workspaceId={this.props.workspaceId}
+              visibleExportIds={this.props.visibleExportIds}
+              exportLockStatusInfo={this.props.exportLockStatusInfo}
+              unlockPointer={this.props.unlockPointer}
             />
           </BlockBody>
           <div
@@ -88,7 +91,11 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               padding: "10px",
             }}
           >
-            <div>
+            <div
+              style={{
+                display: this.props.hasTimeBudget ? "block" : "none",
+              }}
+            >
               <span
                 style={{
                   fontSize: "13px",
@@ -284,18 +291,17 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                     </Button>
                   </span>
               }
-              <br />
-              <Button
-                bsSize="xsmall"
-                bsStyle="primary"
-                disabled={this.props.availableBudget - 90 < this.state.totalBudget}
-                type="submit"
-                onClick={this.onSubmit}
-                style={{ marginTop: "10px" }}
-              >
-                Submit
-              </Button>
             </div>
+            <Button
+              bsSize="xsmall"
+              bsStyle="primary"
+              disabled={this.props.hasTimeBudget && this.props.availableBudget - 90 < this.state.totalBudget}
+              type="submit"
+              onClick={this.onSubmit}
+              style={{ marginTop: this.props.hasTimeBudget ? "10px" : "0px" }}
+            >
+              Submit
+            </Button>
           </div>
         </BlockContainer>
       </div>
@@ -328,7 +334,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
 
     this.props.onMutate({
       question: valueToDatabaseJSON(this.state.blockValue),
-      totalBudget: this.state.totalBudget,
+      totalBudget: this.props.hasTimeBudget ? this.state.totalBudget : 0,
     });
   };
 }

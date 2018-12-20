@@ -3,6 +3,7 @@ import { Assignment } from "./Assignment";
 import { RootParentFinder } from "./RootParentFinder";
 
 const ORACLE_TIME_LIMIT = 1000 * 60 * 15;
+const TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET = 1000 * 60 * 20;
 
 class UserSchedule {
   private lastWorkedOnTimestampForTree = {};
@@ -12,6 +13,7 @@ class UserSchedule {
   private userSchedule = [];
   private hasUserLeftLastAssignment = false;
   private isLastAssignmentOracle = false;
+  private isLastAssignmentTimed = true;
 
   public constructor({ rootParentCache, timeLimit, userId }) {
     this.rootParentCache = rootParentCache;
@@ -19,7 +21,7 @@ class UserSchedule {
     this.userId = userId;
   }
 
-  public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false) {
+  public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false, isLastAssignmentTimed = true) {
     const assignment = new Assignment({
       userId: this.userId,
       workspace,
@@ -30,6 +32,7 @@ class UserSchedule {
 
     this.hasUserLeftLastAssignment = false;
     this.isLastAssignmentOracle = isOracle;
+    this.isLastAssignmentTimed = isLastAssignmentTimed;
 
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
 
@@ -102,7 +105,16 @@ class UserSchedule {
     const lastWorkedOnAssignment = this.getMostRecentAssignment();
     const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
 
+    // handle case where time budgets aren't in use, but
+    // we still don't want users taking over 15 minutes
+    if (!this.isLastAssignmentTimed) {
+      if (howLongAgoUserStartedWorkingOnIt < TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET) {
+        return true;
+      }
+      return false;
+    }
 
+    // normal time budget case
     const timeLimit = this.isLastAssignmentOracle ? ORACLE_TIME_LIMIT : this.timeLimit;
     const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < timeLimit;
 

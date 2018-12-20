@@ -250,7 +250,7 @@ const schema = new GraphQLSchema({
 
           const workspace = await models.Workspace.findById(id);
           await loadDataForEachWorkspaceInSubtree(workspace);
-          
+
           return JSON.stringify(cacheForTimeSpentOnWorkspace);
         },
       },
@@ -494,7 +494,7 @@ const schema = new GraphQLSchema({
           }
           if (!user.is_admin) {
             throw new Error(
-              "Non-admin attempted to toggle workspace visiblity"
+              "Non-admin attempted to toggle workspace visiblity."
             );
           }
           const workspace = await models.Workspace.findById(workspaceId);
@@ -504,10 +504,10 @@ const schema = new GraphQLSchema({
       updateWorkspaceIsEligible: {
         type: workspaceType,
         args: {
-          isEligible: { type: GraphQLBoolean },
+          isEligibleForAssignment: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { isEligible, workspaceId }, context) => {
+        resolve: async (_, { isEligibleForAssignment, workspaceId }, context) => {
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error(
@@ -515,7 +515,53 @@ const schema = new GraphQLSchema({
             );
           }
           const workspace = await models.Workspace.findById(workspaceId);
-          await workspace.update({ isEligibleForAssignment: isEligible });
+          await workspace.update({ isEligibleForAssignment });
+          return { id: workspaceId };
+        }
+      },
+      updateWorkspaceHasTimeBudget: {
+        type: workspaceType,
+        args: {
+          hasTimeBudget: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { hasTimeBudget, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update workspace time budget status."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to workspace time budget status."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ hasTimeBudget });
+          return { id: workspaceId };
+        }
+      },
+      updateWorkspaceHasIOConstraints: {
+        type: workspaceType,
+        args: {
+          hasIOConstraints: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { hasIOConstraints, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update workspace i/o constraint status."
+            );
+          }
+          if (!user.is_admin) {
+            throw new Error(
+              "Non-admin attempted to update workspace i/o constraint status."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+          await workspace.update({ hasIOConstraints });
           return { id: workspaceId };
         }
       },
@@ -541,9 +587,8 @@ const schema = new GraphQLSchema({
         args: {
           workspaceId: { type: GraphQLString },
           changeToBudget: { type: GraphQLInt },
-          isResultOfTimerCountdown: { type: GraphQLBoolean },
         },
-        resolve: async (_, { workspaceId, changeToBudget, isResultOfTimerCountdown }, context) => {
+        resolve: async (_, { workspaceId, changeToBudget }, context) => {
           const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error(
@@ -556,6 +601,81 @@ const schema = new GraphQLSchema({
             workspace.allocatedBudget + changeToBudget
           );
           await workspace.update({ allocatedBudget: updatedTimeBudget });
+        }
+      },
+      updateTimeSpentOnWorkspace: {
+        type: GraphQLBoolean,
+        args: {
+          doesAffectAllocatedBudget: { type: GraphQLBoolean },
+          workspaceId: { type: GraphQLString },
+          secondsSpent: { type: GraphQLInt },
+        },
+        resolve: async (_, { doesAffectAllocatedBudget, workspaceId, secondsSpent }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to update time spent on workspace."
+            );
+          }
+          const workspace = await models.Workspace.findById(workspaceId);
+
+          if (doesAffectAllocatedBudget) {
+
+            const changeToBudget = secondsSpent;
+
+            const updatedTimeBudget = Math.min(
+              workspace.totalBudget,
+              workspace.allocatedBudget + changeToBudget
+            );
+
+            await workspace.update({
+              allocatedBudget: updatedTimeBudget,
+              timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent
+            });
+
+          } else {
+
+            await workspace.update({
+              timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent,
+            });
+
+          }
+
+          return true;
+        }
+      },
+      unlockPointer: {
+        type: GraphQLBoolean,
+        args: {
+          pointerId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: async (_, { pointerId, workspaceId }, context) => {
+          const user = await userFromAuthToken(context.authorization);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to unlock pointer."
+            );
+          }
+
+          const exportWorkspaceLockRelation = await models.ExportWorkspaceLockRelation.findOne({
+            where: {
+              pointerId,
+              workspaceId,
+            }
+          });
+
+          if (exportWorkspaceLockRelation) {
+            await exportWorkspaceLockRelation.update({ isLocked: false });
+          } else {
+            await models.ExportWorkspaceLockRelation.create({
+              isLocked: false,
+              pointerId,
+              workspaceId,
+            });
+          }
+
+          return true;
         }
       }
     }

@@ -9,10 +9,13 @@ export const DARK_GRAY = "#666";
 export const VERY_LIGHT_BLUE = "#f0f8ff";
 export const DARK_BLUE = "#337ab7";
 export const VERY_DARK_BLUE = "#26a";
+export const LIVELY_BLUE = "#007deb";
+export const DARKENED_LIVELY_BLUE = "#0062b8";
 
 export const adminCheckboxBgColor = VERY_LIGHT_GRAY;
 export const adminCheckboxBorderColor = GRAY;
 export const availableBudgetHeaderFontColor = DARK_BLUE;
+export const charCountDisplayHeaderFontColor = DARK_BLUE;
 export const blockBodyBgColor = WHITE;
 export const blockBorderColor = LIGHT_GRAY;
 export const blockHeaderBgColor = VERY_LIGHT_GRAY;
@@ -24,8 +27,8 @@ export const editBudgetFormBoxShadow = `0 0 3px ${DARK_GRAY}`;
 export const headerBgColor = DARK_BLUE;
 export const newQuestionFormFooterBgColor = VERY_LIGHT_GRAY;
 export const newQuestionFormBorderTopColor = LIGHT_GRAY;
-export const pointerImportNameColor = DARK_BLUE;
-export const pointerImportNameColorOnHover = VERY_DARK_BLUE;
+export const lockedPointerImportBgColor = DARK_BLUE;
+export const lockedPointerImportBgColorOnHover = VERY_DARK_BLUE;
 export const responseFooterBgColor = VERY_LIGHT_GRAY;
 export const responseFooterBorderTopColor = LIGHT_GRAY;
 export const subquestionsFooterBgColor = VERY_LIGHT_GRAY;
@@ -39,6 +42,8 @@ export const treeWorkspaceBgColor = WHITE;
 export const brandFontColor = WHITE;
 export const headerLinkFontColor = WHITE;
 export const subQuestionAnswerFontColor = SLIGHTLY_DARKER_GRAY;
+export const unlockedImportBgColor = LIVELY_BLUE;
+export const unlockedImportBgColorOnHover = DARKENED_LIVELY_BLUE;
 
 export const homepageWorkspaceBgColor = WHITE;
 export const homepageWorkspaceBorderColor = LIGHT_GRAY;
@@ -54,6 +59,7 @@ export const headerLinkFontSize = "14px";
 export const blockHeaderFontSize = "18px";
 export const timerHeaderFontSize = "18px";
 export const availableBudgetHeaderFontSize = "18px";
+export const charCountDisplayHeaderFontSize = "18px";
 // 25px
 export const homePageHeadingFontSize = "25px";
 // 28px

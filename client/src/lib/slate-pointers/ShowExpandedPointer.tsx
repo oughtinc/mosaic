@@ -30,7 +30,7 @@ export class InlineNode extends React.Component<any, any> {
       return (
         <a
           href={href}
-          onClick={e => e.stopPropagation()/* this prevents imported pointer from toggling after the user clicks a link */} 
+          onClick={e => e.stopPropagation()/* this prevents imported pointer from toggling after the user clicks a link */}
         >
           {this.props.node.nodes[0].leaves[0].text}
         </a>
@@ -48,6 +48,9 @@ export class InlineNode extends React.Component<any, any> {
           }}
           isHoverable={this.props.isHoverable}
           onMouseOver={this.props.onMouseOver}
+          exportLockStatusInfo={this.props.exportLockStatusInfo}
+          visibleExportIds={this.props.visibleExportIds}
+          unlockPointer={this.props.unlockPointer}
         />
       );
     }
@@ -55,11 +58,14 @@ export class InlineNode extends React.Component<any, any> {
 }
 
 export class ShowExpandedPointer extends React.Component<any, any> {
+
   public shouldComponentUpdate(newProps: any) {
     // Try filtering down to just the node.object==="leaf", and then node.leaves[0].
 
     if (
-      !_.isEqual(newProps.availablePointers.nodes, this.props.availablePointers)
+      !_.isEqual(newProps.availablePointers.nodes, this.props.availablePointers) ||
+      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
     ) {
       return true;
     }
@@ -83,6 +89,9 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                   pointerId={this.props.exportingPointer.pointerId}
                   onMouseOver={this.props.onMouseOverPointerImport}
                   isHoverable={this.props.isHoverable}
+                  visibleExportIds={this.props.visibleExportIds}
+                  exportLockStatusInfo={this.props.exportLockStatusInfo}
+                  unlockPointer={this.props.unlockPointer}
                 />
               </span>
             );

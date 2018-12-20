@@ -13,7 +13,9 @@ import { parse as parseQueryString } from "query-string";
 
 import { EpisodeNav } from "./EpisodeNav";
 import { ResponseFooter } from "./ResponseFooter";
+import { CharCountDisplays } from "./CharCountDisplays";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
+import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -24,6 +26,10 @@ import {
   exportingBlocksPointersSelector,
   exportingNodes,
 } from "../../modules/blocks/exportingPointers";
+import {
+  inputCharCountSelector,
+  outputCharCountSelector,
+} from "../../modules/blocks/charCounts";
 import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 import { Value } from "slate";
@@ -57,10 +63,13 @@ const WORKSPACE_QUERY = gql`
       isPublic
       isStale
       isEligibleForOracle
+      hasIOConstraintsOfRootParent
+      hasTimeBudgetOfRootParent
       childWorkspaceOrder
       connectedPointers
       totalBudget
       allocatedBudget
+      exportLockStatusInfo
       childWorkspaces {
         id
         totalBudget
@@ -221,7 +230,8 @@ export class WorkspaceView extends React.Component<any, any> {
   private scratchpadField;
   private answerField;
   private newChildField;
-  private tickDuration = 1;
+  private tickDurationForCountdownTimer = 1;
+  private tickDurationForUpdatingTimeSpentWhenNoTimeBudget = 5;
 
   public constructor(props: any) {
     super(props);
@@ -313,6 +323,9 @@ export class WorkspaceView extends React.Component<any, any> {
     const isUserOracle = Auth.isOracle();
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
 
+    const hasTimeBudget = workspace.hasTimeBudgetOfRootParent;
+    const hasIOConstraints = workspace.hasIOConstraintsOfRootParent;
+
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const hasTimer = queryParams.timer;
@@ -320,7 +333,18 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
     const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
+
     const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
+
+    const exportLockStatusInfo = workspace.exportLockStatusInfo;
+    const unlockPointer = pointerId => this.props.unlockPointerMutation({
+      variables: {
+        pointerId,
+        workspaceId: workspace.id,
+      }
+    });
+
+    const visibleExportIds = this.props.exportingPointers.map(p => p.data.pointerId);
 
     return (
       <div>
@@ -355,18 +379,38 @@ export class WorkspaceView extends React.Component<any, any> {
                     <div
                       style={{
                         display: "flex",
-                        justifyContent: "flex-end",
+                        justifyContent: "space-between",
+                        minHeight: "60px",
                       }}
                     >
-                      <TimerAndTimeBudgetInfo
-                        durationInMs={durationInMs}
-                        handleTimerEnd={this.handleTimerEnd}
-                        hasTimer={hasTimer}
-                        initialAllocatedBudget={workspace.allocatedBudget}
-                        tickDuration={this.tickDuration}
-                        totalBudget={workspace.totalBudget}
-                        workspaceId={workspace.id}
-                      />
+                      {
+                        hasIOConstraints
+                        ?
+                        <CharCountDisplays
+                          inputCharCount={this.props.inputCharCount}
+                          outputCharCount={this.props.outputCharCount}
+                        />
+                        :
+                        <div />
+                      }
+                      {
+                        hasTimeBudget
+                        ?
+                        <TimerAndTimeBudgetInfo
+                          durationInMs={durationInMs}
+                          handleTimerEnd={this.handleTimerEnd}
+                          hasTimer={hasTimer}
+                          initialAllocatedBudget={workspace.allocatedBudget}
+                          tickDuration={this.tickDurationForCountdownTimer}
+                          totalBudget={workspace.totalBudget}
+                          workspaceId={workspace.id}
+                        />
+                        :
+                        <TimerWhenNoTimeBudget
+                          tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
+                          workspaceId={workspace.id}
+                        />
+                      }
                     </div>
                   </Col>
                 </Row>
@@ -387,6 +431,9 @@ export class WorkspaceView extends React.Component<any, any> {
                       >
                         <BlockEditor
                           availablePointers={availablePointers}
+                          exportLockStatusInfo={exportLockStatusInfo}
+                          visibleExportIds={visibleExportIds}
+                          unlockPointer={unlockPointer}
                           {...questionProps}
                         />
                       </div>
@@ -412,7 +459,10 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}
+                          visibleExportIds={visibleExportIds}
+                          exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the scratchpad..."
+                          unlockPointer={unlockPointer}
                           {...scratchpadProps}
                         />
                       </BlockBody>
@@ -423,7 +473,10 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}
+                          visibleExportIds={visibleExportIds}
+                          exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the answer..."
+                          unlockPointer={unlockPointer}
                           {...answerProps}
                         />
                       </BlockBody>
@@ -435,6 +488,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         (!((isUserOracle && isInOracleMode) && !hasParent))
                         &&
                         <ResponseFooter
+                          hasTimeBudget={hasTimeBudget}
                           depleteBudget={() =>
                             this.props.depleteBudget({
                               variables: { id: workspace.id },
@@ -451,7 +505,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           markAsNotEligible={() =>
                             this.props.updateWorkspaceIsEligible({
                               variables: {
-                                isEligible: false,
+                                isEligibleForAssignment: false,
                                 workspaceId: workspace.id,
                               }
                             })
@@ -481,6 +535,10 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      hasTimeBudget={hasTimeBudget}
+                      visibleExportIds={visibleExportIds}
+                      exportLockStatusInfo={exportLockStatusInfo}
+                      unlockPointer={unlockPointer}
                       hasTimer={hasTimer}
                       isInOracleMode={isInOracleMode}
                       subquestionDraftProps={subquestionDraftProps}
@@ -603,10 +661,74 @@ function mapStateToProps(state: any, { workspace }: any) {
     workspace.workspace
   );
   const allBlockIds = [..._visibleBlockIds, newQuestionFormBlockId];
-  const exportingPointers = exportingBlocksPointersSelector(allBlockIds)(state);
+  const exportingPointers: any = exportingBlocksPointersSelector(allBlockIds)(state);
+
+  let inputCharCount, outputCharCount;
+  if (workspace.workspace) {
+
+    const visibleExportIds = exportingPointers.map(p => p.data.pointerId);
+
+    const exportLockStatusInfo = workspace.workspace.exportLockStatusInfo;
+
+    const connectedPointers = _.uniqBy(
+      workspace.workspace.connectedPointers,
+      (p: any) => p.data.pointerId
+    );
+
+    const question = workspace.workspace.blocks.find(b =>
+      b.type === "QUESTION"
+    );
+
+    const subquestionAnswers = _.flatten(
+      workspace.workspace.childWorkspaces.map(w =>
+        w.blocks.filter(b => b.type === "ANSWER")
+      )
+    );
+
+    const inputBlocks = [question, ...subquestionAnswers];
+
+    const inputBlockIds = inputBlocks.map((b: any) => b.id);
+
+    inputCharCount = inputCharCountSelector({
+      state,
+      inputBlockIds,
+      connectedPointers,
+      exportingPointers,
+      visibleExportIds,
+      exportLockStatusInfo
+    });
+
+    const scratchpad = workspace.workspace.blocks.find(b => b.type === "SCRATCHPAD");
+    const answer = workspace.workspace.blocks.find(b => b.type === "ANSWER");
+    const subquestionDraft = workspace.workspace.blocks.find(b => b.type === "SUBQUESTION_DRAFT");
+
+    const subquestionQuestions = _.flatten(
+      workspace.workspace.childWorkspaces.map(w =>
+        w.blocks.filter(b => b.type === "QUESTION")
+      )
+    );
+
+    const outputBlocks = [
+      scratchpad,
+      answer,
+      subquestionDraft,
+      ...subquestionQuestions
+    ];
+
+    const outputBlockIds = outputBlocks.map((b: any) => b.id);
+
+    outputCharCount = outputCharCountSelector(state, outputBlockIds);
+  }
+
   const { blocks } = state;
-  return { blocks, exportingPointers };
+  return { blocks, exportingPointers, inputCharCount, outputCharCount };
 }
+
+const UNLOCK_POINTER_MUTATION = gql`
+  mutation unlockPointerMutation($pointerId: String, $workspaceId: String) {
+    unlockPointer(pointerId: $pointerId, workspaceId: $workspaceId)
+  }
+`;
 
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
@@ -670,6 +792,12 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_ELIGIBLE, {
     name: "updateWorkspaceIsEligible",
+  }),
+  graphql(UNLOCK_POINTER_MUTATION, {
+    name: "unlockPointerMutation",
+    options: {
+      refetchQueries: ["workspace"]
+    }
   }),
   connect(
     mapStateToProps,

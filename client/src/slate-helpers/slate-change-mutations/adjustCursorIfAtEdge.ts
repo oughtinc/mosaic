@@ -16,9 +16,7 @@ export function adjustCursorIfAtEdge(change: Change) {
     const prevTextNode = value.document.getPreviousText(textNode.key);
 
     if (focusOffsetAtStart && prevTextNode) {
-      change.moveToRangeOf(prevTextNode)
-        .collapseToEnd()
-        .move(-1);
+      change.move(1);
     }
 
     if (focusOffsetAtEnd && nextTextNode) {

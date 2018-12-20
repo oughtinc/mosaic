@@ -7,6 +7,7 @@ var env = process.env.NODE_ENV || "development";
 var config = require(__dirname + "/../../config/config.json")[env];
 
 const BlockModel = require("./block");
+const ExportWorkspaceLockRelationModel = require("./exportWorkspaceLockRelation");
 const EventModel = require("./event");
 const PointerModel = require("./pointer");
 const PointerImportModel = require("./pointerImport");
@@ -27,6 +28,7 @@ if (config.use_env_variable) {
 }
 
 const models = [
+  ["exportWorkspaceLockRelation", ExportWorkspaceLockRelationModel],
   ["event", EventModel],
   ["block", BlockModel],
   ["pointer", PointerModel],

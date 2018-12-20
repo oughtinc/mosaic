@@ -55,6 +55,8 @@ export const WORKSPACES_QUERY = gql`
       }
       connectedPointers
       isEligibleForAssignment
+      hasIOConstraints
+      hasTimeBudget
     }
   }
 `;
@@ -115,8 +117,8 @@ export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
 `;
 
 export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
-  mutation updateWorkspaceIsEligible($isEligible: Boolean, $workspaceId: String) {
-    updateWorkspaceIsEligible(isEligible: $isEligible, workspaceId: $workspaceId) {
+  mutation updateWorkspaceIsEligible($isEligibleForAssignment: Boolean, $workspaceId: String) {
+    updateWorkspaceIsEligible(isEligibleForAssignment: $isEligibleForAssignment, workspaceId: $workspaceId) {
       id
     }
   }
@@ -135,5 +137,27 @@ export const UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE = gql`
     updateWorkspaceIsEligibleForOracle(isEligibleForOracle: $isEligibleForOracle, workspaceId: $workspaceId) {
       id
     }
+  }
+`;
+
+export const UPDATE_WORKSPACE_HAS_TIME_BUDGET = gql`
+  mutation updateWorkspaceHasTimeBudget($hasTimeBudget: Boolean, $workspaceId: String) {
+    updateWorkspaceHasTimeBudget(hasTimeBudget: $hasTimeBudget, workspaceId: $workspaceId) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS = gql`
+  mutation updateWorkspaceHasIOConstraints($hasIOConstraints: Boolean, $workspaceId: String) {
+    updateWorkspaceHasIOConstraints(hasIOConstraints: $hasIOConstraints, workspaceId: $workspaceId) {
+      id
+    }
+  }
+`;
+
+export const UPDATE_TIME_SPENT_ON_WORKSPACE = gql`
+  mutation updateTimeSpentOnWorkspace($doesAffectAllocatedBudget: Boolean, $secondsSpent: Int, $workspaceId: String) {
+    updateTimeSpentOnWorkspace(doesAffectAllocatedBudget: $doesAffectAllocatedBudget, secondsSpent: $secondsSpent, workspaceId: $workspaceId)
   }
 `;

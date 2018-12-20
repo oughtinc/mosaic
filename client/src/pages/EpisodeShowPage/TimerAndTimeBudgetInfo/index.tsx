@@ -2,9 +2,9 @@ import * as React from "react";
 import { graphql } from "react-apollo";
 
 import { AvailableBudget } from "./AvailableBudget";
-import { Timer } from "./Timer";
+import { WorkspaceTimer } from "../WorkspaceTimer";
 
-import { UPDATE_ALLOCATED_BUDGET } from "../../../graphqlQueries";
+import { UPDATE_TIME_SPENT_ON_WORKSPACE } from "../../../graphqlQueries";
 
 class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
   public constructor(props: any) {
@@ -23,7 +23,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
 
     // an upshot of ignoring graphQL updates to allocatedBudget is that we miss
     // the updates to allocatedBudget that occur after the creation of a child
-    // easiest fix here is to just assume any change < 10 is a child creation
+    // easiest fix here is to just assume any change <0||>5 is a child creation
     // and listen to any graphQL update to allocaedBudget above this threshold
     const initialAllocatedBudgetChange = prevProps.initialAllocatedBudget - this.props.initialAllocatedBudget;
 
@@ -45,7 +45,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
         {
           this.props.hasTimer
           &&
-          <Timer
+          <WorkspaceTimer
             totalDurationInMs={this.props.durationInMs}
             remainingDurationInMs={this.state.remainingDurationInMs}
             onTimerEnd={this.props.handleTimerEnd}
@@ -65,10 +65,10 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
   }
 
   private handleTimerTick = () => {
-    this.props.updateAllocatedBudget({
+    this.props.updateTimeSpentOnWorkspace({
       variables: {
-        changeToBudget: this.props.tickDuration,
-        isResultOfTimerCountdown: true,
+        secondsSpent: this.props.tickDuration,
+        doesAffectAllocatedBudget: true,
         workspaceId: this.props.workspaceId,
       }
     });
@@ -91,9 +91,9 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
 }
 
 export const TimerAndTimeBudgetInfo: any = graphql(
-  UPDATE_ALLOCATED_BUDGET,
+  UPDATE_TIME_SPENT_ON_WORKSPACE,
   {
-    name: "updateAllocatedBudget",
+    name: "updateTimeSpentOnWorkspace",
     options: {
       refetchQueries: ["workspace"]
     }
