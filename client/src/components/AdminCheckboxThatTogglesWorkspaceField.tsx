@@ -4,9 +4,9 @@ import { Checkbox } from "react-bootstrap";
 import {
   adminCheckboxBgColor,
   adminCheckboxBorderColor,
-} from "../../../styles";
+} from "../styles";
 
-class AdminCheckbox extends React.Component<any, any> {
+class AdminCheckboxThatTogglesWorkspaceField extends React.Component<any, any> {
   public state = {
     isStatusPending: false,
   };
@@ -71,4 +71,4 @@ class AdminCheckbox extends React.Component<any, any> {
     return prevWorkspace[this.props.workspaceFieldToUpdate] !== curWorkspace[this.props.workspaceFieldToUpdate];
   }
 }
-export { AdminCheckbox };
+export { AdminCheckboxThatTogglesWorkspaceField };

@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
 
-import { AdminCheckbox } from "./AdminCheckbox";
+import { AdminCheckboxThatTogglesWorkspaceField } from "../../../components/AdminCheckboxThatTogglesWorkspaceField";
 
 import {
   UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS,
@@ -21,25 +21,25 @@ class AdminControlsPresentational extends React.Component<any, any> {
           marginBottom: "5px",
         }}
       >
-        <AdminCheckbox
+        <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="front page"
           updateMutation={this.props.updateWorkspaceIsPublic}
           workspace={workspace}
           workspaceFieldToUpdate="isPublic"
         />
-        <AdminCheckbox
+        <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="is eligible"
           updateMutation={this.props.updateWorkspaceIsEligible}
           workspace={workspace}
           workspaceFieldToUpdate="isEligibleForAssignment"
         />
-        <AdminCheckbox
+        <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="time budget"
           updateMutation={this.props.updateWorkspaceHasTimeBudget}
           workspace={workspace}
           workspaceFieldToUpdate="hasTimeBudget"
         />
-        <AdminCheckbox
+        <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="i/o constraints"
           updateMutation={this.props.updateWorkspaceHasIOConstraints}
           workspace={workspace}

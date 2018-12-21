@@ -61,7 +61,6 @@ export const closeAllPointerReferences = () => ({
   type: CLOSE_ALL_POINTER_REFERENCES
 });
 
-
 export const exportSelection = blockId => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();

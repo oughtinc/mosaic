@@ -5,7 +5,6 @@ import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
-import { Checkbox } from "react-bootstrap";
 import _ = require("lodash");
 import {
   ROOT_WORKSPACE_SUBTREE_QUERY,
@@ -15,11 +14,11 @@ import {
 } from "../../graphqlQueries";
 import { ChildBudgetBadge } from "../ChildBudgetBadge";
 
+import { AdminCheckboxThatTogglesWorkspaceField } from "../AdminCheckboxThatTogglesWorkspaceField";
+
 import { Auth } from "../../auth";
 
 import {
-  adminCheckboxBgColor,
-  adminCheckboxBorderColor,  
   blockBorderAndBoxShadow,
   treeWorkspaceBgColor,
 } from "../../styles";
@@ -119,7 +118,7 @@ interface WorkspaceCardState {
     [toggleTypes.CHILDREN]: boolean;
   };
   isStaleCheckboxStatusPending: boolean;
-  isEligibleForOracleCheckboxStatusPending: boolean;  
+  isEligibleForOracleCheckboxStatusPending: boolean;
 }
 
 const getPointerId = (p: any) => p.data.pointerId;
@@ -147,7 +146,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<
 
     const isStaleDidChange = this.props.subtreeQuery.workspace.isStale !== prevProps.subtreeQuery.workspace.isStale;
     const isEligibleForOracleDidChange = this.props.subtreeQuery.workspace.isEligibleForOracle !== prevProps.subtreeQuery.workspace.isEligibleForOracle;
-
 
     if (isStaleDidChange || isEligibleForOracleDidChange) {
       this.setState({
@@ -234,7 +232,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               />
               {" "}work on this workspace
             </span>
-       
+
             {
               workspace.wasAnsweredByOracle
               &&
@@ -243,54 +241,24 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               <span style={{ color: "darkRed"}}>
                 WAS ANSWERED BY ORACLE
               </span>
-            }           
+            }
             {
               Auth.isAdmin()
               &&
               <span style={{ padding: "0 10px"}}>
-                <Checkbox
-                  style={{
-                    backgroundColor: adminCheckboxBgColor,
-                    border: `1px solid ${adminCheckboxBorderColor}`,
-                    borderRadius: "3px",
-                    padding: "5px 5px 5px 25px",
-                    opacity: this.state.isStaleCheckboxStatusPending ? 0.75 : 1,
-                  }}
-                  inline={true}
-                  type="checkbox"
-                  checked={workspace.isStale}
-                  onChange={this.handleOnIsStaleCheckboxChange}
-                >
-                  {
-                    this.state.isStaleCheckboxStatusPending
-                    ?
-                    "updating..."
-                    :
-                    "is stale"
-                  }
-                </Checkbox>
-                <Checkbox
-                  style={{
-                    backgroundColor: adminCheckboxBgColor,
-                    border: `1px solid ${adminCheckboxBorderColor}`,
-                    borderRadius: "3px",
-                    padding: "5px 5px 5px 25px",
-                    opacity: this.state.isEligibleForOracleCheckboxStatusPending ? 0.75 : 1,
-                  }}
-                  inline={true}
-                  type="checkbox"
-                  checked={workspace.isEligibleForOracle}
-                  onChange={this.handleOnIsEligibleForOracleCheckboxChange}
-                >
-                  {
-                    this.state.isEligibleForOracleCheckboxStatusPending
-                    ?
-                    "updating..."
-                    :
-                    "is eligible for oracle"
-                  }
-                </Checkbox>
-              </span>                
+                <AdminCheckboxThatTogglesWorkspaceField
+                  checkboxLabelText="is stale"
+                  updateMutation={this.handleOnIsStaleCheckboxChange}
+                  workspace={workspace}
+                  workspaceFieldToUpdate="isStale"
+                />
+                <AdminCheckboxThatTogglesWorkspaceField
+                  checkboxLabelText="oracle only"
+                  updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
+                  workspace={workspace}
+                  workspaceFieldToUpdate="isEligibleForOracle"
+                />
+              </span>
               }
               {
                 !Auth.isAdmin()
@@ -308,9 +276,9 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                     &&
                     <span style={{ padding: "0 10px"}}>ORACLE ONLY</span>
                   }
-                </span>                  
-              }                
-          </div>          
+                </span>
+              }
+          </div>
           <BlockSection
             workspace={workspace}
             availablePointers={availablePointers}
@@ -333,56 +301,43 @@ export class WorkspaceCardPresentational extends React.PureComponent<
   }
 
   // TODO: This code template for checkboxes is reused in several places (Here and in RootWorkspacePage/index.tsx).  Unify usage?
-  private handleOnIsStaleCheckboxChange = () => {
-    if (this.state.isStaleCheckboxStatusPending) {
-      return;
-    }
-  
-    this.setState({ isStaleCheckboxStatusPending: true }, () => {
-        setTimeout(() => {
-          this.props.updateWorkspaceStaleness({
-            variables: {
-              isStale: !this.props.subtreeQuery.workspace.isStale,
-              workspaceId: this.props.workspaceId,
-            },
-          }).then((() => {
-            this.props.subtreeQuery.updateQuery((prv: any, opt: any) => ({
-              ...prv,
-              workspace: {
-                ...prv.workspace,
-                isStale: !this.props.subtreeQuery.workspace.isStale}
-              }))
-            }));
-          }, 200);
-      }
-    );
+  private handleOnIsStaleCheckboxChange = async () => {
+    await this.props.updateWorkspaceStaleness({
+      variables: {
+        isStale: !this.props.subtreeQuery.workspace.isStale,
+        workspaceId: this.props.workspaceId,
+      },
+    });
+
+    this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+      return {
+        ...prv,
+        workspace: {
+          ...prv.workspace,
+          isStale: !this.props.subtreeQuery.workspace.isStale
+        },
+      };
+    });
   }
 
-  private handleOnIsEligibleForOracleCheckboxChange = () => {
-    if (this.state.isEligibleForOracleCheckboxStatusPending) {
-      return;
-    }
-  
-  
-    this.setState({ isEligibleForOracleCheckboxStatusPending: true }, () => {
-      setTimeout(() => {
-        this.props.updateWorkspaceIsEligibleForOracle({
-          variables: {
-            isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle,
-            workspaceId: this.props.workspaceId,
-          },
-        }).then((() => {
-          this.props.subtreeQuery.updateQuery((prv: any, opt: any) => ({
-            ...prv,
-            workspace: {
-              ...prv.workspace,
-              isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle}
-            }))
-          }));
-        }, 200);
-      }
-    );
-  }    
+  private handleOnIsEligibleForOracleCheckboxChange = async () => {
+    await this.props.updateWorkspaceIsEligibleForOracle({
+      variables: {
+        isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle,
+        workspaceId: this.props.workspaceId,
+      },
+    });
+
+    this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+      return {
+        ...prv,
+        workspace: {
+          ...prv.workspace,
+          isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle
+        },
+      };
+    });
+  }
 }
 
 const optionsForTopLevel = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
@@ -424,5 +379,5 @@ export const WorkspaceCard: any = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE, {
     name: "updateWorkspaceIsEligibleForOracle"
-  }),    
+  }),
 )(WorkspaceCardPresentational);
