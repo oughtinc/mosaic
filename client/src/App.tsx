@@ -20,6 +20,7 @@ import { applyMiddleware, combineReducers, createStore } from "redux";
 import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
+import { ClosePointerListener } from "./components/ClosePointerListener";
 import { Header } from "./components/Header";
 
 import { Config } from "./config";
@@ -66,6 +67,14 @@ const client: any = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+const store = createStore(
+  combineReducers({
+    blocks: blockReducer,
+    blockEditor: blockEditorReducer,
+  } as any),
+  composeWithDevTools(applyMiddleware(thunk))
+);
+
 export class Layout extends React.Component {
   public render() {
     return (
@@ -105,20 +114,13 @@ const Routes = () => (
         return <Redirect to="/" />;
       }}
     />
+    <ClosePointerListener />
   </div>
 );
 
 LogRocket.init(Config.logrocket_id);
 const environment = process.env.NODE_ENV || ""; // "development" or "production"
 LogRocket.track(environment);
-
-const store = createStore(
-  combineReducers({
-    blocks: blockReducer,
-    blockEditor: blockEditorReducer,
-  } as any),
-  composeWithDevTools(applyMiddleware(thunk))
-);
 
 class App extends React.Component {
   public render() {
