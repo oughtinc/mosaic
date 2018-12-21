@@ -20,7 +20,7 @@ import { applyMiddleware, combineReducers, createStore } from "redux";
 import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
-import { ClosePointerListener } from "./components/ClosePointerListener";
+import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
 
 import { Config } from "./config";
@@ -114,7 +114,7 @@ const Routes = () => (
         return <Redirect to="/" />;
       }}
     />
-    <ClosePointerListener />
+    <ListenerThatClosesPointersOnPathnameChange />
   </div>
 );
 
