@@ -162,22 +162,26 @@ export class BlockEditorEditingPresentational extends React.Component<
     const lastCharacters = lastCharactersAfterEvent(event, 4);
     const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBERS_NOT_NUMBER);
     if (pointerNameMatch) {
-      this.handlePointerNameAutocomplete(
-        lastCharacters,
-        pointerNameMatch,
-        event
-      );
+      if (event.key == "Enter") {
+        // For some reason, enter was not causing autocomplete when called from inside the event.
+        // This might be due to competing with newline handling inside of the Slate component?
+        // For now a timeout works, with the downside of being able to see the entered newline for a brief moment.
+        setTimeout(() => this.handlePointerNameAutocomplete(pointerNameMatch, 1), 0);
+      }
+      else {
+        this.handlePointerNameAutocomplete(pointerNameMatch, 0);
+      }
     }
   };
 
-  private handlePointerNameAutocomplete = (characters, match, event) => {
+  private handlePointerNameAutocomplete = (match, additionalCharsToDelete) => {
     const matchNumber = Number(match[0].substring(1, match[0].length - 1));
     const pointer = this.props.availablePointers[matchNumber - 1];
 
     if (!!pointer) {
       const { value } = this.props.value
         .change()
-        .deleteBackward(matchNumber.toString().length + 1)
+        .deleteBackward(matchNumber.toString().length + 1 + additionalCharsToDelete)
         .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
         .collapseToStartOfNextText()
         .focus();
