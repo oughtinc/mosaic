@@ -124,14 +124,6 @@ export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
   }
 `;
 
-export const UPDATE_WORKSPACE_STALENESS = gql`
-  mutation updateWorkspaceStaleness($isStale: Boolean, $workspaceId: String) {
-    updateWorkspaceStaleness(isStale: $isStale, id: $workspaceId) {
-      id
-    }
-  }
-`;
-
 export const UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE = gql`
   mutation updateWorkspaceIsEligibleForOracle($isEligibleForOracle: Boolean, $workspaceId: String) {
     updateWorkspaceIsEligibleForOracle(isEligibleForOracle: $isEligibleForOracle, workspaceId: $workspaceId) {
@@ -159,5 +151,13 @@ export const UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS = gql`
 export const UPDATE_TIME_SPENT_ON_WORKSPACE = gql`
   mutation updateTimeSpentOnWorkspace($doesAffectAllocatedBudget: Boolean, $secondsSpent: Int, $workspaceId: String) {
     updateTimeSpentOnWorkspace(doesAffectAllocatedBudget: $doesAffectAllocatedBudget, secondsSpent: $secondsSpent, workspaceId: $workspaceId)
+  }
+`;
+
+export const UPDATE_WORKSPACE = gql`
+  mutation updateWorkspace($id: String, $input: WorkspaceInput) {
+    updateWorkspace(id: $id, input: $input) {
+      id
+    }
   }
 `;

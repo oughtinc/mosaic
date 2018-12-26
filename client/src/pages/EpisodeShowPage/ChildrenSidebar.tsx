@@ -357,8 +357,13 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     <TakeBreakBtn
                       label="Wait for an answer"
                       navHook={() => {
-                        this.props.updateWorkspaceStaleness({
-                          variables: { id: this.props.workspace.id, isStale: false }
+                        this.props.updateWorkspace({
+                          variables: {
+                            id: this.props.workspace.id,
+                            input: {
+                              isStale: false,
+                            },
+                          },
                         });
                       }}
                     />

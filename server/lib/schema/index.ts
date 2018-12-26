@@ -93,6 +93,11 @@ const BlockInput = new GraphQLInputObjectType({
   fields: _.pick(attributeFields(models.Block), "value", "id")
 });
 
+const WorkspaceInput = new GraphQLInputObjectType({
+  name: "WorkspaceInput",
+  fields: _.pick(attributeFields(models.Workspace), "isStale")
+});
+
 function modelGraphQLFields(type: any, model: any) {
   return {
     type,
@@ -306,16 +311,21 @@ const schema = new GraphQLSchema({
           return workspace.update({ childWorkspaceOrder }, { event });
         }
       },
-      updateWorkspaceStaleness: {
+      updateWorkspace: {
         type: workspaceType,
         args: {
           id: { type: GraphQLString },
-          isStale: { type: GraphQLBoolean }
+          input: { type: WorkspaceInput }
         },
-        resolve: async (_, { id, isStale }) => {
+        resolve: async (_, { id, input }) => {
+          if (user == null) {
+            throw new Error("Got null user while attempting to update workspace");
+          }
           const workspace = await models.Workspace.findById(id);
-          const event = await models.Event.create();
-          return workspace.update({ isStale }, { event });
+          const { isStale } = input;
+          if (isStale) {
+            return workspace.update({ isStale });
+          }
         }
       },
       updateWorkspaceIsArchived: {

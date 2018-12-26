@@ -107,14 +107,6 @@ const UPDATE_WORKSPACE = gql`
   }
 `;
 
-const UPDATE_WORKSPACE_STALENESS = gql`
-  mutation updateWorkspaceStaleness($id: String!, $isStale: Boolean!) {
-    updateWorkspaceStaleness(id: $id, isStale: $isStale) {
-      id
-    }
-  }
-`;
-
 const UPDATE_WORKSPACE_IS_ARCHIVED = gql`
   mutation updateWorkspaceIsArchived($id: String!, $isArchived: Boolean!) {
     updateWorkspaceIsArchived(id: $id, isArchived: $isArchived) {
@@ -354,9 +346,14 @@ export class WorkspaceView extends React.Component<any, any> {
             isInOracleMode={isInOracleMode}
             hasTimer={hasTimer}
             hasTimerEnded={hasTimerEnded}
-            updateStaleness={isStale =>
-              this.props.updateWorkspaceStaleness({
-                variables: { id: workspace.id, isStale }
+            markAsNotStale={() =>
+              this.props.updateWorkspace({
+                variables: {
+                  id: workspace.id,
+                  input: {
+                    isStale: false,
+                  },
+                },
               })
             }
             updateIsEligibleForOracle={isEligibleForOracle =>
@@ -519,8 +516,13 @@ export class WorkspaceView extends React.Component<any, any> {
                             })
                           }
                           markAsNotStale={() =>
-                            this.props.updateWorkspaceStaleness({
-                              variables: { id: workspace.id, isStale: false }
+                            this.props.updateWorkspace({
+                              variables: {
+                                id: workspace.id,
+                                input: {
+                                  isStale: false,
+                                },
+                              }
                             })
                           }
                           transferRemainingBudgetToParent={() =>
@@ -584,7 +586,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           variables: {workspaceId, isEligibleForOracle}
                         });
                       }}
-                      updateWorkspaceStaleness={this.props.updateWorkspaceStaleness}
+                      updateWorkspace={this.props.updateWorkspace}
                       ref={input => {
                         if (input && input.editor()) {
                           this.newChildField = input.editor();
@@ -751,8 +753,8 @@ export const EpisodeShowPage = compose(
       refetchQueries: ["workspace"],
     },
   }),
-  graphql(UPDATE_WORKSPACE_STALENESS, {
-    name: "updateWorkspaceStaleness",
+  graphql(UPDATE_WORKSPACE, {
+    name: "updateWorkspace",
     options: {
       refetchQueries: ["workspace"]
     }

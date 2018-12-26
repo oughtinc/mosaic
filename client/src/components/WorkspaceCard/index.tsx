@@ -9,7 +9,7 @@ import _ = require("lodash");
 import {
   ROOT_WORKSPACE_SUBTREE_QUERY,
   CHILD_WORKSPACE_SUBTREE_QUERY,
-  UPDATE_WORKSPACE_STALENESS,
+  UPDATE_WORKSPACE,
   UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE
 } from "../../graphqlQueries";
 import { ChildBudgetBadge } from "../ChildBudgetBadge";
@@ -101,7 +101,7 @@ interface WorkspaceCardProps {
   subtreeTimeSpentQuery: any;
   subtreeTimeSpentData: any;
   oracleModeQuery: any;
-  updateWorkspaceStaleness: any;
+  updateWorkspace: any;
   updateWorkspaceIsEligibleForOracle: any;
 }
 
@@ -302,10 +302,12 @@ export class WorkspaceCardPresentational extends React.PureComponent<
 
   // TODO: This code template for checkboxes is reused in several places (Here and in RootWorkspacePage/index.tsx).  Unify usage?
   private handleOnIsStaleCheckboxChange = async () => {
-    await this.props.updateWorkspaceStaleness({
+    await this.props.updateWorkspace({
       variables: {
-        isStale: !this.props.subtreeQuery.workspace.isStale,
-        workspaceId: this.props.workspaceId,
+        id: this.props.workspaceId,
+        input: {
+          isStale: !this.props.subtreeQuery.workspace.isStale,
+        },
       },
     });
 
@@ -374,8 +376,8 @@ export const WorkspaceCard: any = compose(
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
   }),
-  graphql(UPDATE_WORKSPACE_STALENESS, {
-    name: "updateWorkspaceStaleness"
+  graphql(UPDATE_WORKSPACE, {
+    name: "updateWorkspace"
   }),
   graphql(UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE, {
     name: "updateWorkspaceIsEligibleForOracle"
