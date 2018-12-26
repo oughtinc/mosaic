@@ -333,10 +333,19 @@ const schema = new GraphQLSchema({
           const isUserAttemptingToUpdateAtLeastOneField = Object.keys(inputWithNoNullOrUndefinedValues).length > 0;
 
           if (isUserAttemptingToUpdateAtLeastOneField) {
-            const { isArchived, isStale } = inputWithNoNullOrUndefinedValues;
+            const {
+              isArchived,
+              isEligibleForOracle,
+              isStale,
+            } = inputWithNoNullOrUndefinedValues;
+
+            if (!_.isNil(isEligibleForOracle) && !user.is_oracle) {
+              throw new Error("Non-oracle attempting to update oracle eligibility.");
+            }
 
             const update = {
               isArchived,
+              isEligibleForOracle,
               isStale,
             };
 

@@ -105,14 +105,6 @@ const UPDATE_WORKSPACE_WAS_ANSWERED_BY_ORACLE = gql`
   }
 `;
 
-const UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE = gql`
-  mutation updateWorkspaceIsEligibleForOracle($workspaceId: String!, $isEligibleForOracle: Boolean!) {
-    updateWorkspaceIsEligibleForOracle(workspaceId: $workspaceId, isEligibleForOracle: $isEligibleForOracle) {
-      id
-    }
-  }
-`;
-
 const TRANSFER_REMAINING_BUDGET_TO_PARENT = gql`
   mutation transferRemainingBudgetToParent($id: String!) {
     transferRemainingBudgetToParent(id: $id) {
@@ -339,8 +331,11 @@ export class WorkspaceView extends React.Component<any, any> {
               })
             }
             updateIsEligibleForOracle={isEligibleForOracle =>
-              this.props.updateWorkspaceIsEligibleForOracle({
-                variables: { workspaceId: workspace.id, isEligibleForOracle }
+              this.props.updateWorkspace({
+                variables: {
+                  id: workspace.id,
+                  isEligibleForOracle,
+                },
               })
             }
           />
@@ -490,10 +485,10 @@ export class WorkspaceView extends React.Component<any, any> {
                             })
                           }
                           markAsNotEligibleForOracle={() =>
-                            this.props.updateWorkspaceIsEligibleForOracle({
+                            this.props.updateWorkspace({
                               variables: {
+                                id: workspace.id,
                                 isEligibleForOracle: false,
-                                workspaceId: workspace.id,
                               }
                             })
                           }
@@ -564,8 +559,13 @@ export class WorkspaceView extends React.Component<any, any> {
                         });
                       }}
                       updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) => {
-                        this.props.updateWorkspaceIsEligibleForOracle({
-                          variables: {workspaceId, isEligibleForOracle}
+                        this.props.updateWorkspace({
+                          variables: {
+                            id: workspaceId,
+                            input: {
+                              isEligibleForOracle
+                            },
+                          },
                         });
                       }}
                       updateWorkspace={this.props.updateWorkspace}
@@ -737,12 +737,6 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_WAS_ANSWERED_BY_ORACLE, {
     name: "updateWorkspaceWasAnsweredByOracle",
-    options: {
-      refetchQueries: ["workspace"]
-    }
-  }),
-  graphql(UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE, {
-    name: "updateWorkspaceIsEligibleForOracle",
     options: {
       refetchQueries: ["workspace"]
     }
