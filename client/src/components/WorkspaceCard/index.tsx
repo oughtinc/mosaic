@@ -10,7 +10,6 @@ import {
   ROOT_WORKSPACE_SUBTREE_QUERY,
   CHILD_WORKSPACE_SUBTREE_QUERY,
   UPDATE_WORKSPACE,
-  UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE
 } from "../../graphqlQueries";
 import { ChildBudgetBadge } from "../ChildBudgetBadge";
 
@@ -102,7 +101,6 @@ interface WorkspaceCardProps {
   subtreeTimeSpentData: any;
   oracleModeQuery: any;
   updateWorkspace: any;
-  updateWorkspaceIsEligibleForOracle: any;
 }
 
 interface SubtreeQuery {
@@ -323,10 +321,12 @@ export class WorkspaceCardPresentational extends React.PureComponent<
   }
 
   private handleOnIsEligibleForOracleCheckboxChange = async () => {
-    await this.props.updateWorkspaceIsEligibleForOracle({
+    await this.props.updateWorkspace({
       variables: {
-        isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle,
-        workspaceId: this.props.workspaceId,
+        id: this.props.workspaceId,
+        input: {
+          isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle,
+        },
       },
     });
 
@@ -378,8 +378,5 @@ export const WorkspaceCard: any = compose(
   }),
   graphql(UPDATE_WORKSPACE, {
     name: "updateWorkspace"
-  }),
-  graphql(UPDATE_WORKSPACE_IS_ELIGIBLE_FOR_ORACLE, {
-    name: "updateWorkspaceIsEligibleForOracle"
   }),
 )(WorkspaceCardPresentational);
