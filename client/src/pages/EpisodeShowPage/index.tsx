@@ -38,7 +38,11 @@ import {
   WorkspaceBlockRelation,
   WorkspaceWithRelations,
 } from "./WorkspaceRelations";
-import { UPDATE_BLOCKS, UPDATE_WORKSPACE_IS_ELIGIBLE } from "../../graphqlQueries";
+import {
+  UPDATE_BLOCKS,
+  UPDATE_WORKSPACE_IS_ELIGIBLE,
+  UPDATE_WORKSPACE,
+} from "../../graphqlQueries";
 import { Auth } from "../../auth";
 
 import {
@@ -89,20 +93,6 @@ const WORKSPACE_QUERY = gql`
         value
         type
       }
-    }
-  }
-`;
-
-const UPDATE_WORKSPACE = gql`
-  mutation updateWorkspaceChildren(
-    $id: String!
-    $childWorkspaceOrder: [String]
-  ) {
-    updateWorkspaceChildren(
-      id: $id
-      childWorkspaceOrder: $childWorkspaceOrder
-    ) {
-      id
     }
   }
 `;
@@ -346,12 +336,12 @@ export class WorkspaceView extends React.Component<any, any> {
             isInOracleMode={isInOracleMode}
             hasTimer={hasTimer}
             hasTimerEnded={hasTimerEnded}
-            markAsNotStale={() =>
+            updateStaleness={isStale =>
               this.props.updateWorkspace({
                 variables: {
                   id: workspace.id,
                   input: {
-                    isStale: false,
+                    isStale,
                   },
                 },
               })
@@ -735,12 +725,6 @@ const UNLOCK_POINTER_MUTATION = gql`
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
-  graphql(UPDATE_WORKSPACE, {
-    name: "updateWorkspaceChildren",
-    options: {
-      refetchQueries: ["workspace"],
-    },
-  }),
   graphql(NEW_CHILD, {
     name: "createChild",
     options: {

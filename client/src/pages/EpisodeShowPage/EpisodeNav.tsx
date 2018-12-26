@@ -40,8 +40,8 @@ interface EpisodeNavProps {
   hasTimerEnded: boolean;
   isInOracleMode: boolean;
   isTakingABreak?: boolean;
-  markAsNotStale?: () => void;
-  updateIsEligibleForOracle(isStale: boolean): void;
+  updateStaleness(isStale: boolean): void;
+  updateIsEligibleForOracle(isEligibleForOracle: boolean): void;
 }
 
 // Note that there in the normal functioning of the app,
@@ -56,7 +56,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       hasTimerEnded,
       isInOracleMode,
       isTakingABreak,
-      markAsNotStale,
+      updateStaleness,
       updateIsEligibleForOracle,
     } = this.props;
 
@@ -112,7 +112,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                 <TakeBreakBtn
                   bsStyle="primary"
                   label="Needs more work"
-                  navHook={() => markAsNotStale && markAsNotStale()}
+                  navHook={() => updateStaleness && updateStaleness(true)}
                 />
               </div>
           )

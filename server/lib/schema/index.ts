@@ -95,7 +95,10 @@ const BlockInput = new GraphQLInputObjectType({
 
 const WorkspaceInput = new GraphQLInputObjectType({
   name: "WorkspaceInput",
-  fields: _.pick(attributeFields(models.Workspace), "isStale")
+  fields: attributeFields(
+    models.Workspace,
+    { allowNull: true },
+  ),
 });
 
 function modelGraphQLFields(type: any, model: any) {
@@ -317,15 +320,32 @@ const schema = new GraphQLSchema({
           id: { type: GraphQLString },
           input: { type: WorkspaceInput }
         },
-        resolve: async (_, { id, input }) => {
+        resolve: async (obj, { id, input }, context) => {
+          const user = await userFromAuthToken(context.authorization);
           if (user == null) {
             throw new Error("Got null user while attempting to update workspace");
           }
+
           const workspace = await models.Workspace.findById(id);
-          const { isStale } = input;
-          if (isStale) {
-            return workspace.update({ isStale });
+
+          const inputWithNoNullOrUndefinedValues = _.omitBy(input, _.isNil);
+
+          const isUserAttemptingToUpdateAtLeastOneField = Object.keys(inputWithNoNullOrUndefinedValues).length > 0;
+
+          if (isUserAttemptingToUpdateAtLeastOneField) {
+            const { isArchived, isStale } = inputWithNoNullOrUndefinedValues;
+
+            const update = {
+              isArchived,
+              isStale,
+            };
+
+            const updateWithNoNullOrUndefinedValues = _.omitBy(update, _.isNil);
+
+            return workspace.update(updateWithNoNullOrUndefinedValues);
           }
+
+          return workspace;
         }
       },
       updateWorkspaceIsArchived: {
