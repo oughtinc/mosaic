@@ -551,10 +551,12 @@ export class WorkspaceView extends React.Component<any, any> {
                         workspace.totalBudget
                       }
                       updateWorkspaceIsArchived={({ isArchived, workspaceId }) => {
-                        this.props.updateWorkspaceIsArchived({
+                        this.props.updateWorkspace({
                           variables: {
                             id: workspaceId,
-                            isArchived,
+                            input: {
+                              isArchived
+                            },
                           }
                         });
                       }}
@@ -568,7 +570,15 @@ export class WorkspaceView extends React.Component<any, any> {
                           },
                         });
                       }}
-                      updateWorkspace={this.props.updateWorkspace}
+                      markAsNotStale={() =>
+                        this.props.updateWorkspace({
+                          variables: {
+                            id: workspace.id,
+                            input: {
+                              isStale: false,
+                            },
+                          }
+                        })}
                       ref={input => {
                         if (input && input.editor()) {
                           this.newChildField = input.editor();

@@ -313,13 +313,9 @@ export class ChildrenSidebar extends React.Component<any, any> {
                       workspace={workspace}
                       key={workspace.id}
                       onDelete={() => {
-                        this.props.updateWorkspace({
-                          variables: {
-                            id: workspace.id,
-                            input: {
-                              isArchived: !workspace.isArchived,
-                            },
-                          },
+                        this.props.updateWorkspaceIsArchived({
+                          workspaceId: workspace.id,
+                          isArchived: !workspace.isArchived,
                         });
                       }}
                       availablePointers={this.props.availablePointers}
@@ -361,14 +357,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     <TakeBreakBtn
                       label="Wait for an answer"
                       navHook={() => {
-                        this.props.updateWorkspace({
-                          variables: {
-                            id: this.props.workspace.id,
-                            input: {
-                              isStale: false,
-                            },
-                          },
-                        });
+                        this.props.markAsNotStale();
                       }}
                     />
                   :
