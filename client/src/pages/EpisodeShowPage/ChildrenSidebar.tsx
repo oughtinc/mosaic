@@ -313,9 +313,13 @@ export class ChildrenSidebar extends React.Component<any, any> {
                       workspace={workspace}
                       key={workspace.id}
                       onDelete={() => {
-                        this.props.updateWorkspaceIsArchived({
-                          workspaceId: workspace.id,
-                          isArchived: !workspace.isArchived,
+                        this.props.updateWorkspace({
+                          variables: {
+                            id: workspace.id,
+                            input: {
+                              isArchived: !workspace.isArchived,
+                            },
+                          },
                         });
                       }}
                       availablePointers={this.props.availablePointers}

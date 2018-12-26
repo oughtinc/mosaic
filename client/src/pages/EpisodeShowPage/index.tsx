@@ -97,14 +97,6 @@ const WORKSPACE_QUERY = gql`
   }
 `;
 
-const UPDATE_WORKSPACE_IS_ARCHIVED = gql`
-  mutation updateWorkspaceIsArchived($id: String!, $isArchived: Boolean!) {
-    updateWorkspaceIsArchived(id: $id, isArchived: $isArchived) {
-      id
-    }
-  }
-`;
-
 const UPDATE_WORKSPACE_WAS_ANSWERED_BY_ORACLE = gql`
   mutation updateWorkspaceWasAnsweredByOracle($id: String!, $wasAnsweredByOracle: Boolean!) {
     updateWorkspaceWasAnsweredByOracle(id: $id, wasAnsweredByOracle: $wasAnsweredByOracle) {
@@ -739,12 +731,6 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE, {
     name: "updateWorkspace",
-    options: {
-      refetchQueries: ["workspace"]
-    }
-  }),
-  graphql(UPDATE_WORKSPACE_IS_ARCHIVED, {
-    name: "updateWorkspaceIsArchived",
     options: {
       refetchQueries: ["workspace"]
     }
