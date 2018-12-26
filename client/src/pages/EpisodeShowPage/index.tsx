@@ -97,14 +97,6 @@ const WORKSPACE_QUERY = gql`
   }
 `;
 
-const UPDATE_WORKSPACE_WAS_ANSWERED_BY_ORACLE = gql`
-  mutation updateWorkspaceWasAnsweredByOracle($id: String!, $wasAnsweredByOracle: Boolean!) {
-    updateWorkspaceWasAnsweredByOracle(id: $id, wasAnsweredByOracle: $wasAnsweredByOracle) {
-      id
-    }
-  }
-`;
-
 const TRANSFER_REMAINING_BUDGET_TO_PARENT = gql`
   mutation transferRemainingBudgetToParent($id: String!) {
     transferRemainingBudgetToParent(id: $id) {
@@ -472,8 +464,13 @@ export class WorkspaceView extends React.Component<any, any> {
                           isInOracleMode={isInOracleMode}
                           isUserOracle={isUserOracle}
                           markAsAnsweredByOracle={() =>
-                            this.props.updateWorkspaceWasAnsweredByOracle({
-                              variables: { id: workspace.id, wasAnsweredByOracle: true }
+                            this.props.updateWorkspace({
+                              variables: {
+                                id: workspace.id,
+                                input: {
+                                  wasAnsweredByOracle: true,
+                                },
+                              },
                             })
                           }
                           markAsNotEligible={() =>
@@ -741,12 +738,6 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE, {
     name: "updateWorkspace",
-    options: {
-      refetchQueries: ["workspace"]
-    }
-  }),
-  graphql(UPDATE_WORKSPACE_WAS_ANSWERED_BY_ORACLE, {
-    name: "updateWorkspaceWasAnsweredByOracle",
     options: {
       refetchQueries: ["workspace"]
     }
