@@ -23,6 +23,8 @@ const WorkspaceContainer = styled.div`
   ${blockBorderAndBoxShadow};
   background-color: ${homepageWorkspaceBgColor};
   padding: 10px;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const ScratchpadContainer = styled.div`
@@ -42,47 +44,43 @@ class RootWorkspacePresentational extends React.Component<any, any> {
 
     return (
       <WorkspaceContainer style={this.props.style}>
-        {
-          Auth.isAdmin()
-          &&
-          <AdminControls workspace={workspace} />
-        }
-        <Link to={`/workspaces/${workspace.id}`}>
+        <div style={{flex: "1 0 0px", minWidth: 0}}>
+          {
+            Auth.isAdmin()
+            &&
+            <AdminControls workspace={workspace} />
+          }
+          <Link to={`/workspaces/${workspace.id}`}>
+            <RootBlock
+              block={question}
+            />
+          </Link>
+          <br />
+          <ScratchpadContainer>
+            <RootBlock
+              block={scratchpad}
+              defaultText="(no description)"
+            />
+          </ScratchpadContainer>
           <RootBlock
-            availablePointers={workspace.connectedPointers}
-            block={question}
+            block={answer}
           />
-        </Link>
-
-        {" "}
-
-        <RootBlock
-          availablePointers={workspace.connectedPointers}
-          block={answer}
-        />
-
-        <Link to={`/workspaces/${workspace.id}/subtree`}>
-          <Button
-            bsSize="xsmall"
-            bsStyle="default"
-            className="pull-right"
-            style={{
-              margin: "5px 1px",
-              padding: "1px 4px",
-            }}
-          >
-            Tree »
-          </Button>
-        </Link>
-
-        <ScratchpadContainer>
-          <RootBlock
-            availablePointers={workspace.connectedPointers}
-            block={scratchpad}
-          />
-        </ScratchpadContainer>
-
-        <div style={{ clear: "both" }} />
+        </div>
+        <div style={{flexShrink: 0, flexGrow: 0, display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+          <Link to={`/workspaces/${workspace.id}/subtree`}>
+            <Button
+              bsSize="xsmall"
+              bsStyle="default"
+              className="pull-right"
+              style={{
+                margin: "5px 1px",
+                padding: "1px 4px",
+              }}
+            >
+              Tree »
+            </Button>
+          </Link>
+        </div>
       </WorkspaceContainer>
     );
   }
