@@ -5,7 +5,14 @@ import { listOfSlateNodesToText } from "../../lib/slateParser";
 const RootBlock = ({ block, defaultText = ""}) => {
   let displayText = defaultText;
   if (block && block.value) {
-    const blockText = listOfSlateNodesToText(block.value);
+
+    let blockText;
+    if (_.isArray(block.value)) {
+      blockText = listOfSlateNodesToText(block.value);
+    } else {
+      blockText = listOfSlateNodesToText([block.value]);
+    }
+
     if (_.trim(blockText) !== "") {
       displayText = blockText;
     }
