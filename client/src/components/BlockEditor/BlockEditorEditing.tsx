@@ -158,19 +158,27 @@ export class BlockEditorEditingPresentational extends React.Component<
     );
   }
 
+  // returns true if we should prevent current character from being inserted
+  // returns false if this character should be inserted
   private checkAutocomplete = event => {
     const lastCharacters = lastCharactersAfterEvent(event, 4);
     const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBERS_NOT_NUMBER);
+
+    let shouldPreventCharInsertion = false;
+
     if (pointerNameMatch) {
-      this.handlePointerNameAutocomplete(
-        lastCharacters,
-        pointerNameMatch,
-        event
-      );
+      if (event.key === "Enter") {
+        this.handlePointerNameAutocomplete(pointerNameMatch);
+        shouldPreventCharInsertion = true;
+      } else {
+        this.handlePointerNameAutocomplete(pointerNameMatch);
+      }
     }
+
+    return shouldPreventCharInsertion;
   };
 
-  private handlePointerNameAutocomplete = (characters, match, event) => {
+  private handlePointerNameAutocomplete = match => {
     const matchNumber = Number(match[0].substring(1, match[0].length - 1));
     const pointer = this.props.availablePointers[matchNumber - 1];
 
@@ -199,10 +207,16 @@ export class BlockEditorEditingPresentational extends React.Component<
       event.preventDefault();
     }
 
-    this.checkAutocomplete(event);
+    const shouldPreventDefault = this.checkAutocomplete(event);
+    if (shouldPreventDefault) {
+      return false;
+    }
+
     if (!!this.props.onKeyDown) {
       this.props.onKeyDown(event);
     }
+
+    return undefined;
   };
 
   private handleSquareBracketExport = () => {
