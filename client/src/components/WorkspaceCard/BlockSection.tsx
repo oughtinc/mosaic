@@ -35,10 +35,12 @@ const BlockContainer = styled.div`
   flex: 1;
 `;
 
+// Setting min-width enables wrapping behavior.
 const BlockEditorContainer = styled.div`
-  margin: 4px 0 4px 0;
+  margin: 4px 9px 4px 0;
   float: left;
   flex: 40;
+  min-width: 1px;
 `;
 
 const BlockSectionContainer = styled.div`
