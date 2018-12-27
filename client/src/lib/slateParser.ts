@@ -21,7 +21,10 @@ export function databaseJSONToValue(databaseJson: any) {
 }
 
 export function listOfSlateNodesToText(list: Array<any>) {
-  return _.map(_.map(list, x => slateNodeToText(x)), _.trim).join(" ");
+  const arrayOfStrings = _.map(list, x => slateNodeToText(x));
+  const trimmedArrayOfStrings = _.map(arrayOfStrings, _.trim);
+  const joinedTrimmedArrayOfStrings = trimmedArrayOfStrings.join(" ");
+  return joinedTrimmedArrayOfStrings;
 }
 
 export function slateNodeToText(node: any) {
