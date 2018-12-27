@@ -2,10 +2,10 @@ import * as _ from "lodash";
 import * as React from "react";
 import { listOfSlateNodesToText } from "../../lib/slateParser";
 
-const RootBlock = ({ availablePointers = [], block, defaultText = ""}) => {
+const RootBlock = ({ block, defaultText = ""}) => {
   let displayText = defaultText;
   if (block && block.value) {
-    const blockText = listOfSlateNodesToText(block.value, availablePointers);
+    const blockText = listOfSlateNodesToText(block.value);
     if (_.trim(blockText) !== "") {
       displayText = blockText;
     }

@@ -52,20 +52,17 @@ class RootWorkspacePresentational extends React.Component<any, any> {
           }
           <Link to={`/workspaces/${workspace.id}`}>
             <RootBlock
-              availablePointers={workspace.connectedPointers}
               block={question}
             />
           </Link>
           <br />
           <ScratchpadContainer>
             <RootBlock
-              availablePointers={workspace.connectedPointers}
               block={scratchpad}
               defaultText="(no description)"
             />
           </ScratchpadContainer>
           <RootBlock
-            availablePointers={workspace.connectedPointers}
             block={answer}
           />
         </div>
