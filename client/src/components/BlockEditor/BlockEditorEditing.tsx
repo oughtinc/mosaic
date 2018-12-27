@@ -158,30 +158,34 @@ export class BlockEditorEditingPresentational extends React.Component<
     );
   }
 
+  // returns true if we should prevent current character from being inserted
+  // returns false if this character should be inserted
   private checkAutocomplete = event => {
     const lastCharacters = lastCharactersAfterEvent(event, 4);
     const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBERS_NOT_NUMBER);
+
+    let shouldPreventCharInsertion = false;
+
     if (pointerNameMatch) {
-      if (event.key == "Enter") {
-        // For some reason, enter was not causing autocomplete when called from inside the event.
-        // This might be due to competing with newline handling inside of the Slate component?
-        // For now a timeout works, with the downside of being able to see the entered newline for a brief moment.
-        setTimeout(() => this.handlePointerNameAutocomplete(pointerNameMatch, 1), 0);
-      }
-      else {
-        this.handlePointerNameAutocomplete(pointerNameMatch, 0);
+      if (event.key === "Enter") {
+        this.handlePointerNameAutocomplete(pointerNameMatch);
+        shouldPreventCharInsertion = true;
+      } else {
+        this.handlePointerNameAutocomplete(pointerNameMatch);
       }
     }
+
+    return shouldPreventCharInsertion;
   };
 
-  private handlePointerNameAutocomplete = (match, additionalCharsToDelete) => {
+  private handlePointerNameAutocomplete = match => {
     const matchNumber = Number(match[0].substring(1, match[0].length - 1));
     const pointer = this.props.availablePointers[matchNumber - 1];
 
     if (!!pointer) {
       const { value } = this.props.value
         .change()
-        .deleteBackward(matchNumber.toString().length + 1 + additionalCharsToDelete)
+        .deleteBackward(matchNumber.toString().length + 1)
         .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
         .collapseToStartOfNextText()
         .focus();
@@ -203,10 +207,16 @@ export class BlockEditorEditingPresentational extends React.Component<
       event.preventDefault();
     }
 
-    this.checkAutocomplete(event);
+    const shouldPreventDefault = this.checkAutocomplete(event);
+    if (shouldPreventDefault) {
+      return false;
+    }
+
     if (!!this.props.onKeyDown) {
       this.props.onKeyDown(event);
     }
+
+    return undefined;
   };
 
   private handleSquareBracketExport = () => {
