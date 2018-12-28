@@ -38,6 +38,7 @@ const BulletAndEditorContainer = styled.div`
 
 const BlockEditorContainer = styled.div`
   min-width: 1px;
+  flex: 1;
 `;
 
 const BlockBody = styled.div`
