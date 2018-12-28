@@ -656,7 +656,6 @@ function mapStateToProps(state: any, { workspace }: any) {
 
   let inputCharCount, outputCharCount;
   if (workspace.workspace) {
-
     const visibleExportIds = exportingPointers.map(p => p.data.pointerId);
 
     const exportLockStatusInfo = workspace.workspace.exportLockStatusInfo;

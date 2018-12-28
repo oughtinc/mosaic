@@ -1,33 +1,10 @@
 import styled from "styled-components";
 import * as React from "react";
+import { BlockBulletLink } from "./BlockBullet";
 import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import Plain from "slate-plain-serializer";
 import { Value } from "slate";
-import { Link } from "react-router-dom";
-
-import {
-  blockBulletBgColor,
-  blockBulletFontColor,
-  blockBulletBgColorOnHover,
-  blockBulletFontColorOnHover,
-} from "../../styles";
-
-const BlockBullet = styled(Link)`
-  background-color: ${blockBulletBgColor};
-  float: left;
-  border-radius: 2px;
-  color: ${blockBulletFontColor};
-  padding: 0px 4px;
-  margin: 4px 4px 4px 9px;
-  font-weight: 500;
-  flex: 1;
-  &:hover {
-    background: ${blockBulletBgColorOnHover};
-    color: ${blockBulletFontColorOnHover};
-    text-decoration: none;
-  }
-`;
 
 const BlockContainer = styled.div`
   display: flex;
@@ -59,7 +36,7 @@ const Block = ({ character, block, availablePointers, workspace }) => {
   }
   return (
     <BlockContainer>
-      <BlockBullet to={`/workspaces/${workspace.id}`}>{character}</BlockBullet>
+      <BlockBulletLink to={`/workspaces/${workspace.id}`}>{character}</BlockBulletLink>
       <BlockEditorContainer>
         <BlockEditor
           name={block.id}

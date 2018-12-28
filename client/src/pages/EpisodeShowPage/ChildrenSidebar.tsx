@@ -10,6 +10,7 @@ import {
   WorkspaceBlockRelation,
   WorkspaceRelationTypes,
 } from "./WorkspaceRelations";
+import { BlockBullet } from "../../components/WorkspaceCard/BlockBullet";
 import { ChildBudgetBadge } from "../../components/ChildBudgetBadge";
 import { ChildBudgetForm } from "./ChildBudgetForm";
 import { Auth } from "../../auth";
@@ -29,6 +30,15 @@ import {
 const BlockContainer = styled.div`
   ${blockBorderAndBoxShadow};
   margin-bottom: 25px;
+`;
+
+const BulletAndEditorContainer = styled.div`
+  display: flex;
+`;
+
+const BlockEditorContainer = styled.div`
+  min-width: 1px;
+  flex: 1;
 `;
 
 const BlockBody = styled.div`
@@ -120,23 +130,33 @@ export class Child extends React.Component<any, any> {
         }}
       >
         {questionRelationship.findBlock().value && (
-          <BlockEditor
-            {...questionRelationship.blockEditorAttributes()}
-            availablePointers={availablePointers}
-            visibleExportIds={this.props.visibleExportIds}
-            exportLockStatusInfo={this.props.exportLockStatusInfo}
-            unlockPointer={this.props.unlockPointer}
-          />
+          <BulletAndEditorContainer>
+            <BlockBullet>Q</BlockBullet>
+            <BlockEditorContainer>
+              <BlockEditor
+                {...questionRelationship.blockEditorAttributes()}
+                availablePointers={availablePointers}
+                visibleExportIds={this.props.visibleExportIds}
+                exportLockStatusInfo={this.props.exportLockStatusInfo}
+                unlockPointer={this.props.unlockPointer}
+              />
+            </BlockEditorContainer>
+          </BulletAndEditorContainer>
         )}
         <div style={{ color: subQuestionAnswerFontColor, marginTop: "8px" }}>
           {answerRelationship.findBlock().value && (
-            <BlockEditor
-              {...answerRelationship.blockEditorAttributes()}
-              availablePointers={availablePointers}
-              visibleExportIds={this.props.visibleExportIds}
-              exportLockStatusInfo={this.props.exportLockStatusInfo}
-              unlockPointer={this.props.unlockPointer}
-            />
+            <BulletAndEditorContainer>
+              <BlockBullet>A</BlockBullet>
+              <BlockEditorContainer>
+                <BlockEditor
+                  {...answerRelationship.blockEditorAttributes()}
+                  availablePointers={availablePointers}
+                  visibleExportIds={this.props.visibleExportIds}
+                  exportLockStatusInfo={this.props.exportLockStatusInfo}
+                  unlockPointer={this.props.unlockPointer}
+                />
+              </BlockEditorContainer>
+            </BulletAndEditorContainer>
           )}
         </div>
 
@@ -282,7 +302,6 @@ export class ChildrenSidebar extends React.Component<any, any> {
   }
 
   public render() {
-
     return (
       <div>
         {!!this.props.workspaceOrder.length && (
