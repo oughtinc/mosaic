@@ -6,6 +6,7 @@ export const LIGHT_GRAY = "#ddd";
 export const GRAY = "#bbb";
 export const SLIGHTLY_DARKER_GRAY = "#999";
 export const DARK_GRAY = "#666";
+export const VERY_DARK_GRAY = "#333";
 export const VERY_LIGHT_BLUE = "#f0f8ff";
 export const DARK_BLUE = "#337ab7";
 export const VERY_DARK_BLUE = "#26a";
@@ -41,7 +42,7 @@ export const treeBulletArrowColorWhenActive = SLIGHTLY_DARKER_GRAY;
 export const treeWorkspaceBgColor = WHITE;
 export const brandFontColor = WHITE;
 export const headerLinkFontColor = WHITE;
-export const subQuestionAnswerFontColor = SLIGHTLY_DARKER_GRAY;
+export const subQuestionAnswerFontColor = VERY_DARK_GRAY;
 export const unlockedImportBgColor = LIVELY_BLUE;
 export const unlockedImportBgColorOnHover = DARKENED_LIVELY_BLUE;
 
