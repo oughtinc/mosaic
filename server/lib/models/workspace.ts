@@ -144,7 +144,7 @@ const WorkspaceModel = (
           if (this.get("timeSpentOnThisWorkspace") > 0) {
             return this.get("timeSpentOnThisWorkspace");
           }
-          
+
           let howMuchSpentOnChildren = 0;
           for (const childId of this.get("childWorkspaceOrder")) {
             const child = await sequelize.models.Workspace.findById(childId);
@@ -357,7 +357,7 @@ const WorkspaceModel = (
     const blocks = await this.visibleBlocks();
     let _connectedPointers: string[] = [];
     for (const block of blocks) {
-      const blockPointerIds = await block.connectedPointers();
+      const blockPointerIds = await block.connectedPointers({ pointersSoFar: _connectedPointers});
       _connectedPointers = [..._connectedPointers, ...blockPointerIds];
     }
 
@@ -377,9 +377,7 @@ const WorkspaceModel = (
     const blocks = await this.getBlocks();
 
     for (const block of blocks) {
-      const blockPointersToAdd = await block.newConnectedPointers(
-        pointersSoFar
-      );
+      const blockPointersToAdd = await block.connectedPointers({ pointersSoFar });
       connectedPointersOfSubtree = connectedPointersOfSubtree.concat(
         blockPointersToAdd
       );

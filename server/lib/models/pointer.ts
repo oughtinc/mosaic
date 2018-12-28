@@ -57,11 +57,11 @@ const PointerModel = (sequelize, DataTypes) => {
     addEventAssociations(Pointer, models);
   };
 
-  Pointer.prototype.containedPointers = async function() {
-    const directPointers = await this.directContainedPointers();
+  Pointer.prototype.containedPointers = async function({ pointersSoFar } = {}) {
+    const directPointers = await this.directContainedPointers({ pointersSoFar });
     const allPointers: any = [...directPointers];
     for (const pointer of allPointers) {
-      const directImports = await pointer.directContainedPointers();
+      const directImports = await pointer.directContainedPointers({ pointersSoFar: _.join(allPointers, pointersSoFar) });
       directImports
         .filter(p => !_.includes(allPointers.map(p => p.id), p.id))
         .forEach(p => {
@@ -71,39 +71,14 @@ const PointerModel = (sequelize, DataTypes) => {
     return allPointers;
   };
 
-  Pointer.prototype.newContainedPointers = async function(pointersSoFar) {
-    const directPointers = await this.newDirectContainedPointers(pointersSoFar);
-    const allPointers: any = [...directPointers];
-
-    for (const pointer of allPointers) {
-      const directImports = await pointer.newDirectContainedPointers(
-        pointersSoFar
+  Pointer.prototype.directContainedPointers = async function({ pointersSoFar } = {}) {
+    let pointerIds = await this.directContainedPointerIds();
+    if (pointersSoFar) {
+      pointerIds = _.difference(
+        pointerIds,
+        _.map(pointersSoFar, _.property("id"))
       );
-      directImports
-        .filter(p => !_.includes(allPointers.map(p => p.id), p.id))
-        .forEach(p => {
-          allPointers.push(p);
-        });
     }
-    return allPointers;
-  };
-
-  Pointer.prototype.directContainedPointers = async function() {
-    const pointerIds = await this.directContainedPointerIds();
-    const pointers = await sequelize.models.Pointer.findAll({
-      where: {
-        id: {
-          [Op.in]: _.uniq(pointerIds)
-        }
-      }
-    });
-    return pointers;
-  };
-
-  Pointer.prototype.newDirectContainedPointers = async function(pointersSoFar) {
-    const pointerIds = await this.newDirectContainedPointerIds(pointersSoFar);
-
-    if (pointerIds.length === 0) return [];
 
     const pointers = await sequelize.models.Pointer.findAll({
       where: {
@@ -125,29 +100,6 @@ const PointerModel = (sequelize, DataTypes) => {
     const pointerInlines = inlines.filter(l => !!l.data.pointerId);
     const pointerIds = pointerInlines.map(p => p.data.pointerId);
     return pointerIds;
-  };
-
-  Pointer.prototype.newDirectContainedPointerIds = async function(
-    pointersSoFar
-  ) {
-    const value = await this.value;
-    if (!value) {
-      return [];
-    }
-
-    const inlines = getAllInlinesAsArray(value);
-    const pointerInlines = inlines.filter(l => !!l.data.pointerId);
-    const pointerIds = pointerInlines.map(p => p.data.pointerId);
-
-    const newPointerIds = pointerIds.filter(pointerId => {
-      const alreadyListed = _.some(
-        pointersSoFar,
-        pointerSoFar => pointerSoFar.id === pointerId
-      );
-      return !alreadyListed;
-    });
-
-    return newPointerIds;
   };
 
   return Pointer;
