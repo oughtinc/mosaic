@@ -326,7 +326,9 @@ export class WorkspaceView extends React.Component<any, any> {
               this.props.updateWorkspace({
                 variables: {
                   id: workspace.id,
-                  isEligibleForOracle,
+                  input: {
+                    isEligibleForOracle,
+                  }
                 },
               })
             }
