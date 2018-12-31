@@ -99,12 +99,14 @@ const WORKSPACE_QUERY = gql`
           id
           value
           type
+          workspaceId
         }
       }
       blocks {
         id
         value
         type
+        workspaceId
       }
       rootWorkspace {
         id

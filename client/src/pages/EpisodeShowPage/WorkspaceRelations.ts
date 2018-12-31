@@ -103,6 +103,7 @@ export class WorkspaceBlockRelation {
     return {
       name: id,
       blockId: id,
+      workspaceId: this.workspace.id,
       readOnly: !editable,
       initialValue: permission === Permissions.Editable ? value : outputsToInputs(value),
       shouldAutosave: editable,

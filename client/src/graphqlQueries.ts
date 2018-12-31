@@ -146,6 +146,19 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
   }
 `;
 
+export const WORKSPACE_AND_PARENT_POINTERS_QUERY = gql`
+  query parentWorkspace($id: String!) {
+    workspace(id: $id) {
+      id
+      connectedPointers
+      parentWorkspace {
+        id
+        connectedPointers
+      }
+    }
+  }
+`;
+
 export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
   mutation updateWorkspaceIsPublic($isPublic: Boolean, $workspaceId: String) {
     updateWorkspaceIsPublic(isPublic: $isPublic, workspaceId: $workspaceId) {

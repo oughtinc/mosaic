@@ -14,7 +14,7 @@ import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection, removeExportOfSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
-import { UPDATE_BLOCKS } from "../../graphqlQueries";
+import { UPDATE_BLOCKS, WORKSPACE_AND_PARENT_POINTERS_QUERY } from "../../graphqlQueries";
 import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 import { parse as parseQueryString } from "query-string";
@@ -78,6 +78,7 @@ interface BlockEditorEditingPresentationalProps {
   plugins: any[];
   shouldAutosave: boolean;
   cyAttributeName?: string;
+  workspaceAndParentPointersQuery: any;
   onMount(value: any): () => {};
   updateBlock(value: any): () => {};
   onChange(value: any): () => boolean;
@@ -441,10 +442,17 @@ export const BlockEditorEditing: any = compose(
       },
     }
   }),
+  graphql(WORKSPACE_AND_PARENT_POINTERS_QUERY, {
+    name: "workspaceAndParentPointersQuery",
+    skip: (props: BlockEditorEditingPresentationalProps) => !props.block.workspaceId,
+    options: (props: BlockEditorEditingPresentationalProps) => ({
+      variables: { id: props.block.workspaceId }
+    })
+  }),
   withState("mutationStatus", "setMutationStatus", {
     status: MutationStatus.NotStarted
   }),
-  withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
+  withProps(({ saveBlocksToServer, block, setMutationStatus, workspaceAndParentPointersQuery }) => {
     const saveBlocksMutation = editorValue => {
       setMutationStatus({ status: MutationStatus.Loading });
 
@@ -454,6 +462,8 @@ export const BlockEditorEditing: any = compose(
         }
       }).then(() => {
           setMutationStatus({ status: MutationStatus.Complete });
+          // Update connected pointers of workspace and parent, so that new pointer exports are visible in other components.
+          workspaceAndParentPointersQuery.refetch();
         })
         .catch(e => {
           setMutationStatus({ status: MutationStatus.Error, error: e });

@@ -70,7 +70,7 @@ import { UserType } from "./User";
 
 export const workspaceType = makeObjectType(Workspace, [
   ["childWorkspaces", () => new GraphQLList(workspaceType)],
-  ["parentWorkspace", () => new GraphQLList(workspaceType)],
+  ["parentWorkspace", () => workspaceType],
   ["blocks", () => new GraphQLList(blockType)],
   ["pointerImports", () => new GraphQLList(pointerImportType)],
   ["tree", () => treeType]
