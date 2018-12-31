@@ -16,7 +16,17 @@ import {
 import * as GraphQLJSON from "graphql-type-json";
 import * as Sequelize from "sequelize";
 
-import { userFromAuthToken } from "./auth";
+import {
+  requireAdmin,
+  requireOracle,
+  requireUser,
+} from "./auth";
+
+import { isUserAdmin } from "./auth/isUserAdmin";
+import { isUserOracle } from "./auth/isUserOracle";
+import { userFromAuthToken } from "./auth/userFromAuthToken";
+import { userFromContext } from "./auth/userFromContext";
+
 import { scheduler } from "../scheduler";
 
 const generateReferences = (model, references) => {
@@ -118,6 +128,7 @@ const schema = new GraphQLSchema({
         resolve: resolver(models.Workspace, {
           before: async function(findOptions, args, context, info) {
             const user = await userFromAuthToken(context.authorization);
+
             if (user == null) {
               findOptions.where = {
                 isPublic: true,
@@ -132,6 +143,7 @@ const schema = new GraphQLSchema({
                 ...findOptions.where
               };
             }
+
             return findOptions;
           }
         })
@@ -218,37 +230,38 @@ const schema = new GraphQLSchema({
       updateOracleMode: {
         type: GraphQLBoolean,
         args: { oracleMode: { type: GraphQLBoolean } },
-        resolve: function (_, { oracleMode }) {
-          isInOracleMode.setValue(oracleMode);
-        },
+        resolve: requireOracle(
+          "You must be logged in as an oracle to toggle oracle mode",
+          async (_, { oracleMode }) => {
+            isInOracleMode.setValue(oracleMode);
+          }
+        ),
       },
       updateBlocks: {
         type: new GraphQLList(blockType),
         args: { blocks: { type: new GraphQLList(BlockInput) } },
-        resolve: async (_, { blocks }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error("Got null user while attempting to update blocks");
-          }
+        resolve: requireUser(
+          "You must be logged in to update blocks",
+          async (_, { blocks }, context) => {
+            const event = await models.Event.create();
+            let newBlocks: any = [];
+            for (const _block of blocks) {
+              const block = await models.Block.findById(_block.id);
 
-          const event = await models.Event.create();
-          let newBlocks: any = [];
-          for (const _block of blocks) {
-            const block = await models.Block.findById(_block.id);
-
-            const workspace = await models.Workspace.findById(
-              block.workspaceId
-            );
-            if (workspace == null) {
-              throw new Error(
-                "Got null workspace while attempting to update blocks"
+              const workspace = await models.Workspace.findById(
+                block.workspaceId
               );
+              if (workspace == null) {
+                throw new Error(
+                  "Got null workspace while attempting to update blocks"
+                );
+              }
+              await block.update({ ..._block }, { event });
+              newBlocks = [...newBlocks, block];
             }
-            await block.update({ ..._block }, { event });
-            newBlocks = [...newBlocks, block];
+            return newBlocks;
           }
-          return newBlocks;
-        }
+        ),
       },
       updateWorkspaceChildren: {
         type: workspaceType,
@@ -256,11 +269,14 @@ const schema = new GraphQLSchema({
           id: { type: GraphQLString },
           childWorkspaceOrder: { type: new GraphQLList(GraphQLString) }
         },
-        resolve: async (_, { id, childWorkspaceOrder }) => {
-          const workspace = await models.Workspace.findById(id);
-          const event = await models.Event.create();
-          return workspace.update({ childWorkspaceOrder }, { event });
-        }
+        resolve: requireUser(
+          "You must be logged in to update workspace children order",
+          async (_, { id, childWorkspaceOrder }) => {
+            const workspace = await models.Workspace.findById(id);
+            const event = await models.Event.create();
+            return workspace.update({ childWorkspaceOrder }, { event });
+          }
+        ),
       },
       updateWorkspace: {
         type: workspaceType,
@@ -268,48 +284,48 @@ const schema = new GraphQLSchema({
           id: { type: GraphQLString },
           input: { type: WorkspaceInput }
         },
-        resolve: async (obj, { id, input }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error("Got null user while attempting to update workspace");
-          }
+        resolve: requireUser(
+          "You must be logged in to update a workspace",
+          async (obj, { id, input }, context) => {
+            const user = context.user;
 
-          const workspace = await models.Workspace.findById(id);
+            const workspace = await models.Workspace.findById(id);
 
-          const inputWithNoNullOrUndefinedValues = _.omitBy(input, _.isNil);
+            const inputWithNoNullOrUndefinedValues = _.omitBy(input, _.isNil);
 
-          const isUserAttemptingToUpdateAtLeastOneField = Object.keys(inputWithNoNullOrUndefinedValues).length > 0;
+            const isUserAttemptingToUpdateAtLeastOneField = Object.keys(inputWithNoNullOrUndefinedValues).length > 0;
 
-          if (isUserAttemptingToUpdateAtLeastOneField) {
-            const {
-              isArchived,
-              isEligibleForOracle,
-              isStale,
-              wasAnsweredByOracle,
-            } = inputWithNoNullOrUndefinedValues;
+            if (isUserAttemptingToUpdateAtLeastOneField) {
+              const {
+                isArchived,
+                isEligibleForOracle,
+                isStale,
+                wasAnsweredByOracle,
+              } = inputWithNoNullOrUndefinedValues;
 
-            if (!_.isNil(isEligibleForOracle) && !user.is_oracle) {
-              throw new Error("Non-oracle attempting to update oracle eligibility.");
+              if (!_.isNil(isEligibleForOracle) && !isUserOracle(user)) {
+                throw new Error("Non-oracle attempting to update oracle eligibility.");
+              }
+
+              if (!_.isNil(wasAnsweredByOracle) && !isUserOracle(user)) {
+                throw new Error("Non-oracle attempting to mark question as answered by an oracle.");
+              }
+
+              const update = {
+                isArchived,
+                isEligibleForOracle,
+                isStale,
+                wasAnsweredByOracle,
+              };
+
+              const updateWithNoNullOrUndefinedValues = _.omitBy(update, _.isNil);
+
+              return workspace.update(updateWithNoNullOrUndefinedValues);
             }
 
-            if (!_.isNil(wasAnsweredByOracle) && !user.is_oracle) {
-              throw new Error("Non-oracle attempting to mark question as answered by an oracle.");
-            }
-
-            const update = {
-              isArchived,
-              isEligibleForOracle,
-              isStale,
-              wasAnsweredByOracle,
-            };
-
-            const updateWithNoNullOrUndefinedValues = _.omitBy(update, _.isNil);
-
-            return workspace.update(updateWithNoNullOrUndefinedValues);
+            return workspace;
           }
-
-          return workspace;
-        }
+        )
       },
       updateWorkspaceWasAnsweredByOracle: {
         type: workspaceType,
@@ -328,17 +344,20 @@ const schema = new GraphQLSchema({
         args: {
           id: { type: GraphQLString }
         },
-        resolve: async (_, { id }) => {
-          const child = await models.Workspace.findById(id);
-          const childRemainingBudget =
-            child.totalBudget - child.allocatedBudget;
-          const parent = await models.Workspace.findById(child.parentId);
-          await parent.update({
-            isStale: true,
-            allocatedBudget: parent.allocatedBudget - childRemainingBudget,
-          });
-          await child.update({ totalBudget: child.allocatedBudget });
-        }
+        resolve: requireUser(
+          "You must be logged in to transfer remaining budget to parent",
+          async (_, { id }) => {
+            const child = await models.Workspace.findById(id);
+            const childRemainingBudget =
+              child.totalBudget - child.allocatedBudget;
+            const parent = await models.Workspace.findById(child.parentId);
+            await parent.update({
+              isStale: true,
+              allocatedBudget: parent.allocatedBudget - childRemainingBudget,
+            });
+            await child.update({ totalBudget: child.allocatedBudget });
+          }
+        )
       },
       depleteBudget: {
         type: workspaceType,
@@ -356,24 +375,19 @@ const schema = new GraphQLSchema({
           question: { type: GraphQLJSON },
           totalBudget: { type: GraphQLInt }
         },
-        resolve: async (_, { question, totalBudget }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to create workspace."
+        resolve: requireUser(
+          "You must be logged in to create a workspace",
+          async (_, { question, totalBudget }, context) => {
+            const event = await models.Event.create();
+            const user = await userFromContext(context);
+
+            const workspace = await models.Workspace.create(
+              { totalBudget, creatorId: user.user_id  }, // TODO replace user.user_id
+              { event, questionValue: JSON.parse(question) }
             );
+            return workspace;
           }
-          const event = await models.Event.create();
-
-          // TODO: Replace with an argument that allows an admin to set private/public
-          const isPublic = user.is_admin;
-
-          const workspace = await models.Workspace.create(
-            { totalBudget, creatorId: user.user_id, isPublic },
-            { event, questionValue: JSON.parse(question) }
-          );
-          return workspace;
-        }
+        ),
       },
       createChildWorkspace: {
         type: workspaceType,
@@ -382,25 +396,23 @@ const schema = new GraphQLSchema({
           question: { type: GraphQLJSON },
           totalBudget: { type: GraphQLInt }
         },
-        resolve: async (_, { workspaceId, question, totalBudget }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to create child workspace."
-            );
+        resolve: requireUser(
+          "You must be logged in to create a subquestion",
+          async (_, { workspaceId, question, totalBudget }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            const event = await models.Event.create();
+            const user = await userFromContext(context);
+            const child = await workspace.createChild({
+              event,
+              question: JSON.parse(question),
+              totalBudget,
+              creatorId: user.user_id,
+              isPublic: isUserAdmin(user),
+            });
+            await workspace.update({ isEligibleForOracle: true });
+            return child;
           }
-          const workspace = await models.Workspace.findById(workspaceId);
-          const event = await models.Event.create();
-          const child = await workspace.createChild({
-            event,
-            question: JSON.parse(question),
-            totalBudget,
-            creatorId: user.user_id,
-            isPublic: user.is_admin
-          });
-          await workspace.update({ isEligibleForOracle: true });
-          return child;
-        }
+        ),
       },
       updateChildTotalBudget: {
         type: workspaceType,
@@ -409,33 +421,29 @@ const schema = new GraphQLSchema({
           childId: { type: GraphQLString },
           totalBudget: { type: GraphQLInt }
         },
-        resolve: async (_, { workspaceId, childId, totalBudget }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to update child workspace."
-            );
+        resolve: requireUser(
+          "You must be logged in to update a child's total budget",
+          async (_, { workspaceId, childId, totalBudget }, context) => {
+            const event = await models.Event.create();
+            const workspace = await models.Workspace.findById(workspaceId);
+            const child = await models.Workspace.findById(childId);
+            await workspace.changeAllocationToChild(child, totalBudget, {
+              event
+            });
           }
-
-          const event = await models.Event.create();
-          const workspace = await models.Workspace.findById(workspaceId);
-          const child = await models.Workspace.findById(childId);
-          await workspace.changeAllocationToChild(child, totalBudget, {
-            event
-          });
-        }
+        ),
       },
       findNextWorkspace: {
         type: workspaceType,
         resolve: async (_, args, context) => {
-          const user = await userFromAuthToken(context.authorization);
+          const user = await userFromContext(context);
           if (user == null) {
             throw new Error(
               "No user found when attempting get next workspace."
             );
           }
 
-          if (user.is_oracle && isInOracleMode.getValue()) {
+          if (isUserOracle(user) && isInOracleMode.getValue()) {
             await scheduler.assignNextWorkspaceForOracle(user.user_id);
           } else {
             await scheduler.assignNextWorkspace(user.user_id);
@@ -449,16 +457,14 @@ const schema = new GraphQLSchema({
       },
       leaveCurrentWorkspace: {
         type: GraphQLBoolean,
-        resolve: async (_, args, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to leave current workspace."
-            );
+        resolve: requireUser(
+          "You must be logged in to leave a workspace",
+          async (_, args, context) => {
+            const user = await userFromContext(context);
+            await scheduler.leaveCurrentWorkspace(user.user_id);
+            return true;
           }
-          await scheduler.leaveCurrentWorkspace(user.user_id);
-          return true;
-        }
+        ),
       },
       updateWorkspaceIsPublic: {
         type: workspaceType,
@@ -466,21 +472,13 @@ const schema = new GraphQLSchema({
           isPublic: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { isPublic, workspaceId }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to toggle workspace visiblity."
-            );
+        resolve: requireAdmin(
+          "You must be logged in as an admin to edit a workspace's front page status",
+          async (_, { isPublic, workspaceId }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            await workspace.update({ isPublic });
           }
-          if (!user.is_admin) {
-            throw new Error(
-              "Non-admin attempted to toggle workspace visiblity."
-            );
-          }
-          const workspace = await models.Workspace.findById(workspaceId);
-          await workspace.update({ isPublic });
-        }
+        ),
       },
       updateWorkspaceIsEligible: {
         type: workspaceType,
@@ -488,17 +486,14 @@ const schema = new GraphQLSchema({
           isEligibleForAssignment: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { isEligibleForAssignment, workspaceId }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to update workspace eligibility."
-            );
+        resolve: requireUser(
+          "You must be logged in to update a workspace's eligibility",
+          async (_, { isEligibleForAssignment, workspaceId }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            await workspace.update({ isEligibleForAssignment });
+            return { id: workspaceId };
           }
-          const workspace = await models.Workspace.findById(workspaceId);
-          await workspace.update({ isEligibleForAssignment });
-          return { id: workspaceId };
-        }
+        ),
       },
       updateWorkspaceHasTimeBudget: {
         type: workspaceType,
@@ -506,22 +501,14 @@ const schema = new GraphQLSchema({
           hasTimeBudget: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { hasTimeBudget, workspaceId }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to update workspace time budget status."
-            );
+        resolve: requireAdmin(
+          "You must be logged in as an admin to edit a workspace's time budget status",
+          async (_, { hasTimeBudget, workspaceId }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            await workspace.update({ hasTimeBudget });
+            return { id: workspaceId };
           }
-          if (!user.is_admin) {
-            throw new Error(
-              "Non-admin attempted to workspace time budget status."
-            );
-          }
-          const workspace = await models.Workspace.findById(workspaceId);
-          await workspace.update({ hasTimeBudget });
-          return { id: workspaceId };
-        }
+        ),
       },
       updateWorkspaceHasIOConstraints: {
         type: workspaceType,
@@ -529,22 +516,14 @@ const schema = new GraphQLSchema({
           hasIOConstraints: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { hasIOConstraints, workspaceId }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to update workspace i/o constraint status."
-            );
+        resolve: requireAdmin(
+          "You must be logged in as an admin to edit a workspace's i/o constraint status",
+          async (_, { hasIOConstraints, workspaceId }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            await workspace.update({ hasIOConstraints });
+            return { id: workspaceId };
           }
-          if (!user.is_admin) {
-            throw new Error(
-              "Non-admin attempted to update workspace i/o constraint status."
-            );
-          }
-          const workspace = await models.Workspace.findById(workspaceId);
-          await workspace.update({ hasIOConstraints });
-          return { id: workspaceId };
-        }
+        ),
       },
       updateWorkspaceIsEligibleForOracle: {
         type: workspaceType,
@@ -552,16 +531,13 @@ const schema = new GraphQLSchema({
           isEligibleForOracle: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { isEligibleForOracle, workspaceId }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to update oracle eligibility."
-            );
+        resolve: requireUser(
+          "You must be logged in to update a workspace's oracle eligibility",
+          async (_, { isEligibleForOracle, workspaceId }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            await workspace.update({ isEligibleForOracle });
           }
-          const workspace = await models.Workspace.findById(workspaceId);
-          await workspace.update({ isEligibleForOracle });
-        }
+        ),
       },
       updateAllocatedBudget: {
         type: workspaceType,
@@ -569,20 +545,17 @@ const schema = new GraphQLSchema({
           workspaceId: { type: GraphQLString },
           changeToBudget: { type: GraphQLInt },
         },
-        resolve: async (_, { workspaceId, changeToBudget }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to update allocated budet."
+        resolve: requireUser(
+          "You must be logged in to update a workspace's allocated budget",
+          async (_, { workspaceId, changeToBudget }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            const updatedTimeBudget = Math.min(
+              workspace.totalBudget,
+              workspace.allocatedBudget + changeToBudget
             );
+            await workspace.update({ allocatedBudget: updatedTimeBudget });
           }
-          const workspace = await models.Workspace.findById(workspaceId);
-          const updatedTimeBudget = Math.min(
-            workspace.totalBudget,
-            workspace.allocatedBudget + changeToBudget
-          );
-          await workspace.update({ allocatedBudget: updatedTimeBudget });
-        }
+        ),
       },
       updateTimeSpentOnWorkspace: {
         type: GraphQLBoolean,
@@ -591,39 +564,36 @@ const schema = new GraphQLSchema({
           workspaceId: { type: GraphQLString },
           secondsSpent: { type: GraphQLInt },
         },
-        resolve: async (_, { doesAffectAllocatedBudget, workspaceId, secondsSpent }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to update time spent on workspace."
-            );
+        resolve: requireUser(
+          "You must be logged in to update the time spent on a workspace",
+          async (_, { doesAffectAllocatedBudget, workspaceId, secondsSpent }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+
+            if (doesAffectAllocatedBudget) {
+
+              const changeToBudget = secondsSpent;
+
+              const updatedTimeBudget = Math.min(
+                workspace.totalBudget,
+                workspace.allocatedBudget + changeToBudget
+              );
+
+              await workspace.update({
+                allocatedBudget: updatedTimeBudget,
+                timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent
+              });
+
+            } else {
+
+              await workspace.update({
+                timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent,
+              });
+
+            }
+
+            return true;
           }
-          const workspace = await models.Workspace.findById(workspaceId);
-
-          if (doesAffectAllocatedBudget) {
-
-            const changeToBudget = secondsSpent;
-
-            const updatedTimeBudget = Math.min(
-              workspace.totalBudget,
-              workspace.allocatedBudget + changeToBudget
-            );
-
-            await workspace.update({
-              allocatedBudget: updatedTimeBudget,
-              timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent
-            });
-
-          } else {
-
-            await workspace.update({
-              timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent,
-            });
-
-          }
-
-          return true;
-        }
+        ),
       },
       unlockPointer: {
         type: GraphQLBoolean,
@@ -631,36 +601,32 @@ const schema = new GraphQLSchema({
           pointerId: { type: GraphQLString },
           workspaceId: { type: GraphQLString }
         },
-        resolve: async (_, { pointerId, workspaceId }, context) => {
-          const user = await userFromAuthToken(context.authorization);
-          if (user == null) {
-            throw new Error(
-              "No user found when attempting to unlock pointer."
-            );
-          }
-
-          const exportWorkspaceLockRelation = await models.ExportWorkspaceLockRelation.findOne({
-            where: {
-              pointerId,
-              workspaceId,
-            }
-          });
-
-          if (exportWorkspaceLockRelation) {
-            await exportWorkspaceLockRelation.update({ isLocked: false });
-          } else {
-            await models.ExportWorkspaceLockRelation.create({
-              isLocked: false,
-              pointerId,
-              workspaceId,
+        resolve: requireUser(
+          "You must be logged in to unlock a pointer",
+          async (_, { pointerId, workspaceId }, context) => {
+            const exportWorkspaceLockRelation = await models.ExportWorkspaceLockRelation.findOne({
+              where: {
+                pointerId,
+                workspaceId,
+              }
             });
-          }
 
-          return true;
-        }
-      }
-    }
-  })
-});
+            if (exportWorkspaceLockRelation) {
+              await exportWorkspaceLockRelation.update({ isLocked: false });
+            } else {
+              await models.ExportWorkspaceLockRelation.create({
+                isLocked: false,
+                pointerId,
+                workspaceId,
+              });
+            }
+
+            return true;
+          }
+        ), // unlock pointer resolver
+      }, // unlockPointer mutation
+    }, // mutation fields
+  }), // mutation: new GraphQLObjectType({...})
+}); // const schema = new GraphQLSchema({...})
 
 export { schema };

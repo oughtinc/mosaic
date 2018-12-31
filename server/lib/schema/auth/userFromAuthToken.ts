@@ -1,6 +1,6 @@
 import * as auth0 from "auth0-js";
 
-const { auth0_client_id } = require(__dirname + "/../../config/config.json");
+const { auth0_client_id } = require("../../../config/config.json");
 
 const webAuth = new auth0.WebAuth({
   domain: "mosaicapp.auth0.com",
