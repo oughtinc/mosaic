@@ -113,6 +113,7 @@ export class WorkspaceBlockRelation {
     return {
       name: id,
       blockId: id,
+      workspaceId: this.workspace.id,
       readOnly: !editable,
       initialValue: editable ? value : outputsToInputs(value),
       shouldAutosave: editable,

@@ -62,7 +62,7 @@ const blockType = makeObjectType(models.Block, [
 const workspaceType = makeObjectType(models.Workspace, [
   ...standardReferences,
   ["childWorkspaces", () => new GraphQLList(workspaceType), "ChildWorkspaces"],
-  ["parentWorkspace", () => new GraphQLList(workspaceType), "ParentWorkspace"],
+  ["parentWorkspace", () => workspaceType, "ParentWorkspace"],
   ["blocks", () => new GraphQLList(blockType), "Blocks"],
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"]
 ]);
