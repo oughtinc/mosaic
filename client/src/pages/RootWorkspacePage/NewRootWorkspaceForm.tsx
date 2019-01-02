@@ -4,7 +4,7 @@ import { NewBlockForm } from "../../components/NewBlockForm";
 class NewRootWorkspaceForm extends React.Component<any, any> {
   public render() {
     return (
-      <div style={this.props.style}>
+      <div style={this.props.style} data-cy="new-root-workspace-form">
         <NewBlockForm
           hasTimeBudget={true}
           maxTotalBudget={100000}

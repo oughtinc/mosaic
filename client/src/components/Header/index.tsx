@@ -41,13 +41,14 @@ const HeaderLink = styled.a`
   }
 `;
 
-const ActionLink = ({ action, children }) => (
+const ActionLink = ({ action, children, ...rest }) => (
   <HeaderLink
     href="#"
     onClick={e => {
       action();
       e.preventDefault();
     }}
+    {...rest}
   >
     {children}
   </HeaderLink>
@@ -59,6 +60,7 @@ const LogoutLink = () => (
       Auth.logout();
       location.reload(); // HACK
     }}
+    data-cy="logout-link"
   >
     Log out
   </ActionLink>
@@ -69,6 +71,7 @@ const LoginLink = () => (
     action={() => {
       Auth.login();
     }}
+    data-cy="login-link"
   >
     Log in
   </ActionLink>
