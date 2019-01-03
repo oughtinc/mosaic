@@ -21,8 +21,8 @@ export function fetchAuthResultsFrom3rdParty(loginCredentials) {
       const authResults = {
         access_token: authResult.accessToken,
         expires_at: authResult.expiresIn * 1000 + Date.now(),
-        is_admin: appMetadata && appMetadata.is_admin,
-        is_oracle: appMetadata && appMetadata.is_oracle,
+        is_admin: appMetadata && appMetadata.is_admin ? true : null,
+        is_oracle: appMetadata && appMetadata.is_oracle ? true : null,
         user_id: userInfo.sub,
       };
 
