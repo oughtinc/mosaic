@@ -16,20 +16,7 @@ import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
-const DOLLAR_NUMBERS_NOT_NUMBER = /\$[0-9]+[^0-9]/;
-
-function lastCharactersAfterEvent(event: any, n: any) {
-  const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
-  if (!wholeText) {
-    return "";
-  }
-  const text: string = wholeText.textContent.slice(
-    Math.max(anchorOffset - n + 1, 0),
-    anchorOffset
-  );
-  const key: string = event.key;
-  return text + key;
-}
+const NUMBER_REGEX = /[0-9]/;
 
 function inlinePointerImportJSON(pointerId: string) {
   return Inline.fromJSON({
@@ -62,11 +49,20 @@ interface BlockEditorEditingPresentationalProps {
   exportSelection(blockId?: string): void;
   removeExportOfSelection(blockId?: string): void;
   onKeyDown(event: any): () => {};
+  onPaste(event: any): () => {};
 }
 
 interface BlockEditorEditingPresentationalState {
   hasChangedSinceDatabaseSave: boolean;
 }
+
+interface ImportPatternLocation {
+  startKey: string;
+  startOffset: number;
+  pointerNum: number;
+  length: number;
+}
+
 export class BlockEditorEditingPresentational extends React.Component<
   BlockEditorEditingPresentationalProps,
   BlockEditorEditingPresentationalState
@@ -75,6 +71,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   private autosaveInterval: any;
 
   private handleBlur = _.debounce(() => {
+    this.checkGlobalImportConversion();
     if (this.props.shouldAutosave) {
       this.considerSaveToDatabase();
       this.endAutosaveInterval();
@@ -152,47 +149,117 @@ export class BlockEditorEditingPresentational extends React.Component<
           onBlur={this.handleBlur}
           onKeyDown={this.onKeyDown}
           onKeyUp={this.onKeyUp}
+          onPaste={this.onPaste}
           ref={this.updateEditor}
         />
       </div>
     );
   }
 
-  // returns true if we should prevent current character from being inserted
-  // returns false if this character should be inserted
-  private checkAutocomplete = event => {
-    const lastCharacters = lastCharactersAfterEvent(event, 4);
-    const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBERS_NOT_NUMBER);
+  private getImportPatternLocationsInTextNode(node: any): ImportPatternLocation[] {
+    const locations: ImportPatternLocation[] = [];
+    let inMatch = false;
+    let matchStart = -1;
+    let matchChars = "";
+    const text = node.text;
+    for (let ii = 0; ii < text.length; ii++) {
+      if (inMatch) {
+        const charIsNumber = !!text[ii].match(NUMBER_REGEX);
 
-    let shouldPreventCharInsertion = false;
-
-    if (pointerNameMatch) {
-      if (event.key === "Enter") {
-        this.handlePointerNameAutocomplete(pointerNameMatch);
-        shouldPreventCharInsertion = true;
-      } else {
-        this.handlePointerNameAutocomplete(pointerNameMatch);
+        if (charIsNumber) {
+          matchChars = matchChars.concat(text[ii]);
+        }
+        if ((!charIsNumber || ii === text.length - 1) && (matchChars.length > 0))  {
+          locations.push({
+            startKey: node.key,
+            startOffset: matchStart,
+            pointerNum: Number(matchChars),
+            length: matchChars.length + 1
+          });
+          inMatch = false;
+        }
+      }
+      if (text[ii] === "$") {
+        inMatch = true;
+        matchStart = ii;
+        matchChars = "";
       }
     }
 
-    return shouldPreventCharInsertion;
-  };
+    return locations;
+  }
 
-  private handlePointerNameAutocomplete = match => {
-    const matchNumber = Number(match[0].substring(1, match[0].length - 1));
-    const pointer = this.props.availablePointers[matchNumber - 1];
+  private getImportPatternLocationsInArrayOfTextNodes(textNodes: any[]): ImportPatternLocation[] {
+    // We only find import patterns contained within a single text node.
+    const locationsPerNode = _.map(textNodes, node => this.getImportPatternLocationsInTextNode(node));
+    return _.flatten(locationsPerNode);
+  }
+
+  // Checks whether current input focus is at the very end of the import pattern location.
+  private isActiveImportPatternLocation(location: ImportPatternLocation) {
+    return (
+      this.props.value.focusKey === location.startKey &&
+      this.props.value.focusOffset === (location.startOffset + location.length)
+    );
+  }
+
+  // Attempts to convert text at the given location (e.g. "$3") to a corresponding inline import node.
+  private convertImportPatternLocation(location: ImportPatternLocation) {
+    const pointer = this.props.availablePointers[location.pointerNum - 1];
 
     if (!!pointer) {
       const { value } = this.props.value
         .change()
-        .deleteBackward(matchNumber.toString().length + 1)
+        .select({
+          anchorKey: location.startKey,
+          anchorOffset: location.startOffset,
+          focusKey: location.startKey,
+          focusOffset: location.startOffset,
+        })
+        .deleteForward(location.length)
         .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
         .collapseToStartOfNextText()
         .focus();
 
       this.onChange(value, true);
+      return true;
     }
-  };
+
+    return false;
+  }
+
+  // Returns true if we should prevent current character from being inserted, false otherwise.
+  private checkKeydownImportConversion(event: any) {
+      // Attempts import conversions in the focused node only.
+    let locations: ImportPatternLocation[] = this.getImportPatternLocationsInArrayOfTextNodes([this.props.value.focusText]);
+    const isNumberKey = !!event.key.match(NUMBER_REGEX);
+
+    if (isNumberKey) {
+      // Do not attempt to complete the focused location (if any), since we could still be adding to it.
+      locations = _.filter(locations, loc => !this.isActiveImportPatternLocation(loc));
+    }
+
+    let anyConverted = false;
+    locations.forEach(location => {
+      if (this.convertImportPatternLocation(location)) {
+        anyConverted = true;
+      }
+    });
+
+    // Both Enter and Left Arrow appear to have default behavior inside Slate interfering with the conversion.
+    if ((event.key === "Enter" || event.key === "ArrowLeft") && anyConverted) {
+      return true;
+    }
+
+    return false;
+  }
+
+  // Attempts import conversions on the whole block.
+  private checkGlobalImportConversion() {
+    const textNodesArray = this.props.value.document.getTexts().toArray();
+    const locations: ImportPatternLocation[] = this.getImportPatternLocationsInArrayOfTextNodes(textNodesArray);
+    locations.forEach(location => this.convertImportPatternLocation(location));
+  }
 
   private onKeyDown = (event: any, change: Change) => {
     const pressedMetaAndE = _event => _event.metaKey && _event.key === "e";
@@ -207,13 +274,13 @@ export class BlockEditorEditingPresentational extends React.Component<
       event.preventDefault();
     }
 
-    const shouldPreventDefault = this.checkAutocomplete(event);
-    if (shouldPreventDefault) {
-      return false;
-    }
-
     if (!!this.props.onKeyDown) {
       this.props.onKeyDown(event);
+    }
+
+    const shouldPreventDefault = this.checkKeydownImportConversion(event);
+    if (shouldPreventDefault) {
+      return false;
     }
 
     return undefined;
@@ -240,6 +307,13 @@ export class BlockEditorEditingPresentational extends React.Component<
   private onKeyUp = (event: any, change: any) => {
     this.handleSquareBracketExport();
   };
+
+  private onPaste = (event: any) => {
+    // We do this in a timeout to avoid interactions with the linkify plugin.
+    // Ideally we could just put this at the appropriate point in the plugin stack and pass the change value through.
+    setTimeout(() => this.checkGlobalImportConversion(), 0);
+    return undefined;
+  }
 
   private onValueChange = () => {
     if (this.props.shouldAutosave) {
