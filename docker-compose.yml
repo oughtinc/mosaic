@@ -3,18 +3,19 @@ services:
   postgres:
     image: postgres:10.3
     restart: always
-    environment: 
-      POSTGRES_DB: mosaic_dev 
-      POSTGRES_USER: mosaic 
+    environment:
+      POSTGRES_DB: mosaic_dev
+      POSTGRES_USER: mosaic
       POSTGRES_PASSWORD: MDaUA2P4ZbkJPCKEM
     ports:
       - "5432:5432"
 
   api:
     image: node:9.7
-    environment: 
+    environment:
         DATABASE_URL: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
         USING_DOCKER: "true"
+        NODE_ENV: ${NODE_ENV}
     ports:
       - "8080:8080"
     volumes:
@@ -24,8 +25,8 @@ services:
       - postgres
 
   web:
-    image: node:9.7  
-    environment: 
+    image: node:9.7
+    environment:
         USING_DOCKER: "true"
     depends_on:
       - api

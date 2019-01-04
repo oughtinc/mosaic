@@ -81,6 +81,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               visibleExportIds={this.props.visibleExportIds}
               exportLockStatusInfo={this.props.exportLockStatusInfo}
               unlockPointer={this.props.unlockPointer}
+              cyAttributeName="slate-editor-new-question-form"
             />
           </BlockBody>
           <div
@@ -295,6 +296,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
             <Button
               bsSize="xsmall"
               bsStyle="primary"
+              data-cy="submit-new-question"
               disabled={this.props.hasTimeBudget && this.props.availableBudget - 90 < this.state.totalBudget}
               type="submit"
               onClick={this.onSubmit}
