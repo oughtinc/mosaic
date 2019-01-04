@@ -239,10 +239,16 @@ export class BlockEditorEditingPresentational extends React.Component<
       locations = _.filter(locations, loc => !this.isActiveImportPatternLocation(loc));
     }
 
-    const converted = (locations.length !== 0) && this.convertImportPatternLocation(locations[0]);
+    let anyConverted = false;
+    for (let ii = 0; ii < locations.length; ii++) {
+      if (this.convertImportPatternLocation(locations[ii])) {
+        anyConverted = true;
+        break;
+      }
+    }
 
     // Both Enter and arrows appear to have default behavior inside Slate interfering with the conversion.
-    if (converted && (event.key === "Enter" || event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+    if (anyConverted && (event.key === "Enter" || event.key === "ArrowLeft" || event.key === "ArrowRight")) {
       return true;
     }
 
@@ -253,8 +259,11 @@ export class BlockEditorEditingPresentational extends React.Component<
   private checkGlobalImportConversion() {
     const textNodesArray = this.props.value.document.getTexts().toArray();
     const locations: ImportPatternLocation[] = this.getImportPatternLocationsInArrayOfTextNodes(textNodesArray);
-    if ((locations.length !== 0) && this.convertImportPatternLocation(locations[0])) {
-      this.checkGlobalImportConversion();
+    for (let ii = 0; ii < locations.length; ii++) {
+      if (this.convertImportPatternLocation(locations[ii])) {
+        this.checkGlobalImportConversion();
+        break;
+      }
     }
   }
 
