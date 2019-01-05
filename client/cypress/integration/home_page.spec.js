@@ -8,11 +8,7 @@ describe("Home page", function() {
       cy.get(`[data-cy="login-link"]`);
       cy.get(`[data-cy="logout-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`).should("not.exist");
-      expect(localStorage.getItem("access_token")).to.not.exist;
-      expect(localStorage.getItem("user_id")).to.not.exist;
-      expect(localStorage.getItem("expires_at")).to.not.exist;
-      expect(localStorage.getItem("is_admin")).to.not.exist;
-      expect(localStorage.getItem("is_oracle")).to.not.exist;
+      cy.expectNoAuthDataInLocalStorage();
     });
   });
 
@@ -25,11 +21,7 @@ describe("Home page", function() {
       cy.get(`[data-cy="logout-link"]`);
       cy.get(`[data-cy="login-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`);
-      expect(localStorage.getItem("access_token")).to.exist;
-      expect(localStorage.getItem("user_id")).to.exist;
-      expect(localStorage.getItem("expires_at")).to.exist;
-      expect(localStorage.getItem("is_admin")).to.not.exist;
-      expect(localStorage.getItem("is_oracle")).to.not.exist;
+      cy.expectTypicalUserAuthDataInLocalStorage();
     });
 
 
@@ -40,10 +32,7 @@ describe("Home page", function() {
         .click();
       cy.contains("This is the question text for a new root-level workspace");
 
-      cy.get(`[data-cy="admin-checkbox-front-page"]`).should("not.exist");
-      cy.get(`[data-cy="admin-checkbox-is-eligible"]`).should("not.exist");
-      cy.get(`[data-cy="admin-checkbox-time-budget"]`).should("not.exist");
-      cy.get(`[data-cy="admin-checkbox-io-constraint"]`).should("not.exist");
+      cy.expectAdminControlsNotToExist();
     });
   });
 
@@ -58,11 +47,7 @@ describe("Home page", function() {
       cy.get(`[data-cy="logout-link"]`);
       cy.get(`[data-cy="login-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`);
-      expect(localStorage.getItem("access_token")).to.exist;
-      expect(localStorage.getItem("user_id")).to.exist;
-      expect(localStorage.getItem("expires_at")).to.exist;
-      expect(localStorage.getItem("is_admin")).to.exist;
-      expect(localStorage.getItem("is_oracle")).to.not.exist;
+      cy.expectAdminAuthDataInLocalStorage();
     });
 
     it("can create new root workspace", function() {
@@ -72,10 +57,63 @@ describe("Home page", function() {
         .click();
       cy.contains("This is the question text for a new root-level workspace written by an admin");
 
-      cy.get(`[data-cy="admin-checkbox-front-page"]`);
-      cy.get(`[data-cy="admin-checkbox-is-eligible"]`);
-      cy.get(`[data-cy="admin-checkbox-time-budget"]`);
-      cy.get(`[data-cy="admin-checkbox-io-constraint"]`);
+      cy.expectAdminControlsToExist();
+
+      cy.get(`[data-cy="oracle-mode-header"]`).should("not.exist");
+    });
+  });
+
+  context("when oracle is logged in", function() {
+    beforeEach(function() {
+      cy.visit("/")
+        .loginAsOracle()
+        .reload();
+    });
+
+    it("diplays proper components & stores proper auth data", function() {
+      cy.get(`[data-cy="logout-link"]`);
+      cy.get(`[data-cy="login-link"]`).should("not.exist");
+      cy.get(`[data-cy="new-root-workspace-form"]`);
+      cy.expectOracleAuthDataInLocalStorage();
+    });
+
+    it("can create new root workspace", function() {
+      cy.get(`[data-cy="slate-editor-new-question-form"]`)
+        .type("This is the question text for a new root-level workspace written by an admin");
+      cy.get(`[data-cy="submit-new-question"]`)
+        .click();
+      cy.contains("This is the question text for a new root-level workspace written by an admin");
+
+      cy.get(`[data-cy="oracle-mode-header"]`);
+
+      cy.expectAdminControlsNotToExist();
+    });
+  });
+
+  context("when user is admin and oracle", function() {
+    beforeEach(function() {
+      cy.visit("/")
+        .loginAsAdminAndOracle()
+        .reload();
+    });
+
+    it("diplays proper components & stores proper auth data", function() {
+      cy.get(`[data-cy="logout-link"]`);
+      cy.get(`[data-cy="login-link"]`).should("not.exist");
+      cy.get(`[data-cy="new-root-workspace-form"]`);
+      cy.expectAdminAndOracleAuthDataInLocalStorage();
+    });
+
+    it("can create new root workspace", function() {
+      cy.get(`[data-cy="slate-editor-new-question-form"]`)
+        .type("This is the question text for a new root-level workspace written by an admin");
+      cy.get(`[data-cy="submit-new-question"]`)
+        .click();
+      cy.contains("This is the question text for a new root-level workspace written by an admin");
+
+      cy.get(`[data-cy="oracle-mode-header"]`);
+
+      cy.expectAdminControlsToExist();
     });
   });
 });

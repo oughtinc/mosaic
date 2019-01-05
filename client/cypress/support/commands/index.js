@@ -1,3 +1,3 @@
 import "./login";
-import "./loginAsAdmin";
+import "./testing";
 import "./resetDb";

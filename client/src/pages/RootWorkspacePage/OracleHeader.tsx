@@ -21,7 +21,7 @@ const UPDATE_ORACLE_MODE = gql`
 class OracleHeaderPresentational extends React.Component<any, any> {
   public render() {
     return (
-      <ContentContainer>
+      <ContentContainer cyAttributeName="oracle-mode-header">
         <Alert
           bsStyle="danger"
           style={{ marginBottom: 0 }}
