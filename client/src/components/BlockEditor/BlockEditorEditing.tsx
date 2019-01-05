@@ -1,7 +1,5 @@
 import { throttle } from "lodash";
 import * as React from "react";
-import { Inline } from "slate";
-import * as uuidv1 from "uuid/v1";
 import { Editor, findDOMNode } from "slate-react";
 import { compose, withProps, withState } from "recompose";
 import { graphql } from "react-apollo";
@@ -11,6 +9,7 @@ import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
+import { applyKeydownImportConversionInSlateValue, applyGlobalImportConversionInSlateValue } from "./importConversion";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
 import { exportSelection, removeExportOfSelection } from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
@@ -36,32 +35,6 @@ const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspa
 };
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
-const DOLLAR_NUMBERS_NOT_NUMBER = /\$[0-9]+[^0-9]/;
-
-function lastCharactersAfterEvent(event: any, n: any) {
-  const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
-  if (!wholeText) {
-    return "";
-  }
-  const text: string = wholeText.textContent.slice(
-    Math.max(anchorOffset - n + 1, 0),
-    anchorOffset
-  );
-  const key: string = event.key;
-  return text + key;
-}
-
-function inlinePointerImportJSON(pointerId: string) {
-  return Inline.fromJSON({
-    object: "inline",
-    type: "pointerImport",
-    isVoid: true,
-    data: {
-      pointerId: pointerId,
-      internalReferenceId: uuidv1()
-    }
-  });
-}
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
@@ -93,13 +66,6 @@ interface BlockEditorEditingPresentationalState {
   editorValue: any;
 }
 
-interface ImportPatternLocation {
-  startKey: string;
-  startOffset: number;
-  pointerNum: number;
-  length: number;
-}
-
 export class BlockEditorEditingPresentational extends React.Component<
   BlockEditorEditingPresentationalProps,
   BlockEditorEditingPresentationalState
@@ -110,7 +76,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   private throttledUpdate = throttle(this.props.updateBlock, 5000);
 
   private handleBlur = _.debounce(() => {
-    this.checkGlobalImportConversion();
+    this.applyGlobalInputConversion();
     if (this.props.shouldAutosave) {
       this.considerSaveToDatabase();
       this.endAutosaveInterval();
@@ -266,117 +232,6 @@ export class BlockEditorEditingPresentational extends React.Component<
     );
   }
 
-  private getImportPatternLocationsInTextNode(node: any): ImportPatternLocation[] {
-    const locations: ImportPatternLocation[] = [];
-    let inMatch = false;
-    let matchStart = -1;
-    let matchChars = "";
-    const text = node.text;
-    for (let ii = 0; ii < text.length; ii++) {
-      if (inMatch) {
-        const charIsNumber = !!text[ii].match(DOLLAR_NUMBERS_NOT_NUMBER);
-
-        if (charIsNumber) {
-          matchChars = matchChars.concat(text[ii]);
-        }
-        if ((!charIsNumber || ii === text.length - 1) && (matchChars.length > 0))  {
-          locations.push({
-            startKey: node.key,
-            startOffset: matchStart,
-            pointerNum: Number(matchChars),
-            length: matchChars.length + 1
-          });
-          inMatch = false;
-        }
-      }
-      if (text[ii] === "$") {
-        inMatch = true;
-        matchStart = ii;
-        matchChars = "";
-      }
-    }
-
-    return locations;
-  }
-
-  private getImportPatternLocationsInArrayOfTextNodes(textNodes: any[]): ImportPatternLocation[] {
-    // We only find import patterns contained within a single text node.
-    const locationsPerNode = _.map(textNodes, node => this.getImportPatternLocationsInTextNode(node));
-    return _.flatten(locationsPerNode);
-  }
-
-  // Checks whether current input focus is at the very end of the import pattern location.
-  private isActiveImportPatternLocation(location: ImportPatternLocation) {
-    return (
-      this.props.value.focusKey === location.startKey &&
-      this.props.value.focusOffset === (location.startOffset + location.length)
-    );
-  }
-
-  // Attempts to convert text at the given location (e.g. "$3") to a corresponding inline import node.
-  private convertImportPatternLocation(location: ImportPatternLocation) {
-    const pointer = this.props.availablePointers[location.pointerNum - 1];
-
-    if (!!pointer) {
-      const { value } = this.state.editorValue
-        .change()
-        .select({
-          anchorKey: location.startKey,
-          anchorOffset: location.startOffset,
-          focusKey: location.startKey,
-          focusOffset: location.startOffset,
-        })
-        .deleteForward(location.length)
-        .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
-        .collapseToStartOfNextText()
-        .focus();
-
-      this.onChange(value, true);
-      return true;
-    }
-
-    return false;
-  }
-
-  // Returns true if we should prevent current character from being inserted, false otherwise.
-  private checkKeydownImportConversion(event: any) {
-      // Attempts import conversions in the focused node only.
-    let locations: ImportPatternLocation[] = this.getImportPatternLocationsInArrayOfTextNodes([this.props.value.focusText]);
-    const isNumberKey = !!event.key.match(NUMBER_REGEX);
-
-    if (isNumberKey) {
-      // Do not attempt to complete the focused location (if any), since we could still be adding to it.
-      locations = _.filter(locations, loc => !this.isActiveImportPatternLocation(loc));
-    }
-
-    let anyConverted = false;
-    for (let ii = 0; ii < locations.length; ii++) {
-      if (this.convertImportPatternLocation(locations[ii])) {
-        anyConverted = true;
-        break;
-      }
-    }
-
-    // Both Enter and arrows appear to have default behavior inside Slate interfering with the conversion.
-    if (anyConverted && (event.key === "Enter" || event.key === "ArrowLeft" || event.key === "ArrowRight")) {
-      return true;
-    }
-
-    return false;
-  };
-
-  // Attempts import conversions on the whole block.
-  private checkGlobalImportConversion() {
-    const textNodesArray = this.props.value.document.getTexts().toArray();
-    const locations: ImportPatternLocation[] = this.getImportPatternLocationsInArrayOfTextNodes(textNodesArray);
-    for (let ii = 0; ii < locations.length; ii++) {
-      if (this.convertImportPatternLocation(locations[ii])) {
-        this.checkGlobalImportConversion();
-        break;
-      }
-    }
-  }
-
   private onKeyDown = (event: any, change: Change) => {
     const pressedMetaAndE = _event => _event.metaKey && _event.key === "e";
     if (pressedMetaAndE(event)) {
@@ -394,13 +249,23 @@ export class BlockEditorEditingPresentational extends React.Component<
       this.props.onKeyDown(event);
     }
 
-    const shouldPreventDefault = this.checkKeydownImportConversion(event);
+    const { shouldPreventDefault, updatedValue } = applyKeydownImportConversionInSlateValue(event, this.props.value, this.props.availablePointers);
+    if (updatedValue) {
+      this.onChange(updatedValue, true);
+    }
     if (shouldPreventDefault) {
       return false;
     }
 
     return undefined;
   };
+
+  private applyGlobalInputConversion = () => {
+    const updatedValue = applyGlobalImportConversionInSlateValue(this.props.value, this.props.availablePointers);
+    if (updatedValue) {
+      this.onChange(updatedValue, true);
+    }
+  }
 
   private handleSquareBracketExport = () => {
     // check to see whether there are a balanced number of square brackets
@@ -429,7 +294,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   private onPaste = (event: any) => {
     // We do this in a timeout to avoid interactions with the linkify plugin.
     // Ideally we could just put this at the appropriate point in the plugin stack and pass the change value through.
-    setTimeout(() => this.checkGlobalImportConversion(), 0);
+    setTimeout(() => this.applyGlobalInputConversion(), 0);
     return undefined;
   }
 
