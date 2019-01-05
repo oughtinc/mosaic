@@ -109,6 +109,7 @@ export class BlockEditorEditingPresentational extends React.Component<
       value: change.value,
       pointerChanged: false
     });
+    this.applyGlobalInputConversion();
   }
 
   public render() {
