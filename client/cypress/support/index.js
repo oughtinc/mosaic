@@ -1,5 +1,5 @@
 import './commands';
 
 beforeEach(() => {
-  cy.resetDb();
+  cy.resetDb().then(() => cy.seedDb());
 });

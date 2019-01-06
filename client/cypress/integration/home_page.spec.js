@@ -8,6 +8,8 @@ describe("Home page", function() {
       cy.get(`[data-cy="login-link"]`);
       cy.get(`[data-cy="logout-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`).should("not.exist");
+      cy.contains("This is a public question.");
+      cy.contains("This is not a public question.").should("not.exist");
       cy.expectNoAuthDataInLocalStorage();
     });
   });
@@ -21,6 +23,8 @@ describe("Home page", function() {
       cy.get(`[data-cy="logout-link"]`);
       cy.get(`[data-cy="login-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`);
+      cy.contains("This is a public question.");
+      cy.contains("This is not a public question.").should("not.exist");
       cy.expectTypicalUserAuthDataInLocalStorage();
     });
 
@@ -47,6 +51,8 @@ describe("Home page", function() {
       cy.get(`[data-cy="logout-link"]`);
       cy.get(`[data-cy="login-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`);
+      cy.contains("This is a public question.");
+      cy.contains("This is not a public question.");
       cy.expectAdminAuthDataInLocalStorage();
     });
 
@@ -75,6 +81,8 @@ describe("Home page", function() {
       cy.get(`[data-cy="login-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`);
       cy.expectOracleAuthDataInLocalStorage();
+      cy.contains("This is a public question.");
+      cy.contains("This is not a public question.").should("not.exist");
     });
 
     it("can create new root workspace", function() {
@@ -102,6 +110,8 @@ describe("Home page", function() {
       cy.get(`[data-cy="login-link"]`).should("not.exist");
       cy.get(`[data-cy="new-root-workspace-form"]`);
       cy.expectAdminAndOracleAuthDataInLocalStorage();
+      cy.contains("This is a public question.");
+      cy.contains("This is not a public question.");
     });
 
     it("can create new root workspace", function() {

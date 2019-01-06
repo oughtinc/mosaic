@@ -56,7 +56,8 @@
     "sequelize-cli": "^4.0.0",
     "sequelize-migration-pg-extras": "^1.0.1",
     "sequelize-typescript": "^0.6.3",
-    "slate": "^0.33.0"
+    "slate": "^0.33.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.40",
@@ -80,7 +81,6 @@
     "sinon": "^6.3.5",
     "ts-node": "^5.0.1",
     "tslint": "^5.10.0",
-    "typescript": "^2.7.2",
-    "uuid": "^3.3.2"
+    "typescript": "^2.7.2"
   }
 }
