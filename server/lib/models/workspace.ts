@@ -37,7 +37,7 @@ const WorkspaceModel = (
       },
       isEligibleForOracle: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true,
+        defaultValue: false,
         allowNull: false
       },
       isStale: {
