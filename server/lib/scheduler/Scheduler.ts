@@ -5,6 +5,7 @@ import { pickRandomItemFromArray } from "../utils/pickRandomItemFromArray";
 class Scheduler {
   private fetchAllWorkspacesInTree;
   private fetchAllRootWorkspaces;
+  private numberOfStaleDescendantsCache;
   private remainingBudgetAmongDescendantsCache;
   private rootParentCache;
   private schedule;
@@ -13,6 +14,7 @@ class Scheduler {
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
     isInOracleMode,
+    numberOfStaleDescendantsCache,
     remainingBudgetAmongDescendantsCache,
     rootParentCache,
     schedule,
@@ -20,6 +22,7 @@ class Scheduler {
   }) {
     this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
+    this.numberOfStaleDescendantsCache = numberOfStaleDescendantsCache;
     this.remainingBudgetAmongDescendantsCache = remainingBudgetAmongDescendantsCache;
     this.rootParentCache = rootParentCache;
     this.schedule = schedule;
@@ -154,12 +157,14 @@ class Scheduler {
       eligibleWorkspaces = staleWorkspaces;
     }
 
-    let workspaceWithLeastRemainingBudgetAmongDescendants = eligibleWorkspaces;
+    let workspaceWithLeastRequiredWorkAmongDescendants = eligibleWorkspaces;
     if (rootWorkspace.hasTimeBudget) {
-      workspaceWithLeastRemainingBudgetAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
+    } else if (rootWorkspace.hasIOConstraints) {
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(eligibleWorkspaces);
     }
 
-    const finalWorkspaces = workspaceWithLeastRemainingBudgetAmongDescendants;
+    const finalWorkspaces = workspaceWithLeastRequiredWorkAmongDescendants;
 
     return finalWorkspaces;
   }
@@ -190,6 +195,30 @@ class Scheduler {
 
     const workspacesToReturn = workspacesWithRemainingDescendantBudget
       .filter(o => o.remainingBudgetAmongDescendants === minLeastRemainingBudgetAmongDescendants)
+      .map(o => o.workspace);
+
+    return workspacesToReturn;
+  }
+
+  private async getWorkspacesWithFewestStaleDescendants(workspaces) {
+    const workspacesWithNumberOfStaleDescendants = await map(
+      workspaces,
+      async w => {
+        const numberOfStaleDescendants = await this.numberOfStaleDescendantsCache.getNumberOfStaleDescendants(w);
+
+        return {
+            numberOfStaleDescendants,
+            workspace: w,
+        };
+      }
+    );
+
+    const minNumberOfStaleDescendants = _.min(
+      workspacesWithNumberOfStaleDescendants.map(o => o.numberOfStaleDescendants)
+    );
+
+    const workspacesToReturn = workspacesWithNumberOfStaleDescendants
+      .filter(o => o.numberOfStaleDescendants === minNumberOfStaleDescendants)
       .map(o => o.workspace);
 
     return workspacesToReturn;

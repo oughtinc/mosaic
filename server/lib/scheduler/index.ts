@@ -1,5 +1,6 @@
 import { isInOracleMode } from "../globals/isInOracleMode";
 import { Workspace } from "../models";
+import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
 import { RootParentCache } from "./RootParentCache";
 import { Schedule } from "./Schedule";
@@ -33,6 +34,7 @@ const scheduler = new Scheduler({
   }),
   isInOracleMode,
   schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: NINETY_SECONDS }),
+  numberOfStaleDescendantsCache: NumberOfStaleDescendantsCache,
   remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,
   timeLimit: NINETY_SECONDS,
