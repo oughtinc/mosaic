@@ -1,4 +1,7 @@
 const uuidv4 = require("uuid/v4");
+import {
+  ID_OF_TYPICAL_USER_FOR_TESTING,
+} from "./constants";
 import * as models from "../models";
 
 const generateQuestionValueFromString = questiontext => {
@@ -23,11 +26,8 @@ const generateQuestionValueFromString = questiontext => {
 };
 
 export async function seedDbForTesting() {
-  const WORKSPACE_1_ID = uuidv4();
-  const WORKSPACE_2_ID = uuidv4();
-
   await models.Workspace.create({
-    id: WORKSPACE_1_ID,
+    id: uuidv4(),
     creatorId: "asdf",
     totalBudget: 90,
     isPublic: true,
@@ -36,7 +36,15 @@ export async function seedDbForTesting() {
   });
 
   await models.Workspace.create({
-    id: WORKSPACE_2_ID,
+    id: uuidv4(),
+    creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
+    totalBudget: 90,
+  }, {
+    questionValue: generateQuestionValueFromString("This is not public, but created by 'typical user'."),
+  });
+
+  await models.Workspace.create({
+    id: uuidv4(),
     creatorId: "asdf",
     totalBudget: 90,
   }, {
