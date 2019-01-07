@@ -409,7 +409,7 @@ const schema = new GraphQLSchema({
               creatorId: user.user_id,
               isPublic: isUserAdmin(user),
             });
-            await workspace.update({ isEligibleForOracle: true });
+            
             return child;
           }
         ),
