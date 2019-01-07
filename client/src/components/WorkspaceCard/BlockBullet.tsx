@@ -10,7 +10,6 @@ import {
 
 // Should potentially be able to eliminate some of the style sharing below with withComponent, but wasn't able to find a clean solution.
 export const BlockBullet = styled.div`
-  background-color: ${blockBulletBgColor};
   border-radius: 2px;
   color: ${blockBulletFontColor};
   padding: 0px 4px;
@@ -28,7 +27,7 @@ export const BlockBulletLink = styled(Link)`
   font-weight: 500;
   flex: 0;
   &:hover {
-    background: ${blockBulletBgColorOnHover};
+    background: rgba(0, 0, 0, 0.05);
     color: ${blockBulletFontColorOnHover};
     text-decoration: none;
   }
