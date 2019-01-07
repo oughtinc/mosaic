@@ -9,19 +9,16 @@ class RemainingBudgetAmongDescendantsCache {
   }
 
   public static async getRemainingBudgetAmongDescendants(workspace) {
-    const workspaceAlreadyCached = _.some(
-      [...this.cache],
-      ([w, remainingBudgetAmongDescendants]) => w.id === workspace.id
-    );
+    const workspaceAlreadyCached = this.cache.has(workspace.id);
 
     if (workspaceAlreadyCached) {
-      return this.cache.get(workspace);
+      return this.cache.get(workspace.id);
     }
 
     const children = await workspace.getChildWorkspaces();
 
     if (children.length === 0) {
-      this.cache.set(workspace, 0);
+      this.cache.set(workspace.id, 0);
       return 0;
     } else {
       let result = 0;
@@ -30,7 +27,7 @@ class RemainingBudgetAmongDescendantsCache {
         result += await RemainingBudgetAmongDescendantsCache.getRemainingBudgetAmongDescendants(child);
       }
 
-      this.cache.set(workspace, result);
+      this.cache.set(workspace.id, result);
       return result;
     }
   }
