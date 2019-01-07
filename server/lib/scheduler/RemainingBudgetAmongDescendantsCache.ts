@@ -26,7 +26,7 @@ class RemainingBudgetAmongDescendantsCache {
     } else {
       let result = 0;
       for (const child of children) {
-        result += child.totalBudget = child.allocatedBudget;
+        result += child.totalBudget - child.allocatedBudget;
         result += await RemainingBudgetAmongDescendantsCache.getRemainingBudgetAmongDescendants(child);
       }
 
