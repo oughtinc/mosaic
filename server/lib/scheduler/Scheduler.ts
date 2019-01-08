@@ -115,6 +115,10 @@ class Scheduler {
     this.schedule.leaveCurrentWorkspace(userId);
   }
 
+  public reset(){
+    this.schedule.reset();
+  }
+
   private async getActionableWorkspaces(userId) {
     let treesToConsider = await this.fetchAllRootWorkspaces();
 

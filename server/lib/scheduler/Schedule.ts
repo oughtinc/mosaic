@@ -53,6 +53,11 @@ class Schedule {
     }
   }
 
+  public reset() {
+    this.schedule = new Map;
+    this.lastWorkedOnTimestampForTree = {};
+  }
+
   public getMostRecentAssignmentForUser(userId) {
     if (!this.doesUserHaveASchedule(userId)) {
       return undefined;
