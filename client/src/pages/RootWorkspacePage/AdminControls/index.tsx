@@ -23,24 +23,28 @@ class AdminControlsPresentational extends React.Component<any, any> {
       >
         <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="front page"
+          cyAttributeName="admin-checkbox-front-page"
           updateMutation={this.props.updateWorkspaceIsPublic}
           workspace={workspace}
           workspaceFieldToUpdate="isPublic"
         />
         <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="is eligible"
+          cyAttributeName="admin-checkbox-is-eligible"
           updateMutation={this.props.updateWorkspaceIsEligible}
           workspace={workspace}
           workspaceFieldToUpdate="isEligibleForAssignment"
         />
         <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="time budget"
+          cyAttributeName="admin-checkbox-time-budget"
           updateMutation={this.props.updateWorkspaceHasTimeBudget}
           workspace={workspace}
           workspaceFieldToUpdate="hasTimeBudget"
         />
         <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="i/o constraints"
+          cyAttributeName="admin-checkbox-io-constraint"
           updateMutation={this.props.updateWorkspaceHasIOConstraints}
           workspace={workspace}
           workspaceFieldToUpdate="hasIOConstraints"

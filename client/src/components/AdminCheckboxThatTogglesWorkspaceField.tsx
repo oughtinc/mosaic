@@ -21,6 +21,7 @@ class AdminCheckboxThatTogglesWorkspaceField extends React.Component<any, any> {
 
   public render() {
     const {
+      cyAttributeName,
       workspace,
       workspaceFieldToUpdate
     } = this.props;
@@ -38,6 +39,7 @@ class AdminCheckboxThatTogglesWorkspaceField extends React.Component<any, any> {
         type="checkbox"
         checked={workspace[workspaceFieldToUpdate]}
         onChange={this.handleStatusChange}
+        data-cy={cyAttributeName}
       >
         {
           this.state.isStatusPending

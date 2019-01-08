@@ -71,6 +71,7 @@
     "@types/react-router": "^4.0.22",
     "@types/react-router-dom": "^4.2.4",
     "@types/recompose": "^0.24.5",
+    "cypress": "^3.1.4",
     "immutable": "^3.8.2",
     "prop-types": "^15.6.1",
     "react-scripts-ts": "^2.14.0",

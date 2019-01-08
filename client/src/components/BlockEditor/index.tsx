@@ -167,6 +167,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         onMount={input => {
           this.blockEditorEditing = input;
         }}
+        cyAttributeName={this.props.cyAttributeName}
       />
     );
   }

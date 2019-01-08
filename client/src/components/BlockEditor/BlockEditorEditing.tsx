@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Inline } from "slate";
 import * as uuidv1 from "uuid/v1";
-import { Editor } from "slate-react";
+import { Editor, findDOMNode } from "slate-react";
 import { compose, withProps, withState } from "recompose";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
@@ -55,6 +55,7 @@ interface BlockEditorEditingPresentationalProps {
   blockEditor: any;
   plugins: any[];
   shouldAutosave: boolean;
+  cyAttributeName?: string;
   onMount(value: any): () => {};
   updateBlock(value: any): () => {};
   onChange(value: any): () => boolean;
@@ -121,6 +122,11 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     if (!oldDocument.equals(newDocument)) {
       this.onValueChange();
+    }
+
+    const underlyingDOMNode = this.editor && findDOMNode(this.editor.value.document);
+    if (underlyingDOMNode && this.props.cyAttributeName) {
+      underlyingDOMNode.setAttribute("data-cy", this.props.cyAttributeName);
     }
   }
 

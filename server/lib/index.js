@@ -9,6 +9,8 @@ import * as bodyParser from "body-parser";
 import * as cors from "cors";
 
 import { schema } from "./schema/index";
+import { resetDbForTesting } from "./testing/resetDbForTesting";
+import { seedDbForTesting } from "./testing/seedDbForTesting";
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
@@ -37,6 +39,22 @@ graphQLServer.use("/graphql", bodyParser.json(), (req, res, next) => {
 });
 
 graphQLServer.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
+
+graphQLServer.post("/__resetDb", async (req, res, next) => {
+  if (process.env.NODE_ENV === "test") {
+    console.log("Resetting DB");
+    await resetDbForTesting();
+  }
+  res.end();
+});
+
+graphQLServer.post("/__seedDb", async (req, res, next) => {
+  if (process.env.NODE_ENV === "test") {
+    console.log("Seeding DB");
+    await seedDbForTesting();
+  }
+  res.end();
+});
 
 graphQLServer.listen(GRAPHQL_PORT, () => {
   if (process.env.USING_DOCKER) {

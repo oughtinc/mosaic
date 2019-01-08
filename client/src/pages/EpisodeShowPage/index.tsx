@@ -431,6 +431,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the scratchpad..."
                           unlockPointer={unlockPointer}
+                          cyAttributeName="slate-editor-scratchpad"
                           {...scratchpadProps}
                         />
                       </BlockBody>
@@ -445,6 +446,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           exportLockStatusInfo={exportLockStatusInfo}
                           placeholder="Text for the answer..."
                           unlockPointer={unlockPointer}
+                          cyAttributeName="slate-editor-response"
                           {...answerProps}
                         />
                       </BlockBody>
