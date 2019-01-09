@@ -8,7 +8,7 @@ import * as models from "../models";
 export async function seedDbForTestingIOConstraintsScheduling() {
   const savedWorkspaceIds = {}
 
-  await models.Workspace.create({
+  const A = await models.Workspace.create({
     id: savedWorkspaceIds["A"] = uuidv4(),
     creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
     totalBudget: 90,
@@ -20,30 +20,21 @@ export async function seedDbForTestingIOConstraintsScheduling() {
     questionValue: generateQuestionValueFromString("A: Root-level [3 descendants]"),
   });
 
-  await models.Workspace.create({
-    id: uuidv4(),
+  const A1 = await A.createChild({
     creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
-    parentId: savedWorkspaceIds["A"],
-    totalBudget: 90,
-  }, {
-    questionValue: generateQuestionValueFromString("A-1: A subquestion #1 [0 descendants]"),
+    totalBudget: 0,
+    question: generateQuestionValueFromString("A-1: A subquestion #1 [0 descendants]"),
   });
 
-  await models.Workspace.create({
-    id: savedWorkspaceIds["A-2"] = uuidv4(),
+  const A2 = await A.createChild({
     creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
-    parentId: savedWorkspaceIds["A"],
-    totalBudget: 90,
-  }, {
-    questionValue: generateQuestionValueFromString("A-2: A subquestion #2 [1 descendants]"),
+    totalBudget: 0,
+    question: generateQuestionValueFromString("A-2: A subquestion #2 [1 descendants]"),
   });
 
-  await models.Workspace.create({
-    id: uuidv4(),
+  const A2$1 = await A2.createChild({
     creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
-    parentId: savedWorkspaceIds["A-2"],
-    totalBudget: 90,
-  }, {
-    questionValue: generateQuestionValueFromString("A-2-1: A-2 subquestion #1 [0 descendants]"),
+    totalBudget: 0,
+    question: generateQuestionValueFromString("A-2-1: A-2 subquestion #1 [0 descendants]"),
   });
 }
