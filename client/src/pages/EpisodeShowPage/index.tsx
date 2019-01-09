@@ -39,6 +39,7 @@ import {
   WorkspaceWithRelations,
 } from "./WorkspaceRelations";
 import {
+  ORACLE_MODE_QUERY,
   UPDATE_BLOCKS,
   UPDATE_WORKSPACE_IS_ELIGIBLE,
   UPDATE_WORKSPACE,
@@ -51,12 +52,6 @@ import {
   blockBodyCSS,
   workspaceViewQuestionFontSize
 } from "../../styles";
-
-const ORACLE_MODE_QUERY = gql`
-  query oracleModeQuery {
-    oracleMode
-  }
-`;
 
 const WORKSPACE_QUERY = gql`
   query workspace($id: String!) {

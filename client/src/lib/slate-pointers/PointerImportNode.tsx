@@ -116,7 +116,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 
   public isLocked() {
     const onHomepageOrTreeView = !this.props.exportLockStatusInfo;
-    if (onHomepageOrTreeView) {
+    if (onHomepageOrTreeView || this.props.isInOracleModeAndIsUserOracle) {
       return false;
     }
 

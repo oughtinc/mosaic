@@ -1,4 +1,5 @@
 import * as React from "react";
+import { graphql } from "react-apollo";
 import { Editor } from "slate-react";
 import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
 import {
@@ -6,6 +7,7 @@ import {
   removeHoverItem,
   HOVER_ITEM_TYPES
 } from "../../modules/blockEditor/actions";
+import { ORACLE_MODE_QUERY } from "../../graphqlQueries";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
@@ -14,6 +16,7 @@ import { CopyPastePlugin } from "../../lib/slate-plugins/copyPastePlugin";
 import { LinkifyPlugin } from "../../lib/slate-plugins/linkifyPlugin";
 import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
+import { Auth } from "../../auth";
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
@@ -98,6 +101,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       visibleExportIds: newProps.visibleExportIds,
       exportLockStatusInfo: newProps.exportLockStatusInfo,
       unlockPointer: newProps.unlockPointer,
+      isInOracleModeAndIsUserOracle: newProps.oracleModeQuery.oracleMode && Auth.isOracle()
     };
     this.setState({
       plugins: [LinkifyPlugin(), CopyPastePlugin(), SoftBreak({}), SlatePointers(SlatePointerInputs)]
@@ -190,6 +194,9 @@ function mapStateToProps(state: any, { blockId }: any) {
 }
 
 export const BlockEditor: any = compose(
+  graphql(ORACLE_MODE_QUERY, {
+    name: "oracleModeQuery",
+  }),
   connect(
     mapStateToProps,
     { addBlocks, removeBlocks, changeHoverItem, removeHoverItem },

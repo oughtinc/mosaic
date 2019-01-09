@@ -152,3 +152,9 @@ export const UPDATE_WORKSPACE = gql`
     }
   }
 `;
+
+export const ORACLE_MODE_QUERY = gql`
+  query oracleModeQuery {
+    oracleMode
+  }
+`;
