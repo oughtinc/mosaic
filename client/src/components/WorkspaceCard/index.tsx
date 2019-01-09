@@ -5,6 +5,7 @@ import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
+import { parse as parseQueryString } from "query-string";
 import _ = require("lodash");
 import {
   ROOT_WORKSPACE_SUBTREE_QUERY,
@@ -127,10 +128,14 @@ export class WorkspaceCardPresentational extends React.PureComponent<
 > {
   public constructor(props: any) {
     super(props);
+
+    const queryParams = parseQueryString(window.location.search);
+    const isInExpandedMode = queryParams.expanded === "true";
+
     this.state = {
       toggles: {
         [toggleTypes.SCRATCHPAD]: true,
-        [toggleTypes.CHILDREN]: false
+        [toggleTypes.CHILDREN]: isInExpandedMode ? true : false
       },
       isStaleCheckboxStatusPending: false,
       isEligibleForOracleCheckboxStatusPending: false
