@@ -2,28 +2,8 @@ const uuidv4 = require("uuid/v4");
 import {
   ID_OF_TYPICAL_USER_FOR_TESTING,
 } from "./constants";
+import { generateQuestionValueFromString } from "./utils/generateQuestionValueFromString";
 import * as models from "../models";
-
-const generateQuestionValueFromString = questiontext => {
-  return [{
-    object: "block",
-    type: "line",
-    isVoid: false,
-    data: {},
-    nodes: [
-      {
-        object: "text",
-        leaves: [
-          {
-            object: "leaf",
-            text: questiontext,
-            marks: []
-          }
-        ]
-      }
-    ]
-  }];
-};
 
 export async function seedDbForTesting() {
   await models.Workspace.create({
