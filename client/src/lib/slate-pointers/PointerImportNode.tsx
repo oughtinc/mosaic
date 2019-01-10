@@ -243,6 +243,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
                   isHoverable={this.props.isHoverable}
                   visibleExportIds={visibleExportIds}
                   exportLockStatusInfo={this.props.exportLockStatusInfo}
+                  isInOracleModeAndIsUserOracle={this.props.isInOracleModeAndIsUserOracle}
                   unlockPointer={this.props.unlockPointer}
                 />
               </Brackets>

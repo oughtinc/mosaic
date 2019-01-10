@@ -49,6 +49,7 @@ export class InlineNode extends React.Component<any, any> {
           isHoverable={this.props.isHoverable}
           onMouseOver={this.props.onMouseOver}
           exportLockStatusInfo={this.props.exportLockStatusInfo}
+          isInOracleModeAndIsUserOracle={this.props.isInOracleModeAndIsUserOracle}
           visibleExportIds={this.props.visibleExportIds}
           unlockPointer={this.props.unlockPointer}
         />
@@ -91,6 +92,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                   isHoverable={this.props.isHoverable}
                   visibleExportIds={this.props.visibleExportIds}
                   exportLockStatusInfo={this.props.exportLockStatusInfo}
+                  isInOracleModeAndIsUserOracle={this.props.isInOracleModeAndIsUserOracle}
                   unlockPointer={this.props.unlockPointer}
                 />
               </span>
