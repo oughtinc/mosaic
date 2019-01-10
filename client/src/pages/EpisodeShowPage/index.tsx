@@ -474,7 +474,7 @@ export class WorkspaceView extends React.Component<any, any> {
                             })
                           }
                           markParentAsStale={() =>
-                            this.props.markParentAsStale({
+                            console.log("5") || this.props.markParentAsStale({
                               variables: {
                                 id: workspace.id,
                               },
@@ -728,8 +728,8 @@ const UNLOCK_POINTER_MUTATION = gql`
 `;
 
 const MARK_PARENT_AS_STALE = gql`
-  mutation markParentAsStale($workspaceId: String) {
-    markParentAsStale(workspaceId: $workspaceId)
+  mutation markParentAsStale($id: String) {
+    markParentAsStale(id: $id)
   }
 `;
 
