@@ -1,5 +1,5 @@
 describe("Oracles", function() {
-  context.only("when in oracle mode", function() {
+  context("when in oracle mode", function() {
     beforeEach(function() {
       cy.seedDbForOracles();
 
@@ -25,6 +25,21 @@ describe("Oracles", function() {
             testFn: $node => $node.text() === "A-2: A subquestion #2 (1 descendants) - oracle eligible",
           },
         ]
+      });
+    });
+
+    it.only("regression: nested pointers not locked", function(){
+      cy.visit("/workspaces/d1189739-0f53-4c3d-acd7-15aa1543619c");
+      cy.contains("🔒").then($n1 => {
+        expect($n1.width()).to.equal(0);
+
+        cy.get("[data-cy='closed-import']").then($n2 => {
+          $n2.parent().click();
+          cy.contains("unnested");
+          cy.contains("🔒").then($n3 => {
+            expect($n3.width()).to.equal(0);
+          });
+        });
       });
     });
   });

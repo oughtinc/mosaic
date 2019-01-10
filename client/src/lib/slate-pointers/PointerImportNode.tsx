@@ -217,6 +217,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
                 maxWidth: isLocked ? "90px" : 0,
                 verticalAlign: "middle",
               }}
+              data-cy="closed-import"
             >
               🔒
             </span>

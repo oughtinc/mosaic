@@ -1,5 +1,6 @@
 "use strict";
 import * as Sequelize from "sequelize";
+import uuidv4 from "uuid/v4";
 import {
   eventRelationshipColumns,
   eventHooks,
@@ -246,11 +247,11 @@ const WorkspaceModel = (
   };
 
   Workspace.createAsChild = async function(
-    { parentId, question, totalBudget, creatorId, isPublic },
+    { id, parentId, question, totalBudget, creatorId, isPublic },
     { event }
   ) {
     const _workspace = await sequelize.models.Workspace.create(
-      { parentId, totalBudget, creatorId, isPublic },
+      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic },
       { event, questionValue: question }
     );
 
@@ -323,6 +324,7 @@ const WorkspaceModel = (
   };
 
   Workspace.prototype.createChild = async function({
+    id,
     event,
     question,
     totalBudget,
@@ -330,7 +332,7 @@ const WorkspaceModel = (
     isPublic,
   }) {
     const child = await sequelize.models.Workspace.createAsChild(
-      { parentId: this.id, question, totalBudget, creatorId, isPublic },
+      { id, parentId: this.id, question, totalBudget, creatorId, isPublic },
       { event }
     );
     if (this.remainingBudget < child.totalBudget) {
