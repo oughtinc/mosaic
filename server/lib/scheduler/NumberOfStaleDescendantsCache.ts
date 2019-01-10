@@ -23,11 +23,13 @@ class NumberOfStaleDescendantsCache {
     } else {
       let result = 0;
       for (const child of children) {
-        if (child.isStale) {
-          result += 1;
-        }
+        if (!child.wasAnsweredByOracle) {
+          if (child.isStale) {
+            result += 1;
+          }
 
-        result += await NumberOfStaleDescendantsCache.getNumberOfStaleDescendants(child);
+          result += await NumberOfStaleDescendantsCache.getNumberOfStaleDescendants(child);  
+        }
       }
 
       this.cache.set(workspace.id, result);
