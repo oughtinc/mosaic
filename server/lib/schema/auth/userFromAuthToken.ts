@@ -18,8 +18,8 @@ export function userFromAuthToken(accessToken: string | null): Promise<any | nul
   if (cachedToken) {
     const nowTimestamp = Date.now();
     const cacheTimestamp = cachedToken.timestamp;
-    const TEN_SECONDS = 10000;
-    if (nowTimestamp - cacheTimestamp < TEN_SECONDS) {
+    const SIXTY_SECONDS = 60000;
+    if (nowTimestamp - cacheTimestamp < SIXTY_SECONDS) {
       return Promise.resolve(cachedToken.data);
     }
   }
