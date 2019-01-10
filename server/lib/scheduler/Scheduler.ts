@@ -22,6 +22,7 @@ class Scheduler {
   }) {
     this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
+    this.isInOracleMode = isInOracleMode;
     this.numberOfStaleDescendantsCache = numberOfStaleDescendantsCache;
     this.remainingBudgetAmongDescendantsCache = remainingBudgetAmongDescendantsCache;
     this.rootParentCache = rootParentCache;
@@ -45,6 +46,7 @@ class Scheduler {
     // clear caches so we don't rely on old information
     this.rootParentCache.clearRootParentCache();
     this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
+    this.numberOfStaleDescendantsCache.clearNumberOfStaleDescendantsCache();
 
     let treesToConsider = await this.fetchAllRootWorkspaces();
     let wasWorkspaceAssigned = false;
@@ -56,7 +58,7 @@ class Scheduler {
       const workspacesInTree = await this.fetchAllWorkspacesInTree(randomlySelectedTree);
 
       const oracleEligibleWorkspaces = workspacesInTree
-        .filter(w => w.isEligibleForOracle);
+        .filter(w => w.isEligibleForOracle && !w.wasAnsweredByOracle);
 
       const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(oracleEligibleWorkspaces);
 
@@ -92,6 +94,7 @@ class Scheduler {
     // clear caches so we don't rely on old information
     this.rootParentCache.clearRootParentCache();
     this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
+    this.numberOfStaleDescendantsCache.clearNumberOfStaleDescendantsCache();
 
     const actionableWorkspaces = await this.getActionableWorkspaces(userId);
 
@@ -141,8 +144,8 @@ class Scheduler {
   private async getActionableWorkspacesForTree(userId, rootWorkspace) {
     let workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
 
-    if (this.isInOracleMode) {
-      workspacesInTree = workspacesInTree.filter(w => !w.isEligibleForOracle);
+    if (this.isInOracleMode.getValue()) {
+      workspacesInTree = workspacesInTree.filter(w => !w.isEligibleForOracle && !w.wasAnsweredByOracle);
     }
 
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
