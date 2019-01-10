@@ -63,9 +63,9 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
     const isExpanded = queryParams.expanded === "true";
 
     if (
-      this.props.oracleModeQuery.oracleMode
+      this.props.oracleModeQuery.oracleMode !== undefined
       &&
-      this.props.subtreeQuery.workspace
+      this.props.subtreeQuery.workspace !== undefined
     ) {
       return (
         <WorkspaceCardPresentational
