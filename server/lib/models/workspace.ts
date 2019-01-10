@@ -100,6 +100,21 @@ const WorkspaceModel = (
           min: 0,
         },
       },
+      hasAncestorAnsweredByOracle: {
+        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
+          "id",
+        ]),
+        get: async function() {
+          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          while (curWorkspace.parentId) {
+            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+            if (curWorkspace.wasAnsweredByOracle) {
+              return true;
+            }
+          }
+          return false;
+        },
+      },
       hasTimeBudgetOfRootParent: {
         type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
           "id",
