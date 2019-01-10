@@ -7,6 +7,9 @@ import { UPDATE_TIME_SPENT_ON_WORKSPACE } from "../../graphqlQueries";
 
 export class TimerWhenNoTimeBudgetPresentational extends React.Component<any,  any> {
   public render() {
+    if (!this.props.hasTimer) {
+      return null;
+    }
     return (
       <Timer
         {...this.props}

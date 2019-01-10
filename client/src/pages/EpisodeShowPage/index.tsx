@@ -370,6 +370,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         />
                         :
                         <TimerWhenNoTimeBudget
+                          hasTimer={hasTimer}
                           tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
                           workspaceId={workspace.id}
                         />
