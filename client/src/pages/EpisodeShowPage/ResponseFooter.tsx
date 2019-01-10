@@ -20,6 +20,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
     const {
       depleteBudget,
       hasParent,
+      hasTimeBudget,
       isInOracleMode,
       isUserOracle,
       markAsAnsweredByOracle,
@@ -45,9 +46,11 @@ class ResponseFooterPresentational extends React.Component<any, any> {
           hasParent
           ?
             <TakeBreakBtn
-              label={`Done!${this.props.hasTimeBudget ? " (returns budget)" : ""}`}
+              label={`Done!${hasTimeBudget ? " (returns budget)" : ""}`}
               navHook={() => {
-                transferRemainingBudgetToParent();
+                // TODO: address potential race condition here with modifying
+                // budget and modifying staleness
+                hasTimeBudget && transferRemainingBudgetToParent();
                 markAsNotStale();
                 markParentAsStale();
               }}
@@ -67,9 +70,9 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               :
               <TakeBreakBtn
                 bsStyle="danger"
-                label={`Done!${this.props.hasTimeBudget ? " (take budget)" : ""}`}
+                label={`Done!${hasTimeBudget ? " (take budget)" : ""}`}
                 navHook={() => {
-                  depleteBudget();
+                  hasTimeBudget && depleteBudget();
                   markAsAnsweredByOracle();
                   markAsNotEligibleForOracle();
                   markParentAsStale();
