@@ -167,7 +167,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   // returns true if we should prevent current character from being inserted
   // returns false if this character should be inserted
   private checkAutocomplete = event => {
-    const lastCharacters = lastCharactersAfterEvent(event, 4);
+    const lastCharacters = lastCharactersAfterEvent(event, 5);
     const pointerNameMatch = lastCharacters.match(DOLLAR_NUMBERS_NOT_NUMBER);
 
     let shouldPreventCharInsertion = false;
