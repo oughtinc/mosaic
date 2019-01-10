@@ -1,7 +1,7 @@
 Cypress.Commands.add("loopNTimes", (n, {
-  before,
-  during,
-  counts
+  before = () => {},
+  during = () => {},
+  counts = [],
 }) => {
   let iArr = [];
   let arrOfPromises = [];
