@@ -105,13 +105,13 @@ const BlockModel = (
       return workspace.update({ isStale: true }, { event });
     }
     // 2. If block is an answer, mark parent as stale (if there is a parent)
-    if (this.type === ANSWER_TYPE && workspace.parentId) {
+    /*if (this.type === ANSWER_TYPE && workspace.parentId) {
       const parentId = workspace.parentId;
       const parentWorkspace = await sequelize.models.Workspace.findById(
         parentId
       );
       return parentWorkspace.update({ isStale: true }, { event });
-    }
+    }*/
     // 3. TODO If edit was to a pointer exported within this block, mark all
     //    workspaces that import and expand that pointer as stale.
   };

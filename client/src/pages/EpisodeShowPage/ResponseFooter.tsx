@@ -26,6 +26,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       markAsNotEligible,
       markAsNotEligibleForOracle,
       markAsNotStale,
+      markParentAsStale,
       transferRemainingBudgetToParent,
     } = this.props;
 
@@ -48,6 +49,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               navHook={() => {
                 transferRemainingBudgetToParent();
                 markAsNotStale();
+                markParentAsStale();
               }}
             />
           :
@@ -59,6 +61,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                 navHook={() => {
                   markAsNotStale();
                   markAsNotEligible();
+                  markParentAsStale();
                 }}
               />
               :
@@ -69,6 +72,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                   depleteBudget();
                   markAsAnsweredByOracle();
                   markAsNotEligibleForOracle();
+                  markParentAsStale();
                 }}
               />
             )

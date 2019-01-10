@@ -473,6 +473,13 @@ export class WorkspaceView extends React.Component<any, any> {
                               },
                             })
                           }
+                          markParentAsStale={() =>
+                            this.props.markParentAsStale({
+                              variables: {
+                                id: workspace.id,
+                              },
+                            })
+                          }
                           markAsNotEligible={() =>
                             this.props.updateWorkspaceIsEligible({
                               variables: {
@@ -720,6 +727,12 @@ const UNLOCK_POINTER_MUTATION = gql`
   }
 `;
 
+const MARK_PARENT_AS_STALE = gql`
+  mutation markParentAsStale($workspaceId: String) {
+    markParentAsStale(workspaceId: $workspaceId)
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -764,6 +777,9 @@ export const EpisodeShowPage = compose(
     options: {
       refetchQueries: ["workspace"]
     }
+  }),
+  graphql(MARK_PARENT_AS_STALE, {
+    name: "markParentAsStale",
   }),
   connect(
     mapStateToProps,
