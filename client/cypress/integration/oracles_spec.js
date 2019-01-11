@@ -28,7 +28,7 @@ describe("Oracles", function() {
       });
     });
 
-    it.only("regression: nested pointers not locked", function(){
+    it("regression: nested pointers not locked", function(){
       cy.visit("/workspaces/d1189739-0f53-4c3d-acd7-15aa1543619c");
       cy.contains("🔒").then($n1 => {
         expect($n1.width()).to.equal(0);
