@@ -1,3 +1,7 @@
+interface GlobalVariable {
+  value: boolean
+}
+
 class GlobalVariable {
   constructor(defaultValue) {
     this.value = defaultValue;
