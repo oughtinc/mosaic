@@ -5,10 +5,12 @@ import { pickRandomItemFromArray } from "../utils/pickRandomItemFromArray";
 class Scheduler {
   private fetchAllWorkspacesInTree;
   private fetchAllRootWorkspaces;
+  private isInOracleMode;
   private numberOfStaleDescendantsCache;
   private remainingBudgetAmongDescendantsCache;
   private rootParentCache;
   private schedule;
+  private timeLimit;
 
   public constructor({
     fetchAllWorkspacesInTree,
@@ -104,9 +106,13 @@ class Scheduler {
     this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
     this.numberOfStaleDescendantsCache.clearNumberOfStaleDescendantsCache();
 
-    const actionableWorkspaces = await this.getActionableWorkspaces(userId);
+    let actionableWorkspaces = await this.getActionableWorkspaces({ userId });
 
-    if (!actionableWorkspaces || !(actionableWorkspaces.length > 0)) {
+    if (actionableWorkspaces.length === 0) {
+      actionableWorkspaces = await this.getActionableWorkspaces({ userId, considerNonStale: true });
+    }
+
+    if (actionableWorkspaces.length === 0) {
       this.schedule.leaveCurrentWorkspace(userId);
       throw new Error("No eligible workspace");
     }
@@ -130,13 +136,13 @@ class Scheduler {
     this.schedule.reset();
   }
 
-  private async getActionableWorkspaces(userId) {
-    let treesToConsider = await this.fetchAllRootWorkspaces();
+  private async getActionableWorkspaces({ userId, considerNonStale = false }) {
+     let treesToConsider = await this.fetchAllRootWorkspaces();
 
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
       const randomlySelectedTree = pickRandomItemFromArray(leastRecentlyWorkedOnTreesToConsider);
-      const actionableWorkspaces = await this.getActionableWorkspacesForTree(userId, randomlySelectedTree);
+      const actionableWorkspaces = await this.getActionableWorkspacesForTree(userId, randomlySelectedTree, considerNonStale);
 
       if (actionableWorkspaces.length > 0) {
         return actionableWorkspaces;
@@ -147,9 +153,13 @@ class Scheduler {
         );
       }
     }
+
+    // if you've made it here, then you've looked through each tree for actionable
+    // workspaces, and each time found none
+    return [];
   }
 
-  private async getActionableWorkspacesForTree(userId, rootWorkspace) {
+  private async getActionableWorkspacesForTree(userId, rootWorkspace, considerNonStale) {
     let workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
 
     if (this.isInOracleMode.getValue()) {
@@ -179,6 +189,12 @@ class Scheduler {
     // filter by staleness IF there are some stale ones
     if (staleWorkspaces.length > 0) {
       eligibleWorkspaces = staleWorkspaces;
+    }
+    
+    // if no stale worksapces, and not considering non-stale,
+    // go ahead and return
+    if(staleWorkspaces.length === 0 && !considerNonStale) {
+      return [];
     }
 
     let workspaceWithLeastRequiredWorkAmongDescendants = eligibleWorkspaces;
