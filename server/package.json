@@ -7,7 +7,7 @@
   "main": "lib/index.js",
   "scripts": {
     "dev": "concurrently \"npm run typecheck\" \"npm run server\"",
-    "server": "nodemon -L --watch lib --exec ts-node lib/index.js -e '.ts,.js' --presets es2015,stage-2",
+    "server": "nodemon -L --watch lib --exec node --inspect=0.0.0.0 -r ts-node/register lib/index.js -e '.ts,.js' --presets es2015,stage-2",
     "typecheck": "tsc -p tsconfig.json --noEmit -w",
     "start": "ts-node lib/index.js",
     "debug": "nodemon --inspect lib/index.js --exec ts-node --extensions '.ts,.js' --presets es2015,stage-2",
