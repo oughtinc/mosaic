@@ -2,7 +2,6 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { Redirect } from "react-router";
 
 import { Auth } from "../auth";
 import { ContentContainer } from  "../components/ContentContainer";
@@ -35,12 +34,14 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
 
   public async componentDidMount() {
     let response, normalSchedulingFailed, oracleSchedulingFailed;
+    
     try {
       response = await this.props.findNextWorkspaceMutation();
     } catch (e) {
       oracleSchedulingFailed = e.message === "GraphQL error: No eligible workspace for oracle";
       normalSchedulingFailed = e.message === "GraphQL error: No eligible workspace";
     }
+
     if (oracleSchedulingFailed) {
       this.setState({ oracleSchedulingFailed });
     } else if (normalSchedulingFailed) {
