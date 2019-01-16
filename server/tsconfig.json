@@ -23,6 +23,9 @@
   },
   "experimentalDecorators": true,
   "emitDecoratorMetadata": true,
+  "include": [
+    "lib/**/*"
+  ],
   "exclude": [
     "config",
     "migrations",

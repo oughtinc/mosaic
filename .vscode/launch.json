@@ -7,17 +7,24 @@
         {
             "type": "node",
             "request": "attach",
-            "name": "Launch Program",
+            "name": "Backend: Node Launch",
             "address": "localhost",
             "port": 9229,
             "restart": true,
             "sourceMaps": true,
             "localRoot": "${workspaceRoot}/server",
             "remoteRoot": "/data",
-            "outFiles": [
-                "${workspaceFolder}/server/dist/**/*.js"
-            ],
             "protocol": "auto"
-        }
+        },
+        {
+            "name": "Front End: Chrome Launch",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceRoot}/client/src",
+            "sourceMapPathOverrides": {
+                "/data/src/*": "${webRoot}/*"
+            }
+          }
     ]
 }
