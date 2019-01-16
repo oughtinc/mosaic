@@ -48,7 +48,7 @@ class CharCountDisplaysPresentational extends React.Component<any,  any> {
           style={{
             alignItems: "center",
             color: charCountDisplayHeaderFontColor,
-            display: "flex",
+            display: "none", // TODO: revisit, hidden for Jan 17 experiments
             fontSize: charCountDisplayHeaderFontSize,
             fontVariant: "small-caps",
             fontWeight: 700,
