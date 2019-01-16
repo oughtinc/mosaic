@@ -21,11 +21,15 @@ const RedExclamation = () => (
 );
 
 export class NextEpisodeShowPagePresentational extends React.Component<any, any> {
+  private countdownInterval: NodeJS.Timer;
+  private isCountingDown = false;
+
   public constructor(props: any) {
     super(props);
     this.state = {
       normalSchedulingFailed: false,
       oracleSchedulingFailed: false,
+      refreshCountdown: 10,
       workspaceId: undefined };
   }
 
@@ -47,23 +51,37 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
     }
   }
 
+  public componentWillUnmount() {
+    clearInterval(this.countdownInterval);
+  }
+
   public render() {
+    if (this.state.refreshCountdown === 0) {
+      location.reload();
+    }
 
     if (this.state.normalSchedulingFailed) {
+      this.startCountingDown();
+
       return (
         <ContentContainer>
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
-            There is no eligible workspace at this time. Please wait a minute and then refresh this page to try again.
+            There is no eligible workspace at this time. Please wait and refresh this page to try again.
+
+            Automatically refreshing in {this.state.refreshCountdown} second{this.state.refreshCountdown !== 1 ? "s" : ""}.
           </span>
         </ContentContainer>
       );
     } else if (this.state.oracleSchedulingFailed) {
+      this.startCountingDown();
+
       return (
         <ContentContainer>
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
-            There is no oracle eligible workspace at this time. Please wait a minute and then refresh this page to try again.
+            There is no oracle eligible workspace at this time. Please wait and refresh this page to try again.
+            Automatically refreshing in {this.state.refreshCountdown} second{this.state.refreshCountdown !== 1 ? "s" : ""}.
           </span>
         </ContentContainer>
       );
@@ -78,6 +96,18 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
       window.location.href = `${window.location.origin}/workspaces/${this.state.workspaceId}${redirectQueryParams}`;
       return null;
     }
+  }
+
+  private startCountingDown() {
+    if (this.isCountingDown) {
+      return;
+    }
+
+    this.isCountingDown = true;
+
+    this.countdownInterval = setInterval(() => this.setState({
+      refreshCountdown: Math.max(0, this.state.refreshCountdown - 1),
+    }), 1000);
   }
 }
 
