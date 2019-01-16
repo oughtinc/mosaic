@@ -474,7 +474,7 @@ export class WorkspaceView extends React.Component<any, any> {
                             })
                           }
                           markParentAsStale={() =>
-                            console.log("5") || this.props.markParentAsStale({
+                            this.props.markParentAsStale({
                               variables: {
                                 id: workspace.id,
                               },
