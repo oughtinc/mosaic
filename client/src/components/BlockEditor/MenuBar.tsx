@@ -7,10 +7,7 @@ import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faEx
 import { MutationStatus } from "./types";
 
 const SavingIconStyle = styled.span`
-  float: right;
-  margin-right: 3px;
   font-size: 0.8em;
-  margin-top: 1px;
 `;
 
 const Icons = {
