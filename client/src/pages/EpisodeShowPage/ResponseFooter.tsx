@@ -50,7 +50,9 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               navHook={() => {
                 // TODO: address potential race condition here with modifying
                 // budget and modifying staleness
-                hasTimeBudget && transferRemainingBudgetToParent();
+                if (hasTimeBudget) {
+                  transferRemainingBudgetToParent();
+                }
                 markAsNotStale();
                 markParentAsStale();
               }}
@@ -72,7 +74,9 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                 bsStyle="danger"
                 label={`Done!${hasTimeBudget ? " (take budget)" : ""}`}
                 navHook={() => {
-                  hasTimeBudget && depleteBudget();
+                  if (hasTimeBudget) {
+                    depleteBudget();
+                  }
                   markAsAnsweredByOracle();
                   markAsNotEligibleForOracle();
                   markParentAsStale();

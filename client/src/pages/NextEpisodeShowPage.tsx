@@ -2,7 +2,6 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { Redirect } from "react-router";
 
 import { Auth } from "../auth";
 import { ContentContainer } from  "../components/ContentContainer";
