@@ -139,6 +139,7 @@ export class Child extends React.Component<any, any> {
                 visibleExportIds={this.props.visibleExportIds}
                 exportLockStatusInfo={this.props.exportLockStatusInfo}
                 unlockPointer={this.props.unlockPointer}
+                shouldAutoExport={this.props.shouldAutoExport}
               />
             </BlockEditorContainer>
           </BulletAndEditorContainer>
@@ -294,7 +295,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
       !_.isEqual(newProps.workspaceOrder, this.props.workspaceOrder) ||
       !_.isEqual(newProps.workspaces, this.props.workspaces) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
-      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
+      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
+      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport)
     ) {
       return true;
     }
@@ -323,6 +325,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     }}
                   >
                     <Child
+                      shouldAutoExport={this.props.shouldAutoExport}
                       hasTimeBudget={this.props.hasTimeBudget}
                       isArchived={this.props.isArchived}
                       isInOracleMode={this.props.isInOracleMode}
@@ -397,6 +400,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            shouldAutoExport={this.props.shouldAutoExport}
             hasTimeBudget={this.props.hasTimeBudget}
             {...this.props.subquestionDraftProps}
             availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}

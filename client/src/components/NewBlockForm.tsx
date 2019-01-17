@@ -67,6 +67,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
           <BlockHeader>New Question</BlockHeader>
           <BlockBody>
             <BlockEditor
+              shouldAutoExport={this.props.shouldAutoExport}
               placeholder="Text of a new question..."
               shouldAutosave={this.props.shouldAutosave}
               readOnly={false}

@@ -39,7 +39,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
       !_.isEqual(newProps.block, this.props.block) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
-      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
+      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
+      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport)
     ) {
       return true;
     }
@@ -172,6 +173,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           this.blockEditorEditing = input;
         }}
         cyAttributeName={this.props.cyAttributeName}
+        shouldAutoExport={this.props.shouldAutoExport}
       />
     );
   }

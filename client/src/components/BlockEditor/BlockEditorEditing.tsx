@@ -45,6 +45,7 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
+  shouldAutoExport?: boolean;
   placeholder?: string;
   block: any;
   availablePointers: any[];
@@ -98,7 +99,8 @@ export class BlockEditorEditingPresentational extends React.Component<
         this.state.hasChangedSinceDatabaseSave
       ) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
-      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
+      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
+      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport)
     ) {
       return true;
     }
@@ -127,6 +129,10 @@ export class BlockEditorEditingPresentational extends React.Component<
     const underlyingDOMNode = this.editor && findDOMNode(this.editor.value.document);
     if (underlyingDOMNode && this.props.cyAttributeName) {
       underlyingDOMNode.setAttribute("data-cy", this.props.cyAttributeName);
+    }
+
+    if (!prevProps.shouldAutoExport && this.props.shouldAutoExport) {
+      this.handleSquareBracketExport();
     }
   }
 
@@ -244,7 +250,9 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onKeyUp = (event: any, change: any) => {
-    this.handleSquareBracketExport();
+    if (this.props.shouldAutoExport) {
+      this.handleSquareBracketExport();
+    }
   };
 
   private onValueChange = () => {

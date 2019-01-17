@@ -6,6 +6,7 @@ import * as keyboardJS from "keyboardjs";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
+import { Checkbox } from "react-bootstrap";
 import { compose } from "recompose";
 import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
@@ -47,6 +48,8 @@ import {
 import { Auth } from "../../auth";
 
 import {
+  adminCheckboxBgColor,
+  adminCheckboxBorderColor,
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
@@ -189,7 +192,8 @@ export class WorkspaceView extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
-      hasTimerEnded: false
+      hasTimerEnded: false,
+      shouldAutoExport: true,
     };
   }
 
@@ -414,6 +418,27 @@ export class WorkspaceView extends React.Component<any, any> {
                           </div>
                         )}
                     </div>
+                    <div
+                      style={{
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <Checkbox
+                        style={{
+                          backgroundColor: adminCheckboxBgColor,
+                          border: "1px solid gray",
+                          borderColor: adminCheckboxBorderColor,
+                          borderRadius: "3px",
+                          padding: "5px 5px 5px 25px",
+                        }}
+                        inline={true}
+                        type="checkbox"
+                        checked={this.state.shouldAutoExport}
+                        onChange={() => this.setState({ shouldAutoExport: !this.state.shouldAutoExport })}
+                      >
+                        auto export
+                      </Checkbox>
+                    </div>
                   </Col>
                 </Row>
                 <Row>
@@ -428,6 +453,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           placeholder="Text for the scratchpad..."
                           unlockPointer={unlockPointer}
                           cyAttributeName="slate-editor-scratchpad"
+                          shouldAutoExport={this.state.shouldAutoExport}
                           {...scratchpadProps}
                         />
                       </BlockBody>
@@ -443,6 +469,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           placeholder="Text for the answer..."
                           unlockPointer={unlockPointer}
                           cyAttributeName="slate-editor-response"
+                          shouldAutoExport={this.state.shouldAutoExport}
                           {...answerProps}
                         />
                       </BlockBody>
@@ -518,6 +545,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      shouldAutoExport={this.state.shouldAutoExport}
                       hasTimeBudget={hasTimeBudget}
                       visibleExportIds={visibleExportIds}
                       exportLockStatusInfo={exportLockStatusInfo}
