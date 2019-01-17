@@ -46,7 +46,6 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
-  style: any;
   isChild: boolean;
   placeholder?: string;
   block: any;
@@ -71,7 +70,6 @@ interface BlockEditorEditingPresentationalProps {
 interface BlockEditorEditingPresentationalState {
   hasChangedSinceDatabaseSave: boolean;
   shouldAutoSquareBracketExport: boolean;
-  shouldShowMenu: boolean;
 }
 export class BlockEditorEditingPresentational extends React.Component<
   BlockEditorEditingPresentationalProps,
@@ -80,12 +78,18 @@ export class BlockEditorEditingPresentational extends React.Component<
   public editor;
   private autosaveInterval: any;
 
+  private handleBlur = _.debounce(() => {
+    if (this.props.shouldAutosave) {
+      this.considerSaveToDatabase();
+      this.endAutosaveInterval();
+    }
+  });
+
   public constructor(props: any) {
     super(props);
     this.state = {
       hasChangedSinceDatabaseSave: false,
       shouldAutoSquareBracketExport: true,
-      shouldShowMenu: false,
     };
   }
 
@@ -102,10 +106,6 @@ export class BlockEditorEditingPresentational extends React.Component<
       !_.isEqual(
         newState.hasChangedSinceDatabaseSave,
         this.state.hasChangedSinceDatabaseSave
-      ) ||
-      !_.isEqual(
-        newState.shouldShowMenu,
-        this.state.shouldShowMenu
       ) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
@@ -160,7 +160,7 @@ export class BlockEditorEditingPresentational extends React.Component<
             backgroundColor: "#f7f7f7",
             border: this.props.isChild && "1px solid #ddd",
             borderBottom: "1px solid #ddd",
-            display: this.state.shouldShowMenu ? "flex" : "none",
+            display: "flex",
             height: "25px",
             justifyContent: "space-between",
             padding: "0 10px",
@@ -184,7 +184,9 @@ export class BlockEditorEditingPresentational extends React.Component<
           />
         </div>
         <div
-          style={this.props.style}
+          style={{
+            padding: "7px 10px",
+          }}
         >
           <Editor
             placeholder={this.props.placeholder}
@@ -196,29 +198,11 @@ export class BlockEditorEditingPresentational extends React.Component<
             onKeyDown={this.onKeyDown}
             onKeyUp={this.onKeyUp}
             ref={this.updateEditor}
-            onFocus={this.handleFocus}
           />
         </div>
       </div>
     );
   }
-
-  private handleBlur = _.debounce(() => {
-    this.setState({
-      shouldShowMenu: false,
-    });
-
-    if (this.props.shouldAutosave) {
-      this.considerSaveToDatabase();
-      this.endAutosaveInterval();
-    }
-  });
-
-  private handleFocus = _.debounce(() => {
-    this.setState({
-      shouldShowMenu: true,
-    });
-  });
 
   // returns true if we should prevent current character from being inserted
   // returns false if this character should be inserted
