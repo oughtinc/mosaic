@@ -5,7 +5,6 @@ import { Editor, findDOMNode } from "slate-react";
 import { compose, withProps, withState } from "recompose";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
-import { Checkbox } from "react-bootstrap";
 import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
@@ -166,17 +165,25 @@ export class BlockEditorEditingPresentational extends React.Component<
             padding: "0 10px",
           }}
         >
-          <Checkbox 
-            checked={this.state.shouldAutoSquareBracketExport}
-            inline={true}
-            onChange={() => this.setState({ shouldAutoSquareBracketExport: !this.state.shouldAutoSquareBracketExport }, () => {
-                if (this.state.shouldAutoSquareBracketExport) {
-                  this.handleSquareBracketExport();
-                }
-            })}
-          >
-            auto export
-          </Checkbox>
+          <span>
+            <input 
+              type="checkbox"
+              checked={this.state.shouldAutoSquareBracketExport}
+              onMouseDown={e => {
+                e.preventDefault();
+              }}
+              onChange={() => {
+                this.setState({ 
+                  shouldAutoSquareBracketExport: !this.state.shouldAutoSquareBracketExport,
+                }, () => {
+                  if (this.state.shouldAutoSquareBracketExport) {
+                    this.handleSquareBracketExport();
+                  }
+                });
+              }}
+            />
+            <span style={{ marginLeft: "3px" }}>auto export</span>
+          </span>
           <MenuBar
             blockEditor={this.props.blockEditor}
             mutationStatus={this.props.mutationStatus}
@@ -204,21 +211,17 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   private handleBlur = _.debounce(() => {
-    this.setState({
-      shouldShowMenu: false,
-    });
-
     if (this.props.shouldAutosave) {
       this.considerSaveToDatabase();
       this.endAutosaveInterval();
     }
   });
 
-  private handleFocus = _.debounce(() => {
+  private handleFocus = () => {
     this.setState({
       shouldShowMenu: true,
     });
-  });
+  };
 
   // returns true if we should prevent current character from being inserted
   // returns false if this character should be inserted
