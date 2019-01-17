@@ -418,27 +418,31 @@ export class WorkspaceView extends React.Component<any, any> {
                           </div>
                         )}
                     </div>
-                    <div
-                      style={{
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <Checkbox
+                    {
+                      Auth.isAuthenticated()
+                      &&
+                      <div
                         style={{
-                          backgroundColor: adminCheckboxBgColor,
-                          border: "1px solid gray",
-                          borderColor: adminCheckboxBorderColor,
-                          borderRadius: "3px",
-                          padding: "5px 5px 5px 25px",
+                          marginBottom: "10px",
                         }}
-                        inline={true}
-                        type="checkbox"
-                        checked={this.state.shouldAutoExport}
-                        onChange={() => this.setState({ shouldAutoExport: !this.state.shouldAutoExport })}
                       >
-                        auto export
-                      </Checkbox>
-                    </div>
+                        <Checkbox
+                          style={{
+                            backgroundColor: adminCheckboxBgColor,
+                            border: "1px solid gray",
+                            borderColor: adminCheckboxBorderColor,
+                            borderRadius: "3px",
+                            padding: "5px 5px 5px 25px",
+                          }}
+                          inline={true}
+                          type="checkbox"
+                          checked={this.state.shouldAutoExport}
+                          onChange={() => this.setState({ shouldAutoExport: !this.state.shouldAutoExport })}
+                        >
+                          auto export
+                        </Checkbox>
+                      </div>
+                    }
                   </Col>
                 </Row>
                 <Row>
