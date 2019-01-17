@@ -5,7 +5,6 @@ import { Editor, findDOMNode } from "slate-react";
 import { compose, withProps, withState } from "recompose";
 import { graphql } from "react-apollo";
 import { connect } from "react-redux";
-import { Checkbox } from "react-bootstrap";
 import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
@@ -68,7 +67,6 @@ interface BlockEditorEditingPresentationalProps {
 
 interface BlockEditorEditingPresentationalState {
   hasChangedSinceDatabaseSave: boolean;
-  shouldAutoSquareBracketExport: boolean;
 }
 export class BlockEditorEditingPresentational extends React.Component<
   BlockEditorEditingPresentationalProps,
@@ -86,22 +84,15 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   public constructor(props: any) {
     super(props);
-    this.state = {
-      hasChangedSinceDatabaseSave: false,
-      shouldAutoSquareBracketExport: true,
-    };
+    this.state = { hasChangedSinceDatabaseSave: false };
   }
 
-  public shouldComponentUpdate(newProps: BlockEditorEditingPresentationalProps, newState: BlockEditorEditingPresentationalState) {
+  public shouldComponentUpdate(newProps: any, newState: any) {
     if (
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
       !_.isEqual(newProps.block, this.props.block) ||
       !_.isEqual(newProps.mutationStatus, this.props.mutationStatus) ||
-      !_.isEqual(
-        newState.shouldAutoSquareBracketExport,
-        this.state.shouldAutoSquareBracketExport
-      ) ||
       !_.isEqual(
         newState.hasChangedSinceDatabaseSave,
         this.state.hasChangedSinceDatabaseSave
@@ -153,25 +144,6 @@ export class BlockEditorEditingPresentational extends React.Component<
   public render() {
     return (
       <div>
-        <div
-          style={{
-            alignItems: "center",
-            display: "flex",
-            height: "20px",
-          }}
-        >
-          <Checkbox 
-            checked={this.state.shouldAutoSquareBracketExport}
-            inline={true}
-            onChange={() => this.setState({ shouldAutoSquareBracketExport: !this.state.shouldAutoSquareBracketExport }, () => {
-                if (this.state.shouldAutoSquareBracketExport) {
-                  this.handleSquareBracketExport();
-                }
-            })}
-          >
-            auto export
-          </Checkbox>
-        </div>
         <MenuBar
           blockEditor={this.props.blockEditor}
           mutationStatus={this.props.mutationStatus}
@@ -272,9 +244,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onKeyUp = (event: any, change: any) => {
-    if (this.state.shouldAutoSquareBracketExport) {
-      this.handleSquareBracketExport();
-    }
+    this.handleSquareBracketExport();
   };
 
   private onValueChange = () => {
