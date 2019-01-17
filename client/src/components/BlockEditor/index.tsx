@@ -157,7 +157,6 @@ class BlockEditorPresentational extends React.Component<any, any> {
       <Editor value={value} readOnly={true} plugins={plugins} />
     ) : (
       <BlockEditorEditing
-        isChild={this.props.isChild}
         placeholder={this.props.placeholder}
         value={value}
         readOnly={true}

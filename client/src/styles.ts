@@ -91,4 +91,5 @@ export const blockHeaderCSS = css`
 export const blockBodyCSS = css`
   background-color: ${blockBodyBgColor};
   border-radius: 0 0 ${blockBorderRadius} ${blockBorderRadius};
+  padding: 10px;
 `;

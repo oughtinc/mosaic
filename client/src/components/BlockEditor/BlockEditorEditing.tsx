@@ -46,7 +46,6 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
-  isChild: boolean;
   placeholder?: string;
   block: any;
   availablePointers: any[];
@@ -157,13 +156,8 @@ export class BlockEditorEditingPresentational extends React.Component<
         <div
           style={{
             alignItems: "center",
-            backgroundColor: "#f7f7f7",
-            border: this.props.isChild && "1px solid #ddd",
-            borderBottom: "1px solid #ddd",
             display: "flex",
-            height: "25px",
-            justifyContent: "space-between",
-            padding: "0 10px",
+            height: "20px",
           }}
         >
           <Checkbox 
@@ -177,29 +171,23 @@ export class BlockEditorEditingPresentational extends React.Component<
           >
             auto export
           </Checkbox>
-          <MenuBar
-            blockEditor={this.props.blockEditor}
-            mutationStatus={this.props.mutationStatus}
-            hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
-          />
         </div>
-        <div
-          style={{
-            padding: "7px 10px",
-          }}
-        >
-          <Editor
-            placeholder={this.props.placeholder}
-            value={this.props.value}
-            onChange={this.onChangeCallback}
-            plugins={this.props.plugins}
-            spellCheck={false}
-            onBlur={this.handleBlur}
-            onKeyDown={this.onKeyDown}
-            onKeyUp={this.onKeyUp}
-            ref={this.updateEditor}
-          />
-        </div>
+        <MenuBar
+          blockEditor={this.props.blockEditor}
+          mutationStatus={this.props.mutationStatus}
+          hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
+        />
+        <Editor
+          placeholder={this.props.placeholder}
+          value={this.props.value}
+          onChange={this.onChangeCallback}
+          plugins={this.props.plugins}
+          spellCheck={false}
+          onBlur={this.handleBlur}
+          onKeyDown={this.onKeyDown}
+          onKeyUp={this.onKeyUp}
+          ref={this.updateEditor}
+        />
       </div>
     );
   }
