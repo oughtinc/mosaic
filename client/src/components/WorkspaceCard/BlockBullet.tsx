@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import {
   blockBulletBgColor,
   blockBulletFontColor,
+  blockBulletBgColorOnHover,
   blockBulletFontColorOnHover
 } from "../../styles";
 
