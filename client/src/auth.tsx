@@ -1,5 +1,4 @@
 import * as auth0 from "auth0-js";
-import * as LogRocket from "logrocket";
 // Note: uses local storage instead of redux to persist across sessions
 // May consider alternate architecture ie through the redux-localstorage package
 import { Config } from "./config";
@@ -53,11 +52,6 @@ export class Auth {
         );
         localStorage.setItem("access_token", authResult.accessToken);
 
-        LogRocket.captureMessage(`
-          Setting expires_at for user ${localStorage.getItem("user_id")}
-          to ${expiresAt}
-          at ${Date.now()}.
-        `);
         localStorage.setItem("expires_at", expiresAt);
 
         Auth.getProfile(callback);
@@ -105,11 +99,6 @@ export class Auth {
     const expiresAt = JSON.parse(expiresJson);
     const isExpired = Date.now() > Number(expiresAt);
     if (isExpired) {
-      LogRocket.captureMessage(`
-        Attempted to logout user ${localStorage.getItem("user_id")}
-        at ${Date.now()}
-        with expires_at set to ${expiresAt}.
-      `);
       Auth.logout();
       return false;
     }
