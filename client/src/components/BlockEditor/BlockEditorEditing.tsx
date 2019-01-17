@@ -155,17 +155,23 @@ export class BlockEditorEditingPresentational extends React.Component<
           mutationStatus={this.props.mutationStatus}
           hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
         />
-        <Editor
-          placeholder={this.props.placeholder}
-          value={this.props.value}
-          onChange={this.onChangeCallback}
-          plugins={this.props.plugins}
-          spellCheck={false}
-          onBlur={this.handleBlur}
-          onKeyDown={this.onKeyDown}
-          onKeyUp={this.onKeyUp}
-          ref={this.updateEditor}
-        />
+        <div
+          style={{
+            paddingRight: "8px",
+          }}
+        >
+          <Editor
+            placeholder={this.props.placeholder}
+            value={this.props.value}
+            onChange={this.onChangeCallback}
+            plugins={this.props.plugins}
+            spellCheck={false}
+            onBlur={this.handleBlur}
+            onKeyDown={this.onKeyDown}
+            onKeyUp={this.onKeyUp}
+            ref={this.updateEditor}
+          />
+        </div>
       </div>
     );
   }
