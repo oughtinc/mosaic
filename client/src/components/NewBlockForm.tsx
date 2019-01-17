@@ -82,6 +82,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               exportLockStatusInfo={this.props.exportLockStatusInfo}
               unlockPointer={this.props.unlockPointer}
               cyAttributeName="slate-editor-new-question-form"
+              style={{ padding: "10px" }}
             />
           </BlockBody>
           <div

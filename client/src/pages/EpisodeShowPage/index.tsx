@@ -428,6 +428,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           placeholder="Text for the scratchpad..."
                           unlockPointer={unlockPointer}
                           cyAttributeName="slate-editor-scratchpad"
+                          style={{ padding: "10px" }}
                           {...scratchpadProps}
                         />
                       </BlockBody>
@@ -443,6 +444,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           placeholder="Text for the answer..."
                           unlockPointer={unlockPointer}
                           cyAttributeName="slate-editor-response"
+                          style={{ padding: "10px" }}
                           {...answerProps}
                         />
                       </BlockBody>

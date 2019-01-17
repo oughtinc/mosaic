@@ -154,7 +154,9 @@ class BlockEditorPresentational extends React.Component<any, any> {
     const value = block.value;
     const { plugins } = this.state;
     return readOnly ? (
-      <Editor value={value} readOnly={true} plugins={plugins} />
+      <div style={this.props.style}>
+        <Editor value={value} readOnly={true} plugins={plugins} />
+      </div>
     ) : (
       <BlockEditorEditing
         isChild={this.props.isChild}
@@ -173,6 +175,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           this.blockEditorEditing = input;
         }}
         cyAttributeName={this.props.cyAttributeName}
+        style={this.props.style}
       />
     );
   }

@@ -155,6 +155,7 @@ export class Child extends React.Component<any, any> {
                   visibleExportIds={this.props.visibleExportIds}
                   exportLockStatusInfo={this.props.exportLockStatusInfo}
                   unlockPointer={this.props.unlockPointer}
+                  isChild={true}
                 />
               </BlockEditorContainer>
             </BulletAndEditorContainer>
