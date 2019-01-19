@@ -1,3 +1,4 @@
+import { Document } from "slate";
 import { getEventTransfer } from "slate-react";
 
 import * as uuidv1 from "uuid/v1";
@@ -15,31 +16,23 @@ export function CopyPastePlugin() {
         return false;
       }
 
-      const processedInlineJSON = processDocumentJSONIntoInlineJSON(fragment.toJSON());
+      const documentAsJSON = fragment.toJSON();
+      const processedDocumentAsJSON = processDocumentJSON(documentAsJSON, false);
 
-      change.insertInline(processedInlineJSON);
+      change.insertFragment(Document.fromJSON(processedDocumentAsJSON));
       return false;
     },
   };
 }
 
-function processDocumentJSONIntoInlineJSON(document: any) {
-  let i = 0;
-  let curBlock = document.nodes[i];
-  let nodes = [];
-
-  while (curBlock = document.nodes[i++]) {
-    nodes = nodes.concat(curBlock.nodes.map(processNode));
-  }
-
+function processDocumentJSON(document: any, shouldConvertExportsToImports = true) {
   return {
-    object: "inline",
-    type: "pasted",
-    nodes,
+    ...document,
+    nodes: document.nodes.map(node => processNode(node, shouldConvertExportsToImports)),
   };
 }
 
-export function processNode(node: any) {
+export function processNode(node: any, shouldConvertExportsToImports) {
   if (node.type === "pointerImport") {
     return {
       ...node,
@@ -49,26 +42,33 @@ export function processNode(node: any) {
       }
     };
   } else if (node.type === "pointerExport") {
-    return {
-      object: "inline",
-      type: "pasted",
-      nodes: node.nodes.map(processNode),
-    };
-  } else if (node.object === "text") {
-    return {
-      object: "text",
-      leaves: node.leaves.map(processNode)
-    };
-  } else if (node.object === "leaf") {
-    return {
-      object: "leaf",
-      text: processText(node.text),
-    };
-  } else {
+    if (shouldConvertExportsToImports) {
+      return {
+        object: "inline",
+        type: "pointerImport",
+        isVoid: true,
+        data: {
+          pointerId: node.data.pointerId,
+          internalReferenceId: uuidv1(),
+        }
+      };
+    } else {
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          pointerId: uuidv1(), // generate new id so it's distinct export
+        },
+        nodes: node.nodes.map(node => processNode(node, shouldConvertExportsToImports)),
+      };
+    }
+  } else if (node.nodes) {
     return {
       ...node,
-      nodes: node.nodes.map(processNode),
+      nodes: node.nodes.map(node => processNode(node, shouldConvertExportsToImports)),
     };
+  } else {
+    return node;
   }
 }
 
