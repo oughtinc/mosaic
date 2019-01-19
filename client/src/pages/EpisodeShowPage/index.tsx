@@ -6,12 +6,11 @@ import * as keyboardJS from "keyboardjs";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
-import { Checkbox, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { compose } from "recompose";
 import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
-
+import { AdvancedOptions } from "./AdvancedOptions";
 import { EpisodeNav } from "./EpisodeNav";
 import { ResponseFooter } from "./ResponseFooter";
 import { CharCountDisplays } from "./CharCountDisplays";
@@ -46,14 +45,11 @@ import {
   UPDATE_WORKSPACE,
 } from "../../graphqlQueries";
 import {
-  CONVERT_PASTED_EXPORT_TO_IMPORT,
-  CONVERT_PASTED_EXPORT_TO_NEW_EXPORT,
+  CONVERT_PASTED_EXPORT_TO_IMPORT
 } from "../../constants";
 import { Auth } from "../../auth";
 
 import {
-  adminCheckboxBgColor,
-  adminCheckboxBorderColor,
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
@@ -431,32 +427,12 @@ export class WorkspaceView extends React.Component<any, any> {
                           marginBottom: "10px",
                         }}
                       >
-                        <Checkbox
-                          style={{
-                            backgroundColor: adminCheckboxBgColor,
-                            border: "1px solid gray",
-                            borderColor: adminCheckboxBorderColor,
-                            borderRadius: "3px",
-                            padding: "5px 5px 5px 25px",
-                          }}
-                          inline={true}
-                          type="checkbox"
-                          checked={this.state.shouldAutoExport}
-                          onChange={() => this.setState({ shouldAutoExport: !this.state.shouldAutoExport })}
-                        >
-                          auto export
-                        </Checkbox>
-                        
-                        <span style={{ marginLeft: "10px", marginRight: "3px", verticalAlign: "middle" }}>Convert pasted exports to:</span>
-                        <ToggleButtonGroup 
-                          type="radio" 
-                          name="options" 
-                          value={this.state.pastedExportFormat}
-                          onChange={this.handlePastedExportFormatChange}
-                        >
-                          <ToggleButton value={CONVERT_PASTED_EXPORT_TO_IMPORT}>import</ToggleButton>
-                          <ToggleButton value={CONVERT_PASTED_EXPORT_TO_NEW_EXPORT}>new export</ToggleButton>
-                        </ToggleButtonGroup>
+                        <AdvancedOptions 
+                          shouldAutoExport={this.state.shouldAutoExport}
+                          handleShouldAutoExportToggle={this.handleShouldAutoExportToggle}
+                          pastedExportFormat={this.state.pastedExportFormat}
+                          handlePastedExportFormatChange={this.handlePastedExportFormatChange}
+                        />
                       </div>
                     }
                   </Col>
@@ -649,6 +625,8 @@ export class WorkspaceView extends React.Component<any, any> {
       </div>
     );
   }
+
+  private handleShouldAutoExportToggle = () => this.setState({ shouldAutoExport: !this.state.shouldAutoExport });
 
   private handlePastedExportFormatChange = (value: any) => {
     this.setState({
