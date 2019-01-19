@@ -45,6 +45,7 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
+  pastedExportFormat: string;
   shouldAutoExport?: boolean;
   placeholder?: string;
   block: any;
@@ -100,7 +101,8 @@ export class BlockEditorEditingPresentational extends React.Component<
       ) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
-      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport)
+      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport) ||
+      !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
     ) {
       return true;
     }

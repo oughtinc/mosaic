@@ -6,7 +6,7 @@ import * as keyboardJS from "keyboardjs";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
-import { Checkbox } from "react-bootstrap";
+import { Checkbox, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { compose } from "recompose";
 import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
@@ -45,6 +45,10 @@ import {
   UPDATE_WORKSPACE_IS_ELIGIBLE,
   UPDATE_WORKSPACE,
 } from "../../graphqlQueries";
+import {
+  CONVERT_PASTED_EXPORT_TO_IMPORT,
+  CONVERT_PASTED_EXPORT_TO_NEW_EXPORT,
+} from "../../constants";
 import { Auth } from "../../auth";
 
 import {
@@ -193,6 +197,7 @@ export class WorkspaceView extends React.Component<any, any> {
     super(props);
     this.state = {
       hasTimerEnded: false,
+      pastedExportFormat: CONVERT_PASTED_EXPORT_TO_IMPORT,
       shouldAutoExport: true,
     };
   }
@@ -441,6 +446,17 @@ export class WorkspaceView extends React.Component<any, any> {
                         >
                           auto export
                         </Checkbox>
+                        
+                        <span style={{ marginLeft: "10px", marginRight: "3px", verticalAlign: "middle" }}>Convert pasted exports to:</span>
+                        <ToggleButtonGroup 
+                          type="radio" 
+                          name="options" 
+                          value={this.state.pastedExportFormat}
+                          onChange={this.handlePastedExportFormatChange}
+                        >
+                          <ToggleButton value={CONVERT_PASTED_EXPORT_TO_IMPORT}>import</ToggleButton>
+                          <ToggleButton value={CONVERT_PASTED_EXPORT_TO_NEW_EXPORT}>new export</ToggleButton>
+                        </ToggleButtonGroup>
                       </div>
                     }
                   </Col>
@@ -458,6 +474,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           unlockPointer={unlockPointer}
                           cyAttributeName="slate-editor-scratchpad"
                           shouldAutoExport={this.state.shouldAutoExport}
+                          pastedExportFormat={this.state.pastedExportFormat}
                           {...scratchpadProps}
                         />
                       </BlockBody>
@@ -474,6 +491,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           unlockPointer={unlockPointer}
                           cyAttributeName="slate-editor-response"
                           shouldAutoExport={this.state.shouldAutoExport}
+                          pastedExportFormat={this.state.pastedExportFormat}
                           {...answerProps}
                         />
                       </BlockBody>
@@ -549,6 +567,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      pastedExportFormat={this.state.pastedExportFormat}
                       shouldAutoExport={this.state.shouldAutoExport}
                       hasTimeBudget={hasTimeBudget}
                       visibleExportIds={visibleExportIds}
@@ -629,6 +648,12 @@ export class WorkspaceView extends React.Component<any, any> {
         </ContentContainer>
       </div>
     );
+  }
+
+  private handlePastedExportFormatChange = (value: any) => {
+    this.setState({
+      pastedExportFormat: value,
+    });
   }
 }
 

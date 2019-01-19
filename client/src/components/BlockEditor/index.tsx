@@ -40,7 +40,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
       !_.isEqual(newProps.block, this.props.block) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
-      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport)
+      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport) ||
+      !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
     ) {
       return true;
     }
@@ -56,7 +57,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
-      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
+      !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
+      !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
     ) {
       this.resetPlugins(newProps);
     }
@@ -102,10 +104,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
       visibleExportIds: newProps.visibleExportIds,
       exportLockStatusInfo: newProps.exportLockStatusInfo,
       unlockPointer: newProps.unlockPointer,
-      isInOracleModeAndIsUserOracle: newProps.oracleModeQuery.oracleMode && Auth.isOracle()
+      isInOracleModeAndIsUserOracle: newProps.oracleModeQuery.oracleMode && Auth.isOracle(),
     };
     this.setState({
-      plugins: [LinkifyPlugin(), CopyPastePlugin(), SoftBreak({}), SlatePointers(SlatePointerInputs)]
+      plugins: [LinkifyPlugin(), CopyPastePlugin({ pastedExportFormat: newProps.pastedExportFormat }), SoftBreak({}), SlatePointers(SlatePointerInputs)]
     });
   }
 
@@ -174,6 +176,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
         }}
         cyAttributeName={this.props.cyAttributeName}
         shouldAutoExport={this.props.shouldAutoExport}
+        pastedExportFormat={this.props.pastedExportFormat}
       />
     );
   }

@@ -140,6 +140,7 @@ export class Child extends React.Component<any, any> {
                 exportLockStatusInfo={this.props.exportLockStatusInfo}
                 unlockPointer={this.props.unlockPointer}
                 shouldAutoExport={this.props.shouldAutoExport}
+                pastedExportFormat={this.props.pastedExportFormat}
               />
             </BlockEditorContainer>
           </BulletAndEditorContainer>
@@ -296,7 +297,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
       !_.isEqual(newProps.workspaces, this.props.workspaces) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
-      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport)
+      !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport) ||
+      !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
     ) {
       return true;
     }
@@ -325,6 +327,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     }}
                   >
                     <Child
+                      pastedExportFormat={this.props.pastedExportFormat}
                       shouldAutoExport={this.props.shouldAutoExport}
                       hasTimeBudget={this.props.hasTimeBudget}
                       isArchived={this.props.isArchived}
@@ -400,6 +403,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            pastedExportFormat={this.props.pastedExportFormat}
             shouldAutoExport={this.props.shouldAutoExport}
             hasTimeBudget={this.props.hasTimeBudget}
             {...this.props.subquestionDraftProps}
