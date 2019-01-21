@@ -424,7 +424,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       &&
                       <div
                         style={{
-                          marginBottom: "10px",
+                          marginBottom: "15px",
                         }}
                       >
                         <AdvancedOptions 

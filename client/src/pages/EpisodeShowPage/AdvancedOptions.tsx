@@ -1,5 +1,10 @@
 import * as React from "react";
-import { Checkbox, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import {
+  ButtonGroup,
+  Checkbox,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "react-bootstrap";
 
 import {
   CONVERT_PASTED_EXPORT_TO_IMPORT,
@@ -27,7 +32,9 @@ class AdvancedOptionsPresentational extends React.Component<any, any> {
         <span
           style={{
             color: "#888",
+            display: "inline-block",
             fontSize: "13px",
+            marginBottom: "5px",
           }}
         >
           Advanced Options: Feel free to just leave the defaults!
@@ -52,13 +59,14 @@ class AdvancedOptionsPresentational extends React.Component<any, any> {
         <span 
           style={{
             marginLeft: "10px",
-            marginRight: "3px",
+            marginRight: "4px",
             verticalAlign: "middle",
           }}
         >
           Convert pasted export to:
         </span>
-        <ToggleButtonGroup 
+        <ToggleButtonGroup
+          bsSize="xsmall"
           type="radio" 
           name="options" 
           value={this.props.pastedExportFormat}
