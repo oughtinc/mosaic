@@ -11,7 +11,7 @@ import {
   CONVERT_PASTED_EXPORT_TO_NEW_EXPORT,
 } from "../../constants";
 
-export function CopyPastePlugin({ pastedExportFormat }) {
+export function CopyPastePlugin({ pastedExportFormat }: { pastedExportFormat: string}) {
   return {
     onPaste: (event, change) => {
       const transfer = getEventTransfer(event);
@@ -33,14 +33,14 @@ export function CopyPastePlugin({ pastedExportFormat }) {
   };
 }
 
-function processDocumentJSON(document: any, pastedExportFormat = CONVERT_PASTED_EXPORT_TO_IMPORT) {
+function processDocumentJSON(document: any, pastedExportFormat: string = CONVERT_PASTED_EXPORT_TO_IMPORT) {
   return {
     ...document,
     nodes: document.nodes.map(node => processNode(node, pastedExportFormat)),
   };
 }
 
-export function processNode(node: any, pastedExportFormat) {
+export function processNode(node: any, pastedExportFormat: string) {
   if (node.type === "pointerImport") {
     return {
       ...node,
