@@ -4,7 +4,7 @@ import { getEventTransfer } from "slate-react";
 import * as uuidv1 from "uuid/v1";
 
 import { isSelectionInExport } from "../../slate-helpers/slate-utils/isSelectionInExport";
-
+import { normalizeAfterRemoval } from "../../slate-helpers/slate-change-mutations/normalizeAfterRemoval";
 import { POINTER_EDGE_SPACE } from "../slate-pointers/exportedPointerSpacer";
 import {
   CONVERT_PASTED_EXPORT_TO_IMPORT,
@@ -28,6 +28,11 @@ export function CopyPastePlugin({ pastedExportFormat }: { pastedExportFormat: st
       const processedDocumentAsJSON = processDocumentJSON(documentAsJSON, pastedExportFormat);
 
       change.insertFragment(Document.fromJSON(processedDocumentAsJSON));
+
+      // the "removal" here is the removal of exports in favor of their associated
+      // imports, which occurs if the user has selected the appropriate settings
+      normalizeAfterRemoval(change);
+      
       return false;
     },
   };
