@@ -3,6 +3,8 @@ import { getEventTransfer } from "slate-react";
 
 import * as uuidv1 from "uuid/v1";
 
+import { isSelectionInExport } from "../../slate-helpers/slate-utils/isSelectionInExport";
+
 import { POINTER_EDGE_SPACE } from "../slate-pointers/exportedPointerSpacer";
 import {
   CONVERT_PASTED_EXPORT_TO_IMPORT,
@@ -15,7 +17,9 @@ export function CopyPastePlugin({ pastedExportFormat }) {
       const transfer = getEventTransfer(event);
       const { fragment, text } = transfer;
 
-      if (fragment === null) {
+      const isInExport = isSelectionInExport(change.value);
+
+      if (fragment === null || isInExport) {
         change.insertText(processText(text));
         return false;
       }
