@@ -127,7 +127,7 @@ class UserSchedule {
     return false;
   }
 
-  public getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+  public getWorkspacesWithMostDistFromWorkedOnWorkspace({
     workspaces,
     workspacesInTree,
   }) {

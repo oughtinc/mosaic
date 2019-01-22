@@ -197,7 +197,7 @@ class Scheduler {
       return [];
     }
 
-    let workspacesWithLeastDistFromWorkedOnWorkspace = await this.getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+    let workspacesWithMostDistFromWorkedOnWorkspace = await this.getWorkspacesWithMostDistFromWorkedOnWorkspace({
       userId,
       workspaces: eligibleWorkspaces,
       workspacesInTree,
@@ -210,7 +210,7 @@ class Scheduler {
     //   workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(eligibleWorkspaces);
     // }
 
-    const finalWorkspaces = workspacesWithLeastDistFromWorkedOnWorkspace;
+    const finalWorkspaces = workspacesWithMostDistFromWorkedOnWorkspace;
 
     return finalWorkspaces;
   }
@@ -294,12 +294,12 @@ class Scheduler {
     return (workspace.totalBudget - workspace.allocatedBudget) >= 90;
   }
 
-  private getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+  private getWorkspacesWithMostDistFromWorkedOnWorkspace({
     userId,
     workspaces,
     workspacesInTree,
   }) {
-    return this.schedule.getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+    return this.schedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
       userId,
       workspaces, 
       workspacesInTree,

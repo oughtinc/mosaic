@@ -116,14 +116,14 @@ class Schedule {
     );
   }
 
-  public getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+  public getWorkspacesWithMostDistFromWorkedOnWorkspace({
     userId,
     workspaces,
     workspacesInTree,
   }) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
-    return userSchedule.getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+    return userSchedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
       workspaces, 
       workspacesInTree,
     });
