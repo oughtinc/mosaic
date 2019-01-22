@@ -26,6 +26,7 @@ class DistanceFromWorkedOnWorkspaceCache {
     let distance = 0;
     let howManyNodesAreInQueueDistanceAway = 1;
     let howManyNodesAreInQueueDistancePlusOneAway = 0;
+    let upperBoundForDistAwayFromWorkedOnWorkspace = Infinity;
     
     const queue: any = [workspace];
 
@@ -39,6 +40,14 @@ class DistanceFromWorkedOnWorkspaceCache {
       const hasUserWorkedOnWorkspace = this.userSchedule.hasUserWorkedOnWorkspace(curWorkspace);
       if (hasUserWorkedOnWorkspace) {
         return distance;
+      }
+
+      const workspaceAlreadyCached: boolean = this.cache.has(curWorkspace.id);
+      if (workspaceAlreadyCached) {
+        upperBoundForDistAwayFromWorkedOnWorkspace = Math.min(
+          upperBoundForDistAwayFromWorkedOnWorkspace,
+          this.cache.get(curWorkspace.id) + distance
+        );
       }
 
       // decrement the number of workspaces in queue distance away
@@ -80,6 +89,9 @@ class DistanceFromWorkedOnWorkspaceCache {
       // and modify node tracking
       if (isLeavingLevel) {
         distance++;
+        if (upperBoundForDistAwayFromWorkedOnWorkspace === distance) {
+          return upperBoundForDistAwayFromWorkedOnWorkspace;
+        }
         howManyNodesAreInQueueDistanceAway = howManyNodesAreInQueueDistancePlusOneAway;
         howManyNodesAreInQueueDistancePlusOneAway = 0;
       }
