@@ -187,14 +187,8 @@ class Scheduler {
     const staleWorkspaces = await this.filterByStaleness(workspacesWithAtLeastMinBudget);
 
     // filter by staleness IF there are some stale ones
-    if (staleWorkspaces.length > 0) {
+    if (staleWorkspaces.length > 0 && !considerNonStale) {
       eligibleWorkspaces = staleWorkspaces;
-    }
-    
-    // if no stale worksapces, and not considering non-stale,
-    // go ahead and return
-    if(staleWorkspaces.length === 0 && !considerNonStale) {
-      return [];
     }
 
     let workspacesWithMostDistFromWorkedOnWorkspace = await this.getWorkspacesWithMostDistFromWorkedOnWorkspace({
