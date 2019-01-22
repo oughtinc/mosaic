@@ -1,5 +1,6 @@
 import { isInOracleMode } from "../globals/isInOracleMode";
 import { Workspace } from "../models";
+import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
 import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
 import { RootParentCache } from "./RootParentCache";
@@ -21,7 +22,7 @@ const fetchAllWorkspacesInTree = async (rootWorkspace) => {
     result.push(...allWorkspacesInChildsTree);
   }
   return result;
-},
+}
 
 const scheduler = new Scheduler({
   fetchAllWorkspacesInTree,
@@ -33,7 +34,11 @@ const scheduler = new Scheduler({
     }
   }),
   isInOracleMode,
-  schedule: new Schedule({ rootParentCache: RootParentCache, timeLimit: NINETY_SECONDS }),
+  schedule: new Schedule({
+    DistanceFromWorkedOnWorkspaceCache,
+    rootParentCache: RootParentCache,
+    timeLimit: NINETY_SECONDS,
+  }),
   numberOfStaleDescendantsCache: NumberOfStaleDescendantsCache,
   remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,

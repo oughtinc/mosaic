@@ -8,11 +8,13 @@ class Schedule {
   // because Sequelize doesn't preserve object identity across queries
   private lastWorkedOnTimestampForTree = {};
 
+  private DistanceFromWorkedOnWorkspaceCache;
   private rootParentCache;
   private schedule = new Map;
   private timeLimit;
 
-  public constructor({ rootParentCache, timeLimit }) {
+  public constructor({ DistanceFromWorkedOnWorkspaceCache, rootParentCache, timeLimit }) {
+    this.DistanceFromWorkedOnWorkspaceCache = DistanceFromWorkedOnWorkspaceCache;
     this.rootParentCache = rootParentCache;
     this.timeLimit = timeLimit;
   }
@@ -27,6 +29,7 @@ class Schedule {
     }
 
     const userSchedule = new UserSchedule({
+      DistanceFromWorkedOnWorkspaceCache: this.DistanceFromWorkedOnWorkspaceCache,
       rootParentCache: this.rootParentCache,
       timeLimit: this.timeLimit, userId
     });
@@ -111,6 +114,19 @@ class Schedule {
       [...this.schedule],
       ([userId, userSchedule]) => userSchedule.hasUserWorkedOnWorkspace(workspace)
     );
+  }
+
+  public getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+    userId,
+    workspaces,
+    workspacesInTree,
+  }) {
+    this.createUserScheduleIfNotCreated(userId);
+    const userSchedule = this.getUserSchedule(userId);
+    return userSchedule.getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+      workspaces, 
+      workspacesInTree,
+    });
   }
 }
 

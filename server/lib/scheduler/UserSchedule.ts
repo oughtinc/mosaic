@@ -6,6 +6,7 @@ const ORACLE_TIME_LIMIT = 1000 * 60 * 15;
 const TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET = 1000 * 60 * 20;
 
 class UserSchedule {
+  private DistanceFromWorkedOnWorkspaceCache;
   private lastWorkedOnTimestampForTree = {};
   private rootParentCache;
   private timeLimit;
@@ -15,7 +16,8 @@ class UserSchedule {
   private isLastAssignmentOracle = false;
   private isLastAssignmentTimed = true;
 
-  public constructor({ rootParentCache, timeLimit, userId }) {
+  public constructor({ DistanceFromWorkedOnWorkspaceCache, rootParentCache, timeLimit, userId }) {
+    this.DistanceFromWorkedOnWorkspaceCache = DistanceFromWorkedOnWorkspaceCache;
     this.rootParentCache = rootParentCache;
     this.timeLimit = timeLimit;
     this.userId = userId;
@@ -123,6 +125,29 @@ class UserSchedule {
     }
 
     return false;
+  }
+
+  public getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+    workspaces,
+    workspacesInTree,
+  }) {
+    const distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
+      userSchedule: this,
+      workspacesInTree,
+    });
+
+    const workspacesWithDist = workspaces.map(w => ({
+      distance: distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
+      workspace: w,
+    }));
+
+    const maxDist = _.max(workspacesWithDist.map(o => o.distance));
+
+    const maxWorkspacesWithDist = workspacesWithDist.filter(o => o.distance === maxDist);
+
+    const maxWorkspaces = maxWorkspacesWithDist.map(o => o.workspace);
+
+    return maxWorkspaces;
   }
 }
 

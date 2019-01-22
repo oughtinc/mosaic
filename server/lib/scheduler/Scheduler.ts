@@ -197,14 +197,20 @@ class Scheduler {
       return [];
     }
 
-    let workspaceWithLeastRequiredWorkAmongDescendants = eligibleWorkspaces;
-    if (rootWorkspace.hasTimeBudget) {
-      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
-    } else if (rootWorkspace.hasIOConstraints) {
-      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(eligibleWorkspaces);
-    }
+    let workspacesWithLeastDistFromWorkedOnWorkspace = await this.getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+      userId,
+      workspaces: eligibleWorkspaces,
+      workspacesInTree,
+    });
 
-    const finalWorkspaces = workspaceWithLeastRequiredWorkAmongDescendants;
+    // let workspaceWithLeastRequiredWorkAmongDescendants = eligibleWorkspaces;
+    // if (rootWorkspace.hasTimeBudget) {
+    //   workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
+    // } else if (rootWorkspace.hasIOConstraints) {
+    //   workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(eligibleWorkspaces);
+    // }
+
+    const finalWorkspaces = workspacesWithLeastDistFromWorkedOnWorkspace;
 
     return finalWorkspaces;
   }
@@ -286,6 +292,18 @@ class Scheduler {
 
   private hasMinRemaining(workspace) {
     return (workspace.totalBudget - workspace.allocatedBudget) >= 90;
+  }
+
+  private getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+    userId,
+    workspaces,
+    workspacesInTree,
+  }) {
+    return this.schedule.getWorkspacesWithLeastDistFromWorkedOnWorkspace({
+      userId,
+      workspaces, 
+      workspacesInTree,
+    });
   }
 }
 
