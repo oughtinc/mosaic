@@ -203,14 +203,14 @@ class Scheduler {
       workspacesInTree,
     });
 
-    // let workspaceWithLeastRequiredWorkAmongDescendants = eligibleWorkspaces;
-    // if (rootWorkspace.hasTimeBudget) {
-    //   workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
-    // } else if (rootWorkspace.hasIOConstraints) {
-    //   workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(eligibleWorkspaces);
-    // }
+    let workspaceWithLeastRequiredWorkAmongDescendants = workspacesWithMostDistFromWorkedOnWorkspace;
+    if (rootWorkspace.hasTimeBudget) {
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(workspacesWithMostDistFromWorkedOnWorkspace);
+    } else if (rootWorkspace.hasIOConstraints) {
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(workspacesWithMostDistFromWorkedOnWorkspace);
+    }
 
-    const finalWorkspaces = workspacesWithMostDistFromWorkedOnWorkspace;
+    const finalWorkspaces = workspaceWithLeastRequiredWorkAmongDescendants;
 
     return finalWorkspaces;
   }
