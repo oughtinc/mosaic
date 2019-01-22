@@ -300,6 +300,7 @@ class Scheduler {
     workspacesInTree,
   }) {
     return this.schedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
+      minDist: 2,
       userId,
       workspaces, 
       workspacesInTree,

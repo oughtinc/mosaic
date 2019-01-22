@@ -128,6 +128,7 @@ class UserSchedule {
   }
 
   public getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    minDist,
     workspaces,
     workspacesInTree,
   }) {
@@ -142,6 +143,11 @@ class UserSchedule {
     }));
 
     const maxDist = _.max(workspacesWithDist.map(o => o.distance));
+
+    // if no workspace exceeds min dist, then no workspace gets returned
+    if (!maxDist || maxDist < minDist) {
+      return [];
+    }
 
     const maxWorkspacesWithDist = workspacesWithDist.filter(o => o.distance === maxDist);
 

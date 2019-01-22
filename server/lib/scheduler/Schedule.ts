@@ -117,6 +117,7 @@ class Schedule {
   }
 
   public getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    minDist,
     userId,
     workspaces,
     workspacesInTree,
@@ -124,6 +125,7 @@ class Schedule {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
     return userSchedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
+      minDist,
       workspaces, 
       workspacesInTree,
     });
