@@ -41,13 +41,8 @@ class DistanceFromWorkedOnWorkspaceCache {
         return distance;
       }
 
-      const workspaceAlreadyCached: boolean = this.cache.has(curWorkspace.id);
-      if (workspaceAlreadyCached) {
-        return this.cache.get(curWorkspace.id) + distance;
-      }
-
       // decrement the number of workspaces in queue distance away
-      howManyNodesAreInQueueDistanceAway--;  
+      howManyNodesAreInQueueDistanceAway--;
 
       let howManyWorkspacesAddedToQueueThisTime = 0;
 
