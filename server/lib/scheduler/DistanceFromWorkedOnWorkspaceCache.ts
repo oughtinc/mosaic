@@ -1,5 +1,6 @@
 class DistanceFromWorkedOnWorkspaceCache {
   private cache = new Map();
+  private weKnowDistIsInfinity = false;
   private userSchedule;
   private workspacesInTree;
 
@@ -9,13 +10,20 @@ class DistanceFromWorkedOnWorkspaceCache {
   }
 
   public getDistFromWorkedOnWorkspace(workspace): number {
-    const workspaceAlreadyCached: boolean = this.cache.has(workspace.id);
+    if (this.weKnowDistIsInfinity) {
+      return Infinity;
+    }
 
+    const workspaceAlreadyCached: boolean = this.cache.has(workspace.id);
     if (workspaceAlreadyCached) {
       return this.cache.get(workspace.id);
     }
 
     const distFromWorkedOnWorkspace: number = this.calculateDistFromWorkedOnWorkspace(workspace);
+
+    if (distFromWorkedOnWorkspace === Infinity) {
+      this.weKnowDistIsInfinity = true;
+    }
 
     this.cache.set(workspace.id, distFromWorkedOnWorkspace);
 
