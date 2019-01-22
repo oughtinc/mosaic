@@ -44,16 +44,16 @@ class DistanceFromWorkedOnWorkspaceCache {
       // decrement the number of workspaces in queue distance away
       howManyNodesAreInQueueDistanceAway--;  
 
-      let workspacesAddedToQueueThisTime = 0;
+      let howManyWorkspacesAddedToQueueThisTime = 0;
 
       // add parent
       if (curWorkspace.parentId) {
-        const alreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(id => id === curWorkspace.parentId);
-        if (!alreadyAdded) {
+        const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(id => id === curWorkspace.parentId);
+        if (!hasBeenAlreadyAdded) {
           const parent = this.workspacesInTree.find(w => w.id === curWorkspace.parentId);
           queue.unshift(parent);
           idsOfWorkspacesAlreadyAddedToQueue.push(parent.id);
-          workspacesAddedToQueueThisTime++;
+          howManyWorkspacesAddedToQueueThisTime++;
         }
       }
 
@@ -61,23 +61,23 @@ class DistanceFromWorkedOnWorkspaceCache {
       const children = this.workspacesInTree.filter(w => w.parentId && w.parentId === curWorkspace.id);
       if (children.length > 0) {
         children.forEach(child => {
-          const alreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(id => id === child.id);
-          if (!alreadyAdded) {
+          const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(id => id === child.id);
+          if (!hasBeenAlreadyAdded) {
             queue.unshift(child);
             idsOfWorkspacesAlreadyAddedToQueue.push(child.id);
-            workspacesAddedToQueueThisTime++;
+            howManyWorkspacesAddedToQueueThisTime++;
           }
         });
       }
 
       // increment number of workspaces in queue distance+1 away
-      howManyNodesAreInQueueDistancePlusOneAway += workspacesAddedToQueueThisTime;
+      howManyNodesAreInQueueDistancePlusOneAway += howManyWorkspacesAddedToQueueThisTime;
       
       const isLeavingLevel = howManyNodesAreInQueueDistanceAway === 0;
 
       // if we're leaving current level
       // increment distance
-      // and modify node-level tracking
+      // and modify node tracking
       if (isLeavingLevel) {
         distance++;
         howManyNodesAreInQueueDistanceAway = howManyNodesAreInQueueDistancePlusOneAway;
@@ -85,6 +85,7 @@ class DistanceFromWorkedOnWorkspaceCache {
       }
     }
 
+    // if no node in tree has been worked on, return Infinity as distance
     return Infinity;
   }
 }
