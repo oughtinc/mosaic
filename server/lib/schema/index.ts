@@ -62,13 +62,19 @@ const blockType = makeObjectType(models.Block, [
   ["workspace", () => workspaceType, "Workspace"]
 ]);
 
-const workspaceType = makeObjectType(models.Workspace, [
+export const workspaceType = makeObjectType(models.Workspace, [
   ...standardReferences,
   ["childWorkspaces", () => new GraphQLList(workspaceType), "ChildWorkspaces"],
   ["parentWorkspace", () => new GraphQLList(workspaceType), "ParentWorkspace"],
   ["blocks", () => new GraphQLList(blockType), "Blocks"],
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"]
 ]);
+
+// TODO - factor out workspaceType into separate file so the following import
+// can go at the top of the file -- right now it's down here to avoid circular
+// import issues
+
+import { UserActivityType } from "./UserActivity";
 
 const eventType = makeObjectType(models.Event, []);
 
@@ -116,6 +122,15 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
+      userActivity: {
+        type: UserActivityType,
+        args: {
+          userId: { type: GraphQLString },
+        },
+        resolve: async (_, { userId }) => {
+          return scheduler.getUserActivity(userId);
+        }
+      },
       oracleMode: {
         type: GraphQLBoolean,
         resolve: function () {
