@@ -1,6 +1,8 @@
 import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
+import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { compose } from "recompose";
 
 import { Auth } from "../auth";
@@ -40,6 +42,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
       oracleSchedulingFailed = e.message === "GraphQL error: No eligible workspace for oracle";
       normalSchedulingFailed = e.message === "GraphQL error: No eligible workspace";
     }
+
     if (oracleSchedulingFailed) {
       this.setState({ oracleSchedulingFailed });
     } else if (normalSchedulingFailed) {
@@ -70,6 +73,39 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
 
             Automatically refreshing in {this.state.refreshCountdown} second{this.state.refreshCountdown !== 1 ? "s" : ""}.
           </span>
+
+          <div
+            style={{
+              marginLeft: "20px",
+              marginTop: "50px",
+            }}
+          >  
+            <div 
+              style={{
+                backgroundColor: "rgba(255, 0, 0, 0.05)",
+                border: "1px solid rgba(255, 0, 0, 0.15)",
+                borderRadius: "8px",
+                color: "darkRed",
+                maxWidth: "500px", 
+                padding: "20px",
+                textAlign: "justify",
+              }}
+            >
+              Another option is to search for a workspace that is "suboptimal" in the sense that you might have already worked on a workspace close to this one. We recommend trying this if a couple of refreshes fails to fetch an eligible workspace.
+              <div 
+                style={{
+                  alignItems: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "20px", 
+                }}
+              >
+                <Link to="/nextMaybeSuboptimal" style={{ margin: "0 5px" }}>
+                  <Button bsStyle="danger">Find Suboptimal Workspace »</Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </ContentContainer>
       );
     } else if (this.state.oracleSchedulingFailed) {

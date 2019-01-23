@@ -470,6 +470,24 @@ const schema = new GraphQLSchema({
           return { id: workspaceId };
         }
       },
+      findNextMaybeSuboptimalWorkspace: {
+        type: workspaceType,
+        resolve: async (_, args, context) => {
+          const user = await userFromContext(context);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting get next workspace."
+            );
+          }
+
+          await scheduler.assignNextMaybeSuboptimalWorkspace(user.user_id);
+
+          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
+            user.user_id
+          );
+          return { id: workspaceId };
+        }
+      },
       leaveCurrentWorkspace: {
         type: GraphQLBoolean,
         resolve: requireUser(

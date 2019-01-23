@@ -14,6 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 import { NextEpisodeShowPage } from "./pages/NextEpisodeShowPage";
+import { NextMaybeSuboptimalEpisodeShowPage } from "./pages/NextMaybeSuboptimalEpisodeShowPage"
 import { BetweenEpisodesPage } from "./pages/BetweenEpisodesPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 import { applyMiddleware, combineReducers, createStore } from "redux";
@@ -91,6 +92,7 @@ const Routes = () => (
     <Route exact={true} path="/workspaces" render={() => <Redirect to="/" />} />
     <Route exact={true} path="/" component={RootWorkspacePage} />
     <Route exact={true} path="/next" component={NextEpisodeShowPage} />
+    <Route exact={true} path="/nextMaybeSuboptimal" component={NextMaybeSuboptimalEpisodeShowPage} />
     <Route exact={true} path="/break" component={BetweenEpisodesPage} />
     <Route
       exact={true}
