@@ -32,6 +32,10 @@ class Scheduler {
     this.timeLimit = timeLimit;
   }
 
+  public async getUserActivity(userId) {
+    return this.schedule.getUserActivity(userId);
+  }
+
   public async getIdOfCurrentWorkspace(userId) {
     const assignment = this.schedule.getMostRecentAssignmentForUser(userId);
 

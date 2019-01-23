@@ -1,4 +1,5 @@
 class Assignment {
+  private endAtTimestamp;
   private startAtTimestamp;
   private userId;
   private workspace;
@@ -15,6 +16,14 @@ class Assignment {
 
   public getWorkspace() {
     return this.workspace;
+  }
+
+  public endAssignment() {
+    this.endAtTimestamp = Date.now();
+  }
+
+  public getHowLongDidAssignmentLast() {
+    return this.endAtTimestamp - this.startAtTimestamp;
   }
 }
 

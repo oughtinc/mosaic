@@ -23,6 +23,13 @@ class UserSchedule {
     this.userId = userId;
   }
 
+  public getUserActivity() {
+    return this.userSchedule.map(assignment => ({
+      howLongDidAssignmentLast: assignment.getHowLongDidAssignmentLast(),
+      workspace: assignment.getWorkspace(),
+    }));
+  }
+
   public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false, isLastAssignmentTimed = true) {
     const assignment = new Assignment({
       userId: this.userId,
@@ -42,6 +49,10 @@ class UserSchedule {
   }
 
   public leaveCurrentWorkspace() {
+    const curAssignment = this.getMostRecentAssignment();
+    curAssignment.endAssignment();
+    // TODO refactor away this.hasUserLeftLastAssignment now that we can
+    // assignment.endAssignment()
     this.hasUserLeftLastAssignment = true;
   }
 

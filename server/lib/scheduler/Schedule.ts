@@ -19,6 +19,12 @@ class Schedule {
     this.timeLimit = timeLimit;
   }
 
+  public async getUserActivity(userId) {
+    this.createUserScheduleIfNotCreated(userId);
+    const userSchedule = this.getUserSchedule(userId);
+    return userSchedule.getUserActivity();
+  }
+
   private doesUserHaveASchedule(userId) {
     return this.schedule.has(userId);
   }
