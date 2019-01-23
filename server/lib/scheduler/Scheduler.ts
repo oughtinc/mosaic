@@ -110,7 +110,6 @@ class Scheduler {
 
     if (actionableWorkspaces.length === 0) {
       actionableWorkspaces = await this.getActionableWorkspaces({
-        considerNonStale: true, 
         maybeSuboptimal, 
         userId,
       });
@@ -145,7 +144,6 @@ class Scheduler {
   }
 
   private async getActionableWorkspaces({ 
-    considerNonStale = false, 
     maybeSuboptimal, 
     userId,
   }) {
@@ -155,7 +153,6 @@ class Scheduler {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
       const randomlySelectedTree = pickRandomItemFromArray(leastRecentlyWorkedOnTreesToConsider);
       const actionableWorkspaces = await this.getActionableWorkspacesForTree({
-        considerNonStale,
         maybeSuboptimal,
         rootWorkspace: randomlySelectedTree,
         userId,
@@ -177,7 +174,6 @@ class Scheduler {
   }
 
   private async getActionableWorkspacesForTree({
-    considerNonStale,
     maybeSuboptimal,
     rootWorkspace,
     userId,
@@ -208,8 +204,7 @@ class Scheduler {
 
     const staleWorkspaces = await this.filterByStaleness(workspacesWithAtLeastMinBudget);
 
-    // filter by staleness IF there are some stale ones
-    if (staleWorkspaces.length > 0 && !considerNonStale) {
+    if (!maybeSuboptimal) {
       eligibleWorkspaces = staleWorkspaces;
     }
 
