@@ -41,9 +41,8 @@ class DistanceFromWorkedOnWorkspaceCache {
     // we keep track of what we've added so we don't add an already added node to the queue
     const idsOfWorkspacesAlreadyAddedToQueue: any = [workspace.id];
 
-    let curWorkspace;
     while (queue.length > 0) {
-      curWorkspace = queue.pop();
+      const curWorkspace = queue.pop();
 
       const hasUserWorkedOnWorkspace = this.userSchedule.hasUserWorkedOnWorkspace(curWorkspace);
       if (hasUserWorkedOnWorkspace) {
@@ -63,7 +62,7 @@ class DistanceFromWorkedOnWorkspaceCache {
 
       let howManyWorkspacesAddedToQueueThisTime = 0;
 
-      // add parent
+      // add parent (if there is one) to queue
       if (curWorkspace.parentId) {
         const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(id => id === curWorkspace.parentId);
         if (!hasBeenAlreadyAdded) {
@@ -74,7 +73,7 @@ class DistanceFromWorkedOnWorkspaceCache {
         }
       }
 
-      // add children
+      // add children (if there are any) to queue
       const children = this.workspacesInTree.filter(w => w.parentId && w.parentId === curWorkspace.id);
       if (children.length > 0) {
         children.forEach(child => {
@@ -97,6 +96,7 @@ class DistanceFromWorkedOnWorkspaceCache {
       // and modify node tracking
       if (isLeavingLevel) {
         distance++;
+        // if we ever hit upper bound, can stop there
         if (upperBoundForDistAwayFromWorkedOnWorkspace === distance) {
           return upperBoundForDistAwayFromWorkedOnWorkspace;
         }
