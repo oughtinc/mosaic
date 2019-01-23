@@ -5,6 +5,7 @@ const ORACLE_TIME_LIMIT = 1000 * 60 * 15;
 const TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET = 1000 * 60 * 20;
 
 class UserSchedule {
+  private distanceFromWorkedOnWorkspaceCache;
   private DistanceFromWorkedOnWorkspaceCache;
   private lastWorkedOnTimestampForTree = {};
   private rootParentCache;
@@ -128,16 +129,19 @@ class UserSchedule {
 
   public getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
     minDist,
+    shouldResetCache = true,
     workspaces,
     workspacesInTree,
   }) {
-    const distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
-      userSchedule: this,
-      workspacesInTree,
-    });
+    if (shouldResetCache) {
+      this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
+        userSchedule: this,
+        workspacesInTree,
+      });
+    }
 
     const workspacesWithDist = workspaces.map(w => ({
-      distance: distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
+      distance: this.distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
       workspace: w,
     }));
 
@@ -149,23 +153,25 @@ class UserSchedule {
   }
 
   public getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    shouldResetCache = true,
     workspaces,
     workspacesInTree,
   }) {
-    const distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
-      userSchedule: this,
-      workspacesInTree,
-    });
+    if (shouldResetCache) {
+      this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
+        userSchedule: this,
+        workspacesInTree,
+      });
+    }
 
     const workspacesWithDist = workspaces.map(w => ({
-      distance: distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
+      distance: this.distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
       workspace: w,
     }));
-
+    
     const maxDist = _.max(workspacesWithDist.map(o => o.distance));
 
     const maxWorkspacesWithDist = workspacesWithDist.filter(o => o.distance === maxDist);
-
     const maxWorkspaces = maxWorkspacesWithDist.map(o => o.workspace);
 
     return maxWorkspaces;

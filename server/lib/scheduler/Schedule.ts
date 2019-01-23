@@ -119,6 +119,7 @@ class Schedule {
   public getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
     minDist,
     userId,
+    shouldResetCache = true,
     workspaces,
     workspacesInTree,
   }) {
@@ -126,6 +127,7 @@ class Schedule {
     const userSchedule = this.getUserSchedule(userId);
     return userSchedule.getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
       minDist,
+      shouldResetCache,
       workspaces, 
       workspacesInTree,
     });
@@ -133,6 +135,7 @@ class Schedule {
 
   public getWorkspacesWithMostDistFromWorkedOnWorkspace({
     minDist,
+    shouldResetCache = true,
     userId,
     workspaces,
     workspacesInTree,
@@ -141,6 +144,7 @@ class Schedule {
     const userSchedule = this.getUserSchedule(userId);
     return userSchedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
       minDist,
+      shouldResetCache,
       workspaces, 
       workspacesInTree,
     });

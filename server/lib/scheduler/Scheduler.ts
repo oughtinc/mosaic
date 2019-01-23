@@ -221,6 +221,7 @@ class Scheduler {
     }
 
     const workspacesWithMostDistFromWorkedOnWorkspace = this.getWorkspacesWithMostDistFromWorkedOnWorkspace({
+      shouldResetCache: false,
       userId,
       workspaces: workspaceWithLeastRequiredWorkAmongDescendants,
       workspacesInTree,
@@ -312,12 +313,14 @@ class Scheduler {
 
   private getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
     minDist,
+    shouldResetCache = true,
     userId,
     workspaces,
     workspacesInTree,
   }) {
     return this.schedule.getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
       minDist,
+      shouldResetCache,
       userId,
       workspaces, 
       workspacesInTree,
@@ -325,11 +328,13 @@ class Scheduler {
   }
 
   private getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    shouldResetCache = true,
     userId,
     workspaces,
     workspacesInTree,
   }) {
     return this.schedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
+      shouldResetCache,  
       userId,
       workspaces, 
       workspacesInTree,
