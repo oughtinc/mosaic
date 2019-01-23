@@ -204,25 +204,29 @@ class Scheduler {
 
     const staleWorkspaces = await this.filterByStaleness(workspacesWithAtLeastMinBudget);
 
-    if (!maybeSuboptimal) {
-      eligibleWorkspaces = staleWorkspaces;
-    }
-
-    let workspacesWithMostDistFromWorkedOnWorkspace = await this.getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    eligibleWorkspaces = staleWorkspaces;
+    
+    const workspacesExceedingDistCuoff = await this.getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
       minDist: maybeSuboptimal ? 1 : 2,
       userId,
       workspaces: eligibleWorkspaces,
       workspacesInTree,
     });
 
-    let workspaceWithLeastRequiredWorkAmongDescendants = workspacesWithMostDistFromWorkedOnWorkspace;
+    let workspaceWithLeastRequiredWorkAmongDescendants = workspacesExceedingDistCuoff;
     if (rootWorkspace.hasTimeBudget) {
-      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(workspacesWithMostDistFromWorkedOnWorkspace);
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(workspacesExceedingDistCuoff);
     } else if (rootWorkspace.hasIOConstraints) {
-      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(workspacesWithMostDistFromWorkedOnWorkspace);
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(workspacesExceedingDistCuoff);
     }
 
-    const finalWorkspaces = workspaceWithLeastRequiredWorkAmongDescendants;
+    const workspacesWithMostDistFromWorkedOnWorkspace = this.getWorkspacesWithMostDistFromWorkedOnWorkspace({
+      userId,
+      workspaces: workspaceWithLeastRequiredWorkAmongDescendants,
+      workspacesInTree,
+    });
+
+    const finalWorkspaces = workspacesWithMostDistFromWorkedOnWorkspace;
 
     return finalWorkspaces;
   }
@@ -306,14 +310,26 @@ class Scheduler {
     return (workspace.totalBudget - workspace.allocatedBudget) >= 90;
   }
 
-  private getWorkspacesWithMostDistFromWorkedOnWorkspace({
+  private getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
     minDist,
     userId,
     workspaces,
     workspacesInTree,
   }) {
-    return this.schedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    return this.schedule.getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
       minDist,
+      userId,
+      workspaces, 
+      workspacesInTree,
+    });
+  }
+
+  private getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    userId,
+    workspaces,
+    workspacesInTree,
+  }) {
+    return this.schedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
       userId,
       workspaces, 
       workspacesInTree,

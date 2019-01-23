@@ -1,6 +1,5 @@
 import * as _ from "lodash";
 import { Assignment } from "./Assignment";
-import { RootParentFinder } from "./RootParentFinder";
 
 const ORACLE_TIME_LIMIT = 1000 * 60 * 15;
 const TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET = 1000 * 60 * 20;
@@ -11,7 +10,7 @@ class UserSchedule {
   private rootParentCache;
   private timeLimit;
   private userId;
-  private userSchedule = [];
+  private userSchedule: any = [];
   private hasUserLeftLastAssignment = false;
   private isLastAssignmentOracle = false;
   private isLastAssignmentTimed = true;
@@ -127,7 +126,7 @@ class UserSchedule {
     return false;
   }
 
-  public getWorkspacesWithMostDistFromWorkedOnWorkspace({
+  public getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
     minDist,
     workspaces,
     workspacesInTree,
@@ -142,12 +141,28 @@ class UserSchedule {
       workspace: w,
     }));
 
-    const maxDist = _.max(workspacesWithDist.map(o => o.distance));
+    const workspacesExceedingMinDistFromWorkedOnWorkspace = workspacesWithDist
+      .filter(o => o.distance >= minDist)
+      .map(o => o.workspace);
+    
+    return workspacesExceedingMinDistFromWorkedOnWorkspace
+  }
 
-    // if no workspace exceeds min dist, then no workspace gets returned
-    if (!maxDist || maxDist < minDist) {
-      return [];
-    }
+  public getWorkspacesWithMostDistFromWorkedOnWorkspace({
+    workspaces,
+    workspacesInTree,
+  }) {
+    const distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
+      userSchedule: this,
+      workspacesInTree,
+    });
+
+    const workspacesWithDist = workspaces.map(w => ({
+      distance: distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
+      workspace: w,
+    }));
+
+    const maxDist = _.max(workspacesWithDist.map(o => o.distance));
 
     const maxWorkspacesWithDist = workspacesWithDist.filter(o => o.distance === maxDist);
 
