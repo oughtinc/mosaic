@@ -3,15 +3,15 @@ import * as React from "react";
 import { listOfSlateNodesToText } from "../../lib/slateParser";
 
 const RootBlock = (props: any) => {
-  const { block, defaultText = "", style } = props;
+  const { block, defaultText = "", shouldTurnExportsIntoImports = false, style } = props;
   let displayText = defaultText;
   if (block && block.value) {
 
     let blockText;
     if (_.isArray(block.value)) {
-      blockText = listOfSlateNodesToText(block.value);
+      blockText = listOfSlateNodesToText(block.value, shouldTurnExportsIntoImports);
     } else {
-      blockText = listOfSlateNodesToText([block.value]);
+      blockText = listOfSlateNodesToText([block.value], shouldTurnExportsIntoImports);
     }
 
     if (_.trim(blockText) !== "") {
