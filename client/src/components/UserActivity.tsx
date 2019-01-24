@@ -100,7 +100,7 @@ export class UserActivityPresentational extends React.Component<any, any> {
                   >
                     <BlockContainer>
                       <BlockBody>
-                        <RootBlock block={question} />   
+                        <RootBlock block={question} style={{ maxWidth: "358px" }} />   
                       </BlockBody>
                     </BlockContainer>
                     <div

@@ -2,7 +2,8 @@ import * as _ from "lodash";
 import * as React from "react";
 import { listOfSlateNodesToText } from "../../lib/slateParser";
 
-const RootBlock = ({ block, defaultText = ""}) => {
+const RootBlock = (props: any) => {
+  const { block, defaultText = "", style } = props;
   let displayText = defaultText;
   if (block && block.value) {
 
@@ -26,7 +27,8 @@ const RootBlock = ({ block, defaultText = ""}) => {
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
-          minWidth: 0
+          minWidth: 0,
+          ...style,
         }}
       >
       {displayText}
