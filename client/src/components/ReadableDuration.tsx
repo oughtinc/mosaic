@@ -13,23 +13,25 @@ class ReadableDuration extends React.Component<any,  any> {
     const isExactlySixtySeconds = (durationInMs / 1000 === 60);
     const isSixtySecondsOrLess = (durationInMs / 1000 <= 60);
 
+    const numberFontSize = this.props.numberFontSize || "28px";
+
     if (this.props.durationInMs < 0) {
       return (
         <span>
-          <span style={{ fontSize: "28px" }}>0</span>s
+          <span style={{ fontSize: numberFontSize }}>0</span>s
         </span>
       );
     }
 
     return (
-      <div style={this.props.style}>
+      <span style={this.props.style}>
         {
           isADayOrMore
           &&
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: numberFontSize,
               }}
             >
               {Duration.fromObject({ days: duration.days }).toFormat("d")}
@@ -44,7 +46,7 @@ class ReadableDuration extends React.Component<any,  any> {
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: numberFontSize,
               }}
             >
               {Duration.fromObject({ hours: duration.hours }).toFormat("h")}
@@ -59,7 +61,7 @@ class ReadableDuration extends React.Component<any,  any> {
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: numberFontSize,
               }}
             >
               {Duration.fromObject({ minutes: duration.minutes }).toFormat("m")}
@@ -78,7 +80,7 @@ class ReadableDuration extends React.Component<any,  any> {
           <span>
             <span
               style={{
-                fontSize: "28px",
+                fontSize: numberFontSize,
               }}
             >
               {
@@ -92,7 +94,7 @@ class ReadableDuration extends React.Component<any,  any> {
             s
           </span>
         }
-      </div>
+      </span>
     );
   }
 }

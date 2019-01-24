@@ -6,10 +6,18 @@ import { compose } from "recompose";
 import { EpisodeNav } from "./EpisodeShowPage/EpisodeNav";
 import { Auth } from "../auth";
 import { ContentContainer } from  "../components/ContentContainer";
+import { UserActivity } from "../components/UserActivity";
 
 export class BetweenEpisodesPagePresentational extends React.Component<any, any> {
+  state = {
+    hasLeftCurrentWorkspace: false,
+  }
+
   public async componentDidMount() {
     await this.props.leaveCurrentWorkspaceMutation();
+    this.setState({
+      hasLeftCurrentWorkspace: true,
+    });
   }
 
   public render() {
@@ -25,7 +33,14 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
           />
         )}
         <ContentContainer>
-          Great job! Now is your chance to take a break. Press the button above when you're ready to start on the next workspace.
+          <div style={{ textAlign: "center" }}>
+          Great job! Now is your chance to take a break. Press the button above when you're ready to start on the next workspace. 
+          </div>
+          {
+            this.state.hasLeftCurrentWorkspace
+            &&
+            <UserActivity />
+          }
         </ContentContainer>
       </div>
     );
