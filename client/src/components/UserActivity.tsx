@@ -78,7 +78,7 @@ export class UserActivityPresentational extends React.Component<any, any> {
                 style={{
                   alignItems: "center",
                   display: "flex",
-                  marginBottom: "10px",
+                  marginBottom: "30px",
                   maxWidth: "500px",
                 }}
               >
@@ -94,15 +94,31 @@ export class UserActivityPresentational extends React.Component<any, any> {
                     numberFontSize="18px"
                   />
                 </div>
-                <BlockContainer
+                <div
                   style={{
                     flexGrow: 1,
+                    position: "relative"
                   }}
                 >
-                  <BlockBody>
-                    <RootBlock block={question} />   
-                  </BlockBody>
-                </BlockContainer>
+                  <BlockContainer>
+                    <BlockBody>
+                      <RootBlock block={question} />   
+                    </BlockBody>
+                  </BlockContainer>
+                  <div
+                    style={{
+                      bottom: "-20px",
+                      color: "#888",
+                      left: "10px",
+                      position: "absolute",
+                    }}
+                  >
+                    <span style={{ color: "#666" }}>{assignment.totalUsersWhoHaveWorkedOnWorkspace}</span>
+                    {" "}
+                    other user{assignment.totalUsersWhoHaveWorkedOnWorkspace !== 1 ? "s" : ""}{" "}
+                    have worked on this workspace
+                  </div>
+                </div>
               </div>
             );
           })
@@ -117,6 +133,7 @@ query userActivityQuery($userId: String) {
   userActivity(userId: $userId) {
     assignments {
       howLongDidAssignmentLast
+      totalUsersWhoHaveWorkedOnWorkspace
       workspace {
         id
         blocks {
