@@ -14,7 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 import { NextEpisodeShowPage } from "./pages/NextEpisodeShowPage";
-import { NextMaybeSuboptimalEpisodeShowPage } from "./pages/NextMaybeSuboptimalEpisodeShowPage"
+import { NextMaybeSuboptimalEpisodeShowPage } from "./pages/NextMaybeSuboptimalEpisodeShowPage";
 import { BetweenEpisodesPage } from "./pages/BetweenEpisodesPage";
 import { RootWorkspacePage } from "./pages/RootWorkspacePage";
 import { applyMiddleware, combineReducers, createStore } from "redux";

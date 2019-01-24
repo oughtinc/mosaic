@@ -3,14 +3,13 @@ import styled from "styled-components";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
-import { RootBlock } from "../pages/RootWorkspacePage/RootBlock"
+import { RootBlock } from "../pages/RootWorkspacePage/RootBlock";
 import { Auth } from "../auth";
 
 import { ReadableDuration } from "./ReadableDuration";
 
 import {
   blockBorderAndBoxShadow,
-  blockHeaderCSS,
   blockBodyCSS,
 } from "../styles";
 
@@ -54,7 +53,7 @@ export class UserActivityPresentational extends React.Component<any, any> {
             {" "}workspace{this.props.userActivityQuery.userActivity.assignments.length !== 1 ? "s" : ""} visited
             <br />
             <ReadableDuration
-              durationInMs={this.props.userActivityQuery.userActivity.assignments.reduce((acc, val) => {return acc + val.howLongDidAssignmentLast}, 0) / this.props.userActivityQuery.userActivity.assignments.length}
+              durationInMs={this.props.userActivityQuery.userActivity.assignments.reduce((acc: number, val) => { return acc + Number(val.howLongDidAssignmentLast); }, 0) / this.props.userActivityQuery.userActivity.assignments.length}
               numberFontSize="24px"
               style={{
                 color: "#11aa11",
@@ -69,58 +68,57 @@ export class UserActivityPresentational extends React.Component<any, any> {
           this.props.userActivityQuery.userActivity.assignments
             .map((elem, i, arr) => arr[arr.length - 1 - i]) // hacky immutable reverse :)
             .map(assignment => {
-            console.log(assignment.howLongDidAssignmentLast)
-            const workspace = assignment.workspace;
-            const question = workspaceToBlock(workspace, "QUESTION"); 
-            return (
-              <div
-                key={workspace.id} 
-                style={{
-                  alignItems: "center",
-                  display: "flex",
-                  marginBottom: "30px",
-                  maxWidth: "500px",
-                }}
-              >
+              const workspace = assignment.workspace;
+              const question = workspaceToBlock(workspace, "QUESTION"); 
+              return (
                 <div
+                  key={workspace.id} 
                   style={{
-                    paddingRight: "10px",
-                    textAlign: "right",
-                    width: "120px"
+                    alignItems: "center",
+                    display: "flex",
+                    marginBottom: "30px",
+                    maxWidth: "500px",
                   }}
                 >
-                  <ReadableDuration
-                    durationInMs={assignment.howLongDidAssignmentLast}
-                    numberFontSize="18px"
-                  />
-                </div>
-                <div
-                  style={{
-                    flexGrow: 1,
-                    position: "relative"
-                  }}
-                >
-                  <BlockContainer>
-                    <BlockBody>
-                      <RootBlock block={question} />   
-                    </BlockBody>
-                  </BlockContainer>
                   <div
                     style={{
-                      bottom: "-20px",
-                      color: "#888",
-                      left: "10px",
-                      position: "absolute",
+                      paddingRight: "10px",
+                      textAlign: "right",
+                      width: "120px"
                     }}
                   >
-                    <span style={{ color: "#666" }}>{assignment.totalUsersWhoHaveWorkedOnWorkspace - 1}</span>
-                    {" "}
-                    other user{assignment.totalUsersWhoHaveWorkedOnWorkspace - 1 !== 1 ? "s" : ""}{" "}
-                    have worked on this workspace
+                    <ReadableDuration
+                      durationInMs={assignment.howLongDidAssignmentLast}
+                      numberFontSize="18px"
+                    />
+                  </div>
+                  <div
+                    style={{
+                      flexGrow: 1,
+                      position: "relative"
+                    }}
+                  >
+                    <BlockContainer>
+                      <BlockBody>
+                        <RootBlock block={question} />   
+                      </BlockBody>
+                    </BlockContainer>
+                    <div
+                      style={{
+                        bottom: "-20px",
+                        color: "#888",
+                        left: "10px",
+                        position: "absolute",
+                      }}
+                    >
+                      <span style={{ color: "#666" }}>{assignment.totalUsersWhoHaveWorkedOnWorkspace - 1}</span>
+                      {" "}
+                      other user{assignment.totalUsersWhoHaveWorkedOnWorkspace - 1 !== 1 ? "s" : ""}{" "}
+                      have worked on this workspace
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
+              );
           })
         }
       </div>
@@ -155,4 +153,3 @@ export const UserActivity = compose(
     },
   }),
 )(UserActivityPresentational);
-

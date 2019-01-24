@@ -9,9 +9,9 @@ import { ContentContainer } from  "../components/ContentContainer";
 import { UserActivity } from "../components/UserActivity";
 
 export class BetweenEpisodesPagePresentational extends React.Component<any, any> {
-  state = {
+  public state = {
     hasLeftCurrentWorkspace: false,
-  }
+  };
 
   public async componentDidMount() {
     await this.props.leaveCurrentWorkspaceMutation();
