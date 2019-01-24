@@ -91,7 +91,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
                 textAlign: "justify",
               }}
             >
-              Another option is to search for a workspace that is "suboptimal" in the sense that you might have already worked on a workspace close to this one. We recommend trying this if a couple of refreshes fails to fetch an eligible workspace.
+              Another option is to search for a workspace that is "suboptimal" in the sense that you might have already worked on a workspace close to this one.
               <div 
                 style={{
                   alignItems: "center",
