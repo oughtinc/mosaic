@@ -32,14 +32,14 @@ class CharCountDisplaysPresentational extends React.Component<any,  any> {
             input
             <div
               style={{
-                color: this.props.inputCharCount < 200 ? "green" : (this.props.inputCharCount < 300 ? "yellow" : "red"),
+                color: this.props.inputCharCount < 250 ? "green" : (this.props.inputCharCount < 350 ? "yellow" : "red"),
                 fontSize: "24px",
                 margin: "3px 0 0 5px",
                 textAlign: "center",
-                textShadow: this.props.inputCharCount >= 200 && this.props.inputCharCount < 300 && "0 0 1px #333",
+                textShadow: this.props.inputCharCount >= 250 && this.props.inputCharCount < 350 && "0 0 1px #333",
               }}
             >
-              {300 - this.props.inputCharCount}
+              {350 - this.props.inputCharCount}
             </div>
           </span>
         </span>
