@@ -419,22 +419,6 @@ export class WorkspaceView extends React.Component<any, any> {
                           </div>
                         )}
                     </div>
-                    {
-                      Auth.isAuthenticated()
-                      &&
-                      <div
-                        style={{
-                          marginBottom: "15px",
-                        }}
-                      >
-                        <AdvancedOptions 
-                          shouldAutoExport={this.state.shouldAutoExport}
-                          handleShouldAutoExportToggle={this.handleShouldAutoExportToggle}
-                          pastedExportFormat={this.state.pastedExportFormat}
-                          handlePastedExportFormatChange={this.handlePastedExportFormatChange}
-                        />
-                      </div>
-                    }
                   </Col>
                 </Row>
                 <Row>
@@ -540,6 +524,17 @@ export class WorkspaceView extends React.Component<any, any> {
                         />
                       }
                     </BlockContainer>
+
+                    {
+                      Auth.isAuthenticated()
+                      &&
+                      <AdvancedOptions 
+                        shouldAutoExport={this.state.shouldAutoExport}
+                        handleShouldAutoExportToggle={this.handleShouldAutoExportToggle}
+                        pastedExportFormat={this.state.pastedExportFormat}
+                        handlePastedExportFormatChange={this.handlePastedExportFormatChange}
+                      />
+                    }
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
