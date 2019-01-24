@@ -60,7 +60,7 @@ export class UserActivityPresentational extends React.Component<any, any> {
                 fontSize: "16px"
               }}
             />
-            {" "}minutes average time spent on each workspace
+            {" "}average time spent on each workspace
           </div>
         }
         {
