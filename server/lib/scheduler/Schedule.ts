@@ -22,7 +22,16 @@ class Schedule {
   public async getUserActivity(userId) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
-    return userSchedule.getUserActivity();
+    const userActivity = userSchedule.getUserActivity();
+    const userActivityWithMoreStats = userActivity.map(assignment => {
+      return {
+        ...assignment,
+        totalUsersWhoHaveWorkedOnWorkspace: [...this.schedule].filter(([userId, curUserSchedule]) => {
+          return curUserSchedule.hasUserWorkedOnWorkspace(assignment.workspace);
+        }).length,
+      }
+    });
+    return userActivityWithMoreStats;
   }
 
   private doesUserHaveASchedule(userId) {

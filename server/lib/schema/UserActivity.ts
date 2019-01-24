@@ -19,6 +19,9 @@ export const UserActivityType = new GraphQLObjectType({
             howLongDidAssignmentLast: {
               type: GraphQLInt,
             },
+            totalUsersWhoHaveWorkedOnWorkspace: {
+              type: GraphQLInt,
+            },
             workspace: {
               type: workspaceType
             },
