@@ -113,9 +113,9 @@ export class UserActivityPresentational extends React.Component<any, any> {
                       position: "absolute",
                     }}
                   >
-                    <span style={{ color: "#666" }}>{assignment.totalUsersWhoHaveWorkedOnWorkspace}</span>
+                    <span style={{ color: "#666" }}>{assignment.totalUsersWhoHaveWorkedOnWorkspace - 1}</span>
                     {" "}
-                    other user{assignment.totalUsersWhoHaveWorkedOnWorkspace !== 1 ? "s" : ""}{" "}
+                    other user{assignment.totalUsersWhoHaveWorkedOnWorkspace - 1 !== 1 ? "s" : ""}{" "}
                     have worked on this workspace
                   </div>
                 </div>
