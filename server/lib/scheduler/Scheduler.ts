@@ -6,9 +6,10 @@ class Scheduler {
   private fetchAllWorkspacesInTree;
   private fetchAllRootWorkspaces;
   private isInOracleMode;
-  private NumberOfStaleDescendantsCache;
   private numberOfStaleDescendantsCache;
+  private NumberOfStaleDescendantsCache;
   private remainingBudgetAmongDescendantsCache;
+  private RemainingBudgetAmongDescendantsCache;
   private rootParentCache;
   private schedule;
   private timeLimit;
@@ -18,7 +19,7 @@ class Scheduler {
     fetchAllRootWorkspaces,
     isInOracleMode,
     NumberOfStaleDescendantsCache,
-    remainingBudgetAmongDescendantsCache,
+    RemainingBudgetAmongDescendantsCache,
     rootParentCache,
     schedule,
     timeLimit,
@@ -27,7 +28,7 @@ class Scheduler {
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
     this.isInOracleMode = isInOracleMode;
     this.NumberOfStaleDescendantsCache = NumberOfStaleDescendantsCache;
-    this.remainingBudgetAmongDescendantsCache = remainingBudgetAmongDescendantsCache;
+    this.RemainingBudgetAmongDescendantsCache = RemainingBudgetAmongDescendantsCache;
     this.rootParentCache = rootParentCache;
     this.schedule = schedule;
     this.timeLimit = timeLimit;
@@ -52,7 +53,7 @@ class Scheduler {
   public async assignNextWorkspaceForOracle(userId) {
     // clear caches so we don't rely on old information
     this.rootParentCache.clearRootParentCache();
-    this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
+    this.remainingBudgetAmongDescendantsCache = new this.RemainingBudgetAmongDescendantsCache();
     this.numberOfStaleDescendantsCache = new this.NumberOfStaleDescendantsCache();
 
     let treesToConsider = await this.fetchAllRootWorkspaces();
@@ -108,7 +109,7 @@ class Scheduler {
   public async assignNextWorkspace(userId, maybeSuboptimal = false) {
     // clear caches so we don't rely on old information
     this.rootParentCache.clearRootParentCache();
-    this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
+    this.remainingBudgetAmongDescendantsCache = new this.RemainingBudgetAmongDescendantsCache();
     this.numberOfStaleDescendantsCache = new this.NumberOfStaleDescendantsCache();
 
     let actionableWorkspaces = await this.getActionableWorkspaces({ maybeSuboptimal, userId });

@@ -2,13 +2,13 @@ import * as _ from "lodash";
 import * as models from "../models";
 
 class RemainingBudgetAmongDescendantsCache {
-  private static cache = new Map();
+  private cache = new Map();
 
-  public static clearRemainingBudgetAmongDescendantsCache() {
+  public clearRemainingBudgetAmongDescendantsCache() {
     this.cache = new Map();
   }
 
-  public static async getRemainingBudgetAmongDescendants(workspace) {
+  public async getRemainingBudgetAmongDescendants(workspace) {
     const workspaceAlreadyCached = this.cache.has(workspace.id);
 
     if (workspaceAlreadyCached) {
@@ -24,7 +24,7 @@ class RemainingBudgetAmongDescendantsCache {
       let result = 0;
       for (const child of children) {
         result += child.totalBudget - child.allocatedBudget;
-        result += await RemainingBudgetAmongDescendantsCache.getRemainingBudgetAmongDescendants(child);
+        result += await this.getRemainingBudgetAmongDescendants(child);
       }
 
       this.cache.set(workspace.id, result);

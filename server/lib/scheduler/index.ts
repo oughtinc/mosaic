@@ -40,7 +40,7 @@ const scheduler = new Scheduler({
     timeLimit: NINETY_SECONDS,
   }),
   NumberOfStaleDescendantsCache,
-  remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
+  RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,
   timeLimit: NINETY_SECONDS,
 });
