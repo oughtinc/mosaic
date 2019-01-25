@@ -6,6 +6,7 @@ class Scheduler {
   private fetchAllWorkspacesInTree;
   private fetchAllRootWorkspaces;
   private isInOracleMode;
+  private NumberOfStaleDescendantsCache;
   private numberOfStaleDescendantsCache;
   private remainingBudgetAmongDescendantsCache;
   private rootParentCache;
@@ -16,7 +17,7 @@ class Scheduler {
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
     isInOracleMode,
-    numberOfStaleDescendantsCache,
+    NumberOfStaleDescendantsCache,
     remainingBudgetAmongDescendantsCache,
     rootParentCache,
     schedule,
@@ -25,7 +26,7 @@ class Scheduler {
     this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
     this.isInOracleMode = isInOracleMode;
-    this.numberOfStaleDescendantsCache = numberOfStaleDescendantsCache;
+    this.NumberOfStaleDescendantsCache = NumberOfStaleDescendantsCache;
     this.remainingBudgetAmongDescendantsCache = remainingBudgetAmongDescendantsCache;
     this.rootParentCache = rootParentCache;
     this.schedule = schedule;
@@ -52,7 +53,7 @@ class Scheduler {
     // clear caches so we don't rely on old information
     this.rootParentCache.clearRootParentCache();
     this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
-    this.numberOfStaleDescendantsCache.clearNumberOfStaleDescendantsCache();
+    this.numberOfStaleDescendantsCache = new this.NumberOfStaleDescendantsCache();
 
     let treesToConsider = await this.fetchAllRootWorkspaces();
     let wasWorkspaceAssigned = false;
@@ -108,7 +109,7 @@ class Scheduler {
     // clear caches so we don't rely on old information
     this.rootParentCache.clearRootParentCache();
     this.remainingBudgetAmongDescendantsCache.clearRemainingBudgetAmongDescendantsCache();
-    this.numberOfStaleDescendantsCache.clearNumberOfStaleDescendantsCache();
+    this.numberOfStaleDescendantsCache = new this.NumberOfStaleDescendantsCache();
 
     let actionableWorkspaces = await this.getActionableWorkspaces({ maybeSuboptimal, userId });
 

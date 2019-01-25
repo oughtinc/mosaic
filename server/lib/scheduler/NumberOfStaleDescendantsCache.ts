@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as models from "../models";
 
 interface Workspace {
   id: string;
@@ -9,13 +8,13 @@ interface Workspace {
 }
 
 class NumberOfStaleDescendantsCache {
-  private static cache = new Map();
+  private cache = new Map();
 
-  public static clearNumberOfStaleDescendantsCache() {
+  public clearNumberOfStaleDescendantsCache() {
     this.cache = new Map();
   }
 
-  public static async getNumberOfStaleDescendants(workspace: Workspace): Promise<number> {
+  public async getNumberOfStaleDescendants(workspace: Workspace): Promise<number> {
     const workspaceAlreadyCached: boolean = this.cache.has(workspace.id);
 
     if (workspaceAlreadyCached) {
@@ -29,7 +28,7 @@ class NumberOfStaleDescendantsCache {
     return numberOfStaleDescendants;
   }
 
-  private static async calculateNumberOfStaleDescendants(workspace: Workspace): Promise<number> {
+  private async calculateNumberOfStaleDescendants(workspace: Workspace): Promise<number> {
     const children = await workspace.getChildWorkspaces();
 
     if (children.length === 0) {
@@ -43,7 +42,7 @@ class NumberOfStaleDescendantsCache {
             result += 1;
           }
 
-          result += await NumberOfStaleDescendantsCache.getNumberOfStaleDescendants(child);
+          result += await this.getNumberOfStaleDescendants(child);
         }
       }
 

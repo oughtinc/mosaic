@@ -39,7 +39,7 @@ const scheduler = new Scheduler({
     rootParentCache: RootParentCache,
     timeLimit: NINETY_SECONDS,
   }),
-  numberOfStaleDescendantsCache: NumberOfStaleDescendantsCache,
+  NumberOfStaleDescendantsCache,
   remainingBudgetAmongDescendantsCache: RemainingBudgetAmongDescendantsCache,
   rootParentCache: RootParentCache,
   timeLimit: NINETY_SECONDS,
