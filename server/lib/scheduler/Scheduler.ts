@@ -51,10 +51,7 @@ class Scheduler {
   }
 
   public async assignNextWorkspaceForOracle(userId) {
-    // clear caches so we don't rely on old information
-    this.rootParentCache.clearRootParentCache();
-    this.remainingBudgetAmongDescendantsCache = new this.RemainingBudgetAmongDescendantsCache();
-    this.numberOfStaleDescendantsCache = new this.NumberOfStaleDescendantsCache();
+    this.resetCaches();
 
     let treesToConsider = await this.fetchAllRootWorkspaces();
     let wasWorkspaceAssigned = false;
@@ -107,10 +104,7 @@ class Scheduler {
   }
 
   public async assignNextWorkspace(userId, maybeSuboptimal = false) {
-    // clear caches so we don't rely on old information
-    this.rootParentCache.clearRootParentCache();
-    this.remainingBudgetAmongDescendantsCache = new this.RemainingBudgetAmongDescendantsCache();
-    this.numberOfStaleDescendantsCache = new this.NumberOfStaleDescendantsCache();
+    this.resetCaches();
 
     let actionableWorkspaces = await this.getActionableWorkspaces({ maybeSuboptimal, userId });
 
@@ -345,6 +339,12 @@ class Scheduler {
       workspaces, 
       workspacesInTree,
     });
+  }
+
+  private resetCaches() {
+    this.rootParentCache.clearRootParentCache();
+    this.remainingBudgetAmongDescendantsCache = new this.RemainingBudgetAmongDescendantsCache();
+    this.numberOfStaleDescendantsCache = new this.NumberOfStaleDescendantsCache();
   }
 }
 
