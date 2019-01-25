@@ -19,15 +19,15 @@ class DistanceFromWorkedOnWorkspaceCache {
       return this.cache.get(workspace.id);
     }
 
-    const distFromWorkedOnWorkspace: number = this.calculateDistanceFromWorkedOnWorkspace(workspace);
+    const distanceFromWorkedOnWorkspace: number = this.calculateDistanceFromWorkedOnWorkspace(workspace);
 
-    if (distFromWorkedOnWorkspace === Infinity) {
+    if (distanceFromWorkedOnWorkspace === Infinity) {
       this.weKnowDistanceIsInfinity = true;
     }
 
-    this.cache.set(workspace.id, distFromWorkedOnWorkspace);
+    this.cache.set(workspace.id, distanceFromWorkedOnWorkspace);
 
-    return distFromWorkedOnWorkspace;
+    return distanceFromWorkedOnWorkspace;
   }
 
   private calculateDistanceFromWorkedOnWorkspace(workspace): number {
