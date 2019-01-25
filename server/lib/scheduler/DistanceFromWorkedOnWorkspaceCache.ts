@@ -32,10 +32,18 @@ class DistanceFromWorkedOnWorkspaceCache {
 
   private calculateDistFromWorkedOnWorkspace(workspace): number {
     let distance = 0;
+    
+    // I use "Distance" instead of "Dist" in next two variables because they
+    // are referring directly to the "distance" variable defined above, "Dist",
+    // on the other hand, as in "upperBoundForDistAwayFromWorkedOnWorkspace"
+    // is just an abbreviation for the concept of distance, NOT
+    // for the "distance" variable defined above
     let howManyNodesAreInQueueDistanceAway = 1;
     let howManyNodesAreInQueueDistancePlusOneAway = 0;
+
     let upperBoundForDistAwayFromWorkedOnWorkspace = Infinity;
-    
+
+    // we're using a queue to implemenet BFS
     const queue: any = [workspace];
 
     // we keep track of what we've added so we don't add an already added node to the queue
