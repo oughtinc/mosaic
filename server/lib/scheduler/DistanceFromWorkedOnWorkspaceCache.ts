@@ -1,6 +1,6 @@
 class DistanceFromWorkedOnWorkspaceCache {
   private cache = new Map();
-  private weKnowDistIsInfinity = false;
+  private weKnowDistanceIsInfinity = false;
   private userSchedule;
   private workspacesInTree;
 
@@ -9,8 +9,8 @@ class DistanceFromWorkedOnWorkspaceCache {
     this.workspacesInTree = workspacesInTree;
   }
 
-  public getDistFromWorkedOnWorkspace(workspace): number {
-    if (this.weKnowDistIsInfinity) {
+  public getDistanceFromWorkedOnWorkspace(workspace): number {
+    if (this.weKnowDistanceIsInfinity) {
       return Infinity;
     }
 
@@ -19,10 +19,10 @@ class DistanceFromWorkedOnWorkspaceCache {
       return this.cache.get(workspace.id);
     }
 
-    const distFromWorkedOnWorkspace: number = this.calculateDistFromWorkedOnWorkspace(workspace);
+    const distFromWorkedOnWorkspace: number = this.calculateDistanceFromWorkedOnWorkspace(workspace);
 
     if (distFromWorkedOnWorkspace === Infinity) {
-      this.weKnowDistIsInfinity = true;
+      this.weKnowDistanceIsInfinity = true;
     }
 
     this.cache.set(workspace.id, distFromWorkedOnWorkspace);
@@ -30,18 +30,12 @@ class DistanceFromWorkedOnWorkspaceCache {
     return distFromWorkedOnWorkspace;
   }
 
-  private calculateDistFromWorkedOnWorkspace(workspace): number {
-    let distance = 0;
-    
-    // I use "Distance" instead of "Dist" in next two variables because they
-    // are referring directly to the "distance" variable defined above, "Dist",
-    // on the other hand, as in "upperBoundForDistAwayFromWorkedOnWorkspace"
-    // is just an abbreviation for the concept of distance, NOT
-    // for the "distance" variable defined above
-    let howManyNodesAreInQueueDistanceAway = 1;
-    let howManyNodesAreInQueueDistancePlusOneAway = 0;
+  private calculateDistanceFromWorkedOnWorkspace(workspace): number {
+    let curDistance = 0;
+    let howManyNodesAreInQueueCurDistanceAway = 1;
+    let howManyNodesAreInQueueCurDistancePlusOneAway = 0;
 
-    let upperBoundForDistAwayFromWorkedOnWorkspace = Infinity;
+    let upperBoundForDistanceAwayFromWorkedOnWorkspace = Infinity;
 
     // we're using a queue to implemenet BFS
     const queue: any = [workspace];
@@ -54,19 +48,19 @@ class DistanceFromWorkedOnWorkspaceCache {
 
       const hasUserWorkedOnWorkspace = this.userSchedule.hasUserWorkedOnWorkspace(curWorkspace);
       if (hasUserWorkedOnWorkspace) {
-        return distance;
+        return curDistance;
       }
 
       const workspaceAlreadyCached: boolean = this.cache.has(curWorkspace.id);
       if (workspaceAlreadyCached) {
-        upperBoundForDistAwayFromWorkedOnWorkspace = Math.min(
-          upperBoundForDistAwayFromWorkedOnWorkspace,
-          this.cache.get(curWorkspace.id) + distance
+        upperBoundForDistanceAwayFromWorkedOnWorkspace = Math.min(
+          upperBoundForDistanceAwayFromWorkedOnWorkspace,
+          this.cache.get(curWorkspace.id) + curDistance
         );
       }
 
       // decrement the number of workspaces in queue distance away
-      howManyNodesAreInQueueDistanceAway--;
+      howManyNodesAreInQueueCurDistanceAway--;
 
       let howManyWorkspacesAddedToQueueThisTime = 0;
 
@@ -95,21 +89,21 @@ class DistanceFromWorkedOnWorkspaceCache {
       }
 
       // increment number of workspaces in queue distance+1 away
-      howManyNodesAreInQueueDistancePlusOneAway += howManyWorkspacesAddedToQueueThisTime;
+      howManyNodesAreInQueueCurDistancePlusOneAway += howManyWorkspacesAddedToQueueThisTime;
       
-      const isLeavingLevel = howManyNodesAreInQueueDistanceAway === 0;
+      const isLeavingLevel = howManyNodesAreInQueueCurDistanceAway === 0;
 
       // if we're leaving current level
       // increment distance
       // and modify node tracking
       if (isLeavingLevel) {
-        distance++;
+        curDistance++;
         // if we ever hit upper bound, can stop there
-        if (upperBoundForDistAwayFromWorkedOnWorkspace === distance) {
-          return upperBoundForDistAwayFromWorkedOnWorkspace;
+        if (upperBoundForDistanceAwayFromWorkedOnWorkspace === curDistance) {
+          return upperBoundForDistanceAwayFromWorkedOnWorkspace;
         }
-        howManyNodesAreInQueueDistanceAway = howManyNodesAreInQueueDistancePlusOneAway;
-        howManyNodesAreInQueueDistancePlusOneAway = 0;
+        howManyNodesAreInQueueCurDistanceAway = howManyNodesAreInQueueCurDistancePlusOneAway;
+        howManyNodesAreInQueueCurDistancePlusOneAway = 0;
       }
     }
 

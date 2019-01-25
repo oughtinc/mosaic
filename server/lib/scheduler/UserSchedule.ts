@@ -152,7 +152,7 @@ class UserSchedule {
     }
 
     const workspacesWithDist = workspaces.map(w => ({
-      distance: this.distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
+      distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(w),
       workspace: w,
     }));
 
@@ -176,7 +176,7 @@ class UserSchedule {
     }
 
     const workspacesWithDist = workspaces.map(w => ({
-      distance: this.distanceFromWorkedOnWorkspaceCache.getDistFromWorkedOnWorkspace(w),
+      distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(w),
       workspace: w,
     }));
     
