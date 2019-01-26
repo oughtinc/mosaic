@@ -50,10 +50,12 @@ class UserSchedule {
 
   public leaveCurrentWorkspace() {
     const curAssignment = this.getMostRecentAssignment();
-    curAssignment.endAssignment();
-    // TODO refactor away this.hasUserLeftLastAssignment now that we can
-    // assignment.endAssignment()
-    this.hasUserLeftLastAssignment = true;
+    if (curAssignment) {
+      curAssignment.endAssignment();
+      // TODO refactor away this.hasUserLeftLastAssignment now that we can
+      // assignment.endAssignment()
+      this.hasUserLeftLastAssignment = true;
+    }
   }
 
   public getMostRecentAssignment() {
@@ -116,6 +118,10 @@ class UserSchedule {
     }
 
     const lastWorkedOnAssignment = this.getMostRecentAssignment();
+    if (!lastWorkedOnAssignment) {
+      return false;
+    }
+
     const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
 
     // handle case where time budgets aren't in use, but

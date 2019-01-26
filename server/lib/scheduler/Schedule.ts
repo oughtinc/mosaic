@@ -67,7 +67,9 @@ class Schedule {
   public leaveCurrentWorkspace(userId) {
     if (this.doesUserHaveASchedule(userId)) {
       const userSchedule = this.getUserSchedule(userId);
-      userSchedule.leaveCurrentWorkspace();
+      if (userSchedule.isActiveInLastWorkspace()) {
+        userSchedule.leaveCurrentWorkspace();
+      }
     }
   }
 
