@@ -365,7 +365,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
               (
                 (Auth.isOracle() && this.props.isInOracleMode)
                 ||
-                this.props.hasTimer
+                this.props.isActive
               )
               &&
               <div

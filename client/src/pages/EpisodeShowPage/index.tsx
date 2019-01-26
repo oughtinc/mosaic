@@ -287,13 +287,15 @@ export class WorkspaceView extends React.Component<any, any> {
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const isActive = queryParams.active;
-    const hasTimer = queryParams.timer;
+    const hasURLTimeRestriction = queryParams.timer;
     const hasTimerEnded = this.state.hasTimerEnded;
 
     const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
-    const durationInMsGivenURLRestriction = moment.duration(queryParams.timer).asMilliseconds();
+    const durationInMsGivenURLRestriction = hasURLTimeRestriction ? moment.duration(queryParams.timer).asMilliseconds() : Infinity;
 
-    const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
+    const DEFAULT_MAX_TIMER_DURATION = 90 * 1000;
+
+    const durationInMs = Math.min(DEFAULT_MAX_TIMER_DURATION, durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
 
     const exportLockStatusInfo = workspace.exportLockStatusInfo;
     const unlockPointer = pointerId => this.props.unlockPointerMutation({
@@ -312,7 +314,7 @@ export class WorkspaceView extends React.Component<any, any> {
             hasSubquestions={hasSubquestions}
             isActive={isActive}
             isInOracleMode={isInOracleMode}
-            hasTimer={hasTimer}
+            hasTimeBudget={hasTimeBudget}
             hasTimerEnded={hasTimerEnded}
             updateStaleness={isStale =>
               this.props.updateWorkspace({
@@ -367,9 +369,9 @@ export class WorkspaceView extends React.Component<any, any> {
                         hasTimeBudget
                         ?
                         <TimerAndTimeBudgetInfo
+                          isActive={isActive}
                           durationInMs={durationInMs}
                           handleTimerEnd={this.handleTimerEnd}
-                          hasTimer={hasTimer}
                           initialAllocatedBudget={workspace.allocatedBudget}
                           tickDuration={this.tickDurationForCountdownTimer}
                           totalBudget={workspace.totalBudget}
@@ -460,7 +462,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       {
                         Auth.isAuthenticated()
                         &&
-                        ((isUserOracle && isInOracleMode) || hasTimer)
+                        isActive
                         &&
                         (!((isUserOracle && isInOracleMode) && !hasParent))
                         &&
@@ -546,7 +548,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       visibleExportIds={visibleExportIds}
                       exportLockStatusInfo={exportLockStatusInfo}
                       unlockPointer={unlockPointer}
-                      hasTimer={hasTimer}
+                      isActive={isActive}
                       isInOracleMode={isInOracleMode}
                       subquestionDraftProps={subquestionDraftProps}
                       isIsolatedWorkspace={isIsolatedWorkspace}

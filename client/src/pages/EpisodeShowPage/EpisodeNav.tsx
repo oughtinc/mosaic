@@ -36,7 +36,7 @@ const EpisodeNavContainer = styled.div`
 
 interface EpisodeNavProps {
   hasSubquestions: boolean;
-  hasTimer: boolean;
+  hasTimeBudget: boolean;
   hasTimerEnded: boolean;
   isActive: boolean;
   isInOracleMode: boolean;
@@ -53,7 +53,7 @@ interface EpisodeNavProps {
 class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
   public render() {
     const {
-      hasTimer,
+      hasTimeBudget,
       hasTimerEnded,
       isActive,
       isInOracleMode,
@@ -103,7 +103,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
           isActive
           ?
           (
-            hasTimer && hasTimerEnded
+            hasTimeBudget && hasTimerEnded
             ?
               <NextWorkspaceBtn
                 bsStyle="primary"

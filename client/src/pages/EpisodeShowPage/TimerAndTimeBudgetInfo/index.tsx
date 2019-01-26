@@ -43,7 +43,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
         }}
       >
         {
-          this.props.hasTimer
+          this.props.isActive
           &&
           <WorkspaceTimer
             totalDurationInMs={this.props.durationInMs}

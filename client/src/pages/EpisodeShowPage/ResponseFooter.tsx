@@ -41,9 +41,11 @@ class ResponseFooterPresentational extends React.Component<any, any> {
         }}
       >
         {
-          !(isUserOracle && isInOracleMode)
-          &&
-          hasParent
+          (
+            !(isUserOracle && isInOracleMode)
+            &&
+            hasParent
+          )
           ?
             <TakeBreakBtn
               label={`Done!${hasTimeBudget ? " (returns budget)" : ""}`}
