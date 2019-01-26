@@ -9,7 +9,7 @@ export class UserActivitySummary extends React.Component<any, any> {
     } = this.props;
 
     return (
-        <div
+      <div
         style={{
           paddingBottom: "15px",
           paddingLeft: "120px"

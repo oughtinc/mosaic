@@ -1,5 +1,4 @@
 import gql from "graphql-tag";
-import styled from "styled-components";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
