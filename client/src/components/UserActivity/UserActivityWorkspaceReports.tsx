@@ -10,6 +10,7 @@ export class UserActivityWorkspaceReports extends React.Component<any, any> {
       .map(assignment => {
         return (
           <UserActivityWorkspaceReport
+            key={assignment.workspace.id}
             assignment={assignment}
           />
         );

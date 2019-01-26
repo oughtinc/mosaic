@@ -127,7 +127,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `${(Auth.isOracle() && this.props.oracleModeQuery.oracleMode) ? "" : "?isolated=true&timer=0:1:30"}`;
+      const redirectQueryParams = `${(Auth.isOracle() && this.props.oracleModeQuery.oracleMode) ? "" : "?isolated=true&active=true"}`;
       window.location.href = `${window.location.origin}/workspaces/${this.state.workspaceId}${redirectQueryParams}`;
       return null;
     }

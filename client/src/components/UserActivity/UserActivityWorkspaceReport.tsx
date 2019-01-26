@@ -30,7 +30,6 @@ export class UserActivityWorkspaceReport extends React.Component<any, any> {
 
     return (
       <div
-        key={workspace.id}
         style={{
           alignItems: "center",
           display: "flex",

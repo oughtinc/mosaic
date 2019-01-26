@@ -38,6 +38,7 @@ interface EpisodeNavProps {
   hasSubquestions: boolean;
   hasTimer: boolean;
   hasTimerEnded: boolean;
+  isActive: boolean;
   isInOracleMode: boolean;
   isTakingABreak?: boolean;
   updateStaleness(isStale: boolean): void;
@@ -54,6 +55,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
     const {
       hasTimer,
       hasTimerEnded,
+      isActive,
       isInOracleMode,
       isTakingABreak,
       updateStaleness,
@@ -98,10 +100,10 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
     return (
       <EpisodeNavContainer>
         {
-          hasTimer
+          isActive
           ?
           (
-            hasTimerEnded
+            hasTimer && hasTimerEnded
             ?
               <NextWorkspaceBtn
                 bsStyle="primary"

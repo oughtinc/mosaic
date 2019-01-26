@@ -75,7 +75,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = "?isolated=true&timer=0:1:30";
+      const redirectQueryParams = "?isolated=true&active=true";
       window.location.href = `${window.location.origin}/workspaces/${this.state.workspaceId}${redirectQueryParams}`;
       return null;
     }
