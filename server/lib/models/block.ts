@@ -57,9 +57,7 @@ const BlockModel = (
           if (item._previousDataValues) {
             const changes = diff(item._previousDataValues, item.dataValues);
             if (!_.isEmpty(changes.value)) {
-              // The content of the block changed, so we need to mark any
-              // workspaces that contain the block as stale.
-              await item.propagateStaleness({ event: options.event });
+              await item.updateStalenessAndIsCurrentlyResolved({ event: options.event });
             }
           }
         }
@@ -97,23 +95,17 @@ const BlockModel = (
     }
   };
 
-  Block.prototype.propagateStaleness = async function({ event }) {
+  Block.prototype.updateStalenessAndIsCurrentlyResolved = async function({ event }) {
     const workspaceId = this.workspaceId;
     const workspace = await sequelize.models.Workspace.findById(workspaceId);
     // 1. If block is a question, mark workspace it belongs to as stale
+    // and make sure that if it's currently marked as resolved, that it isn't anymore
     if (this.type === QUESTION_TYPE) {
-      return workspace.update({ isStale: true }, { event });
+      return workspace.update({ 
+        isCurrentlyResolved: false,
+        isStale: true
+      }, { event });
     }
-    // 2. If block is an answer, mark parent as stale (if there is a parent)
-    /*if (this.type === ANSWER_TYPE && workspace.parentId) {
-      const parentId = workspace.parentId;
-      const parentWorkspace = await sequelize.models.Workspace.findById(
-        parentId
-      );
-      return parentWorkspace.update({ isStale: true }, { event });
-    }*/
-    // 3. TODO If edit was to a pointer exported within this block, mark all
-    //    workspaces that import and expand that pointer as stale.
   };
 
   Block.prototype.connectedPointers = async function({ pointersSoFar } = {}) {

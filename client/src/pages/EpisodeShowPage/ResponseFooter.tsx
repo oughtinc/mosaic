@@ -24,10 +24,10 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       isInOracleMode,
       isUserOracle,
       markAsAnsweredByOracle,
+      markAsCurrentlyResolved,
       markAsNotEligible,
       markAsNotEligibleForOracle,
       markAsNotStale,
-      markParentAsStale,
       transferRemainingBudgetToParent,
     } = this.props;
 
@@ -56,7 +56,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                   transferRemainingBudgetToParent();
                 }
                 markAsNotStale();
-                markParentAsStale();
+                markAsCurrentlyResolved();
               }}
             />
           :
@@ -67,8 +67,8 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                 label="Done!"
                 navHook={() => {
                   markAsNotStale();
+                  markAsCurrentlyResolved();
                   markAsNotEligible();
-                  markParentAsStale();
                 }}
               />
               :
@@ -81,7 +81,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                   }
                   markAsAnsweredByOracle();
                   markAsNotEligibleForOracle();
-                  markParentAsStale();
+                  markAsCurrentlyResolved();
                 }}
               />
             )

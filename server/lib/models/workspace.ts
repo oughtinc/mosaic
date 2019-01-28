@@ -61,6 +61,11 @@ const WorkspaceModel = (
         allowNull: false,
         defaultValue: false
       },
+      isCurrentlyResolved: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+      },
       wasAnsweredByOracle: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

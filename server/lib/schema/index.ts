@@ -313,6 +313,7 @@ const schema = new GraphQLSchema({
             if (isUserAttemptingToUpdateAtLeastOneField) {
               const {
                 isArchived,
+                isCurrentlyResolved,
                 isEligibleForOracle,
                 isStale,
                 wasAnsweredByOracle,
@@ -328,6 +329,7 @@ const schema = new GraphQLSchema({
 
               const update = {
                 isArchived,
+                isCurrentlyResolved,
                 isEligibleForOracle,
                 isStale,
                 wasAnsweredByOracle,
@@ -335,7 +337,26 @@ const schema = new GraphQLSchema({
 
               const updateWithNoNullOrUndefinedValues = _.omitBy(update, _.isNil);
 
-              return workspace.update(updateWithNoNullOrUndefinedValues);
+              const updatedWorkspace = await workspace.update(updateWithNoNullOrUndefinedValues);
+              
+              // if parent workspace has all children resolved
+              // then mark as not stale
+              if (updatedWorkspace.parentId) {
+                const parent = await models.Workspace.findById(updatedWorkspace.parentId);
+                const children = await parent.getChildWorkspaces();
+                let allResolved = true;
+                for (const child of children) {
+                  if (!child.isCurrentlyResolved) {
+                    allResolved = false;
+                    break;
+                  }
+                }
+                if (allResolved) {
+                  await parent.update({ isStale: true });
+                }
+              }
+
+              return updatedWorkspace;
             }
 
             return workspace;
