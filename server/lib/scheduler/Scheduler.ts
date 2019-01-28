@@ -108,9 +108,9 @@ class Scheduler {
 
     let actionableWorkspaces = await this.getActionableWorkspaces({ maybeSuboptimal, userId });
 
-    if (actionableWorkspaces.length === 0) {
+    if (actionableWorkspaces.length === 0 && maybeSuboptimal) {
       actionableWorkspaces = await this.getActionableWorkspaces({
-        maybeSuboptimal, 
+        maybeSuboptimal: true,
         userId,
       });
     }
