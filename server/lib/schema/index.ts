@@ -293,6 +293,31 @@ const schema = new GraphQLSchema({
           }
         ),
       },
+      updateWorkspaceIsStaleRelativeToUser: {
+        type: workspaceType,
+        args: {
+          workspaceId: { type: GraphQLString },
+          isStale: { type: GraphQLBoolean }
+        },
+        resolve: requireUser(
+          "You must be logged in to update workspace children order",
+          async (_, { workspaceId, isStale }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+            const user = await userFromContext(context);
+            const userId = user.user_id;
+
+            let isNotStaleRelativeToUser = workspace.isNotStaleRelativeToUser;
+            if (!isStale && isNotStaleRelativeToUser.indexOf(userId) === -1) {
+              isNotStaleRelativeToUser.push(userId);
+            }
+            if (isStale && isNotStaleRelativeToUser.indexOf(userId) > -1) {
+              isNotStaleRelativeToUser = isNotStaleRelativeToUser.filter(uId => uId !== userId);
+            }
+
+            return await workspace.update({ isNotStaleRelativeToUser });
+          }
+        ),
+      },
       updateWorkspace: {
         type: workspaceType,
         args: {
@@ -339,9 +364,16 @@ const schema = new GraphQLSchema({
 
               const updatedWorkspace = await workspace.update(updateWithNoNullOrUndefinedValues);
               
+              // is isStale updated to true
+              // then is stale relative to all users as well
+              if (!_.isNil(isStale) && isStale === true) {
+                await workspace.update({ isNotStaleRelativeToUser: [] });
+              }
+
+              // if is currently resolved updated to true
               // if parent workspace has all children resolved
-              // then mark as not stale
-              if (updatedWorkspace.parentId) {
+              // then mark parent workspace as not stale
+              if (isCurrentlyResolved && updatedWorkspace.parentId) {
                 const parent = await models.Workspace.findById(updatedWorkspace.parentId);
                 const children = await parent.getChildWorkspaces();
                 let allResolved = true;
@@ -352,7 +384,10 @@ const schema = new GraphQLSchema({
                   }
                 }
                 if (allResolved) {
-                  await parent.update({ isStale: true });
+                  await parent.update({ 
+                    isStale: true,
+                    isNotStaleRelativeToUser: [],
+                  });
                 }
               }
 
@@ -389,6 +424,7 @@ const schema = new GraphQLSchema({
             const parent = await models.Workspace.findById(child.parentId);
             await parent.update({
               isStale: true,
+              isNotStaleRelativeToUser: [],
               allocatedBudget: parent.allocatedBudget - childRemainingBudget,
             });
             await child.update({ totalBudget: child.allocatedBudget });

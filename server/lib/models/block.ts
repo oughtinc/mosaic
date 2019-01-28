@@ -103,7 +103,8 @@ const BlockModel = (
     if (this.type === QUESTION_TYPE) {
       return workspace.update({ 
         isCurrentlyResolved: false,
-        isStale: true
+        isStale: true,
+        isNotStaleRelativeToUser: [],
       }, { event });
     }
   };

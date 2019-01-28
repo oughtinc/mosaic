@@ -41,12 +41,12 @@ interface EpisodeNavProps {
   isActive: boolean;
   isInOracleMode: boolean;
   isTakingABreak?: boolean;
-  updateStaleness(isStale: boolean): void;
+  markAsNotStaleRelativeToUser(): void;
   updateIsEligibleForOracle(isEligibleForOracle: boolean): void;
 }
 
 // Note that there in the normal functioning of the app,
-// transferRemainingBudgetToParent and updateStaleness will not be undefined
+// transferRemainingBudgetToParent and markAsNotStaleRelativeToUser will not be undefined
 // wherever they are called. Nevertheless, guards are included below because
 // it's possible for this situation to arise given abnormal functioning of the
 // app.
@@ -58,7 +58,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       isActive,
       isInOracleMode,
       isTakingABreak,
-      updateStaleness,
+      markAsNotStaleRelativeToUser,
       updateIsEligibleForOracle,
     } = this.props;
 
@@ -114,7 +114,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                 <TakeBreakBtn
                   bsStyle="primary"
                   label="Needs more work"
-                  navHook={() => updateStaleness && updateStaleness(true)}
+                  navHook={() => markAsNotStaleRelativeToUser && markAsNotStaleRelativeToUser()}
                 />
               </div>
           )

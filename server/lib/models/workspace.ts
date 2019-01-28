@@ -46,6 +46,11 @@ const WorkspaceModel = (
         defaultValue: true,
         allowNull: false
       },
+      isNotStaleRelativeToUser: {
+        type: DataTypes.JSON,
+        defaultValue: [],
+        allowNull: false
+      },
       isArchived: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

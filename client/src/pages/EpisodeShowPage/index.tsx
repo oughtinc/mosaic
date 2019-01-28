@@ -316,13 +316,11 @@ export class WorkspaceView extends React.Component<any, any> {
             isInOracleMode={isInOracleMode}
             hasTimeBudget={hasTimeBudget}
             hasTimerEnded={hasTimerEnded}
-            updateStaleness={isStale =>
-              this.props.updateWorkspace({
+            markAsNotStaleRelativeToUser={() =>
+              this.props.updateWorkspaceIsStaleRelativeToUser({
                 variables: {
-                  id: workspace.id,
-                  input: {
-                    isStale,
-                  },
+                  workspaceId: workspace.id,
+                  isStale: false,
                 },
               })
             }
@@ -764,6 +762,14 @@ const UNLOCK_POINTER_MUTATION = gql`
   }
 `;
 
+const UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER = gql`
+  mutation updateWorkspaceIsStaleRelativeToUser($isStale: Boolean, $workspaceId: String) {
+    updateWorkspaceIsStaleRelativeToUser(isStale: $isStale, workspaceId: $workspaceId) {
+      id
+    }
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -802,6 +808,9 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_ELIGIBLE, {
     name: "updateWorkspaceIsEligible",
+  }),
+  graphql(UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER, {
+    name: "updateWorkspaceIsStaleRelativeToUser",
   }),
   graphql(UNLOCK_POINTER_MUTATION, {
     name: "unlockPointerMutation",

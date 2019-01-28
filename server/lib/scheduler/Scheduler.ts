@@ -202,7 +202,7 @@ class Scheduler {
 
     let eligibleWorkspaces = workspacesWithAtLeastMinBudget;
 
-    const staleWorkspaces = await this.filterByStaleness(workspacesWithAtLeastMinBudget);
+    const staleWorkspaces = await this.filterByStaleness(userId, workspacesWithAtLeastMinBudget);
 
     eligibleWorkspaces = staleWorkspaces;
     
@@ -232,11 +232,13 @@ class Scheduler {
     return finalWorkspaces;
   }
 
-  private async filterByStaleness(workspaces) {
-    return await filter(
-      workspaces,
-      async w => await w.isStale
-    );
+  private async filterByStaleness(userId, workspaces) {
+    const staleWorkspaces = workspaces.filter(w => {
+      const isStale = w.isStale;
+      const isStaleForUser = w.isNotStaleRelativeToUser.indexOf(userId) === -1;
+      return isStale && isStaleForUser;
+    })
+    return staleWorkspaces;
   }
 
   private async getWorkspacesWithLeastRemainingBugetAmongDescendants(workspaces) {
