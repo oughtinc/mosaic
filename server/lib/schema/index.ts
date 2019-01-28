@@ -363,21 +363,6 @@ const schema = new GraphQLSchema({
           }
         )
       },
-      markParentAsStale: {
-        type: GraphQLBoolean,
-        args: {
-          id: { type: GraphQLString },
-        },
-        resolve: async (_, { id, wasAnsweredByOracle }) => {
-          const childWorkspace = await models.Workspace.findById(id);
-          if (!childWorkspace.parentId) {
-            return false;
-          }
-          const parentWorkspace = await models.Workspace.findById(childWorkspace.parentId);
-          await parentWorkspace.update({ isStale: true });
-          return true;
-        }
-      },
       updateWorkspaceWasAnsweredByOracle: {
         type: workspaceType,
         args: {
