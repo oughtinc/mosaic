@@ -206,18 +206,25 @@ class Scheduler {
 
     eligibleWorkspaces = staleWorkspaces;
     
-    const workspacesExceedingDistCuoff = await this.getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
-      minDist: maybeSuboptimal ? 1 : 2,
-      userId,
-      workspaces: eligibleWorkspaces,
-      workspacesInTree,
-    });
+    const previouslyWorkedOnWorkspaces = this.getWorkspacesPreviouslyWorkedOnByUser({ userId, workspaces: eligibleWorkspaces });
+    if (previouslyWorkedOnWorkspaces.length > 0 && !rootWorkspace.hasTimeBudget) {
+      eligibleWorkspaces = previouslyWorkedOnWorkspaces;
+    } else {
+      const workspacesExceedingDistCuoff = await this.getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
+        minDist: maybeSuboptimal ? 1 : 2,
+        userId,
+        workspaces: eligibleWorkspaces,
+        workspacesInTree,
+      });
 
-    let workspaceWithLeastRequiredWorkAmongDescendants = workspacesExceedingDistCuoff;
+      eligibleWorkspaces = workspacesExceedingDistCuoff;
+    }
+
+    let workspaceWithLeastRequiredWorkAmongDescendants = eligibleWorkspaces;
     if (rootWorkspace.hasTimeBudget) {
-      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(workspacesExceedingDistCuoff);
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(eligibleWorkspaces);
     } else if (rootWorkspace.hasIOConstraints) {
-      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(workspacesExceedingDistCuoff);
+      workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(eligibleWorkspaces);
     }
 
     const workspacesWithMostDistFromWorkedOnWorkspace = this.getWorkspacesWithMostDistFromWorkedOnWorkspace({
@@ -311,6 +318,10 @@ class Scheduler {
 
   private hasMinRemaining(workspace) {
     return (workspace.totalBudget - workspace.allocatedBudget) >= 90;
+  }
+
+  private getWorkspacesPreviouslyWorkedOnByUser({ userId, workspaces }) {
+    return this.schedule.getWorkspacesPreviouslyWorkedOnByUser({ userId, workspaces });
   }
 
   private getWorkspacesExceedingMinDistFromWorkedOnWorkspace({

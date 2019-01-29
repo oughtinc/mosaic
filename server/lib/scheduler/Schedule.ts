@@ -166,6 +166,14 @@ class Schedule {
       workspacesInTree,
     });
   }
+
+  public getWorkspacesPreviouslyWorkedOnByUser({ userId, workspaces }) {
+    if (!this.doesUserHaveASchedule(userId)) {
+      return;
+    }
+    const userSchedule = this.getUserSchedule(userId);
+    return userSchedule.getWorkspacesPreviouslyWorkedOnByUser({ workspaces }); 
+  }
 }
 
 export { Schedule };

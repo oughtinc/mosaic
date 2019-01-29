@@ -193,6 +193,11 @@ class UserSchedule {
 
     return maxWorkspaces;
   }
+
+  public getWorkspacesPreviouslyWorkedOnByUser({ workspaces }) {
+    const workspacesPreviouslyWorkedOnByUser = workspaces.filter(w => this.hasUserWorkedOnWorkspace(w));
+    return workspacesPreviouslyWorkedOnByUser; 
+  }
 }
 
 export { UserSchedule };
