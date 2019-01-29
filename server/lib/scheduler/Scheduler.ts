@@ -62,16 +62,8 @@ class Scheduler {
 
       const workspacesInTree = await this.fetchAllWorkspacesInTree(randomlySelectedTree);
 
-      const oracleEligibleWorkspaces = await filter(
-        workspacesInTree,
-        async w => {
-          if (w.isEligibleForOracle && !w.wasAnsweredByOracle) {
-            const hasAncestorAnsweredByOracle = await w.hasAncestorAnsweredByOracle;
-            return !hasAncestorAnsweredByOracle;
-          }
-          return false;
-        }
-      );
+      let oracleEligibleWorkspaces = await this.filterByWhetherEligibleForOracle(workspacesInTree);
+      oracleEligibleWorkspaces = await this.filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(oracleEligibleWorkspaces);
 
       const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(oracleEligibleWorkspaces);
 
@@ -173,6 +165,27 @@ class Scheduler {
     return [];
   }
 
+  private filterByWhetherEligibleForOracle(workspaces) {
+    return workspaces.filter(w => w.isEligibleForOracle);
+  }
+
+  private async filterByWhetherNotEligibleForOracle(workspaces) {
+    return workspaces.filter(w => !w.isEligibleForOracle);
+  }
+
+  private async filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(workspaces) {
+    return await filter(
+      workspaces,
+      async w => {
+        if (w.wasAnsweredByOracle) {
+          return false;
+        }
+        const hasAncestorAnsweredByOracle = await w.hasAncestorAnsweredByOracle;
+        return !hasAncestorAnsweredByOracle;
+      }
+    );
+  }
+
   private async getActionableWorkspacesForTree({
     maybeSuboptimal,
     rootWorkspace,
@@ -181,16 +194,8 @@ class Scheduler {
     let workspacesInTree = await this.fetchAllWorkspacesInTree(rootWorkspace);
 
     if (this.isInOracleMode.getValue()) {
-      workspacesInTree = await filter(
-        workspacesInTree,
-        async w => {
-          if (!w.isEligibleForOracle && !w.wasAnsweredByOracle) {
-            const hasAncestorAnsweredByOracle = await w.hasAncestorAnsweredByOracle;
-            return !hasAncestorAnsweredByOracle;
-          }
-          return false;
-        }
-      );
+      workspacesInTree = await this.filterByWhetherNotEligibleForOracle(workspacesInTree);
+      workspacesInTree = await this.filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(workspacesInTree);
     }
 
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
