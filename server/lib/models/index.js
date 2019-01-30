@@ -11,6 +11,7 @@ const ExportWorkspaceLockRelationModel = require("./exportWorkspaceLockRelation"
 const EventModel = require("./event");
 const PointerModel = require("./pointer");
 const PointerImportModel = require("./pointerImport");
+const TreeModel = require("./tree");
 const WorkspaceModel = require("./workspace");
 
 if (config.use_env_variable) {
@@ -33,6 +34,7 @@ const models = [
   ["block", BlockModel],
   ["pointer", PointerModel],
   ["pointerImport", PointerImportModel],
+  ["tree", TreeModel],
   ["workspace", WorkspaceModel],
 ];
 
