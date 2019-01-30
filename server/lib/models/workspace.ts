@@ -268,6 +268,10 @@ const WorkspaceModel = (
       as: "blocks",
       foreignKey: "workspaceId",
     });
+    Workspace.Tree = Workspace.hasOne(models.Tree, {
+      as: "tree",
+      foreignKey: "rootWorkspaceId",
+    });
     addEventAssociations(Workspace, models);
   };
 

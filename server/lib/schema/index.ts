@@ -67,7 +67,8 @@ export const workspaceType = makeObjectType(models.Workspace, [
   ["childWorkspaces", () => new GraphQLList(workspaceType), "ChildWorkspaces"],
   ["parentWorkspace", () => new GraphQLList(workspaceType), "ParentWorkspace"],
   ["blocks", () => new GraphQLList(blockType), "Blocks"],
-  ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"]
+  ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"],
+  ["tree", () => treeType, "Tree"]
 ]);
 
 const treeType = makeObjectType(models.Tree, [
