@@ -43,9 +43,9 @@ module.exports = {
     };
 
     await queryInterface.createTable("Experiments", {
+      ...standardColumns,
       name: Sequelize.STRING,
       description: Sequelize.JSON,
-      ...standardColumns,
     });
   },
 

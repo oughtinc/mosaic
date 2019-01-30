@@ -44,8 +44,8 @@ module.exports = {
 
     await queryInterface.createTable("ExperimentTreeRelation", {
       ...standardColumns,
-      experimentId: referenceTo("Experiments"),
-      treeId: referenceTo("Trees"),
+      ExperimentId: referenceTo("Experiments"),
+      TreeId: referenceTo("Trees"),
     });
   },
 
