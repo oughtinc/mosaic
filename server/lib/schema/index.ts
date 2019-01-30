@@ -70,6 +70,17 @@ export const workspaceType = makeObjectType(models.Workspace, [
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"]
 ]);
 
+const treeType = makeObjectType(models.Tree, [
+  ...standardReferences,
+  ["rootWorkspace", () => workspaceType, "RootWorkspace"],
+  ["experiments", () => new GraphQLList(experimentType), "Experiments"]
+]);
+
+const experimentType = makeObjectType(models.Experiment, [
+  ...standardReferences,
+  ["trees", () => new GraphQLList(treeType), "Trees"],
+]);
+
 // TODO - factor out workspaceType into separate file so the following import
 // can go at the top of the file -- right now it's down here to avoid circular
 // import issues
@@ -210,6 +221,8 @@ const schema = new GraphQLSchema({
         })
       },
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
+      trees: modelGraphQLFields(new GraphQLList(treeType), models.Tree),
+      experiments: modelGraphQLFields(new GraphQLList(experimentType), models.Experiment),
       pointers: modelGraphQLFields(
         new GraphQLList(pointerType),
         models.Pointer
