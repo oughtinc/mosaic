@@ -9,7 +9,7 @@ const TreeModel = (
   sequelize: Sequelize.Sequelize,
   DataTypes: Sequelize.DataTypes
 ) => {
-  const Tree = sequelize.define("ExportWorkspaceLockRelation", {
+  const Tree = sequelize.define("Tree", {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -28,6 +28,7 @@ const TreeModel = (
     Tree.RootWorkspace = Tree.belongsTo(models.Workspace, {
       foreignKey: "rootWorkspaceId"
     });
+    Tree.Experiments = Tree.belongsToMany(models.Experiment, {through: 'ExperimentTreeRelation'});
     addEventAssociations(Tree, models);
   };
 
