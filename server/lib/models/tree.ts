@@ -17,18 +17,15 @@ const TreeModel = (
       allowNull: false
     },
     ...eventRelationshipColumns(DataTypes),
-    isLocked: {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: false
-    }
   });
 
   Tree.associate = function(models: any) {
     Tree.RootWorkspace = Tree.belongsTo(models.Workspace, {
       foreignKey: "rootWorkspaceId"
     });
-    Tree.Experiments = Tree.belongsToMany(models.Experiment, {through: 'ExperimentTreeRelation'});
+    Tree.Experiments = Tree.belongsToMany(models.Experiment, {
+      through: "ExperimentTreeRelation",
+    });
     addEventAssociations(Tree, models);
   };
 
