@@ -4,14 +4,9 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     const ID_TYPE = Sequelize.UUID;
 
-    const ID = {
-      allowNull: false,
-      primaryKey: true,
-      type: ID_TYPE
-    };
-
     const referenceTo = target => ({
       type: ID_TYPE,
+      primaryKey: true,
       references: {
         model: target,
         key: "id"
@@ -19,7 +14,6 @@ module.exports = {
     });
 
     const standardColumns = {
-      id: ID,
       createdAt: {
         type: Sequelize.DATE
       },
