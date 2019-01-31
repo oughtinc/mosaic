@@ -172,14 +172,34 @@ const schema = new GraphQLSchema({
             }
 
             return findOptions;
-          }
-        })
+          },
+          after:  async (result, args, ctx) => {
+            // ensure root workspace has associated tree
+            for (const workspace of result) {
+              const tree = await workspace.getTree();
+              if (tree === null && !workspace.parentId) {
+                const tree = await models.Tree.create({
+                  rootWorkspaceId: workspace.id,
+                });
+              }
+            }
+            return result;
+          }  
+        }),
       },
       workspace: {
         type: workspaceType,
         args: { id: { type: GraphQLString } },
         resolve: resolver(models.Workspace, {
           after: async (result, args, ctx) => {
+            // ensure root workspace has associated tree
+            const tree = await result.getTree();
+            if (tree === null && !result.parentId) {
+              const tree = await models.Tree.create({
+                rootWorkspaceId: result.id,
+              });
+            }
+
             // On Thursday, Nov 1 2018, a workspace failed to load on the
             // frontend. When looking into this, it was clear that this
             // workspace only had a QUESTION block on the backend, and no
@@ -289,6 +309,38 @@ const schema = new GraphQLSchema({
               newBlocks = [...newBlocks, block];
             }
             return newBlocks;
+          }
+        ),
+      },
+      addTreeToExperiment: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          treeId: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to add a tree to an experiment",
+          async (_, { experimentId, treeId }) => {
+            const tree = await models.Tree.findById(treeId);
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.addTree(tree);
+            return true;
+          }
+        ),
+      },
+      removeTreeFromExperiment: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          treeId: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to remove a tree from an experiment",
+          async (_, { experimentId, treeId }) => {
+            const tree = await models.Tree.findById(treeId);
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.removeTree(tree);
+            return true;
           }
         ),
       },

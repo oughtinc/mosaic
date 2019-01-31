@@ -6,6 +6,7 @@ import { compose } from "recompose";
 import styled from "styled-components";
 
 import { AdminControls } from "./AdminControls";
+import { ExperimentsCheckboxes } from "./ExperimentsCheckboxes";
 import { RootBlock } from "./RootBlock";
 import { Auth } from "../../auth";
 import {
@@ -48,7 +49,11 @@ class RootWorkspacePresentational extends React.Component<any, any> {
           {
             Auth.isAdmin()
             &&
-            <AdminControls workspace={workspace} />
+            <div>
+              <AdminControls workspace={workspace} />
+              <ExperimentsCheckboxes workspace={workspace} />
+            </div>
+            
           }
           <Link to={`/workspaces/${workspace.id}`}>
             <RootBlock
