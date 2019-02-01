@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import * as _ from "lodash";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { Button, Checkbox, OverlayTrigger, Popover } from "react-bootstrap";
@@ -25,6 +26,11 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
   };
   
   public render() {
+    const experiments =  this.props.experimentsQuery.experiments && _.sortBy(
+      this.props.experimentsQuery.experiments,
+      experiment => Date.parse(experiment.createdAt)
+    );
+
     const popoverWithProps = (
       this.props.experimentsQuery.loading
       ?
@@ -32,7 +38,7 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
       :
       <Popover id={`experiments-popover-${this.props.workspace.id}`} title="Experiments">
          {
-           this.props.experimentsQuery.experiments.map(experiment => {
+           experiments.map(experiment => {
              return (
                <Checkbox
                 key ={experiment.id}
@@ -65,6 +71,7 @@ const EXPERIMENTS_QUERY = gql`
   query experiments {
     experiments {
       id
+      createdAt
       name
     }
   }
