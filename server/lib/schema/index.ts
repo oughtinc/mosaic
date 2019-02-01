@@ -312,6 +312,19 @@ const schema = new GraphQLSchema({
           }
         ),
       },
+      createExperiment: {
+        type: GraphQLBoolean,
+        args: {
+          name: { type: GraphQLString },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to create an experiment",
+          async (_, { name }) => {
+            await models.Experiment.create({ name });
+            return true;
+          }
+        ),
+      },
       addTreeToExperiment: {
         type: GraphQLBoolean,
         args: {

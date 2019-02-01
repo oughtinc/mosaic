@@ -6,6 +6,7 @@ import { compose } from "recompose";
 
 import { HomePageHeading } from "./HomePageHeading";
 import { ListOfRootWorkspaces } from "./ListOfRootWorkspaces";
+import { NewExperimentForm } from "../../components/NewExperimentForm";
 import { NewRootWorkspaceForm } from "./NewRootWorkspaceForm";
 import { WelcomeMessage } from "./WelcomeMessage";
 import { GetStartedNav } from "./GetStartedNav";
@@ -45,6 +46,9 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
                 marginTop: "30px"
               }}
             />
+          )}
+          {Auth.isAuthenticated() && Auth.isAdmin() && (
+            <NewExperimentForm />
           )}
         </ContentContainer>
       </div>
