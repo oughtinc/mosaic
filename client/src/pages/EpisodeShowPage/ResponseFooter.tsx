@@ -68,7 +68,6 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                 navHook={() => {
                   markAsNotStale();
                   markAsCurrentlyResolved();
-                  markAsNotEligible();
                 }}
               />
               :

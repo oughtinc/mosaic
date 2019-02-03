@@ -7,7 +7,6 @@ import { AdminCheckboxThatTogglesWorkspaceField } from "../../../components/Admi
 import {
   UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS,
   UPDATE_WORKSPACE_HAS_TIME_BUDGET,
-  UPDATE_WORKSPACE_IS_ELIGIBLE,
   UPDATE_WORKSPACE_IS_PUBLIC,
 } from "../../../graphqlQueries";
 
@@ -27,13 +26,6 @@ class AdminControlsPresentational extends React.Component<any, any> {
           updateMutation={this.props.updateWorkspaceIsPublic}
           workspace={workspace}
           workspaceFieldToUpdate="isPublic"
-        />
-        <AdminCheckboxThatTogglesWorkspaceField
-          checkboxLabelText="is eligible"
-          cyAttributeName="admin-checkbox-is-eligible"
-          updateMutation={this.props.updateWorkspaceIsEligible}
-          workspace={workspace}
-          workspaceFieldToUpdate="isEligibleForAssignment"
         />
         <AdminCheckboxThatTogglesWorkspaceField
           checkboxLabelText="time budget"
@@ -63,12 +55,6 @@ const AdminControls: any = compose(
   }),
   graphql(UPDATE_WORKSPACE_HAS_TIME_BUDGET, {
     name: "updateWorkspaceHasTimeBudget",
-    options: {
-      refetchQueries: ["RootWorkspacesQuery"]
-    }
-  }),
-  graphql(UPDATE_WORKSPACE_IS_ELIGIBLE, {
-    name: "updateWorkspaceIsEligible",
     options: {
       refetchQueries: ["RootWorkspacesQuery"]
     }

@@ -41,7 +41,6 @@ import {
 import {
   ORACLE_MODE_QUERY,
   UPDATE_BLOCKS,
-  UPDATE_WORKSPACE_IS_ELIGIBLE,
   UPDATE_WORKSPACE,
 } from "../../graphqlQueries";
 import {
@@ -494,14 +493,6 @@ export class WorkspaceView extends React.Component<any, any> {
                               },
                             })
                           }
-                          markAsNotEligible={() =>
-                            this.props.updateWorkspaceIsEligible({
-                              variables: {
-                                isEligibleForAssignment: false,
-                                workspaceId: workspace.id,
-                              }
-                            })
-                          }
                           markAsNotEligibleForOracle={() =>
                             this.props.updateWorkspace({
                               variables: {
@@ -805,9 +796,6 @@ export const EpisodeShowPage = compose(
   }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
-  }),
-  graphql(UPDATE_WORKSPACE_IS_ELIGIBLE, {
-    name: "updateWorkspaceIsEligible",
   }),
   graphql(UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER, {
     name: "updateWorkspaceIsStaleRelativeToUser",

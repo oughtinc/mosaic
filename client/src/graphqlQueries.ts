@@ -122,14 +122,6 @@ export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
   }
 `;
 
-export const UPDATE_WORKSPACE_IS_ELIGIBLE = gql`
-  mutation updateWorkspaceIsEligible($isEligibleForAssignment: Boolean, $workspaceId: String) {
-    updateWorkspaceIsEligible(isEligibleForAssignment: $isEligibleForAssignment, workspaceId: $workspaceId) {
-      id
-    }
-  }
-`;
-
 export const UPDATE_WORKSPACE_HAS_TIME_BUDGET = gql`
   mutation updateWorkspaceHasTimeBudget($hasTimeBudget: Boolean, $workspaceId: String) {
     updateWorkspaceHasTimeBudget(hasTimeBudget: $hasTimeBudget, workspaceId: $workspaceId) {
