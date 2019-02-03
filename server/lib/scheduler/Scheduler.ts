@@ -53,7 +53,7 @@ class Scheduler {
   public async assignNextWorkspaceForOracle(userId) {
     this.resetCaches();
 
-    let treesToConsider = await this.fetchAllRootWorkspaces();
+    let treesToConsider = await this.fetchAllRootWorkspaces(1);
     let wasWorkspaceAssigned = false;
 
     while (treesToConsider.length > 0) {
@@ -136,10 +136,11 @@ class Scheduler {
   }
 
   private async getActionableWorkspaces({ 
+    eligibilityRank = 1,
     maybeSuboptimal, 
     userId,
   }) {
-     let treesToConsider = await this.fetchAllRootWorkspaces();
+    let treesToConsider = await this.fetchAllRootWorkspaces(eligibilityRank);
 
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
@@ -160,8 +161,17 @@ class Scheduler {
       }
     }
 
-    // if you've made it here, then you've looked through each tree for actionable
-    // workspaces, and each time found none
+    // try fallback
+    // currently set up so fallback occurs before maybeSuboptimal
+    if (eligibilityRank === 1) {
+      return await this.getActionableWorkspaces({ 
+        eligibilityRank: 2,
+        maybeSuboptimal, 
+        userId,
+      });
+    }
+
+    // if already trying fallback return empty array
     return [];
   }
 

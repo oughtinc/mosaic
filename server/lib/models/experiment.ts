@@ -19,6 +19,11 @@ const ExperimentModel = (
         allowNull: false,
       },
       name: Sequelize.STRING,
+      eligibilityRank: {
+        type: Sequelize.INTEGER,
+        defaultValue: null,
+        allowNull: true,
+      },
       description: Sequelize.JSON,
       ...eventRelationshipColumns(DataTypes),
     },

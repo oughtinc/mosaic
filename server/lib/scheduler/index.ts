@@ -1,5 +1,7 @@
+import * as _ from "lodash";
+import { filter } from "asyncro";
 import { isInOracleMode } from "../globals/isInOracleMode";
-import { Workspace } from "../models";
+import { Tree, Workspace } from "../models";
 import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
 import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
@@ -26,13 +28,39 @@ const fetchAllWorkspacesInTree = async (rootWorkspace) => {
 
 const scheduler = new Scheduler({
   fetchAllWorkspacesInTree,
-  fetchAllRootWorkspaces: async () => await Workspace.findAll({
-    where: {
-      parentId: null,
-      isArchived: false,
-      isEligibleForAssignment: true,
-    }
-  }),
+  fetchAllRootWorkspaces: async eligibilityRank => {
+    const rootWorkspaces = await Workspace.findAll({
+      where: {
+        parentId: null,
+        isArchived: false,
+      }
+    });
+    
+    const eligibleRootWorkspaces = await filter(
+      rootWorkspaces,
+      async w => {
+        const tree = await Tree.findOne({
+          where: {
+            rootWorkspaceId: w.id,
+          },
+        });
+
+        if (!tree) {
+          return false;
+        }
+
+        const experiments = await tree.getExperiments();
+        
+        if (_.some(experiments, e => e.eligibilityRank === eligibilityRank)) {
+          return true;
+        }
+
+        return false;
+      }
+    );
+
+    return eligibleRootWorkspaces;
+  },
   isInOracleMode,
   schedule: new Schedule({
     DistanceFromWorkedOnWorkspaceCache,
