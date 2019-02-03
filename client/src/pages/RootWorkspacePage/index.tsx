@@ -8,6 +8,7 @@ import { HomePageHeading } from "./HomePageHeading";
 import { ListOfRootWorkspaces } from "./ListOfRootWorkspaces";
 import { NewExperimentForm } from "../../components/NewExperimentForm";
 import { NewRootWorkspaceForm } from "./NewRootWorkspaceForm";
+import { ListOfExperiments } from "./ExperimentsControls";
 import { WelcomeMessage } from "./WelcomeMessage";
 import { GetStartedNav } from "./GetStartedNav";
 import { OracleHeader } from "./OracleHeader";
@@ -37,7 +38,6 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
 
           <HomePageHeading>Questions</HomePageHeading>
           <ListOfRootWorkspaces isLoading={isLoading} workspaces={workspaces} />
-
           {Auth.isAuthenticated() && (
             <NewRootWorkspaceForm
               createWorkspace={this.props.createWorkspace}
@@ -47,9 +47,15 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
               }}
             />
           )}
-          {Auth.isAuthenticated() && Auth.isAdmin() && (
-            <NewExperimentForm />
-          )}
+          {
+            Auth.isAdmin() 
+            && 
+            <div>
+              <HomePageHeading>Experiments</HomePageHeading>
+              <ListOfExperiments />
+            </div>
+          }
+          {Auth.isAdmin() && <NewExperimentForm />}
         </ContentContainer>
       </div>
     );

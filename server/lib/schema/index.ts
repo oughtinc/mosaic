@@ -325,6 +325,21 @@ const schema = new GraphQLSchema({
           }
         ),
       },
+      updateExperimentEligibilityRank: {
+        type: GraphQLBoolean,
+        args: {
+          eligibilityRank: { type: GraphQLInt },
+          experimentId: { type: GraphQLString },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to change an experiment's eligibility",
+          async (_, { eligibilityRank, experimentId }) => {
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.update({ eligibilityRank });
+            return true;
+          }
+        ),
+      },
       addTreeToExperiment: {
         type: GraphQLBoolean,
         args: {
