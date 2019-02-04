@@ -1,7 +1,6 @@
 import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
-import { ControlLabel, FormGroup, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { compose } from "recompose";
 import styled from "styled-components";
 
@@ -10,16 +9,14 @@ import {
   blockBorderAndBoxShadow
 } from "../../../styles";
 
+import { ExperimentControl } from "./ExperimentControl";
+
 const ExperimentsContainer = styled.div`
   ${blockBorderAndBoxShadow};
   background-color: ${homepageWorkspaceBgColor};
   padding: 10px;
   margin-bottom: 30px;
 `;
-
-const isActive = e => e.eligibilityRank === 1;
-const isFallback = e => e.eligibilityRank === 2;
-const isInactive = e => e.eligibilityRank !== 1 && e.eligibilityRank !== 2;
 
 export class ListOfExperimentsPresentational extends React.Component<any, any> {
   public render() {
@@ -32,23 +29,17 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
           : 
           this.props.experimentsQuery.experiments.map(e => {
             return (
-              <div key={e.id}>
-                <FormGroup controlId="formControlsSelect">
-                  <ControlLabel>{e.name}</ControlLabel>
-                  <br />
-                  <ToggleButtonGroup
-                    bsSize="xsmall"
-                    type="radio" 
-                    name="options" 
-                    value={e.eligibilityRank === null ? 0 : e.eligibilityRank}
-                    onChange={value => this.onEligibilityRankChange(e.id, value)}
-                  >
-                    <ToggleButton value={1}>active</ToggleButton>
-                    <ToggleButton value={2}>fallback</ToggleButton>
-                    <ToggleButton value={0}>inactive</ToggleButton>
-                  </ToggleButtonGroup>
-                </FormGroup>
-              </div>
+              <ExperimentControl
+                experiment={e}
+                key={e.id}
+                onEligibilityRankChange={this.onEligibilityRankChange}
+                updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
+                  variables: {
+                    experimentId,
+                    name,
+                  },
+                })}
+              />
             );
           })
         }
@@ -83,12 +74,24 @@ const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
   }
 `; 
 
+const UPDATE_EXPERIMENT_NAME_MUTATION = gql`
+  mutation updateExperimentName($experimentId: String, $name: String) {
+    updateExperimentName(experimentId: $experimentId, name: $name)
+  }
+`;
+
 export const ListOfExperiments: any = compose(
   graphql(EXPERIMENTS_QUERY, {
     name: "experimentsQuery"
   }),
   graphql(UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION, {
     name: "updateExperimentEligibilityRankMutation",
+    options: {
+      refetchQueries: ["experiments"],
+    }
+  }),
+  graphql(UPDATE_EXPERIMENT_NAME_MUTATION, {
+    name: "updateExperimentNameMutation",
     options: {
       refetchQueries: ["experiments"],
     }

@@ -340,6 +340,21 @@ const schema = new GraphQLSchema({
           }
         ),
       },
+      updateExperimentName: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          name: { type: GraphQLString },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to change an experiment's name",
+          async (_, { experimentId, name }) => {
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.update({ name });
+            return true;
+          }
+        ),
+      },
       addTreeToExperiment: {
         type: GraphQLBoolean,
         args: {
