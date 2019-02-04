@@ -6,23 +6,31 @@ import { Button, Checkbox, OverlayTrigger, Popover } from "react-bootstrap";
 import { compose } from "recompose";
 
 export class ExperimentsCheckboxesPresentational extends React.Component<any,  any> {
+  public state = {
+    pending: false,
+  }
+  
   public handleOnChange = (event, experimentId, treeId) => {
     const isChecked = event.target.checked;
-    if (isChecked) {
-      this.props.addTreeToExperimentMutation({
-        variables: {
-          experimentId,
-          treeId,
-        }
-      });
-    } else {
-      this.props.removeTreeFromExperimentMutation({
-        variables: {
-          experimentId,
-          treeId,
-        }
-      });
-    }
+
+    this.setState({ pending: true }, async () => {
+      if (isChecked) {
+        await this.props.addTreeToExperimentMutation({
+          variables: {
+            experimentId,
+            treeId,
+          }
+        });
+      } else {
+        await this.props.removeTreeFromExperimentMutation({
+          variables: {
+            experimentId,
+            treeId,
+          }
+        });
+      }
+      this.setState({ pending: false });
+    });
   };
   
   public render() {
@@ -37,26 +45,35 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
         <div />
       :
         (
-          <Popover id={`experiments-popover-${this.props.workspace.id}`} title="Experiments">
-            {
-              experiments.map(experiment => {
-                return (
-                  <Checkbox
-                    key={experiment.id}
-                    checked={
-                      this.props.workspace.tree.experiments.find(e => e.id === experiment.id)
-                      ?
-                      true
-                      :
-                      false
-                    }
-                    onChange={e => this.handleOnChange(e, experiment.id, this.props.workspace.tree.id)}
-                  >
-                    {experiment.name}
-                  </Checkbox>
-                );
-              })
-            }
+          <Popover 
+            id={`experiments-popover-${this.props.workspace.id}`}
+            title="Experiments"
+          >
+            <div
+              style={{
+                opacity: this.state.pending ? 0.5 : 1,
+              }}
+            >
+              {
+                experiments.map(experiment => {
+                  return (
+                    <Checkbox
+                      key={experiment.id}
+                      checked={
+                        this.props.workspace.tree.experiments.find(e => e.id === experiment.id)
+                        ?
+                        true
+                        :
+                        false
+                      }
+                      onChange={e => this.handleOnChange(e, experiment.id, this.props.workspace.tree.id)}
+                    >
+                      {experiment.name}
+                    </Checkbox>
+                  );
+                })
+              }
+            </div>
           </Popover>
         )
     );
@@ -70,10 +87,13 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
     return (
       <div
         style={{
-          marginTop: "8px"
+          marginTop: "8px",
         }}
       >
-        <div style={{ marginBottom: "5px"}}>
+        <OverlayTrigger trigger="click" placement="right" overlay={popoverWithProps}>
+          <Button bsSize="xsmall" bsStyle="default">Edit Experiments</Button>
+        </OverlayTrigger>
+        <div style={{ marginTop: "5px"}}>
         Currently included in: {
           experimentsIncludedIn.length === 0
           ?
@@ -84,9 +104,6 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
           </ul>
         }
         </div>
-        <OverlayTrigger trigger="click" placement="right" overlay={popoverWithProps}>
-          <Button bsSize="xsmall" bsStyle="default">Edit Experiments</Button>
-        </OverlayTrigger>
       </div>
     );
   }
