@@ -10,6 +10,14 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
     pending: false,
   }
   
+  public componentDidUpdate(prevProps: any, prevState: any) {
+    const didStatusChange = prevProps.workspace.tree.experiments.length !== this.props.workspace.tree.experiments.length;
+
+    if (didStatusChange) {
+      this.setState({ pending: false });
+    }
+  }
+
   public handleOnChange = (event, experimentId, treeId) => {
     const isChecked = event.target.checked;
 
@@ -28,8 +36,7 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
             treeId,
           }
         });
-      }
-      this.setState({ pending: false });
+        }
     });
   };
   
@@ -66,6 +73,7 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
                         :
                         false
                       }
+                      disabled={this.state.pending}
                       onChange={e => this.handleOnChange(e, experiment.id, this.props.workspace.tree.id)}
                     >
                       {experiment.name}
