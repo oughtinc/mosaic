@@ -42,7 +42,7 @@ class ExperimentControl extends React.Component<any, any> {
           :
             <span>
               <FormControl
-                autoFocus
+                autoFocus={true}
                 disabled={this.state.isEditNameFieldDisabled}
                 onChange={this.handleChangeOfEditNameField}
                 placeholder="name of experiment (metadata can be added later on the Experiments page)"
@@ -116,4 +116,4 @@ class ExperimentControl extends React.Component<any, any> {
   };
 }
 
-export { ExperimentControl }
+export { ExperimentControl };

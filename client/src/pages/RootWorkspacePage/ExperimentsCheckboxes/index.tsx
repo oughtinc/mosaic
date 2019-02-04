@@ -34,36 +34,38 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
     const popoverWithProps = (
       this.props.experimentsQuery.loading
       ?
-      <div />
+        <div />
       :
-      <Popover id={`experiments-popover-${this.props.workspace.id}`} title="Experiments">
-         {
-           experiments.map(experiment => {
-             return (
-               <Checkbox
-                key ={experiment.id}
-                checked={
-                  this.props.workspace.tree.experiments.find(e => e.id === experiment.id)
-                  ?
-                  true
-                  :
-                  false
-                }
-                onChange={e => this.handleOnChange(e, experiment.id, this.props.workspace.tree.id)}
-               >
-                 { experiment.name }
-               </Checkbox>
-             );
-           })
-         }
-      </Popover>
+        (
+          <Popover id={`experiments-popover-${this.props.workspace.id}`} title="Experiments">
+            {
+              experiments.map(experiment => {
+                return (
+                  <Checkbox
+                    key={experiment.id}
+                    checked={
+                      this.props.workspace.tree.experiments.find(e => e.id === experiment.id)
+                      ?
+                      true
+                      :
+                      false
+                    }
+                    onChange={e => this.handleOnChange(e, experiment.id, this.props.workspace.tree.id)}
+                  >
+                    {experiment.name}
+                  </Checkbox>
+                );
+              })
+            }
+          </Popover>
+        )
     );
 
     const experimentsIncludedIn = 
       this.props.experimentsQuery.experiments
       &&
       this.props.experimentsQuery.experiments
-       .filter(e1 => this.props.workspace.tree.experiments.find(e2 => e1.id === e2.id))
+       .filter(e1 => this.props.workspace.tree.experiments.find(e2 => e1.id === e2.id));
  
     return (
       <div

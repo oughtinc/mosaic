@@ -3,11 +3,7 @@ import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
 import styled from "styled-components";
-import { BlockEditor } from "./BlockEditor";
-import { valueToDatabaseJSON } from "../lib/slateParser";
 import { Button, FormControl } from "react-bootstrap";
-import { resetBlock } from "../modules/blocks/actions";
-import { ChildBudgetBadge } from "./ChildBudgetBadge";
 
 import {
   blockBorderAndBoxShadow,
@@ -31,7 +27,7 @@ const BlockHeader = styled.div`
 `;
 
 export class NewExperimentFormPresentational extends React.Component<any, any> {
-  public state= {
+  public state = {
     experimentName: "",
   };
 

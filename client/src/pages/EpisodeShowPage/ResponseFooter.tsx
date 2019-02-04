@@ -25,7 +25,6 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       isUserOracle,
       markAsAnsweredByOracle,
       markAsCurrentlyResolved,
-      markAsNotEligible,
       markAsNotEligibleForOracle,
       markAsNotStale,
       transferRemainingBudgetToParent,
