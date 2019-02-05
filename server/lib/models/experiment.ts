@@ -31,6 +31,12 @@ const ExperimentModel = (
 
   Experiment.associate = function(models: any) {
     Experiment.Trees = Experiment.belongsToMany(models.Tree, {through: 'ExperimentTreeRelation'});
+    Experiment.Fallbacks = Experiment.belongsToMany(models.Experiment, {
+      as: "Fallbacks",
+      through: "FallbackRelation",
+      foreignKey: "primaryExperimentId",
+      otherKey: "fallbackExperimentId",
+    })
     addEventAssociations(Experiment, models);
   };
 
