@@ -90,6 +90,7 @@ const treeType = makeObjectType(models.Tree, [
 
 const experimentType = makeObjectType(models.Experiment, [
   ...standardReferences,
+  ["fallbacks", () => new GraphQLList(experimentType), "Fallbacks"],
   ["trees", () => new GraphQLList(treeType), "Trees"],
 ]);
 
@@ -394,6 +395,38 @@ const schema = new GraphQLSchema({
             const tree = await models.Tree.findById(treeId);
             const experiment = await models.Experiment.findById(experimentId);
             await experiment.removeTree(tree);
+            return true;
+          }
+        ),
+      },
+      addFallbackToExperiment: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          fallbackId: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to add a fallback to an experiment",
+          async (_, { experimentId, fallbackId }) => {
+            const fallback = await models.Experiment.findById(fallbackId);
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.addFallback(fallback);
+            return true;
+          }
+        ),
+      },
+      removeFallbackFromExperiment: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          fallbackId: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to remove a fallback from an experiment",
+          async (_, { experimentId, fallbackId }) => {
+            const fallback = await models.Experiment.findById(fallbackId);
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.removeFallback(fallback);
             return true;
           }
         ),

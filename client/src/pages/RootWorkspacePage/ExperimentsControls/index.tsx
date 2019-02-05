@@ -40,6 +40,7 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
             return (
               <ExperimentControl
                 experiment={e}
+                fallbacks={e.fallbacks}
                 key={e.id}
                 onEligibilityRankChange={this.onEligibilityRankChange}
                 updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
@@ -73,6 +74,11 @@ const EXPERIMENTS_QUERY = gql`
       createdAt
       name
       eligibilityRank
+      fallbacks {
+        id
+        createdAt
+        name
+      }
     }
   }
 `; 

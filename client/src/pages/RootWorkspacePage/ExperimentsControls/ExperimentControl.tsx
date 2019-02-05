@@ -7,6 +7,8 @@ import {
   ToggleButtonGroup,
 } from "react-bootstrap";
 
+import { Fallbacks } from "./Fallbacks";
+
 const wordLinkStyle = {
   color: "#369",
   cursor: "pointer",
@@ -68,18 +70,22 @@ class ExperimentControl extends React.Component<any, any> {
               </span>
             </span>
           }
-          <br />
           <ToggleButtonGroup
             bsSize="xsmall"
+            style={{
+              display: "inline-block",
+              marginLeft: "10px",
+            }}
             type="radio"
             name="options"
             value={experiment.eligibilityRank === null ? 0 : experiment.eligibilityRank}
             onChange={value => this.props.onEligibilityRankChange(experiment.id, value)}
           >
             <ToggleButton value={1}>active</ToggleButton>
-            <ToggleButton value={2}>fallback</ToggleButton>
             <ToggleButton value={0}>inactive</ToggleButton>
           </ToggleButtonGroup>
+          <br />
+          <Fallbacks experiment={experiment} />
         </FormGroup>
     );
   }
