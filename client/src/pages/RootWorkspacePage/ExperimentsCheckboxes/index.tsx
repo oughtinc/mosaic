@@ -93,26 +93,9 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
        .filter(e1 => this.props.workspace.tree.experiments.find(e2 => e1.id === e2.id));
  
     return (
-      <div
-        style={{
-          marginTop: "8px",
-        }}
-      >
-        <OverlayTrigger trigger="click" placement="right" overlay={popoverWithProps}>
-          <Button bsSize="xsmall" bsStyle="default">Edit Experiments</Button>
-        </OverlayTrigger>
-        <div style={{ marginTop: "5px"}}>
-        Currently included in: {
-          experimentsIncludedIn.length === 0
-          ?
-          "none"
-          :
-          <ul>
-            {experimentsIncludedIn.map((e, i, arr) => <li key={`${this.props.workspace.id}${e.id}`}>{e.name}</li>)}
-          </ul>
-        }
-        </div>
-      </div>
+      <OverlayTrigger trigger="click" placement="right" overlay={popoverWithProps}>
+        <Button bsSize="xsmall" bsStyle="default">Edit Experiments</Button>
+      </OverlayTrigger>
     );
   }
 }

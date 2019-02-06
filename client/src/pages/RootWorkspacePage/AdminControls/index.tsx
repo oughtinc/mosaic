@@ -3,7 +3,7 @@ import { graphql } from "react-apollo";
 import { compose } from "recompose";
 
 import { AdminCheckboxThatTogglesWorkspaceField } from "../../../components/AdminCheckboxThatTogglesWorkspaceField";
-
+import { ExperimentsCheckboxes } from "../ExperimentsCheckboxes";
 import {
   UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS,
   UPDATE_WORKSPACE_HAS_TIME_BUDGET,
@@ -41,6 +41,9 @@ class AdminControlsPresentational extends React.Component<any, any> {
           workspace={workspace}
           workspaceFieldToUpdate="hasIOConstraints"
         />
+        <span style={{ marginLeft: "10px" }}>
+          <ExperimentsCheckboxes workspace={workspace} />
+        </span>
       </div>
     );
   }

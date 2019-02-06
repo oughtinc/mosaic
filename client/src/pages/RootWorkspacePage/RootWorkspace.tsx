@@ -50,7 +50,6 @@ class RootWorkspacePresentational extends React.Component<any, any> {
               }}
             >
               <AdminControls workspace={workspace} />
-              <ExperimentsCheckboxes workspace={workspace} />
             </div>
             
           }
