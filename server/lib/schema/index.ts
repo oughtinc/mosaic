@@ -69,7 +69,18 @@ export const workspaceType = makeObjectType(models.Workspace, [
   ["blocks", () => new GraphQLList(blockType), "Blocks"],
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"],
   ["tree", () => treeType, "Tree"]
-]);
+], {
+  rootWorkspace: {
+    get type() { return workspaceType },
+    resolve: async workspace => {
+      let curWorkspace = workspace;
+      while (curWorkspace.parentId) {
+        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+      }
+      return curWorkspace;
+    }
+  }
+});
 
 const treeType = makeObjectType(models.Tree, [
   ...standardReferences,

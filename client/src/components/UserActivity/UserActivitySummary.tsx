@@ -5,7 +5,8 @@ export class UserActivitySummary extends React.Component<any, any> {
   public render() {
     const {
         averageTimeInMsSpentOnEachWorkspace,
-        howManyWorkspacesHasUserWorkedOn,
+        howManyPrimaryWorkspacesHasUserWorkedOn,
+        howManyFallbackWorkspacesHasUserWorkedOn,
     } = this.props;
 
     return (
@@ -18,9 +19,16 @@ export class UserActivitySummary extends React.Component<any, any> {
         <span
           style={{ color: "#11aa11", fontSize: "24px" }}
         >
-          {howManyWorkspacesHasUserWorkedOn}
+          {howManyPrimaryWorkspacesHasUserWorkedOn}
         </span>
-        {" "}workspace{howManyWorkspacesHasUserWorkedOn !== 1 ? "s" : ""} visited
+        {" "}primary workspace{howManyPrimaryWorkspacesHasUserWorkedOn !== 1 ? "s" : ""} visited
+        <br />
+        <span
+          style={{ color: "pink", fontSize: "24px" }}
+        >
+          {howManyFallbackWorkspacesHasUserWorkedOn}
+        </span>
+        {" "}fallback workspace{howManyFallbackWorkspacesHasUserWorkedOn !== 1 ? "s" : ""} visited
         <br />
         <ReadableDuration
           durationInMs={averageTimeInMsSpentOnEachWorkspace}

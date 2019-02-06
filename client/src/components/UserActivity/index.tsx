@@ -9,6 +9,19 @@ import { UserActivityWorkspaceReports } from "./UserActivityWorkspaceReports";
 
 export class UserActivityPresentational extends React.Component<any, any> {
   public render() {
+
+    const primaryAssignments = this.props.userActivityQuery.userActivity && this.props.userActivityQuery.userActivity.assignments.filter(
+      a => {
+        return a.workspace.rootWorkspace.tree.experiments.some(e => e.eligibilityRank === 1);
+      }
+    );
+
+    const fallbackAssignments = this.props.userActivityQuery.userActivity && this.props.userActivityQuery.userActivity.assignments.filter(
+      a => {
+        return !a.workspace.rootWorkspace.tree.experiments.some(e => e.eligibilityRank === 1);
+      }
+    );
+
     return (
       <div
         style={{
@@ -21,11 +34,12 @@ export class UserActivityPresentational extends React.Component<any, any> {
       >
         <h3 style={{ textAlign: "center" }}>Your Activity</h3>
         {
-          !this.props.userActivityQuery.loading && 
+          !this.props.userActivityQuery.loading &&
           <div>
             <UserActivitySummary
               averageTimeInMsSpentOnEachWorkspace={this.props.userActivityQuery.userActivity.assignments.reduce((acc: number, val) => { return acc + Number(val.howLongDidAssignmentLast); }, 0) / this.props.userActivityQuery.userActivity.assignments.length}
-              howManyWorkspacesHasUserWorkedOn={this.props.userActivityQuery.userActivity.assignments.length}
+              howManyPrimaryWorkspacesHasUserWorkedOn={primaryAssignments.length}
+              howManyFallbackWorkspacesHasUserWorkedOn={fallbackAssignments.length}
             />
             <UserActivityWorkspaceReports 
               assignments={this.props.userActivityQuery.userActivity.assignments}
@@ -48,6 +62,14 @@ query userActivityQuery($userId: String) {
         blocks {
           type
           value
+        }
+        rootWorkspace {
+          id
+          tree {
+            experiments {
+              eligibilityRank
+            }
+          }
         }
       }
     }

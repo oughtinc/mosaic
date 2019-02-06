@@ -28,6 +28,8 @@ export class UserActivityWorkspaceReport extends React.Component<any, any> {
     const workspace = assignment.workspace;
     const question = workspaceToBlock(workspace, "QUESTION");
 
+    const isFallback = !assignment.workspace.rootWorkspace.tree.experiments.find(e => e.eligibilityRank === 1);
+
     return (
       <div
         style={{
@@ -55,7 +57,11 @@ export class UserActivityWorkspaceReport extends React.Component<any, any> {
             position: "relative"
           }}
         >
-          <BlockContainer>
+          <BlockContainer
+            style={{
+              boxShadow: `0 0 5px 1px ${isFallback ? "pink" : "none"}`,
+            }}
+          >
             <BlockBody>
               <RootBlock
                 block={question}
