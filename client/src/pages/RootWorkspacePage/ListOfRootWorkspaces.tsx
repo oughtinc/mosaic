@@ -51,6 +51,6 @@ const ListOfRootWorkspaces = ({ isLoading, workspaces }) => {
       }
     </div>
   );
-}
+};
 
 export { ListOfRootWorkspaces };

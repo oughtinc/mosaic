@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import { AdminControls } from "./AdminControls";
-import { ExperimentsCheckboxes } from "./ExperimentsCheckboxes";
 import { RootBlock } from "./RootBlock";
 import { Auth } from "../../auth";
 
