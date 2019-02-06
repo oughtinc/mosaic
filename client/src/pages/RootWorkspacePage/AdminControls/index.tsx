@@ -41,9 +41,7 @@ class AdminControlsPresentational extends React.Component<any, any> {
           workspace={workspace}
           workspaceFieldToUpdate="hasIOConstraints"
         />
-        <span style={{ marginLeft: "10px" }}>
-          <ExperimentsCheckboxes workspace={workspace} />
-        </span>
+        <ExperimentsCheckboxes workspace={workspace} />
       </div>
     );
   }

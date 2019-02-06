@@ -7,6 +7,7 @@ import { compose } from "recompose";
 
 export class ExperimentsCheckboxesPresentational extends React.Component<any,  any> {
   public state = {
+    isShowingExperimentsCheckboxes: false,
     pending: false,
   }
   
@@ -51,39 +52,32 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
       ?
         <div />
       :
-        (
-          <Popover 
-            id={`experiments-popover-${this.props.workspace.id}`}
-            title="Experiments"
-          >
-            <div
-              style={{
-                opacity: this.state.pending ? 0.5 : 1,
-              }}
-            >
-              {
-                experiments.map(experiment => {
-                  return (
-                    <Checkbox
-                      key={experiment.id}
-                      checked={
-                        this.props.workspace.tree.experiments.find(e => e.id === experiment.id)
-                        ?
-                        true
-                        :
-                        false
-                      }
-                      disabled={this.state.pending}
-                      onChange={e => this.handleOnChange(e, experiment.id, this.props.workspace.tree.id)}
-                    >
-                      {experiment.name}
-                    </Checkbox>
-                  );
-                })
-              }
-            </div>
-          </Popover>
-        )
+        <div
+          style={{
+            opacity: this.state.pending ? 0.5 : 1,
+          }}
+        >
+          {
+            experiments.map(experiment => {
+              return (
+                <Checkbox
+                  key={experiment.id}
+                  checked={
+                    this.props.workspace.tree.experiments.find(e => e.id === experiment.id)
+                    ?
+                    true
+                    :
+                    false
+                  }
+                  disabled={this.state.pending}
+                  onChange={e => this.handleOnChange(e, experiment.id, this.props.workspace.tree.id)}
+                >
+                  {experiment.name}
+                </Checkbox>
+              );
+            })
+          }
+        </div>
     );
 
     const experimentsIncludedIn = 
@@ -93,9 +87,30 @@ export class ExperimentsCheckboxesPresentational extends React.Component<any,  a
        .filter(e1 => this.props.workspace.tree.experiments.find(e2 => e1.id === e2.id));
  
     return (
-      <OverlayTrigger trigger="click" placement="right" overlay={popoverWithProps}>
-        <Button bsSize="xsmall" bsStyle="default">Edit Experiments</Button>
-      </OverlayTrigger>
+        <div style={{ marginTop: "10px" }}>
+           <Button 
+            bsSize="xsmall"
+            bsStyle="default"
+            onClick={() => this.setState({ 
+              isShowingExperimentsCheckboxes: !this.state.isShowingExperimentsCheckboxes
+              })}
+            >
+              {
+                this.state.isShowingExperimentsCheckboxes
+                ?
+                <strong>Close</strong>
+                :
+                "Edit Experiments"
+              }
+            </Button>
+           <div 
+            style={{
+              display: this.state.isShowingExperimentsCheckboxes ? "block" : "none",
+            }}
+           >
+            {popoverWithProps}
+           </div>
+        </div>
     );
   }
 }
