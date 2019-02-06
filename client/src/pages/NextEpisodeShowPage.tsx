@@ -4,6 +4,7 @@ import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { compose } from "recompose";
+import { parse as parseQueryString } from "query-string";
 
 import { Auth } from "../auth";
 import { ContentContainer } from  "../components/ContentContainer";
@@ -36,8 +37,14 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
 
   public async componentDidMount() {
     let response, normalSchedulingFailed, oracleSchedulingFailed;
+    const queryParams = parseQueryString(window.location.search);
+
     try {
-      response = await this.props.findNextWorkspaceMutation();
+      response = await this.props.findNextWorkspaceMutation({
+        variables: {
+          experimentId: queryParams.experiment,
+        }
+      });
     } catch (e) {
       oracleSchedulingFailed = e.message === "GraphQL error: No eligible workspace for oracle";
       normalSchedulingFailed = e.message === "GraphQL error: No eligible workspace";
@@ -153,8 +160,8 @@ const ORACLE_MODE_QUERY = gql`
 `;
 
 const FIND_NEXT_WORKSPACE_MUTATION = gql`
-  mutation findNextWorkspace {
-    findNextWorkspace {
+  mutation findNextWorkspace($experimentId: String) {
+    findNextWorkspace(experimentId: $experimentId) {
       id
     }
   }

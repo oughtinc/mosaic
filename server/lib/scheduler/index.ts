@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { filter } from "asyncro";
 import { isInOracleMode } from "../globals/isInOracleMode";
-import { Tree, Workspace } from "../models";
+import { Experiment, Tree, Workspace } from "../models";
 import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
 import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
@@ -26,51 +26,78 @@ const fetchAllWorkspacesInTree = async (rootWorkspace) => {
   return result;
 }
 
-const scheduler = new Scheduler({
-  fetchAllWorkspacesInTree,
-  fetchAllRootWorkspaces: async eligibilityRank => {
-    const rootWorkspaces = await Workspace.findAll({
-      where: {
-        parentId: null,
-        isArchived: false,
-      }
-    });
-    
-    const eligibleRootWorkspaces = await filter(
-      rootWorkspaces,
-      async w => {
-        const tree = await Tree.findOne({
-          where: {
-            rootWorkspaceId: w.id,
-          },
-        });
+export const schedulers = new Map();
 
-        if (!tree) {
+export async function createScheduler(experimentId) {
+  const scheduler = new Scheduler({
+    fetchAllWorkspacesInTree,
+    fetchAllRootWorkspaces: async () => {
+      const rootWorkspaces = await Workspace.findAll({
+        where: {
+          parentId: null,
+          isArchived: false,
+        }
+      });
+      
+      const eligibleRootWorkspaces = await filter(
+        rootWorkspaces,
+        async w => {
+          const tree = await Tree.findOne({
+            where: {
+              rootWorkspaceId: w.id,
+            },
+          });
+  
+          if (!tree) {
+            return false;
+          }
+  
+          const experiments = await tree.getExperiments();
+          
+          if (_.some(experiments, e => e.id === experimentId)) {
+            return true;
+          }
+  
           return false;
         }
+      );
+  
+      return eligibleRootWorkspaces;
+    },
+    getFallbackScheduler: async () => {
+      let fallback;
+      let fallbackScheduler;
 
-        const experiments = await tree.getExperiments();
-        
-        if (_.some(experiments, e => e.eligibilityRank === eligibilityRank)) {
-          return true;
+      const experiment = await Experiment.findById(experimentId);
+      const fallbacks = await experiment.getFallbacks();
+      
+      if (fallbacks.length === 0) {
+        fallbackScheduler = null;
+      } else {
+        fallback = fallbacks[0];
+
+        if (schedulers.has(fallback.id)) {
+          fallbackScheduler = schedulers.get(fallback.id);
+        } else {
+          fallbackScheduler = await createScheduler(fallback.id);
         }
 
-        return false;
+        return fallbackScheduler;
       }
-    );
-
-    return eligibleRootWorkspaces;
-  },
-  isInOracleMode,
-  schedule: new Schedule({
-    DistanceFromWorkedOnWorkspaceCache,
-    rootParentCache: RootParentCache,
+    },
+    isInOracleMode,
+    schedule: new Schedule({
+      DistanceFromWorkedOnWorkspaceCache,
+      rootParentCache: new RootParentCache(),
+      timeLimit: NINETY_SECONDS,
+    }),
+    NumberOfStaleDescendantsCache,
+    RemainingBudgetAmongDescendantsCache,
+    rootParentCache: new RootParentCache(),
     timeLimit: NINETY_SECONDS,
-  }),
-  NumberOfStaleDescendantsCache,
-  RemainingBudgetAmongDescendantsCache,
-  rootParentCache: RootParentCache,
-  timeLimit: NINETY_SECONDS,
-});
+  });
 
-export { scheduler };
+  schedulers.set(experimentId, scheduler);
+
+  return scheduler;
+}

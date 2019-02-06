@@ -27,7 +27,7 @@ import { isUserOracle } from "./auth/isUserOracle";
 import { userFromAuthToken } from "./auth/userFromAuthToken";
 import { userFromContext } from "./auth/userFromContext";
 
-import { scheduler } from "../scheduler";
+import { createScheduler, schedulers } from "../scheduler";
 
 const generateReferences = (model, references) => {
   const all = {};
@@ -146,15 +146,15 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
-      userActivity: {
-        type: UserActivityType,
-        args: {
-          userId: { type: GraphQLString },
-        },
-        resolve: async (_, { userId }) => {
-          return scheduler.getUserActivity(userId);
-        }
-      },
+      // userActivity: {
+      //   type: UserActivityType,
+      //   args: {
+      //     userId: { type: GraphQLString },
+      //   },
+      //   resolve: async (_, { userId }) => {
+      //     return scheduler.getUserActivity(userId);
+      //   }
+      // },
       oracleMode: {
         type: GraphQLBoolean,
         resolve: function () {
@@ -660,7 +660,10 @@ const schema = new GraphQLSchema({
       },
       findNextWorkspace: {
         type: workspaceType,
-        resolve: async (_, args, context) => {
+        args: {
+          experimentId: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId }, context) => {
           const user = await userFromContext(context);
           if (user == null) {
             throw new Error(
@@ -668,21 +671,29 @@ const schema = new GraphQLSchema({
             );
           }
 
-          if (isUserOracle(user) && isInOracleMode.getValue()) {
-            await scheduler.assignNextWorkspaceForOracle(user.user_id);
+          let scheduler;
+          if (schedulers.has(experimentId)) {
+            scheduler = schedulers.get(experimentId);
           } else {
-            await scheduler.assignNextWorkspace(user.user_id);
+            scheduler = await createScheduler(experimentId);
           }
 
-          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
-            user.user_id
-          );
+          let workspaceId;
+          if (isUserOracle(user) && isInOracleMode.getValue()) {
+            workspaceId = await scheduler.assignNextWorkspaceForOracle(user.user_id);
+          } else {
+            workspaceId = await scheduler.assignNextWorkspace(user.user_id);
+          }
+
           return { id: workspaceId };
         }
       },
       findNextMaybeSuboptimalWorkspace: {
         type: workspaceType,
-        resolve: async (_, args, context) => {
+        args: {
+          experimentId: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId }, context) => {
           const user = await userFromContext(context);
           if (user == null) {
             throw new Error(
@@ -690,21 +701,35 @@ const schema = new GraphQLSchema({
             );
           }
 
-          await scheduler.assignNextMaybeSuboptimalWorkspace(user.user_id);
+          let scheduler;
+          if (schedulers.has(experimentId)) {
+            scheduler = schedulers.get(experimentId);
+          } else {
+            scheduler = await createScheduler(experimentId);
+          }
 
-          const workspaceId = await scheduler.getIdOfCurrentWorkspace(
-            user.user_id
-          );
+          const workspaceId = await scheduler.assignNextMaybeSuboptimalWorkspace(user.user_id);
+
           return { id: workspaceId };
         }
       },
       leaveCurrentWorkspace: {
         type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+        },
         resolve: requireUser(
           "You must be logged in to leave a workspace",
-          async (_, args, context) => {
+          async (_, { experimentId }, context) => {
             const user = await userFromContext(context);
-            await scheduler.leaveCurrentWorkspace(user.user_id);
+            let scheduler;
+            if (schedulers.has(experimentId)) {
+              scheduler = schedulers.get(experimentId);
+            } else {
+              scheduler = await createScheduler(experimentId);
+            }
+
+            await scheduler.leaveCurrentWorkspace(user.user_id)
             return true;
           }
         ),

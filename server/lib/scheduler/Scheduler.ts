@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import { pickRandomItemFromArray } from "../utils/pickRandomItemFromArray";
 
 class Scheduler {
+  private getFallbackScheduler;
   private fetchAllWorkspacesInTree;
   private fetchAllRootWorkspaces;
   private isInOracleMode;
@@ -15,6 +16,7 @@ class Scheduler {
   private timeLimit;
 
   public constructor({
+    getFallbackScheduler,
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
     isInOracleMode,
@@ -24,6 +26,7 @@ class Scheduler {
     schedule,
     timeLimit,
   }) {
+    this.getFallbackScheduler = getFallbackScheduler;
     this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
     this.isInOracleMode = isInOracleMode;
@@ -97,6 +100,7 @@ class Scheduler {
 
   public async assignNextWorkspace(userId, maybeSuboptimal = false) {
     this.resetCaches();
+    this.schedule.leaveCurrentWorkspace(userId);
 
     let actionableWorkspaces = await this.getActionableWorkspaces({ maybeSuboptimal, userId });
 
@@ -108,7 +112,16 @@ class Scheduler {
     }
 
     if (actionableWorkspaces.length === 0) {
-      this.schedule.leaveCurrentWorkspace(userId);
+      const fallbackScheduler = await this.getFallbackScheduler();
+      if (fallbackScheduler) {
+        const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspace({
+          maybeSuboptimal, 
+          userId,
+        });
+
+        return assignedWorkspaceId;
+      }
+    
       throw new Error("No eligible workspace");
     }
 
@@ -121,14 +134,21 @@ class Scheduler {
       isOracle: false,
       isLastAssignmentTimed: isThisAssignmentTimed,
     });
+
+    return assignedWorkspace.id;
   }
 
   public async assignNextMaybeSuboptimalWorkspace(userId) {
     await this.assignNextWorkspace(userId, true);
   }
 
-  public leaveCurrentWorkspace(userId) {
+  public async leaveCurrentWorkspace(userId) {
     this.schedule.leaveCurrentWorkspace(userId);
+
+    const fallbackScheduler = await this.getFallbackScheduler();
+    if (fallbackScheduler) {
+      await fallbackScheduler.leaveCurrentWorkspace(userId);
+    }
   }
 
   public reset(){
@@ -136,11 +156,10 @@ class Scheduler {
   }
 
   private async getActionableWorkspaces({ 
-    eligibilityRank = 1,
     maybeSuboptimal, 
     userId,
   }) {
-    let treesToConsider = await this.fetchAllRootWorkspaces(eligibilityRank);
+    let treesToConsider = await this.fetchAllRootWorkspaces();
 
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
@@ -159,16 +178,6 @@ class Scheduler {
           [randomlySelectedTree]
         );
       }
-    }
-
-    // try fallback
-    // currently set up so fallback occurs before maybeSuboptimal
-    if (eligibilityRank === 1) {
-      return await this.getActionableWorkspaces({ 
-        eligibilityRank: 2,
-        maybeSuboptimal, 
-        userId,
-      });
     }
 
     // if already trying fallback return empty array

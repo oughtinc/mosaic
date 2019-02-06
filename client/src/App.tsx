@@ -13,6 +13,7 @@ import thunk from "redux-thunk";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
+import { ExperimentShowPage } from "./pages/ExperimentShowPage";
 import { NextEpisodeShowPage } from "./pages/NextEpisodeShowPage";
 import { NextMaybeSuboptimalEpisodeShowPage } from "./pages/NextMaybeSuboptimalEpisodeShowPage";
 import { BetweenEpisodesPage } from "./pages/BetweenEpisodesPage";
@@ -98,6 +99,11 @@ const Routes = () => (
       exact={true}
       path="/workspaces/:workspaceId"
       component={EpisodeShowPage}
+    />
+    <Route
+      exact={true}
+      path="/experiments/:experimentId"
+      component={ExperimentShowPage}
     />
     <Route
       exact={true}
