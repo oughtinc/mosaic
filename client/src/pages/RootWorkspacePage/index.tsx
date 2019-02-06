@@ -35,8 +35,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
         }
         <ContentContainer>
           {!Auth.isAuthenticated() && <WelcomeMessage />}
-
-          <HomePageHeading>Questions</HomePageHeading>
+          
           <ListOfRootWorkspaces isLoading={isLoading} workspaces={workspaces} />
           {Auth.isAuthenticated() && (
             <NewRootWorkspaceForm

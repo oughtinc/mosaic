@@ -20,20 +20,34 @@ const ListOfRootWorkspaces = ({ isLoading, workspaces }) => {
         ?
         "Loading..."
         :
-          experiments.map(e => 
-            <div key={e.id}>
-              <h1 style={{fontSize: "22px"}}>{e.name}</h1>
-              {e.workspaces.map(w => 
-                <RootWorkspace
-                  key={`${e.id}${w.id}`}
-                  style={{
-                    margin: "5px 0",
-                  }}
-                  workspace={w}
-                />
-              )}
-            </div>
-          )
+          <div>
+            {
+              experiments.map(e => 
+                <div key={e.id}>
+                  <h1 style={{fontSize: "22px"}}>{e.name}</h1>
+                  {e.workspaces.map(w => 
+                    <RootWorkspace
+                      key={`${e.id}${w.id}`}
+                      style={{
+                        margin: "5px 0",
+                      }}
+                      workspace={w}
+                    />
+                  )}
+                </div>
+              )
+            }
+            <h1 style={{fontSize: "22px"}}>all workspaces</h1>
+            {workspaces.map(w => 
+              <RootWorkspace
+                key={`${w.id}`}
+                style={{
+                  margin: "5px 0",
+                }}
+                workspace={w}
+              />
+            )}
+          </div>
       }
     </div>
   );
