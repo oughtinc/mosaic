@@ -63,6 +63,13 @@ export const WORKSPACES_QUERY = gql`
       isEligibleForAssignment
       hasIOConstraints
       hasTimeBudget
+      tree {
+        experiments {
+          id
+          createdAt
+          name
+        }
+      }
     }
   }
 `;
