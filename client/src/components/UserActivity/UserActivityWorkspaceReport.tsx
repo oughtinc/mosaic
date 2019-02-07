@@ -56,10 +56,23 @@ export class UserActivityWorkspaceReport extends React.Component<any, any> {
             flexGrow: 1,
             position: "relative"
           }}
-        >
+        >   
+          {
+            isFallback
+            &&
+            <span
+              style={{
+                color: "#058",
+                fontVariant: "small-caps",
+                fontWeight: 500,
+              }}
+            >
+              fallback
+            </span>
+          }
           <BlockContainer
             style={{
-              boxShadow: `0 0 5px 1px ${isFallback ? "pink" : "none"}`,
+              boxShadow: `0 0 5px 1px ${isFallback ? "#058" : "none"}`,
             }}
           >
             <BlockBody>

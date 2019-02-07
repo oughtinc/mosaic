@@ -24,7 +24,7 @@ export class UserActivitySummary extends React.Component<any, any> {
         {" "}primary workspace{howManyPrimaryWorkspacesHasUserWorkedOn !== 1 ? "s" : ""} visited
         <br />
         <span
-          style={{ color: "pink", fontSize: "24px" }}
+          style={{ color: "#058", fontSize: "24px" }}
         >
           {howManyFallbackWorkspacesHasUserWorkedOn}
         </span>
