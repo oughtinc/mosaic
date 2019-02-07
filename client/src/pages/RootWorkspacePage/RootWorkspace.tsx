@@ -30,7 +30,7 @@ class RootWorkspacePresentational extends React.Component<any, any> {
 
     return (
       <WorkspaceContainer style={this.props.style}>
-        <div style={{flex: "1 0 0px", minWidth: 0}}>
+        <div style={{ width: "100%" }}>
           {
             Auth.isAdmin()
             &&
@@ -55,22 +55,40 @@ class RootWorkspacePresentational extends React.Component<any, any> {
             
           }
           <div
-            style={{ padding: "10px "}}
+            style={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "space-between",
+              padding: "10px",
+              maxWidth: "100%",
+            }}
           >
-            <Link to={`/workspaces/${workspace.id}/subtree`}>
-              <Button
-                bsSize="xsmall"
-                bsStyle="default"
-                className="pull-right"
-              >
-                Tree »
-              </Button>
-            </Link>
-            <Link to={`/workspaces/${workspace.id}`}>
-              <RootBlock
-                block={question}
-              />
-            </Link>
+            <div
+              style={{
+                paddingRight: "50px",
+                marginRight: "-50px",
+                maxWidth: "100%",
+              }}
+            >
+              <Link to={`/workspaces/${workspace.id}`}>
+                <RootBlock
+                  block={question}
+                  style={{
+                    verticalAlign: "middle",
+                  }}
+                />
+              </Link> 
+            </div>
+            <div>
+              <Link to={`/workspaces/${workspace.id}/subtree`}>
+                <Button
+                  bsSize="xsmall"
+                  bsStyle="default"
+                >
+                  Tree »
+                </Button>
+              </Link>      
+            </div>
           </div>
         </div>
       </WorkspaceContainer>
