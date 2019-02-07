@@ -9,6 +9,8 @@ export class UserActivitySummary extends React.Component<any, any> {
         howManyFallbackWorkspacesHasUserWorkedOn,
     } = this.props;
 
+    const howManyWorkspacesVisited = Number(howManyPrimaryWorkspacesHasUserWorkedOn) + Number(howManyFallbackWorkspacesHasUserWorkedOn);
+
     return (
       <div
         style={{
@@ -19,16 +21,9 @@ export class UserActivitySummary extends React.Component<any, any> {
         <span
           style={{ color: "#11aa11", fontSize: "24px" }}
         >
-          {howManyPrimaryWorkspacesHasUserWorkedOn}
+          {howManyWorkspacesVisited}
         </span>
-        {" "}primary workspace{howManyPrimaryWorkspacesHasUserWorkedOn !== 1 ? "s" : ""} visited
-        <br />
-        <span
-          style={{ color: "#058", fontSize: "24px" }}
-        >
-          {howManyFallbackWorkspacesHasUserWorkedOn}
-        </span>
-        {" "}fallback workspace{howManyFallbackWorkspacesHasUserWorkedOn !== 1 ? "s" : ""} visited
+        {" "}workspace{howManyPrimaryWorkspacesHasUserWorkedOn !== 1 ? "s" : ""} visited
         <br />
         <ReadableDuration
           durationInMs={averageTimeInMsSpentOnEachWorkspace}
