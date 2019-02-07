@@ -9,7 +9,6 @@ import { Auth } from "../../auth";
 
 import {
   homepageWorkspaceBgColor,
-  homepageWorkspaceScratchpadFontColor,
   blockBorderAndBoxShadow
 } from "../../styles";
 
@@ -20,10 +19,6 @@ const WorkspaceContainer = styled.div`
   justify-content: space-between;
 `;
 
-const ScratchpadContainer = styled.div`
-  color: ${homepageWorkspaceScratchpadFontColor};
-`;
-
 const workspaceToBlock = (workspace, blockType) =>
   workspace.blocks && workspace.blocks.find(b => b.type === blockType);
 
@@ -32,8 +27,6 @@ class RootWorkspacePresentational extends React.Component<any, any> {
     const workspace = this.props.workspace;
 
     const question = workspaceToBlock(workspace, "QUESTION");
-    const answer = workspaceToBlock(workspace, "ANSWER");
-    const scratchpad = workspaceToBlock(workspace, "SCRATCHPAD");
 
     return (
       <WorkspaceContainer style={this.props.style}>
@@ -69,10 +62,6 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                 bsSize="xsmall"
                 bsStyle="default"
                 className="pull-right"
-                style={{
-                  margin: "5px 1px",
-                  padding: "1px 4px",
-                }}
               >
                 Tree »
               </Button>
@@ -82,16 +71,6 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                 block={question}
               />
             </Link>
-            <br />
-            <ScratchpadContainer>
-              <RootBlock
-                block={scratchpad}
-                defaultText="(no description)"
-              />
-            </ScratchpadContainer>
-            <RootBlock
-              block={answer}
-            />
           </div>
         </div>
       </WorkspaceContainer>
