@@ -48,6 +48,15 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                 padding: "10px",
               }}
             >
+              <span
+                style={{
+                  color: "#888",
+                  display: "inline-block",
+                  marginBottom: "5px",
+                }}
+              >
+                {workspace.createdAt}
+              </span>
               <AdminControls workspace={workspace} />
             </div>
             
