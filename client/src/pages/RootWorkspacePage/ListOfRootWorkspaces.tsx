@@ -36,7 +36,7 @@ class ListOfRootWorkspaces extends React.Component<any, any> {
         {
           isLoading
           ?
-          "Loading..."
+            <div style={{ marginTop: "10px" }}>Loading...</div>
           :
             <div>
               {
