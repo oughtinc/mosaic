@@ -61,7 +61,7 @@ class ListOfRootWorkspaces extends React.Component<any, any> {
                 this.state.displayFormat === "all"
                 &&
                 <div>
-                  <h1 style={{fontSize: "22px"}}>all workspaces</h1>
+                  <h1 style={{fontSize: "22px"}}>All Questions</h1>
                   {workspaces.map(w => 
                     <RootWorkspace
                       key={`${w.id}`}
