@@ -405,6 +405,10 @@ export class WorkspaceView extends React.Component<any, any> {
                           visibleExportIds={visibleExportIds}
                           unlockPointer={unlockPointer}
                           {...questionProps}
+                          readOnly={(!isActive && Auth.isAdmin()) ? false : true}
+                          shouldAutosave={(!isActive && Auth.isAdmin()) ? true : false}
+                          shouldAutoExport={(!isActive && Auth.isAdmin()) && this.state.shouldAutoExport}
+                          pastedExportFormat={(!isActive && Auth.isAdmin()) && this.state.pastedExportFormat}
                         />
                       </div>
                       {hasParent &&
