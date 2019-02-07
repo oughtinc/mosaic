@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import * as _ from "lodash";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
@@ -20,6 +21,14 @@ const ExperimentsContainer = styled.div`
 
 export class ListOfExperimentsPresentational extends React.Component<any, any> {
   public render() {
+    const experiments = 
+      this.props.experimentsQuery.experiments
+      &&
+      _.sortBy(
+        this.props.experimentsQuery.experiments,
+        experiment => -Date.parse(experiment.createdAt)
+      );
+
     return (
       <ExperimentsContainer>
         {
@@ -27,7 +36,7 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
           ? 
           "Loading..."
           : 
-          this.props.experimentsQuery.experiments.map(e => {
+          experiments.map(e => {
             return (
               <ExperimentControl
                 experiment={e}
