@@ -12,11 +12,11 @@ import {
 
 import { ExperimentControl } from "./ExperimentControl";
 
-const ExperimentsContainer = styled.div`
+const ExperimentContainer = styled.div`
   ${blockBorderAndBoxShadow};
   background-color: ${homepageWorkspaceBgColor};
   padding: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 5px;
 `;
 
 export class ListOfExperimentsPresentational extends React.Component<any, any> {
@@ -30,7 +30,7 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
       );
 
     return (
-      <ExperimentsContainer>
+      <div style={{ marginTop: "10px" }}>
         {
           this.props.experimentsQuery.loading
           ? 
@@ -38,22 +38,23 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
           : 
           experiments.map(e => {
             return (
-              <ExperimentControl
-                experiment={e}
-                fallbacks={e.fallbacks}
-                key={e.id}
-                onEligibilityRankChange={this.onEligibilityRankChange}
-                updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
-                  variables: {
-                    experimentId,
-                    name,
-                  },
-                })}
-              />
+              <ExperimentContainer key={e.id}>
+                <ExperimentControl
+                  experiment={e}
+                  fallbacks={e.fallbacks}
+                  onEligibilityRankChange={this.onEligibilityRankChange}
+                  updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
+                    variables: {
+                      experimentId,
+                      name,
+                    },
+                  })}
+                />
+              </ExperimentContainer>
             );
           })
         }
-      </ExperimentsContainer>
+      </div>
     );
   }
 
