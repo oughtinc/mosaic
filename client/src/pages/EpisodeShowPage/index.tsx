@@ -309,7 +309,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
     return (
       <div>
-        {Auth.isAuthenticated() && (
+        {Auth.isAuthenticated() && experimentId && (
           <EpisodeNav
             experimentId={experimentId}
             hasSubquestions={hasSubquestions}
