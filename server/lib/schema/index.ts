@@ -146,15 +146,23 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
-      // userActivity: {
-      //   type: UserActivityType,
-      //   args: {
-      //     userId: { type: GraphQLString },
-      //   },
-      //   resolve: async (_, { userId }) => {
-      //     return scheduler.getUserActivity(userId);
-      //   }
-      // },
+      userActivity: {
+        type: UserActivityType,
+        args: {
+          experimentId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId, userId }) => {
+          let scheduler;
+          if (schedulers.has(experimentId)) {
+            scheduler = schedulers.get(experimentId);
+          } else {
+            scheduler = await createScheduler(experimentId);
+          }
+
+          return scheduler.getUserActivity(userId);
+        }
+      },
       oracleMode: {
         type: GraphQLBoolean,
         resolve: function () {

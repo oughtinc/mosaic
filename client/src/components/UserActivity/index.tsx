@@ -52,8 +52,8 @@ export class UserActivityPresentational extends React.Component<any, any> {
 }
 
 const USER_ACTIVITY_QUERY = gql`
-query userActivityQuery($userId: String) {
-  userActivity(userId: $userId) {
+query userActivityQuery($experimentId: String, $userId: String) {
+  userActivity(experimentId: $experimentId, userId: $userId) {
     assignments {
       howLongDidAssignmentLast
       totalUsersWhoHaveWorkedOnWorkspace
@@ -76,13 +76,16 @@ query userActivityQuery($userId: String) {
   }
 }`;
 
-export const UserActivity = compose(
+const options = ({ experimentId }) => ({
+  variables: {
+    experimentId, 
+    userId: Auth.userId(),
+  }
+});
+
+export const UserActivity: any = compose(
   graphql(USER_ACTIVITY_QUERY, { 
     name: "userActivityQuery",
-    options: {
-      variables: {
-        userId: Auth.userId(),
-      }
-    },
+    options,
   }),
 )(UserActivityPresentational);

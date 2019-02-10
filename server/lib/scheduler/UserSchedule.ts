@@ -24,10 +24,11 @@ class UserSchedule {
   }
 
   public getUserActivity() {
-    return this.userSchedule.map(assignment => ({
+    const userActivity = this.userSchedule.map(assignment => ({
       howLongDidAssignmentLast: assignment.getHowLongDidAssignmentLast(),
       workspace: assignment.getWorkspace(),
     }));
+    return userActivity;
   }
 
   public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false, isLastAssignmentTimed = true) {

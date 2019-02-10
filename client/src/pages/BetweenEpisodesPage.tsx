@@ -46,11 +46,11 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
           <div style={{ textAlign: "center" }}>
           Great job! Now is your chance to take a break. Press the button above when you're ready to start on the next workspace. 
           </div>
-          {/*
+          {
             this.state.hasLeftCurrentWorkspace
             &&
-            <UserActivity />
-          */}
+            <UserActivity experimentId={queryParams.experiment} />
+          }
         </ContentContainer>
       </div>
     );

@@ -38,7 +38,18 @@ class Scheduler {
   }
 
   public async getUserActivity(userId) {
-    return this.schedule.getUserActivity(userId);
+    const thisSchedulerUserActivity = await this.schedule.getUserActivity(userId);
+    const fallbackScheduler = await this.getFallbackScheduler();  
+    const fallbackSchedulerUserActivity = 
+      fallbackScheduler
+      ?
+      await fallbackScheduler.getUserActivity(userId)
+      :
+      [];
+    
+    const mergedUserActivity = thisSchedulerUserActivity.concat(fallbackSchedulerUserActivity);
+
+    return mergedUserActivity;
   }
 
   public async getIdOfCurrentWorkspace(userId) {
@@ -114,10 +125,7 @@ class Scheduler {
     if (actionableWorkspaces.length === 0) {
       const fallbackScheduler = await this.getFallbackScheduler();
       if (fallbackScheduler) {
-        const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspace({
-          maybeSuboptimal, 
-          userId,
-        });
+        const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspace(userId, maybeSuboptimal);
 
         return assignedWorkspaceId;
       }
