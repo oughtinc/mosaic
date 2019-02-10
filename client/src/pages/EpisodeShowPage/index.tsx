@@ -286,6 +286,7 @@ export class WorkspaceView extends React.Component<any, any> {
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
     const isActive = queryParams.active;
+    const experimentId = queryParams.experiment;
     const hasURLTimeRestriction = queryParams.timer;
     const hasTimerEnded = this.state.hasTimerEnded;
 
@@ -310,6 +311,7 @@ export class WorkspaceView extends React.Component<any, any> {
       <div>
         {Auth.isAuthenticated() && (
           <EpisodeNav
+            experimentId={experimentId}
             hasSubquestions={hasSubquestions}
             isActive={isActive}
             isInOracleMode={isInOracleMode}

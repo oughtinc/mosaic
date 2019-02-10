@@ -2,6 +2,7 @@ import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
+import { parse as parseQueryString } from "query-string";
 
 import { EpisodeNav } from "./EpisodeShowPage/EpisodeNav";
 import { Auth } from "../auth";
@@ -14,17 +15,26 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
   };
 
   public async componentDidMount() {
-    await this.props.leaveCurrentWorkspaceMutation();
+    const queryParams = parseQueryString(window.location.search);
+
+    await this.props.leaveCurrentWorkspaceMutation({
+      variables: {
+        experimentId: queryParams.experiment,
+      }
+    });
     this.setState({
       hasLeftCurrentWorkspace: true,
     });
   }
 
   public render() {
+    const queryParams = parseQueryString(window.location.search);
+
     return (
       <div>
         {Auth.isAuthenticated() && (
           <EpisodeNav
+            experimentId={queryParams.experiment}
             hasParent={false}
             hasTimer={false}
             hasTimerEnded={true}
@@ -36,11 +46,11 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
           <div style={{ textAlign: "center" }}>
           Great job! Now is your chance to take a break. Press the button above when you're ready to start on the next workspace. 
           </div>
-          {
+          {/*
             this.state.hasLeftCurrentWorkspace
             &&
             <UserActivity />
-          }
+          */}
         </ContentContainer>
       </div>
     );
@@ -54,8 +64,8 @@ const ORACLE_MODE_QUERY = gql`
 `;
 
 const LEAVE_CURRENT_WORKSPACE_MUTATION = gql`
-  mutation leaveCurrentWorkspace {
-    leaveCurrentWorkspace
+  mutation leaveCurrentWorkspace($experimentId: String) {
+    leaveCurrentWorkspace(experimentId: $experimentId)
   }
 `;
 

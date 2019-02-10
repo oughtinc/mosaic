@@ -29,10 +29,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
 
     return (
       <div>
-        {Auth.isAuthenticated() && <GetStartedNav isInOracleMode={this.props.oracleModeQuery.oracleMode}/>}
-        {Auth.isOracle() &&
-          <OracleHeader />
-        }
+        {Auth.isOracle() && <OracleHeader />}
         <ContentContainer>
           {!Auth.isAuthenticated() && <WelcomeMessage />}
           

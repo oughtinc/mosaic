@@ -7,21 +7,22 @@ import { Auth } from "../../auth";
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
+  experimentId: string;
   label: string;
   navHook?: () => void;
 }
 
-const NextWorkspaceBtn = ({ bsStyle, label, navHook }: NextWorkspaceBtnProps) => {
+const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
   return (
-    <Link onClick={navHook} to="/next" style={{ margin: "0 5px" }}>
+    <Link onClick={navHook} to={`/next?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
       <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
     </Link>
   );
 };
 
-const TakeBreakBtn = ({ bsStyle, label, navHook }: NextWorkspaceBtnProps) => {
+const TakeBreakBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
   return (
-    <Link onClick={navHook} to="/break" style={{ margin: "0 5px" }}>
+    <Link onClick={navHook} to={`/break?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
       <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
     </Link>
   );
@@ -35,6 +36,7 @@ const EpisodeNavContainer = styled.div`
 `;
 
 interface EpisodeNavProps {
+  experimentId: string;
   hasSubquestions: boolean;
   hasTimeBudget: boolean;
   hasTimerEnded: boolean;
@@ -53,6 +55,7 @@ interface EpisodeNavProps {
 class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
   public render() {
     const {
+      experimentId,
       hasTimeBudget,
       hasTimerEnded,
       isActive,
@@ -70,6 +73,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
             ?
               <NextWorkspaceBtn
                 bsStyle="default"
+                experimentId={experimentId}
                 label={"Start on next workspace (Oracle Mode)"}
               />
             :
@@ -77,6 +81,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                 <div>
                   <TakeBreakBtn
                     bsStyle="default"
+                    experimentId={experimentId}
                     label="Skip and go to next workspace"
                   />
                   {
@@ -84,6 +89,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                     &&
                     <TakeBreakBtn
                       bsStyle="default"
+                      experimentId={experimentId}
                       label="Done (leave budget)"
                       navHook={() => {
                         updateIsEligibleForOracle(false);
@@ -107,12 +113,14 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
             ?
               <NextWorkspaceBtn
                 bsStyle="primary"
+                experimentId={experimentId}
                 label="Get next workspace"
               />
             :
               <div>
                 <TakeBreakBtn
                   bsStyle="primary"
+                  experimentId={experimentId}
                   label="Needs more work"
                   navHook={() => markAsNotStaleRelativeToUser && markAsNotStaleRelativeToUser()}
                 />
@@ -121,6 +129,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
           :
           <NextWorkspaceBtn
             bsStyle="primary"
+            experimentId={experimentId}
             label={isTakingABreak ? "Start on next workspace" : "Get started"}
           />
         }

@@ -69,6 +69,7 @@ export async function createScheduler(experimentId) {
       let fallbackScheduler;
 
       const experiment = await Experiment.findById(experimentId);
+      
       const fallbacks = await experiment.getFallbacks();
       
       if (fallbacks.length === 0) {
