@@ -6,6 +6,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from "react-bootstrap";
+import { Link } from "react-router-dom";  
 
 import { Fallbacks } from "./Fallbacks";
 
@@ -33,7 +34,9 @@ class ExperimentControl extends React.Component<any, any> {
           !this.state.isShowingEditNameField
           ?
             <span>
-              <ControlLabel>{experiment.name}</ControlLabel>
+              <Link to={`/experiments/${experiment.id}`}>
+                <ControlLabel style={{ cursor: "pointer" }}>{experiment.name}</ControlLabel>
+              </Link> 
               <span
                 onClick={this.showEditNameField}
                 style={wordLinkStyle}

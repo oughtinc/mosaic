@@ -10,7 +10,6 @@ import { NewExperimentForm } from "../../components/NewExperimentForm";
 import { NewRootWorkspaceForm } from "./NewRootWorkspaceForm";
 import { ListOfExperiments } from "./ExperimentsControls";
 import { WelcomeMessage } from "./WelcomeMessage";
-import { GetStartedNav } from "./GetStartedNav";
 import { OracleHeader } from "./OracleHeader";
 
 import { ContentContainer } from "../../components/ContentContainer";

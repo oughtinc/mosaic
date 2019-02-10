@@ -1,16 +1,36 @@
-import gql from "graphql-tag";
 import * as React from "react";
-import { graphql } from "react-apollo";
-import { compose } from "recompose";
+import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 import { ContentContainer } from  "../../components/ContentContainer";
 
+interface NextWorkspaceBtnProps {
+  bsStyle: string;
+  experimentId: string;
+  label: string;
+  navHook?: () => void;
+}
+
+const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
+  return (
+    <Link onClick={navHook} to={`/next?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
+      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
+    </Link>
+  );
+};
+
 export class ExperimentShowPagePresentational extends React.Component<any, any> {
   public render() {
+    const experimentId = this.props.match.params.experimentId;
     return (
       <div>
         <ContentContainer>
-         {JSON.stringify(this.props)}
+          <h1></h1>
+          <NextWorkspaceBtn
+            bsStyle="primary"
+            experimentId={experimentId}
+            label={"Participate in experiment"}
+          />
         </ContentContainer>
       </div>
     );

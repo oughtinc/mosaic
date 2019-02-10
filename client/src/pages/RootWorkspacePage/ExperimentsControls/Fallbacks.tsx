@@ -8,7 +8,7 @@ import { compose } from "recompose";
 export class FallbacksPresentational extends React.Component<any,  any> {
   public state = {
     pending: false,
-  }
+  };
 
   public componentDidUpdate(prevProps: any, prevState: any) {
     const didStatusChange = prevProps.experiment.fallbacks.length !== this.props.experiment.fallbacks.length;
