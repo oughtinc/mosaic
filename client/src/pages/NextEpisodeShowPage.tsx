@@ -109,7 +109,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
                   marginTop: "20px", 
                 }}
               >
-                <Link to="/nextMaybeSuboptimal" style={{ margin: "0 5px" }}>
+                <Link to={`/nextMaybeSuboptimal?experiment=${queryParams.experiment}`} style={{ margin: "0 5px" }}>
                   <Button bsStyle="danger">Find Suboptimal Workspace »</Button>
                 </Link>
               </div>

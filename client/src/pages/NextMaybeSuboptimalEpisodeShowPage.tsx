@@ -2,6 +2,8 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
+import { parse as parseQueryString } from "query-string";
+
 import { ContentContainer } from  "../components/ContentContainer";
 
 const RedExclamation = () => (
@@ -31,9 +33,16 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
   }
 
   public async componentDidMount() {
+    const queryParams = parseQueryString(window.location.search);
+
     let response, schedulingFailed;
+    
     try {
-      response = await this.props.findNextMaybeSuboptimalWorkspaceMutation();
+      response = await this.props.findNextMaybeSuboptimalWorkspaceMutation({
+        variables: {
+          experimentId: queryParams.experiment,
+        }
+      });
     } catch (e) {
       schedulingFailed = e.message === "GraphQL error: No eligible workspace";
     }
@@ -51,6 +60,8 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
   }
 
   public render() {
+    const queryParams = parseQueryString(window.location.search);
+
     if (this.state.refreshCountdown === 0) {
       location.reload();
     }
@@ -75,7 +86,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = "?isolated=true&active=true";
+      const redirectQueryParams = `?isolated=true&active=true&experiment=${queryParams.experiment}`;
       window.location.href = `${window.location.origin}/workspaces/${this.state.workspaceId}${redirectQueryParams}`;
       return null;
     }
@@ -95,8 +106,8 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
 }
 
 const FIND_NEXT_MAYBE_SUBOPTIMAL_WORKSPACE_MUTATION = gql`
-  mutation findNextMaybeSuboptimalWorkspace {
-    findNextMaybeSuboptimalWorkspace {
+  mutation findNextMaybeSuboptimalWorkspace($experimentId: String) {
+    findNextMaybeSuboptimalWorkspace(experimentId: $experimentId) {
       id
     }
   }

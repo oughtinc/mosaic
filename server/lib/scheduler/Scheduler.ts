@@ -139,7 +139,7 @@ class Scheduler {
   }
 
   public async assignNextMaybeSuboptimalWorkspace(userId) {
-    await this.assignNextWorkspace(userId, true);
+    return await this.assignNextWorkspace(userId, true);
   }
 
   public async leaveCurrentWorkspace(userId) {
