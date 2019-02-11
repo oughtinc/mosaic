@@ -540,6 +540,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      experimentId={experimentId}
                       pastedExportFormat={this.state.pastedExportFormat}
                       shouldAutoExport={this.state.shouldAutoExport}
                       hasTimeBudget={hasTimeBudget}

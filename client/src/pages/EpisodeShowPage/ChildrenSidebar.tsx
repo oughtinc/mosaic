@@ -50,9 +50,9 @@ const BlockHeader = styled.div`
   ${blockHeaderCSS};
 `;
 
-const TakeBreakBtn = ({ bsStyle, label, navHook, style }: any) => {
+const TakeBreakBtn = ({ bsStyle, experimentId, label, navHook, style }: any) => {
   return (
-    <Link onClick={navHook} to="/break" style={{ ...style, display: "inline-block" }}>
+    <Link onClick={navHook} to={`/break?experiment=${experimentId}`} style={{ ...style, display: "inline-block" }}>
       <Button bsSize="small" bsStyle={bsStyle || "primary"}>{label} »</Button>
     </Link>
   );
@@ -380,6 +380,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                   !(Auth.isOracle() && this.props.isInOracleMode)
                   ?
                     <TakeBreakBtn
+                      experimentId={this.props.experimentId}
                       label="Wait for an answer"
                       navHook={() => {
                         this.props.markAsNotStale();
@@ -388,6 +389,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                   :
                     <TakeBreakBtn
                       bsStyle="danger"
+                      experimentId={this.props.experimentId}
                       label="Done! (leave budget)"
                       navHook={() => {
                         this.props.updateIsEligibleForOracle({

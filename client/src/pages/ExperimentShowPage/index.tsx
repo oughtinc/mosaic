@@ -25,7 +25,6 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
     return (
       <div>
         <ContentContainer>
-          <h1></h1>
           <NextWorkspaceBtn
             bsStyle="primary"
             experimentId={experimentId}

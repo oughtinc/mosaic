@@ -66,9 +66,9 @@ class Scheduler {
 
   public async assignNextWorkspaceForOracle(userId) {
     this.resetCaches();
+    this.schedule.leaveCurrentWorkspace(userId);
 
-    let treesToConsider = await this.fetchAllRootWorkspaces(1);
-    let wasWorkspaceAssigned = false;
+    let treesToConsider = await this.fetchAllRootWorkspaces();
 
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(userId, treesToConsider);
@@ -98,15 +98,17 @@ class Scheduler {
           isOracle: true,
           isLastAssignmentTimed: true,
         });
-        wasWorkspaceAssigned = true;
-        break;
+        return assignedWorkspace.id;
       }
     }
+    
+    const fallbackScheduler = await this.getFallbackScheduler();
+    if (fallbackScheduler) {
+      const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspaceForOracle(userId);
 
-    if (!wasWorkspaceAssigned) {
-      this.schedule.leaveCurrentWorkspace(userId);
-      throw new Error("No eligible workspace for oracle");
+      return assignedWorkspaceId;
     }
+    throw new Error("No eligible workspace for oracle");
   }
 
   public async assignNextWorkspace(userId, maybeSuboptimal = false) {
