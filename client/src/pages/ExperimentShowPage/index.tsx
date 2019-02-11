@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 
 import { ContentContainer } from  "../../components/ContentContainer";
+import { Auth } from "../../auth";
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
@@ -40,11 +41,17 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
               this.props.experimentQuery.experiment.name
             }
           </h1>
-          <NextWorkspaceBtn
-            bsStyle="primary"
-            experimentId={experimentId}
-            label={"Participate in experiment"}
-          />
+          {
+            Auth.isAuthenticated()
+            ?
+            <NextWorkspaceBtn
+              bsStyle="primary"
+              experimentId={experimentId}
+              label={"Participate in experiment"} 
+            />
+            :
+            "Please login to participate in this experiment!"
+          }
         </ContentContainer>
       </div>
     );
