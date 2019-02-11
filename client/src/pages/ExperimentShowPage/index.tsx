@@ -59,9 +59,9 @@ const EXPERIMENT_QUERY = gql`
   } 
 `;
 
-const options = ({ experimentId }) => ({
+const options = props => ({
   variables: {
-    id: experimentId,
+    id: props.match.params.experimentId,
   },
 });
 
