@@ -7,9 +7,9 @@ import {
   responseFooterBorderTopColor,
 } from "../../styles";
 
-const TakeBreakBtn = ({ label, navHook }: any) => {
+const TakeBreakBtn = ({ experimentId, label, navHook }: any) => {
   return (
-    <Link onClick={navHook} to="/break" style={{ margin: "0 5px" }}>
+    <Link onClick={navHook} to={`/break?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
       <Button bsSize="small" bsStyle="primary">{label} »</Button>
     </Link>
   );
@@ -19,6 +19,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
   public render() {
     const {
       depleteBudget,
+      experimentId,
       hasParent,
       hasTimeBudget,
       isInOracleMode,
@@ -47,6 +48,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
           )
           ?
             <TakeBreakBtn
+              experimentId={experimentId}
               label={`Done!${hasTimeBudget ? " (returns budget)" : ""}`}
               navHook={() => {
                 // TODO: address potential race condition here with modifying
@@ -63,6 +65,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               !(isUserOracle && isInOracleMode)
               ?
               <TakeBreakBtn
+                experimentId={experimentId}
                 label="Done!"
                 navHook={() => {
                   markAsNotStale();
@@ -71,6 +74,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               />
               :
               <TakeBreakBtn
+                experimentId={experimentId}
                 bsStyle="danger"
                 label={`Done!${hasTimeBudget ? " (take budget)" : ""}`}
                 navHook={() => {
