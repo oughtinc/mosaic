@@ -3,8 +3,6 @@ import {
   ControlLabel,
   FormControl,
   FormGroup,
-  ToggleButton,
-  ToggleButtonGroup,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";  
 
@@ -73,20 +71,6 @@ class ExperimentControl extends React.Component<any, any> {
               </span>
             </span>
           }
-          <ToggleButtonGroup
-            bsSize="xsmall"
-            style={{
-              display: "inline-block",
-              marginLeft: "10px",
-            }}
-            type="radio"
-            name="options"
-            value={experiment.eligibilityRank === null ? 0 : experiment.eligibilityRank}
-            onChange={value => this.props.onEligibilityRankChange(experiment.id, value)}
-          >
-            <ToggleButton value={1}>active</ToggleButton>
-            <ToggleButton value={0}>inactive</ToggleButton>
-          </ToggleButtonGroup>
           <br />
           <Fallbacks experiment={experiment} />
         </FormGroup>
