@@ -30,7 +30,8 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
         <ContentContainer>
           <h1
             style={{
-              marginBottom: "10px",
+              fontSize: "22px",
+              marginBottom: "20px",
             }}
           >
             {
