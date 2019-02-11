@@ -264,6 +264,11 @@ const schema = new GraphQLSchema({
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       trees: modelGraphQLFields(new GraphQLList(treeType), models.Tree),
       experiments: modelGraphQLFields(new GraphQLList(experimentType), models.Experiment),
+      experiment: {
+        type: experimentType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(models.Experiment),
+      },
       pointers: modelGraphQLFields(
         new GraphQLList(pointerType),
         models.Pointer
