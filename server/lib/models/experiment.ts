@@ -25,6 +25,7 @@ const ExperimentModel = (
         allowNull: true,
       },
       description: Sequelize.JSON,
+      metadata: Sequelize.JSON,
       ...eventRelationshipColumns(DataTypes),
     },
   );

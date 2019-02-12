@@ -7,6 +7,7 @@ import { compose } from "recompose";
 
 import { ContentContainer } from  "../../components/ContentContainer";
 import { Auth } from "../../auth";
+import { MetaDataEditor } from "../../components/MetadataEditor";
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
@@ -31,8 +32,9 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
         <ContentContainer>
           <h1
             style={{
-              fontSize: "22px",
-              marginBottom: "20px",
+              fontSize: "26px",
+              fontWeight: 600,
+              marginBottom: "10px",
             }}
           >
             {
@@ -42,6 +44,14 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             }
           </h1>
           {
+            this.props.experimentQuery.experiment
+            &&
+            <MetaDataEditor
+              experimentId={this.props.match.params.experimentId}
+              valueAsJSON={this.props.experimentQuery.experiment.metadata}
+            />
+          }
+          {
             Auth.isAuthenticated()
             ?
             <NextWorkspaceBtn
@@ -50,7 +60,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
               label={"Participate in experiment"} 
             />
             :
-            "Please login to participate in this experiment!"
+            <span style={{ fontSize: "16px", fontWeight: 600 }}>Please login to participate in this experiment!</span>
           }
         </ContentContainer>
       </div>
@@ -63,6 +73,7 @@ const EXPERIMENT_QUERY = gql`
     experiment(id: $id) {
       id
       name
+      metadata
     }
   } 
 `;

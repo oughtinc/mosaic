@@ -876,6 +876,21 @@ const schema = new GraphQLSchema({
           }
         ),
       },
+      updateExperimentMetadata: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          metadata: { type: GraphQLString }
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to update experiment metadata",
+          async (_, { experimentId, metadata }, context) => {
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.update({ metadata: JSON.parse(metadata) });
+            return true;
+          }
+        ),
+      },
       unlockPointer: {
         type: GraphQLBoolean,
         args: {
