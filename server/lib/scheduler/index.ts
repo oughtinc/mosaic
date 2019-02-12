@@ -1,7 +1,8 @@
+const uuidv4 = require("uuid/v4");
 import * as _ from "lodash";
 import { filter } from "asyncro";
 import { isInOracleMode } from "../globals/isInOracleMode";
-import { Experiment, Tree, Workspace } from "../models";
+import { Assignment, Experiment, Tree, Workspace } from "../models";
 import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
 import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
@@ -30,6 +31,7 @@ export const schedulers = new Map();
 
 export async function createScheduler(experimentId) {
   const scheduler = new Scheduler({
+    experimentId,
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces: async () => {
       const rootWorkspaces = await Workspace.findAll({
@@ -88,6 +90,18 @@ export async function createScheduler(experimentId) {
     },
     isInOracleMode,
     schedule: new Schedule({
+      // createAssignment is not async because it occurs in a constructor
+      // and I want to pass id on
+      // TODO: figure out better way to do this
+      createAssignment: fields => {
+        const id = uuidv4();
+        Assignment.create({ ...fields, id });
+        return id;
+      },
+      updateAssignment: async (id, fields) => {
+        const assignment = await Assignment.findById(id);
+        await assignment.update(fields);
+      },
       DistanceFromWorkedOnWorkspaceCache,
       rootParentCache: new RootParentCache(),
       timeLimit: NINETY_SECONDS,

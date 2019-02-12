@@ -3,6 +3,9 @@ import * as _ from "lodash";
 import { UserSchedule } from "./UserSchedule";
 
 class Schedule {
+  private createAssignment;
+  private updateAssignment;
+
   // the following object maps root workspace ids to timestamps
   // I didn't use a Map (and map a workspace object to a timestamp)
   // because Sequelize doesn't preserve object identity across queries
@@ -13,7 +16,15 @@ class Schedule {
   private schedule = new Map;
   private timeLimit;
 
-  public constructor({ DistanceFromWorkedOnWorkspaceCache, rootParentCache, timeLimit }) {
+  public constructor({
+    createAssignment,
+    updateAssignment,
+    DistanceFromWorkedOnWorkspaceCache,
+    rootParentCache,
+    timeLimit,
+  }) {
+    this.createAssignment = createAssignment;
+    this.updateAssignment = updateAssignment;
     this.DistanceFromWorkedOnWorkspaceCache = DistanceFromWorkedOnWorkspaceCache;
     this.rootParentCache = rootParentCache;
     this.timeLimit = timeLimit;
@@ -44,6 +55,8 @@ class Schedule {
     }
 
     const userSchedule = new UserSchedule({
+      createAssignment: this.createAssignment,
+      updateAssignment: this.updateAssignment,
       DistanceFromWorkedOnWorkspaceCache: this.DistanceFromWorkedOnWorkspaceCache,
       rootParentCache: this.rootParentCache,
       timeLimit: this.timeLimit, userId
@@ -56,10 +69,23 @@ class Schedule {
     return this.schedule.get(userId);
   }
 
-  public async assignWorkspaceToUser({userId, workspace, startAtTimestamp = Date.now(), isOracle = false, isLastAssignmentTimed}) {
+  public async assignWorkspaceToUser({
+    experimentId,
+    userId,
+    workspace,
+    startAtTimestamp = Date.now(),
+    isOracle = false,
+    isLastAssignmentTimed
+  }) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
-    await userSchedule.assignWorkspace(workspace, startAtTimestamp, isOracle, isLastAssignmentTimed);
+    await userSchedule.assignWorkspace(
+      experimentId,
+      workspace,
+      startAtTimestamp,
+      isOracle,
+      isLastAssignmentTimed
+    );
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
   }

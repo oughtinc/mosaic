@@ -5,6 +5,8 @@ const ORACLE_TIME_LIMIT = 1000 * 60 * 15;
 const TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET = 1000 * 60 * 20;
 
 class UserSchedule {
+  private createAssignment;
+  private updateAssignment;
   private distanceFromWorkedOnWorkspaceCache;
   private DistanceFromWorkedOnWorkspaceCache;
   private lastWorkedOnTimestampForTree = {};
@@ -12,11 +14,17 @@ class UserSchedule {
   private timeLimit;
   private userId;
   private userSchedule: any = [];
-  private hasUserLeftLastAssignment = false;
-  private isLastAssignmentOracle = false;
-  private isLastAssignmentTimed = true;
 
-  public constructor({ DistanceFromWorkedOnWorkspaceCache, rootParentCache, timeLimit, userId }) {
+  public constructor({
+    createAssignment,
+    updateAssignment,
+    DistanceFromWorkedOnWorkspaceCache,
+    rootParentCache,
+    timeLimit,
+    userId
+  }) {
+    this.createAssignment = createAssignment;
+    this.updateAssignment = updateAssignment;
     this.DistanceFromWorkedOnWorkspaceCache = DistanceFromWorkedOnWorkspaceCache;
     this.rootParentCache = rootParentCache;
     this.timeLimit = timeLimit;
@@ -31,18 +39,25 @@ class UserSchedule {
     return userActivity;
   }
 
-  public async assignWorkspace(workspace, startAtTimestamp = Date.now(), isOracle = false, isLastAssignmentTimed = true) {
+  public async assignWorkspace(
+    experimentId,
+    workspace,
+    startAtTimestamp = Date.now(),
+    isOracle = false,
+    isLastAssignmentTimed = true
+  ) {
     const assignment = new Assignment({
+      createAssignment: this.createAssignment,
+      updateAssignment: this.updateAssignment,
+      experimentId,
+      isOracle,
+      isTimed: isLastAssignmentTimed,
       userId: this.userId,
       workspace,
       startAtTimestamp,
     });
 
     this.userSchedule.push(assignment);
-
-    this.hasUserLeftLastAssignment = false;
-    this.isLastAssignmentOracle = isOracle;
-    this.isLastAssignmentTimed = isLastAssignmentTimed;
 
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
 
@@ -53,9 +68,6 @@ class UserSchedule {
     const curAssignment = this.getMostRecentAssignment();
     if (curAssignment) {
       curAssignment.endAssignment();
-      // TODO refactor away this.hasUserLeftLastAssignment now that we can
-      // assignment.endAssignment()
-      this.hasUserLeftLastAssignment = true;
     }
   }
 
@@ -114,12 +126,12 @@ class UserSchedule {
   }
 
   private isActiveInLastWorkspace() {
-    if (this.hasUserLeftLastAssignment) {
+    const lastWorkedOnAssignment = this.getMostRecentAssignment();
+    if (!lastWorkedOnAssignment) {
       return false;
     }
 
-    const lastWorkedOnAssignment = this.getMostRecentAssignment();
-    if (!lastWorkedOnAssignment) {
+    if (lastWorkedOnAssignment.hasEnded()) {
       return false;
     }
 
@@ -127,7 +139,7 @@ class UserSchedule {
 
     // handle case where time budgets aren't in use, but
     // we still don't want users taking over 15 minutes
-    if (!this.isLastAssignmentTimed) {
+    if (!lastWorkedOnAssignment.isTimed) {
       if (howLongAgoUserStartedWorkingOnIt < TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET) {
         return true;
       }
@@ -135,7 +147,7 @@ class UserSchedule {
     }
 
     // normal time budget case
-    const timeLimit = this.isLastAssignmentOracle ? ORACLE_TIME_LIMIT : this.timeLimit;
+    const timeLimit = lastWorkedOnAssignment.isOracle ? ORACLE_TIME_LIMIT : this.timeLimit;
     const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < timeLimit;
 
     if (didUserStartWorkingOnItWithinTimeLimit) {

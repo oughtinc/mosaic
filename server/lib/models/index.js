@@ -6,6 +6,7 @@ const Sequelize = require("sequelize");
 var env = process.env.NODE_ENV || "development";
 var config = require(__dirname + "/../../config/config.json")[env];
 
+const AssignmentModel = require("./assignment");
 const BlockModel = require("./block");
 const ExperimentModel = require("./experiment");
 const ExportWorkspaceLockRelationModel = require("./exportWorkspaceLockRelation");
@@ -30,6 +31,7 @@ if (config.use_env_variable) {
 }
 
 const models = [
+  ["assignment", AssignmentModel],
   ["experiment", ExperimentModel],
   ["exportWorkspaceLockRelation", ExportWorkspaceLockRelationModel],
   ["event", EventModel],

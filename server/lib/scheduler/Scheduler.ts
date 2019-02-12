@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import { pickRandomItemFromArray } from "../utils/pickRandomItemFromArray";
 
 class Scheduler {
+  private experimentId;
   private getFallbackScheduler;
   private fetchAllWorkspacesInTree;
   private fetchAllRootWorkspaces;
@@ -16,6 +17,7 @@ class Scheduler {
   private timeLimit;
 
   public constructor({
+    experimentId,
     getFallbackScheduler,
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
@@ -26,6 +28,7 @@ class Scheduler {
     schedule,
     timeLimit,
   }) {
+    this.experimentId = experimentId;
     this.getFallbackScheduler = getFallbackScheduler;
     this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
@@ -93,6 +96,7 @@ class Scheduler {
         );
       } else {
         await this.schedule.assignWorkspaceToUser({
+          experimentId: this.experimentId,
           userId,
           workspace: assignedWorkspace,
           isOracle: true,
@@ -139,6 +143,7 @@ class Scheduler {
     const isThisAssignmentTimed = await assignedWorkspace.hasTimeBudgetOfRootParent;
 
     await this.schedule.assignWorkspaceToUser({
+      experimentId: this.experimentId,
       userId,
       workspace: assignedWorkspace,
       isOracle: false,
