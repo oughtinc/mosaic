@@ -78,7 +78,7 @@
     "nodemon": "^1.12.1",
     "rimraf": "^2.6.2",
     "sinon": "^6.3.5",
-    "ts-node": "^5.0.1",
+    "ts-node": "^8.0.2",
     "tslint": "^5.10.0",
     "typescript": "^2.7.2",
     "uuid": "^3.3.2"
