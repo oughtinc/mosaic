@@ -59,12 +59,12 @@ const WorkspaceModel = (
       hasTimeBudget: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: false
       },
       hasIOConstraints: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: true
       },
       isCurrentlyResolved: {
         type: DataTypes.BOOLEAN,
