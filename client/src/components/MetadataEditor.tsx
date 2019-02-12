@@ -39,16 +39,7 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
 
   public render() {
     return (
-      <div
-        style={{
-          backgroundColor: "#fcfcfc",
-          border: "1px solid #ddd",
-          fontSize: "16px",
-          marginBottom: "10px",
-          maxWidth: "800px",
-          padding: "10px",
-        }}
-      >
+      <div>
         <Editor
           onChange={this.onChange}
           readOnly={!Auth.isAdmin()}

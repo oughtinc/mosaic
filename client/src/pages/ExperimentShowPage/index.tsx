@@ -4,11 +4,22 @@ import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { compose } from "recompose";
+import styled from "styled-components";
 
 import { ContentContainer } from  "../../components/ContentContainer";
 import { Auth } from "../../auth";
 import { MetaDataEditor } from "../../components/MetadataEditor";
 import { ExperimentControl } from "../RootWorkspacePage/ExperimentsControls/ExperimentControl";
+
+import {
+  blockBorderAndBoxShadow,
+  blockBodyCSS,
+} from "../../styles";
+
+const BlockContainer = styled.div`
+  ${blockBorderAndBoxShadow};
+  ${blockBodyCSS};
+`;
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
@@ -73,10 +84,12 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
           {
             this.props.experimentQuery.experiment
             &&
-            <MetaDataEditor
-              experimentId={this.props.match.params.experimentId}
-              valueAsJSON={this.props.experimentQuery.experiment.metadata}
-            />
+            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+              <MetaDataEditor
+                experimentId={this.props.match.params.experimentId}
+                valueAsJSON={this.props.experimentQuery.experiment.metadata}
+              />
+            </BlockContainer>
           }
           {
             Auth.isAuthenticated()
