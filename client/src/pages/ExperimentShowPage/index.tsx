@@ -8,6 +8,7 @@ import { compose } from "recompose";
 import { ContentContainer } from  "../../components/ContentContainer";
 import { Auth } from "../../auth";
 import { MetaDataEditor } from "../../components/MetadataEditor";
+import { ExperimentControl } from "../RootWorkspacePage/ExperimentsControls/ExperimentControl";
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
@@ -46,6 +47,32 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
           {
             this.props.experimentQuery.experiment
             &&
+            Auth.isAdmin()
+            &&
+            <div style={{ backgroundColor: "#fff", border: "1px solid #ddd", padding: "10px", marginBottom: "10px", maxWidth: "800px" }}>
+              <ExperimentControl
+                experiment={this.props.experimentQuery.experiment}
+                fallbacks={this.props.experimentQuery.experiment.fallbacks}
+                onEligibilityRankChange={(experimentId, value) => {
+                  this.props.updateExperimentEligibilityRankMutation({
+                    variables: {
+                      experimentId,
+                      eligibilityRank: value,
+                    },
+                  });
+                }}  
+                updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
+                  variables: {
+                    experimentId,
+                    name,
+                  },
+                })}
+              />
+            </div>
+          }
+          {
+            this.props.experimentQuery.experiment
+            &&
             <MetaDataEditor
               experimentId={this.props.match.params.experimentId}
               valueAsJSON={this.props.experimentQuery.experiment.metadata}
@@ -54,11 +81,17 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
           {
             Auth.isAuthenticated()
             ?
-            <NextWorkspaceBtn
-              bsStyle="primary"
-              experimentId={experimentId}
-              label={"Participate in experiment"} 
-            />
+            (
+              this.props.experimentQuery.experiment
+              &&
+              this.props.experimentQuery.experiment.eligibilityRank === 1
+              &&
+              <NextWorkspaceBtn
+                bsStyle="primary"
+                experimentId={experimentId}
+                label={"Participate in experiment"} 
+              />
+            )
             :
             <span style={{ fontSize: "16px", fontWeight: 600 }}>Please login to participate in this experiment!</span>
           }
@@ -72,11 +105,29 @@ const EXPERIMENT_QUERY = gql`
   query experimentQuery($id: String) {
     experiment(id: $id) {
       id
+      eligibilityRank
       name
       metadata
+      fallbacks {
+        id
+        createdAt
+        name
+      }
     }
   } 
 `;
+
+const UPDATE_EXPERIMENT_NAME_MUTATION = gql`
+  mutation updateExperimentName($experimentId: String, $name: String) {
+    updateExperimentName(experimentId: $experimentId, name: $name)
+  }
+`;
+
+const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
+  mutation updateExperimentEligibilityRank($eligibilityRank: Int, $experimentId: String) {
+    updateExperimentEligibilityRank(eligibilityRank: $eligibilityRank, experimentId: $experimentId)
+  }
+`; 
 
 const options = props => ({
   variables: {
@@ -88,5 +139,17 @@ export const ExperimentShowPage: any = compose(
   graphql(EXPERIMENT_QUERY, {
     name: "experimentQuery",
     options
-  })
+  }),
+  graphql(UPDATE_EXPERIMENT_NAME_MUTATION, {
+    name: "updateExperimentNameMutation",
+    options: {
+      refetchQueries: ["experimentQuery"],
+    }
+  }),
+  graphql(UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION, {
+    name: "updateExperimentEligibilityRankMutation",
+    options: {
+      refetchQueries: ["experimentQuery"],
+    }
+  }),
 )(ExperimentShowPagePresentational);
