@@ -9,6 +9,8 @@ import { Auth } from "../auth";
 
 export class MetaDataEditorPresentational extends React.Component<any, any> {
   public state = {
+    isSavePending: false,
+    didSaveJustSuccesfullyOccur: false,
     value: this.props.valueAsJSON
       ?
       Value.fromJSON(this.props.valueAsJSON)
@@ -49,7 +51,7 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
       >
         <Editor
           onChange={this.onChange}
-          readOnly={Auth.isAdmin()}
+          readOnly={!Auth.isAdmin()}
           style={{
             marginBottom: Auth.isAdmin() && "10px",
           }}
@@ -61,9 +63,22 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
           <Button
             bsSize="xsmall"
             bsStyle="primary"
+            disabled={this.state.isSavePending || this.state.didSaveJustSuccesfullyOccur}
             onClick={this.onSave}
           >
-          Save
+            {
+              this.state.isSavePending
+              ?
+              "Saving..."
+              :
+              (
+                this.state.didSaveJustSuccesfullyOccur
+                ?
+                "Saved!"
+                :
+                "Save"
+              )
+            }
           </Button>
         }
       </div>
@@ -73,11 +88,19 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
   private onChange = change => this.setState({ value: change.value });
   
   private onSave = () => {
-    this.props.updateExperimentMetadataMutation({
-      variables: {
-        experimentId: this.props.experimentId,
-        metadata: JSON.stringify(this.state.value.toJSON()),
-      }
+    this.setState({ isSavePending: true}, async () => {
+      await this.props.updateExperimentMetadataMutation({
+        variables: {
+          experimentId: this.props.experimentId,
+          metadata: JSON.stringify(this.state.value.toJSON()),
+        }
+      });
+      this.setState({
+        didSaveJustSuccesfullyOccur: true,
+        isSavePending: false,
+      }, () => {
+        setTimeout(() => this.setState({ didSaveJustSuccesfullyOccur: false }), 1000);
+      });
     });
   }
 
