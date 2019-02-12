@@ -3,6 +3,8 @@ import * as React from "react";
 import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 import { RootWorkspace } from "./RootWorkspace";
 
+import { ExperimentLink } from "../../components/ExperimentLink";
+
 class ListOfRootWorkspaces extends React.Component<any, any> {
   public state = {
     displayFormat: "experiment",
@@ -44,7 +46,11 @@ class ListOfRootWorkspaces extends React.Component<any, any> {
                 &&
                 experiments.map(e => 
                   <div key={e.id}>
-                    <h1 style={{fontSize: "22px"}}>{e.name}</h1>
+                    <ExperimentLink
+                      experiment={e}
+                    >
+                      <h1 style={{fontSize: "22px"}}>{e.name}</h1>
+                    </ExperimentLink>
                     {e.workspaces.map(w => 
                       <RootWorkspace
                         key={`${e.id}${w.id}`}
