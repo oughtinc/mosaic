@@ -42,6 +42,7 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
       <div>
         <Editor
           onChange={this.onChange}
+          placeholder={"Experiment metadata..."}
           readOnly={!Auth.isAdmin()}
           style={{
             marginBottom: Auth.isAdmin() && "10px",
