@@ -6,6 +6,11 @@ import { compose } from "recompose";
 import { Value } from "slate";
 import { Editor } from "slate-react";
 import { Auth } from "../auth";
+import { LinkifyPlugin } from "../lib/slate-plugins/linkifyPlugin";
+
+const linkifyPlugin = LinkifyPlugin();
+
+const plugins = [linkifyPlugin];
 
 export class MetaDataEditorPresentational extends React.Component<any, any> {
   public state = {
@@ -43,6 +48,7 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
         <Editor
           onChange={this.onChange}
           placeholder={"Experiment metadata..."}
+          plugins={plugins}
           readOnly={!Auth.isAdmin()}
           style={{
             marginBottom: Auth.isAdmin() && "10px",
