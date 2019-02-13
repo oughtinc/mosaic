@@ -10,6 +10,7 @@ import { ContentContainer } from  "../../components/ContentContainer";
 import { Auth } from "../../auth";
 import { MetaDataEditor } from "../../components/MetadataEditor";
 import { ExperimentControl } from "../RootWorkspacePage/ExperimentsControls/ExperimentControl";
+import { RootWorkspace } from "../RootWorkspacePage/RootWorkspace";
 
 import {
   blockBorderAndBoxShadow,
@@ -92,21 +93,51 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             </BlockContainer>
           }
           {
-            Auth.isAuthenticated()
-            ?
+            this.props.experimentQuery.experiment
+            &&
+            this.props.experimentQuery.experiment.eligibilityRank === 1
+            &&
             (
-              this.props.experimentQuery.experiment
-              &&
-              this.props.experimentQuery.experiment.eligibilityRank === 1
-              &&
+              Auth.isAuthenticated()
+              ?
               <NextWorkspaceBtn
                 bsStyle="primary"
                 experimentId={experimentId}
                 label={"Participate in experiment"} 
               />
+              :
+              <span style={{ fontSize: "16px", fontWeight: 600 }}>Please login to participate in this experiment!</span>
             )
-            :
-            <span style={{ fontSize: "16px", fontWeight: 600 }}>Please login to participate in this experiment!</span>
+          }
+          {
+            this.props.experimentQuery.experiment
+            &&
+            this.props.experimentQuery.experiment.eligibilityRank === 0
+            &&
+            <div>
+              <h2
+                style={{
+                  fontSize: "24px",
+                  fontWeight: 600,
+                }}
+              >
+                Workspaces
+              </h2>
+              {
+                this.props.experimentQuery.experiment.trees.map(tree =>
+                  <div
+                    key={`${tree.rootWorkspace.id}`}
+                    style={{
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <RootWorkspace
+                      workspace={tree.rootWorkspace}
+                    />
+                  </div>
+                )
+              }
+            </div>
           }
         </ContentContainer>
       </div>
@@ -125,6 +156,40 @@ const EXPERIMENT_QUERY = gql`
         id
         createdAt
         name
+      }
+      trees {
+        rootWorkspace { 
+          id
+          parentId
+          creatorId
+          isPublic
+          childWorkspaceOrder
+          totalBudget
+          createdAt
+          allocatedBudget
+          blocks {
+            id
+            value
+            type
+          }
+          tree {
+            id
+            experiments {
+              id
+              name
+            }
+          }
+          isEligibleForAssignment
+          hasIOConstraints
+          hasTimeBudget
+          tree {
+            experiments {
+              id
+              createdAt
+              name
+            }
+          }
+        }
       }
     }
   } 
