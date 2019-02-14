@@ -42,128 +42,138 @@ const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspa
 
 export class ExperimentShowPagePresentational extends React.Component<any, any> {
   public render() {
-    const experimentId = this.props.match.params.experimentId;
+    const hasExperimentLoaded = this.props.experimentQuery.experiment;
+
+    if (!hasExperimentLoaded) {
+      return <ContentContainer>Loading experiment page...</ContentContainer>;
+    }
+
+    const experiment = this.props.experimentQuery.experiment;
+    const isExperimentActive = experiment.eligibilityRank === 1;
+    const isUserLoggedIn = Auth.isAuthenticated();
+    const isUserAdmin = Auth.isAdmin();
+
     return (
-      <div>
-        <ContentContainer>
-          <h1
+      <ContentContainer>
+        <h1
+          style={{
+            fontSize: "26px",
+            fontWeight: 600,
+            marginBottom: "10px",
+          }}
+        >
+          {experiment.name}
+        </h1>
+        {
+          isUserAdmin
+          &&
+          <div
             style={{
-              fontSize: "26px",
-              fontWeight: 600,
+              backgroundColor: "#fff",
+              border: "1px solid #ddd",
               marginBottom: "10px",
+              maxWidth: "800px",
+              padding: "10px",
             }}
           >
-            {
-              this.props.experimentQuery.experiment
-              &&
-              this.props.experimentQuery.experiment.name
-            }
-          </h1>
-          {
-            this.props.experimentQuery.experiment
-            &&
-            Auth.isAdmin()
-            &&
-            <div style={{ backgroundColor: "#fff", border: "1px solid #ddd", padding: "10px", marginBottom: "10px", maxWidth: "800px" }}>
-              <ExperimentControl
-                experiment={this.props.experimentQuery.experiment}
-                fallbacks={this.props.experimentQuery.experiment.fallbacks}
-                onEligibilityRankChange={(experimentId, value) => {
-                  this.props.updateExperimentEligibilityRankMutation({
-                    variables: {
-                      experimentId,
-                      eligibilityRank: value,
-                    },
-                  });
-                }}  
-                updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
+            <ExperimentControl
+              experiment={experiment}
+              fallbacks={experiment.fallbacks}
+              onEligibilityRankChange={(experimentId, value) => {
+                this.props.updateExperimentEligibilityRankMutation({
                   variables: {
                     experimentId,
-                    name,
+                    eligibilityRank: value,
                   },
-                })}
-              />
-            </div>
-          }
-          {
-            this.props.experimentQuery.experiment
-            &&
-            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
-              <MetaDataEditor
-                experimentId={this.props.match.params.experimentId}
-                valueAsJSON={this.props.experimentQuery.experiment.metadata}
-              />
-            </BlockContainer>
-          }
-          {
-            this.props.experimentQuery.experiment
-            &&
-            this.props.experimentQuery.experiment.eligibilityRank === 1
-            &&
-            (
-              Auth.isAuthenticated()
-              ?
-              <NextWorkspaceBtn
-                bsStyle="primary"
-                experimentId={experimentId}
-                label={"Participate in experiment"} 
-              />
-              :
-              <span style={{ fontSize: "16px", fontWeight: 600 }}>Please login to participate in this experiment!</span>
-            )
-          }
-          {
-            this.props.experimentQuery.experiment
-            &&
-            (
-              this.props.experimentQuery.experiment.eligibilityRank !== 1
-              ||
-              Auth.isAdmin()
-            )
-            &&
-            this.props.experimentQuery.experiment.trees.length > 0
-            &&
-            <div>
-              <h2
-                style={{
-                  fontSize: "24px",
-                  fontWeight: 600,
-                }}
-              >
-                Workspaces
-              </h2>
-              {
-                _.sortBy(
-                  this.props.experimentQuery.experiment.trees,
-                  t => Date.parse(t.rootWorkspace.createdAt)
-                ).map(tree =>
-                  <div
-                    key={`${tree.rootWorkspace.id}`}
-                    style={{
-                      marginBottom: "10px",
-                    }}
-                  >
-                    <RootWorkspace
-                      workspace={tree.rootWorkspace}
-                    />
-                  </div>
-                )
-              }
-            </div>
-          }
-          {
-            Auth.isAdmin()
-            &&
-            <NewRootWorkspaceForExperimentForm
-              experimentId={experimentId}
-              maxTotalBudget={100000}
-              createWorkspace={this.props.createWorkspace}
-              shouldAutosave={false}
-              style={{ marginTop: "50px" }}
+                });
+              }}  
+              updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
+                variables: {
+                  experimentId,
+                  name,
+                },
+              })}
             />
-          }
-        </ContentContainer>
-      </div>
+          </div>
+        }
+        <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+          <MetaDataEditor
+            experimentId={experiment.id}
+            valueAsJSON={experiment.metadata}
+          />
+        </BlockContainer>
+        {
+          isExperimentActive
+          &&
+          (
+            isUserLoggedIn
+            ?
+            <NextWorkspaceBtn
+              bsStyle="primary"
+              experimentId={experiment.id}
+              label={"Participate in experiment"} 
+            />
+            :
+            <span 
+              style={{
+                fontSize: "16px",
+                fontWeight: 600,
+              }}
+            >
+              Please login to participate in this experiment!
+            </span>
+          )
+        }
+        {
+          (
+            !isExperimentActive
+            ||
+            isUserAdmin
+          )
+          &&
+          experiment.trees.length > 0
+          &&
+          <div>
+            <h2
+              style={{
+                fontSize: "24px",
+                fontWeight: 600,
+              }}
+            >
+              Workspaces
+            </h2>
+            {
+              _.sortBy(
+                experiment.trees,
+                t => Date.parse(t.rootWorkspace.createdAt)
+              ).map(tree =>
+                <div
+                  key={`${tree.rootWorkspace.id}`}
+                  style={{
+                    marginBottom: "10px",
+                  }}
+                >
+                  <RootWorkspace
+                    sourceQueries={["experimentQuery"]}
+                    workspace={tree.rootWorkspace}
+                  />
+                </div>
+              )
+            }
+          </div>
+        }
+        {
+          isUserAdmin
+          &&
+          <NewRootWorkspaceForExperimentForm
+            experimentId={experiment.id}
+            maxTotalBudget={100000}
+            createWorkspace={this.props.createWorkspaceMutation}
+            shouldAutosave={false}
+            style={{ marginTop: "50px" }}
+          />
+        }
+      </ContentContainer>
     );
   }
 }
@@ -183,17 +193,14 @@ const EXPERIMENT_QUERY = gql`
       trees {
         rootWorkspace { 
           id
-          parentId
-          creatorId
-          isPublic
-          childWorkspaceOrder
-          totalBudget
           createdAt
+          parentId
+          totalBudget
           allocatedBudget
           blocks {
             id
-            value
             type
+            value
           }
           tree {
             id
@@ -236,7 +243,7 @@ export const ExperimentShowPage: any = compose(
     options
   }),
   graphql(CREATE_ROOT_WORKSPACE, {
-    name: "createWorkspace",
+    name: "createWorkspaceMutation",
     options: {
       refetchQueries: ["experimentQuery"]
     }

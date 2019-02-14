@@ -54,6 +54,7 @@ class ListOfRootWorkspaces extends React.Component<any, any> {
                     {e.workspaces.map(w => 
                       <RootWorkspace
                         key={`${e.id}${w.id}`}
+                        sourceQueries={["RootWorkspacesQuery"]}
                         style={{
                           margin: "5px 0",
                         }}

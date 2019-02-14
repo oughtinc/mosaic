@@ -50,7 +50,10 @@ class RootWorkspacePresentational extends React.Component<any, any> {
               >
                 {workspace.createdAt}
               </span>
-              <AdminControls workspace={workspace} />
+              <AdminControls
+                refetchQueries={this.props.sourceQueries}
+                workspace={workspace}
+              />
             </div>
             
           }

@@ -50,21 +50,21 @@ class AdminControlsPresentational extends React.Component<any, any> {
 const AdminControls: any = compose(
   graphql(UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS, {
     name: "updateWorkspaceHasIOConstraints",
-    options: {
-      refetchQueries: ["RootWorkspacesQuery"]
-    }
+    options: (props: any) => ({
+      refetchQueries: props.refetchQueries,
+    }),
   }),
   graphql(UPDATE_WORKSPACE_HAS_TIME_BUDGET, {
     name: "updateWorkspaceHasTimeBudget",
-    options: {
-      refetchQueries: ["RootWorkspacesQuery"]
-    }
+    options: (props: any) => ({
+      refetchQueries: props.refetchQueries,
+    }),
   }),
   graphql(UPDATE_WORKSPACE_IS_PUBLIC, {
     name: "updateWorkspaceIsPublic",
-    options: {
-      refetchQueries: ["RootWorkspacesQuery"]
-    }
+    options: (props: any) => ({
+      refetchQueries: props.refetchQueries,
+    }),
   })
 )(AdminControlsPresentational);
 
