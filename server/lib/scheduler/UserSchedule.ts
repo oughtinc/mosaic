@@ -163,7 +163,7 @@ class UserSchedule {
     workspaces,
     workspacesInTree,
   }) {
-    if (shouldResetCache) {
+    if (shouldResetCache || !this.distanceFromWorkedOnWorkspaceCache) {
       this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
         userSchedule: this,
         workspacesInTree,
@@ -187,7 +187,7 @@ class UserSchedule {
     workspaces,
     workspacesInTree,
   }) {
-    if (shouldResetCache) {
+    if (shouldResetCache || !this.distanceFromWorkedOnWorkspaceCache) {
       this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
         userSchedule: this,
         workspacesInTree,
