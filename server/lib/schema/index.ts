@@ -611,11 +611,12 @@ const schema = new GraphQLSchema({
         type: workspaceType,
         args: {
           question: { type: GraphQLJSON },
-          totalBudget: { type: GraphQLInt }
+          totalBudget: { type: GraphQLInt },
+          experimentId: { type: GraphQLString },
         },
         resolve: requireUser(
           "You must be logged in to create a workspace",
-          async (_, { question, totalBudget }, context) => {
+          async (_, { question, totalBudget, experimentId }, context) => {
             const event = await models.Event.create();
             const user = await userFromContext(context);
 
@@ -623,6 +624,17 @@ const schema = new GraphQLSchema({
               { totalBudget, creatorId: user.user_id  }, // TODO replace user.user_id
               { event, questionValue: JSON.parse(question) }
             );
+
+            if (experimentId) {
+              const tree = await models.Tree.create({
+                rootWorkspaceId: workspace.id,
+              });
+
+              const experiment = await models.Experiment.findById(experimentId);
+
+              await experiment.addTree(tree);
+            }
+
             return workspace;
           }
         ),

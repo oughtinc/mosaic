@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
@@ -6,8 +7,10 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import styled from "styled-components";
 
+import { NewRootWorkspaceForExperimentForm } from "./NewRootWorkspaceForExperimentForm";
 import { ContentContainer } from  "../../components/ContentContainer";
 import { Auth } from "../../auth";
+import { CREATE_ROOT_WORKSPACE } from "../../graphqlQueries";
 import { MetaDataEditor } from "../../components/MetadataEditor";
 import { ExperimentControl } from "../RootWorkspacePage/ExperimentsControls/ExperimentControl";
 import { RootWorkspace } from "../RootWorkspacePage/RootWorkspace";
@@ -112,7 +115,9 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
           {
             this.props.experimentQuery.experiment
             &&
-            this.props.experimentQuery.experiment.eligibilityRank === 0
+            this.props.experimentQuery.experiment.eligibilityRank !== 1
+            &&
+            this.props.experimentQuery.experiment.trees.length > 0
             &&
             <div>
               <h2
@@ -124,7 +129,10 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
                 Workspaces
               </h2>
               {
-                this.props.experimentQuery.experiment.trees.map(tree =>
+                _.sortBy(
+                  this.props.experimentQuery.experiment.trees,
+                  t => Date.parse(t.rootWorkspace.createdAt)
+                ).map(tree =>
                   <div
                     key={`${tree.rootWorkspace.id}`}
                     style={{
@@ -138,6 +146,17 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
                 )
               }
             </div>
+          }
+          {
+            Auth.isAdmin()
+            &&
+            <NewRootWorkspaceForExperimentForm
+              experimentId={experimentId}
+              maxTotalBudget={100000}
+              createWorkspace={this.props.createWorkspace}
+              shouldAutosave={false}
+              style={{ marginTop: "50px" }}
+            />
           }
         </ContentContainer>
       </div>
@@ -176,19 +195,13 @@ const EXPERIMENT_QUERY = gql`
             id
             experiments {
               id
+              createdAt
               name
             }
           }
           isEligibleForAssignment
           hasIOConstraints
           hasTimeBudget
-          tree {
-            experiments {
-              id
-              createdAt
-              name
-            }
-          }
         }
       }
     }
@@ -217,6 +230,12 @@ export const ExperimentShowPage: any = compose(
   graphql(EXPERIMENT_QUERY, {
     name: "experimentQuery",
     options
+  }),
+  graphql(CREATE_ROOT_WORKSPACE, {
+    name: "createWorkspace",
+    options: {
+      refetchQueries: ["experimentQuery"]
+    }
   }),
   graphql(UPDATE_EXPERIMENT_NAME_MUTATION, {
     name: "updateExperimentNameMutation",

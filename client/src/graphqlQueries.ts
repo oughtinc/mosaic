@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
 export const CREATE_ROOT_WORKSPACE = gql`
-  mutation createWorkspace($question: JSON, $totalBudget: Int) {
-    createWorkspace(question: $question, totalBudget: $totalBudget) {
+  mutation createWorkspace($question: JSON, $totalBudget: Int, $experimentId: String) {
+    createWorkspace(question: $question, totalBudget: $totalBudget, experimentId: $experimentId) {
       id
       parentId
       creatorId
