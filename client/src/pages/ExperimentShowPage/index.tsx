@@ -115,7 +115,11 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
           {
             this.props.experimentQuery.experiment
             &&
-            this.props.experimentQuery.experiment.eligibilityRank !== 1
+            (
+              this.props.experimentQuery.experiment.eligibilityRank !== 1
+              ||
+              Auth.isAdmin()
+            )
             &&
             this.props.experimentQuery.experiment.trees.length > 0
             &&
