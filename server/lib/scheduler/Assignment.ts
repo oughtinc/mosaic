@@ -17,26 +17,31 @@ class Assignment {
     isOracle,
     isTimed,
     startAtTimestamp = Date.now(),
+    endAtTimestamp,
     userId,
-    workspace
+    workspace,
+    isAlreadySavedToDb = false,
   }){
     this.updateAssignment = updateAssignment;
     this.experimentId = experimentId;
     this.isOracle = isOracle;
     this.isTimed = isTimed;
     this.startAtTimestamp = startAtTimestamp;
+    this.endAtTimestamp = endAtTimestamp;
     this.userId = userId;
     this.workspace = workspace;
 
-    this.id = createAssignment({
-      experimentId,
-      workspaceId: workspace.id,
-      userId,
-      startAtTimestamp,
-      endAtTimestamp: null,
-      isOracle,
-      isTimed,
-    });
+    if (!isAlreadySavedToDb) {
+      this.id = createAssignment({
+        experimentId,
+        workspaceId: workspace.id,
+        userId,
+        startAtTimestamp,
+        endAtTimestamp: null,
+        isOracle,
+        isTimed,
+      });
+    }
   }
 
   public getStartedAtTimestamp() {

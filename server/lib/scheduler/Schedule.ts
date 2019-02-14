@@ -6,6 +6,8 @@ class Schedule {
   private createAssignment;
   private updateAssignment;
 
+  private fetchAllAssignments;
+
   // the following object maps root workspace ids to timestamps
   // I didn't use a Map (and map a workspace object to a timestamp)
   // because Sequelize doesn't preserve object identity across queries
@@ -19,15 +21,45 @@ class Schedule {
   public constructor({
     createAssignment,
     updateAssignment,
+    fetchAllAssignments,
     DistanceFromWorkedOnWorkspaceCache,
     rootParentCache,
     timeLimit,
   }) {
     this.createAssignment = createAssignment;
     this.updateAssignment = updateAssignment;
+    this.fetchAllAssignments = fetchAllAssignments;
     this.DistanceFromWorkedOnWorkspaceCache = DistanceFromWorkedOnWorkspaceCache;
     this.rootParentCache = rootParentCache;
     this.timeLimit = timeLimit;
+  }
+
+  public async initialize() {
+    const assignments = await this.fetchAllAssignments();
+    for (const assignment of assignments) {
+      const {
+        userId,
+        startAtTimestamp,
+        endAtTimestamp,
+        workspace,
+        experimentId,
+        isOracle,
+        isTimed,
+      } = assignment;
+
+      this.createUserScheduleIfNotCreated(userId);
+      const userSchedule = this.getUserSchedule(userId);
+
+      await userSchedule.addAlreadySavedToDbAssignmentToSchedule({
+        userId,
+        startAtTimestamp,
+        endAtTimestamp,
+        workspace,
+        experimentId,
+        isOracle,
+        isTimed,
+      });
+    }
   }
 
   public async getUserActivity(userId) {

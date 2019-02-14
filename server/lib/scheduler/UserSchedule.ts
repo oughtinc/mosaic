@@ -55,6 +55,7 @@ class UserSchedule {
       userId: this.userId,
       workspace,
       startAtTimestamp,
+      endAtTimestamp: null,
     });
 
     this.userSchedule.push(assignment);
@@ -62,6 +63,30 @@ class UserSchedule {
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
 
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
+  }
+
+  public async addAlreadySavedToDbAssignmentToSchedule({
+    experimentId,
+    workspace,
+    startAtTimestamp,
+    endAtTimestamp,
+    isOracle,
+    isLastAssignmentTimed,
+  }) {
+    const assignment = new Assignment({
+      createAssignment: this.createAssignment,
+      updateAssignment: this.updateAssignment,
+      experimentId,
+      isOracle,
+      isTimed: isLastAssignmentTimed,
+      userId: this.userId,
+      workspace,
+      startAtTimestamp,
+      endAtTimestamp: endAtTimestamp || Date.now(),
+      isAlreadySavedToDb: true,
+    });
+
+    this.userSchedule.push(assignment);
   }
 
   public leaveCurrentWorkspace() {

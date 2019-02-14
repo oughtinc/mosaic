@@ -1,6 +1,6 @@
 const uuidv4 = require("uuid/v4");
 import * as _ from "lodash";
-import { filter } from "asyncro";
+import { filter, map } from "asyncro";
 import { isInOracleMode } from "../globals/isInOracleMode";
 import { Assignment, Experiment, Tree, Workspace } from "../models";
 import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
@@ -30,6 +30,41 @@ const fetchAllWorkspacesInTree = async (rootWorkspace) => {
 export const schedulers = new Map();
 
 export async function createScheduler(experimentId) {
+  const schedule = new Schedule({
+    fetchAllAssignments: async () => {
+      const assignments = await Assignment.findAll();
+      const enhancedAssignments = await map(
+        assignments,
+        async a => {
+          const workspace = await Workspace.findById(a.workspaceId);
+          return {
+            ...a.dataValues,
+            workspace
+          };
+        },
+      );
+
+      return enhancedAssignments;
+    },
+    // createAssignment is not async because it occurs in a constructor
+    // and I want to pass id on
+    // TODO: figure out better way to do this
+    createAssignment: fields => {
+      const id = uuidv4();
+      Assignment.create({ ...fields, id });
+      return id;
+    },
+    updateAssignment: async (id, fields) => {
+      const assignment = await Assignment.findById(id);
+      await assignment.update(fields);
+    },
+    DistanceFromWorkedOnWorkspaceCache,
+    rootParentCache: new RootParentCache(),
+    timeLimit: NINETY_SECONDS,
+  });
+
+  await schedule.initialize();
+
   const scheduler = new Scheduler({
     experimentId,
     fetchAllWorkspacesInTree,
@@ -89,23 +124,7 @@ export async function createScheduler(experimentId) {
       }
     },
     isInOracleMode,
-    schedule: new Schedule({
-      // createAssignment is not async because it occurs in a constructor
-      // and I want to pass id on
-      // TODO: figure out better way to do this
-      createAssignment: fields => {
-        const id = uuidv4();
-        Assignment.create({ ...fields, id });
-        return id;
-      },
-      updateAssignment: async (id, fields) => {
-        const assignment = await Assignment.findById(id);
-        await assignment.update(fields);
-      },
-      DistanceFromWorkedOnWorkspaceCache,
-      rootParentCache: new RootParentCache(),
-      timeLimit: NINETY_SECONDS,
-    }),
+    schedule,
     NumberOfStaleDescendantsCache,
     RemainingBudgetAmongDescendantsCache,
     rootParentCache: new RootParentCache(),
