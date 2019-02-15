@@ -31,8 +31,12 @@ export const schedulers = new Map();
 
 export async function createScheduler(experimentId) {
   const schedule = new Schedule({
-    fetchAllAssignments: async () => {
-      const assignments = await Assignment.findAll();
+    fetchAllAssignmentsInExperiment: async () => {
+      const assignments = await Assignment.findAll({
+        where: {
+          experimentId,
+        },
+      });
       const enhancedAssignments = await map(
         assignments,
         async a => {

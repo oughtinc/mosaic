@@ -6,7 +6,7 @@ class Schedule {
   private createAssignment;
   private updateAssignment;
 
-  private fetchAllAssignments;
+  private fetchAllAssignmentsInExperiment;
 
   // the following object maps root workspace ids to timestamps
   // I didn't use a Map (and map a workspace object to a timestamp)
@@ -21,21 +21,21 @@ class Schedule {
   public constructor({
     createAssignment,
     updateAssignment,
-    fetchAllAssignments,
+    fetchAllAssignmentsInExperiment,
     DistanceFromWorkedOnWorkspaceCache,
     rootParentCache,
     timeLimit,
   }) {
     this.createAssignment = createAssignment;
     this.updateAssignment = updateAssignment;
-    this.fetchAllAssignments = fetchAllAssignments;
+    this.fetchAllAssignmentsInExperiment = fetchAllAssignmentsInExperiment;
     this.DistanceFromWorkedOnWorkspaceCache = DistanceFromWorkedOnWorkspaceCache;
     this.rootParentCache = rootParentCache;
     this.timeLimit = timeLimit;
   }
 
   public async initialize() {
-    const assignments = await this.fetchAllAssignments();
+    const assignments = await this.fetchAllAssignmentsInExperiment();
     for (const assignment of assignments) {
       const {
         userId,
