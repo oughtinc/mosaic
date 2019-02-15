@@ -2,6 +2,7 @@ import {
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
+  GraphQLString,
 } from "graphql";
 
 import {
@@ -18,6 +19,9 @@ export const UserActivityType = new GraphQLObjectType({
           fields: {
             howLongDidAssignmentLast: {
               type: GraphQLInt,
+            },
+            startAtTimestamp: {
+              type: GraphQLString,
             },
             totalUsersWhoHaveWorkedOnWorkspace: {
               type: GraphQLInt,

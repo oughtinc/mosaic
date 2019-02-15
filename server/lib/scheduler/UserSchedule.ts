@@ -34,6 +34,7 @@ class UserSchedule {
   public getUserActivity() {
     const userActivity = this.userSchedule.map(assignment => ({
       howLongDidAssignmentLast: assignment.getHowLongDidAssignmentLast(),
+      startAtTimestamp: assignment.startAtTimestamp,
       workspace: assignment.getWorkspace(),
     }));
     return userActivity;

@@ -56,6 +56,7 @@ query userActivityQuery($experimentId: String, $userId: String) {
   userActivity(experimentId: $experimentId, userId: $userId) {
     assignments {
       howLongDidAssignmentLast
+      startAtTimestamp
       totalUsersWhoHaveWorkedOnWorkspace
       workspace {
         id
