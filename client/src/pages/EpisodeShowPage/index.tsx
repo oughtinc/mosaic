@@ -415,7 +415,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       >
                         <BlockEditor
                           availablePointers={availablePointers}
-                          exportLockStatusInfo={console.log(exportLockStatusInfo) || exportLockStatusInfo}
+                          exportLockStatusInfo={exportLockStatusInfo}
                           visibleExportIds={visibleExportIds}
                           unlockPointer={unlockPointer}
                           {...questionProps}
