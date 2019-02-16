@@ -182,6 +182,7 @@ function findPointers(value: any) {
 }
 
 export class WorkspaceView extends React.Component<any, any> {
+  private experimentId;
   private scratchpadField;
   private answerField;
   private newChildField;
@@ -197,7 +198,14 @@ export class WorkspaceView extends React.Component<any, any> {
     };
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
+    this.experimentId = parseQueryString(window.location.search).experiment;
+
+    window.addEventListener("beforeunload", async e => {
+      e.preventDefault();
+      await this.leaveCurrentWorkspace();
+    });
+
     keyboardJS.bind("alt+s", e => {
       e.preventDefault();
       this.scratchpadField.focus();
@@ -210,6 +218,10 @@ export class WorkspaceView extends React.Component<any, any> {
       e.preventDefault();
       this.newChildField.focus();
     });
+  }
+
+  public async componentWillUnmount() {
+    await this.leaveCurrentWorkspace();
   }
 
   public updateBlocks = (blocks: any) => {
@@ -403,7 +415,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       >
                         <BlockEditor
                           availablePointers={availablePointers}
-                          exportLockStatusInfo={exportLockStatusInfo}
+                          exportLockStatusInfo={console.log(exportLockStatusInfo) || exportLockStatusInfo}
                           visibleExportIds={visibleExportIds}
                           unlockPointer={unlockPointer}
                           {...questionProps}
@@ -627,6 +639,18 @@ export class WorkspaceView extends React.Component<any, any> {
 
   private handleShouldAutoExportToggle = () => this.setState({ shouldAutoExport: !this.state.shouldAutoExport });
 
+  private leaveCurrentWorkspace = async () => {
+    const isInExperiment = this.experimentId;
+
+    if (isInExperiment) {
+      await this.props.leaveCurrentWorkspaceMutation({
+        variables: {
+          experimentId: this.experimentId,
+        },
+      });
+    }
+  }
+
   private handlePastedExportFormatChange = (value: any) => {
     this.setState({
       pastedExportFormat: value,
@@ -755,6 +779,12 @@ function mapStateToProps(state: any, { workspace }: any) {
   return { blocks, exportingPointers, inputCharCount, outputCharCount };
 }
 
+const LEAVE_CURRENT_WORKSPACE_MUTATION = gql`
+  mutation leaveCurrentWorkspace($experimentId: String) {
+    leaveCurrentWorkspace(experimentId: $experimentId)
+  }
+`;
+
 const UNLOCK_POINTER_MUTATION = gql`
   mutation unlockPointerMutation($pointerId: String, $workspaceId: String) {
     unlockPointer(pointerId: $pointerId, workspaceId: $workspaceId)
@@ -772,6 +802,7 @@ const UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER = gql`
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
+  graphql(LEAVE_CURRENT_WORKSPACE_MUTATION, { name: "leaveCurrentWorkspaceMutation" }),
   graphql(NEW_CHILD, {
     name: "createChild",
     options: {
