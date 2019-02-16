@@ -64,30 +64,6 @@ const RelationTypeAttributes = [
   },
 ];
 
-function outputsToInputs(value: any) {
-  const node = value.document.nodes[0];
-  if (node == null || node.nodes == null) {
-    return value;
-  }
-  const newNodes = node.nodes.map(n => {
-    if (n.type && n.type === "pointerExport") {
-      return {
-        object: "inline",
-        type: "pointerImport",
-        isVoid: true,
-        data: {
-          pointerId: n.data.pointerId,
-          internalReferenceId: uuidv1(),
-        },
-      };
-    } else {
-      return n;
-    }
-  });
-  const newValue = _.cloneDeep(value);
-  newValue.document.nodes[0].nodes = newNodes;
-  return newValue;
-}
 
 export class WorkspaceBlockRelation {
   public workspace;
@@ -114,7 +90,7 @@ export class WorkspaceBlockRelation {
       name: id,
       blockId: id,
       readOnly: !editable,
-      initialValue: editable ? value : outputsToInputs(value),
+      initialValue: value,
       shouldAutosave: editable,
     };
   }

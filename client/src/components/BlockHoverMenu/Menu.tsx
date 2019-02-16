@@ -11,6 +11,8 @@ import {
   HOVER_ITEM_TYPES
 } from "../../modules/blockEditor/actions";
 
+import { Auth } from "../../auth";
+
 const HoverBackground = styled.span`
   background-color: #b5b5b557;
   color: black;
@@ -37,6 +39,9 @@ export class MenuPresentational extends React.Component<any> {
   }
 
   public render() {
+    if (!Auth.isAuthenticated()) {
+      return null;
+    }
     const root: any = window.document.getElementById("root");
     const { blockEditor } = this.props;
     const hoverItemType = _.get(blockEditor, "hoveredItem.hoverItemType");
