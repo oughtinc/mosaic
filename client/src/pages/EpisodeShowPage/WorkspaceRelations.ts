@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import * as uuidv1 from "uuid/v1";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { Auth } from "../../auth";
 
@@ -63,7 +62,6 @@ const RelationTypeAttributes = [
     permission: Permissions.ReadOnly,
   },
 ];
-
 
 export class WorkspaceBlockRelation {
   public workspace;
