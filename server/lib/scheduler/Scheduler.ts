@@ -55,6 +55,10 @@ class Scheduler {
     return mergedUserActivity;
   }
 
+  public isUserCurrentlyWorkingOnWorkspace(userId, workspaceId) {
+    return this.schedule.isUserCurrentlyWorkingOnWorkspace(userId, workspaceId);
+  }
+
   public async getIdOfCurrentWorkspace(userId) {
     const assignment = this.schedule.getMostRecentAssignmentForUser(userId);
 

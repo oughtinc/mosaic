@@ -41,6 +41,10 @@ const ExperimentModel = (
     addEventAssociations(Experiment, models);
   };
 
+  Experiment.prototype.isActive = function() {
+    return this.eligibilityRank === 1;
+  }
+
   return Experiment;
 };
 

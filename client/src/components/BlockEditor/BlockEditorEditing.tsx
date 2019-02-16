@@ -14,6 +14,8 @@ import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
+import { parse as parseQueryString } from "query-string";
+import { Auth } from "../../auth";
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
 const DOLLAR_NUMBERS_NOT_NUMBER = /\$[0-9]+[^0-9]/;
@@ -115,8 +117,12 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   public componentWillUnmount() {
     if (this.props.shouldAutosave) {
-      this.saveToDatabase();
-      this.endAutosaveInterval();
+      const isUserAdmin = Auth.isAdmin();
+      const isUserInExperiment = parseQueryString(window.location.search).experiment;
+      if (isUserAdmin || isUserInExperiment) {
+        this.saveToDatabase();
+        this.endAutosaveInterval();
+      }
     }
   }
 
@@ -352,7 +358,15 @@ export const BlockEditorEditing: any = compose(
     null,
     { withRef: true }
   ),
-  graphql(UPDATE_BLOCKS, { name: "saveBlocksToServer", withRef: true }),
+  graphql(UPDATE_BLOCKS, {
+    name: "saveBlocksToServer",
+    withRef: true,
+    options: {
+      variables: {
+        experimentId: parseQueryString(window.location.search).experiment,
+      },
+    }
+  }),
   withState("mutationStatus", "setMutationStatus", {
     status: MutationStatus.NotStarted
   }),

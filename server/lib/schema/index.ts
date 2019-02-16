@@ -313,10 +313,13 @@ const schema = new GraphQLSchema({
       },
       updateBlocks: {
         type: new GraphQLList(blockType),
-        args: { blocks: { type: new GraphQLList(BlockInput) } },
+        args: {
+          blocks: { type: new GraphQLList(BlockInput) },
+          experimentId: { type: GraphQLString },
+        },
         resolve: requireUser(
           "You must be logged in to update blocks",
-          async (_, { blocks }, context) => {
+          async (_, { blocks, experimentId }, context) => {
             const event = await models.Event.create();
             let newBlocks: any = [];
             for (const _block of blocks) {
@@ -325,10 +328,51 @@ const schema = new GraphQLSchema({
               const workspace = await models.Workspace.findById(
                 block.workspaceId
               );
+
               if (workspace == null) {
                 throw new Error(
                   "Got null workspace while attempting to update blocks"
                 );
+              }
+
+              const user = await userFromContext(context);
+              const userId = user.user_id;
+
+              if (!user.is_admin) {
+                if (!experimentId) {
+                  throw new Error(
+                    "User not participating in an experiment."
+                  );
+                } else {
+                  const experiment = await models.Experiment.findById(experimentId);
+
+                  if (!experiment.isActive()) {
+                    throw new Error(
+                      "This experiment is not active."
+                    );
+                  }
+
+                  let scheduler;
+                  if (schedulers.has(experimentId)) {
+                    scheduler = schedulers.get(experimentId);
+                  } else {
+                    scheduler = await createScheduler(experimentId);
+                  }
+
+                  if (block.type === "QUESTION") {
+                    if (!scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspace.parentId)) {
+                      throw new Error(
+                        "User is not currently assigned to this workspace."
+                      );
+                    }
+                  } else {
+                    if (!scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspace.id)) {
+                      throw new Error(
+                        "User is not currently assigned to this workspace."
+                      );
+                    }
+                  }
+                }
               }
               await block.update({ ..._block }, { event });
               newBlocks = [...newBlocks, block];
@@ -753,7 +797,6 @@ const schema = new GraphQLSchema({
             } else {
               scheduler = await createScheduler(experimentId);
             }
-
             await scheduler.leaveCurrentWorkspace(user.user_id)
             return true;
           }

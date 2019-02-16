@@ -177,6 +177,12 @@ class Schedule {
     return userSchedule.getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces);
   }
 
+  public isUserCurrentlyWorkingOnWorkspace(userId, workspaceId) {
+    this.createUserScheduleIfNotCreated(userId);
+    const userSchedule = this.getUserSchedule(userId);
+    return userSchedule.isUserCurrentlyWorkingOnWorkspace(workspaceId)
+  }
+
   public isWorkspaceCurrentlyBeingWorkedOn(workspace) {
     return _.some(
       [...this.schedule],

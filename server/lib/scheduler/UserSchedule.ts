@@ -127,18 +127,22 @@ class UserSchedule {
     return _.some(this.userSchedule, assignment => assignment.getWorkspace().id === workspace.id);
   }
 
-  public isUserCurrentlyWorkingOnWorkspace(workspace) {
+  public isUserCurrentlyWorkingOnWorkspace(workspaceOrWorkspaceId) {
+    let workspaceId;
+    if (typeof workspaceOrWorkspaceId === "string") {
+      workspaceId = workspaceOrWorkspaceId;
+    } else {
+      workspaceId = workspaceOrWorkspaceId.id;
+    }
     const lastWorkedOnWorkspace = this.lastWorkedOnWorkspace();
 
     if (!lastWorkedOnWorkspace) {
       return false;
     }
 
-    return (
-      this.lastWorkedOnWorkspace().id === workspace.id
-      &&
-      this.isActiveInLastWorkspace()
-    );
+    const isThisWorkspaceTheLastWorkedOnWorkspace = this.lastWorkedOnWorkspace().id === workspaceId;
+
+    return isThisWorkspaceTheLastWorkedOnWorkspace && this.isActiveInLastWorkspace();
   }
 
   private lastWorkedOnWorkspace() {

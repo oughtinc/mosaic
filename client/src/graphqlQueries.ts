@@ -20,8 +20,8 @@ export const CREATE_ROOT_WORKSPACE = gql`
 `;
 
 export const UPDATE_BLOCKS = gql`
-  mutation updateBlocks($blocks: [blockInput]) {
-    updateBlocks(blocks: $blocks) {
+  mutation updateBlocks($blocks: [blockInput], $experimentId: String) {
+    updateBlocks(blocks: $blocks, experimentId: $experimentId) {
       id
       value
       updatedAtEventId
