@@ -166,8 +166,35 @@ export class BlockEditorEditingPresentational extends React.Component<
         <div
           style={{
             paddingRight: "8px",
+            position: "relative",
           }}
         >
+          <div
+            style={{
+              alignItems: "center",
+              backgroundColor: "#eaa",
+              border: "1px solid #aaa",
+              borderRadius: "4px",
+              boxShadow: "1px 1px 6px #bbb",
+              display: this.props.mutationStatus.status === MutationStatus.Error ? "flex" : "none",
+              justifyContent: "center",
+              left: "50%",
+              marginLeft: "-200px",
+              padding: "10px",
+              position: "fixed",
+              top: "150px",
+              width: "400px",
+              zIndex: 1000,
+            }}
+          >
+            {
+              this.props.mutationStatus
+              &&
+              this.props.mutationStatus.error
+              &&
+              this.props.mutationStatus.error.message.slice(15)
+            }
+          </div>
           <Editor
             placeholder={this.props.placeholder}
             value={this.props.value}
