@@ -201,9 +201,12 @@ export class WorkspaceView extends React.Component<any, any> {
   public async componentDidMount() {
     this.experimentId = parseQueryString(window.location.search).experiment;
 
-    window.addEventListener("beforeunload", async e => {
+    window.addEventListener("beforeunload",async e => {
       e.preventDefault();
-      await this.leaveCurrentWorkspace();
+      const isLeavingWorkspacePage = /^\/workspaces\//.test(window.location.pathname);
+      if (isLeavingWorkspacePage) {
+        await this.leaveCurrentWorkspace();
+      }
     });
 
     keyboardJS.bind("alt+s", e => {
