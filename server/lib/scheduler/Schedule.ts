@@ -36,7 +36,9 @@ class Schedule {
 
   public async initialize() {
     const assignments = await this.fetchAllAssignmentsInExperiment();
-    for (const assignment of assignments) {
+    const sortedAssignments = _.sortBy(assignments, "startAtTimestamp");
+
+    for (const assignment of sortedAssignments) {
       const {
         userId,
         startAtTimestamp,
@@ -180,7 +182,7 @@ class Schedule {
   public isUserCurrentlyWorkingOnWorkspace(userId, workspaceId) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
-    return userSchedule.isUserCurrentlyWorkingOnWorkspace(workspaceId)
+    return userSchedule.isUserCurrentlyWorkingOnWorkspace(workspaceId);
   }
 
   public isWorkspaceCurrentlyBeingWorkedOn(workspace) {
