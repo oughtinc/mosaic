@@ -48,15 +48,9 @@ class ListOfRootWorkspaces extends React.Component<any, any> {
                 &&
                 experiments.map(e => 
                   <div key={e.id}>
-                    {
-                      Auth.isAdmin()
-                      ?
-                      <ExperimentLink experiment={e}>
-                        <h1 style={{fontSize: "22px"}}>{e.name}</h1>
-                      </ExperimentLink>
-                      :
+                    <ExperimentLink experiment={e}>
                       <h1 style={{fontSize: "22px"}}>{e.name}</h1>
-                    }
+                    </ExperimentLink>
                     {e.workspaces.map(w => 
                       <RootWorkspace
                         key={`${e.id}${w.id}`}
