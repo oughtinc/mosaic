@@ -32,7 +32,8 @@ const BlockModel = (
           "QUESTION",
           "ANSWER",
           "SCRATCHPAD",
-          "SUBQUESTION_DRAFT"
+          "SUBQUESTION_DRAFT",
+          "ANSWER_DRAFT"
         ),
         allowNull: false,
       },

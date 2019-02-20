@@ -241,6 +241,10 @@ const schema = new GraphQLSchema({
               b => b.type === "SUBQUESTION_DRAFT"
             );
 
+            const includesAnswerDraft = blocks.find(
+              b => b.type === "ANSWER_DRAFT"
+            );
+
             if (!includesQuestion) {
               await result.createBlock({ type: "QUESTION" });
             }
@@ -255,6 +259,12 @@ const schema = new GraphQLSchema({
 
             if (!includesSubquestionDraft) {
               await result.createBlock({ type: "SUBQUESTION_DRAFT" });
+            }
+
+            if (!includesAnswerDraft) {
+              const curBlocks = await result.getBlocks();
+              const curAnswer = blocks.find(b => b.type === "ANSWER");
+              await result.createBlock({ type: "ANSWER_DRAFT", value: curAnswer.value });
             }
 
             return result;
@@ -580,25 +590,41 @@ const schema = new GraphQLSchema({
                 await workspace.update({ isNotStaleRelativeToUser: [] });
               }
 
-              // if is currently resolved updated to true
-              // if parent workspace has all children resolved
-              // then mark parent workspace as not stale
-              if (isCurrentlyResolved && updatedWorkspace.parentId) {
-                const parent = await models.Workspace.findById(updatedWorkspace.parentId);
-                const children = await parent.getChildWorkspaces();
-                let allResolved = true;
-                for (const child of children) {
-                  if (!child.isCurrentlyResolved) {
-                    allResolved = false;
-                    break;
+              if (isCurrentlyResolved) {
+                // if is currently resolved updated to true
+                // set answer value to answer draft value
+                const blocks = await updatedWorkspace.getBlocks();
+                const answerDraft = blocks.find(
+                  b => b.type === "ANSWER_DRAFT"
+                );
+                const answer = blocks.find(
+                  b => b.type === "ANSWER"
+                );
+
+                await answer.update({ value: answerDraft.value });
+
+                // if is currently resolved updated to true
+                // and workspace has parent, then
+                // if parent workspace has all children resolved
+                // then mark parent workspace as not stale
+                if (updatedWorkspace.parentId) {
+                  const parent = await models.Workspace.findById(updatedWorkspace.parentId);
+                  const children = await parent.getChildWorkspaces();
+                  let allResolved = true;
+                  for (const child of children) {
+                    if (!child.isCurrentlyResolved) {
+                      allResolved = false;
+                      break;
+                    }
+                  }
+                  if (allResolved) {
+                    await parent.update({ 
+                      isStale: true,
+                      isNotStaleRelativeToUser: [],
+                    });
                   }
                 }
-                if (allResolved) {
-                  await parent.update({ 
-                    isStale: true,
-                    isNotStaleRelativeToUser: [],
-                  });
-                }
+
               }
 
               return updatedWorkspace;

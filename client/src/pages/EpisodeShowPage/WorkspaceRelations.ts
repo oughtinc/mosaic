@@ -8,6 +8,7 @@ export enum WorkspaceRelationTypes {
   WorkspaceScratchpad,
   WorkspaceAnswer,
   WorkspaceSubquestionDraft,
+  WorkspaceAnswerDraft,
   SubworkspaceQuestion,
   SubworkspaceAnswer,
 }
@@ -21,6 +22,7 @@ const QUESTION = "QUESTION";
 const ANSWER = "ANSWER";
 const SCRATCHPAD = "SCRATCHPAD";
 const SUBQUESTION_DRAFT = "SUBQUESTION_DRAFT";
+const ANSWER_DRAFT = "ANSWER_DRAFT";
 
 const WORKSPACE = "WORKSPACE";
 const SUBWORKSPACE = "SUBWORKSPACE";
@@ -48,6 +50,12 @@ const RelationTypeAttributes = [
     name: WorkspaceRelationTypes.WorkspaceSubquestionDraft,
     source: WORKSPACE,
     blockType: SUBQUESTION_DRAFT,
+    permission: Permissions.Editable,
+  },
+  {
+    name: WorkspaceRelationTypes.WorkspaceAnswerDraft,
+    source: WORKSPACE,
+    blockType: ANSWER_DRAFT,
     permission: Permissions.Editable,
   },
   {

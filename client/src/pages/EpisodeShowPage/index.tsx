@@ -281,12 +281,12 @@ export class WorkspaceView extends React.Component<any, any> {
       WorkspaceRelationTypes.WorkspaceScratchpad,
       workspace
     ).blockEditorAttributes();
-    const answerProps = new WorkspaceBlockRelation(
-      WorkspaceRelationTypes.WorkspaceAnswer,
-      workspace
-    ).blockEditorAttributes();
     const subquestionDraftProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceSubquestionDraft,
+      workspace
+    ).blockEditorAttributes();
+    const answerDraftProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceAnswerDraft,
       workspace
     ).blockEditorAttributes();
 
@@ -474,7 +474,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           cyAttributeName="slate-editor-response"
                           shouldAutoExport={this.state.shouldAutoExport}
                           pastedExportFormat={this.state.pastedExportFormat}
-                          {...answerProps}
+                          {...answerDraftProps}
                         />
                       </BlockBody>
                       {
