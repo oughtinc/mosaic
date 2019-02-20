@@ -5,8 +5,6 @@ import { RootWorkspace } from "./RootWorkspace";
 
 import { ExperimentLink } from "../../components/ExperimentLink";
 
-import { Auth } from "../../auth";
-
 class ListOfRootWorkspaces extends React.Component<any, any> {
   public state = {
     displayFormat: "experiment",
