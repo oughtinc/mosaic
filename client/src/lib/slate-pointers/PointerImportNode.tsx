@@ -9,6 +9,7 @@ import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
 import { changePointerReference } from "../../modules/blockEditor/actions";
 import { getInputCharCount } from "../../modules/blocks/charCounts";
+import { Auth } from "../../auth";
 
 import {
   lockedPointerImportBgColor,
@@ -72,7 +73,10 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       const exportPointerId = props.nodeAsJson.data.pointerId;
       const isLockedRelation = props.exportLockStatusInfo && props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
       const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
-      const isLocked = !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
+      const isLocked =
+        Auth.isAuthenticated()
+        &&
+        !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
 
       this.state = {
         isLocked,
@@ -129,7 +133,10 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     const exportPointerId = this.props.nodeAsJson.data.pointerId;
     const isLockedRelation = this.props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
     const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
-    const isLocked = !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
+    const isLocked =
+      !Auth.isAuthenticated()
+      &&
+      !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
 
     return isLocked;
   }

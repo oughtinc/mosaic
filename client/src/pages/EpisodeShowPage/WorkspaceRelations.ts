@@ -1,3 +1,4 @@
+import * as uuidv1 from "uuid/v1";
 import * as _ from "lodash";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { Auth } from "../../auth";
@@ -88,7 +89,7 @@ export class WorkspaceBlockRelation {
       name: id,
       blockId: id,
       readOnly: !editable,
-      initialValue: value,
+      initialValue: permission === Permissions.Editable ? value : outputsToInputs(value),
       shouldAutosave: editable,
     };
   }
@@ -102,6 +103,33 @@ export class WorkspaceBlockRelation {
     return _.keyBy(RelationTypeAttributes, "name")[this.workspaceRelationType];
   }
 }
+
+function outputsToInputs(value: any) {
+  const node = value.document.nodes[0];
+  if (node == null || node.nodes == null) {
+    return value;
+  }
+  const newNodes = node.nodes.map(n => {
+    if (n.type && n.type === "pointerExport") {
+      return {
+        object: "inline",
+        type: "pointerImport",
+        isVoid: true,
+        data: {
+          pointerId: n.data.pointerId,
+          internalReferenceId: uuidv1(),
+          isOriginallyExport: true,
+        },
+      };
+    } else {
+      return n;
+    }
+  });
+  const newValue = _.cloneDeep(value);
+  newValue.document.nodes[0].nodes = newNodes;
+  return newValue;
+}
+
 export class WorkspaceWithRelations {
   public workspace;
   public constructor(workspace: any) {
