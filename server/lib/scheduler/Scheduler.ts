@@ -55,8 +55,19 @@ class Scheduler {
     return mergedUserActivity;
   }
 
-  public isUserCurrentlyWorkingOnWorkspace(userId, workspaceId) {
-    return this.schedule.isUserCurrentlyWorkingOnWorkspace(userId, workspaceId);
+  public async isUserCurrentlyWorkingOnWorkspace(userId, workspaceId) {
+    const result = this.schedule.isUserCurrentlyWorkingOnWorkspace(userId, workspaceId);
+
+    if (!result) {
+      const fallbackScheduler = await this.getFallbackScheduler();
+      if (fallbackScheduler) {
+        const fallbackResult = await fallbackScheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspaceId);
+        return fallbackResult;
+      }
+      return result;
+    } else {
+      return result;
+    }
   }
 
   public async getIdOfCurrentWorkspace(userId) {

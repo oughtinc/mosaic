@@ -370,13 +370,15 @@ const schema = new GraphQLSchema({
                   }
 
                   if (block.type === "QUESTION") {
-                    if (!scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspace.parentId)) {
+                    const isUserCurrentlyWorkingOnWorkspace = !await scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspace.parentId);
+                    if (isUserCurrentlyWorkingOnWorkspace) {
                       throw new Error(
                         "User is not currently assigned to this workspace."
                       );
                     }
                   } else {
-                    if (!scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspace.id)) {
+                    const isUserCurrentlyWorkingOnWorkspace = !await scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspace.id);
+                    if (isUserCurrentlyWorkingOnWorkspace) {
                       throw new Error(
                         "User is not currently assigned to this workspace."
                       );
