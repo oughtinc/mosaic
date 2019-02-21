@@ -49,7 +49,7 @@ class Assignment {
   }
 
   public hasEnded() {
-    return !!this.endAtTimestamp && Date.now() - this.endAtTimestamp > 10*1000;
+    return !!this.endAtTimestamp && Date.now() - this.endAtTimestamp > 3*1000;
   }
 
   public getWorkspace() {
