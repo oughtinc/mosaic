@@ -202,7 +202,6 @@ export class WorkspaceView extends React.Component<any, any> {
     this.experimentId = parseQueryString(window.location.search).experiment;
 
     window.addEventListener("beforeunload", async e => {
-      e.preventDefault();
       const isLeavingWorkspacePage = /^\/workspaces\//.test(window.location.pathname);
       if (isLeavingWorkspacePage) {
         await this.leaveCurrentWorkspace();
