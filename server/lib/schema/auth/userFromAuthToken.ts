@@ -5,7 +5,6 @@ const { auth0_client_id } = require("../../../config/config.json");
 const webAuth = new auth0.WebAuth({
   domain: "mosaicapp.auth0.com",
   clientID: auth0_client_id,
-  scope: "openid user_metadata app_metadata"
 });
 
 export function userFromAuthToken(accessToken: string | null): Promise<any | null> {
