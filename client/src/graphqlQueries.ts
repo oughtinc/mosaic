@@ -85,6 +85,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       isPublic
       isStale
       isEligibleForOracle
+      isCurrentlyResolved
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
@@ -107,6 +108,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       isPublic
       isStale
       isEligibleForOracle
+      isCurrentlyResolved
       creatorId
       childWorkspaceOrder
       budgetUsedWorkingOnThisWorkspace

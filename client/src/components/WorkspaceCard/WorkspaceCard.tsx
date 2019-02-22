@@ -83,8 +83,6 @@ interface WorkspaceCardState {
     [toggleTypes.SCRATCHPAD]: boolean;
     [toggleTypes.CHILDREN]: boolean;
   };
-  isStaleCheckboxStatusPending: boolean;
-  isEligibleForOracleCheckboxStatusPending: boolean;
 }
 
 const getPointerId = (p: any) => p.data.pointerId;
@@ -98,21 +96,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         [toggleTypes.SCRATCHPAD]: true,
         [toggleTypes.CHILDREN]: (this.props.isInOracleModeAndIsUserOracle || this.props.isExpanded) ? true : false
       },
-      isStaleCheckboxStatusPending: false,
-      isEligibleForOracleCheckboxStatusPending: false
     };
-  }
-
-  public componentDidUpdate(prevProps: any, prevState: any) {
-    const isStaleDidChange = this.props.subtreeQuery.workspace.isStale !== prevProps.subtreeQuery.workspace.isStale;
-    const isEligibleForOracleDidChange = this.props.subtreeQuery.workspace.isEligibleForOracle !== prevProps.subtreeQuery.workspace.isEligibleForOracle;
-
-    if (isStaleDidChange || isEligibleForOracleDidChange) {
-      this.setState({
-        isStaleCheckboxStatusPending: isStaleDidChange ? false : this.state.isStaleCheckboxStatusPending,
-        isEligibleForOracleCheckboxStatusPending: isEligibleForOracleDidChange ? false : this.state.isEligibleForOracleCheckboxStatusPending
-      });
-    }
   }
 
   public handleChangeToggle = (name: toggleTypes, value: boolean) => {
@@ -209,6 +193,12 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                   workspace={workspace}
                   workspaceFieldToUpdate="isEligibleForOracle"
                 />
+                <AdminCheckboxThatTogglesWorkspaceField
+                  checkboxLabelText="currently resolved"
+                  updateMutation={this.handleOnIsCurrentlyResolvedCheckboxChange}
+                  workspace={workspace}
+                  workspaceFieldToUpdate="isCurrentlyResolved"
+                />
               </span>
               }
               {
@@ -289,6 +279,27 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         workspace: {
           ...prv.workspace,
           isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle
+        },
+      };
+    });
+  }
+
+  private handleOnIsCurrentlyResolvedCheckboxChange = async () => {
+    await this.props.updateWorkspace({
+      variables: {
+        id: this.props.workspaceId,
+        input: {
+          isCurrentlyResolved: !this.props.subtreeQuery.workspace.isCurrentlyResolved,
+        },
+      },
+    });
+
+    this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+      return {
+        ...prv,
+        workspace: {
+          ...prv.workspace,
+          isCurrentlyResolved: !this.props.subtreeQuery.workspace.isCurrentlyResolved
         },
       };
     });
