@@ -8,7 +8,9 @@ import { graphqlExpress, graphiqlExpress } from "apollo-server-express";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
 
+import { userFromAuthToken } from "./schema/auth/userFromAuthToken";
 import { schema } from "./schema/index";
+import * as models from "./models";
 import { testingRoutes } from "./testing/routes";
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
@@ -27,14 +29,39 @@ if (!process.env.USING_DOCKER) {
   });
 }
 
-graphQLServer.use("/graphql", bodyParser.json(), (req, res, next) => {
-  return graphqlExpress({
-    schema,
-    context: {
-      authorization: req.headers.authorization,
-      user_id: req.headers.user_id
+graphQLServer.use("/graphql", bodyParser.json(), async (req, res, next) => {
+  if (req.headers.authorization !== "null") {
+    const userInfo = await userFromAuthToken(req.headers.authorization);
+    let user = await models.User.findById(userInfo.user_id);
+
+    if (!user) {
+      user = await models.User.create({
+        id: userInfo.user_id,
+        givenName: userInfo.given_name,
+        familyName: userInfo.family_name,
+        gender: userInfo.gender,
+        pictureURL: userInfo.picture,
+      });
     }
-  })(req, res, next);
+
+    return graphqlExpress({
+      schema,
+      context: {
+        authorization: req.headers.authorization,
+        user,
+      }
+    })(req, res, next);
+
+  } else {
+
+    return graphqlExpress({
+      schema,
+      context: {
+        authorization: null,
+      }
+    })(req, res, next);
+
+  }
 });
 
 graphQLServer.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));

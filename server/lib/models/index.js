@@ -14,6 +14,7 @@ const EventModel = require("./event");
 const PointerModel = require("./pointer");
 const PointerImportModel = require("./pointerImport");
 const TreeModel = require("./tree");
+const UserModel = require("./user");
 const WorkspaceModel = require("./workspace");
 
 if (config.use_env_variable) {
@@ -39,6 +40,7 @@ const models = [
   ["pointer", PointerModel],
   ["pointerImport", PointerImportModel],
   ["tree", TreeModel],
+  ["user", UserModel],
   ["workspace", WorkspaceModel],
 ];
 
