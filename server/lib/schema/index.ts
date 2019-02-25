@@ -62,6 +62,8 @@ const blockType = makeObjectType(models.Block, [
   ["workspace", () => workspaceType, "Workspace"]
 ]);
 
+import { UserType } from "./User";
+
 export const workspaceType = makeObjectType(models.Workspace, [
   ...standardReferences,
   ["childWorkspaces", () => new GraphQLList(workspaceType), "ChildWorkspaces"],
@@ -70,6 +72,21 @@ export const workspaceType = makeObjectType(models.Workspace, [
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"],
   ["tree", () => treeType, "Tree"]
 ], {
+
+  isNotStaleRelativeToUserFullInformation: {
+    type: new GraphQLList(UserType),
+    resolve: async workspace => {
+      const fullInfo = await map(
+        workspace.isNotStaleRelativeToUser,
+        async userId => {
+          const user = await models.User.findById(userId);
+          return user;
+        }
+      );
+
+      return fullInfo;
+    }
+  },
   rootWorkspace: {
     get type() { return workspaceType },
     resolve: async workspace => {
@@ -99,6 +116,7 @@ const experimentType = makeObjectType(models.Experiment, [
 // import issues
 
 import { UserActivityType } from "./UserActivity";
+import { map } from "asyncro";
 
 const eventType = makeObjectType(models.Event, []);
 
@@ -970,6 +988,27 @@ const schema = new GraphQLSchema({
           async (_, { experimentId, metadata }, context) => {
             const experiment = await models.Experiment.findById(experimentId);
             await experiment.update({ metadata: JSON.parse(metadata) });
+            return true;
+          }
+        ),
+      },
+      markWorkspaceStaleForUser: {
+        type: GraphQLBoolean,
+        args: {
+          userId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to mark a workspace stale for a user",
+          async (_, { userId, workspaceId }, context) => {
+            const workspace = await models.Workspace.findById(workspaceId);
+
+            const isNotStaleRelativeToUser = workspace.isNotStaleRelativeToUser.filter(
+              uId => uId !== userId
+            );
+
+            await workspace.update({ isNotStaleRelativeToUser });
+
             return true;
           }
         ),

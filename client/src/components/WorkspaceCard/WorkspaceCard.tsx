@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import * as React from "react";
+import { Button } from "react-bootstrap";
 import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
 import _ = require("lodash");
@@ -56,12 +57,14 @@ interface WorkspaceType {
   wasAnsweredByOracle: boolean;
   isArchived: boolean;
   subtreeTimeSpentData: any;
+  isNotStaleRelativeToUserFullInformation: any;
 }
 
 interface WorkspaceCardProps {
   isExpanded: boolean;
   isInOracleModeAndIsUserOracle: boolean;
   isTopLevelOfCurrentTree: boolean;
+  markWorkspaceStaleForUser: any;
   parentPointers: ConnectedPointerType[];
   workspaceId: string;
   subtreeQuery: SubtreeQuery;
@@ -140,85 +143,128 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         <CardBody>
           <div
             style={{
-              alignItems: "center",
               backgroundColor: "#f8f8f8",
               borderBottom: "1px solid #ddd",
               color: "#999",
               fontSize: "12px",
-              display: "flex",
-              height: "40px",
-              justifyContent: "space-between",
+              padding: "10px",
             }}
           >
-            <span style={{ padding: "0 10px"}}>
-              <ChildBudgetBadge
-                noBadge={true}
-                shouldShowSeconds={false}
-                style={{ color: "#555", fontSize: "12px" }}
-                totalBudget={subtreeTimeSpentData[workspace.id]}
-              />
-              {" "}work on this entire subtree
-              <br />
-              <ChildBudgetBadge
-                noBadge={true}
-                shouldShowSeconds={false}
-                style={{ color: "#555", fontSize: "12px" }}
-                totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
-              />
-              {" "}work on this workspace
-            </span>
-
-            {
-              workspace.wasAnsweredByOracle
-              &&
-              isInOracleMode
-              &&
-              <span style={{ color: "darkRed"}}>
-                WAS ANSWERED BY ORACLE
+            <div
+              style={{
+                alignItems: "center",
+                display: "flex",
+                height: "40px",
+                justifyContent: "space-between",
+                paddingBottom: "10px",
+              }}
+            >
+              <span>
+                <ChildBudgetBadge
+                  noBadge={true}
+                  shouldShowSeconds={false}
+                  style={{ color: "#555", fontSize: "12px" }}
+                  totalBudget={subtreeTimeSpentData[workspace.id]}
+                />
+                {" "}work on this entire subtree
+                <br />
+                <ChildBudgetBadge
+                  noBadge={true}
+                  shouldShowSeconds={false}
+                  style={{ color: "#555", fontSize: "12px" }}
+                  totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
+                />
+                {" "}work on this workspace
               </span>
-            }
+
+              {
+                workspace.wasAnsweredByOracle
+                &&
+                isInOracleMode
+                &&
+                <span style={{ color: "darkRed"}}>
+                  WAS ANSWERED BY ORACLE
+                </span>
+              }
+              {
+                Auth.isAdmin()
+                &&
+                <span style={{ padding: "0 10px"}}>
+                  <AdminCheckboxThatTogglesWorkspaceField
+                    checkboxLabelText="is stale"
+                    updateMutation={this.handleOnIsStaleCheckboxChange}
+                    workspace={workspace}
+                    workspaceFieldToUpdate="isStale"
+                  />
+                  <AdminCheckboxThatTogglesWorkspaceField
+                    checkboxLabelText="oracle only"
+                    updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
+                    workspace={workspace}
+                    workspaceFieldToUpdate="isEligibleForOracle"
+                  />
+                  <AdminCheckboxThatTogglesWorkspaceField
+                    checkboxLabelText="currently resolved"
+                    updateMutation={this.handleOnIsCurrentlyResolvedCheckboxChange}
+                    workspace={workspace}
+                    workspaceFieldToUpdate="isCurrentlyResolved"
+                  />
+                </span>
+                }
+            </div>
             {
               Auth.isAdmin()
               &&
-              <span style={{ padding: "0 10px"}}>
-                <AdminCheckboxThatTogglesWorkspaceField
-                  checkboxLabelText="is stale"
-                  updateMutation={this.handleOnIsStaleCheckboxChange}
-                  workspace={workspace}
-                  workspaceFieldToUpdate="isStale"
-                />
-                <AdminCheckboxThatTogglesWorkspaceField
-                  checkboxLabelText="oracle only"
-                  updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
-                  workspace={workspace}
-                  workspaceFieldToUpdate="isEligibleForOracle"
-                />
-                <AdminCheckboxThatTogglesWorkspaceField
-                  checkboxLabelText="currently resolved"
-                  updateMutation={this.handleOnIsCurrentlyResolvedCheckboxChange}
-                  workspace={workspace}
-                  workspaceFieldToUpdate="isCurrentlyResolved"
-                />
-              </span>
-              }
-              {
-                !Auth.isAdmin()
-                &&
-                <span>
-                  {
-                    workspace.isStale
-                    &&
-                    <span style={{ padding: "0 10px"}}>STALE</span>
-                  }
-                  {
-                    workspace.isEligibleForOracle
-                    &&
-                    isInOracleMode
-                    &&
-                    <span style={{ padding: "0 10px"}}>ORACLE ONLY</span>
-                  }
-                </span>
-              }
+              <div
+                style={{
+                  padding: "10px 10px 0 10px",
+                  width: "100%",
+                }}
+              >
+                Users who have passed on workspace with "Needs More Work":
+                <ul style={{paddingInlineStart: "30px"}}>
+                {workspace.isNotStaleRelativeToUserFullInformation.map((user, i, arr) => {
+                  return (
+                    <li key={user.id} style={{ margin: i < arr.length - 1 ? "10px 0" : "5px 0 0 0" }}>
+                      {
+                        user.givenName
+                        ?
+                        `${user.givenName} ${user.familyName}`
+                        :
+                        user.id
+                      }
+                      <Button
+                        bsSize="xsmall"
+                        onClick={async () => {
+                          await this.props.markWorkspaceStaleForUser({
+                            userId: user.id,
+                            workspaceId: workspace.id,
+                          });
+
+                          this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+                            return {
+                              ...prv,
+                              workspace: {
+                                ...prv.workspace,
+                                isNotStaleRelativeToUserFullInformation: prv.workspace.isNotStaleRelativeToUserFullInformation.filter(u => u.id !== user.id)
+                              },
+                            };
+                          });
+                        }}
+                        style={{ marginLeft: "8px" }}
+                      >
+                        make stale for user
+                      </Button>
+                    </li>
+                  );
+                })}
+                {
+                  workspace.isNotStaleRelativeToUserFullInformation.length === 0
+                  &&
+                  "None"
+                }
+                </ul>
+              </div>
+            }
           </div>
           <BlockSection
             workspace={workspace}

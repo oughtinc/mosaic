@@ -25,6 +25,12 @@ query subtreeTimeSpentQuery($id: String!) {
 }
 `;
 
+const MARK_WORKSPACE_STALE_FOR_USER_MUTATION = gql`
+  mutation markWorkspaceStaleForUser($userId: String, $workspaceId: String) {
+    markWorkspaceStaleForUser(userId: $userId, workspaceId: $workspaceId)
+  }
+`;
+
 const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
   return (
     <div>
@@ -40,13 +46,13 @@ const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
 };
 
 const optionsForTopLevel = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
-  fetchPolicy: "cache-and-network",
+  fetchPolicy: "network-only",
   variables: { workspaceId },
   skip: !isTopLevelOfCurrentTree
 });
 
 const optionsForNested = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
-  fetchPolicy: "cache-and-network",
+  fetchPolicy: "network-only",
   variables: { workspaceId },
   skip: isTopLevelOfCurrentTree
 });
@@ -73,6 +79,12 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
           isInOracleModeAndIsUserOracle={this.props.oracleModeQuery.oracleMode && Auth.isOracle()}
           isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}
           oracleModeQuery={this.props.oracleModeQuery}
+          markWorkspaceStaleForUser={({ userId, workspaceId }) => this.props.markWorkspaceStaleForUserMutation({
+            variables: {
+              userId,
+              workspaceId,
+            }
+          })}
           parentPointers={this.props.parentPointers}
           subtreeQuery={this.props.subtreeQuery}
           subtreeTimeSpentData={this.props.subtreeTimeSpentData}
@@ -105,6 +117,12 @@ export const WorkspaceCard: any = compose(
     name: "oracleModeQuery",
   }),
   graphql(UPDATE_WORKSPACE, {
-    name: "updateWorkspace"
+    name: "updateWorkspace",
+    options: {
+      refetchQueries: [ "subtreeQuery" ],
+    }
+  }),
+  graphql(MARK_WORKSPACE_STALE_FOR_USER_MUTATION, {
+    name: "markWorkspaceStaleForUserMutation",
   }),
 )(WorkspaceCardContainer);
