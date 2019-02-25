@@ -74,20 +74,21 @@ export const workspaceType = makeObjectType(models.Workspace, [
 ], {
   currentlyActiveUser: {
     type: UserType,
-    resolve: async workspace => {
+    resolve: async (workspace, args, context) => {
+      // get root workspace
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
         curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
       }
-
       const rootWorkspace = curWorkspace;
 
+      // get experiment id
       const tree = await rootWorkspace.getTree();
-
       const experiments = await tree.getExperiments();
       const experiment = experiments[0];
       const experimentId = experiment.id;
 
+      // get scheduler
       let scheduler;
       if (schedulers.has(experimentId)) {
         scheduler = schedulers.get(experimentId);
@@ -95,8 +96,24 @@ export const workspaceType = makeObjectType(models.Workspace, [
         scheduler = await createScheduler(experimentId);
       }
 
+      // get user
       const userId = scheduler.getIdOfCurrentlyActiveUser(workspace.id);
-      const user = await models.User.findById(userId);
+      if (!userId) {
+        return null;
+      }
+
+      let user = await models.User.findById(userId);
+
+      if (!user) {
+        const userInfo = await userFromAuthToken(context.authorization);
+        user = await models.User.create({
+          id: userInfo.user_id,
+          givenName: userInfo.given_name,
+          familyName: userInfo.family_name,
+          gender: userInfo.gender,
+          pictureURL: userInfo.picture,
+        });
+      }
 
       return user;
     },
