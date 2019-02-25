@@ -72,7 +72,35 @@ export const workspaceType = makeObjectType(models.Workspace, [
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"],
   ["tree", () => treeType, "Tree"]
 ], {
+  currentlyActiveUser: {
+    type: UserType,
+    resolve: async workspace => {
+      let curWorkspace = workspace;
+      while (curWorkspace.parentId) {
+        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+      }
 
+      const rootWorkspace = curWorkspace;
+
+      const tree = await rootWorkspace.getTree();
+
+      const experiments = await tree.getExperiments();
+      const experiment = experiments[0];
+      const experimentId = experiment.id;
+
+      let scheduler;
+      if (schedulers.has(experimentId)) {
+        scheduler = schedulers.get(experimentId);
+      } else {
+        scheduler = await createScheduler(experimentId);
+      }
+
+      const userId = scheduler.getIdOfCurrentlyActiveUser(workspace.id);
+      const user = await models.User.findById(userId);
+
+      return user;
+    },
+  },
   isNotStaleRelativeToUserFullInformation: {
     type: new GraphQLList(UserType),
     resolve: async workspace => {
@@ -844,6 +872,45 @@ const schema = new GraphQLSchema({
               scheduler = await createScheduler(experimentId);
             }
             await scheduler.leaveCurrentWorkspace(user.user_id)
+            return true;
+          }
+        ),
+      },
+      ejectUserFromCurrentWorkspace: {
+        type: GraphQLBoolean,
+        args: {
+          userId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to eject a user from a workspace",
+          async (_, { userId, workspaceId }, context) => {
+            let curWorkspace = await models.Workspace.findById(workspaceId);
+            while (curWorkspace.parentId) {
+              curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+            }
+
+            const rootWorkspace = curWorkspace;
+
+            const tree = await rootWorkspace.getTree();
+
+            const experiments = await tree.getExperiments();
+            const experiment = experiments[0];
+            const experimentId = experiment.id;
+
+            let scheduler;
+            if (schedulers.has(experimentId)) {
+              scheduler = schedulers.get(experimentId);
+            } else {
+              scheduler = await createScheduler(experimentId);
+            }
+
+            // have this guard here in case user has already left this particular workspace
+            // and is working on a different one
+            if (scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspaceId)) {
+              await scheduler.leaveCurrentWorkspace(userId);
+            }
+
             return true;
           }
         ),

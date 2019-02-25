@@ -91,6 +91,11 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
         givenName
         familyName
       }
+      currentlyActiveUser {
+        id
+        givenName
+        familyName
+      }
       creatorId
       childWorkspaceOrder
       connectedPointersOfSubtree
@@ -115,6 +120,11 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       isEligibleForOracle
       isCurrentlyResolved
       isNotStaleRelativeToUserFullInformation {
+        id
+        givenName
+        familyName
+      }
+      currentlyActiveUser {
         id
         givenName
         familyName

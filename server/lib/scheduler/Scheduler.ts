@@ -40,6 +40,10 @@ class Scheduler {
     this.timeLimit = timeLimit;
   }
 
+  public getIdOfCurrentlyActiveUser(workspaceId) {
+    return this.schedule.getIdOfCurrentlyActiveUserForWorkspace(workspaceId);
+  }
+
   public async getUserActivity(userId) {
     const thisSchedulerUserActivity = await this.schedule.getUserActivity(userId);
     const fallbackScheduler = await this.getFallbackScheduler();  

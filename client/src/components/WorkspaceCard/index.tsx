@@ -31,6 +31,12 @@ const MARK_WORKSPACE_STALE_FOR_USER_MUTATION = gql`
   }
 `;
 
+const EJECT_USER_FROM_CURRENT_WORKSPACE_MUTATION = gql`
+  mutation ejectUserFromCurrentWorkspace($userId: String, $workspaceId: String) {
+    ejectUserFromCurrentWorkspace(userId: $userId, workspaceId: $workspaceId)
+  }
+`;
+
 const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
   return (
     <div>
@@ -75,6 +81,12 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
     ) {
       return (
         <WorkspaceCardPresentational
+          ejectUserFromCurrentWorkspace={async ({ userId, workspaceId }) => await this.props.ejectUserFromCurrentWorkspaceMutation({
+            variables: {
+              userId,
+              workspaceId,
+            },
+          })}
           isExpanded={isExpanded}
           isInOracleModeAndIsUserOracle={this.props.oracleModeQuery.oracleMode && Auth.isOracle()}
           isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}
@@ -124,5 +136,8 @@ export const WorkspaceCard: any = compose(
   }),
   graphql(MARK_WORKSPACE_STALE_FOR_USER_MUTATION, {
     name: "markWorkspaceStaleForUserMutation",
+  }),
+  graphql(EJECT_USER_FROM_CURRENT_WORKSPACE_MUTATION, {
+    name: "ejectUserFromCurrentWorkspaceMutation",
   }),
 )(WorkspaceCardContainer);

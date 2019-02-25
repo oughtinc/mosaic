@@ -49,6 +49,7 @@ interface WorkspaceType {
   blocks: any[];
   childWorkspaceOrder: string[];
   connectedPointersOfSubtree: ConnectedPointerType[];
+  currentlyActiveUser: any;
   id: string;
   isStale: boolean;
   isEligibleForOracle: boolean;
@@ -61,6 +62,7 @@ interface WorkspaceType {
 }
 
 interface WorkspaceCardProps {
+  ejectUserFromCurrentWorkspace: any;
   isExpanded: boolean;
   isInOracleModeAndIsUserOracle: boolean;
   isTopLevelOfCurrentTree: boolean;
@@ -150,6 +152,62 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
               padding: "10px",
             }}
           >
+            {
+              Auth.isAdmin()
+              &&
+              <div
+                style={{
+                  borderBottom: "1px solid #ddd",
+                  marginBottom: "10px",
+                  paddingBottom: "5px",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: "18px",
+                  }}
+                >
+                  Currently assigned to:{" "}
+                  {
+                    workspace.currentlyActiveUser
+                    ?
+                      <span style={{ color: "red", fontWeight: 600 }}>
+                        {
+                          workspace.currentlyActiveUser.givenName
+                          ?
+                            `${workspace.currentlyActiveUser.givenName} ${workspace.currentlyActiveUser.familyName}`
+                          :
+                            workspace.currentlyActiveUser.id
+                        }
+                        <Button
+                          bsSize="xsmall"
+                          onClick={async () => {
+                            await this.props.ejectUserFromCurrentWorkspace({
+                              userId: workspace.currentlyActiveUser.id,
+                              workspaceId: workspace.id,
+                              });
+
+                            this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+                              return {
+                                ...prv,
+                                workspace: {
+                                  ...prv.workspace,
+                                  currentlyActiveUser: null,
+                                },
+                              };
+                            });
+                          }}
+                          style={{ marginLeft: "10px" }}
+                        >
+                          un-assign
+                        </Button>
+                      </span>
+                    :
+                      "None"
+                  }
+                </span>
+              </div>
+            }
             <div
               style={{
                 alignItems: "center",

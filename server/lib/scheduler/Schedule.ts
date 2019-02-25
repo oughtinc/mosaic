@@ -192,6 +192,21 @@ class Schedule {
     );
   }
 
+  public getIdOfCurrentlyActiveUserForWorkspace(workspaceId) {
+    const bitOfSchedule = _.find(
+      [...this.schedule],
+      ([userId, userSchedule]) => userSchedule.isUserCurrentlyWorkingOnWorkspace(workspaceId)
+    );
+
+    if (!bitOfSchedule) {
+      return null;
+    }
+
+    const [ userId ] = bitOfSchedule;
+
+    return userId;
+  }
+
   public hasWorkspaceBeenWorkedOnYet(workspace) {
     return _.some(
       [...this.schedule],
