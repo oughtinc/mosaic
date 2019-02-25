@@ -120,11 +120,23 @@ export const workspaceType = makeObjectType(models.Workspace, [
   },
   isNotStaleRelativeToUserFullInformation: {
     type: new GraphQLList(UserType),
-    resolve: async workspace => {
+    resolve: async (workspace, args, context) => {
       const fullInfo = await map(
         workspace.isNotStaleRelativeToUser,
         async userId => {
-          const user = await models.User.findById(userId);
+          let user = await models.User.findById(userId);
+
+          if (!user) {
+            const userInfo = await userFromAuthToken(context.authorization);
+            user = await models.User.create({
+              id: userInfo.user_id,
+              givenName: userInfo.given_name,
+              familyName: userInfo.family_name,
+              gender: userInfo.gender,
+              pictureURL: userInfo.picture,
+            });
+          }
+
           return user;
         }
       );
