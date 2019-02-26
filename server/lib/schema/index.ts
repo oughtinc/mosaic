@@ -105,14 +105,11 @@ export const workspaceType = makeObjectType(models.Workspace, [
       let user = await models.User.findById(userId);
 
       if (!user) {
-        const userInfo = await userFromAuthToken(context.authorization);
-        user = await models.User.create({
-          id: userInfo.user_id,
-          givenName: userInfo.given_name,
-          familyName: userInfo.family_name,
-          gender: userInfo.gender,
-          pictureURL: userInfo.picture,
-        });
+        user = {
+          id: userId,
+          givenName: null,
+          familyName: null,
+        };
       }
 
       return user;
@@ -139,16 +136,14 @@ export const workspaceType = makeObjectType(models.Workspace, [
             const userInfo = await userFromAuthToken(context.authorization);
             console.log(`
           
-            userInfo: ${userInfo}
+            userInfo: ${JSON.stringify(userInfo)}
         
           `);
-            user = await models.User.create({
-              id: userInfo.user_id,
-              givenName: userInfo.given_name,
-              familyName: userInfo.family_name,
-              gender: userInfo.gender,
-              pictureURL: userInfo.picture,
-            });
+            user = {
+              id: userId,
+              givenName: null,
+              familyName: null,
+            };
           }
 
           return user;
