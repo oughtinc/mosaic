@@ -124,10 +124,24 @@ export const workspaceType = makeObjectType(models.Workspace, [
       const fullInfo = await map(
         workspace.isNotStaleRelativeToUser,
         async userId => {
+          console.log(`
+          
+            userId: ${userId}
+          
+          `);
           let user = await models.User.findById(userId);
-
+          console.log(`
+          
+          user: ${JSON.stringify(user.dataValues)}
+        
+          `);
           if (!user) {
             const userInfo = await userFromAuthToken(context.authorization);
+            console.log(`
+          
+            userInfo: ${userInfo}
+        
+          `);
             user = await models.User.create({
               id: userInfo.user_id,
               givenName: userInfo.given_name,
