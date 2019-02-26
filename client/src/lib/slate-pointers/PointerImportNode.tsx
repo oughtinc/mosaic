@@ -134,7 +134,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     const isLockedRelation = this.props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
     const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
     const isLocked =
-      !Auth.isAuthenticated()
+      Auth.isAuthenticated()
       &&
       !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
 
