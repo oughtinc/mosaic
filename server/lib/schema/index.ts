@@ -132,7 +132,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
           let user = await models.User.findById(userId);
           console.log(`
           
-          user: ${JSON.stringify(user.dataValues)}
+          user: ${JSON.stringify(user && user.dataValues)}
         
           `);
           if (!user) {
