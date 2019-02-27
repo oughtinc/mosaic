@@ -99,9 +99,26 @@ const BlockModel = (
   Block.prototype.updateStalenessAndIsCurrentlyResolved = async function({ event }) {
     const workspaceId = this.workspaceId;
     const workspace = await sequelize.models.Workspace.findById(workspaceId);
-    // 1. If block is a question, mark workspace it belongs to as stale
-    // and make sure that if it's currently marked as resolved, that it isn't anymore
+
+    // If block is a question
     if (this.type === QUESTION_TYPE) {
+
+      // If it's marked as resolved, then it's going to transition from
+      // from resolved to unresolved, so let's take a snapshot of the draft as the answer
+      if (workspace.isCurrentlyResolved) {
+        const blocks = await workspace.getBlocks();
+        const answerDraft = blocks.find(
+          b => b.type === "ANSWER_DRAFT"
+        );
+        const answer = blocks.find(
+          b => b.type === "ANSWER"
+        );
+
+        await answer.update({ value: answerDraft.value });
+      }
+
+      // Mark workspace as stale
+      // If it's currently marked as resolved, that it isn't anymore
       return workspace.update({ 
         isCurrentlyResolved: false,
         isStale: true,

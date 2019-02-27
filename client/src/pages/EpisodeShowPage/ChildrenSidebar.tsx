@@ -74,6 +74,10 @@ export class Child extends React.Component<any, any> {
       WorkspaceRelationTypes.SubworkspaceAnswer,
       workspace
     );
+    const answerDraftRelationship = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.WorkspaceAnswerDraft,
+      workspace
+    );
 
     const hasTimeBudget = this.props.hasTimeBudget;
 
@@ -146,17 +150,35 @@ export class Child extends React.Component<any, any> {
           </BulletAndEditorContainer>
         )}
         <div style={{ color: subQuestionAnswerFontColor, marginTop: "8px" }}>
-          {answerRelationship.findBlock().value && (
+          {
+            (
+              this.props.workspace.isCurrentlyResolved
+              ? answerDraftRelationship.findBlock().value
+              : answerRelationship.findBlock().value
+            )
+            && (
             <BulletAndEditorContainer>
               <BlockBullet>A</BlockBullet>
               <BlockEditorContainer>
-                <BlockEditor
-                  {...answerRelationship.blockEditorAttributes()}
-                  availablePointers={availablePointers}
-                  visibleExportIds={this.props.visibleExportIds}
-                  exportLockStatusInfo={this.props.exportLockStatusInfo}
-                  unlockPointer={this.props.unlockPointer}
-                />
+                {
+                  this.props.workspace.isCurrentlyResolved
+                  ?
+                    <BlockEditor
+                      {...answerDraftRelationship.blockEditorAttributes()}
+                      availablePointers={availablePointers}
+                      visibleExportIds={this.props.visibleExportIds}
+                      exportLockStatusInfo={this.props.exportLockStatusInfo}
+                      unlockPointer={this.props.unlockPointer}
+                    />
+                  :
+                    <BlockEditor
+                      {...answerRelationship.blockEditorAttributes()}
+                      availablePointers={availablePointers}
+                      visibleExportIds={this.props.visibleExportIds}
+                      exportLockStatusInfo={this.props.exportLockStatusInfo}
+                      unlockPointer={this.props.unlockPointer}
+                    />
+                }
               </BlockEditorContainer>
             </BulletAndEditorContainer>
           )}

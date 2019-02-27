@@ -77,6 +77,7 @@ const WORKSPACE_QUERY = gql`
         creatorId
         isArchived
         isEligibleForOracle
+        isCurrentlyResolved
         isPublic
         allocatedBudget
         blocks {

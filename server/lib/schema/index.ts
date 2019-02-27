@@ -665,18 +665,6 @@ const schema = new GraphQLSchema({
 
               if (isCurrentlyResolved) {
                 // if is currently resolved updated to true
-                // set answer value to answer draft value
-                const blocks = await updatedWorkspace.getBlocks();
-                const answerDraft = blocks.find(
-                  b => b.type === "ANSWER_DRAFT"
-                );
-                const answer = blocks.find(
-                  b => b.type === "ANSWER"
-                );
-
-                await answer.update({ value: answerDraft.value });
-
-                // if is currently resolved updated to true
                 // and workspace has parent, then
                 // if parent workspace has all children resolved
                 // then mark parent workspace as not stale
