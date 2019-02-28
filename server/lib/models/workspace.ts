@@ -438,7 +438,7 @@ const WorkspaceModel = (
           [Op.in]: this.childWorkspaceOrder,
         },
         type: {
-          [Op.in]: ["QUESTION", "ANSWER"],
+          [Op.in]: ["QUESTION", "ANSWER", "ANSWER_DRAFT"],
         },
       },
     });

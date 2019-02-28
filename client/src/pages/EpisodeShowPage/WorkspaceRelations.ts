@@ -11,6 +11,7 @@ export enum WorkspaceRelationTypes {
   WorkspaceAnswerDraft,
   SubworkspaceQuestion,
   SubworkspaceAnswer,
+  SubworkspaceAnswerDraft,
 }
 
 enum Permissions {
@@ -68,6 +69,12 @@ const RelationTypeAttributes = [
     name: WorkspaceRelationTypes.SubworkspaceAnswer,
     source: SUBWORKSPACE,
     blockType: ANSWER,
+    permission: Permissions.ReadOnly,
+  },
+  {
+    name: WorkspaceRelationTypes.SubworkspaceAnswerDraft,
+    source: SUBWORKSPACE,
+    blockType: ANSWER_DRAFT,
     permission: Permissions.ReadOnly,
   },
 ];
