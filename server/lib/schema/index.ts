@@ -85,6 +85,9 @@ export const workspaceType = makeObjectType(models.Workspace, [
       // get experiment id
       const tree = await rootWorkspace.getTree();
       const experiments = await tree.getExperiments();
+      if (experiments.length === 0) {
+        return null;
+      }
       const experiment = experiments[0];
       const experimentId = experiment.id;
 
