@@ -42,6 +42,14 @@ graphQLServer.use("/graphql", bodyParser.json(), async (req, res, next) => {
         gender: userInfo.gender,
         pictureURL: userInfo.picture,
       });
+    } else if (!user.givenName && userInfo.given_name) {
+      await user.update({
+        id: userInfo.user_id,
+        givenName: userInfo.given_name,
+        familyName: userInfo.family_name,
+        gender: userInfo.gender,
+        pictureURL: userInfo.picture,
+      });
     }
 
     return graphqlExpress({
