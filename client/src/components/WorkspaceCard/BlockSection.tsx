@@ -54,7 +54,7 @@ const Block = ({ character, block, availablePointers, workspace }) => {
 export const BlockSection = ({ workspace, availablePointers }) => {
   const question = workspace.blocks.find(b => b.type === "QUESTION");
   const scratchpad = workspace.blocks.find(b => b.type === "SCRATCHPAD");
-  const answer = workspace.blocks.find(b => b.type === "ANSWER");
+  const answerDraft = workspace.blocks.find(b => b.type === "ANSWER_DRAFT");
   return (
     <div style={{ display: "flexbox" }}>
       <BlockSectionContainer>
@@ -71,7 +71,7 @@ export const BlockSection = ({ workspace, availablePointers }) => {
           workspace={workspace}
         />
         <Block
-          block={answer}
+          block={answerDraft}
           character={"A"}
           availablePointers={availablePointers}
           workspace={workspace}
