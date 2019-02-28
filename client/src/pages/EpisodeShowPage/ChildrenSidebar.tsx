@@ -165,6 +165,7 @@ export class Child extends React.Component<any, any> {
                   ?
                     <BlockEditor
                       {...answerDraftRelationship.blockEditorAttributes()}
+                      readOnly={true}
                       availablePointers={availablePointers}
                       visibleExportIds={this.props.visibleExportIds}
                       exportLockStatusInfo={this.props.exportLockStatusInfo}
