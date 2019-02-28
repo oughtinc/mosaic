@@ -202,11 +202,13 @@ export class WorkspaceView extends React.Component<any, any> {
   public async componentDidMount() {
     this.experimentId = parseQueryString(window.location.search).experiment;
 
-    window.addEventListener("beforeunload", async e => {
-      const isLeavingWorkspacePage = /^\/workspaces\//.test(window.location.pathname);
-      if (isLeavingWorkspacePage) {
-        await this.leaveCurrentWorkspace();
-      }
+    window.addEventListener("beforeunload", e => {
+      setTimeout(() => {
+        const isLeavingWorkspacePage = /^\/workspaces\//.test(window.location.pathname);
+        if (isLeavingWorkspacePage) {
+          this.leaveCurrentWorkspace();
+        }
+      }, 1);
     });
 
     keyboardJS.bind("alt+s", e => {
@@ -223,8 +225,8 @@ export class WorkspaceView extends React.Component<any, any> {
     });
   }
 
-  public async componentWillUnmount() {
-    await this.leaveCurrentWorkspace();
+  public componentWillUnmount() {
+    this.leaveCurrentWorkspace();
   }
 
   public updateBlocks = (blocks: any) => {
@@ -642,11 +644,11 @@ export class WorkspaceView extends React.Component<any, any> {
 
   private handleShouldAutoExportToggle = () => this.setState({ shouldAutoExport: !this.state.shouldAutoExport });
 
-  private leaveCurrentWorkspace = async () => {
+  private leaveCurrentWorkspace = () => {
     const isInExperiment = this.experimentId;
 
     if (isInExperiment) {
-      await this.props.leaveCurrentWorkspaceMutation({
+      this.props.leaveCurrentWorkspaceMutation({
         variables: {
           experimentId: this.experimentId,
         },
