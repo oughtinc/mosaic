@@ -97,7 +97,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
       }
 
       // get user
-      const userId = scheduler.getIdOfCurrentlyActiveUser(workspace.id);
+      const userId = await scheduler.getIdOfCurrentlyActiveUser(workspace.id);
       if (!userId) {
         return null;
       }

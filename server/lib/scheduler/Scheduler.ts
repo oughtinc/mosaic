@@ -40,8 +40,19 @@ class Scheduler {
     this.timeLimit = timeLimit;
   }
 
-  public getIdOfCurrentlyActiveUser(workspaceId) {
-    return this.schedule.getIdOfCurrentlyActiveUserForWorkspace(workspaceId);
+  public async getIdOfCurrentlyActiveUser(workspaceId) {
+    const result = this.schedule.getIdOfCurrentlyActiveUserForWorkspace(workspaceId);
+
+    if (!result) {
+      const fallbackScheduler = await this.getFallbackScheduler();
+      if (fallbackScheduler) {
+        const fallbackResult = await fallbackScheduler.getIdOfCurrentlyActiveUser(workspaceId);
+        return fallbackResult;
+      }
+      return result;
+    } else {
+      return result;
+    }
   }
 
   public async getUserActivity(userId) {
