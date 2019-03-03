@@ -155,6 +155,8 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
             {
               Auth.isAdmin()
               &&
+              workspace.currentlyActiveUser
+              &&
               <div
                 style={{
                   borderBottom: "1px solid #ddd",
@@ -168,43 +170,37 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                   }}
                 >
                   Currently assigned to:{" "}
-                  {
-                    workspace.currentlyActiveUser
-                    ?
-                      <span style={{ color: "red", fontWeight: 600 }}>
-                        {
-                          workspace.currentlyActiveUser.givenName
-                          ?
-                            `${workspace.currentlyActiveUser.givenName} ${workspace.currentlyActiveUser.familyName}`
-                          :
-                            workspace.currentlyActiveUser.id
-                        }
-                        <Button
-                          bsSize="xsmall"
-                          onClick={async () => {
-                            await this.props.ejectUserFromCurrentWorkspace({
-                              userId: workspace.currentlyActiveUser.id,
-                              workspaceId: workspace.id,
-                              });
+                  <span style={{ color: "red", fontWeight: 600 }}>
+                    {
+                      workspace.currentlyActiveUser.givenName
+                      ?
+                        `${workspace.currentlyActiveUser.givenName} ${workspace.currentlyActiveUser.familyName}`
+                      :
+                        workspace.currentlyActiveUser.id
+                    }
+                    <Button
+                      bsSize="xsmall"
+                      onClick={async () => {
+                        await this.props.ejectUserFromCurrentWorkspace({
+                          userId: workspace.currentlyActiveUser.id,
+                          workspaceId: workspace.id,
+                          });
 
-                            this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
-                              return {
-                                ...prv,
-                                workspace: {
-                                  ...prv.workspace,
-                                  currentlyActiveUser: null,
-                                },
-                              };
-                            });
-                          }}
-                          style={{ marginLeft: "10px" }}
-                        >
-                          un-assign
-                        </Button>
-                      </span>
-                    :
-                      "None"
-                  }
+                        this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+                          return {
+                            ...prv,
+                            workspace: {
+                              ...prv.workspace,
+                              currentlyActiveUser: null,
+                            },
+                          };
+                        });
+                      }}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      un-assign
+                    </Button>
+                  </span>
                 </span>
               </div>
             }
