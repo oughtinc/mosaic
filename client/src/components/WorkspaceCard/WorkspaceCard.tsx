@@ -210,7 +210,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                 display: "flex",
                 height: "40px",
                 justifyContent: "space-between",
-                paddingBottom: "10px",
               }}
             >
               <span>
@@ -268,6 +267,8 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
             {
               Auth.isAdmin()
               &&
+              workspace.isNotStaleRelativeToUserFullInformation.length !== 0
+              &&
               <div
                 style={{
                   padding: "10px 10px 0 10px",
@@ -311,11 +312,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                     </li>
                   );
                 })}
-                {
-                  workspace.isNotStaleRelativeToUserFullInformation.length === 0
-                  &&
-                  "None"
-                }
                 </ul>
               </div>
             }
