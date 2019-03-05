@@ -276,11 +276,11 @@ const WorkspaceModel = (
   };
 
   Workspace.createAsChild = async function(
-    { id, parentId, question, totalBudget, creatorId, isPublic },
+    { id, parentId, question, totalBudget, creatorId, isPublic, isEligibleForOracle },
     { event }
   ) {
     const _workspace = await sequelize.models.Workspace.create(
-      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic },
+      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForOracle },
       { event, questionValue: question }
     );
 
@@ -359,9 +359,10 @@ const WorkspaceModel = (
     totalBudget,
     creatorId,
     isPublic,
+    isEligibleForOracle = false,
   }) {
     const child = await sequelize.models.Workspace.createAsChild(
-      { id, parentId: this.id, question, totalBudget, creatorId, isPublic },
+      { id, parentId: this.id, question, totalBudget, creatorId, isPublic, isEligibleForOracle },
       { event }
     );
     if (this.remainingBudget < child.totalBudget) {

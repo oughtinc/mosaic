@@ -8,6 +8,12 @@ import {
 } from "../../styles";
 
 const TakeBreakBtn = ({ experimentId, label, navHook }: any) => {
+  if (!experimentId) {
+    return (
+      <Button bsSize="small" bsStyle="primary" onClick={navHook} style={{ margin: "0 5px" }}>{label} »</Button>
+    );
+  }
+
   return (
     <Link onClick={navHook} to={`/break?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
       <Button bsSize="small" bsStyle="primary">{label} »</Button>

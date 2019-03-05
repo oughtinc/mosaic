@@ -755,19 +755,34 @@ const schema = new GraphQLSchema({
             const event = await models.Event.create();
             const user = await userFromContext(context);
 
-            const workspace = await models.Workspace.create(
-              { totalBudget, creatorId: user.user_id  }, // TODO replace user.user_id
-              { event, questionValue: JSON.parse(question) }
-            );
+            let workspace;
 
             if (experimentId) {
+              const experiment = await models.Experiment.findById(experimentId);
+
+
+              workspace = await models.Workspace.create(
+                {
+                  totalBudget,
+                  creatorId: user.user_id,
+                  isEligibleForOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
+                }, // TODO replace user.user_id
+                { event, questionValue: JSON.parse(question) }
+              );
+
               const tree = await models.Tree.create({
                 rootWorkspaceId: workspace.id,
               });
 
-              const experiment = await models.Experiment.findById(experimentId);
-
               await experiment.addTree(tree);
+            } else {
+              workspace = await models.Workspace.create(
+                {
+                  totalBudget,
+                  creatorId: user.user_id 
+                }, // TODO replace user.user_id
+                { event, questionValue: JSON.parse(question) }
+              );
             }
 
             return workspace;
@@ -779,21 +794,37 @@ const schema = new GraphQLSchema({
         args: {
           workspaceId: { type: GraphQLString },
           question: { type: GraphQLJSON },
-          totalBudget: { type: GraphQLInt }
+          totalBudget: { type: GraphQLInt },
+          experimentId: { type: GraphQLString },
         },
         resolve: requireUser(
           "You must be logged in to create a subquestion",
-          async (_, { workspaceId, question, totalBudget }, context) => {
+          async (_, { workspaceId, question, totalBudget, experimentId }, context) => {
             const workspace = await models.Workspace.findById(workspaceId);
             const event = await models.Event.create();
             const user = await userFromContext(context);
-            const child = await workspace.createChild({
-              event,
-              question: JSON.parse(question),
-              totalBudget,
-              creatorId: user.user_id,
-              isPublic: isUserAdmin(user),
-            });
+            
+            let child;
+            
+            if (experimentId) {
+              const experiment = await models.Experiment.findById(experimentId);
+              child = await workspace.createChild({
+                event,
+                question: JSON.parse(question),
+                totalBudget,
+                creatorId: user.user_id,
+                isPublic: isUserAdmin(user),
+                isEligibleForOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
+              });
+            } else {
+              child = await workspace.createChild({
+                event,
+                question: JSON.parse(question),
+                totalBudget,
+                creatorId: user.user_id,
+                isPublic: isUserAdmin(user),
+              });
+            }
 
             return child;
           }

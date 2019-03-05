@@ -115,12 +115,14 @@ const NEW_CHILD = gql`
   mutation createChildWorkspace(
     $workspaceId: String
     $question: JSON
-    $totalBudget: Int
+    $totalBudget: Int,
+    $experimentId: String,
   ) {
     createChildWorkspace(
       workspaceId: $workspaceId
       question: $question
       totalBudget: $totalBudget
+      experimentId: $experimentId
     ) {
       id
     }
@@ -578,7 +580,8 @@ export class WorkspaceView extends React.Component<any, any> {
                           variables: {
                             workspaceId: workspace.id,
                             question,
-                            totalBudget
+                            totalBudget,
+                            experimentId,
                           }
                         });
                       }}

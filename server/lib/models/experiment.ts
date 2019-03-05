@@ -26,6 +26,11 @@ const ExperimentModel = (
       },
       description: Sequelize.JSON,
       metadata: Sequelize.JSON,
+      areNewWorkspacesOracleOnlyByDefault: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       ...eventRelationshipColumns(DataTypes),
     },
   );
