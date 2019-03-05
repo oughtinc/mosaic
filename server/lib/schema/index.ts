@@ -88,8 +88,9 @@ export const workspaceType = makeObjectType(models.Workspace, [
       if (experiments.length === 0) {
         return null;
       }
-      const experiment = experiments[0];
-      const experimentId = experiment.id;
+
+      const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
+      const experimentId = mostRecentExperiment.id;
 
       // get scheduler
       let scheduler;
