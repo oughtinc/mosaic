@@ -110,7 +110,7 @@ class Scheduler {
       const workspacesInTree = await this.fetchAllWorkspacesInTree(randomlySelectedTree);
 
       let oracleEligibleWorkspaces = await this.filterByWhetherEligibleForOracle(workspacesInTree);
-      oracleEligibleWorkspaces = await this.filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(oracleEligibleWorkspaces);
+      oracleEligibleWorkspaces = await this.filterByWhetherAnsweredByOracle(oracleEligibleWorkspaces);
 
       const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(oracleEligibleWorkspaces);
 
@@ -237,6 +237,10 @@ class Scheduler {
     return workspaces.filter(w => !w.isEligibleForOracle);
   }
 
+  private async filterByWhetherAnsweredByOracle(workspaces) {
+    return workspaces.filter(w => !w.wasAnsweredByOracle);
+  }
+
   private async filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(workspaces) {
     return await filter(
       workspaces,
@@ -259,7 +263,7 @@ class Scheduler {
 
     if (this.isInOracleMode.getValue()) {
       workspacesInTree = await this.filterByWhetherNotEligibleForOracle(workspacesInTree);
-      workspacesInTree = await this.filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(workspacesInTree);
+      workspacesInTree = await this.filterByWhetherAnsweredByOracle(workspacesInTree);
     }
 
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
