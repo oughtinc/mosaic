@@ -42,7 +42,11 @@ export async function createScheduler(experimentId) {
         async a => {
           const workspace = await Workspace.findById(a.workspaceId);
           return {
-            ...a.dataValues,
+            ...{
+              ...a.dataValues,
+              startAtTimestamp: Number(a.dataValues.startAtTimestamp),
+              endAtTimestamp: a.dataValues.endAtTimestamp ? Number(a.dataValues.endAtTimestamp) : Date.now(),
+            },
             workspace
           };
         },
