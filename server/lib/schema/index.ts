@@ -698,14 +698,6 @@ const schema = new GraphQLSchema({
                 wasAnsweredByOracle,
               } = inputWithNoNullOrUndefinedValues;
 
-              if (!_.isNil(isEligibleForOracle) && !isUserOracle(user)) {
-                throw new Error("Non-oracle attempting to update oracle eligibility.");
-              }
-
-              if (!_.isNil(wasAnsweredByOracle) && !isUserOracle(user)) {
-                throw new Error("Non-oracle attempting to mark question as answered by an oracle.");
-              }
-
               const update = {
                 isArchived,
                 isCurrentlyResolved,
