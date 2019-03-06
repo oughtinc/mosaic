@@ -177,7 +177,8 @@ export const workspaceType = makeObjectType(models.Workspace, [
 const treeType = makeObjectType(models.Tree, [
   ...standardReferences,
   ["rootWorkspace", () => workspaceType, "RootWorkspace"],
-  ["experiments", () => new GraphQLList(experimentType), "Experiments"]
+  ["experiments", () => new GraphQLList(experimentType), "Experiments"],
+  ["oracles", () => new GraphQLList(UserType), "Oracles"],
 ]);
 
 const experimentType = makeObjectType(models.Experiment, [
@@ -364,8 +365,14 @@ const schema = new GraphQLSchema({
           }
         })
       },
+      users: modelGraphQLFields(new GraphQLList(UserType), models.User),
       blocks: modelGraphQLFields(new GraphQLList(blockType), models.Block),
       trees: modelGraphQLFields(new GraphQLList(treeType), models.Tree),
+      tree: {
+        type: treeType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(models.Tree),
+      },
       experiments: modelGraphQLFields(new GraphQLList(experimentType), models.Experiment),
       experiment: {
         type: experimentType,
@@ -557,6 +564,38 @@ const schema = new GraphQLSchema({
             const tree = await models.Tree.findById(treeId);
             const experiment = await models.Experiment.findById(experimentId);
             await experiment.removeTree(tree);
+            return true;
+          }
+        ),
+      },
+      addOracleToTree: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to add an oracle to a tree",
+          async (_, { treeId, userId }) => {
+            const tree = await models.Tree.findById(treeId);
+            const user = await models.User.findById(userId);
+            await tree.addOracle(user);
+            return true;
+          }
+        ),
+      },
+      removeOracleFromTree: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to remove an oracle from a tree",
+          async (_, { treeId, userId }) => {
+            const tree = await models.Tree.findById(treeId);
+            const user = await models.User.findById(userId);
+            await tree.removeOracle(user);
             return true;
           }
         ),

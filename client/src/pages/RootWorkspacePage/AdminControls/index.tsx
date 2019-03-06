@@ -4,6 +4,8 @@ import { compose } from "recompose";
 
 import { AdminCheckboxThatTogglesWorkspaceField } from "../../../components/AdminCheckboxThatTogglesWorkspaceField";
 import { ExperimentsCheckboxes } from "../ExperimentsCheckboxes";
+import { UserOracleControls } from "../UserOracleControls";
+
 import {
   UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS,
   UPDATE_WORKSPACE_HAS_TIME_BUDGET,
@@ -42,6 +44,7 @@ class AdminControlsPresentational extends React.Component<any, any> {
           workspaceFieldToUpdate="hasIOConstraints"
         />
         <ExperimentsCheckboxes workspace={workspace} />
+        <UserOracleControls workspace={workspace} />
       </div>
     );
   }
