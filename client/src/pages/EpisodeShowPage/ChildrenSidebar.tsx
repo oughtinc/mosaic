@@ -413,7 +413,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     <TakeBreakBtn
                       bsStyle="danger"
                       experimentId={this.props.experimentId}
-                      label="Done! (leave budget)"
+                      label="Done as oracle (non-oracles can now be assigned)"
                       navHook={() => {
                         this.props.updateIsEligibleForOracle({
                           isEligibleForOracle: false,

@@ -92,7 +92,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                     <TakeBreakBtn
                       bsStyle="default"
                       experimentId={experimentId}
-                      label="Done (leave budget)"
+                      label="Done as oracle (non-oracles can now be assigned)"
                       navHook={() => {
                         updateIsEligibleForOracle(false);
                       }}
