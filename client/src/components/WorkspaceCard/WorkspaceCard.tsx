@@ -218,7 +218,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                   style={{ color: "#555", fontSize: "12px" }}
                   totalBudget={subtreeTimeSpentData[workspace.id]}
                 />
-                {" "}work on this entire subtree
+                {" "}work on entire subtree
                 <br />
                 <ChildBudgetBadge
                   noBadge={true}
@@ -226,7 +226,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                   style={{ color: "#555", fontSize: "12px" }}
                   totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
                 />
-                {" "}work on this workspace
+                {" "}work on workspace
               </span>
 
               {
@@ -235,7 +235,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                 isInOracleMode
                 &&
                 <span style={{ color: "darkRed"}}>
-                  WAS ANSWERED BY ORACLE
+                  ORACLE ANSWERED
                 </span>
               }
               {
@@ -243,19 +243,19 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                 &&
                 <span style={{ padding: "0 10px"}}>
                   <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="is stale"
+                    checkboxLabelText="stale"
                     updateMutation={this.handleOnIsStaleCheckboxChange}
                     workspace={workspace}
                     workspaceFieldToUpdate="isStale"
                   />
                   <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="oracle only"
+                    checkboxLabelText="oracle"
                     updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
                     workspace={workspace}
                     workspaceFieldToUpdate="isEligibleForOracle"
                   />
                   <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="currently resolved"
+                    checkboxLabelText="resolved"
                     updateMutation={this.handleOnIsCurrentlyResolvedCheckboxChange}
                     workspace={workspace}
                     workspaceFieldToUpdate="isCurrentlyResolved"
