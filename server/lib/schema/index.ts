@@ -872,12 +872,7 @@ const schema = new GraphQLSchema({
             scheduler = await createScheduler(experimentId);
           }
 
-          let workspaceId;
-          if (isUserOracle(user) && isInOracleMode.getValue()) {
-            workspaceId = await scheduler.assignNextWorkspaceForOracle(user.user_id);
-          } else {
-            workspaceId = await scheduler.assignNextWorkspace(user.user_id);
-          }
+          const workspaceId = await scheduler.assignNextWorkspace(user.user_id);
 
           return { id: workspaceId };
         }

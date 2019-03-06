@@ -76,6 +76,11 @@ export async function createScheduler(experimentId) {
   const scheduler = new Scheduler({
     experimentId,
     fetchAllWorkspacesInTree,
+    isUserOracleForRootWorkspace: async (userId, rootWorkspace) => {
+      const tree = await rootWorkspace.getTree();
+      const oracles = await tree.getOracles();
+      return !!oracles.find(o => o.id === userId);
+    },
     fetchAllRootWorkspaces: async () => {
       const rootWorkspaces = await Workspace.findAll({
         where: {
