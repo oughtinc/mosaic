@@ -96,7 +96,7 @@ class ExperimentControl extends React.Component<any, any> {
             type="radio"
             name="options"
             value={experiment.areNewWorkspacesOracleOnlyByDefault ? 1 : 0}
-            onChange={value => console.log("value", value) || this.props.onDefaultOracleChange(experiment.id, value === 1 ? true : false)}
+            onChange={value => this.props.onDefaultOracleChange(experiment.id, value === 1 ? true : false)}
           >
             <ToggleButton value={0}>default non-oracle</ToggleButton>
             <ToggleButton value={1}>default oracle</ToggleButton>
