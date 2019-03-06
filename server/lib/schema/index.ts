@@ -795,36 +795,21 @@ const schema = new GraphQLSchema({
           workspaceId: { type: GraphQLString },
           question: { type: GraphQLJSON },
           totalBudget: { type: GraphQLInt },
-          experimentId: { type: GraphQLString },
         },
         resolve: requireUser(
           "You must be logged in to create a subquestion",
-          async (_, { workspaceId, question, totalBudget, experimentId }, context) => {
+          async (_, { workspaceId, question, totalBudget }, context) => {
             const workspace = await models.Workspace.findById(workspaceId);
             const event = await models.Event.create();
             const user = await userFromContext(context);
             
-            let child;
-            
-            if (experimentId) {
-              const experiment = await models.Experiment.findById(experimentId);
-              child = await workspace.createChild({
-                event,
-                question: JSON.parse(question),
-                totalBudget,
-                creatorId: user.user_id,
-                isPublic: isUserAdmin(user),
-                isEligibleForOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
-              });
-            } else {
-              child = await workspace.createChild({
-                event,
-                question: JSON.parse(question),
-                totalBudget,
-                creatorId: user.user_id,
-                isPublic: isUserAdmin(user),
-              });
-            }
+            const child = await workspace.createChild({
+              event,
+              question: JSON.parse(question),
+              totalBudget,
+              creatorId: user.user_id,
+              isPublic: isUserAdmin(user),
+            });
 
             return child;
           }
