@@ -43,6 +43,7 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
                   experiment={e}
                   fallbacks={e.fallbacks}
                   onEligibilityRankChange={this.onEligibilityRankChange}
+                  onDefaultOracleChange={this.onDefaultOracleChange}
                   updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
                     variables: {
                       experimentId,
@@ -66,6 +67,16 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
       },
     });
   }
+
+  private onDefaultOracleChange = (experimentId, value) => {
+    console.log("experimentId, value", experimentId, value);
+    this.props.updateExperimentDefaultOracleMutation({
+      variables: {
+        experimentId,
+        defaultOracle: value,
+      },
+    });
+  }
 }
 
 const EXPERIMENTS_QUERY = gql`
@@ -75,6 +86,7 @@ const EXPERIMENTS_QUERY = gql`
       createdAt
       name
       eligibilityRank
+      areNewWorkspacesOracleOnlyByDefault
       fallbacks {
         id
         createdAt
@@ -87,6 +99,12 @@ const EXPERIMENTS_QUERY = gql`
 const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
   mutation updateExperimentEligibilityRank($eligibilityRank: Int, $experimentId: String) {
     updateExperimentEligibilityRank(eligibilityRank: $eligibilityRank, experimentId: $experimentId)
+  }
+`;
+
+const UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION = gql`
+  mutation updateExperimentDefaultOracle($defaultOracle: Boolean, $experimentId: String) {
+    updateExperimentDefaultOracle(defaultOracle: $defaultOracle, experimentId: $experimentId)
   }
 `; 
 
@@ -102,6 +120,12 @@ export const ListOfExperiments: any = compose(
   }),
   graphql(UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION, {
     name: "updateExperimentEligibilityRankMutation",
+    options: {
+      refetchQueries: ["experiments"],
+    }
+  }),
+  graphql(UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION, {
+    name: "updateExperimentDefaultOracleMutation",
     options: {
       refetchQueries: ["experiments"],
     }

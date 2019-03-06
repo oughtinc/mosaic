@@ -81,11 +81,25 @@ class ExperimentControl extends React.Component<any, any> {
             }}
             type="radio"
             name="options"
-            value={experiment.eligibilityRank === null ? 0 : experiment.eligibilityRank}
+            value={experiment.are === null ? 0 : experiment.eligibilityRank}
             onChange={value => this.props.onEligibilityRankChange(experiment.id, value)}
           >
             <ToggleButton value={1}>active</ToggleButton>
             <ToggleButton value={0}>inactive</ToggleButton>
+          </ToggleButtonGroup>
+          <ToggleButtonGroup
+            bsSize="xsmall"
+            style={{
+              display: "inline-block",
+              marginLeft: "10px",
+            }}
+            type="radio"
+            name="options"
+            value={experiment.areNewWorkspacesOracleOnlyByDefault ? 1 : 0}
+            onChange={value => console.log("value", value) || this.props.onDefaultOracleChange(experiment.id, value === 1 ? true : false)}
+          >
+            <ToggleButton value={0}>default non-oracle</ToggleButton>
+            <ToggleButton value={1}>default oracle</ToggleButton>
           </ToggleButtonGroup>
           <br />
           <Fallbacks experiment={experiment} />

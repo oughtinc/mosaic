@@ -1092,6 +1092,21 @@ const schema = new GraphQLSchema({
           }
         ),
       },
+      updateExperimentDefaultOracle: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          defaultOracle: { type: GraphQLBoolean }
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to update experiment metadata",
+          async (_, { experimentId, defaultOracle }, context) => {
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.update({ areNewWorkspacesOracleOnlyByDefault: defaultOracle });
+            return true;
+          }
+        ),
+      },
       markWorkspaceStaleForUser: {
         type: GraphQLBoolean,
         args: {

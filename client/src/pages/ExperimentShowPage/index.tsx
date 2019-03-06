@@ -86,7 +86,15 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
                     eligibilityRank: value,
                   },
                 });
-              }}  
+              }}
+              onDefaultOracleChange={(experimentId, value) => {
+                this.props.updateExperimentDefaultOracleMutation({
+                  variables: {
+                    experimentId,
+                    defaultOracle: value,
+                  },
+                });
+              }}
               updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
                 variables: {
                   experimentId,
@@ -183,6 +191,7 @@ const EXPERIMENT_QUERY = gql`
     experiment(id: $id) {
       id
       eligibilityRank
+      areNewWorkspacesOracleOnlyByDefault
       name
       metadata
       fallbacks {
@@ -225,6 +234,12 @@ const UPDATE_EXPERIMENT_NAME_MUTATION = gql`
   }
 `;
 
+const UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION = gql`
+  mutation updateExperimentDefaultOracle($defaultOracle: Boolean, $experimentId: String) {
+    updateExperimentDefaultOracle(defaultOracle: $defaultOracle, experimentId: $experimentId)
+  }
+`;
+
 const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
   mutation updateExperimentEligibilityRank($eligibilityRank: Int, $experimentId: String) {
     updateExperimentEligibilityRank(eligibilityRank: $eligibilityRank, experimentId: $experimentId)
@@ -256,6 +271,12 @@ export const ExperimentShowPage: any = compose(
   }),
   graphql(UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION, {
     name: "updateExperimentEligibilityRankMutation",
+    options: {
+      refetchQueries: ["experimentQuery"],
+    }
+  }),
+  graphql(UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION, {
+    name: "updateExperimentDefaultOracleMutation",
     options: {
       refetchQueries: ["experimentQuery"],
     }
