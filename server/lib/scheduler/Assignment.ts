@@ -62,7 +62,11 @@ class Assignment {
   }
 
   public getHowLongDidAssignmentLast() {
-    return this.endAtTimestamp - this.startAtTimestamp;
+    if (this.endAtTimestamp) {
+      return this.endAtTimestamp - this.startAtTimestamp;
+    }
+
+    return 0;
   }
 }
 
