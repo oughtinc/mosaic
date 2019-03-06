@@ -129,7 +129,7 @@ export class Child extends React.Component<any, any> {
     return (
       <div
         style={{
-          backgroundColor: (Auth.isOracle() && this.props.isInOracleMode && workspace.isEligibleForOracle) && "#ffe8e8",
+          backgroundColor: (this.props.isUserOracle && this.props.isInOracleMode && workspace.isEligibleForOracle) && "#ffe8e8",
           padding: "10px",
         }}
       >
@@ -261,7 +261,7 @@ export class Child extends React.Component<any, any> {
         </div>
         <div style={{ marginTop: "10px" }}>
           {
-            Auth.isOracle()
+            this.props.isUserOracle
             &&
             this.props.isInOracleMode
             &&
@@ -349,6 +349,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     }}
                   >
                     <Child
+                      isUserOracle={this.props.isUserOracle}
                       pastedExportFormat={this.props.pastedExportFormat}
                       shouldAutoExport={this.props.shouldAutoExport}
                       hasTimeBudget={this.props.hasTimeBudget}
@@ -385,7 +386,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
               this.props.workspaceOrder.length > 0
               &&
               (
-                (Auth.isOracle() && this.props.isInOracleMode)
+                (this.props.isUserOracle && this.props.isInOracleMode)
                 ||
                 this.props.isActive
               )
@@ -399,7 +400,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                 }}
               >
                 {
-                  !(Auth.isOracle() && this.props.isInOracleMode)
+                  !(this.props.isUserOracle && this.props.isInOracleMode)
                   ?
                     <TakeBreakBtn
                       experimentId={this.props.experimentId}

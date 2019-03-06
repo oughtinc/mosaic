@@ -64,7 +64,6 @@ interface WorkspaceType {
 interface WorkspaceCardProps {
   ejectUserFromCurrentWorkspace: any;
   isExpanded: boolean;
-  isInOracleModeAndIsUserOracle: boolean;
   isTopLevelOfCurrentTree: boolean;
   markWorkspaceStaleForUser: any;
   parentPointers: ConnectedPointerType[];
@@ -99,7 +98,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     this.state = {
       toggles: {
         [toggleTypes.SCRATCHPAD]: true,
-        [toggleTypes.CHILDREN]: (this.props.isInOracleModeAndIsUserOracle || this.props.isExpanded) ? true : false
+        [toggleTypes.CHILDREN]: this.props.isExpanded ? true : false
       },
     };
   }

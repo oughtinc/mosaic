@@ -25,19 +25,9 @@ const GetStartedNavContainer = styled.div`
 `;
 
 const GetStartedNav = ({ isInOracleMode }) => (
-  <GetStartedNavContainer
-    style={{
-      backgroundColor: (Auth.isOracle() && isInOracleMode) && "#f8e8e8",
-    }}
-  >
+  <GetStartedNavContainer>
     <NextWorkspaceBtn
-      label={
-        (Auth.isOracle() && isInOracleMode)
-        ?
-        "Get Started! (Oracle Mode)"
-        :
-        "Get started!"
-      }
+      label={"Get started!"}
     />
   </GetStartedNavContainer>
 );

@@ -28,7 +28,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
 
     return (
       <div>
-        {Auth.isOracle() && <OracleHeader />}
+        {Auth.isAdmin() && <OracleHeader />}
         <ContentContainer>
           {!Auth.isAuthenticated() && <WelcomeMessage />}
           

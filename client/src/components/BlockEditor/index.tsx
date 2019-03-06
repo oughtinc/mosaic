@@ -104,7 +104,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
       visibleExportIds: newProps.visibleExportIds,
       exportLockStatusInfo: newProps.exportLockStatusInfo,
       unlockPointer: newProps.unlockPointer,
-      isInOracleModeAndIsUserOracle: newProps.oracleModeQuery.oracleMode && Auth.isOracle(),
+      isInOracleModeAndIsUserOracle: newProps.oracleModeQuery.oracleMode && newProps.isUserOracle,
     };
     this.setState({
       plugins: [LinkifyPlugin(), CopyPastePlugin({ pastedExportFormat: newProps.pastedExportFormat }), SoftBreak({}), SlatePointers(SlatePointerInputs)]

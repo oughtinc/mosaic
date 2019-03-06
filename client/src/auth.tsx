@@ -37,7 +37,6 @@ export class Auth {
     localStorage.removeItem("access_token");
     localStorage.removeItem("expires_at");
     localStorage.removeItem("is_admin");
-    localStorage.removeItem("is_oracle");
     localStorage.removeItem("user_id");
   }
 
@@ -81,9 +80,6 @@ export class Auth {
       if (appMetadata != null && appMetadata.is_admin != null) {
         localStorage.setItem("is_admin", appMetadata.is_admin);
       }
-      if (appMetadata != null && appMetadata.is_oracle != null) {
-        localStorage.setItem("is_oracle", appMetadata.is_oracle);
-      }
       localStorage.setItem("user_id", profile.sub);
       callback();
     });
@@ -119,13 +115,6 @@ export class Auth {
       return false;
     }
     return localStorage.getItem("is_admin") === "true";
-  }
-
-  public static isOracle(): boolean {
-    if (!Auth.isAuthenticated()) {
-      return false;
-    }
-    return localStorage.getItem("is_oracle") === "true";
   }
 
   public static accessToken(): string | null {

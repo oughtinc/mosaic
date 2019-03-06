@@ -295,7 +295,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const hasParent = !!workspace.parentId;
     const hasSubquestions = workspace.childWorkspaceOrder.length > 0;
-    const isUserOracle = Auth.isOracle();
+    const isUserOracle = workspace.isUserOracleForTree;
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
 
     const hasTimeBudget = workspace.hasTimeBudgetOfRootParent;
@@ -333,6 +333,7 @@ export class WorkspaceView extends React.Component<any, any> {
             hasSubquestions={hasSubquestions}
             isActive={isActive}
             isInOracleMode={isInOracleMode}
+            isUserOracle={isUserOracle}
             hasTimeBudget={hasTimeBudget}
             hasTimerEnded={hasTimerEnded}
             markAsNotStaleRelativeToUser={() =>
@@ -420,6 +421,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         }}
                       >
                         <BlockEditor
+                          isUserOracle={isUserOracle}
                           availablePointers={availablePointers}
                           exportLockStatusInfo={exportLockStatusInfo}
                           visibleExportIds={visibleExportIds}
@@ -452,6 +454,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockHeader>Scratchpad</BlockHeader>
                       <BlockBody>
                         <BlockEditor
+                          isUserOracle={isUserOracle}
                           availablePointers={availablePointers}
                           visibleExportIds={visibleExportIds}
                           exportLockStatusInfo={exportLockStatusInfo}
@@ -469,6 +472,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       <BlockHeader>Response</BlockHeader>
                       <BlockBody>
                         <BlockEditor
+                          isUserOracle={isUserOracle}
                           availablePointers={availablePointers}
                           visibleExportIds={visibleExportIds}
                           exportLockStatusInfo={exportLockStatusInfo}
@@ -559,6 +563,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Col>
                   <Col sm={6}>
                     <ChildrenSidebar
+                      isUserOracle={isUserOracle}
                       experimentId={experimentId}
                       pastedExportFormat={this.state.pastedExportFormat}
                       shouldAutoExport={this.state.shouldAutoExport}

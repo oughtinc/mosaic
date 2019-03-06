@@ -43,6 +43,7 @@ interface EpisodeNavProps {
   isActive: boolean;
   isInOracleMode: boolean;
   isTakingABreak?: boolean;
+  isUserOracle: boolean;
   markAsNotStaleRelativeToUser(): void;
   updateIsEligibleForOracle(isEligibleForOracle: boolean): void;
 }
@@ -61,11 +62,12 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       isActive,
       isInOracleMode,
       isTakingABreak,
+      isUserOracle,
       markAsNotStaleRelativeToUser,
       updateIsEligibleForOracle,
     } = this.props;
 
-    if (Auth.isOracle() && isInOracleMode) {
+    if (isUserOracle && isInOracleMode) {
       return (
         <EpisodeNavContainer style={{ backgroundColor: "#ffe8e8" }}>
           {

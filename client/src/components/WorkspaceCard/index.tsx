@@ -88,7 +88,6 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
             },
           })}
           isExpanded={isExpanded}
-          isInOracleModeAndIsUserOracle={this.props.oracleModeQuery.oracleMode && Auth.isOracle()}
           isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}
           oracleModeQuery={this.props.oracleModeQuery}
           markWorkspaceStaleForUser={({ userId, workspaceId }) => this.props.markWorkspaceStaleForUserMutation({
