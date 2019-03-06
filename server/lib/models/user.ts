@@ -26,6 +26,7 @@ const UserModel = (
   );
 
   User.associate = function(models: any) {
+    User.OracleTrees = User.belongsToMany(models.Tree, {through: 'UserTreeOracleRelation'});
     addEventAssociations(User, models);
   };
 

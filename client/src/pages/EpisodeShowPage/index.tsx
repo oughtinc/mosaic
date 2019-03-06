@@ -64,6 +64,7 @@ const WORKSPACE_QUERY = gql`
       isPublic
       isStale
       isEligibleForOracle
+      isUserOracleForTree
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
       childWorkspaceOrder

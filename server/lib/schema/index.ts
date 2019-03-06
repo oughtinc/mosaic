@@ -72,6 +72,24 @@ export const workspaceType = makeObjectType(models.Workspace, [
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"],
   ["tree", () => treeType, "Tree"]
 ], {
+  isUserOracleForTree: {
+    type: GraphQLBoolean,
+    resolve: async (workspace, args, context) => {
+      // get tree
+      let curWorkspace = workspace;
+      while (curWorkspace.parentId) {
+        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+      }
+      const rootWorkspace = curWorkspace;
+      const tree = await rootWorkspace.getTree();
+      const oracles = await tree.getOracles();
+
+      const user = context.user;
+      const isUserOracleForTree = !!oracles.find(o => o.id === user.id);
+
+      return isUserOracleForTree;
+    },
+  },
   currentlyActiveUser: {
     type: UserType,
     resolve: async (workspace, args, context) => {

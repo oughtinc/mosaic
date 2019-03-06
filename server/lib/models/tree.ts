@@ -26,6 +26,10 @@ const TreeModel = (
     Tree.Experiments = Tree.belongsToMany(models.Experiment, {
       through: "ExperimentTreeRelation",
     });
+    Tree.Oracles = Tree.belongsToMany(models.User, {
+      as: "Oracles",
+      through: "UserTreeOracleRelation",
+    });
     addEventAssociations(Tree, models);
   };
 
