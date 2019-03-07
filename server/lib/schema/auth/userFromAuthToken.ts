@@ -35,6 +35,7 @@ export function userFromAuthToken(accessToken: string | null): Promise<any | nul
 
       const data = {
         user_id: user.sub,
+        email: user.email,
         given_name: user.given_name,
         family_name: user.family_name,
         gender: user.gender,

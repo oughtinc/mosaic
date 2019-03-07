@@ -175,7 +175,12 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                       ?
                         `${workspace.currentlyActiveUser.givenName} ${workspace.currentlyActiveUser.familyName}`
                       :
-                        workspace.currentlyActiveUser.id
+                        (
+                          workspace.currentlyActiveUser.email
+                          ||
+                          workspace.currentlyActiveUser.id
+                        )
+
                     }
                     <Button
                       bsSize="xsmall"

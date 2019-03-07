@@ -18,5 +18,9 @@ import {
         type: GraphQLString,
         resolve: user => user.givenName,
       },
+      email: {
+        type: GraphQLString,
+        resolve: user => user.email,
+      }
     }
   })

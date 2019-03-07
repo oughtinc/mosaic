@@ -12,7 +12,7 @@ export class Auth {
     redirectUri: Auth.redirectUri(),
     audience: "https://mosaicapp.auth0.com/userinfo",
     responseType: "token",
-    scope: "openid profile user_metadata app_metadata"
+    scope: "openid email profile user_metadata app_metadata"
   });
 
   public static login(): void {

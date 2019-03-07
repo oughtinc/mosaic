@@ -19,6 +19,7 @@ const UserModel = (
       },
       familyName: Sequelize.STRING,
       givenName: Sequelize.STRING,
+      email: Sequelize.STRING,
       gender: Sequelize.STRING,
       pictureURL: Sequelize.STRING,
       ...eventRelationshipColumns(DataTypes),

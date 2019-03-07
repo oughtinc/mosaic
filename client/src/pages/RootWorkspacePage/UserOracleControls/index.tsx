@@ -34,7 +34,9 @@ export class UserOracleControlsPresentational extends React.Component<any, any> 
                           ?
                           `${u.givenName} ${u.familyName}`
                           :
-                          u.id
+                          (
+                            u.email || u.id
+                          )
                         }
                       </Checkbox>
                     );
@@ -81,6 +83,7 @@ const USERS_QUERY = gql`
       id
       givenName
       familyName
+      email
     }
   }
 `; 

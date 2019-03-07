@@ -95,6 +95,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
         id
         givenName
         familyName
+        email
       }
       creatorId
       childWorkspaceOrder
@@ -128,6 +129,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
         id
         givenName
         familyName
+        email
       }
       creatorId
       childWorkspaceOrder
