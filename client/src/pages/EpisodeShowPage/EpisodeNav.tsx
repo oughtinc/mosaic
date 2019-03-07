@@ -79,27 +79,15 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                 label={"Start on next workspace (Oracle Mode)"}
               />
             :
-              (
-                <div>
-                  <TakeBreakBtn
-                    bsStyle="default"
-                    experimentId={experimentId}
-                    label="Skip and go to next workspace"
-                  />
-                  {
-                    !this.props.hasSubquestions
-                    &&
-                    <TakeBreakBtn
-                      bsStyle="default"
-                      experimentId={experimentId}
-                      label="Done as oracle (non-oracles can now be assigned)"
-                      navHook={() => {
-                        updateIsEligibleForOracle(false);
-                      }}
-                    />
-                  }
-                </div>
-              )
+              <div
+                style={{
+                  color: "#a66",
+                  fontSize: "24px",
+                  fontVariant: "small-caps"
+                }}
+              >
+                oracle mode
+              </div>
           }
         </EpisodeNavContainer>
       );

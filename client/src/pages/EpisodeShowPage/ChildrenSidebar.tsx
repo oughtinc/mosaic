@@ -401,26 +401,14 @@ export class ChildrenSidebar extends React.Component<any, any> {
               >
                 {
                   !(this.props.isUserOracle && this.props.isInOracleMode)
-                  ?
-                    <TakeBreakBtn
-                      experimentId={this.props.experimentId}
-                      label="Wait for an answer"
-                      navHook={() => {
-                        this.props.markAsNotStale();
-                      }}
-                    />
-                  :
-                    <TakeBreakBtn
-                      bsStyle="danger"
-                      experimentId={this.props.experimentId}
-                      label="Done as oracle (non-oracles can now be assigned)"
-                      navHook={() => {
-                        this.props.updateIsEligibleForOracle({
-                          isEligibleForOracle: false,
-                          workspaceId: this.props.workspace.id,
-                        });
-                      }}
-                    />
+                  &&
+                  <TakeBreakBtn
+                    experimentId={this.props.experimentId}
+                    label="Wait for an answer"
+                    navHook={() => {
+                      this.props.markAsNotStale();
+                    }}
+                  />
                 }
               </div>
             }
