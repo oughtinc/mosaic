@@ -34,8 +34,6 @@ graphQLServer.use("/graphql", bodyParser.json(), async (req, res, next) => {
     const userInfo = await userFromAuthToken(req.headers.authorization);
     let user = await models.User.findById(userInfo.user_id);
 
-
-
     if (!user) {
       user = await models.User.create({
         id: userInfo.user_id,
@@ -54,6 +52,7 @@ graphQLServer.use("/graphql", bodyParser.json(), async (req, res, next) => {
         id: userInfo.user_id,
         givenName: userInfo.given_name,
         familyName: userInfo.family_name,
+        email: userInfo.email,
         gender: userInfo.gender,
         pictureURL: userInfo.picture,
       });
