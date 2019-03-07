@@ -420,6 +420,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            isUserOracle={this.props.isUserOracle}
             pastedExportFormat={this.props.pastedExportFormat}
             shouldAutoExport={this.props.shouldAutoExport}
             hasTimeBudget={this.props.hasTimeBudget}
