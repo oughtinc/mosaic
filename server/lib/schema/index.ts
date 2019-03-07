@@ -75,6 +75,12 @@ export const workspaceType = makeObjectType(models.Workspace, [
   isUserOracleForTree: {
     type: GraphQLBoolean,
     resolve: async (workspace, args, context) => {
+      const user = context.user;
+
+      if (!user) {
+        return false;
+      }
+
       // get tree
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
@@ -84,7 +90,6 @@ export const workspaceType = makeObjectType(models.Workspace, [
       const tree = await rootWorkspace.getTree();
       const oracles = await tree.getOracles();
 
-      const user = context.user;
       const isUserOracleForTree = !!oracles.find(o => o.id === user.id);
 
       return isUserOracleForTree;
