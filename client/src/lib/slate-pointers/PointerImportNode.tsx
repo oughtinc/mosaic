@@ -4,6 +4,7 @@ import * as React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import * as ReactDOM from "react-dom";
 import { connect } from "react-redux";
+import { Inline } from "slate";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
@@ -184,13 +185,19 @@ class PointerImportNodePresentational extends React.Component<any, any> {
           backgroundColor: isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover,
         }
       },
+      ClosedLazyPointerImportStyle: {
+        backgroundColor: "red",
+        color: "rgb(233, 239, 233)",
+        padding: "0 4px",
+        borderRadius: "4px",
+        whiteSpace: "nowrap",
+      },
     });
 
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
     const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
 
     const exportPointer = availablePointers.find(p => p.data.pointerId === exportPointerId);
-
     const exportPointerInputCharCount = exportPointer && getInputCharCount(exportPointer);
 
     if (!importingPointer) {
@@ -209,6 +216,42 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         <strong>{exportPointerInputCharCount}</strong> char{exportPointerInputCharCount === 1 ? "" : "s"}
       </Tooltip>
     );
+
+    if (
+      this.props.isInOracleMode
+      &&
+      !this.props.isUserOracle
+    ) {
+      const exportPointerText = Inline.fromJSON(exportPointer).text.trim();
+
+      if (exportPointerText.slice(0, 2) === "@L") {
+        return (
+          <ClosedPointerImport
+            className={css(styles.ClosedLazyPointerImportStyle)}
+            style={{
+              backgroundColor: "red",
+            }}
+          >
+            <span
+              key={exportPointerId}
+              style={{
+                display: "inline-block",
+                filter: "brightness(110%) saturate(400%)",
+                fontSize: "smaller",
+                transform: !isLocked && "scale(0, 0)",
+                transition: "all 0.5s",
+                maxWidth: isLocked ? "90px" : 0,
+                verticalAlign: "middle",
+              }}
+              data-cy="closed-import"
+            >
+              🔒
+            </span>
+            {`$${pointerIndex + 1}`}
+          </ClosedPointerImport>
+        );
+      }
+    }
 
     if (!isOpen) {
       return (

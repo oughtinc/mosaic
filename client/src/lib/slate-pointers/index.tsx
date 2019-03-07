@@ -110,6 +110,8 @@ function SlatePointers(options: any = {}) {
           <PointerImportNode
             visibleExportIds={options.visibleExportIds}
             exportLockStatusInfo={options.exportLockStatusInfo}
+            isInOracleMode={options.isInOracleMode}
+            isUserOracle={options.isUserOracle}
             isInOracleModeAndIsUserOracle={options.isInOracleModeAndIsUserOracle}
             unlockPointer={options.unlockPointer}
             nodeAsJson={node.toJSON()}
