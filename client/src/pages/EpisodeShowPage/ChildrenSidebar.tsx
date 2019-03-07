@@ -93,6 +93,7 @@ export class Child extends React.Component<any, any> {
             {questionRelationship.findBlock().value && (
               <BlockEditor
                 {...questionRelationship.blockEditorAttributes()}
+                isUserOracle={this.props.isUserOracle}
                 readOnly={true}
                 availablePointers={availablePointers}
                 visibleExportIds={this.props.visibleExportIds}
@@ -139,6 +140,7 @@ export class Child extends React.Component<any, any> {
             <BlockEditorContainer>
               <BlockEditor
                 {...questionRelationship.blockEditorAttributes()}
+                isUserOracle={this.props.isUserOracle}
                 availablePointers={availablePointers}
                 visibleExportIds={this.props.visibleExportIds}
                 exportLockStatusInfo={this.props.exportLockStatusInfo}
@@ -165,6 +167,7 @@ export class Child extends React.Component<any, any> {
                   ?
                     <BlockEditor
                       {...answerDraftRelationship.blockEditorAttributes()}
+                      isUserOracle={this.props.isUserOracle}
                       availablePointers={availablePointers}
                       visibleExportIds={this.props.visibleExportIds}
                       exportLockStatusInfo={this.props.exportLockStatusInfo}
@@ -173,6 +176,7 @@ export class Child extends React.Component<any, any> {
                   :
                     <BlockEditor
                       {...answerRelationship.blockEditorAttributes()}
+                      isUserOracle={this.props.isUserOracle}
                       availablePointers={availablePointers}
                       visibleExportIds={this.props.visibleExportIds}
                       exportLockStatusInfo={this.props.exportLockStatusInfo}
