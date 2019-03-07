@@ -377,7 +377,7 @@ class Scheduler {
     const workspacesWithMostDistFromWorkedOnWorkspace = this.getWorkspacesWithMostDistFromWorkedOnWorkspace({
       userId,
       workspaces: workspaceWithLeastRequiredWorkAmongDescendants,
-      workspacesInTree,
+      workspacesInTree: allWorkspacesInTree,,
     });
 
     const finalWorkspaces = workspacesWithMostDistFromWorkedOnWorkspace;
