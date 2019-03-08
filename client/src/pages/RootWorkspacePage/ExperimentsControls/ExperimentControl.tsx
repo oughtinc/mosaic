@@ -81,7 +81,7 @@ class ExperimentControl extends React.Component<any, any> {
             }}
             type="radio"
             name="options"
-            value={experiment.are === null ? 0 : experiment.eligibilityRank}
+            value={experiment.eligibilityRank === null ? 0 : experiment.eligibilityRank}
             onChange={value => this.props.onEligibilityRankChange(experiment.id, value)}
           >
             <ToggleButton value={1}>active</ToggleButton>
