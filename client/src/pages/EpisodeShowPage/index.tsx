@@ -489,8 +489,6 @@ export class WorkspaceView extends React.Component<any, any> {
                         &&
                         isActive
                         &&
-                        (!((isUserOracle && isInOracleMode) && !hasParent))
-                        &&
                         <ResponseFooter
                           experimentId={experimentId}
                           hasTimeBudget={hasTimeBudget}
