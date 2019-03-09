@@ -3,8 +3,6 @@ import styled from "styled-components";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-import { Auth } from "../../auth";
-
 interface NextWorkspaceBtnProps {
   bsStyle: string;
   experimentId: string;
@@ -45,7 +43,6 @@ interface EpisodeNavProps {
   isTakingABreak?: boolean;
   isUserOracle: boolean;
   markAsNotStaleRelativeToUser(): void;
-  updateIsEligibleForOracle(isEligibleForOracle: boolean): void;
 }
 
 // Note that there in the normal functioning of the app,
@@ -64,7 +61,6 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       isTakingABreak,
       isUserOracle,
       markAsNotStaleRelativeToUser,
-      updateIsEligibleForOracle,
     } = this.props;
 
     if (isUserOracle && isInOracleMode) {

@@ -9,8 +9,6 @@ import {
   UPDATE_WORKSPACE,
 } from "../../graphqlQueries";
 
-import { Auth } from "../../auth";
-
 import { WorkspaceCardPresentational } from "./WorkspaceCard";
 
 const ORACLE_MODE_QUERY = gql`

@@ -6,7 +6,6 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
-import { Auth } from "../auth";
 import { ContentContainer } from  "../components/ContentContainer";
 
 const RedExclamation = () => (

@@ -16,7 +16,6 @@ import { CopyPastePlugin } from "../../lib/slate-plugins/copyPastePlugin";
 import { LinkifyPlugin } from "../../lib/slate-plugins/linkifyPlugin";
 import { BlockEditorEditing } from "./BlockEditorEditing";
 import * as _ from "lodash";
-import { Auth } from "../../auth";
 
 class BlockEditorPresentational extends React.Component<any, any> {
   public menu;
