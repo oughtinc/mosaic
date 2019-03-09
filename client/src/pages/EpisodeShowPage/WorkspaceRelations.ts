@@ -107,7 +107,7 @@ export class WorkspaceBlockRelation {
       name: id,
       blockId: id,
       readOnly: !editable,
-      initialValue: (permission === Permissions.Editable && !Auth.isAdmin()) ? value : outputsToInputs(value),
+      initialValue: (permission === Permissions.Editable || Auth.isAdmin()) ? value : outputsToInputs(value),
       shouldAutosave: editable,
     };
   }
