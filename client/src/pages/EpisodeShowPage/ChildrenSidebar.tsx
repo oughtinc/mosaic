@@ -163,7 +163,7 @@ export class Child extends React.Component<any, any> {
               <BlockBullet>A</BlockBullet>
               <BlockEditorContainer>
                 {
-                  this.props.workspace.isCurrentlyResolved
+                  this.props.workspace.isCurrentlyResolved && answerDraftRelationship.findBlock())
                   ?
                     <BlockEditor
                       {...answerDraftRelationship.blockEditorAttributes()}

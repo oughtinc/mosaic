@@ -94,6 +94,7 @@ export class WorkspaceBlockRelation {
   public blockEditorAttributes() {
     const { permission } = this.relationTypeAttributes();
     const block: any = this.findBlock();
+
     const editable =
       Auth.isAuthorizedToEditWorkspace(this.workspace) &&
       permission === Permissions.Editable;
