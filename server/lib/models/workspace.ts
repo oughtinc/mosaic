@@ -247,6 +247,7 @@ const WorkspaceModel = (
           await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
           await workspace.createBlock({ type: "ANSWER" }, { event });
           await workspace.createBlock({ type: "SUBQUESTION_DRAFT" }, { event });
+          await workspace.createBlock({ type: "ANSWER_DRAFT" }, { event });
         },
       },
     }
