@@ -154,7 +154,7 @@ export class Child extends React.Component<any, any> {
         <div style={{ color: subQuestionAnswerFontColor, marginTop: "8px" }}>
           {
             (
-              this.props.workspace.isCurrentlyResolved
+              (this.props.workspace.isCurrentlyResolved && answerDraftRelationship.findBlock())
               ? answerDraftRelationship.findBlock().value
               : answerRelationship.findBlock().value
             )
