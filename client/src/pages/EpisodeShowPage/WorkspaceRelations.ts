@@ -33,7 +33,7 @@ const RelationTypeAttributes = [
     name: WorkspaceRelationTypes.WorkspaceQuestion,
     source: WORKSPACE,
     blockType: QUESTION,
-    permission: Permissions.ReadOnly,
+    permission: Auth.isAdmin() ? Permissions.Editable : Permissions.ReadOnly,
   },
   {
     name: WorkspaceRelationTypes.WorkspaceScratchpad,
@@ -95,10 +95,7 @@ export class WorkspaceBlockRelation {
     const { permission } = this.relationTypeAttributes();
     const block: any = this.findBlock();
 
-    const editable =
-      (Auth.isAuthorizedToEditWorkspace(this.workspace) && permission === Permissions.Editable)
-      ||
-      Auth.isAdmin();
+    const editable = Auth.isAuthorizedToEditWorkspace(this.workspace) && permission === Permissions.Editable;
 
       let { value } = block;
     const { id } = block;
@@ -107,7 +104,7 @@ export class WorkspaceBlockRelation {
       name: id,
       blockId: id,
       readOnly: !editable,
-      initialValue: (permission === Permissions.Editable || Auth.isAdmin()) ? value : outputsToInputs(value),
+      initialValue: permission === Permissions.Editable ? value : outputsToInputs(value),
       shouldAutosave: editable,
     };
   }
