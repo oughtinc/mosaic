@@ -337,7 +337,7 @@ class Scheduler {
     let workspacesInTree = allWorkspacesInTree;
     if (this.isInOracleMode.getValue()) {
       workspacesInTree = await this.filterByWhetherNotEligibleForOracle(allWorkspacesInTree);
-      workspacesInTree = await this.filterByWhetherAnsweredByOracle(allWorkspacesInTree);
+      workspacesInTree = await this.filterByWhetherAnsweredByOracle(workspacesInTree);
     }
 
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(workspacesInTree);
