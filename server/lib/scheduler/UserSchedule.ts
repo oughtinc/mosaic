@@ -1,9 +1,6 @@
 import * as _ from "lodash";
 import { Assignment } from "./Assignment";
 
-const ORACLE_TIME_LIMIT = 1000 * 60 * 15;
-const TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET = 1000 * 60 * 20;
-
 class UserSchedule {
   private createAssignment;
   private updateAssignment;
@@ -170,16 +167,11 @@ class UserSchedule {
     // handle case where time budgets aren't in use, but
     // we still don't want users taking over 15 minutes
     if (!lastWorkedOnAssignment.isTimed) {
-      if (howLongAgoUserStartedWorkingOnIt < TIME_LIMIT_EVEN_WITHOUT_TIME_BUDGET) {
-        return true;
-      }
-      return false;
+      return true;
     }
 
     // normal time budget case
-    const timeLimit = lastWorkedOnAssignment.isOracle ? ORACLE_TIME_LIMIT : this.timeLimit;
-    const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < timeLimit;
-
+    const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < this.timeLimit;
     if (didUserStartWorkingOnItWithinTimeLimit) {
       return true;
     }
