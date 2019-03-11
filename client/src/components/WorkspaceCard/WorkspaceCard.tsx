@@ -141,7 +141,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
 
     return (
       <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
-        <CardBody>
+        <CardBody style={{ filter: workspace.isEligibleForOracle && "sepia(40%)" }}>
           <div
             style={{
               backgroundColor: "#f8f8f8",
