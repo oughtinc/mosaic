@@ -260,7 +260,7 @@ class Scheduler {
       const workspacesInTree = await this.fetchAllWorkspacesInTree(randomlySelectedTree);
 
       let oracleEligibleWorkspaces = await this.filterByWhetherEligibleForOracle(workspacesInTree);
-      oracleEligibleWorkspaces = await this.filterByWhetherAnsweredByOracle(oracleEligibleWorkspaces);
+      oracleEligibleWorkspaces = await this.filterByStaleness(userId, oracleEligibleWorkspaces);
 
       const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(oracleEligibleWorkspaces);
 
