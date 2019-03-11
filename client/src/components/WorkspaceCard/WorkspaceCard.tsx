@@ -289,7 +289,11 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                         ?
                         `${user.givenName} ${user.familyName}`
                         :
-                        user.id
+                        (
+                          user.email
+                          ||
+                          user.id
+                        )
                       }
                       <Button
                         bsSize="xsmall"
