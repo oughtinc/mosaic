@@ -4,6 +4,8 @@ import * as uuidv1 from "uuid/v1";
 import { Editor, findDOMNode } from "slate-react";
 import { compose, withProps, withState } from "recompose";
 import { graphql } from "react-apollo";
+import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
 import { MenuBar } from "./MenuBar";
@@ -16,6 +18,21 @@ import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 import { parse as parseQueryString } from "query-string";
 import { Auth } from "../../auth";
+
+interface NextWorkspaceBtnProps {
+  bsStyle: string;
+  experimentId: string;
+  label: string;
+  navHook?: () => void;
+}
+
+const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
+  return (
+    <Link onClick={navHook} to={`/next?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
+      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
+    </Link>
+  );
+};
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
 const DOLLAR_NUMBERS_NOT_NUMBER = /\$[0-9]+[^0-9]/;
@@ -177,13 +194,13 @@ export class BlockEditorEditingPresentational extends React.Component<
               borderRadius: "4px",
               boxShadow: "1px 1px 6px #bbb",
               display: this.props.mutationStatus.status === MutationStatus.Error ? "flex" : "none",
-              justifyContent: "center",
+              justifyContent: "space-around",
               left: "50%",
               marginLeft: "-200px",
               padding: "10px",
               position: "fixed",
               top: "150px",
-              width: "400px",
+              width: "600px",
               zIndex: 1000,
             }}
           >
@@ -193,6 +210,15 @@ export class BlockEditorEditingPresentational extends React.Component<
               this.props.mutationStatus.error
               &&
               this.props.mutationStatus.error.message.slice(15)
+            }
+            {
+              parseQueryString(window.location.search).experiment
+              &&
+              <NextWorkspaceBtn
+                bsStyle="default"
+                experimentId={parseQueryString(window.location.search).experiment}
+                label={"Find assigned workspace"}
+              />
             }
           </div>
           <Editor
