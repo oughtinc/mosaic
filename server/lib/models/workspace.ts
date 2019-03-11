@@ -280,27 +280,10 @@ const WorkspaceModel = (
     { id, parentId, question, totalBudget, creatorId, isPublic },
     { event }
   ) {
-    // get root workspace
-    let curWorkspace = await sequelize.models.Workspace.findById(parentId);
-    while (curWorkspace.parentId) {
-      curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
-    }
-    const rootWorkspace = curWorkspace;
+    // get parent workspace
+    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
 
-    // get experiment id
-    const tree = await rootWorkspace.getTree();
-    const experiments = await tree.getExperiments();
-
-    if (experiments.length === 0) {
-      const workspace = await sequelize.models.Workspace.create(
-        { id = uuidv4(), parentId, totalBudget, creatorId, isPublic },
-        { event, questionValue: question }
-      );
-      return workspace;
-    }
-
-    const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
-    const isEligibleForOracle =  mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault;
+    const isEligibleForOracle =  !parentWorkspace.isEligibleForOracle;
 
     const workspace = await sequelize.models.Workspace.create(
       { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForOracle },
