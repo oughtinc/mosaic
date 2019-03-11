@@ -10,10 +10,7 @@ class CharCountDisplaysPresentational extends React.Component<any,  any> {
   public render() {
     return (
       <div
-        style={{
-          display: "flex",
-
-        }}
+        style={{ display: "flex" }}
       >
         <span>
           <span
@@ -32,14 +29,14 @@ class CharCountDisplaysPresentational extends React.Component<any,  any> {
             input
             <div
               style={{
-                color: this.props.inputCharCount < 250 ? "green" : (this.props.inputCharCount < 350 ? "yellow" : "red"),
+                color: this.props.inputCharCount < 400 ? "green" : (this.props.inputCharCount < 500 ? "yellow" : "red"),
                 fontSize: "24px",
                 margin: "3px 0 0 5px",
                 textAlign: "center",
-                textShadow: this.props.inputCharCount >= 250 && this.props.inputCharCount < 350 && "0 0 1px #333",
+                textShadow: this.props.inputCharCount >= 400 && this.props.inputCharCount < 500 && "0 0 1px #333",
               }}
             >
-              {350 - this.props.inputCharCount}
+              {500 - this.props.inputCharCount}
             </div>
           </span>
         </span>
