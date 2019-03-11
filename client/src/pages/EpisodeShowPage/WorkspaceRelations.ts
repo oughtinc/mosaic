@@ -97,7 +97,7 @@ export class WorkspaceBlockRelation {
 
     const editable = Auth.isAuthorizedToEditWorkspace(this.workspace) && permission === Permissions.Editable;
 
-      let { value } = block;
+    let { value } = block;
     const { id } = block;
     value = databaseJSONToValue(value);
     return {
