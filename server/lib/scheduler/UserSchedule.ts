@@ -30,7 +30,7 @@ class UserSchedule {
 
   public getUserActivity() {
     const userActivity = this.userSchedule.map(assignment => ({
-      howLongDidAssignmentLast: Math.max(3600*1000, assignment.getHowLongDidAssignmentLast()),
+      howLongDidAssignmentLast: Math.min(3600*1000, assignment.getHowLongDidAssignmentLast()),
       startAtTimestamp: assignment.startAtTimestamp,
       workspace: assignment.getWorkspace(),
     }));
