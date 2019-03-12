@@ -32,7 +32,6 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       isUserOracle,
       markAsAnsweredByOracle,
       markAsCurrentlyResolved,
-      markAsNotEligibleForOracle,
       markAsNotStale,
       transferRemainingBudgetToParent,
     } = this.props;
@@ -88,7 +87,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                     depleteBudget();
                   }
                   markAsAnsweredByOracle();
-                  markAsNotEligibleForOracle();
+                  markAsNotStale();
                   markAsCurrentlyResolved();
                 }}
               />

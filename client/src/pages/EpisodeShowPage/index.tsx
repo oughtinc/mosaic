@@ -519,14 +519,6 @@ export class WorkspaceView extends React.Component<any, any> {
                               },
                             })
                           }
-                          markAsNotEligibleForOracle={() =>
-                            this.props.updateWorkspace({
-                              variables: {
-                                id: workspace.id,
-                                isEligibleForOracle: false,
-                              }
-                            })
-                          }
                           markAsNotStale={() =>
                             this.props.updateWorkspace({
                               variables: {
