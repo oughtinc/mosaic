@@ -196,7 +196,7 @@ export class BlockEditorEditingPresentational extends React.Component<
               display: this.props.mutationStatus.status === MutationStatus.Error ? "flex" : "none",
               justifyContent: "space-around",
               left: "50%",
-              marginLeft: "-200px",
+              marginLeft: "-300px",
               padding: "10px",
               position: "fixed",
               top: "150px",
