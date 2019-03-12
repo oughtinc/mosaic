@@ -98,7 +98,7 @@ export const createOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: "Which of the following is the best answer to  ",
+              text: "Which is a better answer to Q ",
               marks: [],
             },
           ],
