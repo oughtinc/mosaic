@@ -170,7 +170,7 @@ const ParentLink = props => (
 );
 
 const SubtreeLink = ({ workspace }) => (
-  <NavLink to={`/workspaces/${workspace.id}/subtree`}>
+  <NavLink target="_blank" to={`/workspaces/${workspace.id}/subtree`}>
     <Button bsStyle="default" bsSize="xsmall">
       Subtree »
     </Button>
@@ -366,6 +366,9 @@ export class WorkspaceView extends React.Component<any, any> {
               <BlockHoverMenu>
                 <Row>
                   <Col sm={12}>
+                  {
+                    !(isUserOracle && isInOracleMode)
+                    &&
                     <div
                       style={{
                         display: "flex",
@@ -403,6 +406,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         />
                       }
                     </div>
+                  }
                   </Col>
                 </Row>
                 <Row>
@@ -439,7 +443,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           </div>
                         )}
                       {workspace &&
-                        !isIsolatedWorkspace && (
+                        (!isIsolatedWorkspace || isUserOracle) && (
                           <div style={{ paddingBottom: "8px" }}>
                             <SubtreeLink workspace={workspace} />
                           </div>
