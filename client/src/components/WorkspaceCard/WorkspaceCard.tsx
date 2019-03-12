@@ -233,16 +233,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                 />
                 {" "}work on workspace
               </span>
-
-              {
-                workspace.wasAnsweredByOracle
-                &&
-                isInOracleMode
-                &&
-                <span style={{ color: "darkRed"}}>
-                  ORACLE ANSWERED
-                </span>
-              }
               {
                 Auth.isAdmin()
                 &&
