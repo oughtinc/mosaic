@@ -137,8 +137,6 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
       :
       this.props.subtreeTimeSpentData;
 
-    const isInOracleMode = this.props.oracleModeQuery.oracleMode;
-
     return (
       <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
         <CardBody style={{ filter: workspace.isEligibleForOracle && "sepia(40%)" }}>
