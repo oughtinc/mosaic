@@ -8,6 +8,8 @@ import {
 } from "../eventIntegration";
 const Op = Sequelize.Op;
 import * as _ from "lodash";
+import { createOracleDefaultBlockValues } from "./helpers/defaultOracleBlocks";
+import { isInOracleMode } from "../globals/isInOracleMode";
 
 const WorkspaceModel = (
   sequelize: Sequelize.Sequelize,
@@ -234,7 +236,7 @@ const WorkspaceModel = (
     {
       hooks: {
         ...eventHooks.beforeValidate,
-        afterCreate: async (workspace, { event, questionValue }) => {
+        afterCreate: async (workspace: any, { event, questionValue }) => {
           const blocks = await workspace.getBlocks();
           if (questionValue) {
             await workspace.createBlock(
@@ -244,10 +246,23 @@ const WorkspaceModel = (
           } else {
             await workspace.createBlock({ type: "QUESTION" }, { event });
           }
-          await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
+
+          if (workspace.isEligibleForOracle && isInOracleMode.getValue()) {
+            const {
+              scratchpadBlockValue,
+              answerDraftBlockValue,
+              responseBlockValue
+            } = createOracleDefaultBlockValues(questionValue);
+            await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+            await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+            await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+          } else {
+            await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
+            await workspace.createBlock({ type: "SUBQUESTION_DRAFT" }, { event });
+            await workspace.createBlock({ type: "ANSWER_DRAFT" }, { event });
+          }
+
           await workspace.createBlock({ type: "ANSWER" }, { event });
-          await workspace.createBlock({ type: "SUBQUESTION_DRAFT" }, { event });
-          await workspace.createBlock({ type: "ANSWER_DRAFT" }, { event });
         },
       },
     }
