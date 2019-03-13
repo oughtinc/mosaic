@@ -291,14 +291,41 @@ const WorkspaceModel = (
     addEventAssociations(Workspace, models);
   };
 
+  Workspace.isNewChildWorkspaceOracleEligible = async function({ parentId }) {
+    if (!isInOracleMode.getValue()) {
+      return false;
+    }
+
+    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
+    const isParentOracleWorkspace = parentWorkspace.isEligibleForOracle;
+    if (isParentOracleWorkspace) {
+      return false;
+    }
+
+    // get root workspace
+    let curWorkspace = parentWorkspace;
+    while (curWorkspace.parentId) {
+      curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+    }
+    const rootWorkspace = curWorkspace;
+
+    // get experiment id
+    const tree = await rootWorkspace.getTree();
+    const experiments = await tree.getExperiments();
+
+    if (experiments.length === 0) {
+      return false;
+    }
+
+    const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
+    return mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault;
+  }
+
   Workspace.createAsChild = async function(
     { id, parentId, question, totalBudget, creatorId, isPublic },
     { event }
   ) {
-    // get parent workspace
-    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
-
-    const isEligibleForOracle =  !parentWorkspace.isEligibleForOracle;
+    const isEligibleForOracle = await sequelize.models.Workspace.isNewChildWorkspaceOracleEligible({ parentId });
 
     const workspace = await sequelize.models.Workspace.create(
       { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForOracle },
