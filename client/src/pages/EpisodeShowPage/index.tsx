@@ -366,47 +366,43 @@ export class WorkspaceView extends React.Component<any, any> {
               <BlockHoverMenu>
                 <Row>
                   <Col sm={12}>
-                  {
-                    !(isUserOracle && isInOracleMode)
-                    &&
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        minHeight: "60px",
-                      }}
-                    >
-                      {
-                        hasIOConstraints
-                        ?
-                        <CharCountDisplays
-                          inputCharCount={this.props.inputCharCount}
-                          outputCharCount={this.props.outputCharCount}
-                        />
-                        :
-                        <div />
-                      }
-                      {
-                        hasTimeBudget
-                        ?
-                        <TimerAndTimeBudgetInfo
-                          isActive={isActive}
-                          durationInMs={durationInMs}
-                          handleTimerEnd={this.handleTimerEnd}
-                          initialAllocatedBudget={workspace.allocatedBudget}
-                          tickDuration={this.tickDurationForCountdownTimer}
-                          totalBudget={workspace.totalBudget}
-                          workspaceId={workspace.id}
-                        />
-                        :
-                        <TimerWhenNoTimeBudget
-                          isActive={isActive}
-                          tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
-                          workspaceId={workspace.id}
-                        />
-                      }
-                    </div>
-                  }
+                  <div
+                    style={{
+                      display: !(isUserOracle && isInOracleMode) ? "flex" : "none",
+                      justifyContent: "space-between",
+                      minHeight: "60px",
+                    }}
+                  >
+                    {
+                      hasIOConstraints
+                      ?
+                      <CharCountDisplays
+                        inputCharCount={this.props.inputCharCount}
+                        outputCharCount={this.props.outputCharCount}
+                      />
+                      :
+                      <div />
+                    }
+                    {
+                      hasTimeBudget
+                      ?
+                      <TimerAndTimeBudgetInfo
+                        isActive={isActive}
+                        durationInMs={durationInMs}
+                        handleTimerEnd={this.handleTimerEnd}
+                        initialAllocatedBudget={workspace.allocatedBudget}
+                        tickDuration={this.tickDurationForCountdownTimer}
+                        totalBudget={workspace.totalBudget}
+                        workspaceId={workspace.id}
+                      />
+                      :
+                      <TimerWhenNoTimeBudget
+                        isActive={isActive}
+                        tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
+                        workspaceId={workspace.id}
+                      />
+                    }
+                  </div>
                   </Col>
                 </Row>
                 <Row>
