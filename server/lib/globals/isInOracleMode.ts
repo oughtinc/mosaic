@@ -16,6 +16,6 @@ class GlobalVariable {
   }
 }
 
-const isInOracleMode = new GlobalVariable(false);
+const isInOracleMode = new GlobalVariable(true);
 
 export { isInOracleMode };
