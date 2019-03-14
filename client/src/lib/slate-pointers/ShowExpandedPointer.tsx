@@ -38,6 +38,8 @@ export class InlineNode extends React.Component<any, any> {
     } else {
       return (
         <PointerImportNode
+          isInOracleMode={this.props.isInOracleMode}
+          isUserOracle={this.props.isUserOracle}
           blockEditor={this.props.blockEditor}
           availablePointers={this.props.availablePointers}
           nodeAsJson={{
@@ -84,6 +86,8 @@ export class ShowExpandedPointer extends React.Component<any, any> {
             return (
               <span key={index} style={{ margin: "2px" }}>
                 <InlineNode
+                  isInOracleMode={this.props.isInOracleMode}
+                  isUserOracle={this.props.isUserOracle}
                   node={node}
                   blockEditor={this.props.blockEditor}
                   availablePointers={this.props.availablePointers}

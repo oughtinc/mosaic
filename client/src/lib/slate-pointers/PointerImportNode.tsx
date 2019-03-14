@@ -4,7 +4,6 @@ import * as React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import * as ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { Inline } from "slate";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
@@ -37,9 +36,15 @@ const ClosedPointerImport: any = styled.span``;
 
 const OpenPointerImport: any = styled.span`
   background: ${(props: any) =>
-    props.isSelected
+    props.isLazy
+    ?
+      "rgba(244, 158, 158)"
+      :
+    (
+      props.isSelected
       ? "rgba(111, 186, 209, 0.66)"
-      : "rgba(158, 224, 244, 0.66)"};
+      : "rgba(158, 224, 244, 0.66)"
+    )};
   border-radius: 2px;
   color: #000;
   cursor: pointer;
@@ -49,13 +54,13 @@ const OpenPointerImport: any = styled.span`
 
 const Brackets: any = styled.span`
   &:before {
-    color: ${unlockedImportBgColor};
+    color: ${(props: any) => props.isLazy ? "red" : unlockedImportBgColor};
     content: "[";
     font: ${bracketFont};
   }
 
   &:after {
-    color: ${unlockedImportBgColor};
+    color: ${(props: any) => props.isLazy ? "red" : unlockedImportBgColor};
     content: "]";
     font: ${bracketFont};
   }
@@ -163,10 +168,20 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 
     const isLocked = this.state.isLocked && this.isLocked();
 
+    const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
+    const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
+
+    const exportPointer = availablePointers.find(p => p.data.pointerId === exportPointerId);
+    const exportPointerInputCharCount = exportPointer && getInputCharCount(exportPointer);
+
+    const isExportPointerFirstNodeTextNode = exportPointer.nodes[0].object === "text";
+    const exportPointerText = exportPointer.nodes[0].leaves[0].text.trim();
+    const isLazyPointer = isExportPointerFirstNodeTextNode && exportPointerText.slice(0, 2) === "@L";
+
     const styles = StyleSheet.create({
       OuterPointerImportStyle: {
         ":before": {
-          backgroundColor: isLocked ? lockedPointerImportBgColor : unlockedImportBgColor,
+          backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
           color: "rgb(233, 239, 233)",
           content: `"$${pointerIndex + 1}"`,
           borderRadius: "4px 0px 0px 4px",
@@ -174,31 +189,18 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         },
       },
       ClosedPointerImportStyle: {
-        backgroundColor: isLocked ? lockedPointerImportBgColor : unlockedImportBgColor,
+        backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
         color: "rgb(233, 239, 233)",
-        cursor: "pointer",
+        cursor: isLazyPointer ? "auto" : "pointer",
         padding: "0 4px",
         borderRadius: "4px",
         transition: "background-color color 0.8s",
         whiteSpace: "nowrap",
         ":hover": {
-          backgroundColor: isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover,
+          backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover),
         }
       },
-      ClosedLazyPointerImportStyle: {
-        backgroundColor: "red",
-        color: "rgb(233, 239, 233)",
-        padding: "0 4px",
-        borderRadius: "4px",
-        whiteSpace: "nowrap",
-      },
     });
-
-    const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
-    const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
-
-    const exportPointer = availablePointers.find(p => p.data.pointerId === exportPointerId);
-    const exportPointerInputCharCount = exportPointer && getInputCharCount(exportPointer);
 
     if (!importingPointer) {
       return (
@@ -217,20 +219,12 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       </Tooltip>
     );
 
-    if (
-      this.props.isInOracleMode
-      &&
-      !this.props.isUserOracle
-    ) {
-      const exportPointerText = Inline.fromJSON(exportPointer).text.trim();
-
-      if (exportPointerText.slice(0, 2) === "@L") {
+    if (isLazyPointer) {
+      const isOracleInOracleMode = this.props.isInOracleMode && this.props.isUserOracle;
+      if (!isOracleInOracleMode) {
         return (
           <ClosedPointerImport
-            className={css(styles.ClosedLazyPointerImportStyle)}
-            style={{
-              backgroundColor: "red",
-            }}
+            className={css(styles.ClosedPointerImportStyle)}
           >
             <span
               key={exportPointerId}
@@ -284,13 +278,16 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     } else {
       return (
         <OpenPointerImport
+          isLazy={isLazyPointer}
           isSelected={isSelected}
           onClick={e => this.handleOpenPointerClick(e, pointerId)}
         >
           <span className={css(styles.OuterPointerImportStyle)}>
             <span onClick={e => e.stopPropagation()}>
-              <Brackets>
+              <Brackets isLazy={isLazyPointer}>
                 <ShowExpandedPointer
+                  isInOracleMode={this.props.isInOracleMode}
+                  isUserOracle={this.props.isUserOracle}
                   blockEditor={blockEditor}
                   exportingPointer={importingPointer}
                   availablePointers={availablePointers}

@@ -40,6 +40,10 @@ export class PointerExportMark extends React.Component<any, any> {
       children,
     }: any = this.props;
 
+    const isExportPointerFirstNodeTextNode = nodeAsJson.nodes[0].object === "text";
+    const exportPointerText = nodeAsJson.nodes[0].leaves[0].text.trim();
+    const isLazyPointer = this.props.isLazyPointer || (isExportPointerFirstNodeTextNode && exportPointerText.slice(0, 2) === "@L");
+
     const pointerExportBackground: any =
       isSelected
       ?
@@ -56,7 +60,7 @@ export class PointerExportMark extends React.Component<any, any> {
     const styles = StyleSheet.create({
       OuterPointerExportStyle: {
         ":before": {
-          backgroundColor: darkGreen,
+          backgroundColor: isLazyPointer ? "red" : darkGreen,
           color: "rgb(233, 239, 233)",
           content: `"$${parseInt(pointerIndex, 10) + 1}"`,
           borderRadius: "4px 0px 0px 4px",
