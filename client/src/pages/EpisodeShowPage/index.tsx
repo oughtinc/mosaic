@@ -65,6 +65,7 @@ const WORKSPACE_QUERY = gql`
       isStale
       isEligibleForOracle
       isUserOracleForTree
+      idOfRootWorkspace
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
       childWorkspaceOrder
@@ -169,8 +170,16 @@ const ParentLink = props => (
   </NavLink>
 );
 
+const RootTreeLink = ({ workspace }) => (
+  <NavLink target="_blank" to={`/workspaces/${workspace.idOfRootWorkspace}/subtree?expanded=true`}>
+    <Button bsStyle="default" bsSize="xsmall">
+      Entire Tree »
+    </Button>
+  </NavLink>
+);
+
 const SubtreeLink = ({ workspace }) => (
-  <NavLink target="_blank" to={`/workspaces/${workspace.id}/subtree`}>
+  <NavLink to={`/workspaces/${workspace.id}/subtree`}>
     <Button bsStyle="default" bsSize="xsmall">
       Subtree »
     </Button>
@@ -438,12 +447,20 @@ export class WorkspaceView extends React.Component<any, any> {
                             <ParentLink parentId={workspace.parentId} />
                           </div>
                         )}
-                      {workspace &&
-                        (!isIsolatedWorkspace || isUserOracle) && (
+                      {workspace && (
+                        (
+                          !isIsolatedWorkspace &&
                           <div style={{ paddingBottom: "8px" }}>
                             <SubtreeLink workspace={workspace} />
                           </div>
-                        )}
+                        )
+                        ||
+                        ((isUserOracle && isInOracleMode) &&
+                          <div style={{ paddingBottom: "8px" }}>
+                            <RootTreeLink workspace={workspace} />
+                          </div>
+                        )
+                      )}
                     </div>
                   </Col>
                 </Row>

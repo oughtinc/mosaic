@@ -181,6 +181,18 @@ const WorkspaceModel = (
           return this.get("allocatedBudget") - howMuchSpentOnChildren;
         },
       },
+      idOfRootWorkspace: {
+        type: Sequelize.VIRTUAL(Sequelize.STRING, ["id"]),
+        get: async function() {
+          // get root workspace
+          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          while (curWorkspace.parentId) {
+            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+          }
+          const rootWorkspace = curWorkspace;
+          return rootWorkspace.id;
+        },
+      },
       connectedPointers: {
         type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
         get: async function() {
