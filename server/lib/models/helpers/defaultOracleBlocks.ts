@@ -17,7 +17,7 @@ export const createOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: `After you create your two candidate answers, make sure you submit the prewritten question and then press "Done!" under the response field.\n----------\nA1 (${coinflip === "A1" ? "correct answer" : "plausible but wrong"}):  `, // `Instructions for oracles:\n\nFirst, create two candidate answers to the workspace question, putting the answer in the two pointers below. Please put the correct answer in the ${coinflip} pointer.\n\nSecond, when finished with your candidate answer, please submit the question.\n\nLastly, please press "Done" below the response field to record your answer and leave the workspace\n\n----------\n\nA1:  `,
+              text: `After you create your two candidate answers, make sure you submit the prewritten question, delete these instructions (to keep the tree view cleaner), and then press "Done!" under the response field.\n----------\nA1 (${coinflip === "A1" ? "correct answer" : "plausible but wrong"}):  `, // `Instructions for oracles:\n\nFirst, create two candidate answers to the workspace question, putting the answer in the two pointers below. Please put the correct answer in the ${coinflip} pointer.\n\nSecond, when finished with your candidate answer, please submit the question.\n\nLastly, please press "Done" below the response field to record your answer and leave the workspace\n\n----------\n\nA1:  `,
               marks: [],
             },
           ],
@@ -163,7 +163,7 @@ export const createOracleDefaultBlockValues = questionValue => {
         {
           object: "text",
           leaves: [
-            { object: "leaf", text: `Answer `, marks: [] },
+            { object: "leaf", text: `A `, marks: [] },
           ],
         },
         {
