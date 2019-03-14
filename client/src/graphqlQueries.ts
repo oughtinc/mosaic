@@ -88,6 +88,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       isCurrentlyResolved
       isNotStaleRelativeToUserFullInformation {
         id
+        email
         givenName
         familyName
       }
@@ -122,6 +123,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       isCurrentlyResolved
       isNotStaleRelativeToUserFullInformation {
         id
+        email
         givenName
         familyName
       }
