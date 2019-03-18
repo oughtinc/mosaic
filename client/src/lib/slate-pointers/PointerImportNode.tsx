@@ -90,6 +90,16 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     }
   }
 
+  public componentDidMount() {
+    if (this.props.isInOracleMode && this.props.isUserOracle) {
+      const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
+      const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
+      if (!this.props.ancestorPointerIds || this.props.ancestorPointerIds.indexOf(exportPointerId) === -1) {
+        this.props.openClosedPointer(pointerId);
+      }
+    }
+  }
+
   public getLocation = () => {
     const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
     const { left, right, top, bottom } = rect;
@@ -286,6 +296,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
             <span onClick={e => e.stopPropagation()}>
               <Brackets isLazy={isLazyPointer}>
                 <ShowExpandedPointer
+                  ancestorPointerIds={!this.props.ancestorPointerIds ? [exportPointerId] : [...this.props.ancestorPointerIds, exportPointerId]}
                   isInOracleMode={this.props.isInOracleMode}
                   isUserOracle={this.props.isUserOracle}
                   blockEditor={blockEditor}

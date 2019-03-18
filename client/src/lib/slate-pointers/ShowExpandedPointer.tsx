@@ -38,6 +38,7 @@ export class InlineNode extends React.Component<any, any> {
     } else {
       return (
         <PointerImportNode
+          ancestorPointerIds={this.props.ancestorPointerIds}
           isInOracleMode={this.props.isInOracleMode}
           isUserOracle={this.props.isUserOracle}
           blockEditor={this.props.blockEditor}
@@ -86,6 +87,7 @@ export class ShowExpandedPointer extends React.Component<any, any> {
             return (
               <span key={index} style={{ margin: "2px" }}>
                 <InlineNode
+                  ancestorPointerIds={this.props.ancestorPointerIds}
                   isInOracleMode={this.props.isInOracleMode}
                   isUserOracle={this.props.isUserOracle}
                   node={node}

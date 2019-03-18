@@ -38,6 +38,9 @@ import {
   WorkspaceBlockRelation,
   WorkspaceWithRelations,
 } from "./WorkspaceRelations";
+
+import { ExpandAllPointersBtn } from "./ExpandAllPointersBtn";
+
 import {
   ORACLE_MODE_QUERY,
   UPDATE_BLOCKS,
@@ -455,9 +458,12 @@ export class WorkspaceView extends React.Component<any, any> {
                           </div>
                         )
                         ||
-                        ((isUserOracle && isInOracleMode) &&
+                        (
+                          ((isUserOracle && isInOracleMode) || (Auth.isAdmin()))
+                          &&
                           <div style={{ paddingBottom: "8px" }}>
                             <RootTreeLink workspace={workspace} />
+                            <ExpandAllPointersBtn />
                           </div>
                         )
                       )}
