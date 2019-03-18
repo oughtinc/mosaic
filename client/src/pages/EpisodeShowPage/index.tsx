@@ -444,25 +444,27 @@ export class WorkspaceView extends React.Component<any, any> {
                           pastedExportFormat={(!isActive && Auth.isAdmin()) && this.state.pastedExportFormat}
                         />
                       </div>
+                    </div>
+                    <div>
                       {hasParent &&
                         !isIsolatedWorkspace && (
-                          <div style={{ paddingBottom: "8px" }}>
+                          <span style={{ display: "inline-block", marginBottom: "12px" }}>
                             <ParentLink parentId={workspace.parentId} />
-                          </div>
+                          </span>
                         )}
                       {workspace && !isIsolatedWorkspace &&
-                        <div style={{ paddingBottom: "8px" }}>
+                        <span style={{ display: "inline-block", marginBottom: "12px" }}>
                           <SubtreeLink workspace={workspace} />
-                        </div>
+                        </span>
                       }
                       {workspace &&
                         (
                           ((isUserOracle && isInOracleMode) || (Auth.isAdmin()))
                           &&
-                          <div style={{ paddingBottom: "8px" }}>
+                          <span style={{ display: "inline-block", marginBottom: "12px" }}>
                             <RootTreeLink workspace={workspace} />
                             <ExpandAllPointersBtn />
-                          </div>
+                          </span>
                         )
                       }
                     </div>
