@@ -450,14 +450,12 @@ export class WorkspaceView extends React.Component<any, any> {
                             <ParentLink parentId={workspace.parentId} />
                           </div>
                         )}
-                      {workspace && (
-                        (
-                          !isIsolatedWorkspace &&
-                          <div style={{ paddingBottom: "8px" }}>
-                            <SubtreeLink workspace={workspace} />
-                          </div>
-                        )
-                        ||
+                      {workspace && !isIsolatedWorkspace &&
+                        <div style={{ paddingBottom: "8px" }}>
+                          <SubtreeLink workspace={workspace} />
+                        </div>
+                      }
+                      {workspace &&
                         (
                           ((isUserOracle && isInOracleMode) || (Auth.isAdmin()))
                           &&
@@ -466,7 +464,7 @@ export class WorkspaceView extends React.Component<any, any> {
                             <ExpandAllPointersBtn />
                           </div>
                         )
-                      )}
+                      }
                     </div>
                   </Col>
                 </Row>
