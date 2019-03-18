@@ -459,7 +459,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       }
                       {workspace &&
                         (
-                          ((isUserOracle && isInOracleMode) || (Auth.isAdmin()))
+                          ((isUserOracle && isInOracleMode) || (Auth.isAdmin() && !isActive))
                           &&
                           <span style={{ display: "inline-block", marginBottom: "12px" }}>
                             <RootTreeLink workspace={workspace} />

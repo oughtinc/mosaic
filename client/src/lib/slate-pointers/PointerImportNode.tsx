@@ -91,7 +91,9 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   }
 
   public componentDidMount() {
-    if (this.props.isInOracleMode && this.props.isUserOracle) {
+    const isAdminNotInFlow = Auth.isAdmin() && !parseQueryString(window.location.search).active;
+    const isOracleInOracleMode = this.props.isInOracleMode && this.props.isUserOracle;
+    if (isAdminNotInFlow || isOracleInOracleMode) {
       const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
       const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
       if (!this.props.ancestorPointerIds || this.props.ancestorPointerIds.indexOf(exportPointerId) === -1) {
