@@ -210,6 +210,7 @@ export class WorkspaceView extends React.Component<any, any> {
       hasTimerEnded: false,
       pastedExportFormat: CONVERT_PASTED_EXPORT_TO_IMPORT,
       shouldAutoExport: true,
+      hasInitiallyLoaded: false,
     };
   }
 
@@ -238,7 +239,10 @@ export class WorkspaceView extends React.Component<any, any> {
       this.newChildField.focus();
     });
 
-    setTimeout(() => this.props.closeAllPointerReferences(), 1);
+    setTimeout(() => {
+      this.props.closeAllPointerReferences();
+      this.setState({ hasInitiallyLoaded: true });
+    }, 1);
   }
 
   public componentWillUnmount() {
@@ -342,323 +346,332 @@ export class WorkspaceView extends React.Component<any, any> {
 
     return (
       <div>
-        {Auth.isAuthenticated() && experimentId && (
-          <EpisodeNav
-            experimentId={experimentId}
-            hasSubquestions={hasSubquestions}
-            isActive={isActive}
-            isInOracleMode={isInOracleMode}
-            isUserOracle={isUserOracle}
-            hasTimeBudget={hasTimeBudget}
-            hasTimerEnded={hasTimerEnded}
-            markAsNotStaleRelativeToUser={() =>
-              this.props.updateWorkspaceIsStaleRelativeToUser({
-                variables: {
-                  workspaceId: workspace.id,
-                  isStale: false,
-                },
-              })
-            }
-            updateIsEligibleForOracle={isEligibleForOracle =>
-              this.props.updateWorkspace({
-                variables: {
-                  id: workspace.id,
-                  input: {
-                    isEligibleForOracle,
-                  }
-                },
-              })
-            }
-          />
-        )}
-        <ContentContainer>
-          {hasTimerEnded ? (
-            <div>
-              Your time with this workspace is up. Thanks for contributing!
-            </div>
-          ) : (
-            <div key={workspace.id}>
-              <BlockHoverMenu>
-                <Row>
-                  <Col sm={12}>
-                  <div
-                    style={{
-                      display: !(isUserOracle && isInOracleMode) ? "flex" : "none",
-                      justifyContent: "space-between",
-                      minHeight: "60px",
-                    }}
-                  >
-                    {
-                      hasIOConstraints
-                      ?
-                      <CharCountDisplays
-                        inputCharCount={this.props.inputCharCount}
-                        outputCharCount={this.props.outputCharCount}
-                      />
-                      :
-                      <div />
+        <div
+          style={{ display: this.state.hasInitiallyLoaded ? "none" : "block"}}
+        >
+          <ContentContainer>Optimizing workspace...</ContentContainer>
+        </div>
+        <div
+          style={{ display: this.state.hasInitiallyLoaded ? "block" : "none"}}
+        >
+          {Auth.isAuthenticated() && experimentId && (
+            <EpisodeNav
+              experimentId={experimentId}
+              hasSubquestions={hasSubquestions}
+              isActive={isActive}
+              isInOracleMode={isInOracleMode}
+              isUserOracle={isUserOracle}
+              hasTimeBudget={hasTimeBudget}
+              hasTimerEnded={hasTimerEnded}
+              markAsNotStaleRelativeToUser={() =>
+                this.props.updateWorkspaceIsStaleRelativeToUser({
+                  variables: {
+                    workspaceId: workspace.id,
+                    isStale: false,
+                  },
+                })
+              }
+              updateIsEligibleForOracle={isEligibleForOracle =>
+                this.props.updateWorkspace({
+                  variables: {
+                    id: workspace.id,
+                    input: {
+                      isEligibleForOracle,
                     }
-                    {
-                      hasTimeBudget
-                      ?
-                      <TimerAndTimeBudgetInfo
-                        isActive={isActive}
-                        durationInMs={durationInMs}
-                        handleTimerEnd={this.handleTimerEnd}
-                        initialAllocatedBudget={workspace.allocatedBudget}
-                        tickDuration={this.tickDurationForCountdownTimer}
-                        totalBudget={workspace.totalBudget}
-                        workspaceId={workspace.id}
-                      />
-                      :
-                      <TimerWhenNoTimeBudget
-                        isActive={isActive}
-                        tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
-                        workspaceId={workspace.id}
-                      />
-                    }
-                  </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col sm={12}>
+                  },
+                })
+              }
+            />
+          )}
+          <ContentContainer>
+            {hasTimerEnded ? (
+              <div>
+                Your time with this workspace is up. Thanks for contributing!
+              </div>
+            ) : (
+              <div key={workspace.id}>
+                <BlockHoverMenu>
+                  <Row>
+                    <Col sm={12}>
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "flex-end",
-                        marginBottom: "10px"
+                        display: !(isUserOracle && isInOracleMode) ? "flex" : "none",
+                        justifyContent: "space-between",
+                        minHeight: "60px",
                       }}
                     >
-                      <div
-                        style={{
-                          fontSize: workspaceViewQuestionFontSize,
-                          marginRight: "8px"
-                        }}
-                      >
-                        <BlockEditor
-                          isUserOracle={isUserOracle}
-                          availablePointers={availablePointers}
-                          exportLockStatusInfo={exportLockStatusInfo}
-                          visibleExportIds={visibleExportIds}
-                          unlockPointer={unlockPointer}
-                          {...questionProps}
-                          shouldAutosave={(!isActive && Auth.isAdmin()) ? true : false}
-                          shouldAutoExport={(!isActive && Auth.isAdmin()) && this.state.shouldAutoExport}
-                          pastedExportFormat={(!isActive && Auth.isAdmin()) && this.state.pastedExportFormat}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      {hasParent &&
-                        !isIsolatedWorkspace && (
-                          <span style={{ display: "inline-block", marginBottom: "12px" }}>
-                            <ParentLink parentId={workspace.parentId} />
-                          </span>
-                        )}
-                      {workspace && !isIsolatedWorkspace &&
-                        <span style={{ display: "inline-block", marginBottom: "12px" }}>
-                          <SubtreeLink workspace={workspace} />
-                        </span>
-                      }
-                      {workspace &&
-                        (
-                          ((isUserOracle && isInOracleMode) || (Auth.isAdmin() && !isActive))
-                          &&
-                          <span style={{ display: "inline-block", marginBottom: "12px" }}>
-                            <RootTreeLink workspace={workspace} />
-                            <ExpandAllPointersBtn />
-                          </span>
-                        )
-                      }
-                    </div>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col sm={6}>
-                    <BlockContainer>
-                      <BlockHeader>Scratchpad</BlockHeader>
-                      <BlockBody>
-                        <BlockEditor
-                          isUserOracle={isUserOracle}
-                          availablePointers={availablePointers}
-                          visibleExportIds={visibleExportIds}
-                          exportLockStatusInfo={exportLockStatusInfo}
-                          placeholder="Text for the scratchpad..."
-                          unlockPointer={unlockPointer}
-                          cyAttributeName="slate-editor-scratchpad"
-                          shouldAutoExport={this.state.shouldAutoExport}
-                          pastedExportFormat={this.state.pastedExportFormat}
-                          {...scratchpadProps}
-                        />
-                      </BlockBody>
-                    </BlockContainer>
-
-                    <BlockContainer>
-                      <BlockHeader>Response</BlockHeader>
-                      <BlockBody>
-                        <BlockEditor
-                          isUserOracle={isUserOracle}
-                          availablePointers={availablePointers}
-                          visibleExportIds={visibleExportIds}
-                          exportLockStatusInfo={exportLockStatusInfo}
-                          placeholder="Text for the answer..."
-                          unlockPointer={unlockPointer}
-                          cyAttributeName="slate-editor-response"
-                          shouldAutoExport={this.state.shouldAutoExport}
-                          pastedExportFormat={this.state.pastedExportFormat}
-                          {...answerDraftProps}
-                        />
-                      </BlockBody>
                       {
-                        Auth.isAuthenticated()
-                        &&
-                        isActive
-                        &&
-                        <ResponseFooter
-                          experimentId={experimentId}
-                          hasTimeBudget={hasTimeBudget}
-                          depleteBudget={() =>
-                            this.props.depleteBudget({
-                              variables: { id: workspace.id },
-                            })
-                          }
-                          hasParent={hasParent}
-                          isInOracleMode={isInOracleMode}
-                          isUserOracle={isUserOracle}
-                          markAsAnsweredByOracle={() =>
-                            this.props.updateWorkspace({
-                              variables: {
-                                id: workspace.id,
-                                input: {
-                                  wasAnsweredByOracle: true,
-                                },
-                              },
-                            })
-                          }
-                          markAsCurrentlyResolved={() =>
-                            this.props.updateWorkspace({
-                              variables: {
-                                id: workspace.id,
-                                input: {
-                                  isCurrentlyResolved: true,
-                                },
-                              },
-                            })
-                          }
-                          markAsNotStale={() =>
-                            this.props.updateWorkspace({
-                              variables: {
-                                id: workspace.id,
-                                input: {
-                                  isStale: false,
-                                },
-                              }
-                            })
-                          }
-                          transferRemainingBudgetToParent={() =>
-                            this.props.transferRemainingBudgetToParent({
-                              variables: { id: workspace.id },
-                            })
-                          }
+                        hasIOConstraints
+                        ?
+                        <CharCountDisplays
+                          inputCharCount={this.props.inputCharCount}
+                          outputCharCount={this.props.outputCharCount}
+                        />
+                        :
+                        <div />
+                      }
+                      {
+                        hasTimeBudget
+                        ?
+                        <TimerAndTimeBudgetInfo
+                          isActive={isActive}
+                          durationInMs={durationInMs}
+                          handleTimerEnd={this.handleTimerEnd}
+                          initialAllocatedBudget={workspace.allocatedBudget}
+                          tickDuration={this.tickDurationForCountdownTimer}
+                          totalBudget={workspace.totalBudget}
+                          workspaceId={workspace.id}
+                        />
+                        :
+                        <TimerWhenNoTimeBudget
+                          isActive={isActive}
+                          tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
                           workspaceId={workspace.id}
                         />
                       }
-                    </BlockContainer>
-
-                    {
-                      Auth.isAuthenticated()
-                      &&
-                      <AdvancedOptions 
-                        shouldAutoExport={this.state.shouldAutoExport}
-                        handleShouldAutoExportToggle={this.handleShouldAutoExportToggle}
-                        pastedExportFormat={this.state.pastedExportFormat}
-                        handlePastedExportFormatChange={this.handlePastedExportFormatChange}
-                      />
-                    }
-                  </Col>
-                  <Col sm={6}>
-                    <ChildrenSidebar
-                      isUserOracle={isUserOracle}
-                      experimentId={experimentId}
-                      pastedExportFormat={this.state.pastedExportFormat}
-                      shouldAutoExport={this.state.shouldAutoExport}
-                      hasTimeBudget={hasTimeBudget}
-                      visibleExportIds={visibleExportIds}
-                      exportLockStatusInfo={exportLockStatusInfo}
-                      unlockPointer={unlockPointer}
-                      isActive={isActive}
-                      isInOracleMode={isInOracleMode}
-                      subquestionDraftProps={subquestionDraftProps}
-                      isIsolatedWorkspace={isIsolatedWorkspace}
-                      workspace={workspace}
-                      workspaces={workspace.childWorkspaces}
-                      availablePointers={availablePointers}
-                      workspaceOrder={workspace.childWorkspaceOrder}
-                      onCreateChild={({ question, totalBudget }) => {
-                        this.props.createChild({
-                          variables: {
-                            workspaceId: workspace.id,
-                            question,
-                            totalBudget,
-                          }
-                        });
-                      }}
-                      onUpdateChildTotalBudget={({ childId, totalBudget }) => {
-                        this.props.updateChildTotalBudget({
-                          variables: {
-                            workspaceId: workspace.id,
-                            childId,
-                            totalBudget
-                          }
-                        });
-                      }}
-                      availableBudget={
-                        workspace.totalBudget - workspace.allocatedBudget
-                      }
-                      parentTotalBudget={
-                        workspace.totalBudget
-                      }
-                      updateWorkspaceIsArchived={({ isArchived, workspaceId }) => {
-                        this.props.updateWorkspace({
-                          variables: {
-                            id: workspaceId,
-                            input: {
-                              isArchived
-                            },
-                          }
-                        });
-                      }}
-                      updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) => {
-                        this.props.updateWorkspace({
-                          variables: {
-                            id: workspaceId,
-                            input: {
-                              isEligibleForOracle
-                            },
-                          },
-                        });
-                      }}
-                      markAsNotStale={() =>
-                        this.props.updateWorkspace({
-                          variables: {
-                            id: workspace.id,
-                            input: {
-                              isStale: false,
-                            },
-                          }
-                        })}
-                      ref={input => {
-                        if (input && input.editor()) {
-                          this.newChildField = input.editor();
+                    </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={12}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-end",
+                          marginBottom: "10px"
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: workspaceViewQuestionFontSize,
+                            marginRight: "8px"
+                          }}
+                        >
+                          <BlockEditor
+                            isUserOracle={isUserOracle}
+                            availablePointers={availablePointers}
+                            exportLockStatusInfo={exportLockStatusInfo}
+                            visibleExportIds={visibleExportIds}
+                            unlockPointer={unlockPointer}
+                            {...questionProps}
+                            shouldAutosave={(!isActive && Auth.isAdmin()) ? true : false}
+                            shouldAutoExport={(!isActive && Auth.isAdmin()) && this.state.shouldAutoExport}
+                            pastedExportFormat={(!isActive && Auth.isAdmin()) && this.state.pastedExportFormat}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        {hasParent &&
+                          !isIsolatedWorkspace && (
+                            <span style={{ display: "inline-block", marginBottom: "12px" }}>
+                              <ParentLink parentId={workspace.parentId} />
+                            </span>
+                          )}
+                        {workspace && !isIsolatedWorkspace &&
+                          <span style={{ display: "inline-block", marginBottom: "12px" }}>
+                            <SubtreeLink workspace={workspace} />
+                          </span>
                         }
-                      }}
-                    />
-                  </Col>
-                </Row>
-              </BlockHoverMenu>
-            </div>
-          )}
-        </ContentContainer>
+                        {workspace &&
+                          (
+                            ((isUserOracle && isInOracleMode) || (Auth.isAdmin() && !isActive))
+                            &&
+                            <span style={{ display: "inline-block", marginBottom: "12px" }}>
+                              <RootTreeLink workspace={workspace} />
+                              <ExpandAllPointersBtn />
+                            </span>
+                          )
+                        }
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col sm={6}>
+                      <BlockContainer>
+                        <BlockHeader>Scratchpad</BlockHeader>
+                        <BlockBody>
+                          <BlockEditor
+                            isUserOracle={isUserOracle}
+                            availablePointers={availablePointers}
+                            visibleExportIds={visibleExportIds}
+                            exportLockStatusInfo={exportLockStatusInfo}
+                            placeholder="Text for the scratchpad..."
+                            unlockPointer={unlockPointer}
+                            cyAttributeName="slate-editor-scratchpad"
+                            shouldAutoExport={this.state.shouldAutoExport}
+                            pastedExportFormat={this.state.pastedExportFormat}
+                            {...scratchpadProps}
+                          />
+                        </BlockBody>
+                      </BlockContainer>
+
+                      <BlockContainer>
+                        <BlockHeader>Response</BlockHeader>
+                        <BlockBody>
+                          <BlockEditor
+                            isUserOracle={isUserOracle}
+                            availablePointers={availablePointers}
+                            visibleExportIds={visibleExportIds}
+                            exportLockStatusInfo={exportLockStatusInfo}
+                            placeholder="Text for the answer..."
+                            unlockPointer={unlockPointer}
+                            cyAttributeName="slate-editor-response"
+                            shouldAutoExport={this.state.shouldAutoExport}
+                            pastedExportFormat={this.state.pastedExportFormat}
+                            {...answerDraftProps}
+                          />
+                        </BlockBody>
+                        {
+                          Auth.isAuthenticated()
+                          &&
+                          isActive
+                          &&
+                          <ResponseFooter
+                            experimentId={experimentId}
+                            hasTimeBudget={hasTimeBudget}
+                            depleteBudget={() =>
+                              this.props.depleteBudget({
+                                variables: { id: workspace.id },
+                              })
+                            }
+                            hasParent={hasParent}
+                            isInOracleMode={isInOracleMode}
+                            isUserOracle={isUserOracle}
+                            markAsAnsweredByOracle={() =>
+                              this.props.updateWorkspace({
+                                variables: {
+                                  id: workspace.id,
+                                  input: {
+                                    wasAnsweredByOracle: true,
+                                  },
+                                },
+                              })
+                            }
+                            markAsCurrentlyResolved={() =>
+                              this.props.updateWorkspace({
+                                variables: {
+                                  id: workspace.id,
+                                  input: {
+                                    isCurrentlyResolved: true,
+                                  },
+                                },
+                              })
+                            }
+                            markAsNotStale={() =>
+                              this.props.updateWorkspace({
+                                variables: {
+                                  id: workspace.id,
+                                  input: {
+                                    isStale: false,
+                                  },
+                                }
+                              })
+                            }
+                            transferRemainingBudgetToParent={() =>
+                              this.props.transferRemainingBudgetToParent({
+                                variables: { id: workspace.id },
+                              })
+                            }
+                            workspaceId={workspace.id}
+                          />
+                        }
+                      </BlockContainer>
+
+                      {
+                        Auth.isAuthenticated()
+                        &&
+                        <AdvancedOptions 
+                          shouldAutoExport={this.state.shouldAutoExport}
+                          handleShouldAutoExportToggle={this.handleShouldAutoExportToggle}
+                          pastedExportFormat={this.state.pastedExportFormat}
+                          handlePastedExportFormatChange={this.handlePastedExportFormatChange}
+                        />
+                      }
+                    </Col>
+                    <Col sm={6}>
+                      <ChildrenSidebar
+                        isUserOracle={isUserOracle}
+                        experimentId={experimentId}
+                        pastedExportFormat={this.state.pastedExportFormat}
+                        shouldAutoExport={this.state.shouldAutoExport}
+                        hasTimeBudget={hasTimeBudget}
+                        visibleExportIds={visibleExportIds}
+                        exportLockStatusInfo={exportLockStatusInfo}
+                        unlockPointer={unlockPointer}
+                        isActive={isActive}
+                        isInOracleMode={isInOracleMode}
+                        subquestionDraftProps={subquestionDraftProps}
+                        isIsolatedWorkspace={isIsolatedWorkspace}
+                        workspace={workspace}
+                        workspaces={workspace.childWorkspaces}
+                        availablePointers={availablePointers}
+                        workspaceOrder={workspace.childWorkspaceOrder}
+                        onCreateChild={({ question, totalBudget }) => {
+                          this.props.createChild({
+                            variables: {
+                              workspaceId: workspace.id,
+                              question,
+                              totalBudget,
+                            }
+                          });
+                        }}
+                        onUpdateChildTotalBudget={({ childId, totalBudget }) => {
+                          this.props.updateChildTotalBudget({
+                            variables: {
+                              workspaceId: workspace.id,
+                              childId,
+                              totalBudget
+                            }
+                          });
+                        }}
+                        availableBudget={
+                          workspace.totalBudget - workspace.allocatedBudget
+                        }
+                        parentTotalBudget={
+                          workspace.totalBudget
+                        }
+                        updateWorkspaceIsArchived={({ isArchived, workspaceId }) => {
+                          this.props.updateWorkspace({
+                            variables: {
+                              id: workspaceId,
+                              input: {
+                                isArchived
+                              },
+                            }
+                          });
+                        }}
+                        updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) => {
+                          this.props.updateWorkspace({
+                            variables: {
+                              id: workspaceId,
+                              input: {
+                                isEligibleForOracle
+                              },
+                            },
+                          });
+                        }}
+                        markAsNotStale={() =>
+                          this.props.updateWorkspace({
+                            variables: {
+                              id: workspace.id,
+                              input: {
+                                isStale: false,
+                              },
+                            }
+                          })}
+                        ref={input => {
+                          if (input && input.editor()) {
+                            this.newChildField = input.editor();
+                          }
+                        }}
+                      />
+                    </Col>
+                  </Row>
+                </BlockHoverMenu>
+              </div>
+            )}
+          </ContentContainer>
+        </div>
       </div>
     );
   }
@@ -690,7 +703,7 @@ export class WorkspaceQuery extends React.Component<any, any> {
     const isLoading = this.props.workspace.loading;
 
     if (isLoading) {
-      return <ContentContainer>Loading...</ContentContainer>;
+      return <ContentContainer>Fetching workspace data...</ContentContainer>;
     }
 
     const workspace = this.props.workspace.workspace;
