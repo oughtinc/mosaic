@@ -23,6 +23,10 @@ const workspaceToBlock = (workspace, blockType) =>
   workspace.blocks && workspace.blocks.find(b => b.type === blockType);
 
 class RootWorkspacePresentational extends React.Component<any, any> {
+  public state = {
+    isShowingAdminControls: false,
+  };
+
   public render() {
     const workspace = this.props.workspace;
 
@@ -41,19 +45,27 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                 padding: "10px",
               }}
             >
-              <span
+              <Button
+                bsSize="xsmall"
+                onClick={
+                  () => this.setState({
+                    isShowingAdminControls: !this.state.isShowingAdminControls,
+                  })
+                }
                 style={{
-                  color: "#888",
-                  display: "inline-block",
-                  marginBottom: "5px",
+                  marginBottom: this.state.isShowingAdminControls && "10px",
                 }}
               >
-                {workspace.createdAt}
-              </span>
-              <AdminControls
-                refetchQueries={this.props.sourceQueries}
-                workspace={workspace}
-              />
+                { this.state.isShowingAdminControls ? "hide" : "show" }{" "}admin controls
+              </Button>
+              {
+                this.state.isShowingAdminControls
+                &&
+                <AdminControls
+                  refetchQueries={this.props.sourceQueries}
+                  workspace={workspace}
+                />
+              }
             </div>
             
           }
