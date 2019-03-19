@@ -6,7 +6,13 @@ import {
   EXPAND_ALL_IMPORTS,
 } from "./actions";
 
-const initialState = {
+interface InitialStateType {
+  hoveredItem: any;
+  pointerReferences: any;
+  exportsOpened: string[];
+}
+
+const initialState: InitialStateType = {
   hoveredItem: {
     hoverItemType: null,
     id: null,
@@ -15,7 +21,8 @@ const initialState = {
     readOnly: null,
     blockId: null
   },
-  pointerReferences: {}
+  pointerReferences: {},
+  exportsOpened: [],
 };
 export const blockEditorReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -26,12 +33,14 @@ export const blockEditorReducer = (state = initialState, action) => {
         hoveredItem: { id, hoverItemType, top, left, readOnly, blockId }
       };
     case CHANGE_POINTER_REFERENCE:
+      const { exportId } = action;
       return {
         ...state,
         pointerReferences: {
           ...state.pointerReferences,
           ...{ [action.id]: action.reference }
-        }
+        },
+        exportsOpened: state.exportsOpened.indexOf(exportId) > - 1 ? state.exportsOpened : [...state.exportsOpened, action.exportId]
       };
     case CLOSE_ALL_POINTER_REFERENCES:
       return {
@@ -42,6 +51,7 @@ export const blockEditorReducer = (state = initialState, action) => {
       return {
         ...state,
         pointerReferences: mapValues(state.pointerReferences, (ref: object) => { return {...ref, isOpen: true }; }),
+        exportsOpened: [],
       };
     default:
       return state;

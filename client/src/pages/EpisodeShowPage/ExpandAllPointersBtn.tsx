@@ -13,7 +13,10 @@ class ExpandAllPointersBtnPresentational extends React.Component<any, any> {
       <span style={{ marginLeft: "10px" }}>
         <Button
           bsSize="xsmall"
-          onClick={this.props.expandAllImports}
+          onClick={() => {
+            this.props.collapseAllImports();
+            this.props.expandAllImports();
+          }}
         >
           expand imports
         </Button>

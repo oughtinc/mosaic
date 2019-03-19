@@ -93,11 +93,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   public componentDidMount() {
     const isAdminNotInFlow = Auth.isAdmin() && !parseQueryString(window.location.search).active;
     const isOracleInOracleMode = this.props.isInOracleMode && this.props.isUserOracle;
-    if (isAdminNotInFlow || isOracleInOracleMode) {
+    if (!this.props.hasExportBeenOpened && (isAdminNotInFlow || isOracleInOracleMode)) {
       const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
       const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
       if (!this.props.ancestorPointerIds || this.props.ancestorPointerIds.indexOf(exportPointerId) === -1) {
-        this.props.openClosedPointer(pointerId);
+        this.props.openClosedPointer(pointerId, exportPointerId);
       }
     }
   }
@@ -130,15 +130,15 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       if (isActive) {
         this.props.unlockPointer(exportPointerId);
       }
-      setTimeout(() => { this.props.openClosedPointer(pointerId); }, 400);
+      setTimeout(() => { this.props.openClosedPointer(pointerId, exportPointerId); }, 400);
     } else {
-      this.props.openClosedPointer(pointerId);
+      this.props.openClosedPointer(pointerId, exportPointerId);
     }
     e.stopPropagation( );
   }
 
-  public handleOpenPointerClick = (e: Event, pointerId: string) => {
-    this.props.closeOpenPointer(pointerId);
+  public handleOpenPointerClick = (e: Event, pointerId: string, exportId: string) => {
+    this.props.closeOpenPointer(pointerId, exportId);
     e.stopPropagation();
   }
 
@@ -292,7 +292,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         <OpenPointerImport
           isLazy={isLazyPointer}
           isSelected={isSelected}
-          onClick={e => this.handleOpenPointerClick(e, pointerId)}
+          onClick={e => this.handleOpenPointerClick(e, pointerId, exportPointerId)}
         >
           <span className={css(styles.OuterPointerImportStyle)}>
             <span onClick={e => e.stopPropagation()}>
@@ -322,16 +322,22 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   }
 }
 
+const mapStateToProps = (state, props) => ({
+  hasExportBeenOpened: state.blockEditor.exportsOpened.indexOf(props.nodeAsJson.data.pointerId) > -1,
+});
+
 const mapDispatchToProps = (dispatch: (actionObjectOrThunkFn: any) => any) => ({
-  openClosedPointer: (pointerId: string) => dispatch(changePointerReference({
+  openClosedPointer: (pointerId: string, exportId: string) => dispatch(changePointerReference({
     id: pointerId,
     reference: { isOpen: true },
+    exportId,
   })),
 
-  closeOpenPointer: (pointerId: string) => dispatch(changePointerReference({
+  closeOpenPointer: (pointerId: string, exportId: string) => dispatch(changePointerReference({
     id: pointerId,
     reference: { isOpen: false },
+    exportId,
   })),
 });
 
-export const PointerImportNode = connect(null, mapDispatchToProps)(PointerImportNodePresentational);
+export const PointerImportNode = connect(mapStateToProps, mapDispatchToProps)(PointerImportNodePresentational);

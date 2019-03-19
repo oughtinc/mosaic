@@ -48,12 +48,13 @@ export const removeHoverItem = () => {
   };
 };
 
-export const changePointerReference = ({ id, reference }) => {
+export const changePointerReference = ({ id, reference, exportId }) => {
   return (dispatch, getState) => {
     dispatch({
       type: CHANGE_POINTER_REFERENCE,
       id,
-      reference
+      reference,
+      exportId
     });
   };
 };
