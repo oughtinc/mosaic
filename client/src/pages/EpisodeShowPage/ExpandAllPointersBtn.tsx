@@ -3,8 +3,8 @@ import { Button } from "react-bootstrap";
 import { connect } from "react-redux";
 
 import {
-  CLOSE_ALL_POINTER_REFERENCES,
-  EXPAND_ALL_IMPORTS,
+  closeAllPointerReferences,
+  expandAllImports,
 } from "../../modules/blockEditor/actions";
 
 class ExpandAllPointersBtnPresentational extends React.Component<any, any> {
@@ -14,7 +14,7 @@ class ExpandAllPointersBtnPresentational extends React.Component<any, any> {
         <Button
           bsSize="xsmall"
           onClick={() => {
-            this.props.collapseAllImports();
+            this.props.closeAllPointerReferences();
             setTimeout(() => this.props.expandAllImports(), 1);
           }}
         >
@@ -23,7 +23,7 @@ class ExpandAllPointersBtnPresentational extends React.Component<any, any> {
         <span style={{ display: "inline-block", width: "3px" }} />
         <Button
           bsSize="xsmall"
-          onClick={this.props.collapseAllImports}
+          onClick={this.props.closeAllPointerReferences}
         >
           collapse imports
         </Button>
@@ -36,10 +36,10 @@ const mapStateToProps = state => ({
   willAutoExpandImports: state.blockEditor.willAutoExpandImports,
 });
 
-const mapDispatchToProps = dispatch => ({
-  collapseAllImports: () => dispatch({ type: CLOSE_ALL_POINTER_REFERENCES }),
-  expandAllImports: () => dispatch({ type: EXPAND_ALL_IMPORTS }),
-});
+const mapDispatchToProps = {
+  closeAllPointerReferences,
+  expandAllImports,
+};
 
 const ExpandAllPointersBtn: any = connect(
   mapStateToProps,
