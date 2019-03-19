@@ -19,6 +19,7 @@ import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
+import { expandAllImports, closeAllPointerReferences } from "../../modules/blockEditor/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { ContentContainer } from "../../components/ContentContainer";
@@ -236,6 +237,8 @@ export class WorkspaceView extends React.Component<any, any> {
       e.preventDefault();
       this.newChildField.focus();
     });
+
+    setTimeout(() => this.props.closeAllPointerReferences(), 1);
   }
 
   public componentWillUnmount() {
@@ -870,6 +873,6 @@ export const EpisodeShowPage = compose(
   }),
   connect(
     mapStateToProps,
-    { addBlocks, saveBlocks }
+    { addBlocks, saveBlocks, expandAllImports, closeAllPointerReferences }
   )
 )(WorkspaceQuery);
