@@ -15,7 +15,7 @@ class ExpandAllPointersBtnPresentational extends React.Component<any, any> {
           bsSize="xsmall"
           onClick={() => {
             this.props.collapseAllImports();
-            this.props.expandAllImports();
+            setTimeout(() => this.props.expandAllImports(), 1);
           }}
         >
           expand imports
