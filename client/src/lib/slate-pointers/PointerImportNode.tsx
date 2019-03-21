@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
-import { changePointerReference } from "../../modules/blockEditor/actions";
+import { changePointerReference, removeImportFromStore } from "../../modules/blockEditor/actions";
 import { getInputCharCount } from "../../modules/blocks/charCounts";
 import { Auth } from "../../auth";
 
@@ -100,6 +100,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         this.props.openClosedPointer(pointerId, exportPointerId);
       }
     }
+  }
+
+  public componentWillUnmount() {
+    const importId = this.props.nodeAsJson.data.internalReferenceId;
+    this.props.removeImportFromStore(importId);
   }
 
   public getLocation = () => {
@@ -338,6 +343,8 @@ const mapDispatchToProps = (dispatch: (actionObjectOrThunkFn: any) => any) => ({
     reference: { isOpen: false },
     exportId,
   })),
+
+  removeImportFromStore: importId => dispatch(removeImportFromStore(importId))
 });
 
 export const PointerImportNode = connect(mapStateToProps, mapDispatchToProps)(PointerImportNodePresentational);
