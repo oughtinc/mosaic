@@ -280,7 +280,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     const pointer = this.props.availablePointers[matchNumber - 1];
 
     if (!!pointer) {
-      const { value } = this.props.value
+      const { value } = this.state.editorValue
         .change()
         .deleteBackward(matchNumber.toString().length + 1)
         .insertInline(inlinePointerImportJSON(pointer.data.pointerId))
@@ -322,7 +322,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     const {
       wasMutationPerformed
     } = slateChangeMutations.scanBlockAndConvertOuterSquareBrackets({
-      change: this.props.value.change(),
+      change: this.state.editorValue.change(),
       updateBlock: this.props.updateBlock,
       exportSelection: this.props.exportSelection,
       blockId: this.props.block.id
