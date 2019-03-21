@@ -1,3 +1,4 @@
+import { throttle } from "lodash";
 import * as React from "react";
 import { Inline } from "slate";
 import * as uuidv1 from "uuid/v1";
@@ -80,7 +81,7 @@ interface BlockEditorEditingPresentationalProps {
   onMount(value: any): () => {};
   updateBlock(value: any): () => {};
   onChange(value: any): () => boolean;
-  saveBlocksMutation(): () => {};
+  saveBlocksMutation(editorValue: any): any;
   exportSelection(blockId?: string): void;
   removeExportOfSelection(blockId?: string): void;
   onKeyDown(event: any): () => {};
@@ -88,6 +89,7 @@ interface BlockEditorEditingPresentationalProps {
 
 interface BlockEditorEditingPresentationalState {
   hasChangedSinceDatabaseSave: boolean;
+  editorValue: any;
 }
 export class BlockEditorEditingPresentational extends React.Component<
   BlockEditorEditingPresentationalProps,
@@ -95,6 +97,8 @@ export class BlockEditorEditingPresentational extends React.Component<
 > {
   public editor;
   private autosaveInterval: any;
+
+  private throttledUpdate = throttle(this.props.updateBlock, 5000);
 
   private handleBlur = _.debounce(() => {
     if (this.props.shouldAutosave) {
@@ -105,7 +109,10 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   public constructor(props: any) {
     super(props);
-    this.state = { hasChangedSinceDatabaseSave: false };
+    this.state = {
+      hasChangedSinceDatabaseSave: false,
+      editorValue: this.props.value,
+    };
   }
 
   public shouldComponentUpdate(newProps: any, newState: any) {
@@ -121,7 +128,8 @@ export class BlockEditorEditingPresentational extends React.Component<
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
       !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport) ||
-      !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
+      !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat) ||
+      !_.isEqual(newState.editorValue, this.state.editorValue)
     ) {
       return true;
     }
@@ -133,6 +141,12 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentWillUnmount() {
+    this.props.updateBlock({
+      id: this.props.block.id,
+      value: this.state.editorValue,
+      pointerChanged: true
+    });
+
     if (this.props.shouldAutosave) {
       const isUserAdmin = Auth.isAdmin();
       const isUserInExperiment = parseQueryString(window.location.search).experiment;
@@ -158,6 +172,10 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     if (!prevProps.shouldAutoExport && this.props.shouldAutoExport) {
       this.handleSquareBracketExport();
+    }
+
+    if (prevProps.value !== this.props.value) {
+      this.setState({ editorValue: this.props.value });
     }
   }
 
@@ -223,7 +241,7 @@ export class BlockEditorEditingPresentational extends React.Component<
           </div>
           <Editor
             placeholder={this.props.placeholder}
-            value={this.props.value}
+            value={this.state.editorValue}
             onChange={this.onChangeCallback}
             plugins={this.props.plugins}
             spellCheck={false}
@@ -361,7 +379,10 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private onChange = (value: any, pointerChanged: boolean = false) => {
-    this.props.updateBlock({ id: this.props.block.id, value, pointerChanged });
+    this.throttledUpdate({ id: this.props.block.id, value, pointerChanged });
+
+    this.setState({ editorValue: value });
+
     if (this.props.onChange) {
       this.props.onChange(value);
     }
@@ -378,7 +399,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private saveToDatabase = () => {
-    this.props.saveBlocksMutation();
+    this.props.saveBlocksMutation(this.state.editorValue);
     this.setState({ hasChangedSinceDatabaseSave: false });
   };
 
@@ -424,14 +445,14 @@ export const BlockEditorEditing: any = compose(
     status: MutationStatus.NotStarted
   }),
   withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
-    const saveBlocksMutation = () => {
+    const saveBlocksMutation = editorValue => {
       setMutationStatus({ status: MutationStatus.Loading });
+
       saveBlocksToServer({
         variables: {
-          blocks: { id: block.id, value: valueToDatabaseJSON(block.value) }
+          blocks: { id: block.id, value: valueToDatabaseJSON(editorValue) }
         }
-      })
-        .then(() => {
+      }).then(() => {
           setMutationStatus({ status: MutationStatus.Complete });
         })
         .catch(e => {
