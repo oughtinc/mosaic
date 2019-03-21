@@ -178,6 +178,17 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       nodeAsJson
     });
 
+    if (!importingPointer) {
+      return (
+        <RemovedPointer
+          onMouseOver={this.onMouseOver}
+          onMouseOut={this.props.onMouseOut}
+        >
+          N/A
+        </RemovedPointer>
+      );
+    }
+
     const isLocked = this.state.isLocked && this.isLocked();
 
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
@@ -213,17 +224,6 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         }
       },
     });
-
-    if (!importingPointer) {
-      return (
-        <RemovedPointer
-          onMouseOver={this.onMouseOver}
-          onMouseOut={this.props.onMouseOut}
-        >
-          N/A
-        </RemovedPointer>
-      );
-    }
 
     const tooltip = (
       <Tooltip id="tooltip" style={{ display: !isLocked && "none" }}>
