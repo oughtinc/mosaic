@@ -1,6 +1,7 @@
 import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
+import { Helmet } from "react-helmet";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
@@ -71,6 +72,11 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
 
       return (
         <ContentContainer>
+          <Helmet>
+            <title>
+              Finding Next (Suboptimal) Assignment - Mosaic
+            </title>
+          </Helmet>
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
             There is no eligible workspace at this time, even if we broaden our search to suboptimal workspaces. Please wait and refresh this page to try again.

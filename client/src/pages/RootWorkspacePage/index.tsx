@@ -2,6 +2,7 @@ import gql from "graphql-tag";
 import * as _ from "lodash";
 import * as React from "react";
 import { graphql } from "react-apollo";
+import { Helmet } from "react-helmet";
 import { compose } from "recompose";
 
 import { HomePageHeading } from "./HomePageHeading";
@@ -28,6 +29,11 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
 
     return (
       <div>
+        <Helmet>
+          <title>
+            Homepage - Mosaic
+          </title>
+        </Helmet>
         {Auth.isAdmin() && <OracleHeader />}
         <ContentContainer>
           {!Auth.isAuthenticated() && <WelcomeMessage />}

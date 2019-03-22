@@ -2,6 +2,7 @@ import * as React from "react";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
@@ -75,6 +76,11 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
 
       return (
         <ContentContainer>
+          <Helmet>
+            <title>
+              Finding Next Assignment - Mosaic
+            </title>
+          </Helmet>
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
             There is no eligible workspace at this time. Please wait and refresh this page to try again.

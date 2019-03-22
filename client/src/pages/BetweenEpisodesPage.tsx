@@ -1,6 +1,7 @@
 import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
+import { Helmet } from "react-helmet";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
@@ -32,6 +33,11 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
 
     return (
       <div>
+        <Helmet>
+          <title>
+            Between Assignments - Mosaic
+          </title>
+        </Helmet>
         {Auth.isAuthenticated() && (
           <EpisodeNav
             experimentId={queryParams.experiment}

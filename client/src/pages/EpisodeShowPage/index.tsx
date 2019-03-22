@@ -6,6 +6,7 @@ import * as keyboardJS from "keyboardjs";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
+import { Helmet } from "react-helmet";
 import { compose } from "recompose";
 import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
@@ -343,9 +344,13 @@ export class WorkspaceView extends React.Component<any, any> {
     });
 
     const visibleExportIds = this.props.exportingPointers.map(p => p.data.pointerId);
-
     return (
       <div>
+        <Helmet>
+          <title>
+            Workspace {Value.fromJSON(questionProps.initialValue).document.text.slice(0, 20)} - Mosaic
+          </title>
+        </Helmet>
         <div
           style={{ display: this.state.hasInitiallyLoaded ? "none" : "block"}}
         >

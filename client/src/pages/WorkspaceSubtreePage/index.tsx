@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Button } from "react-bootstrap";
+import { Helmet } from "react-helmet";
 
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { ContentContainer } from "../../components/ContentContainer";
@@ -11,6 +12,11 @@ export class WorkspaceSubtreePage extends React.PureComponent<any, any> {
     const workspaceId = this.props.match.params.workspaceId;
     return (
       <ContentContainer>
+        <Helmet>
+          <title>
+            Tree View {workspaceId.slice(0, 7)} - Mosaic
+          </title>
+        </Helmet>
         {
           parseQueryString(window.location.search).expanded === "true"
           ?

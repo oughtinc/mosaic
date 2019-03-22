@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import styled from "styled-components";
@@ -55,6 +56,11 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
 
     return (
       <ContentContainer>
+        <Helmet>
+          <title>
+            {experiment.name} - Mosaic
+          </title>
+        </Helmet>
         <h1
           style={{
             fontSize: "26px",
