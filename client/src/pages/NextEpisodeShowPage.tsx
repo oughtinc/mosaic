@@ -78,7 +78,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
         <ContentContainer>
           <Helmet>
             <title>
-              Finding Next Assignment - Mosaic
+              No Assignment Found - Mosaic
             </title>
           </Helmet>
           <RedExclamation />
@@ -127,6 +127,11 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
 
       return (
         <ContentContainer>
+          <Helmet>
+            <title>
+              No (Oracle) Assignment Found - Mosaic
+            </title>
+          </Helmet>
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
             There is no oracle eligible workspace at this time. Please wait and refresh this page to try again.
@@ -137,6 +142,11 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
     } else if (!this.state.workspaceId) {
       return (
         <ContentContainer>
+          <Helmet>
+            <title>
+              Finding Next Assignment - Mosaic
+            </title>
+          </Helmet>
           Finding your next workspace...
         </ContentContainer>
       );

@@ -74,7 +74,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
         <ContentContainer>
           <Helmet>
             <title>
-              Finding Next (Suboptimal) Assignment - Mosaic
+              No Assignment Found - Mosaic
             </title>
           </Helmet>
           <RedExclamation />
@@ -88,6 +88,11 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     } else if (!this.state.workspaceId) {
       return (
         <ContentContainer>
+          <Helmet>
+            <title>
+              Finding Next (Suboptimal) Workspace - Mosaic
+            </title>
+          </Helmet>
           Finding your next (maybe suboptimal) workspace...
         </ContentContainer>
       );
