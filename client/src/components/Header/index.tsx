@@ -92,7 +92,7 @@ const Header = () => (
           padding: "0 20px"
         }}
       >
-        <Brand to="/">Mosaic v0.3</Brand>
+        <Brand to="/">Mosaic v0.4</Brand>
         <UserControls />
       </div>
     </div>
