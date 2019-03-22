@@ -31,7 +31,7 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
       <div>
         <Helmet>
           <title>
-            Homepage - Mosaic
+            Mosaic
           </title>
         </Helmet>
         {Auth.isAdmin() && <OracleHeader />}
