@@ -8,7 +8,8 @@ class Scheduler {
   private fetchAllWorkspacesInTree;
   private fetchAllRootWorkspaces;
   private isInOracleMode;
-  private isUserOracleForRootWorkspace;
+  private isUserHonestOracleForRootWorkspace;
+  private isUserMaliciousOracleForRootWorkspace;
   private numberOfStaleDescendantsCache;
   private NumberOfStaleDescendantsCache;
   private remainingBudgetAmongDescendantsCache;
@@ -23,7 +24,8 @@ class Scheduler {
     fetchAllWorkspacesInTree,
     fetchAllRootWorkspaces,
     isInOracleMode,
-    isUserOracleForRootWorkspace,
+    isUserHonestOracleForRootWorkspace,
+    isUserMaliciousOracleForRootWorkspace,
     NumberOfStaleDescendantsCache,
     RemainingBudgetAmongDescendantsCache,
     rootParentCache,
@@ -35,7 +37,8 @@ class Scheduler {
     this.fetchAllWorkspacesInTree = fetchAllWorkspacesInTree;
     this.fetchAllRootWorkspaces = fetchAllRootWorkspaces;
     this.isInOracleMode = isInOracleMode;
-    this.isUserOracleForRootWorkspace = isUserOracleForRootWorkspace;
+    this.isUserHonestOracleForRootWorkspace = isUserHonestOracleForRootWorkspace;
+    this.isUserMaliciousOracleForRootWorkspace = isUserMaliciousOracleForRootWorkspace;
     this.NumberOfStaleDescendantsCache = NumberOfStaleDescendantsCache;
     this.RemainingBudgetAmongDescendantsCache = RemainingBudgetAmongDescendantsCache;
     this.rootParentCache = rootParentCache;
@@ -246,7 +249,11 @@ class Scheduler {
 
     let oracleTreesToConsider = await filter(
       treesToConsider,
-      async t => await this.isUserOracleForRootWorkspace(userId, t),
+      async t => {
+        const isHonestOracle = await this.isUserHonestOracleForRootWorkspace(userId, t);
+        const isMaliciousOracle = await this.isUserMaliciousOracleForRootWorkspace(userId, t);
+        return isHonestOracle || isMaliciousOracle;
+      },
     );
 
     let nonOracleTreesToConsider = _.difference(
@@ -259,7 +266,16 @@ class Scheduler {
       const randomlySelectedTree = pickRandomItemFromArray(leastRecentlyWorkedOnTreesToConsider);
       const workspacesInTree = await this.fetchAllWorkspacesInTree(randomlySelectedTree);
 
-      let oracleEligibleWorkspaces = await this.filterByWhetherEligibleForOracle(workspacesInTree);
+      const isHonestOracle = await this.isUserHonestOracleForRootWorkspace(userId, randomlySelectedTree);
+      const isMaliciousOracle = await this.isUserMaliciousOracleForRootWorkspace(userId, randomlySelectedTree);
+
+      let oracleEligibleWorkspaces = workspacesInTree;
+      if (isHonestOracle) {
+        oracleEligibleWorkspaces = await this.filterByWhetherEligibleForHonestOracle(workspacesInTree);
+      } else {
+        oracleEligibleWorkspaces = await this.filterByWhetherEligibleForMaliciousOracle(workspacesInTree);
+      }
+
       oracleEligibleWorkspaces = await this.filterByStaleness(userId, oracleEligibleWorkspaces);
 
       const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(oracleEligibleWorkspaces);
@@ -302,8 +318,12 @@ class Scheduler {
     return [];
   }
 
-  private filterByWhetherEligibleForOracle(workspaces) {
+  private filterByWhetherEligibleForHonestOracle(workspaces) {
     return workspaces.filter(w => w.isEligibleForHonestOracle);
+  }
+
+  private filterByWhetherEligibleForMaliciousOracle(workspaces) {
+    return workspaces.filter(w => w.isEligibleForMaliciousOracle);
   }
 
   private async filterByWhetherNotEligibleForOracle(workspaces) {

@@ -43,6 +43,10 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
+      isEligibleForMaliciousOracle: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       isStale: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

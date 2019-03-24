@@ -727,6 +727,7 @@ const schema = new GraphQLSchema({
                 isArchived,
                 isCurrentlyResolved,
                 isEligibleForHonestOracle,
+                isEligibleForMaliciousOracle,
                 isStale,
                 wasAnsweredByOracle,
               } = inputWithNoNullOrUndefinedValues;
@@ -735,6 +736,7 @@ const schema = new GraphQLSchema({
                 isArchived,
                 isCurrentlyResolved,
                 isEligibleForHonestOracle,
+                isEligibleForMaliciousOracle,
                 isStale,
                 wasAnsweredByOracle,
               };

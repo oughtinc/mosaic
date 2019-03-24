@@ -2,7 +2,7 @@ const uuidv4 = require("uuid/v4");
 import * as _ from "lodash";
 import { filter, map } from "asyncro";
 import { isInOracleMode } from "../globals/isInOracleMode";
-import { Assignment, Experiment, Tree, Workspace } from "../models";
+import { Assignment, Experiment, Tree, UserTreeOracleRelation, Workspace } from "../models";
 import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
 import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
@@ -76,10 +76,25 @@ export async function createScheduler(experimentId) {
   const scheduler = new Scheduler({
     experimentId,
     fetchAllWorkspacesInTree,
-    isUserOracleForRootWorkspace: async (userId, rootWorkspace) => {
+    isUserHonestOracleForRootWorkspace: async (userId, rootWorkspace) => {
       const tree = await rootWorkspace.getTree();
-      const oracles = await tree.getOracles();
-      return !!oracles.find(o => o.id === userId);
+      const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
+        where: {
+          TreeId: tree.id,
+          UserId: userId,
+        },
+      });
+      return userTreeOracleRelation && !userTreeOracleRelation.isMalicious;
+    },
+    isUserMaliciousOracleForRootWorkspace: async (userId, rootWorkspace) => {
+      const tree = await rootWorkspace.getTree();
+      const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
+        where: {
+          TreeId: tree.id,
+          UserId: userId,
+        },
+      });
+      return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
     },
     fetchAllRootWorkspaces: async () => {
       const rootWorkspaces = await Workspace.findAll({

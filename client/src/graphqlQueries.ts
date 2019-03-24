@@ -85,6 +85,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       isPublic
       isStale
       isEligibleForHonestOracle
+      isEligibleForMaliciousOracle
       isCurrentlyResolved
       isNotStaleRelativeToUserFullInformation {
         id
@@ -120,6 +121,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       isPublic
       isStale
       isEligibleForHonestOracle
+      isEligibleForMaliciousOracle
       isCurrentlyResolved
       isNotStaleRelativeToUserFullInformation {
         id

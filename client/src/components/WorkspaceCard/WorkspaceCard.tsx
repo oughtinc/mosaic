@@ -242,10 +242,16 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                     workspaceFieldToUpdate="isStale"
                   />
                   <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="oracle"
+                    checkboxLabelText="honest oracle"
                     updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
                     workspace={workspace}
                     workspaceFieldToUpdate="isEligibleForHonestOracle"
+                  />
+                  <AdminCheckboxThatTogglesWorkspaceField
+                    checkboxLabelText="malicious oracle"
+                    updateMutation={this.handleOnIsEligibleForMaliciousOracleCheckboxChange}
+                    workspace={workspace}
+                    workspaceFieldToUpdate="isEligibleForMaliciousOracle"
                   />
                   <AdminCheckboxThatTogglesWorkspaceField
                     checkboxLabelText="resolved"
@@ -371,6 +377,27 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         workspace: {
           ...prv.workspace,
           isEligibleForHonestOracle: !this.props.subtreeQuery.workspace.isEligibleForHonestOracle
+        },
+      };
+    });
+  }
+
+  private handleOnIsEligibleForMaliciousOracleCheckboxChange = async () => {
+    await this.props.updateWorkspace({
+      variables: {
+        id: this.props.workspaceId,
+        input: {
+          isEligibleForMaliciousOracle: !this.props.subtreeQuery.workspace.isEligibleForMaliciousOracle,
+        },
+      },
+    });
+
+    this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+      return {
+        ...prv,
+        workspace: {
+          ...prv.workspace,
+          isEligibleForMaliciousOracle: !this.props.subtreeQuery.workspace.isEligibleForMaliciousOracle
         },
       };
     });
