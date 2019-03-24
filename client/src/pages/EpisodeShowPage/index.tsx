@@ -70,6 +70,7 @@ const WORKSPACE_QUERY = gql`
       isStale
       isEligibleForHonestOracle
       isUserOracleForTree
+      isUserMaliciousOracleForTree
       idOfRootWorkspace
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
@@ -316,6 +317,7 @@ export class WorkspaceView extends React.Component<any, any> {
     const hasParent = !!workspace.parentId;
     const hasSubquestions = workspace.childWorkspaceOrder.length > 0;
     const isUserOracle = workspace.isUserOracleForTree;
+    const isUserMaliciousOracle = workspace.isUserMaliciousOracleForTree;
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
 
     const hasTimeBudget = workspace.hasTimeBudgetOfRootParent;
@@ -366,6 +368,7 @@ export class WorkspaceView extends React.Component<any, any> {
               isActive={isActive}
               isInOracleMode={isInOracleMode}
               isUserOracle={isUserOracle}
+              isUserMaliciousOracle={isUserMaliciousOracle}
               hasTimeBudget={hasTimeBudget}
               hasTimerEnded={hasTimerEnded}
               markAsNotStaleRelativeToUser={() =>

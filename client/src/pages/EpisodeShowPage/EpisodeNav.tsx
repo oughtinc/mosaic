@@ -42,6 +42,7 @@ interface EpisodeNavProps {
   isInOracleMode: boolean;
   isTakingABreak?: boolean;
   isUserOracle: boolean;
+  isUserMaliciousOracle: boolean;
   markAsNotStaleRelativeToUser(): void;
 }
 
@@ -60,12 +61,13 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       isInOracleMode,
       isTakingABreak,
       isUserOracle,
+      isUserMaliciousOracle,
       markAsNotStaleRelativeToUser,
     } = this.props;
 
     if (isUserOracle && isInOracleMode) {
       return (
-        <EpisodeNavContainer style={{ backgroundColor: "#ffe8e8" }}>
+        <EpisodeNavContainer style={{ backgroundColor: isUserMaliciousOracle ? "#ffcccc" : "#ccffcc" }}>
           {
             isTakingABreak
             ?
@@ -77,7 +79,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
             :
               <div
                 style={{
-                  color: "#a66",
+                  color: isUserMaliciousOracle ? "#a66" : "#6a6",
                   fontSize: "24px",
                   fontVariant: "small-caps"
                 }}

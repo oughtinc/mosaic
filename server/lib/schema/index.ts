@@ -95,6 +95,34 @@ export const workspaceType = makeObjectType(models.Workspace, [
       return isUserOracleForTree;
     },
   },
+  isUserMaliciousOracleForTree: {
+    type: GraphQLBoolean,
+    resolve: async (workspace, args, context) => {
+      const user = context.user;
+
+      if (!user) {
+        return false;
+      }
+
+      // get tree
+      let curWorkspace = workspace;
+      while (curWorkspace.parentId) {
+        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+      }
+      const rootWorkspace = curWorkspace;
+      const tree = await rootWorkspace.getTree();
+      const userTreeOracleRelation = await models.UserTreeOracleRelation.findOne({
+        where: {
+          TreeId: tree.id,
+          UserId: user.id
+        },
+      })
+
+      const isUserMaliciousOracleForTree = userTreeOracleRelation && userTreeOracleRelation.isMalicious;
+
+      return isUserMaliciousOracleForTree;
+    },
+  },
   currentlyActiveUser: {
     type: UserType,
     resolve: async (workspace, args, context) => {
