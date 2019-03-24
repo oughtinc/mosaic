@@ -130,7 +130,7 @@ export class Child extends React.Component<any, any> {
     return (
       <div
         style={{
-          backgroundColor: (this.props.isUserOracle && this.props.isInOracleMode && workspace.isEligibleForOracle) && "#ffe8e8",
+          backgroundColor: (this.props.isUserOracle && this.props.isInOracleMode && workspace.isEligibleForHonestOracle) && "#ffe8e8",
           padding: "10px",
         }}
       >
@@ -278,10 +278,10 @@ export class Child extends React.Component<any, any> {
               }}
               inline={true}
               type="checkbox"
-              checked={workspace.isEligibleForOracle}
+              checked={workspace.isEligibleForHonestOracle}
               onChange={() => {
                 this.props.updateIsEligibleForOracle({
-                  isEligibleForOracle: !workspace.isEligibleForOracle,
+                  isEligibleForHonestOracle: !workspace.isEligibleForHonestOracle,
                   workspaceId: workspace.id,
                 });
               }}

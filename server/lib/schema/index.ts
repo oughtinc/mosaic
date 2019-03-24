@@ -726,7 +726,7 @@ const schema = new GraphQLSchema({
               const {
                 isArchived,
                 isCurrentlyResolved,
-                isEligibleForOracle,
+                isEligibleForHonestOracle,
                 isStale,
                 wasAnsweredByOracle,
               } = inputWithNoNullOrUndefinedValues;
@@ -734,7 +734,7 @@ const schema = new GraphQLSchema({
               const update = {
                 isArchived,
                 isCurrentlyResolved,
-                isEligibleForOracle,
+                isEligibleForHonestOracle,
                 isStale,
                 wasAnsweredByOracle,
               };
@@ -847,7 +847,7 @@ const schema = new GraphQLSchema({
                 {
                   totalBudget,
                   creatorId: user.user_id,
-                  isEligibleForOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
+                  isEligibleForHonestOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
                 }, // TODO replace user.user_id
                 { event, questionValue: JSON.parse(question) }
               );
@@ -1087,14 +1087,14 @@ const schema = new GraphQLSchema({
       updateWorkspaceIsEligibleForOracle: {
         type: workspaceType,
         args: {
-          isEligibleForOracle: { type: GraphQLBoolean },
+          isEligibleForHonestOracle: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to update a workspace's oracle eligibility",
-          async (_, { isEligibleForOracle, workspaceId }, context) => {
+          async (_, { isEligibleForHonestOracle, workspaceId }, context) => {
             const workspace = await models.Workspace.findById(workspaceId);
-            await workspace.update({ isEligibleForOracle });
+            await workspace.update({ isEligibleForHonestOracle });
           }
         ),
       },

@@ -147,7 +147,7 @@ export async function seedDbForTestingOracles() {
     hasTimeBudget: false,
     hasIOConstraints: true,
     isEligibleForAssignment: true,
-    isEligibleForOracle: true,
+    isEligibleForHonestOracle: true,
     isPublic: true,
   }, {
     questionValue: generateQuestionValueFromString("A: Root-level (3 descendants) - oracle eligible"),
@@ -179,7 +179,7 @@ export async function seedDbForTestingOracles() {
   await A2QuestionBlock.update({ value: valueOfQuestionBlockForA2 });
 
   await A2.update({
-    isEligibleForOracle: true,
+    isEligibleForHonestOracle: true,
   });
 
   const A2$1 = await A2.createChild({

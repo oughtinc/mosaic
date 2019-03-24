@@ -68,7 +68,7 @@ const WORKSPACE_QUERY = gql`
       creatorId
       isPublic
       isStale
-      isEligibleForOracle
+      isEligibleForHonestOracle
       isUserOracleForTree
       idOfRootWorkspace
       hasIOConstraintsOfRootParent
@@ -83,7 +83,7 @@ const WORKSPACE_QUERY = gql`
         totalBudget
         creatorId
         isArchived
-        isEligibleForOracle
+        isEligibleForHonestOracle
         isCurrentlyResolved
         isPublic
         allocatedBudget
@@ -376,12 +376,12 @@ export class WorkspaceView extends React.Component<any, any> {
                   },
                 })
               }
-              updateIsEligibleForOracle={isEligibleForOracle =>
+              updateIsEligibleForOracle={isEligibleForHonestOracle =>
                 this.props.updateWorkspace({
                   variables: {
                     id: workspace.id,
                     input: {
-                      isEligibleForOracle,
+                      isEligibleForHonestOracle,
                     }
                   },
                 })
@@ -645,12 +645,12 @@ export class WorkspaceView extends React.Component<any, any> {
                             }
                           });
                         }}
-                        updateIsEligibleForOracle={({ isEligibleForOracle, workspaceId }) => {
+                        updateIsEligibleForOracle={({ isEligibleForHonestOracle, workspaceId }) => {
                           this.props.updateWorkspace({
                             variables: {
                               id: workspaceId,
                               input: {
-                                isEligibleForOracle
+                                isEligibleForHonestOracle
                               },
                             },
                           });

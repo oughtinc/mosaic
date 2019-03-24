@@ -38,7 +38,7 @@ const WorkspaceModel = (
         defaultValue: false,
         allowNull: false
       },
-      isEligibleForOracle: {
+      isEligibleForHonestOracle: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false
@@ -259,7 +259,7 @@ const WorkspaceModel = (
             await workspace.createBlock({ type: "QUESTION" }, { event });
           }
 
-          if (workspace.isEligibleForOracle && isInOracleMode.getValue()) {
+          if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
             const {
               scratchpadBlockValue,
               answerDraftBlockValue,
@@ -309,7 +309,7 @@ const WorkspaceModel = (
     }
 
     const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
-    const isParentOracleWorkspace = parentWorkspace.isEligibleForOracle;
+    const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle;
     if (isParentOracleWorkspace) {
       return false;
     }
@@ -337,10 +337,10 @@ const WorkspaceModel = (
     { id, parentId, question, totalBudget, creatorId, isPublic },
     { event }
   ) {
-    const isEligibleForOracle = await sequelize.models.Workspace.isNewChildWorkspaceOracleEligible({ parentId });
+    const isEligibleForHonestOracle = await sequelize.models.Workspace.isNewChildWorkspaceOracleEligible({ parentId });
 
     const workspace = await sequelize.models.Workspace.create(
-      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForOracle },
+      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForHonestOracle },
       { event, questionValue: question }
     );
     return workspace;

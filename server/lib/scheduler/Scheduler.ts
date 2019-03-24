@@ -303,11 +303,11 @@ class Scheduler {
   }
 
   private filterByWhetherEligibleForOracle(workspaces) {
-    return workspaces.filter(w => w.isEligibleForOracle);
+    return workspaces.filter(w => w.isEligibleForHonestOracle);
   }
 
   private async filterByWhetherNotEligibleForOracle(workspaces) {
-    return workspaces.filter(w => !w.isEligibleForOracle);
+    return workspaces.filter(w => !w.isEligibleForHonestOracle);
   }
 
   private async filterByWhetherAnsweredByOracle(workspaces) {

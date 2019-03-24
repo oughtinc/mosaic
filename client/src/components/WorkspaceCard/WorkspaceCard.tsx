@@ -52,7 +52,7 @@ interface WorkspaceType {
   currentlyActiveUser: any;
   id: string;
   isStale: boolean;
-  isEligibleForOracle: boolean;
+  isEligibleForHonestOracle: boolean;
   budgetUsedWorkingOnThisWorkspace: number;
   allocatedBudget: number;
   wasAnsweredByOracle: boolean;
@@ -139,7 +139,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
 
     return (
       <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
-        <CardBody style={{ filter: workspace.isEligibleForOracle && "sepia(40%)" }}>
+        <CardBody style={{ filter: workspace.isEligibleForHonestOracle && "sepia(40%)" }}>
           <div
             style={{
               backgroundColor: "#f8f8f8",
@@ -245,7 +245,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                     checkboxLabelText="oracle"
                     updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
                     workspace={workspace}
-                    workspaceFieldToUpdate="isEligibleForOracle"
+                    workspaceFieldToUpdate="isEligibleForHonestOracle"
                   />
                   <AdminCheckboxThatTogglesWorkspaceField
                     checkboxLabelText="resolved"
@@ -360,7 +360,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
       variables: {
         id: this.props.workspaceId,
         input: {
-          isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle,
+          isEligibleForHonestOracle: !this.props.subtreeQuery.workspace.isEligibleForHonestOracle,
         },
       },
     });
@@ -370,7 +370,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         ...prv,
         workspace: {
           ...prv.workspace,
-          isEligibleForOracle: !this.props.subtreeQuery.workspace.isEligibleForOracle
+          isEligibleForHonestOracle: !this.props.subtreeQuery.workspace.isEligibleForHonestOracle
         },
       };
     });
