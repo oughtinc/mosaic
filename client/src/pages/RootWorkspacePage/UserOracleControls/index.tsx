@@ -143,7 +143,7 @@ const ADD_ORACLE_TO_TREE_MUTATION = gql`
   }
 `;
 
-const REMOVE_ORALCE_FROM_TREE_MUTATION = gql`
+const REMOVE_ORACLE_FROM_TREE_MUTATION = gql`
   mutation removeOracleFromTree($treeId: String, $userId: String) {
     removeOracleFromTree(treeId: $treeId, userId: $userId)
   }
@@ -171,7 +171,7 @@ export const UserOracleControls: any = compose(
       refetchQueries: ["tree"],
     },
   }),
-  graphql(REMOVE_ORALCE_FROM_TREE_MUTATION, {
+  graphql(REMOVE_ORACLE_FROM_TREE_MUTATION, {
     name: "removeOracleFromTreeMutation",
     options: {
       refetchQueries: ["tree"],
