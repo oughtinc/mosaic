@@ -8,6 +8,7 @@ export class UserOracleControlsPresentational extends React.Component<any, any> 
   public render() {
     const users = this.props.usersQuery.users;
     const tree = this.props.treeQuery.tree;
+
     const popoverWithProps = (
       !users || !tree
       ?
@@ -16,28 +17,60 @@ export class UserOracleControlsPresentational extends React.Component<any, any> 
         (
           <Popover
             id={`fallbacks-popover-${this.props.workspace.id}`}
+            style={{ minWidth: "450px" }}
             title="Oracles"
           >
             <div>
               {
                 users
                   .map(u => {
+                    const isOracle = !!tree.oracles.find(o => o.id === u.id);
+                    const isMalicious = tree.oracleRelations.find(r => r.user.id === u.id) &&  tree.oracleRelations.find(r => r.user.id === u.id).isMalicious;
                     return (
-                      <Checkbox
+                      <div
                         key={u.id}
-                        checked={!!tree.oracles.find(o => o.id === u.id)}
-                        onChange={(e => this.handleOnChange(e, tree.id, u.id))}
+                        style={{
+                          backgroundColor: isOracle && (isMalicious ? "#ffeeee" : "#eeffee"),
+                          border: isOracle && "1px solid #eee",
+                          paddingBottom: "3px",
+                          paddingLeft: "3px",
+                          marginBottom: "3px",
+                        }}
                       >
+                        <Checkbox
+                          inline
+                          checked={isOracle}
+                          onChange={(e => this.handleOnChange(e, tree.id, u.id))}
+                        >
+                          {
+                            u.givenName
+                            ?
+                            `${u.givenName} ${u.familyName}`
+                            :
+                            (
+                              u.email || u.id
+                            )
+                          }
+                          {" "}
+                        </Checkbox>
                         {
-                          u.givenName
-                          ?
-                          `${u.givenName} ${u.familyName}`
-                          :
-                          (
-                            u.email || u.id
-                          )
+                          isOracle
+                          &&
+                          <Checkbox
+                            inline
+                            checked={isMalicious}
+                            onChange={() => this.props.updateMaliciousnessOfOracleMutation({
+                              variables: {
+                                userId: u.id,
+                                treeId: tree.id,
+                                isMalicious: !isMalicious
+                              }
+                            })}
+                          >
+                            is malicious
+                          </Checkbox>
                         }
-                      </Checkbox>
+                      </div>
                     );
                 })
               }
@@ -94,6 +127,12 @@ const TREE_QUERY = gql`
       oracles {
         id
       }
+      oracleRelations {
+        isMalicious
+        user {
+          id
+        }
+      }
     }
   }
 `; 
@@ -109,6 +148,12 @@ const REMOVE_ORALCE_FROM_TREE_MUTATION = gql`
     removeOracleFromTree(treeId: $treeId, userId: $userId)
   }
 `; 
+
+const UPDATE_MALICIOUSNESS_OF_ORACLE = gql`
+  mutation updateMaliciousnessOfOracleMutation($treeId: String, $userId: String, $isMalicious: Boolean) {
+    updateMaliciousnessOfOracle(treeId: $treeId, userId: $userId, isMalicious: $isMalicious)
+  }
+`;
 
 export const UserOracleControls: any = compose(
   graphql(USERS_QUERY, {
@@ -128,6 +173,12 @@ export const UserOracleControls: any = compose(
   }),
   graphql(REMOVE_ORALCE_FROM_TREE_MUTATION, {
     name: "removeOracleFromTreeMutation",
+    options: {
+      refetchQueries: ["tree"],
+    },
+  }),
+  graphql(UPDATE_MALICIOUSNESS_OF_ORACLE, {
+    name: "updateMaliciousnessOfOracleMutation",
     options: {
       refetchQueries: ["tree"],
     },

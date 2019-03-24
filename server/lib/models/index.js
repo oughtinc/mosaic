@@ -15,6 +15,7 @@ const PointerModel = require("./pointer");
 const PointerImportModel = require("./pointerImport");
 const TreeModel = require("./tree");
 const UserModel = require("./user");
+const UserTreeOracleRelationModel = require("./userTreeOracleRelation");
 const WorkspaceModel = require("./workspace");
 
 if (config.use_env_variable) {
@@ -41,6 +42,7 @@ const models = [
   ["pointerImport", PointerImportModel],
   ["tree", TreeModel],
   ["user", UserModel],
+  ["userTreeOracleRelation", UserTreeOracleRelationModel],
   ["workspace", WorkspaceModel],
 ];
 

@@ -179,10 +179,17 @@ export const workspaceType = makeObjectType(models.Workspace, [
   }
 });
 
+const OracleRelationsType = makeObjectType(models.UserTreeOracleRelation, [
+  ...standardReferences,
+  ["tree", () => treeType, "Tree"],
+  ["user", () => UserType, "User"],
+]);
+
 const treeType = makeObjectType(models.Tree, [
   ...standardReferences,
   ["rootWorkspace", () => workspaceType, "RootWorkspace"],
   ["experiments", () => new GraphQLList(experimentType), "Experiments"],
+  ["oracleRelations", () => new GraphQLList(OracleRelationsType), "UserTreeOracleRelations"],
   ["oracles", () => new GraphQLList(UserType), "Oracles"],
 ]);
 
@@ -585,6 +592,27 @@ const schema = new GraphQLSchema({
             const tree = await models.Tree.findById(treeId);
             const user = await models.User.findById(userId);
             await tree.addOracle(user);
+            return true;
+          }
+        ),
+      },
+      updateMaliciousnessOfOracle:{
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+          isMalicious: { type: GraphQLBoolean },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to toggle the maliciousness of an oracle",
+          async (_, { treeId, userId, isMalicious }) => {
+            const oracleRelation = await models.UserTreeOracleRelation.findOne({
+              where: {
+                UserId: userId,
+                TreeId: treeId,
+              }
+            });
+            await oracleRelation.update({ isMalicious });
             return true;
           }
         ),

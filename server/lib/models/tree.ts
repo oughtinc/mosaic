@@ -26,6 +26,7 @@ const TreeModel = (
     Tree.Experiments = Tree.belongsToMany(models.Experiment, {
       through: "ExperimentTreeRelation",
     });
+    Tree.UserTreeOracleRelations = Tree.hasMany(models.UserTreeOracleRelation);
     Tree.Oracles = Tree.belongsToMany(models.User, {
       as: "Oracles",
       through: "UserTreeOracleRelation",
