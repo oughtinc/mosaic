@@ -38,7 +38,7 @@ export class UserOracleControlsPresentational extends React.Component<any, any> 
                         }}
                       >
                         <Checkbox
-                          inline
+                          inline={true}
                           checked={isOracle}
                           onChange={(e => this.handleOnChange(e, tree.id, u.id))}
                         >
@@ -57,7 +57,7 @@ export class UserOracleControlsPresentational extends React.Component<any, any> 
                           isOracle
                           &&
                           <Checkbox
-                            inline
+                            inline={true}
                             checked={isMalicious}
                             onChange={() => this.props.updateMaliciousnessOfOracleMutation({
                               variables: {

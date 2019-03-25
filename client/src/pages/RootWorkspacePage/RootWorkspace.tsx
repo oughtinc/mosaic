@@ -56,7 +56,7 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                   marginBottom: this.state.isShowingAdminControls && "10px",
                 }}
               >
-                { this.state.isShowingAdminControls ? "hide" : "show" }{" "}admin controls
+                {this.state.isShowingAdminControls ? "hide" : "show"}{" "}admin controls
               </Button>
               {
                 this.state.isShowingAdminControls
