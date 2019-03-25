@@ -8,7 +8,8 @@ import {
 } from "../eventIntegration";
 const Op = Sequelize.Op;
 import * as _ from "lodash";
-import { createOracleDefaultBlockValues } from "./helpers/defaultOracleBlocks";
+import { createHonestOracleDefaultBlockValues } from "./helpers/defaultHonestOracleBlocks";
+import { createMaliciousOracleDefaultBlockValues } from "./helpers/defaultMaliciousOracleBlocks";
 import { isInOracleMode } from "../globals/isInOracleMode";
 
 const WorkspaceModel = (
@@ -268,7 +269,16 @@ const WorkspaceModel = (
               scratchpadBlockValue,
               answerDraftBlockValue,
               responseBlockValue
-            } = createOracleDefaultBlockValues(questionValue);
+            } = createHonestOracleDefaultBlockValues(questionValue);
+            await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+            await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+            await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+          } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
+            const {
+              scratchpadBlockValue,
+              answerDraftBlockValue,
+              responseBlockValue
+            } = createMaliciousOracleDefaultBlockValues(questionValue);
             await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
             await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
             await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
