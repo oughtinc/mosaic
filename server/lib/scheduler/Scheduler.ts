@@ -327,7 +327,7 @@ class Scheduler {
   }
 
   private async filterByWhetherNotEligibleForOracle(workspaces) {
-    return workspaces.filter(w => !w.isEligibleForHonestOracle);
+    return workspaces.filter(w => !w.isEligibleForHonestOracle && !w.isEligibleForMaliciousOracle);
   }
 
   private async filterByWhetherAnsweredByOracle(workspaces) {
