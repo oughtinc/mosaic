@@ -27,8 +27,23 @@ const Container = styled.div`
   float: left;
 `;
 
-const CardBody = styled.div`
+const CardBody: any = styled.div`
   ${blockBorderAndBoxShadow};
+  border: ${(props: any) =>
+    (
+      props.workspace.isEligibleForHonestOracle
+      &&
+      "3px solid green"
+    )
+
+    ||
+
+    (
+      props.workspace.isEligibleForMaliciousOracle
+      &&
+      "3px solid red"
+    )
+  }
   float: left;
   margin-bottom: 1em;
   width: 42em;
@@ -53,6 +68,7 @@ interface WorkspaceType {
   id: string;
   isStale: boolean;
   isEligibleForHonestOracle: boolean;
+  isEligibleForMaliciousOracle: boolean;
   budgetUsedWorkingOnThisWorkspace: number;
   allocatedBudget: number;
   wasAnsweredByOracle: boolean;
@@ -139,7 +155,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
 
     return (
       <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
-        <CardBody style={{ filter: workspace.isEligibleForHonestOracle && "sepia(40%)" }}>
+        <CardBody workspace={workspace}>
           <div
             style={{
               backgroundColor: "#f8f8f8",
