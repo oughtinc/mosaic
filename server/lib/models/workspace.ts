@@ -307,14 +307,44 @@ const WorkspaceModel = (
     addEventAssociations(Workspace, models);
   };
 
-  Workspace.isNewChildWorkspaceOracleEligible = async function({ parentId }) {
+  Workspace.isNewChildWorkspaceHonestOracleEligible = async function({ parentId }) {
     if (!isInOracleMode.getValue()) {
       return false;
     }
 
     const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
-    const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle;
+    const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle || parentWorkspace.isEligibleForMaliciousOracle;
     if (isParentOracleWorkspace) {
+      return false;
+    }
+
+    // get root workspace
+    let curWorkspace = parentWorkspace;
+    while (curWorkspace.parentId) {
+      curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+    }
+    const rootWorkspace = curWorkspace;
+
+    // get experiment id
+    const tree = await rootWorkspace.getTree();
+    const experiments = await tree.getExperiments();
+
+    if (experiments.length === 0) {
+      return false;
+    }
+
+    const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
+    return mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault;
+  }
+
+  Workspace.isNewChildWorkspaceMaliciousOracleEligible = async function({ parentId }) {
+    if (!isInOracleMode.getValue()) {
+      return false;
+    }
+
+    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
+    const isParentHonestOracleWorkspace = parentWorkspace.isEligibleForHonestOracle;
+    if (!isParentHonestOracleWorkspace) {
       return false;
     }
 
@@ -341,10 +371,10 @@ const WorkspaceModel = (
     { id, parentId, question, totalBudget, creatorId, isPublic },
     { event }
   ) {
-    const isEligibleForHonestOracle = await sequelize.models.Workspace.isNewChildWorkspaceOracleEligible({ parentId });
-
+    const isEligibleForHonestOracle = await sequelize.models.Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
+    const isEligibleForMaliciousOracle = await sequelize.models.Workspace.isNewChildWorkspaceMaliciousOracleEligible({ parentId });
     const workspace = await sequelize.models.Workspace.create(
-      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForHonestOracle },
+      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForHonestOracle, isEligibleForMaliciousOracle },
       { event, questionValue: question }
     );
     return workspace;
