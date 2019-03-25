@@ -19,7 +19,15 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: `After you create your incorrect candidate answer, make sure you submit the prewritten question, delete these instructions (to keep the tree view cleaner), and then press "Done!" under the response field.\n----------\nA1 (plausible but wrong):  `,
+              text: 
+`1. Decide whether to challenge the honest oracle on this question and answer
+2. If you decided to challenge:
+    - Fill in an incorrect/unhelpful but plausible alternative answer below
+    - Click "Submit" on the right
+3. Delete these instructions
+4. Click "Done!" under the response field
+--
+A (incorrect): `,
               marks: [],
             },
           ],
@@ -143,25 +151,9 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
         {
           object: "text",
           leaves: [
-            { object: "leaf", text: `Incorrect A `, marks: [] },
+            { object: "leaf", text: `Ok`, marks: [] },
           ],
         },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId: incorrectPointerId,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
-            },
-          ],
-        },
-        { object: "text", leaves: [{ object: "leaf", text: "", marks: [] }] },
       ],
     },
   ];

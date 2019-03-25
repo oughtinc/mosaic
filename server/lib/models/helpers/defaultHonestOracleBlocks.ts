@@ -15,7 +15,13 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: `After you create your correct answer, make sure you submit the prewritten question, delete these instructions (to keep the tree view cleaner), and then press "Done!" under the response field.\n----------\nA1 :  `,
+              text:
+`1. Fill in a correct/helpful answer below
+2. Click "Submit" on the right
+3. Delete these instructions
+4. Click "Done!" under the response field
+--
+A (correct):  `,
               marks: [],
             },
           ],
@@ -66,7 +72,7 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: "The honest oracle has answsered Q ",
+              text: "The honest oracle has responded to question ",
               marks: [],
             },
           ],
@@ -80,7 +86,7 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
         },
         {
           object: "text",
-          leaves: [{ object: "leaf", text: "with the correct answer A ", marks: [] }],
+          leaves: [{ object: "leaf", text: "with answer ", marks: [] }],
         },
         {
           object: "inline",
