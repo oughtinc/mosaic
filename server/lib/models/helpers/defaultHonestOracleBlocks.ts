@@ -86,7 +86,7 @@ A (correct):  `,
         },
         {
           object: "text",
-          leaves: [{ object: "leaf", text: "with answer ", marks: [] }],
+          leaves: [{ object: "leaf", text: " with answer ", marks: [] }],
         },
         {
           object: "inline",
