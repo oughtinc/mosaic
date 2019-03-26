@@ -31,6 +31,7 @@ export class InlineNode extends React.Component<any, any> {
         <a
           href={href}
           onClick={e => e.stopPropagation()/* this prevents imported pointer from toggling after the user clicks a link */}
+          target="_blank"
         >
           {this.props.node.nodes[0].leaves[0].text}
         </a>

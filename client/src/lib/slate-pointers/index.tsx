@@ -99,7 +99,7 @@ function SlatePointers(options: any = {}) {
         const { data } = node;
         const href = data.get("href");
         return (
-          <a {...props} href={href}>
+          <a {...props} href={href} target="_blank">
             {children}
           </a>
         );
