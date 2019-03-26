@@ -5,6 +5,7 @@ import {
   CLOSE_ALL_POINTER_REFERENCES,
   EXPAND_ALL_IMPORTS,
   REMOVE_IMPORT_FROM_STORE,
+  ADD_EXPORT_ID_TO_STORE,
 } from "./actions";
 
 interface InitialStateType {
@@ -58,6 +59,11 @@ export const blockEditorReducer = (state = initialState, action) => {
       return {
         ...state,
         pointerReferences: pick(state.pointerReferences, keys(state.pointerReferences).filter(k => k !== action.importId)),
+      };
+    case ADD_EXPORT_ID_TO_STORE:
+      return {
+        ...state,
+        exportsOpened: state.exportsOpened.indexOf(action.exportId) > -1 ? state.exportsOpened : state.exportsOpened.concat(action.exportId),
       };
     default:
       return state;

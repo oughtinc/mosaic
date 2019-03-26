@@ -1,6 +1,7 @@
 import { UPDATE_BLOCK } from "../blocks/actions";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 
+export const ADD_EXPORT_ID_TO_STORE = "ADD_EXPORT_ID_TO_STORE";
 export const CHANGE_HOVERED_ITEM = "CHANGE_HOVERED_ITEM";
 export const CHANGE_POINTER_REFERENCE = "CHANGE_POINTER_REFERENCE";
 export const CLOSE_ALL_POINTER_REFERENCES = "CLOSE_ALL_POINTER_REFERENCES";
@@ -72,6 +73,12 @@ export const removeImportFromStore = importId => ({
   type: REMOVE_IMPORT_FROM_STORE,
   importId,
 });
+
+export const addExportIdToStore = exportId => ({
+  type: ADD_EXPORT_ID_TO_STORE,
+  exportId,
+});
+
 
 export const exportSelection = blockId => {
   return async (dispatch, getState) => {

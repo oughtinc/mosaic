@@ -1,7 +1,11 @@
 import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { connect } from "react-redux";
+
 import { propsToPointerDetails } from "./helpers";
+
+import { addExportIdToStore } from "../../modules/blockEditor/actions";
 
 // We don't use this function but it's here if we need it later.
 // function getMaxNesting(node: any): number {
@@ -13,9 +17,14 @@ import { propsToPointerDetails } from "./helpers";
 const darkGreen = "rgba(12, 165, 0, 0.63)";
 const bracketFont = "800 1.2em sans-serif";
 
-export class PointerExportMark extends React.Component<any, any> {
+export class PointerExportMarkPresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
+  }
+
+  public componentDidMount() {
+    const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
+    this.props.addExportIdToStore(exportPointerId);
   }
 
   public getLocation = () => {
@@ -112,3 +121,8 @@ export class PointerExportMark extends React.Component<any, any> {
     );
   }
 }
+
+export const PointerExportMark: any = connect(
+  null,
+  { addExportIdToStore }
+)(PointerExportMarkPresentational);
