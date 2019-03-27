@@ -32,7 +32,7 @@ export class UserOracleControlsPresentational extends React.Component<any, any> 
                         style={{
                           backgroundColor: isOracle && (isMalicious ? "#ffeeee" : "#eeffee"),
                           border: isOracle && "1px solid #eee",
-                          paddingBottom: "3px",
+                          paddingBottom: u.givenName ? "15px" : "3px",
                           paddingLeft: "3px",
                           marginBottom: "3px",
                         }}
@@ -45,7 +45,19 @@ export class UserOracleControlsPresentational extends React.Component<any, any> 
                           {
                             u.givenName
                             ?
-                            `${u.givenName} ${u.familyName}`
+                            <span style={{ position: "relative" }}>
+                                {`${u.givenName} ${u.familyName}`}
+                              <span
+                                style={{
+                                  bottom: "-15px",
+                                  left: "0",
+                                  fontSize: "12px",
+                                  position: "absolute",
+                                }}
+                              >
+                                {u.email}
+                              </span>
+                            </span>
                             :
                             (
                               u.email || u.id
