@@ -3,7 +3,14 @@ import * as _ from "lodash";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { Button, Checkbox, OverlayTrigger, Popover } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { compose } from "recompose";
+
+const NavLink = props => (
+  <Link to={`/experiments/${props.experimentId}`}>
+    {props.children}
+  </Link>
+);
 
 export class FallbacksPresentational extends React.Component<any,  any> {
   public state = {
@@ -39,7 +46,7 @@ export class FallbacksPresentational extends React.Component<any,  any> {
         }
     });
   };
-  
+
   public render() {
     const experiments =  this.props.experimentsQuery.experiments && _.sortBy(
       this.props.experimentsQuery.experiments,
@@ -78,7 +85,9 @@ export class FallbacksPresentational extends React.Component<any,  any> {
                         disabled={this.state.pending}
                         onChange={event => this.handleOnChange(event, this.props.experiment.id, e.id)}
                       >
-                        {e.name}
+                        <NavLink experimentId={e.id}>
+                          {e.name}
+                        </NavLink>
                       </Checkbox>
                     );
                 })
@@ -106,7 +115,15 @@ export class FallbacksPresentational extends React.Component<any,  any> {
           "none"
           :
           <ul>
-            {fallbacks.map((f, i, arr) => <li key={`${this.props.experiment.id}${f.id}`}>{f.name}</li>)}
+            {
+              fallbacks.map((f, i, arr) =>
+                <li key={`${this.props.experiment.id}${f.id}`}>
+                  <NavLink experimentId={f.id}>
+                    {f.name}
+                  </NavLink>
+                </li>
+              )
+            }
           </ul>
         }
         </div>
