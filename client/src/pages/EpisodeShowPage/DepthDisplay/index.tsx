@@ -29,14 +29,14 @@ class DepthDisplayPresentational extends React.Component<any,  any> {
             depth level
             <div
               style={{
-                color: "#666",
+                color: 6 - this.props.depth <= 1 ? (6 - this.props.depth === 1 ? "yellow" : "red") : "#666",
                 fontSize: "24px",
                 margin: "3px 0 0 5px",
                 textAlign: "center",
                 textShadow: this.props.inputCharCount >= 550 && this.props.inputCharCount < 650 && "0 0 1px #333",
               }}
             >
-              {this.props.depth}
+              {6 - this.props.depth}
             </div>
           </span>
         </span>
