@@ -101,11 +101,14 @@ const WORKSPACE_QUERY = gql`
         value
         type
       }
-      tree {
+      rootWorkspace {
         id
-        experiments {
+        tree {
           id
-          areNewWorkspacesOracleOnlyByDefault
+          experiments {
+            id
+            areNewWorkspacesOracleOnlyByDefault
+          }
         }
       }
     }
@@ -356,7 +359,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const visibleExportIds = this.props.exportingPointers.map(p => p.data.pointerId);
 
-    const isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly = workspace.tree.experiments.some(e => e.areNewWorkspacesOracleOnlyByDefault);
+    const isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly = workspace.rootWorkspace.tree.experiments.some(e => e.areNewWorkspacesOracleOnlyByDefault);
     const isWorkspacePartOfOracleExperiment = isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly;
 
     return (
