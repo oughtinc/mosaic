@@ -26,7 +26,7 @@ class DepthDisplayPresentational extends React.Component<any,  any> {
             }}
           >
             <Glyphicon glyph="sort" style={{ fontSize: "24px", marginRight: "5px" }}/>
-            depth level
+            depth remaining
             <div
               style={{
                 color: 6 - this.props.depth <= 1 ? (6 - this.props.depth === 1 ? "yellow" : "red") : "#666",
