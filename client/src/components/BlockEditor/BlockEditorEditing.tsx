@@ -157,11 +157,11 @@ export class BlockEditorEditingPresentational extends React.Component<
     }
   }
 
-  public componentDidUpdate(prevProps: any) {
-    const oldDocument = prevProps.block.value.document;
-    const newDocument = this.props.block.value.document;
+  public componentDidUpdate(prevProps: any, prevState: any) {
+    const oldEditorValue = prevState.editorValue;
+    const newEditorValue = this.state.editorValue;
 
-    if (!oldDocument.equals(newDocument)) {
+    if (JSON.stringify(oldEditorValue) !== JSON.stringify(newEditorValue)) {
       this.onValueChange();
     }
 
