@@ -79,6 +79,7 @@ const WORKSPACE_QUERY = gql`
       totalBudget
       allocatedBudget
       exportLockStatusInfo
+      depth
       childWorkspaces {
         id
         totalBudget
@@ -401,6 +402,7 @@ export class WorkspaceView extends React.Component<any, any> {
                 <BlockHoverMenu>
                   <Row>
                     <Col sm={12}>
+                    { workspace.depth }
                     <div
                       style={{
                         display: !(isUserOracle && isInOracleMode) ? "flex" : "none",

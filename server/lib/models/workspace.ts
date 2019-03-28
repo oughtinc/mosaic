@@ -249,6 +249,26 @@ const WorkspaceModel = (
           return values.filter(v => !!v);
         },
       },
+      depth: {
+        type: Sequelize.VIRTUAL(Sequelize.INTEGER, ["id"]),
+        get: async function() {
+          const isInOracleModeValue = isInOracleMode.getValue();
+          let depth = 1;
+          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          if (isInOracleModeValue) {
+            while (curWorkspace.parentId) {
+              curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+              if (!curWorkspace.isEligibleForHonestOracle && !curWorkspace.isEligibleForMaliciousOracle) {
+                depth++;
+              }
+            }
+          } else {
+            depth++;
+          }
+
+          return depth;
+        },
+      },
     },
     {
       hooks: {
