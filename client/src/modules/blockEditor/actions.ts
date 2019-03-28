@@ -79,7 +79,6 @@ export const addExportIdToStore = exportId => ({
   exportId,
 });
 
-
 export const exportSelection = blockId => {
   return async (dispatch, getState) => {
     const { blocks, blockEditor } = await getState();
