@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { propsToPointerDetails } from "./helpers";
 
 import { addExportIdToStore } from "../../modules/blockEditor/actions";
+import { getInputCharCount } from "../../modules/blocks/charCounts";
 
 // We don't use this function but it's here if we need it later.
 // function getMaxNesting(node: any): number {
@@ -53,12 +54,20 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
     const exportPointerText = nodeAsJson.nodes[0].leaves[0].text.trim();
     const isLazyPointer = this.props.isLazyPointer || (isExportPointerFirstNodeTextNode && exportPointerText.slice(0, 2) === "@L");
 
+    const fullExportCharCount = getInputCharCount(nodeAsJson);
+
     const pointerExportBackground: any =
+    fullExportCharCount > 600 / 3
+    ?
+    "orange"
+    :
+    (
       isSelected
       ?
       "rgba(85, 228, 38, 0.9)"
       :
-      "rgba(200, 243, 197, 0.5)";
+      "rgba(200, 243, 197, 0.5)"
+    );
 
     const { pointerIndex }: any = propsToPointerDetails({
       blockEditor,
