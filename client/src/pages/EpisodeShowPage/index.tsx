@@ -419,7 +419,7 @@ export class WorkspaceView extends React.Component<any, any> {
                     <Col sm={12}>
                       <div
                         style={{
-                          display: !(isUserOracle && isInOracleMode) ? "flex" : "none",
+                          display: "flex",
                           justifyContent: "space-between",
                           minHeight: "60px",
                         }}
@@ -437,7 +437,7 @@ export class WorkspaceView extends React.Component<any, any> {
                             <DepthDisplay depth={workspace.depth} />
                           }
                           {
-                            hasIOConstraints
+                            hasIOConstraints && !(isUserOracle && isInOracleMode)
                             ?
                             <CharCountDisplays
                               inputCharCount={this.props.inputCharCount}
