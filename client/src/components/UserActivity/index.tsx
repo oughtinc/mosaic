@@ -67,7 +67,9 @@ query userActivityQuery($experimentId: String, $userId: String) {
         rootWorkspace {
           id
           tree {
+            id
             experiments {
+              id
               eligibilityRank
             }
           }

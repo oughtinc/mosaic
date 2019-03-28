@@ -64,6 +64,7 @@ export const WORKSPACES_QUERY = gql`
       hasIOConstraints
       hasTimeBudget
       tree {
+        id
         experiments {
           id
           createdAt
