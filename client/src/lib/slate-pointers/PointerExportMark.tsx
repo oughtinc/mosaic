@@ -57,7 +57,7 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
     const fullExportCharCount = getInputCharCount(nodeAsJson);
 
     const pointerExportBackground: any =
-    fullExportCharCount > 600 / 3
+    fullExportCharCount > 650 / 3
     ?
     "orange"
     :
