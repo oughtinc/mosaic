@@ -101,6 +101,13 @@ const WORKSPACE_QUERY = gql`
         value
         type
       }
+      tree {
+        id
+        experiments {
+          id
+          areNewWorkspacesOracleOnlyByDefault
+        }
+      }
     }
   }
 `;
@@ -348,6 +355,10 @@ export class WorkspaceView extends React.Component<any, any> {
     });
 
     const visibleExportIds = this.props.exportingPointers.map(p => p.data.pointerId);
+
+    const isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly = workspace.tree.experiments.some(e => e.areNewWorkspacesOracleOnlyByDefault);
+    const isWorkspacePartOfOracleExperiment = isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly;
+
     return (
       <div>
         <Helmet>
@@ -417,7 +428,11 @@ export class WorkspaceView extends React.Component<any, any> {
                             minHeight: "60px",
                           }}
                         >
-                          <DepthDisplay depth={workspace.depth} />
+                          {
+                            isWorkspacePartOfOracleExperiment
+                            &&
+                            <DepthDisplay depth={workspace.depth} />
+                          }
                           {
                             hasIOConstraints
                             ?
