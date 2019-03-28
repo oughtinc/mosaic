@@ -12,6 +12,7 @@ import { Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 import { AdvancedOptions } from "./AdvancedOptions";
+import { DepthDisplay } from "./DepthDisplay";
 import { EpisodeNav } from "./EpisodeNav";
 import { ResponseFooter } from "./ResponseFooter";
 import { CharCountDisplays } from "./CharCountDisplays";
@@ -402,44 +403,52 @@ export class WorkspaceView extends React.Component<any, any> {
                 <BlockHoverMenu>
                   <Row>
                     <Col sm={12}>
-                    { workspace.depth }
-                    <div
-                      style={{
-                        display: !(isUserOracle && isInOracleMode) ? "flex" : "none",
-                        justifyContent: "space-between",
-                        minHeight: "60px",
-                      }}
-                    >
-                      {
-                        hasIOConstraints
-                        ?
-                        <CharCountDisplays
-                          inputCharCount={this.props.inputCharCount}
-                          outputCharCount={this.props.outputCharCount}
-                        />
-                        :
-                        <div />
-                      }
-                      {
-                        hasTimeBudget
-                        ?
-                        <TimerAndTimeBudgetInfo
-                          isActive={isActive}
-                          durationInMs={durationInMs}
-                          handleTimerEnd={this.handleTimerEnd}
-                          initialAllocatedBudget={workspace.allocatedBudget}
-                          tickDuration={this.tickDurationForCountdownTimer}
-                          totalBudget={workspace.totalBudget}
-                          workspaceId={workspace.id}
-                        />
-                        :
-                        <TimerWhenNoTimeBudget
-                          isActive={isActive}
-                          tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
-                          workspaceId={workspace.id}
-                        />
-                      }
-                    </div>
+                      <div
+                        style={{
+                          display: !(isUserOracle && isInOracleMode) ? "flex" : "none",
+                          justifyContent: "space-between",
+                          minHeight: "60px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            minHeight: "60px",
+                          }}
+                        >
+                          <DepthDisplay depth={workspace.depth} />
+                          {
+                            hasIOConstraints
+                            ?
+                            <CharCountDisplays
+                              inputCharCount={this.props.inputCharCount}
+                              outputCharCount={this.props.outputCharCount}
+                            />
+                            :
+                            <div />
+                          }
+                        </div>
+                        {
+                          hasTimeBudget
+                          ?
+                          <TimerAndTimeBudgetInfo
+                            isActive={isActive}
+                            durationInMs={durationInMs}
+                            handleTimerEnd={this.handleTimerEnd}
+                            initialAllocatedBudget={workspace.allocatedBudget}
+                            tickDuration={this.tickDurationForCountdownTimer}
+                            totalBudget={workspace.totalBudget}
+                            workspaceId={workspace.id}
+                          />
+                          :
+                          <TimerWhenNoTimeBudget
+                            isActive={isActive}
+                            tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
+                            workspaceId={workspace.id}
+                          />
+                        }
+                      </div>
                     </Col>
                   </Row>
                   <Row>

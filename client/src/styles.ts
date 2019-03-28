@@ -17,6 +17,7 @@ export const adminCheckboxBgColor = VERY_LIGHT_GRAY;
 export const adminCheckboxBorderColor = GRAY;
 export const availableBudgetHeaderFontColor = DARK_BLUE;
 export const charCountDisplayHeaderFontColor = DARK_BLUE;
+export const depthDisplayHeaderFontColor = DARK_BLUE;
 export const blockBodyBgColor = WHITE;
 export const blockBorderColor = LIGHT_GRAY;
 export const blockHeaderBgColor = VERY_LIGHT_GRAY;
@@ -61,6 +62,7 @@ export const blockHeaderFontSize = "18px";
 export const timerHeaderFontSize = "18px";
 export const availableBudgetHeaderFontSize = "18px";
 export const charCountDisplayHeaderFontSize = "18px";
+export const depthDisplayHeaderFontSize = "18px";
 // 25px
 export const homePageHeadingFontSize = "25px";
 // 28px
