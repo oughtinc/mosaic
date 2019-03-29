@@ -5237,9 +5237,10 @@ lru-cache@^4.1.1:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
 
-luxon@^1.4.3:
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.4.3.tgz#84614abdeae688af115f2188504f0d890ebb3d7e"
+luxon@^1.12.0:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.12.0.tgz#d02d53c8d8aaebe6b4c00ba1ce1be3913546b2e7"
+  integrity sha512-enPnPIHd5ZnZT0vpj9Xv8aq4j0yueAkhnh4xUKUHpqlgSm1r/8s6xTMjfyp2ugOWP7zivqJqgVTkW+rpHed61w==
 
 macaddress@^0.2.8:
   version "0.2.8"
