@@ -319,7 +319,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
       !_.isEqual(newProps.block, this.props.block) ||
-      !_.isEqual(newProps.workspaceOrder, this.props.workspaceOrder) ||
+      !_.isEqual(newProps.workspaces.map(w => w.id), this.props.workspaces.map(w => w.id)) ||
       !_.isEqual(newProps.workspaces, this.props.workspaces) ||
       !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
@@ -334,13 +334,10 @@ export class ChildrenSidebar extends React.Component<any, any> {
   public render() {
     return (
       <div>
-        {!!this.props.workspaceOrder.length && (
+        {!!this.props.workspaces.length && (
           <BlockContainer>
             <BlockHeader>Subquestions</BlockHeader>
-            {this.props.workspaceOrder
-              .map((workspaceId, i, arr) => this.props.workspaces.find(
-                w => w.id === workspaceId
-              ))
+            {_.sortBy(this.props.workspaces, w => Date.parse(w.createdAt))
               .map((workspace, i, arr) => {
                 return (
                   <BlockBody
@@ -387,7 +384,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
             {
               Auth.isAuthenticated()
               &&
-              this.props.workspaceOrder.length > 0
+              this.props.workspaces.length > 0
               &&
               (
                 (this.props.isUserOracle && this.props.isInOracleMode)

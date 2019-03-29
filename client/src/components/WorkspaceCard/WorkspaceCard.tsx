@@ -69,7 +69,7 @@ interface ConnectedPointerType {
 
 interface WorkspaceType {
   blocks: any[];
-  childWorkspaceOrder: string[];
+  childWorkspaces: any;
   connectedPointersOfSubtree: ConnectedPointerType[];
   currentlyActiveUser: any;
   id: string;

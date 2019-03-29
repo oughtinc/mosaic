@@ -75,7 +75,6 @@ const WORKSPACE_QUERY = gql`
       idOfRootWorkspace
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
-      childWorkspaceOrder
       connectedPointers
       totalBudget
       allocatedBudget
@@ -83,6 +82,7 @@ const WORKSPACE_QUERY = gql`
       depth
       childWorkspaces {
         id
+        createdAt
         totalBudget
         creatorId
         isArchived
@@ -327,7 +327,7 @@ export class WorkspaceView extends React.Component<any, any> {
     ).blockEditorAttributes();
 
     const hasParent = !!workspace.parentId;
-    const hasSubquestions = workspace.childWorkspaceOrder.length > 0;
+    const hasSubquestions = workspace.childWorkspaces.length > 0;
     const isUserOracle = workspace.isUserOracleForTree;
     const isUserMaliciousOracle = workspace.isUserMaliciousOracleForTree;
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
@@ -642,7 +642,6 @@ export class WorkspaceView extends React.Component<any, any> {
                         workspace={workspace}
                         workspaces={workspace.childWorkspaces}
                         availablePointers={availablePointers}
-                        workspaceOrder={workspace.childWorkspaceOrder}
                         onCreateChild={({ question, totalBudget }) => {
                           this.props.createChild({
                             variables: {

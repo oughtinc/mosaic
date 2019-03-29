@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import styled from "styled-components";
 import * as React from "react";
 
@@ -54,7 +55,7 @@ export const ChildrenSection = ({
   parentPointers,
   subtreeTimeSpentData
 }) => {
-  const childrenIds = workspace.childWorkspaceOrder;
+  const childrenIds = _.sortBy(workspace.childWorkspaces, w => Date.parse(w.createdAt)).map(w => w.id);
   if (!!childrenIds.length) {
     return (
       <ChildrenContainer>

@@ -7,7 +7,6 @@ export const CREATE_ROOT_WORKSPACE = gql`
       parentId
       creatorId
       isPublic
-      childWorkspaceOrder
       totalBudget
       allocatedBudget
       blocks {
@@ -44,7 +43,6 @@ export const WORKSPACES_QUERY = gql`
       parentId
       creatorId
       isPublic
-      childWorkspaceOrder
       totalBudget
       createdAt
       allocatedBudget
@@ -101,7 +99,9 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
         email
       }
       creatorId
-      childWorkspaceOrder
+      childWorkspaces {
+        id
+      }
       connectedPointersOfSubtree
       budgetUsedWorkingOnThisWorkspace
       isArchived
@@ -137,7 +137,9 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
         email
       }
       creatorId
-      childWorkspaceOrder
+      childWorkspaces {
+        id
+      }
       budgetUsedWorkingOnThisWorkspace
       isArchived
       wasAnsweredByOracle
