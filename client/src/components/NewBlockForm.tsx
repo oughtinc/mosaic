@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
@@ -323,7 +324,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     }
   };
 
-  private onSubmit = () => {
+  private onSubmit = _.throttle(() => {
     const isOnFrontPage = !this.props.shouldAutosave;
 
     // front page doesn't receive a prop when workspaces reload
@@ -341,7 +342,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       question: valueToDatabaseJSON(this.state.blockValue),
       totalBudget: this.props.hasTimeBudget ? this.state.totalBudget : 0,
     });
-  };
+  }, 3000);
 }
 
 const mapDispatchToProps = dispatch => ({
