@@ -235,13 +235,9 @@
   version "6.0.41"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.41.tgz#578cf53aaec65887bcaf16792f8722932e8ff8ea"
 
-"@types/reflect-metadata@0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@types/reflect-metadata/-/reflect-metadata-0.0.4.tgz#b6477ca9a97e5265f2ac67f9ea704eae5e0eaf4d"
-
-"@types/sequelize@4.27.14":
-  version "4.27.14"
-  resolved "https://registry.yarnpkg.com/@types/sequelize/-/sequelize-4.27.14.tgz#621dcc33db884e1fca368dc1b9fa7a60b38785d3"
+"@types/sequelize@4.27.34":
+  version "4.27.34"
+  resolved "https://registry.yarnpkg.com/@types/sequelize/-/sequelize-4.27.34.tgz#8ac436f23015d8a8ef3163db4400908b17ce3f91"
   dependencies:
     "@types/bluebird" "*"
     "@types/continuation-local-storage" "*"
@@ -3784,14 +3780,13 @@ sequelize-migration-pg-extras@^1.0.1:
   dependencies:
     pg "^4.0.0"
 
-sequelize-typescript@^0.6.3:
-  version "0.6.4"
-  resolved "https://registry.yarnpkg.com/sequelize-typescript/-/sequelize-typescript-0.6.4.tgz#3fa829fd86790079ba425686d2ee6dc3cb697978"
+sequelize-typescript@^0.6.8:
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/sequelize-typescript/-/sequelize-typescript-0.6.8.tgz#29c7ee4e14f0fdb1756f8d9915c30695975b7b8c"
   dependencies:
     "@types/bluebird" "3.5.18"
     "@types/node" "6.0.41"
-    "@types/reflect-metadata" "0.0.4"
-    "@types/sequelize" "4.27.14"
+    "@types/sequelize" "4.27.34"
     es6-shim "0.35.3"
     glob "7.1.2"
 

@@ -58,7 +58,7 @@
     "sequelize": "^4.36.1",
     "sequelize-cli": "^4.0.0",
     "sequelize-migration-pg-extras": "^1.0.1",
-    "sequelize-typescript": "^0.6.3",
+    "sequelize-typescript": "^0.6.8",
     "slate": "^0.33.0",
     "uuid": "^3.3.2"
   },
