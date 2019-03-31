@@ -51,13 +51,6 @@ export const WORKSPACES_QUERY = gql`
         value
         type
       }
-      tree {
-        id
-        experiments {
-          id
-          name
-        }
-      }
       isEligibleForAssignment
       hasIOConstraints
       hasTimeBudget
