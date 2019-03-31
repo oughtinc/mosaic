@@ -523,7 +523,7 @@ const WorkspaceModel = (
   Workspace.prototype.getConnectedPointersOfSubtree = async function(
     pointersSoFar = []
   ) {
-    const connectedPointersOfSubtree = [];
+    let connectedPointersOfSubtree = [];
 
     // Can use this.getBlocks instead of this.getVisibleBlocks because later we
     // will go on to iterate through all the children workspaces.
@@ -537,11 +537,10 @@ const WorkspaceModel = (
       pointersSoFar = pointersSoFar.concat(blockPointersToAdd);
     }
 
-    for (const childWorkspaceId of this.childWorkspaceOrder) {
-      const currentWorkspace = await sequelize.models.Workspace.findById(
-        childWorkspaceId
-      );
-      const workspacePointersToAdd = await currentWorkspace.getConnectedPointersOfSubtree(
+    const childWorkspaces = await this.getChildWorkspaces();
+
+    for (const childWorkspace of childWorkspaces) {
+      const workspacePointersToAdd = await childWorkspace.getConnectedPointersOfSubtree(
         pointersSoFar
       );
       connectedPointersOfSubtree = connectedPointersOfSubtree.concat(
