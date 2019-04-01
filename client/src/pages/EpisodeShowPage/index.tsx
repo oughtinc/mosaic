@@ -80,6 +80,9 @@ const WORKSPACE_QUERY = gql`
       allocatedBudget
       exportLockStatusInfo
       depth
+      currentlyActiveUser {
+        id
+      }
       childWorkspaces {
         id
         createdAt
@@ -337,7 +340,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
-    const isActive = queryParams.active;
+    const isActive = workspace.currentlyActiveUser && workspace.currentlyActiveUser.id === Auth.userId();
     const experimentId = queryParams.experiment;
     const hasURLTimeRestriction = queryParams.timer;
     const hasTimerEnded = this.state.hasTimerEnded;
@@ -485,6 +488,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           }}
                         >
                           <BlockEditor
+                            isActive={isActive}
                             isUserOracle={isUserOracle}
                             availablePointers={availablePointers}
                             exportLockStatusInfo={exportLockStatusInfo}
@@ -528,6 +532,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         <BlockHeader>Scratchpad</BlockHeader>
                         <BlockBody>
                           <BlockEditor
+                            isActive={isActive}
                             isUserOracle={isUserOracle}
                             availablePointers={availablePointers}
                             visibleExportIds={visibleExportIds}
@@ -546,6 +551,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         <BlockHeader>Response</BlockHeader>
                         <BlockBody>
                           <BlockEditor
+                            isActive={isActive}
                             isUserOracle={isUserOracle}
                             availablePointers={availablePointers}
                             visibleExportIds={visibleExportIds}

@@ -151,7 +151,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<any, any>
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?isolated=true&active=true&experiment=${queryParams.experiment}`;
+      const redirectQueryParams = `?isolated=true&experiment=${queryParams.experiment}`;
       window.location.href = `${window.location.origin}/workspaces/${this.state.workspaceId}${redirectQueryParams}`;
       return null;
     }
