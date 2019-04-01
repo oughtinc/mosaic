@@ -79,6 +79,7 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
     ) {
       return (
         <WorkspaceCardPresentational
+          activeWorkspaceId={queryParams.activeWorkspace}
           ejectUserFromCurrentWorkspace={async ({ userId, workspaceId }) => await this.props.ejectUserFromCurrentWorkspaceMutation({
             variables: {
               userId,
