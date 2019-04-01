@@ -189,7 +189,7 @@ const ParentLink = props => (
 );
 
 const RootTreeLink = ({ workspace }) => (
-  <NavLink target="_blank" to={`/workspaces/${workspace.idOfRootWorkspace}/subtree?expanded=true`}>
+  <NavLink target="_blank" to={`/workspaces/${workspace.idOfRootWorkspace}/subtree?expanded=true&activeWorkspace=${workspace.id}`}>
     <Button bsStyle="default" bsSize="xsmall">
       Entire Tree »
     </Button>
