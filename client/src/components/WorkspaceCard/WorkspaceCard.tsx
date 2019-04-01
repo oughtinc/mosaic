@@ -52,6 +52,7 @@ const CardBody: any = styled.div`
       "3px solid red"
     )
   }
+  box-shadow: ${(props: any) => props.isActive && "0 0 10px 5px yellow"}
   float: left;
   margin-bottom: 1em;
   width: 42em;
@@ -148,6 +149,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     const workspace: WorkspaceType = this.props.subtreeQuery.workspace;
 
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
+    const isActive = this.props.activeWorkspaceId === workspace.id;
 
     const availablePointers: ConnectedPointerType[] =
       !this.props.isTopLevelOfCurrentTree
@@ -175,7 +177,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     return (
       <Element name={workspace.id}>
         <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
-          <CardBody workspace={workspace}>
+          <CardBody isActive={isActive} workspace={workspace}>
             <div
               style={{
                 backgroundColor: "#f8f8f8",
