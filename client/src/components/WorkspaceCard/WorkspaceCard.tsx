@@ -52,7 +52,7 @@ const CardBody: any = styled.div`
       "3px solid red"
     )
   }
-  box-shadow: ${(props: any) => props.isActive && "0 0 10px 5px yellow"}
+  box-shadow: ${(props: any) => props.isActive ? "0 0 10px 5px yellow" : undefined}
   float: left;
   margin-bottom: 1em;
   width: 42em;
