@@ -132,10 +132,12 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
   public componentDidMount() {
     const isThisActiveWorkspace = this.props.activeWorkspaceId === this.props.subtreeQuery.workspace.id;
     if (isThisActiveWorkspace) {
-      scroller.scrollTo(this.props.activeWorkspaceId, {
-        duration: 500,
-        smooth: true,
-      });
+      setTimeout(() => {
+        scroller.scrollTo(this.props.activeWorkspaceId, {
+          duration: 500,
+          smooth: true,
+        });
+      }, 3000);
     }
   }
 
