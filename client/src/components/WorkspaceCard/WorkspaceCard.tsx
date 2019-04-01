@@ -2,6 +2,7 @@ import styled from "styled-components";
 import * as React from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { scroller, Element } from "react-scroll";
 import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
 import _ = require("lodash");
@@ -51,6 +52,7 @@ const CardBody: any = styled.div`
       "3px solid red"
     )
   }
+  box-shadow: ${(props: any) => props.isActive ? "0 0 10px 5px yellow" : "none"}
   float: left;
   margin-bottom: 1em;
   width: 42em;
@@ -85,6 +87,7 @@ interface WorkspaceType {
 }
 
 interface WorkspaceCardProps {
+  activeWorkspaceId: string;
   ejectUserFromCurrentWorkspace: any;
   isExpanded: boolean;
   isTopLevelOfCurrentTree: boolean;
@@ -126,6 +129,18 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     };
   }
 
+  public componentDidMount() {
+    const isThisActiveWorkspace = this.props.activeWorkspaceId === this.props.subtreeQuery.workspace.id;
+    if (isThisActiveWorkspace) {
+      setTimeout(() => {
+        scroller.scrollTo(this.props.activeWorkspaceId, {
+          duration: 500,
+          smooth: true,
+        });
+      }, 3000);
+    }
+  }
+
   public handleChangeToggle = (name: toggleTypes, value: boolean) => {
     const newToggles = { ...this.state.toggles };
     newToggles[name] = value;
@@ -136,6 +151,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     const workspace: WorkspaceType = this.props.subtreeQuery.workspace;
 
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
+    const isActive = this.props.activeWorkspaceId === workspace.id;
 
     const availablePointers: ConnectedPointerType[] =
       !this.props.isTopLevelOfCurrentTree
@@ -161,209 +177,211 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
       this.props.subtreeTimeSpentData;
 
     return (
-      <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
-        <CardBody workspace={workspace}>
-          <div
-            style={{
-              backgroundColor: "#f8f8f8",
-              borderBottom: "1px solid #ddd",
-              color: "#999",
-              fontSize: "12px",
-              padding: "10px",
-            }}
-          >
-            <div>
-              <WorkspaceLink workspaceId={workspace.id}>
-                Go to workspace »
-              </WorkspaceLink>
-            </div>
-            {
-              Auth.isAdmin()
-              &&
-              workspace.currentlyActiveUser
-              &&
-              <div
-                style={{
-                  borderBottom: "1px solid #ddd",
-                  marginBottom: "10px",
-                  paddingBottom: "5px",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "18px",
-                  }}
-                >
-                  Currently assigned to:{" "}
-                  <span style={{ color: "red", fontWeight: 600 }}>
-                    {
-                      workspace.currentlyActiveUser.givenName
-                      ?
-                        `${workspace.currentlyActiveUser.givenName} ${workspace.currentlyActiveUser.familyName}`
-                      :
-                        (
-                          workspace.currentlyActiveUser.email
-                          ||
-                          workspace.currentlyActiveUser.id
-                        )
-
-                    }
-                    <Button
-                      bsSize="xsmall"
-                      onClick={async () => {
-                        await this.props.ejectUserFromCurrentWorkspace({
-                          userId: workspace.currentlyActiveUser.id,
-                          workspaceId: workspace.id,
-                          });
-
-                        this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
-                          return {
-                            ...prv,
-                            workspace: {
-                              ...prv.workspace,
-                              currentlyActiveUser: null,
-                            },
-                          };
-                        });
-                      }}
-                      style={{ marginLeft: "10px" }}
-                    >
-                      un-assign
-                    </Button>
-                  </span>
-                </span>
-              </div>
-            }
+      <Element name={workspace.id}>
+        <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
+          <CardBody isActive={isActive} workspace={workspace}>
             <div
               style={{
-                alignItems: "center",
-                display: "flex",
-                height: "40px",
-                justifyContent: "space-between",
+                backgroundColor: "#f8f8f8",
+                borderBottom: "1px solid #ddd",
+                color: "#999",
+                fontSize: "12px",
+                padding: "10px",
               }}
             >
-              <span>
-                <ChildBudgetBadge
-                  noBadge={true}
-                  shouldShowSeconds={false}
-                  style={{ color: "#555", fontSize: "12px" }}
-                  totalBudget={subtreeTimeSpentData[workspace.id]}
-                />
-                {" "}work on entire subtree
-                <br />
-                <ChildBudgetBadge
-                  noBadge={true}
-                  shouldShowSeconds={false}
-                  style={{ color: "#555", fontSize: "12px" }}
-                  totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
-                />
-                {" "}work on workspace
-              </span>
+              <div>
+                <WorkspaceLink workspaceId={workspace.id}>
+                  Go to workspace »
+                </WorkspaceLink>
+              </div>
               {
                 Auth.isAdmin()
                 &&
-                <span style={{ padding: "0 10px"}}>
-                  <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="stale"
-                    updateMutation={this.handleOnIsStaleCheckboxChange}
-                    workspace={workspace}
-                    workspaceFieldToUpdate="isStale"
-                  />
-                  <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="honest oracle"
-                    updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
-                    workspace={workspace}
-                    workspaceFieldToUpdate="isEligibleForHonestOracle"
-                  />
-                  <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="malicious oracle"
-                    updateMutation={this.handleOnIsEligibleForMaliciousOracleCheckboxChange}
-                    workspace={workspace}
-                    workspaceFieldToUpdate="isEligibleForMaliciousOracle"
-                  />
-                  <AdminCheckboxThatTogglesWorkspaceField
-                    checkboxLabelText="resolved"
-                    updateMutation={this.handleOnIsCurrentlyResolvedCheckboxChange}
-                    workspace={workspace}
-                    workspaceFieldToUpdate="isCurrentlyResolved"
-                  />
-                </span>
-                }
-            </div>
-            {
-              Auth.isAdmin()
-              &&
-              workspace.isNotStaleRelativeToUserFullInformation.length !== 0
-              &&
-              <div
-                style={{
-                  padding: "10px 10px 0 10px",
-                  width: "100%",
-                }}
-              >
-                Users who have passed on workspace with "Needs More Work":
-                <ul style={{paddingInlineStart: "30px"}}>
-                {workspace.isNotStaleRelativeToUserFullInformation.map((user, i, arr) => {
-                  return (
-                    <li key={user.id} style={{ margin: i < arr.length - 1 ? "10px 0" : "5px 0 0 0" }}>
+                workspace.currentlyActiveUser
+                &&
+                <div
+                  style={{
+                    borderBottom: "1px solid #ddd",
+                    marginBottom: "10px",
+                    paddingBottom: "5px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "18px",
+                    }}
+                  >
+                    Currently assigned to:{" "}
+                    <span style={{ color: "red", fontWeight: 600 }}>
                       {
-                        user.givenName
+                        workspace.currentlyActiveUser.givenName
                         ?
-                        `${user.givenName} ${user.familyName}`
+                          `${workspace.currentlyActiveUser.givenName} ${workspace.currentlyActiveUser.familyName}`
                         :
-                        (
-                          user.email
-                          ||
-                          user.id
-                        )
+                          (
+                            workspace.currentlyActiveUser.email
+                            ||
+                            workspace.currentlyActiveUser.id
+                          )
+
                       }
                       <Button
                         bsSize="xsmall"
                         onClick={async () => {
-                          await this.props.markWorkspaceStaleForUser({
-                            userId: user.id,
+                          await this.props.ejectUserFromCurrentWorkspace({
+                            userId: workspace.currentlyActiveUser.id,
                             workspaceId: workspace.id,
-                          });
+                            });
 
                           this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
                             return {
                               ...prv,
                               workspace: {
                                 ...prv.workspace,
-                                isNotStaleRelativeToUserFullInformation: prv.workspace.isNotStaleRelativeToUserFullInformation.filter(u => u.id !== user.id)
+                                currentlyActiveUser: null,
                               },
                             };
                           });
                         }}
-                        style={{ marginLeft: "8px" }}
+                        style={{ marginLeft: "10px" }}
                       >
-                        make stale for user
+                        un-assign
                       </Button>
-                    </li>
-                  );
-                })}
-                </ul>
+                    </span>
+                  </span>
+                </div>
+              }
+              <div
+                style={{
+                  alignItems: "center",
+                  display: "flex",
+                  height: "40px",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span>
+                  <ChildBudgetBadge
+                    noBadge={true}
+                    shouldShowSeconds={false}
+                    style={{ color: "#555", fontSize: "12px" }}
+                    totalBudget={subtreeTimeSpentData[workspace.id]}
+                  />
+                  {" "}work on entire subtree
+                  <br />
+                  <ChildBudgetBadge
+                    noBadge={true}
+                    shouldShowSeconds={false}
+                    style={{ color: "#555", fontSize: "12px" }}
+                    totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
+                  />
+                  {" "}work on workspace
+                </span>
+                {
+                  Auth.isAdmin()
+                  &&
+                  <span style={{ padding: "0 10px"}}>
+                    <AdminCheckboxThatTogglesWorkspaceField
+                      checkboxLabelText="stale"
+                      updateMutation={this.handleOnIsStaleCheckboxChange}
+                      workspace={workspace}
+                      workspaceFieldToUpdate="isStale"
+                    />
+                    <AdminCheckboxThatTogglesWorkspaceField
+                      checkboxLabelText="honest oracle"
+                      updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
+                      workspace={workspace}
+                      workspaceFieldToUpdate="isEligibleForHonestOracle"
+                    />
+                    <AdminCheckboxThatTogglesWorkspaceField
+                      checkboxLabelText="malicious oracle"
+                      updateMutation={this.handleOnIsEligibleForMaliciousOracleCheckboxChange}
+                      workspace={workspace}
+                      workspaceFieldToUpdate="isEligibleForMaliciousOracle"
+                    />
+                    <AdminCheckboxThatTogglesWorkspaceField
+                      checkboxLabelText="resolved"
+                      updateMutation={this.handleOnIsCurrentlyResolvedCheckboxChange}
+                      workspace={workspace}
+                      workspaceFieldToUpdate="isCurrentlyResolved"
+                    />
+                  </span>
+                  }
               </div>
-            }
-          </div>
-          <BlockSection
+              {
+                Auth.isAdmin()
+                &&
+                workspace.isNotStaleRelativeToUserFullInformation.length !== 0
+                &&
+                <div
+                  style={{
+                    padding: "10px 10px 0 10px",
+                    width: "100%",
+                  }}
+                >
+                  Users who have passed on workspace with "Needs More Work":
+                  <ul style={{paddingInlineStart: "30px"}}>
+                  {workspace.isNotStaleRelativeToUserFullInformation.map((user, i, arr) => {
+                    return (
+                      <li key={user.id} style={{ margin: i < arr.length - 1 ? "10px 0" : "5px 0 0 0" }}>
+                        {
+                          user.givenName
+                          ?
+                          `${user.givenName} ${user.familyName}`
+                          :
+                          (
+                            user.email
+                            ||
+                            user.id
+                          )
+                        }
+                        <Button
+                          bsSize="xsmall"
+                          onClick={async () => {
+                            await this.props.markWorkspaceStaleForUser({
+                              userId: user.id,
+                              workspaceId: workspace.id,
+                            });
+
+                            this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
+                              return {
+                                ...prv,
+                                workspace: {
+                                  ...prv.workspace,
+                                  isNotStaleRelativeToUserFullInformation: prv.workspace.isNotStaleRelativeToUserFullInformation.filter(u => u.id !== user.id)
+                                },
+                              };
+                            });
+                          }}
+                          style={{ marginLeft: "8px" }}
+                        >
+                          make stale for user
+                        </Button>
+                      </li>
+                    );
+                  })}
+                  </ul>
+                </div>
+              }
+            </div>
+            <BlockSection
+              workspace={workspace}
+              availablePointers={availablePointers}
+            />
+          </CardBody>
+          <ChildrenSection
+            parentPointers={availablePointers}
             workspace={workspace}
-            availablePointers={availablePointers}
+            childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
+            onChangeToggle={() =>
+              this.handleChangeToggle(
+                toggleTypes.CHILDREN,
+                !this.state.toggles[toggleTypes.CHILDREN]
+              )
+            }
+            subtreeTimeSpentData={subtreeTimeSpentData}
           />
-        </CardBody>
-        <ChildrenSection
-          parentPointers={availablePointers}
-          workspace={workspace}
-          childrenToggle={this.state.toggles[toggleTypes.CHILDREN]}
-          onChangeToggle={() =>
-            this.handleChangeToggle(
-              toggleTypes.CHILDREN,
-              !this.state.toggles[toggleTypes.CHILDREN]
-            )
-          }
-          subtreeTimeSpentData={subtreeTimeSpentData}
-        />
-      </Container>
+        </Container>
+      </Element>
     );
   }
 

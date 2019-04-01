@@ -40,6 +40,7 @@
     "react-router": "^4.2.0",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.2.2",
+    "react-scroll": "^1.7.11",
     "react-select": "^1.2.1",
     "react-table": "^6.8.0",
     "recompose": "^0.26.0",
