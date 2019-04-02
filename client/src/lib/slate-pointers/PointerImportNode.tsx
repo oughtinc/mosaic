@@ -97,7 +97,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       return;
     }
 
-    const isAdminNotInFlow = Auth.isAdmin() && !parseQueryString(window.location.search).active;
+    const isAdminNotInFlow = Auth.isAdmin() && !this.props.isActive;
     const isOracleInOracleMode = this.props.isInOracleMode && this.props.isUserOracle;
 
     if (!this.props.hasExportBeenOpened && (isAdminNotInFlow || isOracleInOracleMode)) {
@@ -134,8 +134,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   };
 
   public handleClosedPointerClick = (e: Event, pointerId: string, exportPointerId: string) => {
-    const queryParams = parseQueryString(window.location.search);
-    const isActive = queryParams.active;
+    const isActive = this.props.isActive;
 
     if (this.isLocked() && this.state.isLocked) {
       this.setState({ isLocked: false });

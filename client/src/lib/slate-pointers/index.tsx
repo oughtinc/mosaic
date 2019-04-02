@@ -108,6 +108,7 @@ function SlatePointers(options: any = {}) {
 
         return (
           <PointerImportNode
+            isActive={options.isActive}
             visibleExportIds={options.visibleExportIds}
             exportLockStatusInfo={options.exportLockStatusInfo}
             isInOracleMode={options.isInOracleMode}

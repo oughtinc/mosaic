@@ -93,6 +93,7 @@ export class Child extends React.Component<any, any> {
             {questionRelationship.findBlock().value && (
               <BlockEditor
                 {...questionRelationship.blockEditorAttributes()}
+                isActive={this.props.isActive}
                 isUserOracle={this.props.isUserOracle}
                 readOnly={true}
                 availablePointers={availablePointers}
@@ -140,6 +141,7 @@ export class Child extends React.Component<any, any> {
             <BlockEditorContainer>
               <BlockEditor
                 {...questionRelationship.blockEditorAttributes()}
+                isActive={this.props.isActive}
                 isUserOracle={this.props.isUserOracle}
                 availablePointers={availablePointers}
                 visibleExportIds={this.props.visibleExportIds}
@@ -167,6 +169,7 @@ export class Child extends React.Component<any, any> {
                   ?
                     <BlockEditor
                       {...answerDraftRelationship.blockEditorAttributes()}
+                      isActive={this.props.isActive}
                       isUserOracle={this.props.isUserOracle}
                       availablePointers={availablePointers}
                       visibleExportIds={this.props.visibleExportIds}
@@ -176,6 +179,7 @@ export class Child extends React.Component<any, any> {
                   :
                     <BlockEditor
                       {...answerRelationship.blockEditorAttributes()}
+                      isActive={this.props.isActive}
                       isUserOracle={this.props.isUserOracle}
                       availablePointers={availablePointers}
                       visibleExportIds={this.props.visibleExportIds}
@@ -350,6 +354,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     }}
                   >
                     <Child
+                      isActive={this.props.isActive}
                       isUserOracle={this.props.isUserOracle}
                       pastedExportFormat={this.props.pastedExportFormat}
                       shouldAutoExport={this.props.shouldAutoExport}
