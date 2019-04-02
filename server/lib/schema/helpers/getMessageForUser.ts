@@ -10,11 +10,11 @@ export function getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspac
 &nbsp;\n
 1. See how the malicious oracle has responded\n
 2. If the malicious oracle is reporting which answer the normal user has selected:\n
-  - Include this selected answer in the reponse field, even if it is the malicious answer\n
-  - Click "Done & bubble answer up" under the response field\n
+   - Include this selected answer in the reponse field, even if it is the malicious answer\n
+   - Click "Done & bubble answer up" under the response field\n
 3. If the malicious oracle is reporting they don't want to challenge your answer:\n
-  - Include your honest answer in the reponse field\n
-  - Click "Done & bubble answer up" under the response field`
+   - Include your honest answer in the reponse field\n
+   - Click "Done & bubble answer up" under the response field`
             );
           }
 
@@ -22,13 +22,13 @@ export function getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspac
             return (
 `**Instructions for returning malicious oracle**\n
 &nbsp;\n
-1. See how the normal user oracle has responded\n
-2. If the normal user has selected one of the answer:\n
+1. See how the normal user has responded\n
+2. If the normal user has selected one of the answers:\n
    - Include this selected answer in the reponse field\n
    - Click "Done & bubble answer up" under the response field\n
 3. If the normal user has asked for clarification:\n
    - Clarify the issue by either editing the subquestion or by submitting a new subquestion
-            `
+   - Click "Next workspace" under the response field`
             );
         }
     }
@@ -59,12 +59,12 @@ export function getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspac
 &nbsp;\n
 1. Decide whether to challenge the honest oracle on this question and answer\n
 2. If you decided to challenge:\n
-  - Fill in an incorrect/unhelpful but plausible alternative answer below\n
-  - Click "Submit" on the right\n
-  - Click "Next workspace" under the response field\n
+   - Fill in an incorrect/unhelpful but plausible alternative answer below\n
+   - Click "Submit" on the right\n
+   - Click "Next workspace" under the response field\n
 3. If you decide not to challenge:\n
-  - Write "No challenge" or something similar in the response field\n
-  - Click "Done & bubble answer up" under the response field`
+   - Write "No challenge" or something similar in the response field\n
+   - Click "Done & bubble answer up" under the response field`
       );
     }
 
