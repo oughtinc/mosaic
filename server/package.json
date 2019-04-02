@@ -27,7 +27,7 @@
     "pretest": "NODE_ENV=test npm run db:reset"
   },
   "dependencies": {
-    "apollo-server-express": "^1.1.7",
+    "apollo-server-express": "^2.4.8",
     "async": "^2.6.0",
     "asyncro": "^3.0.0",
     "auth0": "^2.16.0",
