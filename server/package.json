@@ -79,7 +79,7 @@
     "concurrently": "^4.0.1",
     "immutable": "^3.8.2",
     "mocha": "^3.0.1",
-    "nodemon": "^1.12.1",
+    "nodemon": "^1.18.10",
     "rimraf": "^2.6.2",
     "sinon": "^6.3.5",
     "ts-node": "^5.0.1",
