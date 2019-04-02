@@ -1,10 +1,10 @@
-import * as auth0 from "auth0-js";
+import { AuthenticationClient } from "auth0";
 
 const { auth0_client_id } = require("../../../config/config.json");
 
-const webAuth = new auth0.WebAuth({
+const authClient = new AuthenticationClient({
   domain: "mosaicapp.auth0.com",
-  clientID: auth0_client_id,
+  clientId: auth0_client_id,
 });
 
 export function userFromAuthToken(accessToken: string | null): Promise<any | null> {
@@ -24,7 +24,7 @@ export function userFromAuthToken(accessToken: string | null): Promise<any | nul
   }
 
   return new Promise(resolve => {
-    webAuth.client.userInfo(accessToken, function(err: any, user: any) {
+    authClient.getProfile(accessToken, function(err: any, user: any) {
       if (err != null) {
         console.log("UserInfo error:", err);
         return resolve(null);
