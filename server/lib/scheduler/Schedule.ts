@@ -214,6 +214,19 @@ class Schedule {
     );
   }
 
+  public isThisFirstTimeWorkspaceHasBeenWorkedOn(workspace) {
+    return this.getAllAssignmentsForWorkspace(workspace).length === 1;
+  }
+
+  public getAllAssignmentsForWorkspace(workspace) {
+    return _.flatten(
+      _.map(
+        [...this.schedule],
+        ([userId, userSchedule]) => userSchedule.getAssignmentsForWorkspace(workspace)
+      )
+    );
+  }
+
   public getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
     minDist,
     userId,

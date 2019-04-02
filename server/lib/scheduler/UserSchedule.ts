@@ -124,6 +124,17 @@ class UserSchedule {
     return _.some(this.userSchedule, assignment => assignment.getWorkspace().id === workspace.id);
   }
 
+  public getAssignmentsForWorkspace(workspaceOrWorkspaceId) {
+    let workspaceId;
+    if (typeof workspaceOrWorkspaceId === "string") {
+      workspaceId = workspaceOrWorkspaceId;
+    } else {
+      workspaceId = workspaceOrWorkspaceId.id;
+    }
+
+    return _.filter(this.userSchedule, assignment => assignment.getWorkspace().id === workspaceId);
+  }
+
   public isUserCurrentlyWorkingOnWorkspace(workspaceOrWorkspaceId) {
     let workspaceId;
     if (typeof workspaceOrWorkspaceId === "string") {

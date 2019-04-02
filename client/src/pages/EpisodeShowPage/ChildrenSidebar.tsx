@@ -269,6 +269,8 @@ export class Child extends React.Component<any, any> {
         </div>
         <div style={{ marginTop: "10px" }}>
           {
+            false /* don't need for current experiments */
+            &&
             this.props.isUserOracle
             &&
             this.props.isInOracleMode

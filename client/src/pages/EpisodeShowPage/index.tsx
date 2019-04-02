@@ -7,8 +7,9 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
 import { Helmet } from "react-helmet";
+const ReactMarkdown = require("react-markdown");
 import { compose } from "recompose";
-import { Row, Col, Button } from "react-bootstrap";
+import { Alert, Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
 import { parse as parseQueryString } from "query-string";
 import { AdvancedOptions } from "./AdvancedOptions";
@@ -80,6 +81,7 @@ const WORKSPACE_QUERY = gql`
       allocatedBudget
       exportLockStatusInfo
       depth
+      message
       currentlyActiveUser {
         id
       }
@@ -528,6 +530,13 @@ export class WorkspaceView extends React.Component<any, any> {
                   </Row>
                   <Row>
                     <Col sm={6}>
+                      {
+                        workspace.message
+                        &&
+                        <Alert style={{ border: "1px solid #ddd"}}>
+                          <ReactMarkdown source={workspace.message} />
+                        </Alert>
+                      }
                       <BlockContainer>
                         <BlockHeader>Scratchpad</BlockHeader>
                         <BlockBody>
@@ -570,6 +579,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           isActive
                           &&
                           <ResponseFooter
+                            hasChildren={workspace.childWorkspaces.length > 0}
                             experimentId={experimentId}
                             hasTimeBudget={hasTimeBudget}
                             depleteBudget={() =>

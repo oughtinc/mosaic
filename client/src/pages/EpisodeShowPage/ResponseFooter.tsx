@@ -7,16 +7,16 @@ import {
   responseFooterBorderTopColor,
 } from "../../styles";
 
-const TakeBreakBtn = ({ experimentId, label, navHook }: any) => {
+const TakeBreakBtn = ({ bsStyle, disabled, experimentId, label, navHook }: any) => {
   if (!experimentId) {
     return (
-      <Button bsSize="small" bsStyle="primary" onClick={navHook} style={{ margin: "0 5px" }}>{label} »</Button>
+      <Button bsSize="small" bsStyle={bsStyle || "primary"} disabled={disabled} onClick={navHook} style={{ margin: "0 5px" }}>{label} »</Button>
     );
   }
 
   return (
     <Link onClick={navHook} to={`/break?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
-      <Button bsSize="small" bsStyle="primary">{label} »</Button>
+      <Button bsSize="small" bsStyle={bsStyle || "primary"} disabled={disabled}>{label} »</Button>
     </Link>
   );
 };
@@ -26,6 +26,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
     const {
       depleteBudget,
       experimentId,
+      hasChildren,
       hasParent,
       hasTimeBudget,
       isInOracleMode,
@@ -78,19 +79,30 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                 }}
               />
               :
-              <TakeBreakBtn
-                experimentId={experimentId}
-                bsStyle="danger"
-                label={`Done!${hasTimeBudget ? " (take budget)" : ""}`}
-                navHook={() => {
-                  if (hasTimeBudget) {
-                    depleteBudget();
-                  }
-                  markAsAnsweredByOracle();
-                  markAsNotStale();
-                  markAsCurrentlyResolved();
-                }}
-              />
+              <div>
+                <TakeBreakBtn
+                  disabled={!hasChildren}
+                  experimentId={experimentId}
+                  bsStyle="primary"
+                  label={`Next workspace`}
+                  navHook={() => {
+                    markAsNotStale();
+                  }}
+                />
+                {
+                  hasParent
+                  &&
+                  <TakeBreakBtn
+                    experimentId={experimentId}
+                    bsStyle="danger"
+                    label={`Done & bubble answer up`}
+                    navHook={() => {
+                      markAsNotStale();
+                      markAsCurrentlyResolved();
+                    }}
+                  />
+                }
+              </div>
             )
         }
       </div>

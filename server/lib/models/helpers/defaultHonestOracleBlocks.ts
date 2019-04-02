@@ -16,12 +16,7 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
             {
               object: "leaf",
               text:
-`1. Fill in a correct/helpful answer below
-2. Click "Submit" on the right
-3. Delete these instructions
-4. Click "Done!" under the response field
---
-A (correct):  `,
+`A (correct):  `,
               marks: [],
             },
           ],
@@ -121,22 +116,6 @@ A (correct):  `,
             { object: "leaf", text: `A `, marks: [] },
           ],
         },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId: a1id,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
-            },
-          ],
-        },
-        { object: "text", leaves: [{ object: "leaf", text: "", marks: [] }] },
       ],
     },
   ];

@@ -27,6 +27,8 @@ import { isUserOracle } from "./auth/isUserOracle";
 import { userFromAuthToken } from "./auth/userFromAuthToken";
 import { userFromContext } from "./auth/userFromContext";
 
+import { getMessageForUser } from "./helpers/getMessageForUser";
+
 import { createScheduler, schedulers } from "../scheduler";
 
 const generateReferences = (model, references) => {
@@ -72,6 +74,63 @@ export const workspaceType = makeObjectType(models.Workspace, [
   ["pointerImports", () => new GraphQLList(pointerImportType), "PointerImports"],
   ["tree", () => treeType, "Tree"]
 ], {
+  message :{
+    type: GraphQLString,
+    resolve: async (workspace, args, context) => {
+      const user = context.user;
+
+      if (!user) {
+        return null;
+      }
+
+      // get root workspace
+      let curWorkspace = workspace;
+      while (curWorkspace.parentId) {
+        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+      }
+      const rootWorkspace = curWorkspace;
+
+      // get experiment id
+      const tree = await rootWorkspace.getTree();
+      const experiments = await tree.getExperiments();
+      if (experiments.length === 0) {
+        return null;
+      }
+
+      const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
+      const experimentId = mostRecentExperiment.id;
+
+      // get scheduler
+      let scheduler;
+      if (schedulers.has(experimentId)) {
+        scheduler = schedulers.get(experimentId);
+      } else {
+        scheduler = await createScheduler(experimentId);
+      }
+
+      const isWorkspaceRootLevel = !workspace.parentId;
+      const isThisFirstTimeWorkspaceHasBeenWorkedOn = await scheduler.isThisFirstTimeWorkspaceHasBeenWorkedOn(workspace.id);
+
+      const userTreeOracleRelations = await tree.getUserTreeOracleRelations();
+      const thisUserTreeOracleRelation = userTreeOracleRelations.find(r => r.UserId === user.id);
+
+      const typeOfUser =
+        !thisUserTreeOracleRelation
+        ?
+        "TYPICAL"
+        : (
+          !thisUserTreeOracleRelation.isMalicious
+          ?
+          "HONEST"
+          :
+          "MALICIOUS"
+        );
+
+      const message = getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspaceHasBeenWorkedOn, typeOfUser});
+
+      return message;
+    },
+  },
   isUserOracleForTree: {
     type: GraphQLBoolean,
     resolve: async (workspace, args, context) => {
@@ -877,7 +936,7 @@ const schema = new GraphQLSchema({
                 {
                   totalBudget,
                   creatorId: user.user_id,
-                  isEligibleForHonestOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
+                  isEligibleForMaliciousOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
                 }, // TODO replace user.user_id
                 { event, questionValue: JSON.parse(question) }
               );

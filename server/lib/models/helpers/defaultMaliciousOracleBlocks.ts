@@ -6,7 +6,6 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
   const [questionPointerId, correctPointerId] = extractPointerIdsFromQuestionValue(questionValue);
 
   const coinflip = Math.random() < 0.5 ? "A1" : "A2";
-
   const scratchpadBlockValue = [
     {
       object: "block",
@@ -20,14 +19,7 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
             {
               object: "leaf",
               text: 
-`1. Decide whether to challenge the honest oracle on this question and answer
-2. If you decided to challenge:
-    - Fill in an incorrect/unhelpful but plausible alternative answer below
-    - Click "Submit" on the right
-3. Delete these instructions
-4. Click "Done!" under the response field
---
-A (incorrect): `,
+`A (incorrect): `,
               marks: [],
             },
           ],
@@ -151,7 +143,7 @@ A (incorrect): `,
         {
           object: "text",
           leaves: [
-            { object: "leaf", text: `Ok`, marks: [] },
+            { object: "leaf", text: " ", marks: [] },
           ],
         },
       ],

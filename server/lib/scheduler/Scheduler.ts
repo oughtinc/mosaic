@@ -61,6 +61,10 @@ class Scheduler {
     }
   }
 
+  public isThisFirstTimeWorkspaceHasBeenWorkedOn(workspaceId) {
+    return this.schedule.isThisFirstTimeWorkspaceHasBeenWorkedOn(workspaceId);
+  }
+
   public async getUserActivity(userId) {
     const thisSchedulerUserActivity = await this.schedule.getUserActivity(userId);
     const fallbackScheduler = await this.getFallbackScheduler();  

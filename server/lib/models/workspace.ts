@@ -10,6 +10,8 @@ const Op = Sequelize.Op;
 import * as _ from "lodash";
 import { createHonestOracleDefaultBlockValues } from "./helpers/defaultHonestOracleBlocks";
 import { createMaliciousOracleDefaultBlockValues } from "./helpers/defaultMaliciousOracleBlocks";
+import { createDefaultRootLevelBlockValues } from "./helpers/defaultRootLevelBlocks";
+
 import { isInOracleMode } from "../globals/isInOracleMode";
 
 const WorkspaceModel = (
@@ -294,14 +296,25 @@ const WorkspaceModel = (
             await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
             await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
           } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
-            const {
-              scratchpadBlockValue,
-              answerDraftBlockValue,
-              responseBlockValue
-            } = createMaliciousOracleDefaultBlockValues(questionValue);
-            await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-            await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-            await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+            if (workspace.parentId) {
+              const {
+                scratchpadBlockValue,
+                answerDraftBlockValue,
+                responseBlockValue
+              } = createMaliciousOracleDefaultBlockValues(questionValue);
+              await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+              await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+              await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+            } else {
+              const {
+                scratchpadBlockValue,
+                answerDraftBlockValue,
+                responseBlockValue
+              } = createDefaultRootLevelBlockValues();
+              await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+              await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+              await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+            }
           } else {
             await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
             await workspace.createBlock({ type: "SUBQUESTION_DRAFT" }, { event });
@@ -343,8 +356,10 @@ const WorkspaceModel = (
     }
 
     const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
+    const isParentRootWorkspace = !parentWorkspace.parentId;
     const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle || parentWorkspace.isEligibleForMaliciousOracle;
-    if (isParentOracleWorkspace) {
+
+    if (isParentOracleWorkspace && !isParentRootWorkspace) {
       return false;
     }
 
