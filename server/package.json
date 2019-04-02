@@ -55,7 +55,7 @@
     "pg-hstore": "^2.3.2",
     "pluralize": "^7.0.0",
     "reflect-metadata": "^0.1.12",
-    "sequelize": "^4.36.1",
+    "sequelize": "^5.2.9",
     "sequelize-cli": "^4.0.0",
     "sequelize-migration-pg-extras": "^1.0.1",
     "sequelize-typescript": "^0.6.3",
