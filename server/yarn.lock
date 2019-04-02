@@ -189,13 +189,10 @@
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/@sinonjs/samsam/-/samsam-2.1.2.tgz#16947fce5f57258d01f1688fdc32723093c55d3f"
 
-"@types/bluebird@*":
-  version "3.5.20"
-  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.20.tgz#f6363172add6f4eabb8cada53ca9af2781e8d6a1"
-
-"@types/bluebird@3.5.18":
-  version "3.5.18"
-  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.18.tgz#6a60435d4663e290f3709898a4f75014f279c4d6"
+"@types/bluebird@*", "@types/bluebird@3.5.26":
+  version "3.5.26"
+  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.26.tgz#a38c438ae84fa02431d6892edf86e46edcbca291"
+  integrity sha512-aj2mrBLn5ky0GmAg6IPXrQjnN0iB/ulozuJ+oZdrHRAzRbXjGmu4UXsNCjFvPbSaaPZmniocdOzsM392qLOlmQ==
 
 "@types/body-parser@*":
   version "1.17.0"
@@ -279,13 +276,10 @@
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.0.tgz#b3c8e69f038835db1a7fdc0b3d879fc50506e29e"
 
-"@types/node@*":
-  version "10.0.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.0.8.tgz#37b4d91d4e958e4c2ba0be2b86e7ed4ff19b0858"
-
-"@types/node@6.0.41":
-  version "6.0.41"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.41.tgz#578cf53aaec65887bcaf16792f8722932e8ff8ea"
+"@types/node@*", "@types/node@11.12.2":
+  version "11.12.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-11.12.2.tgz#d7f302e74b10e9801d52852137f652d9ee235da8"
+  integrity sha512-c82MtnqWB/CqqK7/zit74Ob8H1dBdV7bK+BcErwtXbe0+nUGkgzq5NTDmRW/pAv2lFtmeNmW95b0zK2hxpeklg==
 
 "@types/node@^8.0.7":
   version "8.10.45"
@@ -297,13 +291,10 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
-"@types/reflect-metadata@0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@types/reflect-metadata/-/reflect-metadata-0.0.4.tgz#b6477ca9a97e5265f2ac67f9ea704eae5e0eaf4d"
-
-"@types/sequelize@4.27.14":
-  version "4.27.14"
-  resolved "https://registry.yarnpkg.com/@types/sequelize/-/sequelize-4.27.14.tgz#621dcc33db884e1fca368dc1b9fa7a60b38785d3"
+"@types/sequelize@4.27.46":
+  version "4.27.46"
+  resolved "https://registry.yarnpkg.com/@types/sequelize/-/sequelize-4.27.46.tgz#f4bc7aafa45f264837200364b31172ad8aff4a33"
+  integrity sha512-hqosowwLJsLrR+A8IOVgGQaToaBAZE54WLJmjxARaoHC4hl4lmfzXPNY/JGn3hmxNIhb6klHs7skQ2uJPrlXSA==
   dependencies:
     "@types/bluebird" "*"
     "@types/continuation-local-storage" "*"
@@ -4579,14 +4570,14 @@ sequelize-migration-pg-extras@^1.0.1:
   dependencies:
     pg "^4.0.0"
 
-sequelize-typescript@^0.6.3:
-  version "0.6.4"
-  resolved "https://registry.yarnpkg.com/sequelize-typescript/-/sequelize-typescript-0.6.4.tgz#3fa829fd86790079ba425686d2ee6dc3cb697978"
+sequelize-typescript@^0.6.9:
+  version "0.6.9"
+  resolved "https://registry.yarnpkg.com/sequelize-typescript/-/sequelize-typescript-0.6.9.tgz#89a35b7e8e0afd6be74e781df5cc06c2884ff8fc"
+  integrity sha512-8A5gi8BpKx4Gk9BjD3Dxrv7Ps/7PpZuYfoVkQXNMuL9a4M2d2fKZiBLurSA/5KmNgdVrLKKRkyJxghBpFR7tNg==
   dependencies:
-    "@types/bluebird" "3.5.18"
-    "@types/node" "6.0.41"
-    "@types/reflect-metadata" "0.0.4"
-    "@types/sequelize" "4.27.14"
+    "@types/bluebird" "3.5.26"
+    "@types/node" "11.12.2"
+    "@types/sequelize" "4.27.46"
     es6-shim "0.35.3"
     glob "7.1.2"
 
