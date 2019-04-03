@@ -579,6 +579,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           isActive
                           &&
                           <ResponseFooter
+                            isUserMaliciousOracle={isUserMaliciousOracle}
                             hasChildren={workspace.childWorkspaces.length > 0}
                             experimentId={experimentId}
                             hasTimeBudget={hasTimeBudget}

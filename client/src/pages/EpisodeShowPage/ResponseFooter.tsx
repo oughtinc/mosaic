@@ -30,6 +30,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       hasTimeBudget,
       isInOracleMode,
       isUserOracle,
+      isUserMaliciousOracle,
       markAsCurrentlyResolved,
       markAsNotStale,
       transferRemainingBudgetToParent,
@@ -79,7 +80,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               :
               <div>
                 <TakeBreakBtn
-                  disabled={!hasChildren}
+                  disabled={!isUserMaliciousOracle && !hasChildren}
                   experimentId={experimentId}
                   bsStyle="primary"
                   label={`Done!`}
