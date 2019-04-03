@@ -58,7 +58,7 @@ export default class Block extends Model<Block> {
   public workspace: Workspace;
 
   @HasMany(() => Pointer, "sourceBlockId")
-  public ExportingPointers: Pointer[];
+  public exportingPointers: Pointer[];
 
   @ForeignKey(() => EventModel)
   @Column(DataType.INTEGER)
@@ -119,14 +119,14 @@ export default class Block extends Model<Block> {
   }
 
   public async ensureAllPointersAreInDatabase({ event }) {
-    const exportingPointers = await this.getExportingPointers();
+    const exportingPointers = await this.$get("exportingPointers") as Pointer[];
     const { cachedExportPointerValues } = this;
 
     for (const pointerId of Object.keys(cachedExportPointerValues)) {
       if (!_.includes(exportingPointers.map(p => p.id), pointerId)) {
         const pointer = await Pointer.findById(pointerId);
         if (!pointer) {
-          await this.createExportingPointer({ id: pointerId }, { event });
+          await this.$create("exportingPointer", { id: pointerId }, { event });
         } else {
           // if the pointer already exists,
           // then it was present in the subquestion draft block,
@@ -146,7 +146,7 @@ export default class Block extends Model<Block> {
       // If it's marked as resolved, then it's going to transition from
       // from resolved to unresolved, so let's take a snapshot of the draft as the answer
       if (workspace.isCurrentlyResolved) {
-        const blocks = await workspace.getBlocks();
+        const blocks = await workspace.$get("blocks") as Block[];
         const answerDraft = blocks.find(b => b.type === "ANSWER_DRAFT");
         const answer = blocks.find(b => b.type === "ANSWER");
 
