@@ -8,9 +8,9 @@ import { graphqlExpress, graphiqlExpress } from "apollo-server-express";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
 
+import db from "./models";
 import { userFromAuthToken } from "./schema/auth/userFromAuthToken";
-import { schema } from "./schema/index";
-import * as models from "./models";
+import { schema } from "./schema";
 import { testingRoutes } from "./testing/routes";
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
@@ -32,10 +32,10 @@ if (!process.env.USING_DOCKER) {
 graphQLServer.use("/graphql", bodyParser.json(), async (req, res, next) => {
   if (req.headers.authorization !== "null") {
     const userInfo = await userFromAuthToken(req.headers.authorization);
-    let user = await models.User.findByPk(userInfo.user_id);
+    let user = await db.models.User.findByPk(userInfo.user_id);
 
     if (!user) {
-      user = await models.User.create({
+      user = await db.models.User.create({
         id: userInfo.user_id,
         givenName: userInfo.given_name,
         familyName: userInfo.family_name,

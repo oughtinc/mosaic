@@ -1,132 +1,172 @@
-import * as Sequelize from "sequelize";
 import { diff } from "deep-object-diff";
-import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations,
-} from "../eventIntegration";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 import * as _ from "lodash";
+import {
+  AfterSave,
+  BeforeUpdate,
+  BeforeValidate,
+  BelongsTo,
+  Column,
+  DataType,
+  HasMany,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import { UUIDV4 } from "sequelize";
+import EventModel from "./event";
+import Workspace from "./workspace";
+import Pointer from "./pointer";
 
 const QUESTION_TYPE = "QUESTION"; // move elsewhere?
 const ANSWER_TYPE = "ANSWER";
 const SCRATCHPAD_TYPE = "SCRATCHPAD";
 
-const BlockModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const Block = sequelize.define(
-    "Block",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      ...eventRelationshipColumns(DataTypes),
-      type: {
-        type: DataTypes.ENUM(
-          "QUESTION",
-          "ANSWER",
-          "SCRATCHPAD",
-          "SUBQUESTION_DRAFT",
-          "ANSWER_DRAFT"
-        ),
-        allowNull: false,
-      },
-      value: {
-        type: DataTypes.JSON,
-      },
-      cachedExportPointerValues: {
-        type: DataTypes.JSON,
-      },
-    },
-    {
-      hooks: {
-        beforeValidate: async (item: any, options: any) => {
-          eventHooks.beforeValidate(item, options);
-          item.cachedExportPointerValues = await item.exportingPointerValues();
-        },
-        beforeUpdate: (item: any, options: any) => {
-          options.fields = item.changed();
-        },
-        afterSave: async (item: any, options: any) => {
-          await item.ensureAllPointersAreInDatabase({ event: options.event, models: sequelize.models });
-          if (item._previousDataValues) {
-            const changes = diff(item._previousDataValues, item.dataValues);
-            if (!_.isEmpty(changes.value)) {
-              await item.updateStalenessAndIsCurrentlyResolved({ event: options.event });
-            }
-          }
-        }
+@Table({ tableName: "Blocks" })
+export default class Block extends Model<Block> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
+
+  @Column({
+    type: DataType.ENUM(
+      "QUESTION",
+      "ANSWER",
+      "SCRATCHPAD",
+      "SUBQUESTION_DRAFT",
+      "ANSWER_DRAFT"
+    ),
+    allowNull: false
+  })
+  public type: string;
+
+  @Column(DataType.JSON)
+  public value: Object;
+
+  @Column(DataType.JSON)
+  public cachedExportPointerValues: Object;
+
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public workspaceId: string;
+
+  @BelongsTo(() => Workspace)
+  public workspace: Workspace;
+
+  @HasMany(() => Pointer, "sourceBlockId")
+  public ExportingPointers: Pointer[];
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public createdAtEventId: number;
+
+  @BelongsTo(() => EventModel, "createdAtEventId")
+  public createdAtEvent: Event;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public updatedAtEventId: number;
+
+  @BelongsTo(() => EventModel, "updatedAtEventId")
+  public updatedAtEvent: Event;
+
+  @BeforeValidate
+  public static async updateCachedExportPointerValues(item: Block) {
+    item.cachedExportPointerValues = await item.exportingPointerValues();
+  }
+
+  @AfterSave
+  public static async updateChangedPoints(
+    item: Block,
+    options: { event: EventModel }
+  ) {
+    await item.ensureAllPointersAreInDatabase({
+      event: options.event,
+    });
+    if (item._previousDataValues) {
+      const changes = diff(item._previousDataValues, item.dataValues);
+      if (!_.isEmpty(changes.value)) {
+        await item.updateStalenessAndIsCurrentlyResolved({
+          event: options.event
+        });
       }
     }
-  );
+  }
 
-  Block.associate = function(models: any) {
-    Block.Workspace = Block.belongsTo(models.Workspace, {
-      foreignKey: "workspaceId",
-    });
-    Block.ExportingPointers = Block.hasMany(models.Pointer, {
-      as: "exportingPointers",
-      foreignKey: "sourceBlockId",
-    });
-    addEventAssociations(Block, models);
-  };
+  @BeforeValidate
+  public static updateEvent(item: Block, options: { event?: EventModel }) {
+    const event = options.event;
+    if (event) {
+      if (!item.createdAtEventId) {
+        item.createdAtEventId = event.dataValues.id;
+      }
+      item.updatedAtEventId = event.dataValues.id;
+    }
+  }
 
-  Block.prototype.ensureAllPointersAreInDatabase = async function({ event, models }) {
+  @BeforeUpdate
+  public static workaroundOnEventUpdate(
+    item: Block,
+    options: { fields: string[] | boolean }
+  ) {
+    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
+    // See: https://github.com/sequelize/sequelize/issues/3534
+    options.fields = item.changed();
+  }
+
+  public async ensureAllPointersAreInDatabase({ event }) {
     const exportingPointers = await this.getExportingPointers();
     const { cachedExportPointerValues } = this;
 
     for (const pointerId of Object.keys(cachedExportPointerValues)) {
       if (!_.includes(exportingPointers.map(p => p.id), pointerId)) {
-        const pointer = await models.Pointer.findByPk(pointerId);
+        const pointer = await Pointer.findByPk(pointerId);
         if (!pointer) {
           await this.createExportingPointer({ id: pointerId }, { event });
         } else {
           // if the pointer already exists,
           // then it was present in the subquestion draft block,
           // and we need to "move" it to the newly created question block
-          pointer.update({ sourceBlockId: this.id })
+          pointer.update({ sourceBlockId: this.id });
         }
       }
     }
-  };
+  }
 
-  Block.prototype.updateStalenessAndIsCurrentlyResolved = async function({ event }) {
+  public async updateStalenessAndIsCurrentlyResolved({ event }) {
     const workspaceId = this.workspaceId;
-    const workspace = await sequelize.models.Workspace.findByPk(workspaceId);
+    const workspace = await Workspace.findByPk(workspaceId);
 
     // If block is a question
     if (this.type === QUESTION_TYPE) {
-
       // If it's marked as resolved, then it's going to transition from
       // from resolved to unresolved, so let's take a snapshot of the draft as the answer
       if (workspace.isCurrentlyResolved) {
         const blocks = await workspace.getBlocks();
-        const answerDraft = blocks.find(
-          b => b.type === "ANSWER_DRAFT"
-        );
-        const answer = blocks.find(
-          b => b.type === "ANSWER"
-        );
+        const answerDraft = blocks.find(b => b.type === "ANSWER_DRAFT");
+        const answer = blocks.find(b => b.type === "ANSWER");
 
         await answer.update({ value: answerDraft.value });
       }
 
       // Mark workspace as stale
       // If it's currently marked as resolved, that it isn't anymore
-      return workspace.update({ 
-        isCurrentlyResolved: false,
-        isStale: true,
-        isNotStaleRelativeToUser: [],
-      }, { event });
+      return workspace.update(
+        {
+          isCurrentlyResolved: false,
+          isStale: true,
+          isNotStaleRelativeToUser: []
+        },
+        { event }
+      );
     }
-  };
+  }
 
-  Block.prototype.connectedPointers = async function({ pointersSoFar } = {}) {
+  public async connectedPointers({ pointersSoFar } = {}) {
     let pointers = await this.topLevelPointers({ pointersSoFar });
     if (pointersSoFar) {
       pointers = _.differenceBy(pointers, pointersSoFar, "id");
@@ -135,15 +175,15 @@ const BlockModel = (
     let allPointers = [...pointers];
     for (const pointer of pointers) {
       const subPointers = await pointer.containedPointers({
-        pointersSoFar: _.unionBy(pointersSoFar, allPointers, "id"),
+        pointersSoFar: _.unionBy(pointersSoFar, allPointers, "id")
       });
       allPointers = [...allPointers, ...subPointers];
     }
     return _.uniqBy(allPointers, "id");
-  };
+  }
 
   // private
-  Block.prototype.topLevelPointers = async function({ pointersSoFar } = {}) {
+  private async topLevelPointers({ pointersSoFar } = {}) {
     let topLevelPointerIds = await this.topLevelPointersIds();
     if (pointersSoFar) {
       topLevelPointerIds = _.difference(
@@ -154,7 +194,7 @@ const BlockModel = (
 
     const pointers: any = [];
     for (const id of topLevelPointerIds) {
-      const pointer = await sequelize.models.Pointer.findByPk(id);
+      const pointer = await Pointer.findByPk(id);
       if (!!pointer) {
         pointers.push(pointer);
       } else {
@@ -164,10 +204,9 @@ const BlockModel = (
       }
     }
     return _.uniqBy(pointers, "id");
-  };
+  }
 
-  // private
-  Block.prototype.topLevelPointersIds = async function() {
+  private async topLevelPointersIds() {
     if (!this.dataValues.value) {
       return [];
     }
@@ -176,10 +215,9 @@ const BlockModel = (
       l => l.type === "pointerImport" || l.type === "pointerExport"
     );
     return pointers.map(p => p.data.pointerId);
-  };
+  }
 
-  // private
-  Block.prototype.exportingPointerValues = async function(models) {
+  private async exportingPointerValues() {
     if (!this.dataValues.value) {
       return {};
     }
@@ -191,7 +229,7 @@ const BlockModel = (
     for (const pointerJSON of pointers) {
       results[pointerJSON.data.pointerId] = pointerJSON;
 
-      const pointer = await sequelize.models.Pointer.findByPk(
+      const pointer = await Pointer.findByPk(
         pointerJSON.data.pointerId
       );
 
@@ -200,9 +238,5 @@ const BlockModel = (
       }
     }
     return results;
-  };
-
-  return Block;
-};
-
-export default BlockModel;
+  }
+}

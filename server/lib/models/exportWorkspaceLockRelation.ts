@@ -1,45 +1,86 @@
-import * as Sequelize from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations,
-} from "../eventIntegration";
+  AllowNull,
+  BeforeUpdate,
+  BeforeValidate,
+  BelongsTo,
+  Column,
+  DataType,
+  Default,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import EventModel from "./event";
+import { UUIDV4 } from "sequelize";
+import Workspace from "./workspace";
+import Pointer from "./pointer";
 
-const ExportWorkspaceLockRelationModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const ExportWorkspaceLockRelation = sequelize.define(
-    "ExportWorkspaceLockRelation",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      ...eventRelationshipColumns(DataTypes),
-      isLocked: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      },
-    },
-  );
+@Table({ tableName: "ExportWorkspaceLockRelations" })
+export default class ExportWorkspaceLockRelation extends Model<
+  ExportWorkspaceLockRelation
+> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  ExportWorkspaceLockRelation.associate = function(models: any) {
-    ExportWorkspaceLockRelation.Workspace = ExportWorkspaceLockRelation.belongsTo(
-      models.Workspace, {
-        foreignKey: "workspaceId",
-      });
-    ExportWorkspaceLockRelation.Export = ExportWorkspaceLockRelation.belongsTo(
-      models.Pointer, {
-        foreignKey: "pointerId",
-      });
-    addEventAssociations(ExportWorkspaceLockRelation, models);
-  };
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isLocked: boolean;
 
-  return ExportWorkspaceLockRelation;
-};
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public workspaceId: string;
 
-export default ExportWorkspaceLockRelationModel;
+  @BelongsTo(() => Workspace)
+  public Workspace: Workspace;
+
+  @ForeignKey(() => Pointer)
+  @Column(DataType.UUID)
+  public pointerId: string;
+
+  @BelongsTo(() => Pointer)
+  public Export: Pointer;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public createdAtEventId: number;
+
+  @BelongsTo(() => EventModel, "createdAtEventId")
+  public createdAtEvent: Event;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public updatedAtEventId: number;
+
+  @BelongsTo(() => EventModel, "updatedAtEventId")
+  public updatedAtEvent: Event;
+
+  @BeforeValidate
+  public static updateEvent(
+    item: ExportWorkspaceLockRelation,
+    options: { event?: EventModel }
+  ) {
+    const event = options.event;
+    if (event) {
+      if (!item.createdAtEventId) {
+        item.createdAtEventId = event.dataValues.id;
+      }
+      item.updatedAtEventId = event.dataValues.id;
+    }
+  }
+
+  @BeforeUpdate
+  public static workaroundOnEventUpdate(
+    item: ExportWorkspaceLockRelation,
+    options: { fields: string[] | boolean }
+  ) {
+    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
+    // See: https://github.com/sequelize/sequelize/issues/3534
+    options.fields = item.changed();
+  }
+}

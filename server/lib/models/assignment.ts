@@ -1,50 +1,89 @@
-import * as Sequelize from "sequelize";
+import { UUIDV4 } from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations
-} from "../eventIntegration";
+  Column,
+  Table,
+  Model,
+  ForeignKey,
+  BelongsTo,
+  BeforeValidate,
+  DataType,
+  BeforeUpdate
+} from "sequelize-typescript";
+import EventModel from "./event";
+import Workspace from "./workspace";
+import Experiment from "./experiment";
 
-const AssignmentModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const Assignment = sequelize.define("Assignment", {
-    id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      defaultValue: Sequelize.UUIDV4,
-      allowNull: false
-    },
-    userId: {
-      type: Sequelize.STRING,
-    },
-    startAtTimestamp: {
-      type: Sequelize.BIGINT,
-    },
-    endAtTimestamp: {
-      type: Sequelize.BIGINT,
-    },
-    isOracle: {
-      type: Sequelize.BOOLEAN
-    },
-    isTimed: {
-      type: Sequelize.BOOLEAN
-    },
-    ...eventRelationshipColumns(DataTypes),
-  });
+@Table({ tableName: "Assignments" })
+export default class Assignment extends Model<Assignment> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  Assignment.associate = function(models: any) {
-    Assignment.Workspace = Assignment.belongsTo(models.Workspace, {
-      foreignKey: "workspaceId"
-    });
-    Assignment.Experiments = Assignment.belongsTo(models.Experiment, {
-      foreignKey: "experimentId",
-    });
-    addEventAssociations(Assignment, models);
-  };
+  @Column(DataType.STRING)
+  public userId: string;
 
-  return Assignment;
-};
+  @Column(DataType.BIGINT)
+  public startAtTimestamp: number;
 
-export default AssignmentModel;
+  @Column(DataType.BIGINT)
+  public endAtTimestamp: number;
+
+  @Column(DataType.BOOLEAN)
+  public isOracle: boolean;
+
+  @Column(DataType.BOOLEAN)
+  public isTimed: boolean;
+
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public workspaceId: string;
+
+  @BelongsTo(() => Workspace)
+  public Workspace: Workspace;
+
+  @ForeignKey(() => Experiment)
+  @Column(DataType.UUID)
+  public experimentId: string;
+
+  @BelongsTo(() => Experiment)
+  public Experiments: Experiment;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public createdAtEventId: number;
+
+  @BelongsTo(() => EventModel, "createdAtEventId")
+  public createdAtEvent: Event;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public updatedAtEventId: number;
+
+  @BelongsTo(() => EventModel, "updatedAtEventId")
+  public updatedAtEvent: Event;
+
+  @BeforeValidate
+  public static updateEvent(item: Assignment, options: { event?: EventModel }) {
+    const event = options.event;
+    if (event) {
+      if (!item.createdAtEventId) {
+        item.createdAtEventId = event.dataValues.id;
+      }
+      item.updatedAtEventId = event.dataValues.id;
+    }
+  }
+
+  @BeforeUpdate
+  public static workaroundOnEventUpdate(
+    item: Assignment,
+    options: { fields: string[] | boolean }
+  ) {
+    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
+    // See: https://github.com/sequelize/sequelize/issues/3534
+    options.fields = item.changed();
+  }
+}

@@ -1,46 +1,80 @@
-"use strict";
-import Sequelize from "sequelize";
+import { UUIDV4 } from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations
-} from "../eventIntegration";
+  BeforeUpdate,
+  BeforeValidate,
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import EventModel from "./event";
+import Pointer from "./pointer";
+import Workspace from "./workspace";
 
-const PointerImportModel = (sequelize, DataTypes) => {
-  const PointerImport = sequelize.define(
-    "PointerImport",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false
-      },
-      ...eventRelationshipColumns(DataTypes),
-      isLocked: {
-        type: DataTypes.BOOLEAN
+@Table({ tableName: "PointerImports" })
+export default class PointerImport extends Model<PointerImport> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
+
+  @Column(DataType.BOOLEAN)
+  public isLocked: boolean;
+
+  @ForeignKey(() => Pointer)
+  @Column(DataType.UUID)
+  public pointerId: string;
+
+  @BelongsTo(() => Pointer)
+  public pointer: Pointer;
+
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public workspaceId: string;
+
+  @BelongsTo(() => Workspace)
+  public workspace: Workspace;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public createdAtEventId: number;
+
+  @BelongsTo(() => EventModel, "createdAtEventId")
+  public createdAtEvent: Event;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public updatedAtEventId: number;
+
+  @BelongsTo(() => EventModel, "updatedAtEventId")
+  public updatedAtEvent: Event;
+
+  @BeforeValidate
+  public static updateEvent(
+    item: PointerImport,
+    options: { event?: EventModel }
+  ) {
+    const event = options.event;
+    if (event) {
+      if (!item.createdAtEventId) {
+        item.createdAtEventId = event.dataValues.id;
       }
-    },
-    {
-      hooks: {
-        beforeValidate: eventHooks.beforeValidate
-      }
+      item.updatedAtEventId = event.dataValues.id;
     }
-  );
+  }
 
-  PointerImport.associate = function(models: any) {
-    PointerImport.Pointer = PointerImport.belongsTo(models.Pointer, {
-      as: "pointer",
-      foreignKey: "pointerId"
-    });
-    PointerImport.Workspace = PointerImport.belongsTo(models.Workspace, {
-      as: "workspace",
-      foreignKey: "workspaceId"
-    });
-    addEventAssociations(PointerImport, models);
-  };
-
-  return PointerImport;
-};
-
-export default PointerImportModel;
+  @BeforeUpdate
+  public static workaroundOnEventUpdate(
+    item: PointerImport,
+    options: { fields: string[] | boolean }
+  ) {
+    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
+    // See: https://github.com/sequelize/sequelize/issues/3534
+    options.fields = item.changed();
+  }
+}
