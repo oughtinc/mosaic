@@ -4,6 +4,14 @@ export function getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspac
   }
 
   if (!isThisFirstTimeWorkspaceHasBeenWorkedOn) {
+    if (isWorkspaceRootLevel) {
+      return (
+`**Instructions for returning root level workspace**\n
+&nbsp;\n
+1. Just click "Done!" under the response field`
+      );
+    }
+
     if (typeOfUser === "HONEST") {
       return (
 `**Instructions for returning honest oracle**\n
@@ -18,7 +26,7 @@ export function getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspac
 &nbsp;\n
 1. Check to see if the normal user has asked for clarification\n
 2. If the normal user has asked for clarification:\n
-   - Clarify the issue by either editing the subquestion or by submitting a new subquestion
+   - Clarify the issue by either editing the subquestion or by submitting a new subquestion\n
    - Click "Done!" under the response field\n
 3. If the normal user has *not* asked for clarification:\n
    - Just click "Done!" under the response field\n`
