@@ -116,6 +116,22 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
             { object: "leaf", text: `A `, marks: [] },
           ],
         },
+        {
+          object: "inline",
+          type: "pointerImport",
+          isVoid: true,
+          data: {
+            pointerId: a1id,
+            internalReferenceId: uuidv4(),
+          },
+          nodes: [
+            {
+              object: "text",
+              leaves: [{ object: "leaf", text: " ", marks: [] }],
+            },
+          ],
+        },
+        { object: "text", leaves: [{ object: "leaf", text: "", marks: [] }] },
       ],
     },
   ];
