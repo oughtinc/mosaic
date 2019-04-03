@@ -130,10 +130,7 @@ export class Child extends React.Component<any, any> {
 
     return (
       <div
-        style={{
-          backgroundColor: (this.props.isUserOracle && this.props.isInOracleMode && workspace.isEligibleForHonestOracle) && "#ffe8e8",
-          padding: "10px",
-        }}
+        style={{ padding: "10px" }}
       >
         {questionRelationship.findBlock().value && (
           <BulletAndEditorContainer>
