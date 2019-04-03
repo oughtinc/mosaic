@@ -34,7 +34,6 @@ import Pointer from "../models/pointer";
 import PointerImport from "../models/pointerImport";
 import ExportWorkspaceLockRelation from "../models/exportWorkspaceLockRelation";
 import {UserType} from "./User";
-import {UserActivityType} from "./UserActivity";
 
 const generateReferences = references => {
   const all = {};
@@ -277,6 +276,8 @@ export const workspaceType = makeObjectType(
 // TODO - factor out workspaceType into separate file so the following import
 // can go at the top of the file -- right now it's down here to avoid circular
 // import issues
+
+import {UserActivityType} from "./UserActivity";
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
   ...standardReferences,
