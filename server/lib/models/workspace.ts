@@ -133,8 +133,14 @@ export default class Workspace extends Model<Workspace> {
   public get hasAncestorAnsweredByOracle() {
     return (async () => {
       let curWorkspace = await Workspace.findById(this.get("id"));
+      if (curWorkspace === null) {
+        return false;
+      }
       while (curWorkspace.parentId) {
         curWorkspace = await Workspace.findById(curWorkspace.parentId);
+        if (curWorkspace === null) {
+          return false;
+        }
         if (curWorkspace.wasAnsweredByOracle) {
           return true;
         }
@@ -146,24 +152,22 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
-      let curWorkspace = await Workspace.findById(this.get("id"));
-      while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findById(curWorkspace.parentId);
+      const rootWorkspace = await Workspace.getRootWorkspace(await Workspace.findById(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
       }
-
-      return curWorkspace.hasTimeBudget;
+      return rootWorkspace.hasTimeBudget;
     })();
   }
 
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
-      let curWorkspace = await Workspace.findById(this.get("id"));
-      while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findById(curWorkspace.parentId);
+      const rootWorkspace = await Workspace.getRootWorkspace(await Workspace.findById(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
       }
-
-      return curWorkspace.hasIOConstraints;
+      return rootWorkspace.hasIOConstraints;
     })();
   }
 
@@ -190,7 +194,9 @@ export default class Workspace extends Model<Workspace> {
       let howMuchSpentOnChildren = 0;
       for (const childId of this.get("childWorkspaceOrder")) {
         const child = await Workspace.findById(childId);
-        howMuchSpentOnChildren += child.totalBudget;
+        if (child !== null) {
+          howMuchSpentOnChildren += child.totalBudget;
+        }
       }
       return this.get("allocatedBudget") - howMuchSpentOnChildren;
     })();
@@ -199,11 +205,10 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
   public get idOfRootWorkspace() {
     return (async () => {
-      let curWorkspace = await Workspace.findById(this.get("id"));
-      while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findById(curWorkspace.parentId);
+      const rootWorkspace = await Workspace.getRootWorkspace(await Workspace.findById(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
       }
-      const rootWorkspace = curWorkspace;
       return rootWorkspace.id;
     })();
   }
@@ -267,9 +272,15 @@ export default class Workspace extends Model<Workspace> {
       const isInOracleModeValue = isInOracleMode.getValue();
       let depth = 1;
       let curWorkspace = await Workspace.findById(this.get("id"));
+      if (curWorkspace === null) {
+        return depth;
+      }
       if (isInOracleModeValue) {
         while (curWorkspace.parentId) {
           curWorkspace = await Workspace.findById(curWorkspace.parentId);
+          if (curWorkspace === null) {
+            return depth;
+          }
           if (
             !curWorkspace.isEligibleForHonestOracle &&
             !curWorkspace.isEligibleForMaliciousOracle
@@ -398,6 +409,9 @@ export default class Workspace extends Model<Workspace> {
     }
 
     const parentWorkspace = await Workspace.findById(parentId);
+    if (parentWorkspace === null) {
+      return false;
+    }
     const isParentRootWorkspace = !parentWorkspace.parentId;
     const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle || parentWorkspace.isEligibleForMaliciousOracle;
 
@@ -405,12 +419,10 @@ export default class Workspace extends Model<Workspace> {
       return false;
     }
 
-    // get root workspace
-    let curWorkspace = parentWorkspace;
-    while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findById(curWorkspace.parentId);
+    const rootWorkspace = await Workspace.getRootWorkspace(parentWorkspace);
+    if (rootWorkspace === null) {
+      return false;
     }
-    const rootWorkspace = curWorkspace;
 
     // get experiment id
     const tree = (await rootWorkspace.$get("tree")) as Tree;
@@ -430,18 +442,19 @@ export default class Workspace extends Model<Workspace> {
     }
 
     const parentWorkspace = await Workspace.findById(parentId);
+    if (parentWorkspace === null) {
+      return false;
+    }
     const isParentHonestOracleWorkspace =
       parentWorkspace.isEligibleForHonestOracle;
     if (!isParentHonestOracleWorkspace) {
       return false;
     }
 
-    // get root workspace
-    let curWorkspace = parentWorkspace;
-    while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findById(curWorkspace.parentId);
+    const rootWorkspace = await Workspace.getRootWorkspace(parentWorkspace);
+    if (rootWorkspace === null) {
+      return false;
     }
-    const rootWorkspace = curWorkspace;
 
     // get experiment id
     const tree = (await rootWorkspace.$get("tree")) as Tree;
@@ -465,7 +478,7 @@ export default class Workspace extends Model<Workspace> {
     const isEligibleForMaliciousOracle = await Workspace.isNewChildWorkspaceMaliciousOracleEligible(
       { parentId }
     );
-    const workspace = await Workspace.create(
+    return await Workspace.create(
       {
         id: uuidv4(),
         parentId,
@@ -477,7 +490,19 @@ export default class Workspace extends Model<Workspace> {
       },
       { event, questionValue: question }
     );
-    return workspace;
+  }
+
+  private static async getRootWorkspace(curWorkspace: Workspace|null) {
+    if (curWorkspace === null) {
+      return null;
+    }
+    while (curWorkspace.parentId) {
+      curWorkspace = await Workspace.findById(curWorkspace.parentId);
+      if (curWorkspace === null) {
+        return null;
+      }
+    }
+    return curWorkspace;
   }
 
   public workSpaceOrderAppend(element) {

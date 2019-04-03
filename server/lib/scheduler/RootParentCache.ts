@@ -24,6 +24,10 @@ class RootParentCache {
       return workspace;
     } else {
       const parent = await Workspace.findById(workspace.parentId);
+      if (parent === null) {
+        return workspace;
+      }
+
       const rootParent = await this.getRootParentOfWorkspace(parent);
       this.cache.set(workspace.id, rootParent.id);
       return rootParent;

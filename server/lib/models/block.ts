@@ -140,6 +140,9 @@ export default class Block extends Model<Block> {
   public async updateStalenessAndIsCurrentlyResolved({ event }) {
     const workspaceId = this.workspaceId;
     const workspace = await Workspace.findById(workspaceId);
+    if (workspace === null) {
+      return null;
+    }
 
     // If block is a question
     if (this.type === QUESTION_TYPE) {
@@ -150,7 +153,9 @@ export default class Block extends Model<Block> {
         const answerDraft = blocks.find(b => b.type === "ANSWER_DRAFT");
         const answer = blocks.find(b => b.type === "ANSWER");
 
-        await answer.update({ value: answerDraft.value });
+        if (answer && answerDraft) {
+          await answer.update({value: answerDraft.value});
+        }
       }
 
       // Mark workspace as stale
