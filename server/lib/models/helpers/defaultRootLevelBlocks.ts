@@ -32,7 +32,7 @@ export const createDefaultRootLevelBlockValues = () => {
           leaves: [
             {
               object: "leaf",
-              text: "Q: <delete this and write your question here> ",
+              text: "",
               marks: [],
             },
           ],
