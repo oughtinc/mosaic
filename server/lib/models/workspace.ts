@@ -137,13 +137,15 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasAncestorAnsweredByOracle() {
     return (async () => {
-      let curWorkspace = await Workspace.findByPk(
-        this.get("id")
-      );
+      let curWorkspace = await Workspace.findByPk(this.get("id"));
+      if (curWorkspace === null) {
+        return false;
+      }
       while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findByPk(
-          curWorkspace.parentId
-        );
+        curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
+        if (curWorkspace === null) {
+          return false;
+        }
         if (curWorkspace.wasAnsweredByOracle) {
           return true;
         }
@@ -155,32 +157,22 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
-      let curWorkspace = await Workspace.findByPk(
-        this.get("id")
-      );
-      while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findByPk(
-          curWorkspace.parentId
-        );
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
       }
-
-      return curWorkspace.hasTimeBudget;
+      return rootWorkspace.hasTimeBudget;
     })();
   }
 
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
-      let curWorkspace = await Workspace.findByPk(
-        this.get("id")
-      );
-      while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findByPk(
-          curWorkspace.parentId
-        );
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
       }
-
-      return curWorkspace.hasIOConstraints;
+      return rootWorkspace.hasIOConstraints;
     })();
   }
 
@@ -207,7 +199,9 @@ export default class Workspace extends Model<Workspace> {
       let howMuchSpentOnChildren = 0;
       for (const childId of this.get("childWorkspaceOrder")) {
         const child = await Workspace.findByPk(childId);
-        howMuchSpentOnChildren += child.totalBudget;
+        if (child !== null) {
+          howMuchSpentOnChildren += child.totalBudget;
+        }
       }
       return this.get("allocatedBudget") - howMuchSpentOnChildren;
     })();
@@ -216,15 +210,10 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
   public get idOfRootWorkspace() {
     return (async () => {
-      let curWorkspace = await Workspace.findByPk(
-        this.get("id")
-      );
-      while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findByPk(
-          curWorkspace.parentId
-        );
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
       }
-      const rootWorkspace = curWorkspace;
       return rootWorkspace.id;
     })();
   }
@@ -290,11 +279,17 @@ export default class Workspace extends Model<Workspace> {
       let curWorkspace = await Workspace.findByPk(
         this.get("id")
       );
+      if (curWorkspace === null) {
+        return depth;
+      }
       if (isInOracleModeValue) {
         while (curWorkspace.parentId) {
           curWorkspace = await Workspace.findByPk(
             curWorkspace.parentId
           );
+          if (curWorkspace === null) {
+            return depth;
+          }
           if (
             !curWorkspace.isEligibleForHonestOracle &&
             !curWorkspace.isEligibleForMaliciousOracle
@@ -379,42 +374,42 @@ export default class Workspace extends Model<Workspace> {
       await workspace.$create("block", { type: "QUESTION" }, { event });
     }
 
-          if (workspace.isRequestingLazyUnlock) {
-            // no default content at the moment
-          } else if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
-            const {
-              scratchpadBlockValue,
-              answerDraftBlockValue,
-              responseBlockValue
-            } = createHonestOracleDefaultBlockValues(questionValue);
-            await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-            await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-            await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
-          } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
-            if (workspace.parentId) {
-              const {
-                scratchpadBlockValue,
-                answerDraftBlockValue,
-                responseBlockValue
-              } = createMaliciousOracleDefaultBlockValues(questionValue);
-              await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-              await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-              await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
-            } else {
-              const {
-                scratchpadBlockValue,
-                answerDraftBlockValue,
-                responseBlockValue
-              } = createDefaultRootLevelBlockValues();
-              await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-              await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-              await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
-            }
-          } else {
-            await workspace.$create("block", { type: "SCRATCHPAD" }, { event });
-            await workspace.$create("block", { type: "SUBQUESTION_DRAFT" }, { event });
-            await workspace.$create("block", { type: "ANSWER_DRAFT" }, { event });
-          }
+    if (workspace.isRequestingLazyUnlock) {
+      // no default content at the moment
+    } else if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
+      const {
+        scratchpadBlockValue,
+        answerDraftBlockValue,
+        responseBlockValue
+      } = createHonestOracleDefaultBlockValues(questionValue);
+      await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+      await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+      await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+    } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
+      if (workspace.parentId) {
+        const {
+          scratchpadBlockValue,
+          answerDraftBlockValue,
+          responseBlockValue
+        } = createMaliciousOracleDefaultBlockValues(questionValue);
+        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+      } else {
+        const {
+          scratchpadBlockValue,
+          answerDraftBlockValue,
+          responseBlockValue
+        } = createDefaultRootLevelBlockValues();
+        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+      }
+    } else {
+      await workspace.$create("block", { type: "SCRATCHPAD" }, { event });
+      await workspace.$create("block", { type: "SUBQUESTION_DRAFT" }, { event });
+      await workspace.$create("block", { type: "ANSWER_DRAFT" }, { event });
+    }
 
     await workspace.$create("block", { type: "ANSWER" }, { event });
   }
@@ -425,6 +420,9 @@ export default class Workspace extends Model<Workspace> {
     }
 
     const parentWorkspace = await Workspace.findByPk(parentId);
+    if (parentWorkspace === null) {
+      return false;
+    }
     const isParentRootWorkspace = !parentWorkspace.parentId;
     const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle || parentWorkspace.isEligibleForMaliciousOracle;
 
@@ -432,14 +430,10 @@ export default class Workspace extends Model<Workspace> {
       return false;
     }
 
-    // get root workspace
-    let curWorkspace = parentWorkspace;
-    while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findByPk(
-        curWorkspace.parentId
-      );
+    const rootWorkspace = await Workspace.getRootWorkspaceFromId(parentWorkspace);
+    if (rootWorkspace === null) {
+      return false;
     }
-    const rootWorkspace = curWorkspace;
 
     // get experiment id
     const tree = (await rootWorkspace.$get("tree")) as Tree;
@@ -459,20 +453,19 @@ export default class Workspace extends Model<Workspace> {
     }
 
     const parentWorkspace = await Workspace.findByPk(parentId);
+    if (parentWorkspace === null) {
+      return false;
+    }
     const isParentHonestOracleWorkspace =
       parentWorkspace.isEligibleForHonestOracle;
     if (!isParentHonestOracleWorkspace) {
       return false;
     }
 
-    // get root workspace
-    let curWorkspace = parentWorkspace;
-    while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findByPk(
-        curWorkspace.parentId
-      );
+    const rootWorkspace = await Workspace.getRootWorkspaceFromId(parentWorkspace);
+    if (rootWorkspace === null) {
+      return false;
     }
-    const rootWorkspace = curWorkspace;
 
     // get experiment id
     const tree = (await rootWorkspace.$get("tree")) as Tree;
@@ -518,6 +511,30 @@ export default class Workspace extends Model<Workspace> {
       },
       { event, questionValue: question }
     );
+  }
+
+  private static async getRootWorkspaceFromId(curWorkspace: Workspace|null) {
+    if (curWorkspace === null) {
+      return null;
+    }
+    while (curWorkspace.parentId) {
+      curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
+      if (curWorkspace === null) {
+        return null;
+      }
+    }
+    return curWorkspace;
+  }
+
+  public async getRootWorkspace() {
+    let curWorkspace: Workspace | null = this;
+    while (curWorkspace.parentId) {
+      curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
+      if (curWorkspace === null) {
+        throw new Error("workspace has dangling pointer to parent");
+      }
+    }
+    return curWorkspace;
   }
 
   public workSpaceOrderAppend(element) {

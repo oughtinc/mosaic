@@ -39,6 +39,9 @@ export default class Pointer extends Model<Pointer> {
       const pointerId = this.get("id");
       const sourceBlockId = this.get("sourceBlockId");
       const sourceBlock = await Block.findByPk(sourceBlockId);
+      if (sourceBlock === null) {
+        return null;
+      }
       const { cachedExportPointerValues } = sourceBlock;
       return cachedExportPointerValues[pointerId];
     })();

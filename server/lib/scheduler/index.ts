@@ -69,6 +69,9 @@ export async function createScheduler(experimentId) {
     },
     updateAssignment: async (id, fields) => {
       const assignment = await Assignment.findByPk(id);
+      if (assignment === null) {
+        return;
+      }
       await assignment.update(fields);
     },
     DistanceFromWorkedOnWorkspaceCache,
@@ -124,11 +127,7 @@ export async function createScheduler(experimentId) {
   
           const experiments = await tree.$get("experiments") as Experiment[];
           
-          if (_.some(experiments, e => e.id === experimentId)) {
-            return true;
-          }
-  
-          return false;
+          return _.some(experiments, e => e.id === experimentId);
         }
       );
   
@@ -139,6 +138,9 @@ export async function createScheduler(experimentId) {
       let fallbackScheduler;
 
       const experiment = await Experiment.findByPk(experimentId);
+      if (experiment === null) {
+        return null;
+      }
       
       const fallbacks = await experiment.$get("fallbacks") as Experiment[];
       
