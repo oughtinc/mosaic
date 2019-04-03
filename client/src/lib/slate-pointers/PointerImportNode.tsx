@@ -1,5 +1,4 @@
 import { css, StyleSheet } from "aphrodite";
-import { parse as parseQueryString } from "query-string";
 import * as React from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import * as ReactDOM from "react-dom";

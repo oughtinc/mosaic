@@ -24,14 +24,12 @@ const TakeBreakBtn = ({ bsStyle, disabled, experimentId, label, navHook }: any) 
 class ResponseFooterPresentational extends React.Component<any, any> {
   public render() {
     const {
-      depleteBudget,
       experimentId,
       hasChildren,
       hasParent,
       hasTimeBudget,
       isInOracleMode,
       isUserOracle,
-      markAsAnsweredByOracle,
       markAsCurrentlyResolved,
       markAsNotStale,
       transferRemainingBudgetToParent,

@@ -31,6 +31,27 @@ const BlockHeader = styled.div`
 
 export class NewBlockFormPresentational extends React.Component<any, any> {
   public blockEditor;
+
+  private onSubmit = _.throttle(() => {
+    const isOnFrontPage = !this.props.shouldAutosave;
+
+    // front page doesn't receive a prop when workspaces reload
+    // so for now I'm not putting in a pending state, because it would be
+    // pretty involved telling it to go out of the pending state
+    if (isOnFrontPage) {
+      this.setState({ totalBudget: 90 }, () => {
+        this.props.resetBlock({ id: this.props.blockId });
+      });
+    } else {
+      this.setState({ pending: true });
+    }
+
+    this.props.onMutate({
+      question: valueToDatabaseJSON(this.state.blockValue),
+      totalBudget: this.props.hasTimeBudget ? this.state.totalBudget : 0,
+    });
+  }, 3000);
+
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -38,10 +59,6 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       totalBudget: this.props.totalBudget || 90,
     };
   }
-
-  public onChange = blockValue => {
-    this.setState({ blockValue });
-  };
 
   public componentWillReceiveProps() {
     if (this.state.pending) {
@@ -314,6 +331,10 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     );
   }
 
+  private onChange = blockValue => {
+    this.setState({ blockValue });
+  };
+
   private onKeyDown = event => {
     const pressedControlAndEnter = _event =>
       _event.metaKey && _event.key === "Enter";
@@ -323,26 +344,6 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       this.onSubmit();
     }
   };
-
-  private onSubmit = _.throttle(() => {
-    const isOnFrontPage = !this.props.shouldAutosave;
-
-    // front page doesn't receive a prop when workspaces reload
-    // so for now I'm not putting in a pending state, because it would be
-    // pretty involved telling it to go out of the pending state
-    if (isOnFrontPage) {
-      this.setState({ totalBudget: 90 }, () => {
-        this.props.resetBlock({ id: this.props.blockId });
-      });
-    } else {
-      this.setState({ pending: true });
-    }
-
-    this.props.onMutate({
-      question: valueToDatabaseJSON(this.state.blockValue),
-      totalBudget: this.props.hasTimeBudget ? this.state.totalBudget : 0,
-    });
-  }, 3000);
 }
 
 const mapDispatchToProps = dispatch => ({
