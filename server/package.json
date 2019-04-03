@@ -12,7 +12,7 @@
     "watch-node": "nodemon --delay 5 --watch dist --inspect=0.0.0.0 --nolazy dist/index.js",
     "server": "nodemon -L --watch lib --exec node --inspect=0.0.0.0 -r ts-node/register lib/index.js -e '.ts,.js' --presets es2015,stage-2",
     "typecheck": "tsc -p tsconfig.json --noEmit -w",
-    "start": "ts-node lib/index.js",
+    "start": "ts-node lib/index.ts",
     "debug": "nodemon --inspect lib/index.js --exec ts-node --extensions '.ts,.js' --presets es2015,stage-2",
     "build": "babel --extensions '.ts,.js' lib -d dist",
     "db:create": "node_modules/.bin/sequelize db:create",
