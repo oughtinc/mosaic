@@ -1,37 +1,79 @@
-import * as Sequelize from "sequelize";
 import {
-  eventRelationshipColumns,
-  addEventAssociations,
-} from "../eventIntegration";
+  BeforeUpdate,
+  BeforeValidate,
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import EventModel from "./event";
+import { UUIDV4 } from "sequelize";
+import Tree from "./tree";
+import UserTreeOracleRelation from "./userTreeOracleRelation";
 
-const UserModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const User = sequelize.define(
-    "User",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      familyName: Sequelize.STRING,
-      givenName: Sequelize.STRING,
-      email: Sequelize.STRING,
-      gender: Sequelize.STRING,
-      pictureURL: Sequelize.STRING,
-      ...eventRelationshipColumns(DataTypes),
-    },
-  );
+@Table({ tableName: "Users" })
+export default class User extends Model<User> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  User.associate = function(models: any) {
-    User.OracleTrees = User.belongsToMany(models.Tree, {through: 'UserTreeOracleRelation'});
-    addEventAssociations(User, models);
-  };
+  @Column(DataType.STRING)
+  public familyName: string;
 
-  return User;
-};
+  @Column(DataType.STRING)
+  public givenName: string;
 
-export default UserModel;
+  @Column(DataType.STRING)
+  public email: string;
+
+  @Column(DataType.STRING)
+  public gender: string;
+
+  @Column(DataType.STRING)
+  public pictureURL: string;
+
+  @BelongsToMany(() => Tree, () => UserTreeOracleRelation)
+  public OracleTrees: Tree[];
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public createdAtEventId: number;
+
+  @BelongsTo(() => EventModel, "createdAtEventId")
+  public createdAtEvent: Event;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public updatedAtEventId: number;
+
+  @BelongsTo(() => EventModel, "updatedAtEventId")
+  public updatedAtEvent: Event;
+
+  @BeforeValidate
+  public static updateEvent(item: User, options: { event?: EventModel }) {
+    const event = options.event;
+    if (event) {
+      if (!item.createdAtEventId) {
+        item.createdAtEventId = event.dataValues.id;
+      }
+      item.updatedAtEventId = event.dataValues.id;
+    }
+  }
+
+  @BeforeUpdate
+  public static workaroundOnEventUpdate(
+    item: User,
+    options: { fields: string[] | boolean }
+  ) {
+    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
+    // See: https://github.com/sequelize/sequelize/issues/3534
+    options.fields = item.changed();
+  }
+}

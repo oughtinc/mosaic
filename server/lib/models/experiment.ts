@@ -1,56 +1,97 @@
-import * as Sequelize from "sequelize";
+import { UUIDV4 } from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations,
-} from "../eventIntegration";
+  AllowNull,
+  BeforeUpdate,
+  BeforeValidate,
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  DataType,
+  Default,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import EventModel from "./event";
+import Tree from "./tree";
+import ExperimentTreeRelation from "./experimentTreeRelation";
 
-const ExperimentModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const Experiment = sequelize.define(
-    "Experiment",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      name: Sequelize.STRING,
-      eligibilityRank: {
-        type: Sequelize.INTEGER,
-        defaultValue: null,
-        allowNull: true,
-      },
-      description: Sequelize.JSON,
-      metadata: Sequelize.JSON,
-      areNewWorkspacesOracleOnlyByDefault: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
-      ...eventRelationshipColumns(DataTypes),
-    },
-  );
+@Table({ tableName: "Experiments" })
+export default class Experiment extends Model<Experiment> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  Experiment.associate = function(models: any) {
-    Experiment.Trees = Experiment.belongsToMany(models.Tree, {through: 'ExperimentTreeRelation'});
-    Experiment.Fallbacks = Experiment.belongsToMany(models.Experiment, {
-      as: "Fallbacks",
-      through: "FallbackRelation",
-      foreignKey: "primaryExperimentId",
-      otherKey: "fallbackExperimentId",
-    })
-    addEventAssociations(Experiment, models);
-  };
+  @Column(DataType.STRING)
+  public name: string;
 
-  Experiment.prototype.isActive = function() {
-    return this.eligibilityRank === 1;
+  @AllowNull
+  @Default(null)
+  @Column(DataType.INTEGER)
+  public eligibilityRank: number;
+
+  @Column(DataType.JSON)
+  public description: Object;
+
+  @Column(DataType.JSON)
+  public metadata: Object;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public areNewWorkspacesOracleOnlyByDefault: boolean;
+
+  @BelongsToMany(() => Tree, () => ExperimentTreeRelation)
+  public trees: Tree[];
+
+  @BelongsToMany(
+    () => Experiment,
+    "FallbackRelation",
+    "primaryExperimentId",
+    "fallbackExperimentId"
+  )
+  public fallbacks: Experiment[];
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public createdAtEventId: number;
+
+  @BelongsTo(() => EventModel, "createdAtEventId")
+  public createdAtEvent: Event;
+
+  @ForeignKey(() => EventModel)
+  @Column(DataType.INTEGER)
+  public updatedAtEventId: number;
+
+  @BelongsTo(() => EventModel, "updatedAtEventId")
+  public updatedAtEvent: Event;
+
+  @BeforeValidate
+  public static updateEvent(item: Experiment, options: { event?: EventModel }) {
+    const event = options.event;
+    if (event) {
+      if (!item.createdAtEventId) {
+        item.createdAtEventId = event.dataValues.id;
+      }
+      item.updatedAtEventId = event.dataValues.id;
+    }
   }
 
-  return Experiment;
-};
+  @BeforeUpdate
+  public static workaroundOnEventUpdate(
+    item: Experiment,
+    options: { fields: string[] | boolean }
+  ) {
+    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
+    // See: https://github.com/sequelize/sequelize/issues/3534
+    options.fields = item.changed();
+  }
 
-export default ExperimentModel;
+  public isActive() {
+    return this.eligibilityRank === 1;
+  }
+}
