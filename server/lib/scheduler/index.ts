@@ -122,7 +122,7 @@ export async function createScheduler(experimentId) {
             return false;
           }
   
-          const experiments = await tree.getExperiments();
+          const experiments = await tree.$get("experiments") as Experiment[];
           
           if (_.some(experiments, e => e.id === experimentId)) {
             return true;
@@ -140,7 +140,7 @@ export async function createScheduler(experimentId) {
 
       const experiment = await Experiment.findByPk(experimentId);
       
-      const fallbacks = await experiment.getFallbacks();
+      const fallbacks = await experiment.$get("fallbacks") as Experiment[];
       
       if (fallbacks.length === 0) {
         fallbackScheduler = null;
