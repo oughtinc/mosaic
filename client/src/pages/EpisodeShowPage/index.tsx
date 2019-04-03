@@ -7,7 +7,7 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import { graphql } from "react-apollo";
 import { Helmet } from "react-helmet";
-const ReactMarkdown = require("react-markdown");
+import * as ReactMarkdown from "react-markdown";
 import { compose } from "recompose";
 import { Alert, Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
