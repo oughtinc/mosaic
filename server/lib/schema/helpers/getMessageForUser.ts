@@ -64,7 +64,6 @@ export function getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspac
    - Click "Submit" on the right\n
    - Click "Done!" under the response field\n
 3. If you decide not to challenge:\n
-   - Write "No challenge" in the response field\n
    - Click "Done!" under the response field`
     );
   }

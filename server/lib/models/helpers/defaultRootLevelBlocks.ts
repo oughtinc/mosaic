@@ -50,7 +50,7 @@ export const createDefaultRootLevelBlockValues = () => {
         {
           object: "text",
           leaves: [
-            { object: "leaf", text: "As a root-level workspace, ignore the content of this field", marks: [] },
+            { object: "leaf", text: "Ok", marks: [] },
           ],
         },
       ],

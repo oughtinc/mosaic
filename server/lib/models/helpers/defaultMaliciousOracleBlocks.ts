@@ -143,7 +143,7 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
         {
           object: "text",
           leaves: [
-            { object: "leaf", text: " ", marks: [] },
+            { object: "leaf", text: "Ok", marks: [] },
           ],
         },
       ],
