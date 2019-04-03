@@ -82,12 +82,13 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                   disabled={!hasChildren}
                   experimentId={experimentId}
                   bsStyle="primary"
-                  label={`Next workspace`}
+                  label={`Done!`}
                   navHook={() => {
                     markAsNotStale();
+                    markAsCurrentlyResolved();
                   }}
                 />
-                {
+                {/*
                   hasParent
                   &&
                   <TakeBreakBtn
@@ -99,7 +100,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                       markAsCurrentlyResolved();
                     }}
                   />
-                }
+                */}
               </div>
             )
         }
