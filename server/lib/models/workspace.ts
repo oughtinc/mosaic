@@ -29,6 +29,7 @@ import PointerImport from "./pointerImport";
 import Block from "./block";
 import Tree from "./tree";
 import ExportWorkspaceLockRelation from "./exportWorkspaceLockRelation";
+import Experiment from "./experiment";
 import Pointer from "./pointer";
 
 const Op = Sequelize.Op;
@@ -131,13 +132,9 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasAncestorAnsweredByOracle() {
     return (async () => {
-      let curWorkspace = await Workspace.findById(
-        this.get("id")
-      );
+      let curWorkspace = await Workspace.findById(this.get("id"));
       while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findById(
-          curWorkspace.parentId
-        );
+        curWorkspace = await Workspace.findById(curWorkspace.parentId);
         if (curWorkspace.wasAnsweredByOracle) {
           return true;
         }
@@ -149,13 +146,9 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
-      let curWorkspace = await Workspace.findById(
-        this.get("id")
-      );
+      let curWorkspace = await Workspace.findById(this.get("id"));
       while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findById(
-          curWorkspace.parentId
-        );
+        curWorkspace = await Workspace.findById(curWorkspace.parentId);
       }
 
       return curWorkspace.hasTimeBudget;
@@ -165,13 +158,9 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
-      let curWorkspace = await Workspace.findById(
-        this.get("id")
-      );
+      let curWorkspace = await Workspace.findById(this.get("id"));
       while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findById(
-          curWorkspace.parentId
-        );
+        curWorkspace = await Workspace.findById(curWorkspace.parentId);
       }
 
       return curWorkspace.hasIOConstraints;
@@ -210,13 +199,9 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
   public get idOfRootWorkspace() {
     return (async () => {
-      let curWorkspace = await Workspace.findById(
-        this.get("id")
-      );
+      let curWorkspace = await Workspace.findById(this.get("id"));
       while (curWorkspace.parentId) {
-        curWorkspace = await Workspace.findById(
-          curWorkspace.parentId
-        );
+        curWorkspace = await Workspace.findById(curWorkspace.parentId);
       }
       const rootWorkspace = curWorkspace;
       return rootWorkspace.id;
@@ -281,14 +266,10 @@ export default class Workspace extends Model<Workspace> {
     return (async () => {
       const isInOracleModeValue = isInOracleMode.getValue();
       let depth = 1;
-      let curWorkspace = await Workspace.findById(
-        this.get("id")
-      );
+      let curWorkspace = await Workspace.findById(this.get("id"));
       if (isInOracleModeValue) {
         while (curWorkspace.parentId) {
-          curWorkspace = await Workspace.findById(
-            curWorkspace.parentId
-          );
+          curWorkspace = await Workspace.findById(curWorkspace.parentId);
           if (
             !curWorkspace.isEligibleForHonestOracle &&
             !curWorkspace.isEligibleForMaliciousOracle
@@ -364,12 +345,13 @@ export default class Workspace extends Model<Workspace> {
     { event, questionValue }
   ) {
     if (questionValue) {
-      await workspace.createBlock(
+      await workspace.$create(
+        "block",
         { type: "QUESTION", value: questionValue },
         { event }
       );
     } else {
-      await workspace.createBlock({ type: "QUESTION" }, { event });
+      await workspace.$create("block", { type: "QUESTION" }, { event });
     }
 
           if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
@@ -378,9 +360,9 @@ export default class Workspace extends Model<Workspace> {
               answerDraftBlockValue,
               responseBlockValue
             } = createHonestOracleDefaultBlockValues(questionValue);
-            await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-            await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-            await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+            await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+            await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+            await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
           } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
             if (workspace.parentId) {
               const {
@@ -388,26 +370,26 @@ export default class Workspace extends Model<Workspace> {
                 answerDraftBlockValue,
                 responseBlockValue
               } = createMaliciousOracleDefaultBlockValues(questionValue);
-              await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-              await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-              await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+              await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+              await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+              await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
             } else {
               const {
                 scratchpadBlockValue,
                 answerDraftBlockValue,
                 responseBlockValue
               } = createDefaultRootLevelBlockValues();
-              await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-              await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-              await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+              await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
+              await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
+              await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
             }
           } else {
-            await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
-            await workspace.createBlock({ type: "SUBQUESTION_DRAFT" }, { event });
-            await workspace.createBlock({ type: "ANSWER_DRAFT" }, { event });
+            await workspace.$create("block", { type: "SCRATCHPAD" }, { event });
+            await workspace.$create("block", { type: "SUBQUESTION_DRAFT" }, { event });
+            await workspace.$create("block", { type: "ANSWER_DRAFT" }, { event });
           }
 
-    await workspace.createBlock({ type: "ANSWER" }, { event });
+    await workspace.$create("block", { type: "ANSWER" }, { event });
   }
 
   public static async isNewChildWorkspaceHonestOracleEligible({ parentId }) {
@@ -426,15 +408,13 @@ export default class Workspace extends Model<Workspace> {
     // get root workspace
     let curWorkspace = parentWorkspace;
     while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findById(
-        curWorkspace.parentId
-      );
+      curWorkspace = await Workspace.findById(curWorkspace.parentId);
     }
     const rootWorkspace = curWorkspace;
 
     // get experiment id
-    const tree = await rootWorkspace.getTree();
-    const experiments = await tree.getExperiments();
+    const tree = (await rootWorkspace.$get("tree")) as Tree;
+    const experiments = (await tree.$get("experiments")) as Experiment[];
 
     if (experiments.length === 0) {
       return false;
@@ -459,15 +439,13 @@ export default class Workspace extends Model<Workspace> {
     // get root workspace
     let curWorkspace = parentWorkspace;
     while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findById(
-        curWorkspace.parentId
-      );
+      curWorkspace = await Workspace.findById(curWorkspace.parentId);
     }
     const rootWorkspace = curWorkspace;
 
     // get experiment id
-    const tree = await rootWorkspace.getTree();
-    const experiments = await tree.getExperiments();
+    const tree = (await rootWorkspace.$get("tree")) as Tree;
+    const experiments = (await tree.$get("experiments")) as Experiment[];
 
     if (experiments.length === 0) {
       return false;
@@ -478,7 +456,7 @@ export default class Workspace extends Model<Workspace> {
   }
 
   public static async createAsChild(
-    { id, parentId, question, totalBudget, creatorId, isPublic },
+    { parentId, question, totalBudget, creatorId, isPublic },
     { event }
   ) {
     const isEligibleForHonestOracle = await Workspace.isNewChildWorkspaceHonestOracleEligible(
@@ -549,26 +527,7 @@ export default class Workspace extends Model<Workspace> {
     );
   }
 
-  public async updatePointerImports(pointerIds, { event }) {
-    const pointerImports = await this.getPointerImports();
-    for (const pointerId of _.uniq(pointerIds)) {
-      if (!_.includes(pointerImports.map(p => p.pointerId), pointerId)) {
-        const pointer = await Pointer.findById(pointerId);
-        if (!pointer) {
-          console.error(
-            "The relevant pointer for pointer import ",
-            pointerId,
-            " does not exist."
-          );
-        } else {
-          await this.createPointerImport({ pointerId }, { event });
-        }
-      }
-    }
-  }
-
   public async createChild({
-    id,
     event,
     question,
     totalBudget,
@@ -576,7 +535,7 @@ export default class Workspace extends Model<Workspace> {
     isPublic
   }) {
     const child = await Workspace.createAsChild(
-      { id, parentId: this.id, question, totalBudget, creatorId, isPublic },
+      { parentId: this.id, question, totalBudget, creatorId, isPublic },
       { event }
     );
     if (this.remainingBudget < child.totalBudget) {
@@ -618,7 +577,7 @@ export default class Workspace extends Model<Workspace> {
 
     // Can use this.getBlocks instead of this.getVisibleBlocks because later we
     // will go on to iterate through all the children workspaces.
-    const blocks = await this.getBlocks();
+    const blocks = (await this.$get("blocks")) as Block[];
 
     for (const block of blocks) {
       const blockPointersToAdd = await block.connectedPointers({
@@ -630,7 +589,7 @@ export default class Workspace extends Model<Workspace> {
       pointersSoFar = pointersSoFar.concat(blockPointersToAdd);
     }
 
-    const childWorkspaces = await this.getChildWorkspaces();
+    const childWorkspaces = (await this.$get("childWorkspaces")) as Workspace[];
 
     for (const childWorkspace of childWorkspaces) {
       const workspacePointersToAdd = await childWorkspace.getConnectedPointersOfSubtree(
@@ -645,7 +604,7 @@ export default class Workspace extends Model<Workspace> {
   }
 
   private async visibleBlocks() {
-    let blocks = await this.getBlocks();
+    let blocks = (await this.$get("blocks")) as Block[];
     const connectingChildBlocks = await Block.findAll({
       where: {
         workspaceId: {
