@@ -1,14 +1,19 @@
+import Assignment from "../models/assignment";
+
 const uuidv4 = require("uuid/v4");
 import * as _ from "lodash";
 import { filter, map } from "asyncro";
 import { isInOracleMode } from "../globals/isInOracleMode";
-import { Assignment, Experiment, Tree, UserTreeOracleRelation, Workspace } from "../models";
 import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
 import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
 import { RootParentCache } from "./RootParentCache";
 import { Schedule } from "./Schedule";
 import { Scheduler } from "./Scheduler";
+import Workspace from "../models/workspace";
+import UserTreeOracleRelation from "../models/userTreeOracleRelation";
+import Tree from "../models/tree";
+import Experiment from "../models/experiment";
 
 const NINETY_SECONDS = 1000 * 90;
 

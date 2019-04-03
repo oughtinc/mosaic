@@ -1,4 +1,13 @@
-import * as Sequelize from "Sequelize";
+import {
+  AllowNull,
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import Experiment from "./experiment";
 
 export const InstructionTypes = [
   "root",
@@ -7,35 +16,23 @@ export const InstructionTypes = [
   "returningRoot",
   "returningHonestOracle",
   "returningMaliciousOracle",
-  "lazyPointerUnlock",
+  "lazyPointerUnlock"
 ];
 
-const InstructionsModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const Instructions = sequelize.define(
-    "Instructions",
-    {
-      type: {
-        type: DataTypes.ENUM(InstructionTypes),
-        allowNull: false,
-      },
-      value: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-    },
-  );
+@Table({ tableName: "Instructions" })
+export default class Instructions extends Model<Instructions> {
+  @AllowNull(false)
+  @Column(DataType.ENUM(InstructionTypes))
+  public type: string;
 
-  Instructions.associate = function(models: any) {
-    Instructions.Experiment = Instructions.belongsTo(models.Experiment, {
-      as: "experiment",
-      foreignKey: "experimentId",
-    });
-  };
+  @AllowNull(false)
+  @Column(DataType.TEXT)
+  public value: string;
 
-  return Instructions;
-};
+  @ForeignKey(() => Experiment)
+  @Column(DataType.UUID)
+  public experimentId: string;
 
-export default InstructionsModel;
+  @BelongsTo(() => Experiment)
+  public experiment: Experiment;
+}
