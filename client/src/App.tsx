@@ -28,7 +28,9 @@ import { Auth } from "./auth";
 
 // set up FullStory identity
 if (Auth.isAuthenticated()) {
-  Auth.getProfile(() => { });
+  Auth.getProfile(() => {
+    return;
+  });
 }
 
 const SERVER_URL =
