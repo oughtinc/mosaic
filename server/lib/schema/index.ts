@@ -113,6 +113,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
 
       const userTreeOracleRelations = await tree.getUserTreeOracleRelations();
       const thisUserTreeOracleRelation = userTreeOracleRelations.find(r => r.UserId === user.id);
+      const experiment = await models.Experiment.findById(experimentId);
 
       const typeOfUser =
         !thisUserTreeOracleRelation
@@ -126,7 +127,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
           "MALICIOUS"
         );
 
-      const message = getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspaceHasBeenWorkedOn, typeOfUser});
+      const message = getMessageForUser({ experiment, isWorkspaceRootLevel, isThisFirstTimeWorkspaceHasBeenWorkedOn, typeOfUser });
 
       return message;
     },
