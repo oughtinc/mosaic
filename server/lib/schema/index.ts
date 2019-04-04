@@ -1,17 +1,17 @@
 import * as models from "../models";
+import { InstructionTypes } from "../models/instructions";
 import { isInOracleMode } from "../globals/isInOracleMode";
 import * as _ from "lodash";
 import { resolver, attributeFields } from "graphql-sequelize";
 import {
   GraphQLBoolean,
-  GraphQLObjectType,
-  GraphQLNonNull,
-  GraphQLFloat,
-  GraphQLList,
-  GraphQLSchema,
+  GraphQLEnumType,
+  GraphQLInputObjectType,
   GraphQLInt,
-  GraphQLString,
-  GraphQLInputObjectType
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLString
 } from "graphql";
 import * as GraphQLJSON from "graphql-type-json";
 import * as Sequelize from "sequelize";
@@ -84,8 +84,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
       }
 
       if (workspace.isRequestingLazyUnlock) {
-        const message = getMessageForUser({isRequestingLazyUnlock: workspace.isRequestingLazyUnlock});
-        return message;
+        return await getMessageForUser({ isRequestingLazyUnlock: workspace.isRequestingLazyUnlock });
       }
 
       // get root workspace
@@ -119,6 +118,12 @@ export const workspaceType = makeObjectType(models.Workspace, [
       const userTreeOracleRelations = await tree.getUserTreeOracleRelations();
       const thisUserTreeOracleRelation = userTreeOracleRelations.find(r => r.UserId === user.id);
 
+      const instructions = await models.Instructions.findAll({ where: { experimentId }});
+      const instructionValues = {};
+      instructions.forEach((instruction) => {
+        instructionValues[instruction.type] = instruction.value;
+      });
+
       const typeOfUser =
         !thisUserTreeOracleRelation
         ?
@@ -131,9 +136,12 @@ export const workspaceType = makeObjectType(models.Workspace, [
           "MALICIOUS"
         );
 
-      const message = getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspaceHasBeenWorkedOn, typeOfUser});
-
-      return message;
+      return await getMessageForUser({
+        instructions: instructionValues,
+        isWorkspaceRootLevel,
+        isThisFirstTimeWorkspaceHasBeenWorkedOn,
+        typeOfUser,
+      });
     },
   },
   isUserOracleForTree: {
@@ -241,7 +249,6 @@ export const workspaceType = makeObjectType(models.Workspace, [
         workspace.isNotStaleRelativeToUser,
         async userId => {
           let user = await models.User.findByPk(userId);
-          
           if (!user) {
             const userInfo = await userFromAuthToken(context.authorization);
 
@@ -285,11 +292,40 @@ const treeType = makeObjectType(models.Tree, [
   ["oracles", () => new GraphQLList(UserType), "Oracles"],
 ]);
 
+const instructionsEnumValues = {};
+const instructionsFields = {};
+InstructionTypes.forEach((type) => {
+  instructionsEnumValues[type] = {};
+  instructionsFields[type] = { type: GraphQLString };
+});
+
+const instructionsEnumType = new GraphQLEnumType({
+  name: "InstructionsEnum",
+  values: instructionsEnumValues,
+});
+
+const instructionsObjectType = new GraphQLObjectType({
+  name: "Instructions",
+  fields: instructionsFields,
+});
+
 const experimentType = makeObjectType(models.Experiment, [
   ...standardReferences,
   ["fallbacks", () => new GraphQLList(experimentType), "Fallbacks"],
   ["trees", () => new GraphQLList(treeType), "Trees"],
-]);
+], {
+  instructions: {
+    type: instructionsObjectType,
+    resolve: async (experiment) => {
+      const instructions = await models.Instructions.findAll({ where: { experimentId: experiment.id }});
+      const instructionValues = {};
+      instructions.forEach((instruction) => {
+        instructionValues[instruction.type] = instruction.value;
+      });
+      return instructionValues;
+    },
+  }
+});
 
 // TODO - factor out workspaceType into separate file so the following import
 // can go at the top of the file -- right now it's down here to avoid circular
@@ -402,7 +438,7 @@ const schema = new GraphQLSchema({
               }
             }
             return result;
-          }  
+          }
         }),
       },
       workspace: {
@@ -1068,7 +1104,7 @@ const schema = new GraphQLSchema({
               workspace = await models.Workspace.create(
                 {
                   totalBudget,
-                  creatorId: user.user_id 
+                  creatorId: user.user_id
                 }, // TODO replace user.user_id
                 { event, questionValue: JSON.parse(question) }
               );
@@ -1091,7 +1127,7 @@ const schema = new GraphQLSchema({
             const workspace = await models.Workspace.findByPk(workspaceId);
             const event = await models.Event.create();
             const user = await userFromContext(context);
-            
+
             const child = await workspace.createChild({
               event,
               question: JSON.parse(question),
@@ -1372,6 +1408,23 @@ const schema = new GraphQLSchema({
           async (_, { experimentId, metadata }, context) => {
             const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.update({ metadata: JSON.parse(metadata) });
+            return true;
+          }
+        ),
+      },
+      updateExperimentInstructions: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          instructions: { type: GraphQLString },
+          type: { type: instructionsEnumType },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to update experiment instructions",
+          async (_, { experimentId, instructions, type }, context) => {
+            const [instruction, created] = await models.Instructions.findOrBuild({ where: { experimentId, type } });
+            instruction.value = instructions;
+            await instruction.save();
             return true;
           }
         ),

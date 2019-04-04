@@ -10,6 +10,7 @@ const AssignmentModel = require("./assignment");
 const BlockModel = require("./block");
 const ExperimentModel = require("./experiment");
 const ExportWorkspaceLockRelationModel = require("./exportWorkspaceLockRelation");
+const InstructionsModel = require("./instructions");
 const EventModel = require("./event");
 const PointerModel = require("./pointer");
 const PointerImportModel = require("./pointerImport");
@@ -35,6 +36,7 @@ if (config.use_env_variable) {
 const models = [
   ["assignment", AssignmentModel],
   ["experiment", ExperimentModel],
+  ["instructions", InstructionsModel],
   ["exportWorkspaceLockRelation", ExportWorkspaceLockRelationModel],
   ["event", EventModel],
   ["block", BlockModel],
