@@ -89,6 +89,8 @@ export class Auth {
         window.FS.identify(profile.sub, {
           displayName: `${profile.given_name} ${profile.family_name}`,
           email: profile.email,
+          isAdmin: appMetadata ? appMetadata.is_admin : false,
+          isOracle: appMetadata ? appMetadata.is_oracle : false,
         });
       }
 
