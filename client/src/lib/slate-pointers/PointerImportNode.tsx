@@ -308,6 +308,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
             <span onClick={e => e.stopPropagation()}>
               <Brackets isLazy={isLazyPointer}>
                 <ShowExpandedPointer
+                  isActive={this.props.isActive}
                   ancestorPointerIds={!this.props.ancestorPointerIds ? [exportPointerId] : [...this.props.ancestorPointerIds, exportPointerId]}
                   isInOracleMode={this.props.isInOracleMode}
                   isUserOracle={this.props.isUserOracle}
