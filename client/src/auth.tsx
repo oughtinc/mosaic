@@ -38,6 +38,13 @@ export class Auth {
     localStorage.removeItem("expires_at");
     localStorage.removeItem("is_admin");
     localStorage.removeItem("user_id");
+
+    // log out of FullStory
+    // @ts-ignore
+    if (window.FS) {
+      // @ts-ignore
+      window.FS.identify(false);
+    }
   }
 
   public static handleAuthentication(callback: () => void): void {
