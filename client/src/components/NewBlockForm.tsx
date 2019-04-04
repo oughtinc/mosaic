@@ -50,6 +50,8 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       question: valueToDatabaseJSON(this.state.blockValue),
       totalBudget: this.props.hasTimeBudget ? this.state.totalBudget : 0,
     });
+
+    this.props.resetBlock({ id: this.props.blockId });
   }, 3000);
 
   public constructor(props: any) {
@@ -62,9 +64,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
 
   public componentWillReceiveProps() {
     if (this.state.pending) {
-      this.setState({ pending: false, totalBudget: 90 }, () => {
-        this.props.resetBlock({ id: this.props.blockId });
-      });
+      this.setState({ pending: false, totalBudget: 90 });
     }
   }
 
