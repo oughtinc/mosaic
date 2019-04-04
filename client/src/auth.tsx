@@ -15,6 +15,8 @@ export class Auth {
     scope: "openid email profile user_metadata app_metadata"
   });
 
+  public static renewTokenTimer: NodeJS.Timer | null;
+
   public static login(): void {
     Auth.savePreAuthUrl();
     Auth.auth0.authorize();
@@ -68,6 +70,21 @@ export class Auth {
     });
   }
 
+  public static renewTokens() {
+    Auth.renewTokenTimer = null;
+    Auth.auth0.checkSession({}, (err, result) => {
+      if (result && result.accessToken) {
+        const expiresAt = JSON.stringify(
+          result.expiresIn * 1000 + Date.now()
+        );
+        localStorage.setItem("access_token", result.accessToken);
+        localStorage.setItem("expires_at", expiresAt);
+      } else if (err) {
+        console.error("Authentication error: ", err);
+      }
+    });
+  }
+
   public static getProfile(callback: () => void): void {
     const root = "https://mosaic:auth0:com/";
 
@@ -117,6 +134,11 @@ export class Auth {
     if (isExpired) {
       Auth.logout();
       return false;
+    }
+
+    // schedule the tokens for renewal if they've not already done so
+    if (!Auth.renewTokenTimer) {
+      Auth.renewTokenTimer = setTimeout(Auth.renewTokens, 900000); // 15 minutes
     }
 
     return true;
