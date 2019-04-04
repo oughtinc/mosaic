@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as LogRocket from "logrocket";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
@@ -125,10 +124,6 @@ const Routes = () => (
     <ListenerThatClosesPointersOnPathnameChange />
   </div>
 );
-
-LogRocket.init(Config.logrocket_id);
-const environment = process.env.NODE_ENV || ""; // "development" or "production"
-LogRocket.track(environment);
 
 class App extends React.Component {
   public render() {
