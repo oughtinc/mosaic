@@ -24,8 +24,12 @@ import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
 
-import { Config } from "./config";
 import { Auth } from "./auth";
+
+// set up FullStory identity
+if (Auth.isAuthenticated()) {
+  Auth.getProfile(() => { });
+}
 
 const SERVER_URL =
   window.location.hostname === "localhost"

@@ -81,6 +81,17 @@ export class Auth {
         localStorage.setItem("is_admin", appMetadata.is_admin);
       }
       localStorage.setItem("user_id", profile.sub);
+
+      // configure FullStory
+      // @ts-ignore
+      if (window.FS) {
+        // @ts-ignore
+        window.FS.identify(profile.sub, {
+          displayName: `${profile.given_name} ${profile.family_name}`,
+          email: profile.email,
+        });
+      }
+
       callback();
     });
   }
