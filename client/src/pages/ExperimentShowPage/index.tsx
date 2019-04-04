@@ -13,6 +13,7 @@ import { ContentContainer } from  "../../components/ContentContainer";
 import { Auth } from "../../auth";
 import { CREATE_ROOT_WORKSPACE } from "../../graphqlQueries";
 import { MetaDataEditor } from "../../components/MetadataEditor";
+import { InstructionsEditor } from "../../components/InstructionsEditor";
 import { ExperimentControl } from "../RootWorkspacePage/ExperimentsControls/ExperimentControl";
 import { RootWorkspace } from "../RootWorkspacePage/RootWorkspace";
 
@@ -179,13 +180,89 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
         {
           isUserAdmin
           &&
-          <NewRootWorkspaceForExperimentForm
-            experimentId={experiment.id}
-            maxTotalBudget={100000}
-            createWorkspace={this.props.createWorkspaceMutation}
-            shouldAutosave={false}
-            style={{ marginTop: "50px" }}
-          />
+          <React.Fragment>
+            <NewRootWorkspaceForExperimentForm
+              experimentId={experiment.id}
+              maxTotalBudget={100000}
+              createWorkspace={this.props.createWorkspaceMutation}
+              shouldAutosave={false}
+              style={{ marginTop: "50px" }}
+            />
+            <h2
+              style={{
+                fontSize: "24px",
+                fontWeight: 600,
+              }}
+            >
+              Instructions
+            </h2>
+
+            <h3 style={{ fontSize: "18px" }}>
+              For root workspaces:
+            </h3>
+            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+              <InstructionsEditor
+                experimentId={experiment.id}
+                instructionType="root"
+                instructions={experiment.root_instructions}
+              />
+            </BlockContainer>
+
+            <h3 style={{ fontSize: "18px" }}>
+              For honest oracles:
+            </h3>
+            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+              <InstructionsEditor
+                experimentId={experiment.id}
+                instructionType="honest_oracle"
+                instructions={experiment.honest_oracle_instructions}
+              />
+            </BlockContainer>
+
+            <h3 style={{ fontSize: "18px" }}>
+              For malicious oracles:
+            </h3>
+            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+              <InstructionsEditor
+                experimentId={experiment.id}
+                instructionType="malicious_oracle"
+                instructions={experiment.malicious_oracle_instructions}
+              />
+            </BlockContainer>
+
+            <h3 style={{ fontSize: "18px" }}>
+              For users returning to a root workspace:
+            </h3>
+            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+              <InstructionsEditor
+                experimentId={experiment.id}
+                instructionType="returning_root"
+                instructions={experiment.returning_root_instructions}
+              />
+            </BlockContainer>
+
+            <h3 style={{ fontSize: "18px" }}>
+              For honest oracles returning to a workspace:
+            </h3>
+            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+              <InstructionsEditor
+                experimentId={experiment.id}
+                instructionType="returning_honest_oracle"
+                instructions={experiment.returning_honest_oracle_instructions}
+              />
+            </BlockContainer>
+
+            <h3 style={{ fontSize: "18px" }}>
+              For malicious oracles returning to a workspace:
+            </h3>
+            <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
+              <InstructionsEditor
+                experimentId={experiment.id}
+                instructionType="returning_malicious_oracle"
+                instructions={experiment.returning_malicious_oracle_instructions}
+              />
+            </BlockContainer>
+          </React.Fragment>
         }
       </ContentContainer>
     );
@@ -200,6 +277,12 @@ const EXPERIMENT_QUERY = gql`
       areNewWorkspacesOracleOnlyByDefault
       name
       metadata
+      root_instructions
+      honest_oracle_instructions
+      malicious_oracle_instructions
+      returning_root_instructions
+      returning_honest_oracle_instructions
+      returning_malicious_oracle_instructions
       fallbacks {
         id
         createdAt

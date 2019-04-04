@@ -11,7 +11,7 @@ import {
   GraphQLSchema,
   GraphQLInt,
   GraphQLString,
-  GraphQLInputObjectType
+  GraphQLInputObjectType, GraphQLEnumType
 } from "graphql";
 import * as GraphQLJSON from "graphql-type-json";
 import * as Sequelize from "sequelize";
@@ -236,7 +236,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
         workspace.isNotStaleRelativeToUser,
         async userId => {
           let user = await models.User.findById(userId);
-          
+
           if (!user) {
             const userInfo = await userFromAuthToken(context.authorization);
 
@@ -312,6 +312,18 @@ const oracleModeType = new GraphQLObjectType({
   fields: {
     value: { type: GraphQLBoolean },
   }
+});
+
+const instructionsEnumType = new GraphQLEnumType({
+  name: "InstructionsEnum",
+  values: {
+    root: { },
+    honest_oracle: { },
+    malicious_oracle: { },
+    returning_root: { },
+    returning_honest_oracle: { },
+    returning_malicious_oracle: { },
+  },
 });
 
 const BlockInput = new GraphQLInputObjectType({
@@ -397,7 +409,7 @@ const schema = new GraphQLSchema({
               }
             }
             return result;
-          }  
+          }
         }),
       },
       workspace: {
@@ -831,7 +843,7 @@ const schema = new GraphQLSchema({
               const updateWithNoNullOrUndefinedValues = _.omitBy(update, _.isNil);
 
               const updatedWorkspace = await workspace.update(updateWithNoNullOrUndefinedValues);
-              
+
               // is isStale updated to true
               // then is stale relative to all users as well
               if (!_.isNil(isStale) && isStale === true) {
@@ -854,7 +866,7 @@ const schema = new GraphQLSchema({
                     }
                   }
                   if (allResolved) {
-                    await parent.update({ 
+                    await parent.update({
                       isStale: true,
                       isNotStaleRelativeToUser: [],
                     });
@@ -950,7 +962,7 @@ const schema = new GraphQLSchema({
               workspace = await models.Workspace.create(
                 {
                   totalBudget,
-                  creatorId: user.user_id 
+                  creatorId: user.user_id
                 }, // TODO replace user.user_id
                 { event, questionValue: JSON.parse(question) }
               );
@@ -973,7 +985,7 @@ const schema = new GraphQLSchema({
             const workspace = await models.Workspace.findById(workspaceId);
             const event = await models.Event.create();
             const user = await userFromContext(context);
-            
+
             const child = await workspace.createChild({
               event,
               question: JSON.parse(question),
@@ -1254,6 +1266,22 @@ const schema = new GraphQLSchema({
           async (_, { experimentId, metadata }, context) => {
             const experiment = await models.Experiment.findById(experimentId);
             await experiment.update({ metadata: JSON.parse(metadata) });
+            return true;
+          }
+        ),
+      },
+      updateExperimentInstructions: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          instructions: { type: GraphQLString },
+          type: { type: instructionsEnumType },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to update experiment instructions",
+          async (_, { experimentId, instructions, type }, context) => {
+            const experiment = await models.Experiment.findById(experimentId);
+            await experiment.update({ [`${type}_instructions`]: instructions });
             return true;
           }
         ),
