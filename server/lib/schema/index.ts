@@ -35,7 +35,6 @@ import User from "../models/user";
 import Experiment from "../models/experiment";
 import Instructions, { InstructionTypes } from "../models/instructions";
 import Tree from "../models/tree";
-import EventModel from "../models/event";
 import Pointer from "../models/pointer";
 import PointerImport from "../models/pointerImport";
 import ExportWorkspaceLockRelation from "../models/exportWorkspaceLockRelation";
@@ -63,20 +62,13 @@ const makeObjectType = (model, references, extraFields = {}) =>
       )
   });
 
-const standardReferences = [
-  ["createdAtEvent", () => eventType],
-  ["updatedAtEvent", () => eventType]
-];
-
 const blockType = makeObjectType(Block, [
-  ...standardReferences,
   ["workspace", () => workspaceType]
 ]);
 
 import { UserType } from "./User";
 
 export const workspaceType = makeObjectType(Workspace, [
-  ...standardReferences,
   ["childWorkspaces", () => new GraphQLList(workspaceType)],
   ["parentWorkspace", () => new GraphQLList(workspaceType)],
   ["blocks", () => new GraphQLList(blockType)],
@@ -269,13 +261,11 @@ export const workspaceType = makeObjectType(Workspace, [
 import { UserActivityType } from "./UserActivity";
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
-  ...standardReferences,
   ["tree", () => treeType],
   ["user", () => UserType],
 ]);
 
 const treeType = makeObjectType(Tree, [
-  ...standardReferences,
   ["rootWorkspace", () => workspaceType],
   ["experiments", () => new GraphQLList(experimentType)],
   ["oracleRelations", () => new GraphQLList(OracleRelationsType)],
@@ -300,7 +290,6 @@ const instructionsObjectType = new GraphQLObjectType({
 });
 
 const experimentType = makeObjectType(Experiment, [
-  ...standardReferences,
   ["fallbacks", () => new GraphQLList(experimentType)],
   ["trees", () => new GraphQLList(treeType)]
 ], {
@@ -317,16 +306,12 @@ const experimentType = makeObjectType(Experiment, [
   }
 });
 
-const eventType = makeObjectType(EventModel, []);
-
 const pointerType = makeObjectType(Pointer, [
-  ...standardReferences,
   ["pointerImport", () => pointerImportType],
   ["sourceBlock", () => blockType]
 ]);
 
 const pointerImportType = makeObjectType(PointerImport, [
-  ...standardReferences,
   ["workspace", () => blockType],
   ["pointer", () => pointerType]
 ]);
@@ -506,7 +491,6 @@ const schema = new GraphQLSchema({
         new GraphQLList(pointerType),
         Pointer
       ),
-      events: modelGraphQLFields(new GraphQLList(eventType), EventModel),
       subtreeTimeSpent: {
         type: GraphQLString, // is JSON stringified
         args: { id: { type: GraphQLString } },
@@ -553,7 +537,6 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update blocks",
           async (_, { blocks, experimentId }, context) => {
-            const event = await EventModel.create();
             let newBlocks: any = [];
             for (const _block of blocks) {
               const block = await Block.findById(_block.id);
@@ -619,7 +602,7 @@ const schema = new GraphQLSchema({
                 }
               }
 
-              await block.update({ ..._block }, { event });
+              await block.update({ ..._block });
 
               if (
                 isInOracleMode.getValue()
@@ -872,8 +855,7 @@ const schema = new GraphQLSchema({
             if (workspace === null) {
               return null;
             }
-            const event = await EventModel.create();
-            return workspace.update({ childWorkspaceOrder }, { event });
+            return workspace.update({ childWorkspaceOrder });
           }
         ),
       },
@@ -1080,8 +1062,7 @@ const schema = new GraphQLSchema({
           if (workspace === null) {
             return null;
           }
-          const event = await EventModel.create();
-          return workspace.update({ wasAnsweredByOracle }, { event });
+          return workspace.update({ wasAnsweredByOracle });
         }
       },
       transferRemainingBudgetToParent: {
@@ -1137,7 +1118,6 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to create a workspace",
           async (_, { question, totalBudget, experimentId }, context) => {
-            const event = await EventModel.create();
             const user = await userFromContext(context);
 
             let workspace;
@@ -1154,7 +1134,7 @@ const schema = new GraphQLSchema({
                   creatorId: user.user_id,
                   isEligibleForMaliciousOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
                 }, // TODO replace user.user_id
-                { event, questionValue: JSON.parse(question) }
+                { questionValue: JSON.parse(question) }
               );
 
               const tree = await Tree.create({
@@ -1168,7 +1148,7 @@ const schema = new GraphQLSchema({
                   totalBudget,
                   creatorId: user.user_id
                 }, // TODO replace user.user_id
-                { event, questionValue: JSON.parse(question) }
+                { questionValue: JSON.parse(question) }
               );
             }
 
@@ -1190,11 +1170,9 @@ const schema = new GraphQLSchema({
             if (workspace === null) {
               return;
             }
-            const event = await EventModel.create();
             const user = await userFromContext(context);
 
             return await workspace.createChild({
-              event,
               question: JSON.parse(question),
               totalBudget,
               creatorId: user.user_id,
@@ -1213,15 +1191,12 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update a child's total budget",
           async (_, { workspaceId, childId, totalBudget }, context) => {
-            const event = await EventModel.create();
             const workspace = await Workspace.findById(workspaceId);
             if (workspace === null) {
               return;
             }
             const child = await Workspace.findById(childId);
-            await workspace.changeAllocationToChild(child, totalBudget, {
-              event
-            });
+            await workspace.changeAllocationToChild(child, totalBudget);
           }
         ),
       },

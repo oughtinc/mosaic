@@ -12,8 +12,6 @@ import { getAllInlinesAsArray } from "../utils/slateUtils";
 import {
   AfterCreate,
   AllowNull,
-  BeforeUpdate,
-  BeforeValidate,
   BelongsTo,
   Column,
   DataType,
@@ -25,7 +23,6 @@ import {
   Model,
   Table
 } from "sequelize-typescript";
-import EventModel from "./event";
 import PointerImport from "./pointerImport";
 import Block from "./block";
 import Tree from "./tree";
@@ -324,54 +321,18 @@ export default class Workspace extends Model<Workspace> {
   @HasOne(() => Tree, "rootWorkspaceId")
   public tree: Tree;
 
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public createdAtEventId: number;
-
-  @BelongsTo(() => EventModel, "createdAtEventId")
-  public createdAtEvent: Event;
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public updatedAtEventId: number;
-
-  @BelongsTo(() => EventModel, "updatedAtEventId")
-  public updatedAtEvent: Event;
-
-  @BeforeValidate
-  public static updateEvent(item: Workspace, options: { event?: EventModel }) {
-    const event = options.event;
-    if (event) {
-      if (!item.createdAtEventId) {
-        item.createdAtEventId = event.dataValues.id;
-      }
-      item.updatedAtEventId = event.dataValues.id;
-    }
-  }
-
-  @BeforeUpdate
-  public static workaroundOnEventUpdate(
-    item: Workspace,
-    options: { fields: string[] | boolean }
-  ) {
-    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
-    // See: https://github.com/sequelize/sequelize/issues/3534
-    options.fields = item.changed();
-  }
-
   @AfterCreate
   public static async populateBlocks(
     workspace: Workspace,
-    { event, questionValue }
+    { questionValue }
   ) {
     if (questionValue) {
       await workspace.$create(
         "block",
         { type: "QUESTION", value: questionValue },
-        { event }
       );
     } else {
-      await workspace.$create("block", { type: "QUESTION" }, { event });
+      await workspace.$create("block", { type: "QUESTION" });
     }
 
     if (workspace.isRequestingLazyUnlock) {
@@ -382,9 +343,9 @@ export default class Workspace extends Model<Workspace> {
         answerDraftBlockValue,
         responseBlockValue
       } = createHonestOracleDefaultBlockValues(questionValue);
-      await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-      await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-      await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+      await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue });
+      await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue });
+      await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue });
     } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
       if (workspace.parentId) {
         const {
@@ -392,26 +353,26 @@ export default class Workspace extends Model<Workspace> {
           answerDraftBlockValue,
           responseBlockValue
         } = createMaliciousOracleDefaultBlockValues(questionValue);
-        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue });
+        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue });
+        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue });
       } else {
         const {
           scratchpadBlockValue,
           answerDraftBlockValue,
           responseBlockValue
         } = createDefaultRootLevelBlockValues();
-        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
+        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue });
+        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue });
+        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue });
       }
     } else {
-      await workspace.$create("block", { type: "SCRATCHPAD" }, { event });
-      await workspace.$create("block", { type: "SUBQUESTION_DRAFT" }, { event });
-      await workspace.$create("block", { type: "ANSWER_DRAFT" }, { event });
+      await workspace.$create("block", { type: "SCRATCHPAD" });
+      await workspace.$create("block", { type: "SUBQUESTION_DRAFT" });
+      await workspace.$create("block", { type: "ANSWER_DRAFT" });
     }
 
-    await workspace.$create("block", { type: "ANSWER" }, { event });
+    await workspace.$create("block", { type: "ANSWER" });
   }
 
   public static async isNewChildWorkspaceHonestOracleEligible({ parentId }) {
@@ -490,7 +451,6 @@ export default class Workspace extends Model<Workspace> {
       isEligibleForHonestOracle,
       isEligibleForMaliciousOracle,
     },
-    { event }
   ) {
     isEligibleForHonestOracle = isEligibleForHonestOracle !== undefined
       ? isEligibleForHonestOracle
@@ -509,7 +469,7 @@ export default class Workspace extends Model<Workspace> {
         isEligibleForHonestOracle,
         isEligibleForMaliciousOracle,
       },
-      { event, questionValue: question }
+      { questionValue: question }
     );
   }
 
@@ -544,7 +504,6 @@ export default class Workspace extends Model<Workspace> {
   public async changeAllocationToChild(
     childWorkspace: any,
     newTotalBudget: number,
-    { event }
   ) {
     const budgetToAddToChild = newTotalBudget - childWorkspace.totalBudget;
 
@@ -580,12 +539,10 @@ export default class Workspace extends Model<Workspace> {
       {
         allocatedBudget: this.allocatedBudget + budgetToAddToChild
       },
-      { event }
     );
   }
 
   public async createChild({
-    event,
     question,
     totalBudget,
     creatorId,
@@ -615,7 +572,6 @@ export default class Workspace extends Model<Workspace> {
         isEligibleForHonestOracle: isRequestingLazyUnlock ? workspaceContainingLazyPointer.isEligibleForHonestOracle : undefined,
         isEligibleForMaliciousOracle: isRequestingLazyUnlock ? workspaceContainingLazyPointer.isEligibleForMaliciousOracle : undefined,
       },
-      { event }
     );
     if (this.remainingBudget < child.totalBudget) {
       throw new Error(
@@ -631,7 +587,6 @@ export default class Workspace extends Model<Workspace> {
         allocatedBudget: newAllocatedBudget,
         childWorkspaceOrder: this.workSpaceOrderAppend(child.id)
       },
-      { event }
     );
     return child;
   }

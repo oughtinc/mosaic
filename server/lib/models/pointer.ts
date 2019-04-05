@@ -2,8 +2,6 @@ import { Op, UUIDV4 } from "sequelize";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 import * as _ from "lodash";
 import {
-  BeforeUpdate,
-  BeforeValidate,
   BelongsTo,
   Column,
   DataType,
@@ -11,7 +9,6 @@ import {
   Model,
   Table
 } from "sequelize-typescript";
-import EventModel from "./event";
 import Block from "./block";
 import PointerImport from "./pointerImport";
 import { HasOne } from "sequelize-typescript/lib/annotations/association/HasOne";
@@ -59,41 +56,6 @@ export default class Pointer extends Model<Pointer> {
 
   @BelongsTo(() => Block)
   public sourceBlock: Block;
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public createdAtEventId: number;
-
-  @BelongsTo(() => EventModel, "createdAtEventId")
-  public createdAtEvent: Event;
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public updatedAtEventId: number;
-
-  @BelongsTo(() => EventModel, "updatedAtEventId")
-  public updatedAtEvent: Event;
-
-  @BeforeValidate
-  public static updateEvent(item: Pointer, options: { event?: EventModel }) {
-    const event = options.event;
-    if (event) {
-      if (!item.createdAtEventId) {
-        item.createdAtEventId = event.dataValues.id;
-      }
-      item.updatedAtEventId = event.dataValues.id;
-    }
-  }
-
-  @BeforeUpdate
-  public static workaroundOnEventUpdate(
-    item: Pointer,
-    options: { fields: string[] | boolean }
-  ) {
-    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
-    // See: https://github.com/sequelize/sequelize/issues/3534
-    options.fields = item.changed();
-  }
 
   public async containedPointers({ pointersSoFar } = {}) {
     const directPointers = await this.directContainedPointers({

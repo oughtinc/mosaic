@@ -1,15 +1,10 @@
 import {
-  BeforeUpdate,
-  BeforeValidate,
-  BelongsTo,
   BelongsToMany,
   Column,
   DataType,
-  ForeignKey,
   Model,
   Table
 } from "sequelize-typescript";
-import EventModel from "./event";
 import { UUIDV4 } from "sequelize";
 import Tree from "./tree";
 import UserTreeOracleRelation from "./userTreeOracleRelation";
@@ -41,39 +36,4 @@ export default class User extends Model<User> {
 
   @BelongsToMany(() => Tree, () => UserTreeOracleRelation)
   public OracleTrees: Tree[];
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public createdAtEventId: number;
-
-  @BelongsTo(() => EventModel, "createdAtEventId")
-  public createdAtEvent: Event;
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public updatedAtEventId: number;
-
-  @BelongsTo(() => EventModel, "updatedAtEventId")
-  public updatedAtEvent: Event;
-
-  @BeforeValidate
-  public static updateEvent(item: User, options: { event?: EventModel }) {
-    const event = options.event;
-    if (event) {
-      if (!item.createdAtEventId) {
-        item.createdAtEventId = event.dataValues.id;
-      }
-      item.updatedAtEventId = event.dataValues.id;
-    }
-  }
-
-  @BeforeUpdate
-  public static workaroundOnEventUpdate(
-    item: User,
-    options: { fields: string[] | boolean }
-  ) {
-    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
-    // See: https://github.com/sequelize/sequelize/issues/3534
-    options.fields = item.changed();
-  }
 }
