@@ -3,7 +3,6 @@ import { getAllInlinesAsArray } from "../utils/slateUtils";
 import * as _ from "lodash";
 import {
   AfterSave,
-  BeforeUpdate,
   BeforeValidate,
   BelongsTo,
   Column,
@@ -14,7 +13,6 @@ import {
   Table
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
-import EventModel from "./event";
 import Workspace from "./workspace";
 import Pointer from "./pointer";
 
@@ -60,33 +58,14 @@ export default class Block extends Model<Block> {
   @HasMany(() => Pointer, "sourceBlockId")
   public exportingPointers: Pointer[];
 
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public createdAtEventId: number;
-
-  @BelongsTo(() => EventModel, "createdAtEventId")
-  public createdAtEvent: Event;
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public updatedAtEventId: number;
-
-  @BelongsTo(() => EventModel, "updatedAtEventId")
-  public updatedAtEvent: Event;
-
   @BeforeValidate
   public static async updateCachedExportPointerValues(item: Block) {
     item.cachedExportPointerValues = await item.exportingPointerValues();
   }
 
   @AfterSave
-  public static async updateChangedPoints(
-    item: Block,
-    options: { event: EventModel }
-  ) {
-    await item.ensureAllPointersAreInDatabase({
-      event: options.event,
-    });
+  public static async updateChangedPoints(item: Block) {
+    await item.ensureAllPointersAreInDatabase();
     if (item._previousDataValues) {
       const changes = diff(item._previousDataValues, item.dataValues);
       if (!_.isEmpty(changes.value)) {
@@ -97,28 +76,7 @@ export default class Block extends Model<Block> {
     }
   }
 
-  @BeforeValidate
-  public static updateEvent(item: Block, options: { event?: EventModel }) {
-    const event = options.event;
-    if (event) {
-      if (!item.createdAtEventId) {
-        item.createdAtEventId = event.dataValues.id;
-      }
-      item.updatedAtEventId = event.dataValues.id;
-    }
-  }
-
-  @BeforeUpdate
-  public static workaroundOnEventUpdate(
-    item: Block,
-    options: { fields: string[] | boolean }
-  ) {
-    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
-    // See: https://github.com/sequelize/sequelize/issues/3534
-    options.fields = item.changed();
-  }
-
-  public async ensureAllPointersAreInDatabase({ event }) {
+  public async ensureAllPointersAreInDatabase() {
     const exportingPointers = await this.$get("exportingPointers") as Pointer[];
     const { cachedExportPointerValues } = this;
 
@@ -126,7 +84,7 @@ export default class Block extends Model<Block> {
       if (!_.includes(exportingPointers.map(p => p.id), pointerId)) {
         const pointer = await Pointer.findByPk(pointerId);
         if (!pointer) {
-          await this.$create("exportingPointer", { id: pointerId }, { event });
+          await this.$create("exportingPointer", { id: pointerId });
         } else {
           // if the pointer already exists,
           // then it was present in the subquestion draft block,
@@ -137,7 +95,7 @@ export default class Block extends Model<Block> {
     }
   }
 
-  public async updateStalenessAndIsCurrentlyResolved({ event }) {
+  public async updateStalenessAndIsCurrentlyResolved() {
     const workspaceId = this.workspaceId;
     const workspace = await Workspace.findByPk(workspaceId);
     if (workspace === null) {
@@ -165,8 +123,7 @@ export default class Block extends Model<Block> {
           isCurrentlyResolved: false,
           isStale: true,
           isNotStaleRelativeToUser: []
-        },
-        { event }
+        }
       );
     }
   }

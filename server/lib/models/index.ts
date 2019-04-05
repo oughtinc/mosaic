@@ -3,9 +3,7 @@
 import { Sequelize } from "sequelize-typescript";
 import Assignment from "./assignment";
 import Block from "./block";
-import EventModel from "./event";
 import Experiment from "./experiment";
-import ExperimentTreeRelation from "./experimentTreeRelation";
 import ExportWorkspaceLockRelation from "./exportWorkspaceLockRelation";
 import Instructions from "./instructions";
 import Pointer from "./pointer";
@@ -38,9 +36,7 @@ const sequelize = configureDb(config);
 sequelize.addModels([
   Assignment,
   Block,
-  EventModel,
   Experiment,
-  ExperimentTreeRelation,
   ExportWorkspaceLockRelation,
   Instructions,
   Pointer,

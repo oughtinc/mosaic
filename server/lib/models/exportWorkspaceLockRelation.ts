@@ -1,7 +1,5 @@
 import {
   AllowNull,
-  BeforeUpdate,
-  BeforeValidate,
   BelongsTo,
   Column,
   DataType,
@@ -10,7 +8,6 @@ import {
   Model,
   Table
 } from "sequelize-typescript";
-import EventModel from "./event";
 import { UUIDV4 } from "sequelize";
 import Workspace from "./workspace";
 import Pointer from "./pointer";
@@ -45,42 +42,4 @@ export default class ExportWorkspaceLockRelation extends Model<
 
   @BelongsTo(() => Pointer)
   public Export: Pointer;
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public createdAtEventId: number;
-
-  @BelongsTo(() => EventModel, "createdAtEventId")
-  public createdAtEvent: Event;
-
-  @ForeignKey(() => EventModel)
-  @Column(DataType.INTEGER)
-  public updatedAtEventId: number;
-
-  @BelongsTo(() => EventModel, "updatedAtEventId")
-  public updatedAtEvent: Event;
-
-  @BeforeValidate
-  public static updateEvent(
-    item: ExportWorkspaceLockRelation,
-    options: { event?: EventModel }
-  ) {
-    const event = options.event;
-    if (event) {
-      if (!item.createdAtEventId) {
-        item.createdAtEventId = event.dataValues.id;
-      }
-      item.updatedAtEventId = event.dataValues.id;
-    }
-  }
-
-  @BeforeUpdate
-  public static workaroundOnEventUpdate(
-    item: ExportWorkspaceLockRelation,
-    options: { fields: string[] | boolean }
-  ) {
-    // This is a workaround of a sequlize bug where the updatedAtEventId wouldn't update for Updates.
-    // See: https://github.com/sequelize/sequelize/issues/3534
-    options.fields = item.changed();
-  }
 }
