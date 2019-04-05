@@ -1299,8 +1299,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment instructions",
           async (_, { experimentId, instructions, type }, context) => {
-            const instruction = await models.Instructions.findOne({ where: { experimentId, type } });
-            await instruction.update({ value: instructions });
+            const [instruction, created] = await models.Instructions.findOrBuild({ where: { experimentId, type } });
+            instruction.value = instructions;
+            await instruction.save();
             return true;
           }
         ),
