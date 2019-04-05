@@ -283,11 +283,11 @@ const treeType = makeObjectType(models.Tree, [
 
 const instructionTypes = [
   "root",
-  "honest_oracle",
-  "malicious_oracle",
-  "returning_root",
-  "returning_honest_oracle",
-  "returning_malicious_oracle"
+  "honestOracle",
+  "maliciousOracle",
+  "returningRoot",
+  "returningHonestOracle",
+  "returningMaliciousOracle"
 ];
 
 const instructionsEnumValues = {};
@@ -315,12 +315,12 @@ const experimentType = makeObjectType(models.Experiment, [
   instructions: {
     type: instructionsObjectType,
     resolve: (experiment) => ({
-      root: experiment.root_instructions,
-      honest_oracle: experiment.honest_oracle_instructions,
-      malicious_oracle: experiment.malicious_oracle_instructions,
-      returning_root: experiment.returning_root_instructions,
-      returning_honest_oracle: experiment.returning_honest_oracle_instructions,
-      returning_malicious_oracle: experiment.returning_malicious_oracle_instructions,
+      root: experiment.rootInstructions,
+      honestOracle: experiment.honestOracleInstructions,
+      maliciousOracle: experiment.maliciousOracleInstructions,
+      returningRoot: experiment.returningRootInstructions,
+      returningHonestOracle: experiment.returningHonestOracleInstructions,
+      returningMaliciousOracle: experiment.returningMaliciousOracleInstructions,
     }),
   }
 });
@@ -1308,7 +1308,7 @@ const schema = new GraphQLSchema({
           "You must be logged in as an admin to update experiment instructions",
           async (_, { experimentId, instructions, type }, context) => {
             const experiment = await models.Experiment.findById(experimentId);
-            await experiment.update({ [`${type}_instructions`]: instructions });
+            await experiment.update({ [`${type}Instructions`]: instructions });
             return true;
           }
         ),

@@ -25,7 +25,7 @@ const ExperimentModel = (
         allowNull: true,
       },
       description: Sequelize.JSON,
-      root_instructions: {
+      rootInstructions: {
         type: Sequelize.TEXT,
         defaultValue: (
 `**Instructions for root level workspace**\n
@@ -35,8 +35,9 @@ const ExperimentModel = (
 3. Click "Done!" under the response field`
         ),
         allowNull: false,
+        field: "root_instructions",
       },
-      honest_oracle_instructions: {
+      honestOracleInstructions: {
         type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: (
@@ -46,8 +47,9 @@ const ExperimentModel = (
 2. Click "Submit" on the right\n
 3. Click "Done!" under the response field`
         ),
+        field: "honest_oracle_instructions",
       },
-      malicious_oracle_instructions: {
+      maliciousOracleInstructions: {
         type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: (
@@ -61,8 +63,9 @@ const ExperimentModel = (
 3. If you decide not to challenge:\n
    - Click "Done!" under the response field`
         ),
+        field: "malicious_oracle_instructions",
       },
-      returning_root_instructions: {
+      returningRootInstructions: {
         type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: (
@@ -70,8 +73,9 @@ const ExperimentModel = (
 &nbsp;\n
 1. Just click "Done!" under the response field`
         ),
+        field: "returning_root_instructions",
       },
-      returning_honest_oracle_instructions: {
+      returningHonestOracleInstructions: {
         type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: (
@@ -79,8 +83,9 @@ const ExperimentModel = (
 &nbsp;\n
 1. Just click "Done!" under the response field`
         ),
+        field: "returning_honest_oracle_instructions",
       },
-      returning_malicious_oracle_instructions: {
+      returningMaliciousOracleInstructions: {
         type: Sequelize.TEXT,
         allowNull: false,
         defaultValue: (
@@ -93,6 +98,7 @@ const ExperimentModel = (
 3. If the normal user has *not* asked for clarification:\n
    - Just click "Done!" under the response field\n`
         ),
+        field: "returning_malicious_oracle_instructions",
       },
       metadata: Sequelize.JSON,
       areNewWorkspacesOracleOnlyByDefault: {

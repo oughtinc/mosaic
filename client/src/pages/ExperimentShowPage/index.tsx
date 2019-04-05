@@ -214,8 +214,8 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
-                instructionType="honest_oracle"
-                instructions={experiment.instructions.honest_oracle}
+                instructionType="honestOracle"
+                instructions={experiment.instructions.honestOracle}
               />
             </BlockContainer>
 
@@ -225,8 +225,8 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
-                instructionType="malicious_oracle"
-                instructions={experiment.instructions.malicious_oracle}
+                instructionType="maliciousOracle"
+                instructions={experiment.instructions.maliciousOracle}
               />
             </BlockContainer>
 
@@ -236,8 +236,8 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
-                instructionType="returning_root"
-                instructions={experiment.instructions.returning_root}
+                instructionType="returningRoot"
+                instructions={experiment.instructions.returningRoot}
               />
             </BlockContainer>
 
@@ -247,8 +247,8 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
-                instructionType="returning_honest_oracle"
-                instructions={experiment.instructions.returning_honest_oracle}
+                instructionType="returningHonestOracle"
+                instructions={experiment.instructions.returningHonestOracle}
               />
             </BlockContainer>
 
@@ -258,8 +258,8 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
-                instructionType="returning_malicious_oracle"
-                instructions={experiment.instructions.returning_malicious_oracle}
+                instructionType="returningMaliciousOracle"
+                instructions={experiment.instructions.returningMaliciousOracle}
               />
             </BlockContainer>
           </React.Fragment>
@@ -279,11 +279,11 @@ const EXPERIMENT_QUERY = gql`
       metadata
       instructions {
         root
-        honest_oracle
-        malicious_oracle
-        returning_root
-        returning_honest_oracle
-        returning_malicious_oracle
+        honestOracle
+        maliciousOracle
+        returningRoot
+        returningHonestOracle
+        returningMaliciousOracle
       }
       fallbacks {
         id
