@@ -1,37 +1,38 @@
-export function getMessageForUser({
-  experiment,
+export async function getMessageForUser({
+  instructions,
   isWorkspaceRootLevel,
   isThisFirstTimeWorkspaceHasBeenWorkedOn,
   typeOfUser
 }) {
+
   if (typeOfUser === "TYPICAL") {
     return null;
   }
 
   if (!isThisFirstTimeWorkspaceHasBeenWorkedOn) {
     if (isWorkspaceRootLevel) {
-      return experiment.returning_root_instructions;
+      return instructions.returningRoot;
     }
 
     if (typeOfUser === "HONEST") {
-      return experiment.returning_honest_oracle_instructions;
+      return instructions.returningHonestOracle;
     }
 
     if (typeOfUser === "MALICIOUS") {
-      return experiment.returning_malicious_oracle_instructions;
+      return instructions.returningMaliciousOracle;
     }
   }
 
   if (isWorkspaceRootLevel) {
-    return experiment.root_instructions;
+    return instructions.root;
   }
 
   if (typeOfUser === "HONEST") {
-    return experiment.honest_oracle_instructions;
+    return instructions.honestOracle;
   }
 
   if (typeOfUser === "MALICIOUS") {
-    return experiment.malicious_oracle_instructions;
+    return instructions.malicious;
   }
 
   return null;
