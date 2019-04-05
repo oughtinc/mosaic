@@ -1,4 +1,5 @@
 import * as models from "../models";
+import { InstructionTypes } from "../models/instructions";
 import { isInOracleMode } from "../globals/isInOracleMode";
 import * as _ from "lodash";
 import { resolver, attributeFields } from "graphql-sequelize";
@@ -281,18 +282,9 @@ const treeType = makeObjectType(models.Tree, [
   ["oracles", () => new GraphQLList(UserType), "Oracles"],
 ]);
 
-const instructionTypes = [
-  "root",
-  "honestOracle",
-  "maliciousOracle",
-  "returningRoot",
-  "returningHonestOracle",
-  "returningMaliciousOracle"
-];
-
 const instructionsEnumValues = {};
 const instructionsFields = {};
-instructionTypes.map((type) => {
+InstructionTypes.forEach((type) => {
   instructionsEnumValues[type] = {};
   instructionsFields[type] = { type: GraphQLString };
 });
@@ -314,14 +306,14 @@ const experimentType = makeObjectType(models.Experiment, [
 ], {
   instructions: {
     type: instructionsObjectType,
-    resolve: (experiment) => ({
-      root: experiment.rootInstructions,
-      honestOracle: experiment.honestOracleInstructions,
-      maliciousOracle: experiment.maliciousOracleInstructions,
-      returningRoot: experiment.returningRootInstructions,
-      returningHonestOracle: experiment.returningHonestOracleInstructions,
-      returningMaliciousOracle: experiment.returningMaliciousOracleInstructions,
-    }),
+    resolve: async (experiment) => {
+      const instructions = await models.Instructions.findAll({ where: { experimentId: experiment.id }});
+      const instructionValues = {};
+      instructions.forEach((instruction) => {
+        instructionValues[instruction.type] = instruction.value;
+      });
+      return instructionValues;
+    },
   }
 });
 
@@ -1307,8 +1299,8 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment instructions",
           async (_, { experimentId, instructions, type }, context) => {
-            const experiment = await models.Experiment.findById(experimentId);
-            await experiment.update({ [`${type}Instructions`]: instructions });
+            const instruction = await models.Instructions.findOne({ where: { experimentId, type } });
+            await instruction.update({ value: instructions });
             return true;
           }
         ),
