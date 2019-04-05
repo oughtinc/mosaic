@@ -281,11 +281,49 @@ const treeType = makeObjectType(models.Tree, [
   ["oracles", () => new GraphQLList(UserType), "Oracles"],
 ]);
 
+const instructionTypes = [
+  "root",
+  "honest_oracle",
+  "malicious_oracle",
+  "returning_root",
+  "returning_honest_oracle",
+  "returning_malicious_oracle"
+];
+
+const instructionsEnumValues = {};
+const instructionsFields = {};
+instructionTypes.map((type) => {
+  instructionsEnumValues[type] = {};
+  instructionsFields[type] = { type: GraphQLString };
+});
+
+const instructionsEnumType = new GraphQLEnumType({
+  name: "InstructionsEnum",
+  values: instructionsEnumValues,
+});
+
+const instructionsObjectType = new GraphQLObjectType({
+  name: "Instructions",
+  fields: instructionsFields,
+});
+
 const experimentType = makeObjectType(models.Experiment, [
   ...standardReferences,
   ["fallbacks", () => new GraphQLList(experimentType), "Fallbacks"],
   ["trees", () => new GraphQLList(treeType), "Trees"],
-]);
+], {
+  instructions: {
+    type: instructionsObjectType,
+    resolve: (experiment) => ({
+      root: experiment.root_instructions,
+      honest_oracle: experiment.honest_oracle_instructions,
+      malicious_oracle: experiment.malicious_oracle_instructions,
+      returning_root: experiment.returning_root_instructions,
+      returning_honest_oracle: experiment.returning_honest_oracle_instructions,
+      returning_malicious_oracle: experiment.returning_malicious_oracle_instructions,
+    }),
+  }
+});
 
 // TODO - factor out workspaceType into separate file so the following import
 // can go at the top of the file -- right now it's down here to avoid circular
@@ -313,18 +351,6 @@ const oracleModeType = new GraphQLObjectType({
   fields: {
     value: { type: GraphQLBoolean },
   }
-});
-
-const instructionsEnumType = new GraphQLEnumType({
-  name: "InstructionsEnum",
-  values: {
-    root: { },
-    honest_oracle: { },
-    malicious_oracle: { },
-    returning_root: { },
-    returning_honest_oracle: { },
-    returning_malicious_oracle: { },
-  },
 });
 
 const BlockInput = new GraphQLInputObjectType({
