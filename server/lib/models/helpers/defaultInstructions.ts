@@ -6,8 +6,8 @@ export const defaultRootInstructions = `**Instructions for root level workspace*
 
 export const defaultHonestOracleInstructions = `**Instructions for honest oracle**
 
-1. Fill in a correct/helpful answer below\n
-2. Click "Submit" on the right\n
+1. Fill in a correct/helpful answer below
+2. Click "Submit" on the right
 3. Click "Done!" under the response field`;
 
 export const defaultMaliciousOracleInstructions = `**Instructions for malicious oracle**
@@ -21,11 +21,11 @@ export const defaultMaliciousOracleInstructions = `**Instructions for malicious 
    - Click "Done!" under the response field`;
 
 export const defaultReturningRootInstructions = `**Instructions for returning root level workspace**
-&nbsp;
+
 1. Just click "Done!" under the response field`;
 
 export const defaultReturningHonestOracleInstructions = `**Instructions for returning honest oracle**
-&nbsp;
+
 1. Just click "Done!" under the response field`;
 
 export const defaultReturningMaliciousOracleInstructions = `**Instructions for returning malicious oracle**
