@@ -625,6 +625,11 @@ export class WorkspaceView extends React.Component<any, any> {
                                 }
                               })
                             }
+                            declineToChallenge={() =>
+                              this.props.declineToChallengeMutation({
+                                variables: { id: workspace.id }
+                              })
+                            }
                             transferRemainingBudgetToParent={() =>
                               this.props.transferRemainingBudgetToParent({
                                 variables: { id: workspace.id },
@@ -903,6 +908,12 @@ const UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER = gql`
   }
 `;
 
+const DECLINE_TO_CHALLENGE_MUTATION = gql`
+  mutation declineToChallengeMutation($id: String) {
+    declineToChallenge(id: $id)
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -942,6 +953,9 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER, {
     name: "updateWorkspaceIsStaleRelativeToUser",
+  }),
+  graphql(DECLINE_TO_CHALLENGE_MUTATION, {
+    name: "declineToChallengeMutation",
   }),
   graphql(UNLOCK_POINTER_MUTATION, {
     name: "unlockPointerMutation",

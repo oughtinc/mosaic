@@ -75,7 +75,7 @@ export function getMessageForUser({isRequestingLazyUnlock, isWorkspaceRootLevel,
    - Click "Submit" on the right\n
    - Click "Done!" under the response field\n
 3. If you decide not to challenge:\n
-   - Click "Done!" under the response field`
+   - Click "Decline to Challenge!" under the response field`
     );
   }
 

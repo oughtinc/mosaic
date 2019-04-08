@@ -826,6 +826,39 @@ const schema = new GraphQLSchema({
           }
         ),
       },
+      declineToChallenge: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to decline to challenge a workspace",
+          async (obj, { id, input }, context) => {
+            const workspace = await models.Workspace.findById(id);
+            const parentWorkspace = await models.Workspace.findById(workspace.parentId);
+            await parentWorkspace.update({ isCurrentlyResolved: true });
+            if (parentWorkspace.parentId) {
+              const grandParent = await models.Workspace.findById(parentWorkspace.parentId);
+              const children = await grandParent.getChildWorkspaces();
+              let allResolved = true;
+              for (const child of children) {
+                if (!child.isCurrentlyResolved) {
+                  allResolved = false;
+                  break;
+                }
+              }
+              if (allResolved) {
+                await grandParent.update({
+                  isStale: true,
+                  isNotStaleRelativeToUser: [],
+                });
+              }
+            }
+
+            return true;
+          }
+        )
+      },
       updateWorkspace: {
         type: workspaceType,
         args: {
