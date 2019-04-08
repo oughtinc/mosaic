@@ -29,6 +29,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       hasParent,
       hasTimeBudget,
       isInOracleMode,
+      isRequestingLazyUnlock,
       isUserOracle,
       isUserMaliciousOracle,
       markAsCurrentlyResolved,
@@ -80,12 +81,15 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               :
               <div>
                 <TakeBreakBtn
-                  disabled={!isUserMaliciousOracle && !hasChildren}
+                  disabled={!isRequestingLazyUnlock && !isUserMaliciousOracle && !hasChildren}
                   experimentId={experimentId}
                   bsStyle="primary"
                   label={`Done!`}
                   navHook={() => {
                     markAsNotStale();
+                    if (isRequestingLazyUnlock) {
+                      markAsCurrentlyResolved();
+                    }
                   }}
                 />
               </div>

@@ -73,6 +73,7 @@ const WORKSPACE_QUERY = gql`
       isEligibleForHonestOracle
       isUserOracleForTree
       isUserMaliciousOracleForTree
+      isRequestingLazyUnlock
       idOfRootWorkspace
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
@@ -367,6 +368,8 @@ export class WorkspaceView extends React.Component<any, any> {
     const isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly = workspace.rootWorkspace.tree.experiments.some(e => e.areNewWorkspacesOracleOnlyByDefault);
     const isWorkspacePartOfOracleExperiment = isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly;
 
+    const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
+
     return (
       <div>
         <Helmet>
@@ -580,6 +583,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           &&
                           <ResponseFooter
                             isUserMaliciousOracle={isUserMaliciousOracle}
+                            isRequestingLazyUnlock={workspace.isRequestingLazyUnlock}
                             hasChildren={workspace.childWorkspaces.length > 0}
                             experimentId={experimentId}
                             hasTimeBudget={hasTimeBudget}
@@ -643,6 +647,13 @@ export class WorkspaceView extends React.Component<any, any> {
                       }
                     </Col>
                     <Col sm={6}>
+                    {
+                      !(
+                        isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly
+                        &&
+                        isRequestingLazyUnlock
+                      )
+                      &&
                       <ChildrenSidebar
                         isUserOracle={isUserOracle}
                         experimentId={experimentId}
@@ -718,6 +729,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           }
                         }}
                       />
+                    }
                     </Col>
                   </Row>
                 </BlockHoverMenu>

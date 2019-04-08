@@ -83,6 +83,11 @@ export const workspaceType = makeObjectType(models.Workspace, [
         return null;
       }
 
+      if (workspace.isRequestingLazyUnlock) {
+        const message = getMessageForUser({isRequestingLazyUnlock: workspace.isRequestingLazyUnlock});
+        return message;
+      }
+
       // get root workspace
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
@@ -878,7 +883,7 @@ const schema = new GraphQLSchema({
                 const experiment = experiments[0];
                 const isOracleExperiment = experiment && experiment.areNewWorkspacesOracleOnlyByDefault;
 
-                if (!isOracleExperiment) {
+                if (!isOracleExperiment || workspace.isRequestingLazyUnlock) {
                   const updatedWorkspace = await workspace.update({ isCurrentlyResolved });
 
                   // if is currently resolved updated to true
@@ -904,7 +909,7 @@ const schema = new GraphQLSchema({
                   }
                 }
 
-                if (isOracleExperiment) {
+                if (isOracleExperiment && !workspace.isRequestingLazyUnlock) {
                   if (
                     !workspace.isEligibleForHonestOracle
                     &&
@@ -1008,7 +1013,6 @@ const schema = new GraphQLSchema({
 
             if (experimentId) {
               const experiment = await models.Experiment.findById(experimentId);
-
 
               workspace = await models.Workspace.create(
                 {
