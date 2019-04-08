@@ -1,4 +1,13 @@
-export function getMessageForUser({isWorkspaceRootLevel, isThisFirstTimeWorkspaceHasBeenWorkedOn, typeOfUser}) {
+export function getMessageForUser({isRequestingLazyUnlock, isWorkspaceRootLevel, isThisFirstTimeWorkspaceHasBeenWorkedOn, typeOfUser}) {
+  if(isRequestingLazyUnlock) {
+    return (
+`**Instructions for unlocking lazy pointer**\n
+&nbsp;\n
+1. Describe the contents of the pointer in the response field\n
+2. Click "Done!" under the response field`
+    );
+  }
+
   if (typeOfUser === "TYPICAL") {
     return null;
   }
