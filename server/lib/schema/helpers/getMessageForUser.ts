@@ -32,7 +32,7 @@ export async function getMessageForUser({
   }
 
   if (typeOfUser === "MALICIOUS") {
-    return instructions.malicious;
+    return instructions.maliciousOracle;
   }
 
   return null;
