@@ -19,7 +19,7 @@ const UserTreeOracleRelationModel = require("./userTreeOracleRelation");
 const WorkspaceModel = require("./workspace");
 
 if (config.use_env_variable) {
-  const dbURL = process.env[config.use_env_variable] + "?ssl=true";
+  const dbURL = process.env[config.use_env_variable];
   console.log("Using DB URL:", dbURL);
   var sequelize = new Sequelize(dbURL, { logging: true, ...config });
 } else {

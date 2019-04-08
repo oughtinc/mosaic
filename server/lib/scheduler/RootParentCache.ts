@@ -16,14 +16,14 @@ class RootParentCache {
 
     if (workspaceAlreadyCached) {
       const workspaceId = this.cache.get(workspace.id);
-      return await models.Workspace.findById(workspaceId);
+      return await models.Workspace.findByPk(workspaceId);
     }
 
     if (!workspace.parentId) {
       this.cache.set(workspace.id, workspace.id);
       return workspace;
     } else {
-      const parent = await models.Workspace.findById(workspace.parentId);
+      const parent = await models.Workspace.findByPk(workspace.parentId);
       const rootParent = await this.getRootParentOfWorkspace(parent);
       this.cache.set(workspace.id, rootParent.id);
       return rootParent;

@@ -91,7 +91,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
       // get root workspace
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
-        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+        curWorkspace = await models.Workspace.findByPk(curWorkspace.parentId);
       }
       const rootWorkspace = curWorkspace;
 
@@ -148,7 +148,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
       // get tree
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
-        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+        curWorkspace = await models.Workspace.findByPk(curWorkspace.parentId);
       }
       const rootWorkspace = curWorkspace;
       const tree = await rootWorkspace.getTree();
@@ -171,7 +171,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
       // get tree
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
-        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+        curWorkspace = await models.Workspace.findByPk(curWorkspace.parentId);
       }
       const rootWorkspace = curWorkspace;
       const tree = await rootWorkspace.getTree();
@@ -193,7 +193,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
       // get root workspace
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
-        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+        curWorkspace = await models.Workspace.findByPk(curWorkspace.parentId);
       }
       const rootWorkspace = curWorkspace;
 
@@ -221,7 +221,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
         return null;
       }
 
-      let user = await models.User.findById(userId);
+      let user = await models.User.findByPk(userId);
 
       if (!user) {
         user = {
@@ -240,7 +240,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
       const fullInfo = await map(
         workspace.isNotStaleRelativeToUser,
         async userId => {
-          let user = await models.User.findById(userId);
+          let user = await models.User.findByPk(userId);
           
           if (!user) {
             const userInfo = await userFromAuthToken(context.authorization);
@@ -264,7 +264,7 @@ export const workspaceType = makeObjectType(models.Workspace, [
     resolve: async workspace => {
       let curWorkspace = workspace;
       while (curWorkspace.parentId) {
-        curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+        curWorkspace = await models.Workspace.findByPk(curWorkspace.parentId);
       }
       return curWorkspace;
     }
@@ -497,14 +497,14 @@ const schema = new GraphQLSchema({
           const loadDataForEachWorkspaceInSubtree = async workspace => {
             let timespentOnWorkspace = await workspace.budgetUsedWorkingOnThisWorkspace;
             for (const childId of workspace.childWorkspaceOrder) {
-              const child = await models.Workspace.findById(childId);
+              const child = await models.Workspace.findByPk(childId);
               timespentOnWorkspace += await loadDataForEachWorkspaceInSubtree(child);
             }
             cacheForTimeSpentOnWorkspace[workspace.id] = timespentOnWorkspace
             return timespentOnWorkspace;
           }
 
-          const workspace = await models.Workspace.findById(id);
+          const workspace = await models.Workspace.findByPk(id);
           await loadDataForEachWorkspaceInSubtree(workspace);
 
           return JSON.stringify(cacheForTimeSpentOnWorkspace);
@@ -537,9 +537,9 @@ const schema = new GraphQLSchema({
             const event = await models.Event.create();
             let newBlocks: any = [];
             for (const _block of blocks) {
-              const block = await models.Block.findById(_block.id);
+              const block = await models.Block.findByPk(_block.id);
 
-              const workspace = await models.Workspace.findById(
+              const workspace = await models.Workspace.findByPk(
                 block.workspaceId
               );
 
@@ -558,7 +558,7 @@ const schema = new GraphQLSchema({
                     "User not participating in an experiment."
                   );
                 } else {
-                  const experiment = await models.Experiment.findById(experimentId);
+                  const experiment = await models.Experiment.findByPk(experimentId);
 
                   if (!experiment.isActive()) {
                     throw new Error(
@@ -648,7 +648,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's eligibility",
           async (_, { eligibilityRank, experimentId }) => {
-            const experiment = await models.Experiment.findById(experimentId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.update({ eligibilityRank });
             return true;
           }
@@ -663,7 +663,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's name",
           async (_, { experimentId, name }) => {
-            const experiment = await models.Experiment.findById(experimentId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.update({ name });
             return true;
           }
@@ -678,8 +678,8 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to add a tree to an experiment",
           async (_, { experimentId, treeId }) => {
-            const tree = await models.Tree.findById(treeId);
-            const experiment = await models.Experiment.findById(experimentId);
+            const tree = await models.Tree.findByPk(treeId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.addTree(tree);
             return true;
           }
@@ -694,8 +694,8 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to remove a tree from an experiment",
           async (_, { experimentId, treeId }) => {
-            const tree = await models.Tree.findById(treeId);
-            const experiment = await models.Experiment.findById(experimentId);
+            const tree = await models.Tree.findByPk(treeId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.removeTree(tree);
             return true;
           }
@@ -710,8 +710,8 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to add an oracle to a tree",
           async (_, { treeId, userId }) => {
-            const tree = await models.Tree.findById(treeId);
-            const user = await models.User.findById(userId);
+            const tree = await models.Tree.findByPk(treeId);
+            const user = await models.User.findByPk(userId);
             await tree.addOracle(user);
             return true;
           }
@@ -747,8 +747,8 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to remove an oracle from a tree",
           async (_, { treeId, userId }) => {
-            const tree = await models.Tree.findById(treeId);
-            const user = await models.User.findById(userId);
+            const tree = await models.Tree.findByPk(treeId);
+            const user = await models.User.findByPk(userId);
             await tree.removeOracle(user);
             return true;
           }
@@ -763,8 +763,8 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to add a fallback to an experiment",
           async (_, { experimentId, fallbackId }) => {
-            const fallback = await models.Experiment.findById(fallbackId);
-            const experiment = await models.Experiment.findById(experimentId);
+            const fallback = await models.Experiment.findByPk(fallbackId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.addFallback(fallback);
             return true;
           }
@@ -779,8 +779,8 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to remove a fallback from an experiment",
           async (_, { experimentId, fallbackId }) => {
-            const fallback = await models.Experiment.findById(fallbackId);
-            const experiment = await models.Experiment.findById(experimentId);
+            const fallback = await models.Experiment.findByPk(fallbackId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.removeFallback(fallback);
             return true;
           }
@@ -795,7 +795,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update workspace children order",
           async (_, { id, childWorkspaceOrder }) => {
-            const workspace = await models.Workspace.findById(id);
+            const workspace = await models.Workspace.findByPk(id);
             const event = await models.Event.create();
             return workspace.update({ childWorkspaceOrder }, { event });
           }
@@ -810,7 +810,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update workspace children order",
           async (_, { workspaceId, isStale }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             const user = await userFromContext(context);
             const userId = user.user_id;
 
@@ -870,7 +870,7 @@ const schema = new GraphQLSchema({
           async (obj, { id, input }, context) => {
             const user = context.user;
 
-            const workspace = await models.Workspace.findById(id);
+            const workspace = await models.Workspace.findByPk(id);
 
             const inputWithNoNullOrUndefinedValues = _.omitBy(input, _.isNil);
 
@@ -924,7 +924,7 @@ const schema = new GraphQLSchema({
                   // if parent workspace has all children resolved
                   // then mark parent workspace as not stale
                   if (updatedWorkspace.parentId) {
-                    const parent = await models.Workspace.findById(updatedWorkspace.parentId);
+                    const parent = await models.Workspace.findByPk(updatedWorkspace.parentId);
                     const children = await parent.getChildWorkspaces();
                     let allResolved = true;
                     for (const child of children) {
@@ -996,7 +996,7 @@ const schema = new GraphQLSchema({
           wasAnsweredByOracle: { type: GraphQLBoolean }
         },
         resolve: async (_, { id, wasAnsweredByOracle }) => {
-          const workspace = await models.Workspace.findById(id);
+          const workspace = await models.Workspace.findByPk(id);
           const event = await models.Event.create();
           return workspace.update({ wasAnsweredByOracle }, { event });
         }
@@ -1009,10 +1009,10 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to transfer remaining budget to parent",
           async (_, { id }) => {
-            const child = await models.Workspace.findById(id);
+            const child = await models.Workspace.findByPk(id);
             const childRemainingBudget =
               child.totalBudget - child.allocatedBudget;
-            const parent = await models.Workspace.findById(child.parentId);
+            const parent = await models.Workspace.findByPk(child.parentId);
             await parent.update({
               isStale: true,
               isNotStaleRelativeToUser: [],
@@ -1028,7 +1028,7 @@ const schema = new GraphQLSchema({
           id: { type: GraphQLString }
         },
         resolve: async (_, { id }) => {
-          const workspace = await models.Workspace.findById(id);
+          const workspace = await models.Workspace.findByPk(id);
           await workspace.update({ allocatedBudget: workspace.totalBudget });
         }
       },
@@ -1048,7 +1048,7 @@ const schema = new GraphQLSchema({
             let workspace;
 
             if (experimentId) {
-              const experiment = await models.Experiment.findById(experimentId);
+              const experiment = await models.Experiment.findByPk(experimentId);
 
               workspace = await models.Workspace.create(
                 {
@@ -1088,7 +1088,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to create a subquestion",
           async (_, { workspaceId, question, totalBudget }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             const event = await models.Event.create();
             const user = await userFromContext(context);
             
@@ -1115,8 +1115,8 @@ const schema = new GraphQLSchema({
           "You must be logged in to update a child's total budget",
           async (_, { workspaceId, childId, totalBudget }, context) => {
             const event = await models.Event.create();
-            const workspace = await models.Workspace.findById(workspaceId);
-            const child = await models.Workspace.findById(childId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
+            const child = await models.Workspace.findByPk(childId);
             await workspace.changeAllocationToChild(child, totalBudget, {
               event
             });
@@ -1202,9 +1202,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to eject a user from a workspace",
           async (_, { userId, workspaceId }, context) => {
-            let curWorkspace = await models.Workspace.findById(workspaceId);
+            let curWorkspace = await models.Workspace.findByPk(workspaceId);
             while (curWorkspace.parentId) {
-              curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+              curWorkspace = await models.Workspace.findByPk(curWorkspace.parentId);
             }
 
             const rootWorkspace = curWorkspace;
@@ -1241,7 +1241,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to edit a workspace's front page status",
           async (_, { isPublic, workspaceId }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             await workspace.update({ isPublic });
           }
         ),
@@ -1255,7 +1255,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update a workspace's eligibility",
           async (_, { isEligibleForAssignment, workspaceId }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             await workspace.update({ isEligibleForAssignment });
             return { id: workspaceId };
           }
@@ -1270,7 +1270,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to edit a workspace's time budget status",
           async (_, { hasTimeBudget, workspaceId }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             await workspace.update({ hasTimeBudget });
             return { id: workspaceId };
           }
@@ -1285,7 +1285,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to edit a workspace's i/o constraint status",
           async (_, { hasIOConstraints, workspaceId }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             await workspace.update({ hasIOConstraints });
             return { id: workspaceId };
           }
@@ -1300,7 +1300,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update a workspace's oracle eligibility",
           async (_, { isEligibleForHonestOracle, workspaceId }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             await workspace.update({ isEligibleForHonestOracle });
           }
         ),
@@ -1314,7 +1314,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update a workspace's allocated budget",
           async (_, { workspaceId, changeToBudget }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
             const updatedTimeBudget = Math.min(
               workspace.totalBudget,
               workspace.allocatedBudget + changeToBudget
@@ -1333,7 +1333,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update the time spent on a workspace",
           async (_, { doesAffectAllocatedBudget, workspaceId, secondsSpent }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
 
             if (doesAffectAllocatedBudget) {
 
@@ -1370,7 +1370,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment metadata",
           async (_, { experimentId, metadata }, context) => {
-            const experiment = await models.Experiment.findById(experimentId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.update({ metadata: JSON.parse(metadata) });
             return true;
           }
@@ -1385,7 +1385,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment metadata",
           async (_, { experimentId, defaultOracle }, context) => {
-            const experiment = await models.Experiment.findById(experimentId);
+            const experiment = await models.Experiment.findByPk(experimentId);
             await experiment.update({ areNewWorkspacesOracleOnlyByDefault: defaultOracle });
             return true;
           }
@@ -1400,7 +1400,7 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to mark a workspace stale for a user",
           async (_, { userId, workspaceId }, context) => {
-            const workspace = await models.Workspace.findById(workspaceId);
+            const workspace = await models.Workspace.findByPk(workspaceId);
 
             const isNotStaleRelativeToUser = workspace.isNotStaleRelativeToUser.filter(
               uId => uId !== userId

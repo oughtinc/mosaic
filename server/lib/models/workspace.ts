@@ -129,9 +129,9 @@ const WorkspaceModel = (
           "id",
         ]),
         get: async function() {
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          let curWorkspace = await sequelize.models.Workspace.findByPk(this.get("id"));
           while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+            curWorkspace = await sequelize.models.Workspace.findByPk(curWorkspace.parentId);
             if (curWorkspace.wasAnsweredByOracle) {
               return true;
             }
@@ -144,9 +144,9 @@ const WorkspaceModel = (
           "id",
         ]),
         get: async function() {
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          let curWorkspace = await sequelize.models.Workspace.findByPk(this.get("id"));
           while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+            curWorkspace = await sequelize.models.Workspace.findByPk(curWorkspace.parentId);
           }
 
           return curWorkspace.hasTimeBudget;
@@ -157,9 +157,9 @@ const WorkspaceModel = (
           "id",
         ]),
         get: async function() {
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          let curWorkspace = await sequelize.models.Workspace.findByPk(this.get("id"));
           while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+            curWorkspace = await sequelize.models.Workspace.findByPk(curWorkspace.parentId);
           }
 
           return curWorkspace.hasIOConstraints;
@@ -187,7 +187,7 @@ const WorkspaceModel = (
 
           let howMuchSpentOnChildren = 0;
           for (const childId of this.get("childWorkspaceOrder")) {
-            const child = await sequelize.models.Workspace.findById(childId);
+            const child = await sequelize.models.Workspace.findByPk(childId);
             howMuchSpentOnChildren += child.totalBudget;
           }
           return this.get("allocatedBudget") - howMuchSpentOnChildren;
@@ -197,9 +197,9 @@ const WorkspaceModel = (
         type: Sequelize.VIRTUAL(Sequelize.STRING, ["id"]),
         get: async function() {
           // get root workspace
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          let curWorkspace = await sequelize.models.Workspace.findByPk(this.get("id"));
           while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+            curWorkspace = await sequelize.models.Workspace.findByPk(curWorkspace.parentId);
           }
           const rootWorkspace = curWorkspace;
           return rootWorkspace.id;
@@ -261,10 +261,10 @@ const WorkspaceModel = (
         get: async function() {
           const isInOracleModeValue = isInOracleMode.getValue();
           let depth = 1;
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
+          let curWorkspace = await sequelize.models.Workspace.findByPk(this.get("id"));
           if (isInOracleModeValue) {
             while (curWorkspace.parentId) {
-              curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+              curWorkspace = await sequelize.models.Workspace.findByPk(curWorkspace.parentId);
               if (!curWorkspace.isEligibleForHonestOracle && !curWorkspace.isEligibleForMaliciousOracle) {
                 depth++;
               }
@@ -362,7 +362,7 @@ const WorkspaceModel = (
       return false;
     }
 
-    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
+    const parentWorkspace = await sequelize.models.Workspace.findByPk(parentId);
     const isParentRootWorkspace = !parentWorkspace.parentId;
     const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle || parentWorkspace.isEligibleForMaliciousOracle;
 
@@ -373,7 +373,7 @@ const WorkspaceModel = (
     // get root workspace
     let curWorkspace = parentWorkspace;
     while (curWorkspace.parentId) {
-      curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+      curWorkspace = await sequelize.models.Workspace.findByPk(curWorkspace.parentId);
     }
     const rootWorkspace = curWorkspace;
 
@@ -394,7 +394,7 @@ const WorkspaceModel = (
       return false;
     }
 
-    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
+    const parentWorkspace = await sequelize.models.Workspace.findByPk(parentId);
     const isParentHonestOracleWorkspace = parentWorkspace.isEligibleForHonestOracle;
     if (!isParentHonestOracleWorkspace) {
       return false;
@@ -403,7 +403,7 @@ const WorkspaceModel = (
     // get root workspace
     let curWorkspace = parentWorkspace;
     while (curWorkspace.parentId) {
-      curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+      curWorkspace = await sequelize.models.Workspace.findByPk(curWorkspace.parentId);
     }
     const rootWorkspace = curWorkspace;
 
@@ -502,7 +502,7 @@ const WorkspaceModel = (
     const pointerImports = await this.getPointerImports();
     for (const pointerId of _.uniq(pointerIds)) {
       if (!_.includes(pointerImports.map(p => p.pointerId), pointerId)) {
-        const pointer = await sequelize.models.Pointer.findById(pointerId);
+        const pointer = await sequelize.models.Pointer.findByPk(pointerId);
         if (!pointer) {
           console.error(
             "The relevant pointer for pointer import ",

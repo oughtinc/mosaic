@@ -32,7 +32,7 @@ if (!process.env.USING_DOCKER) {
 graphQLServer.use("/graphql", bodyParser.json(), async (req, res, next) => {
   if (req.headers.authorization !== "null") {
     const userInfo = await userFromAuthToken(req.headers.authorization);
-    let user = await models.User.findById(userInfo.user_id);
+    let user = await models.User.findByPk(userInfo.user_id);
 
     if (!user) {
       user = await models.User.create({

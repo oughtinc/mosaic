@@ -11,11 +11,11 @@ services:
       - "5432:5432"
 
   api:
-    image: node:9.7
+    image: node:10
     environment:
         DATABASE_URL: postgres://mosaic:MDaUA2P4ZbkJPCKEM@postgres/mosaic_dev
         USING_DOCKER: "true"
-        NODE_ENV: ${NODE_ENV}
+        NODE_ENV: "${NODE_ENV:-development}"
     ports:
       - "8080:8080"
       - "9229:9229"
@@ -26,13 +26,14 @@ services:
       - postgres
 
   web:
-    image: node:9.7
+    image: node:10
     environment:
         USING_DOCKER: "true"
+        NODE_ENV: "${NODE_ENV:-development}"
     depends_on:
       - api
     volumes:
       - ./client:/data
     ports:
       - "3000:3000"
-    command: "bash -c 'cd /data && yarn install && yarn run start'"
+    command: "bash -c 'cd /data && yarn --production=false && yarn run start'"

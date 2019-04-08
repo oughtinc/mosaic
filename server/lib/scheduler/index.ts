@@ -40,7 +40,7 @@ export async function createScheduler(experimentId) {
       const enhancedAssignments = await map(
         assignments,
         async a => {
-          const workspace = await Workspace.findById(a.workspaceId);
+          const workspace = await Workspace.findByPk(a.workspaceId);
           return {
             ...{
               ...a.dataValues,
@@ -63,7 +63,7 @@ export async function createScheduler(experimentId) {
       return id;
     },
     updateAssignment: async (id, fields) => {
-      const assignment = await Assignment.findById(id);
+      const assignment = await Assignment.findByPk(id);
       await assignment.update(fields);
     },
     DistanceFromWorkedOnWorkspaceCache,
@@ -133,7 +133,7 @@ export async function createScheduler(experimentId) {
       let fallback;
       let fallbackScheduler;
 
-      const experiment = await Experiment.findById(experimentId);
+      const experiment = await Experiment.findByPk(experimentId);
       
       const fallbacks = await experiment.getFallbacks();
       

@@ -31,7 +31,7 @@ const PointerModel = (sequelize, DataTypes) => {
           // as well as the Block cachedExportPointerValues
           const pointerId = this.get("id");
           const sourceBlockId = this.get("sourceBlockId");
-          const sourceBlock = await sequelize.models.Block.findById(
+          const sourceBlock = await sequelize.models.Block.findByPk(
             sourceBlockId
           );
           const { cachedExportPointerValues } = sourceBlock;
