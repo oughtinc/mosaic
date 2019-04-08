@@ -40,6 +40,9 @@ export class Auth {
     localStorage.removeItem("expires_at");
     localStorage.removeItem("is_admin");
     localStorage.removeItem("user_id");
+    if (Auth.renewTokenTimer) {
+      clearInterval(Auth.renewTokenTimer);
+    }
 
     // log out of FullStory
     // @ts-ignore
@@ -71,7 +74,6 @@ export class Auth {
   }
 
   public static renewTokens() {
-    Auth.renewTokenTimer = null;
     Auth.auth0.checkSession({}, (err, result) => {
       if (result && result.accessToken) {
         const expiresAt = JSON.stringify(
@@ -138,7 +140,7 @@ export class Auth {
 
     // schedule the tokens for renewal if they've not already done so
     if (!Auth.renewTokenTimer) {
-      Auth.renewTokenTimer = setTimeout(Auth.renewTokens, 900000); // 15 minutes
+      Auth.renewTokenTimer = setInterval(Auth.renewTokens, 900000); // 15 minutes
     }
 
     return true;
