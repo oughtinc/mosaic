@@ -290,9 +290,14 @@ export class WorkspaceView extends React.Component<any, any> {
     ).allReadOnlyBlocks();
 
     let readOnlyExportedPointers = [];
-    readOnlyExportedPointers = _.flatten(
-      allReadOnlyBlocks.map(b => findPointers(b.value))
-    );
+    try {
+      readOnlyExportedPointers = _.flatten(
+        allReadOnlyBlocks.map(b => findPointers(b.value))
+      );
+    } catch (err) {
+      // @ts-ignore
+      window.FS.log("error", err.toString());
+    }
 
     const unsortedAvailablePointers = _.uniqBy(
       [
