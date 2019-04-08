@@ -6,7 +6,6 @@ import {
   addEventAssociations,
 } from "../eventIntegration";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
-import { Value } from "slate";
 import * as _ from "lodash";
 
 const QUESTION_TYPE = "QUESTION"; // move elsewhere?
@@ -83,7 +82,7 @@ const BlockModel = (
 
     for (const pointerId of Object.keys(cachedExportPointerValues)) {
       if (!_.includes(exportingPointers.map(p => p.id), pointerId)) {
-        const pointer = await models.Pointer.findById(pointerId);
+        const pointer = await models.Pointer.findByPk(pointerId);
         if (!pointer) {
           await this.createExportingPointer({ id: pointerId }, { event });
         } else {
@@ -98,7 +97,7 @@ const BlockModel = (
 
   Block.prototype.updateStalenessAndIsCurrentlyResolved = async function({ event }) {
     const workspaceId = this.workspaceId;
-    const workspace = await sequelize.models.Workspace.findById(workspaceId);
+    const workspace = await sequelize.models.Workspace.findByPk(workspaceId);
 
     // If block is a question
     if (this.type === QUESTION_TYPE) {
@@ -155,7 +154,7 @@ const BlockModel = (
 
     const pointers: any = [];
     for (const id of topLevelPointerIds) {
-      const pointer = await sequelize.models.Pointer.findById(id);
+      const pointer = await sequelize.models.Pointer.findByPk(id);
       if (!!pointer) {
         pointers.push(pointer);
       } else {
@@ -192,7 +191,7 @@ const BlockModel = (
     for (const pointerJSON of pointers) {
       results[pointerJSON.data.pointerId] = pointerJSON;
 
-      const pointer = await sequelize.models.Pointer.findById(
+      const pointer = await sequelize.models.Pointer.findByPk(
         pointerJSON.data.pointerId
       );
 
