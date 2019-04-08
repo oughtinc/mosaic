@@ -3,8 +3,10 @@ export function getMessageForUser({isRequestingLazyUnlock, isWorkspaceRootLevel,
     return (
 `**Instructions for unlocking lazy pointer**\n
 &nbsp;\n
-1. Describe the contents of the pointer in the response field\n
-2. Click "Done!" under the response field`
+1. Use the response field to describe the contents of the lazy pointer\n
+2. As an oracle, you can open the lazy pointer by clicking on it\n
+3. If you need more information than what you included in the lazy pointer, you can click the "Entire Tree »" button above to view the entire tree so far\n
+4. When you've finished, click "Done!" under the response field`
     );
   }
 
