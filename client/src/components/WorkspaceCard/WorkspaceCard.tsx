@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import * as React from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -37,11 +37,11 @@ const Container = styled.div`
 
 const CardBody: any = styled.div`
   ${blockBorderAndBoxShadow};
-  border: ${(props: any) =>
+  ${(props: any) =>
     (
       props.workspace.isEligibleForHonestOracle
       &&
-      "3px solid green"
+      css`border: 3px solid green`
     )
 
     ||
@@ -49,10 +49,10 @@ const CardBody: any = styled.div`
     (
       props.workspace.isEligibleForMaliciousOracle
       &&
-      "3px solid red"
+      css`border: 3px solid red`
     )
   }
-  box-shadow: ${(props: any) => props.isActive ? "0 0 10px 5px yellow" : "none"}
+  ${(props: any) => props.isActive ? css`box-shadow: 0 0 10px 5px yellow` : css`box-shadow: none`}
   float: left;
   margin-bottom: 1em;
   width: 42em;
