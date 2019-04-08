@@ -585,7 +585,36 @@ const schema = new GraphQLSchema({
                   }
                 }
               }
+
               await block.update({ ..._block }, { event });
+
+              if (
+                isInOracleMode.getValue()
+                &&
+                !workspace.isEligibleForHonestOracle
+                &&
+                !workspace.isEligibleForMaliciousOracle
+                &&
+                workspace.parentId
+              ) {
+                const experiment = await models.Experiment.findById(experimentId);
+                const isOracleExperiment = experiment.areNewWorkspacesOracleOnlyByDefault;
+                if (isOracleExperiment) {
+                  const parentWorkspace = await models.Workspace.findById(workspace.parentId);
+
+                  if (parentWorkspace.parentId) {
+                    const grandparentWorkspace = await models.Workspace.findById(parentWorkspace.parentId);
+                    const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
+
+                    if (isUpdatingAnswerDraft) {
+                      const blocks = await grandparentWorkspace.getBlocks();
+                      const answerDraftBlock = blocks.find(b => b.type === "ANSWER_DRAFT");
+                      await answerDraftBlock.update({ ..._block }, { event });
+                    }
+                  }
+                }
+              }
+
               newBlocks = [...newBlocks, block];
             }
             return newBlocks;
@@ -821,7 +850,6 @@ const schema = new GraphQLSchema({
 
               const update = {
                 isArchived,
-                isCurrentlyResolved,
                 isEligibleForHonestOracle,
                 isEligibleForMaliciousOracle,
                 isStale,
@@ -831,7 +859,7 @@ const schema = new GraphQLSchema({
               const updateWithNoNullOrUndefinedValues = _.omitBy(update, _.isNil);
 
               const updatedWorkspace = await workspace.update(updateWithNoNullOrUndefinedValues);
-              
+
               // is isStale updated to true
               // then is stale relative to all users as well
               if (!_.isNil(isStale) && isStale === true) {
@@ -839,28 +867,78 @@ const schema = new GraphQLSchema({
               }
 
               if (isCurrentlyResolved) {
-                // if is currently resolved updated to true
-                // and workspace has parent, then
-                // if parent workspace has all children resolved
-                // then mark parent workspace as not stale
-                if (updatedWorkspace.parentId) {
-                  const parent = await models.Workspace.findById(updatedWorkspace.parentId);
-                  const children = await parent.getChildWorkspaces();
-                  let allResolved = true;
-                  for (const child of children) {
-                    if (!child.isCurrentlyResolved) {
-                      allResolved = false;
-                      break;
+                // determine isOracleExperiment
+                let curWorkspace = workspace;
+                while (curWorkspace.parentId) {
+                  curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+                }
+                const rootWorkspace = curWorkspace;
+                const tree = await rootWorkspace.getTree();
+                const experiments = await tree.getExperiments();
+                const experiment = experiments[0];
+                const isOracleExperiment = experiment && experiment.areNewWorkspacesOracleOnlyByDefault;
+
+                if (!isOracleExperiment) {
+                  const updatedWorkspace = await workspace.update({ isCurrentlyResolved });
+
+                  // if is currently resolved updated to true
+                  // and workspace has parent, then
+                  // if parent workspace has all children resolved
+                  // then mark parent workspace as not stale
+                  if (updatedWorkspace.parentId) {
+                    const parent = await models.Workspace.findById(updatedWorkspace.parentId);
+                    const children = await parent.getChildWorkspaces();
+                    let allResolved = true;
+                    for (const child of children) {
+                      if (!child.isCurrentlyResolved) {
+                        allResolved = false;
+                        break;
+                      }
                     }
-                  }
-                  if (allResolved) {
-                    await parent.update({ 
-                      isStale: true,
-                      isNotStaleRelativeToUser: [],
-                    });
+                    if (allResolved) {
+                      await parent.update({
+                        isStale: true,
+                        isNotStaleRelativeToUser: [],
+                      });
+                    }
                   }
                 }
 
+                if (isOracleExperiment) {
+                  if (
+                    !workspace.isEligibleForHonestOracle
+                    &&
+                    !workspace.isEligibleForMaliciousOracle
+                    &&
+                    workspace.parentId
+                  ) {
+                    const parentWorkspace = await models.Workspace.findById(workspace.parentId);
+
+                    if (parentWorkspace.parentId) {
+                      const grandparentWorkspace = await models.Workspace.findById(parentWorkspace.parentId);
+                      await grandparentWorkspace.update({ isCurrentlyResolved });
+                      if (grandparentWorkspace.parentId) {
+                        const greatGrandparentWorkspace = await models.Workspace.findById(grandparentWorkspace.parentId);
+                        const children = await greatGrandparentWorkspace.getChildWorkspaces();
+                        let allResolved = true;
+                        for (const child of children) {
+                          if (!child.isCurrentlyResolved) {
+                            allResolved = false;
+                            break;
+                          }
+                        }
+                        if (allResolved) {
+                          await greatGrandparentWorkspace .update({
+                            isStale: true,
+                            isNotStaleRelativeToUser: [],
+                          });
+                        }
+                      }
+                    }
+                  }
+                }
+
+                // if in oracle workspace and typical user, propagate isCurrentlyResolved up through oracles
               }
 
               return updatedWorkspace;

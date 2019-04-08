@@ -94,6 +94,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
       creatorId
       childWorkspaces {
         id
+        createdAt
       }
       connectedPointersOfSubtree
       budgetUsedWorkingOnThisWorkspace
@@ -132,6 +133,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
       creatorId
       childWorkspaces {
         id
+        createdAt
       }
       budgetUsedWorkingOnThisWorkspace
       isArchived

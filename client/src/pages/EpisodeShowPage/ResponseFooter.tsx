@@ -86,22 +86,8 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                   label={`Done!`}
                   navHook={() => {
                     markAsNotStale();
-                    markAsCurrentlyResolved();
                   }}
                 />
-                {/*
-                  hasParent
-                  &&
-                  <TakeBreakBtn
-                    experimentId={experimentId}
-                    bsStyle="danger"
-                    label={`Done & bubble answer up`}
-                    navHook={() => {
-                      markAsNotStale();
-                      markAsCurrentlyResolved();
-                    }}
-                  />
-                */}
               </div>
             )
         }
