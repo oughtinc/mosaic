@@ -13,6 +13,7 @@ import { createMaliciousOracleDefaultBlockValues } from "./helpers/defaultMalici
 import { createDefaultRootLevelBlockValues } from "./helpers/defaultRootLevelBlocks";
 
 import { isInOracleMode } from "../globals/isInOracleMode";
+import { getAllInlinesAsArray } from "../utils/slateUtils";
 
 const WorkspaceModel = (
   sequelize: Sequelize.Sequelize,
@@ -49,6 +50,10 @@ const WorkspaceModel = (
       isEligibleForMaliciousOracle: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+      },
+      isRequestingLazyUnlock: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       isStale: {
         type: DataTypes.BOOLEAN,
@@ -286,7 +291,9 @@ const WorkspaceModel = (
             await workspace.createBlock({ type: "QUESTION" }, { event });
           }
 
-          if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
+          if (workspace.isRequestingLazyUnlock) {
+            // no default content at the moment
+          } else if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
             const {
               scratchpadBlockValue,
               answerDraftBlockValue,
@@ -413,13 +420,32 @@ const WorkspaceModel = (
   }
 
   Workspace.createAsChild = async function(
-    { id, parentId, question, totalBudget, creatorId, isPublic },
+    {
+      id,
+      parentId,
+      question,
+      totalBudget,
+      creatorId,
+      isPublic,
+      isRequestingLazyUnlock,
+      isEligibleForHonestOracle,
+      isEligibleForMaliciousOracle,
+    },
     { event }
   ) {
-    const isEligibleForHonestOracle = await sequelize.models.Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
-    const isEligibleForMaliciousOracle = await sequelize.models.Workspace.isNewChildWorkspaceMaliciousOracleEligible({ parentId });
+    isEligibleForHonestOracle = isEligibleForHonestOracle !== undefined ?  isEligibleForHonestOracle : await sequelize.models.Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
+    isEligibleForMaliciousOracle = isEligibleForMaliciousOracle !== undefined ? isEligibleForMaliciousOracle : await sequelize.models.Workspace.isNewChildWorkspaceMaliciousOracleEligible({ parentId });
     const workspace = await sequelize.models.Workspace.create(
-      { id = uuidv4(), parentId, totalBudget, creatorId, isPublic, isEligibleForHonestOracle, isEligibleForMaliciousOracle },
+      {
+        id = uuidv4(),
+        parentId,
+        totalBudget,
+        creatorId,
+        isPublic,
+        isRequestingLazyUnlock,
+        isEligibleForHonestOracle,
+        isEligibleForMaliciousOracle,
+      },
       { event, questionValue: question }
     );
     return workspace;
@@ -498,8 +524,31 @@ const WorkspaceModel = (
     creatorId,
     isPublic,
   }) {
+    const isRequestingLazyUnlock =
+      _.get(question, "[0].nodes[0].leaves[0].text")
+      &&
+      _.get(question, "[0].nodes[0].leaves[0].text").trim().slice(0, 6).toUpperCase() === "UNLOCK";
+
+    let workspaceContainingLazyPointer;
+    if (isRequestingLazyUnlock) {
+      const idOfExportToUnlock = getAllInlinesAsArray(question)[0].data.pointerId;
+      const exportToUnlock = await sequelize.models.Pointer.findById(idOfExportToUnlock);
+      const blockContainingLazyPointer = await sequelize.models.Block.findById(exportToUnlock.sourceBlockId);
+      workspaceContainingLazyPointer = await sequelize.models.Workspace.findById(blockContainingLazyPointer.workspaceId);
+    }
+
     const child = await sequelize.models.Workspace.createAsChild(
-      { id, parentId: this.id, question, totalBudget, creatorId, isPublic },
+      {
+        id,
+        parentId: this.id,
+        question,
+        totalBudget,
+        creatorId,
+        isPublic,
+        isRequestingLazyUnlock,
+        isEligibleForHonestOracle: isRequestingLazyUnlock ? workspaceContainingLazyPointer.isEligibleForHonestOracle : undefined,
+        isEligibleForMaliciousOracle: isRequestingLazyUnlock ? workspaceContainingLazyPointer.isEligibleForMaliciousOracle : undefined,
+      },
       { event }
     );
     if (this.remainingBudget < child.totalBudget) {
@@ -509,6 +558,7 @@ const WorkspaceModel = (
         }. Needs: ${child.totalBudget}.`
       );
     }
+
     const newAllocatedBudget = this.allocatedBudget + child.totalBudget;
     await this.update(
       {

@@ -24,11 +24,13 @@ const TakeBreakBtn = ({ bsStyle, disabled, experimentId, label, navHook }: any) 
 class ResponseFooterPresentational extends React.Component<any, any> {
   public render() {
     const {
+      declineToChallenge,
       experimentId,
       hasChildren,
       hasParent,
       hasTimeBudget,
       isInOracleMode,
+      isRequestingLazyUnlock,
       isUserOracle,
       isUserMaliciousOracle,
       markAsCurrentlyResolved,
@@ -80,28 +82,34 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               :
               <div>
                 <TakeBreakBtn
-                  disabled={!isUserMaliciousOracle && !hasChildren}
+                  disabled={!isRequestingLazyUnlock && !hasChildren}
                   experimentId={experimentId}
                   bsStyle="primary"
-                  label={`Done!`}
+                  label={(isUserMaliciousOracle && !isRequestingLazyUnlock && hasParent) ? "Challenge!" : "Done!"}
                   navHook={() => {
                     markAsNotStale();
-                    markAsCurrentlyResolved();
+                    if (isRequestingLazyUnlock) {
+                      markAsCurrentlyResolved();
+                    }
                   }}
                 />
-                {/*
+                {
+                  isUserMaliciousOracle
+                  &&
+                  !isRequestingLazyUnlock
+                  &&
                   hasParent
                   &&
                   <TakeBreakBtn
                     experimentId={experimentId}
                     bsStyle="danger"
-                    label={`Done & bubble answer up`}
+                    label={`Decline to Challenge!`}
                     navHook={() => {
                       markAsNotStale();
-                      markAsCurrentlyResolved();
+                      declineToChallenge();
                     }}
                   />
-                */}
+                }
               </div>
             )
         }

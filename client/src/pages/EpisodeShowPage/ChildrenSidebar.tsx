@@ -138,6 +138,7 @@ export class Child extends React.Component<any, any> {
             <BlockEditorContainer>
               <BlockEditor
                 {...questionRelationship.blockEditorAttributes()}
+                readOnly={true}
                 isActive={this.props.isActive}
                 isUserOracle={this.props.isUserOracle}
                 availablePointers={availablePointers}

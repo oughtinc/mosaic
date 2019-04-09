@@ -72,6 +72,7 @@ const WORKSPACE_QUERY = gql`
       isEligibleForHonestOracle
       isUserOracleForTree
       isUserMaliciousOracleForTree
+      isRequestingLazyUnlock
       idOfRootWorkspace
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
@@ -367,6 +368,8 @@ export class WorkspaceView extends React.Component<any, any> {
     const isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly = workspace.rootWorkspace.tree.experiments.some(e => e.areNewWorkspacesOracleOnlyByDefault);
     const isWorkspacePartOfOracleExperiment = isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly;
 
+    const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
+
     return (
       <div>
         <Helmet>
@@ -531,6 +534,35 @@ export class WorkspaceView extends React.Component<any, any> {
                   <Row>
                     <Col sm={6}>
                       {
+                        Auth.isAuthenticated()
+                        &&
+                        !isActive
+                        &&
+                        <Alert bsStyle="danger" style={{ border: "1px solid #ddd"}}>
+                          <div
+                            style={{
+                              fontSize: "24px",
+                              fontWeight: 600,
+                              paddingBottom: "10px",
+                              textAlign: "center",
+                            }}
+                          >
+                            !
+                          </div>
+                          <div
+                            style={{ textAlign: "center" }}
+                          >
+                             You are currently <strong>not</strong> assigned to this workspace. If you are looking for an assignment, navigate back to the main experiment page and rejoin the experiment.
+                          </div>
+                        </Alert>
+                      }
+                      {
+                        !(
+                          Auth.isAuthenticated()
+                          &&
+                          !isActive
+                        )
+                        &&
                         workspace.message
                         &&
                         <Alert style={{ border: "1px solid #ddd"}}>
@@ -580,6 +612,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           &&
                           <ResponseFooter
                             isUserMaliciousOracle={isUserMaliciousOracle}
+                            isRequestingLazyUnlock={isRequestingLazyUnlock}
                             hasChildren={workspace.childWorkspaces.length > 0}
                             experimentId={experimentId}
                             hasTimeBudget={hasTimeBudget}
@@ -621,6 +654,11 @@ export class WorkspaceView extends React.Component<any, any> {
                                 }
                               })
                             }
+                            declineToChallenge={() =>
+                              this.props.declineToChallengeMutation({
+                                variables: { id: workspace.id }
+                              })
+                            }
                             transferRemainingBudgetToParent={() =>
                               this.props.transferRemainingBudgetToParent({
                                 variables: { id: workspace.id },
@@ -643,6 +681,13 @@ export class WorkspaceView extends React.Component<any, any> {
                       }
                     </Col>
                     <Col sm={6}>
+                    {
+                      !(
+                        isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly
+                        &&
+                        isRequestingLazyUnlock
+                      )
+                      &&
                       <ChildrenSidebar
                         isUserOracle={isUserOracle}
                         experimentId={experimentId}
@@ -718,6 +763,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           }
                         }}
                       />
+                    }
                     </Col>
                   </Row>
                 </BlockHoverMenu>
@@ -891,6 +937,12 @@ const UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER = gql`
   }
 `;
 
+const DECLINE_TO_CHALLENGE_MUTATION = gql`
+  mutation declineToChallengeMutation($id: String) {
+    declineToChallenge(id: $id)
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -930,6 +982,9 @@ export const EpisodeShowPage = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER, {
     name: "updateWorkspaceIsStaleRelativeToUser",
+  }),
+  graphql(DECLINE_TO_CHALLENGE_MUTATION, {
+    name: "declineToChallengeMutation",
   }),
   graphql(UNLOCK_POINTER_MUTATION, {
     name: "unlockPointerMutation",
