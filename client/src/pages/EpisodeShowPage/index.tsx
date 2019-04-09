@@ -1,4 +1,3 @@
-import * as LogRocket from "logrocket";
 import * as moment from "moment";
 import * as React from "react";
 import * as keyboardJS from "keyboardjs";
@@ -296,7 +295,8 @@ export class WorkspaceView extends React.Component<any, any> {
         allReadOnlyBlocks.map(b => findPointers(b.value))
       );
     } catch (err) {
-      LogRocket.captureException(err);
+      // @ts-ignore
+      window.FS.log("error", err.toString());
     }
 
     const unsortedAvailablePointers = _.uniqBy(

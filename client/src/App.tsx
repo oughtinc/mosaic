@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as LogRocket from "logrocket";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
@@ -25,8 +24,14 @@ import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
 
-import { Config } from "./config";
 import { Auth } from "./auth";
+
+// set up FullStory identity
+if (Auth.isAuthenticated()) {
+  Auth.getProfile(() => {
+    return;
+  });
+}
 
 const SERVER_URL =
   window.location.hostname === "localhost"
@@ -125,10 +130,6 @@ const Routes = () => (
     <ListenerThatClosesPointersOnPathnameChange />
   </div>
 );
-
-LogRocket.init(Config.logrocket_id);
-const environment = process.env.NODE_ENV || ""; // "development" or "production"
-LogRocket.track(environment);
 
 class App extends React.Component {
   public render() {

@@ -38,6 +38,13 @@ export class Auth {
     localStorage.removeItem("expires_at");
     localStorage.removeItem("is_admin");
     localStorage.removeItem("user_id");
+
+    // log out of FullStory
+    // @ts-ignore
+    if (window.FS) {
+      // @ts-ignore
+      window.FS.identify(false);
+    }
   }
 
   public static handleAuthentication(callback: () => void): void {
@@ -81,6 +88,19 @@ export class Auth {
         localStorage.setItem("is_admin", appMetadata.is_admin);
       }
       localStorage.setItem("user_id", profile.sub);
+
+      // configure FullStory
+      // @ts-ignore
+      if (window.FS) {
+        // @ts-ignore
+        window.FS.identify(profile.sub, {
+          displayName: `${profile.given_name} ${profile.family_name}`,
+          email: profile.email,
+          isAdmin: appMetadata ? appMetadata.is_admin : false,
+          isOracle: appMetadata ? appMetadata.is_oracle : false,
+        });
+      }
+
       callback();
     });
   }
