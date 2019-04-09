@@ -534,6 +534,35 @@ export class WorkspaceView extends React.Component<any, any> {
                   <Row>
                     <Col sm={6}>
                       {
+                        Auth.isAuthenticated()
+                        &&
+                        !isActive
+                        &&
+                        <Alert bsStyle="danger" style={{ border: "1px solid #ddd"}}>
+                          <div
+                            style={{
+                              fontSize: "24px",
+                              fontWeight: 600,
+                              paddingBottom: "10px",
+                              textAlign: "center",
+                            }}
+                          >
+                            !
+                          </div>
+                          <div
+                            style={{ textAlign: "center" }}
+                          >
+                             You are currently <strong>not</strong> assigned to this workspace. If you are looking for an assignment, navigate back to the main experiment page and rejoin the experiment.
+                          </div>
+                        </Alert>
+                      }
+                      {
+                        !(
+                          Auth.isAuthenticated()
+                          &&
+                          !isActive
+                        )
+                        &&
                         workspace.message
                         &&
                         <Alert style={{ border: "1px solid #ddd"}}>
