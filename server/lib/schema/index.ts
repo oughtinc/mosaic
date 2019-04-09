@@ -957,19 +957,22 @@ const schema = new GraphQLSchema({
                       await grandparentWorkspace.update({ isCurrentlyResolved });
                       if (grandparentWorkspace.parentId) {
                         const greatGrandparentWorkspace = await models.Workspace.findById(grandparentWorkspace.parentId);
-                        const children = await greatGrandparentWorkspace.getChildWorkspaces();
-                        let allResolved = true;
-                        for (const child of children) {
-                          if (!child.isCurrentlyResolved) {
-                            allResolved = false;
-                            break;
+                        const isNotRoot = greatGrandparentWorkspace.parentId;
+                        if (isNotRoot) {
+                          const children = await greatGrandparentWorkspace.getChildWorkspaces();
+                          let allResolved = true;
+                          for (const child of children) {
+                            if (!child.isCurrentlyResolved) {
+                              allResolved = false;
+                              break;
+                            }
                           }
-                        }
-                        if (allResolved) {
-                          await greatGrandparentWorkspace .update({
-                            isStale: true,
-                            isNotStaleRelativeToUser: [],
-                          });
+                          if (allResolved) {
+                            await greatGrandparentWorkspace .update({
+                              isStale: true,
+                              isNotStaleRelativeToUser: [],
+                            });
+                          }
                         }
                       }
                     }
