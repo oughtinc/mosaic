@@ -82,7 +82,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               :
               <div>
                 <TakeBreakBtn
-                  disabled={!isRequestingLazyUnlock && !isUserMaliciousOracle && !hasChildren}
+                  disabled={!isRequestingLazyUnlock && !hasChildren}
                   experimentId={experimentId}
                   bsStyle="primary"
                   label={`Done!`}
