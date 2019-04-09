@@ -583,7 +583,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           &&
                           <ResponseFooter
                             isUserMaliciousOracle={isUserMaliciousOracle}
-                            isRequestingLazyUnlock={workspace.isRequestingLazyUnlock}
+                            isRequestingLazyUnlock={isRequestingLazyUnlock}
                             hasChildren={workspace.childWorkspaces.length > 0}
                             experimentId={experimentId}
                             hasTimeBudget={hasTimeBudget}
