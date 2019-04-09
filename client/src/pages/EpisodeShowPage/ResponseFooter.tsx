@@ -85,7 +85,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                   disabled={!isRequestingLazyUnlock && !hasChildren}
                   experimentId={experimentId}
                   bsStyle="primary"
-                  label={`Done!`}
+                  label={(isUserMaliciousOracle && !isRequestingLazyUnlock && hasParent) ? "Challenge!" : "Done!"}
                   navHook={() => {
                     markAsNotStale();
                     if (isRequestingLazyUnlock) {
