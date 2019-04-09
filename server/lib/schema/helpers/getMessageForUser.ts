@@ -17,30 +17,28 @@ export function getMessageForUser({isRequestingLazyUnlock, isWorkspaceRootLevel,
   if (!isThisFirstTimeWorkspaceHasBeenWorkedOn) {
     if (isWorkspaceRootLevel) {
       return (
-`**Instructions for returning root level workspace**\n
+`**Instructions**\n
 &nbsp;\n
-1. Just click "Done!" under the response field`
+1. Let the experiment administrator know that you see this message\n
+2. Please navigate to the main experiment page and rejoin the experiment\n`
       );
     }
 
     if (typeOfUser === "HONEST") {
       return (
-`**Instructions for returning honest oracle**\n
+`**Instructions**\n
 &nbsp;\n
-1. Just click "Done!" under the response field`
+1. Let the experiment administrator know that you see this message\n
+2. Please navigate to the main experiment page and rejoin the experiment\n`
       );
     }
 
     if (typeOfUser === "MALICIOUS") {
       return (
-`**Instructions for returning malicious oracle**\n
+`**Instructions**\n
 &nbsp;\n
-1. Check to see if the normal user has asked for clarification\n
-2. If the normal user has asked for clarification:\n
-   - Clarify the issue by either editing the subquestion or by submitting a new subquestion\n
-   - Click "Done!" under the response field\n
-3. If the normal user has *not* asked for clarification:\n
-   - Just click "Done!" under the response field\n`
+1. Let the experiment administrator know that you see this message\n
+2. Please navigate to the main experiment page and rejoin the experiment\n`
       );
     }
   }
@@ -73,7 +71,7 @@ export function getMessageForUser({isRequestingLazyUnlock, isWorkspaceRootLevel,
 2. If you decide to challenge:\n
    - Fill in an incorrect/unhelpful but plausible alternative answer below\n
    - Click "Submit" on the right\n
-   - Click "Done!" under the response field\n
+   - Click "Challenge!" under the response field\n
 3. If you decide not to challenge:\n
    - Click "Decline to Challenge!" under the response field`
     );
