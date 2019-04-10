@@ -602,13 +602,13 @@ const schema = new GraphQLSchema({
                 &&
                 workspace.parentId
               ) {
-                const experiment = await models.Experiment.findById(experimentId);
+                const experiment = await models.Experiment.findByPk(experimentId);
                 const isOracleExperiment = experiment.areNewWorkspacesOracleOnlyByDefault;
                 if (isOracleExperiment) {
-                  const parentWorkspace = await models.Workspace.findById(workspace.parentId);
+                  const parentWorkspace = await models.Workspace.findByPk(workspace.parentId);
 
                   if (parentWorkspace.parentId) {
-                    const grandparentWorkspace = await models.Workspace.findById(parentWorkspace.parentId);
+                    const grandparentWorkspace = await models.Workspace.findByPk(parentWorkspace.parentId);
                     const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
 
                     if (isUpdatingAnswerDraft) {
@@ -834,11 +834,11 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to decline to challenge a workspace",
           async (obj, { id, input }, context) => {
-            const workspace = await models.Workspace.findById(id);
-            const parentWorkspace = await models.Workspace.findById(workspace.parentId);
+            const workspace = await models.Workspace.findByPk(id);
+            const parentWorkspace = await models.Workspace.findByPk(workspace.parentId);
             await parentWorkspace.update({ isCurrentlyResolved: true });
             if (parentWorkspace.parentId) {
-              const grandParent = await models.Workspace.findById(parentWorkspace.parentId);
+              const grandParent = await models.Workspace.findByPk(parentWorkspace.parentId);
               const children = await grandParent.getChildWorkspaces();
               let allResolved = true;
               for (const child of children) {
@@ -908,7 +908,7 @@ const schema = new GraphQLSchema({
                 // determine isOracleExperiment
                 let curWorkspace = workspace;
                 while (curWorkspace.parentId) {
-                  curWorkspace = await models.Workspace.findById(curWorkspace.parentId);
+                  curWorkspace = await models.Workspace.findByPk(curWorkspace.parentId);
                 }
                 const rootWorkspace = curWorkspace;
                 const tree = await rootWorkspace.getTree();
@@ -950,13 +950,13 @@ const schema = new GraphQLSchema({
                     &&
                     workspace.parentId
                   ) {
-                    const parentWorkspace = await models.Workspace.findById(workspace.parentId);
+                    const parentWorkspace = await models.Workspace.findByPk(workspace.parentId);
 
                     if (parentWorkspace.parentId) {
-                      const grandparentWorkspace = await models.Workspace.findById(parentWorkspace.parentId);
+                      const grandparentWorkspace = await models.Workspace.findByPk(parentWorkspace.parentId);
                       await grandparentWorkspace.update({ isCurrentlyResolved });
                       if (grandparentWorkspace.parentId) {
-                        const greatGrandparentWorkspace = await models.Workspace.findById(grandparentWorkspace.parentId);
+                        const greatGrandparentWorkspace = await models.Workspace.findByPk(grandparentWorkspace.parentId);
                         const isNotRoot = greatGrandparentWorkspace.parentId;
                         if (isNotRoot) {
                           const children = await greatGrandparentWorkspace.getChildWorkspaces();
