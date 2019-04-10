@@ -630,18 +630,25 @@ const schema = new GraphQLSchema({
                 workspace.parentId
               ) {
                 const experiment = await Experiment.findByPk(experimentId);
+                if (experiment === null) {
+                  return newBlocks;
+                }
                 const isOracleExperiment = experiment.areNewWorkspacesOracleOnlyByDefault;
                 if (isOracleExperiment) {
                   const parentWorkspace = await Workspace.findByPk(workspace.parentId);
+                  if (parentWorkspace === null) {
+                    return newBlocks;
+                  }
 
                   if (parentWorkspace.parentId) {
                     const grandparentWorkspace = await Workspace.findByPk(parentWorkspace.parentId);
+                    if (grandparentWorkspace === null) {
+                      return newBlocks;
+                    }
                     const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
-
                     if (isUpdatingAnswerDraft) {
-                      const blocks = await grandparentWorkspace.$get("blocks") as Block[];
-                      const answerDraftBlock = blocks.find(b => b.type === "ANSWER_DRAFT");
-                      await answerDraftBlock.update({ ..._block }, { event });
+                      const blocks = await grandparentWorkspace.$get("blocks", { where: { type: "ANSWER_DRAFT" }}) as Block[];
+                      await blocks[0].update({ ..._block }, { event });
                     }
                   }
                 }
@@ -913,10 +920,20 @@ const schema = new GraphQLSchema({
           "You must be logged in to decline to challenge a workspace",
           async (obj, { id, input }, context) => {
             const workspace = await Workspace.findByPk(id);
+            if (workspace === null) {
+              return false;
+            }
+
             const parentWorkspace = await Workspace.findByPk(workspace.parentId);
+            if (parentWorkspace === null) {
+              return false;
+            }
             await parentWorkspace.update({ isCurrentlyResolved: true });
             if (parentWorkspace.parentId) {
               const grandParent = await Workspace.findByPk(parentWorkspace.parentId);
+              if (grandParent === null) {
+                return false;
+              }
               const children = await grandParent.$get("childWorkspaces") as Workspace[];
               let allResolved = true;
               for (const child of children) {
@@ -985,11 +1002,7 @@ const schema = new GraphQLSchema({
 
               if (isCurrentlyResolved) {
                 // determine isOracleExperiment
-                let curWorkspace = workspace;
-                while (curWorkspace.parentId) {
-                  curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
-                }
-                const rootWorkspace = curWorkspace;
+                const rootWorkspace = await workspace.getRootWorkspace();
                 const tree = await rootWorkspace.$get("tree") as Tree;
                 const experiments = await tree.$get("experiments") as Experiment[];
                 const experiment = experiments[0];
@@ -1004,6 +1017,9 @@ const schema = new GraphQLSchema({
                   // then mark parent workspace as not stale
                   if (updatedWorkspace.parentId) {
                     const parent = await Workspace.findByPk(updatedWorkspace.parentId);
+                    if (parent === null) {
+                      return;
+                    }
                     const children = await parent.$get("childWorkspaces") as Workspace[];
                     let allResolved = true;
                     for (const child of children) {
@@ -1030,12 +1046,21 @@ const schema = new GraphQLSchema({
                     workspace.parentId
                   ) {
                     const parentWorkspace = await Workspace.findByPk(workspace.parentId);
+                    if (parentWorkspace === null) {
+                      return null;
+                    }
 
                     if (parentWorkspace.parentId) {
                       const grandparentWorkspace = await Workspace.findByPk(parentWorkspace.parentId);
+                      if (grandparentWorkspace === null) {
+                        return null;
+                      }
                       await grandparentWorkspace.update({ isCurrentlyResolved });
                       if (grandparentWorkspace.parentId) {
                         const greatGrandparentWorkspace = await Workspace.findByPk(grandparentWorkspace.parentId);
+                        if (greatGrandparentWorkspace === null) {
+                          return null;
+                        }
                         const isNotRoot = greatGrandparentWorkspace.parentId;
                         if (isNotRoot) {
                           const children = await greatGrandparentWorkspace.$get("childWorkspaces") as Workspace[];
@@ -1047,7 +1072,7 @@ const schema = new GraphQLSchema({
                             }
                           }
                           if (allResolved) {
-                            await greatGrandparentWorkspace .update({
+                            await greatGrandparentWorkspace.update({
                               isStale: true,
                               isNotStaleRelativeToUser: [],
                             });

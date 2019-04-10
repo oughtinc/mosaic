@@ -600,7 +600,13 @@ export default class Workspace extends Model<Workspace> {
     if (isRequestingLazyUnlock) {
       const idOfExportToUnlock = getAllInlinesAsArray(question)[0].data.pointerId;
       const exportToUnlock = await Pointer.findByPk(idOfExportToUnlock);
+      if (exportToUnlock === null) {
+        throw new Error(`Pointer ${idOfExportToUnlock} does not exist in the database`);
+      }
       const blockContainingLazyPointer = await Block.findByPk(exportToUnlock.sourceBlockId);
+      if (blockContainingLazyPointer === null) {
+        throw new Error(`Block for pointer ${idOfExportToUnlock} does not exist in the database`);
+      }
       workspaceContainingLazyPointer = await Workspace.findByPk(blockContainingLazyPointer.workspaceId);
     }
 
