@@ -532,9 +532,9 @@ const WorkspaceModel = (
     let workspaceContainingLazyPointer;
     if (isRequestingLazyUnlock) {
       const idOfExportToUnlock = getAllInlinesAsArray(question)[0].data.pointerId;
-      const exportToUnlock = await sequelize.models.Pointer.findById(idOfExportToUnlock);
-      const blockContainingLazyPointer = await sequelize.models.Block.findById(exportToUnlock.sourceBlockId);
-      workspaceContainingLazyPointer = await sequelize.models.Workspace.findById(blockContainingLazyPointer.workspaceId);
+      const exportToUnlock = await sequelize.models.Pointer.findByPk(idOfExportToUnlock);
+      const blockContainingLazyPointer = await sequelize.models.Block.findByPk(exportToUnlock.sourceBlockId);
+      workspaceContainingLazyPointer = await sequelize.models.Workspace.findByPk(blockContainingLazyPointer.workspaceId);
     }
 
     const child = await sequelize.models.Workspace.createAsChild(
