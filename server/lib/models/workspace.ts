@@ -11,6 +11,7 @@ import { getAllInlinesAsArray } from "../utils/slateUtils";
 
 import {
   AfterCreate,
+  AfterUpdate,
   AllowNull,
   BelongsTo,
   Column,
@@ -154,7 +155,7 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
-      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(this.get("id"));
       if (rootWorkspace === null) {
         return false;
       }
@@ -165,7 +166,7 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
-      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(this.get("id"));
       if (rootWorkspace === null) {
         return false;
       }
@@ -207,7 +208,7 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
   public get idOfRootWorkspace() {
     return (async () => {
-      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(this.get("id"));
       if (rootWorkspace === null) {
         return false;
       }
@@ -315,6 +316,11 @@ export default class Workspace extends Model<Workspace> {
   @BelongsTo(() => Workspace, "parentId")
   public parentWorkspace: Workspace;
 
+  @AllowNull
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public rootWorkspaceId: string;
+
   @HasMany(() => Block)
   public blocks: Block[];
 
@@ -375,6 +381,41 @@ export default class Workspace extends Model<Workspace> {
     await workspace.$create("block", { type: "ANSWER" });
   }
 
+  @AfterCreate
+  public static async cacheRootWorkspace(workspace: Workspace) {
+    if (workspace.parentId === null) {
+      // this is the root of its own tree
+      if (workspace.id !== workspace.rootWorkspaceId) {
+        await workspace.update({ rootWorkspaceId: workspace.id });
+      }
+    } else {
+      // inherit root from parent
+      const parentWorkspace = await workspace.$get("parentWorkspace") as Workspace;
+      if (workspace.rootWorkspaceId !== parentWorkspace.rootWorkspaceId) {
+        await workspace.update({ rootWorkspaceId: parentWorkspace.rootWorkspaceId });
+      }
+    }
+  }
+
+  @AfterUpdate
+  public static async updateCachedRootWorkspace(workspace: Workspace & { _changed: { [field: string]: boolean } }) {
+    if (workspace._changed.parentId) {
+      // parent has changed, update cache
+      await Workspace.cacheRootWorkspace(workspace);
+    }
+  }
+
+  @AfterUpdate
+  public static async updateChildCachedRootWorkspaces(workspace: Workspace & { _changed: { [field: string]: boolean } }) {
+    if (workspace._changed.rootWorkspaceId) {
+      // cached root has changed, propogate to children
+      const children = await workspace.$get("childWorkspaces") as Workspace[];
+      await Promise.all(children.map(async (child) => {
+        await child.update({ rootWorkspaceId: workspace.rootWorkspaceId === null ? workspace.id : workspace.rootWorkspaceId });
+      }));
+    }
+  }
+
   public static async isNewChildWorkspaceHonestOracleEligible({ parentId }) {
     if (!isInOracleMode.getValue()) {
       return false;
@@ -391,10 +432,7 @@ export default class Workspace extends Model<Workspace> {
       return false;
     }
 
-    const rootWorkspace = await Workspace.getRootWorkspaceFromId(parentWorkspace);
-    if (rootWorkspace === null) {
-      return false;
-    }
+    const rootWorkspace = await parentWorkspace.getRootWorkspace();
 
     // get experiment id
     const tree = (await rootWorkspace.$get("tree")) as Tree;
@@ -423,10 +461,7 @@ export default class Workspace extends Model<Workspace> {
       return false;
     }
 
-    const rootWorkspace = await Workspace.getRootWorkspaceFromId(parentWorkspace);
-    if (rootWorkspace === null) {
-      return false;
-    }
+    const rootWorkspace = await parentWorkspace.getRootWorkspace();
 
     // get experiment id
     const tree = (await rootWorkspace.$get("tree")) as Tree;
@@ -473,28 +508,25 @@ export default class Workspace extends Model<Workspace> {
     );
   }
 
-  private static async getRootWorkspaceFromId(curWorkspace: Workspace|null) {
-    if (curWorkspace === null) {
-      return null;
+  private static async getRootWorkspaceFromId(workspaceId: string) {
+    const workspace = await Workspace.findByPk(workspaceId);
+    if (workspace === null) {
+      throw new Error("requested workspace ID does not exist");
     }
-    while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
-      if (curWorkspace === null) {
-        return null;
-      }
-    }
-    return curWorkspace;
+    return await workspace.getRootWorkspace();
   }
 
   public async getRootWorkspace() {
-    let curWorkspace: Workspace | null = this;
-    while (curWorkspace.parentId) {
-      curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
-      if (curWorkspace === null) {
-        throw new Error("workspace has dangling pointer to parent");
-      }
+    if (this.rootWorkspaceId === null) {
+      // this is a root
+      return this;
     }
-    return curWorkspace;
+
+    const workspace = await Workspace.findByPk(this.rootWorkspaceId);
+    if (workspace === null) {
+      throw new Error("workspace has dangling pointer to root");
+    }
+    return workspace;
   }
 
   public workSpaceOrderAppend(element) {
