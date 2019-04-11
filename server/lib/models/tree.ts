@@ -14,7 +14,7 @@ import Workspace from "./workspace";
 import UserTreeOracleRelation from "./userTreeOracleRelation";
 import User from "./user";
 
-@Table({ tableName: "Trees" })
+@Table
 export default class Tree extends Model<Tree> {
   @Column({
     type: DataType.UUID,
@@ -34,8 +34,8 @@ export default class Tree extends Model<Tree> {
   @BelongsToMany(
     () => Experiment,
     "ExperimentTreeRelation",
-    "ExperimentId",
-    "TreeId"
+    "TreeId",
+    "ExperimentId"
   )
   public experiments: Experiment[];
 

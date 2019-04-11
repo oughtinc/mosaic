@@ -12,7 +12,7 @@ import {
 import Pointer from "./pointer";
 import Workspace from "./workspace";
 
-@Table({ tableName: "PointerImports" })
+@Table
 export default class PointerImport extends Model<PointerImport> {
   @Column({
     type: DataType.UUID,

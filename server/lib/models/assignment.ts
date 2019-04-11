@@ -10,7 +10,7 @@ import {
 import Workspace from "./workspace";
 import Experiment from "./experiment";
 
-@Table({ tableName: "Assignments" })
+@Table
 export default class Assignment extends Model<Assignment> {
   @Column({
     type: DataType.UUID,

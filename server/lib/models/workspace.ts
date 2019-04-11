@@ -32,7 +32,7 @@ import Pointer from "./pointer";
 
 const Op = Sequelize.Op;
 
-@Table({ tableName: "Workspaces" })
+@Table
 export default class Workspace extends Model<Workspace> {
   @Column({
     type: DataType.UUID,

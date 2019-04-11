@@ -9,7 +9,7 @@ import {
 import User from "./user";
 import Tree from "./tree";
 
-@Table
+@Table({ tableName: "UserTreeOracleRelation" })
 export default class UserTreeOracleRelation extends Model<
   UserTreeOracleRelation
 > {

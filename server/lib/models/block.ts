@@ -20,7 +20,7 @@ const QUESTION_TYPE = "QUESTION"; // move elsewhere?
 const ANSWER_TYPE = "ANSWER";
 const SCRATCHPAD_TYPE = "SCRATCHPAD";
 
-@Table({ tableName: "Blocks" })
+@Table
 export default class Block extends Model<Block> {
   @Column({
     type: DataType.UUID,
@@ -69,9 +69,7 @@ export default class Block extends Model<Block> {
     if (item._previousDataValues) {
       const changes = diff(item._previousDataValues, item.dataValues);
       if (!_.isEmpty(changes.value)) {
-        await item.updateStalenessAndIsCurrentlyResolved({
-          event: options.event
-        });
+        await item.updateStalenessAndIsCurrentlyResolved();
       }
     }
   }

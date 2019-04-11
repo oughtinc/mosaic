@@ -19,7 +19,7 @@ export const InstructionTypes = [
   "lazyPointerUnlock"
 ];
 
-@Table({ tableName: "Instructions" })
+@Table
 export default class Instructions extends Model<Instructions> {
   @AllowNull(false)
   @Column(DataType.ENUM(InstructionTypes))

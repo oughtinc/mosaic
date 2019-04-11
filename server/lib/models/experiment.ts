@@ -22,7 +22,7 @@ import {
 } from "./helpers/defaultInstructions";
 import Instructions from "./instructions";
 
-@Table({ tableName: "Experiments" })
+@Table
 export default class Experiment extends Model<Experiment> {
   @Column({
     type: DataType.UUID,
@@ -54,8 +54,8 @@ export default class Experiment extends Model<Experiment> {
   @BelongsToMany(
     () => Tree,
     "ExperimentTreeRelation",
-    "TreeId",
-    "ExperimentId"
+    "ExperimentId",
+    "TreeId"
   )
   public trees: Tree[];
 

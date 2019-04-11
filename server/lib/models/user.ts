@@ -9,7 +9,7 @@ import { UUIDV4 } from "sequelize";
 import Tree from "./tree";
 import UserTreeOracleRelation from "./userTreeOracleRelation";
 
-@Table({ tableName: "Users" })
+@Table
 export default class User extends Model<User> {
   @Column({
     type: DataType.UUID,

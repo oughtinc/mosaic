@@ -22,9 +22,9 @@ function configureDb(config: {
   use_env_variable: string;
 }) {
   if (config.use_env_variable) {
-    const dbURL = process.env[config.use_env_variable] + "?ssl=true";
+    const dbURL = process.env[config.use_env_variable] as string;
     console.log("Using DB URL:", dbURL);
-    return new Sequelize({ url: dbURL, logging: true, ...config });
+    return new Sequelize(dbURL, { logging: console.log, ...config });
   } else {
     console.log("No env variable used, using config.");
     return new Sequelize({ ...config, logging: true });

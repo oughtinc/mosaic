@@ -465,7 +465,9 @@ const schema = new GraphQLSchema({
             if (!includesAnswerDraft) {
               const curBlocks = await result.$get("blocks") as Block[];
               const curAnswer = blocks.find(b => b.type === "ANSWER");
-              await result.$create("block", { type: "ANSWER_DRAFT", value: curAnswer.value });
+              if (curAnswer) {
+                await result.$create("block", {type: "ANSWER_DRAFT", value: curAnswer.value});
+              }
             }
 
             return result;

@@ -12,7 +12,7 @@ import { UUIDV4 } from "sequelize";
 import Workspace from "./workspace";
 import Pointer from "./pointer";
 
-@Table({ tableName: "ExportWorkspaceLockRelations" })
+@Table
 export default class ExportWorkspaceLockRelation extends Model<
   ExportWorkspaceLockRelation
 > {

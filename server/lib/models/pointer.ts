@@ -13,7 +13,7 @@ import {
 import Block from "./block";
 import PointerImport from "./pointerImport";
 
-@Table({ tableName: "Pointers" })
+@Table
 export default class Pointer extends Model<Pointer> {
   @Column({
     type: DataType.UUID,
