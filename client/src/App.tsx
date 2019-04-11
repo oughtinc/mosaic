@@ -21,6 +21,7 @@ import { applyMiddleware, combineReducers, createStore } from "redux";
 import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
+import { CompactTreeView } from "./pages/CompactTreeView";
 import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
 
@@ -114,6 +115,11 @@ const Routes = () => (
       exact={true}
       path="/workspaces/:workspaceId/subtree"
       component={WorkspaceSubtreePage}
+    />
+    <Route
+      exact={true}
+      path="/workspaces/:workspaceId/compactTree"
+      component={CompactTreeView}
     />
     <Route
       path="/authCallback"

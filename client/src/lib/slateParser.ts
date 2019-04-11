@@ -12,7 +12,7 @@ export function databaseJSONToValue(databaseJson: any) {
       document: {
         object: "document",
         data: {},
-        nodes: [].concat(databaseJson),
+        nodes: console.log(databaseJson, [].concat(databaseJson)) || [].concat(databaseJson),
       }
     };
   } else {
