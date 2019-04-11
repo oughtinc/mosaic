@@ -152,10 +152,10 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
-  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
-      const rootWorkspace = await Workspace.getRootWorkspaceFromId(this.get("id"));
+      const rootWorkspace = await Workspace.findByPk(this.get("rootWorkspaceId"));
       if (rootWorkspace === null) {
         return false;
       }
@@ -163,10 +163,10 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
-  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
-      const rootWorkspace = await Workspace.getRootWorkspaceFromId(this.get("id"));
+      const rootWorkspace = await Workspace.findByPk(this.get("rootWorkspaceId"));
       if (rootWorkspace === null) {
         return false;
       }
@@ -202,17 +202,6 @@ export default class Workspace extends Model<Workspace> {
         }
       }
       return this.get("allocatedBudget") - howMuchSpentOnChildren;
-    })();
-  }
-
-  @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
-  public get idOfRootWorkspace() {
-    return (async () => {
-      const rootWorkspace = await Workspace.getRootWorkspaceFromId(this.get("id"));
-      if (rootWorkspace === null) {
-        return false;
-      }
-      return rootWorkspace.id;
     })();
   }
 
@@ -506,14 +495,6 @@ export default class Workspace extends Model<Workspace> {
       },
       { questionValue: question }
     );
-  }
-
-  private static async getRootWorkspaceFromId(workspaceId: string) {
-    const workspace = await Workspace.findByPk(workspaceId);
-    if (workspace === null) {
-      throw new Error("requested workspace ID does not exist");
-    }
-    return await workspace.getRootWorkspace();
   }
 
   public async getRootWorkspace() {

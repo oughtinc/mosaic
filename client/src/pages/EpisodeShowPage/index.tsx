@@ -73,7 +73,7 @@ const WORKSPACE_QUERY = gql`
       isUserOracleForTree
       isUserMaliciousOracleForTree
       isRequestingLazyUnlock
-      idOfRootWorkspace
+      rootWorkspaceId
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
       connectedPointers
@@ -194,7 +194,7 @@ const ParentLink = props => (
 );
 
 const RootTreeLink = ({ workspace }) => (
-  <NavLink target="_blank" to={`/workspaces/${workspace.idOfRootWorkspace}/subtree?expanded=true&activeWorkspace=${workspace.id}`}>
+  <NavLink target="_blank" to={`/workspaces/${workspace.rootWorkspaceId}/subtree?expanded=true&activeWorkspace=${workspace.id}`}>
     <Button bsStyle="default" bsSize="xsmall">
       Entire Tree »
     </Button>
