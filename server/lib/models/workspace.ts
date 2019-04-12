@@ -527,13 +527,10 @@ export default class Workspace extends Model<Workspace> {
 
     const budgetIncreased = childWorkspace.totalBudget < newTotalBudget;
 
-    await childWorkspace.update(
-      {
-        isStale: budgetIncreased ? true : childWorkspace.isStale,
-        totalBudget: newTotalBudget
-      },
-      { event }
-    );
+    await childWorkspace.update({
+      isStale: budgetIncreased ? true : childWorkspace.isStale,
+      totalBudget: newTotalBudget
+    });
 
     await this.update(
       {

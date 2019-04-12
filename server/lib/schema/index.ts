@@ -633,7 +633,7 @@ const schema = new GraphQLSchema({
                     const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
                     if (isUpdatingAnswerDraft) {
                       const blocks = await grandparentWorkspace.$get("blocks", { where: { type: "ANSWER_DRAFT" }}) as Block[];
-                      await blocks[0].update({ ..._block }, { event });
+                      await blocks[0].update({ ..._block });
                     }
                   }
                 }
