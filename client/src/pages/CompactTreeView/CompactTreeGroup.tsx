@@ -19,7 +19,15 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
 
   public render() {
     return (
-      <div style={{ backgroundColor: "#f7f7f7", border: "1px solid #bbb", padding: "10px", minHeight: "35px", position: "relative" }}>
+      <div style={{
+        backgroundColor: "#f9f9f9",
+        border: "1px solid #bbb",
+        marginTop: "15px",
+        minHeight: "35px",
+        padding: "10px",
+        position: "relative",
+      }}
+    >
         <Button
           bsSize="xsmall"
           onClick={() => this.setState({isShowing: !this.state.isShowing})}
@@ -53,7 +61,12 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
       const { workspace } = this.props;
 
       if (workspace.isRequestingLazyUnlock) {
-        return <LazyUnlockGroup workspace={workspace} />;
+        return (
+          <LazyUnlockGroup
+            availablePointers={this.props.availablePointers}
+            workspace={workspace}
+          />
+        );
       }
 
       const honestQuestionBlock = workspace.blocks.find(b => b.type === "QUESTION");
@@ -82,7 +95,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
 
       const didMaliciousDeclineToChallenge = didHonestWin && !normal;
 
-      const Checkmark = props => <span style={{ color: "green", fontSize: "24px" }}>✓</span>;
+      const Checkmark = ({ color }) => <span style={{ color, fontSize: "24px" }}>✓</span>;
 
       return (
         <div>
@@ -138,7 +151,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
                 width: "100px",
               }}
             >
-              {didHonestWin && <Checkmark />}{" "}Honest
+              {didHonestWin && <Checkmark color="green" />}{" "}Honest
             </div>
             <div
               style={{
@@ -163,7 +176,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
               alignItems: "center",
               display: "flex",
               justifyContent: "flex-start",
-              marginBottom: "10px",
+              marginBottom: "5px",
             }}
           >
             <div
@@ -174,7 +187,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
                 width: "100px",
               }}
             >
-              {didMaliciousWin && <Checkmark />}{" "}Malicious
+              {didMaliciousWin && <Checkmark color="red" />}{" "}Malicious
             </div>
             {
               didMaliciousDeclineToChallenge

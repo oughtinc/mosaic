@@ -19,24 +19,76 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
 
       return (
         <div>
-          <strong>Pointer Unlock</strong>
-          <BlockEditor
-            name={oracleQuestionBlock.id}
-            blockId={oracleQuestionBlock.id}
-            readOnly={true}
-            initialValue={questionValue}
-            shouldAutosave={false}
-            availablePointers={workspace.connectedPointersOfSubtree}
-          />
-          Answer ({ isHonestOracleCurrentlyResolved ? "Submitted" : "In Progress"})
-          <BlockEditor
-            name={oracleAnswerDraftBlock.id}
-            blockId={oracleAnswerDraftBlock.id}
-            readOnly={true}
-            initialValue={oracleAnswerDraftValue}
-            shouldAutosave={false}
-            availablePointers={workspace.connectedPointersOfSubtree}
-          />
+          <div
+            style={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "flex-start",
+              marginBottom: "10px",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 600,
+                paddingRight: "10px",
+                textAlign: "right",
+                width: "100px",
+              }}
+            >
+              Unlock
+            </div>
+            <div
+              style={{
+                backgroundColor: "#fff",
+                border: "1px solid #ddd",
+                padding: "5px",
+              }}
+            >
+              <BlockEditor
+                name={oracleQuestionBlock.id}
+                blockId={oracleQuestionBlock.id}
+                readOnly={true}
+                initialValue={questionValue}
+                shouldAutosave={false}
+                availablePointers={this.props.availablePointers}
+              />
+            </div>
+          </div>
+          <div
+            style={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "flex-start",
+              marginBottom: "5px",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 600,
+                paddingRight: "10px",
+                textAlign: "right",
+                width: "100px",
+              }}
+            >
+              🔓 Content
+            </div>
+            <div
+              style={{
+                backgroundColor: "#fff",
+                border: "1px solid #ddd",
+                padding: "5px",
+              }}
+            >
+              <BlockEditor
+                name={oracleAnswerDraftBlock.id}
+                blockId={oracleAnswerDraftBlock.id}
+                readOnly={true}
+                initialValue={oracleAnswerDraftValue}
+                shouldAutosave={false}
+                availablePointers={this.props.availablePointers}
+              />
+            </div>
+          </div>
         </div>
       );
     }
