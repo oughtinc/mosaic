@@ -1,6 +1,4 @@
 import * as React from "react";
-import { graphql } from "react-apollo";
-import { compose } from "recompose";
 
 import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
@@ -14,8 +12,6 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
 
       const oracleAnswerDraftBlock = workspace.blocks.find(b => b.type === "ANSWER_DRAFT");
       const oracleAnswerDraftValue = databaseJSONToValue(oracleAnswerDraftBlock.value);
-
-      const isHonestOracleCurrentlyResolved = workspace.isCurrentlyResolved;
 
       return (
         <div>

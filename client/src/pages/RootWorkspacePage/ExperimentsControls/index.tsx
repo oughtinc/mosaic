@@ -69,7 +69,6 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
   }
 
   private onDefaultOracleChange = (experimentId, value) => {
-    console.log("experimentId, value", experimentId, value);
     this.props.updateExperimentDefaultOracleMutation({
       variables: {
         experimentId,

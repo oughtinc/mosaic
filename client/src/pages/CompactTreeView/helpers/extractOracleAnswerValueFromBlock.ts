@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import { databaseJSONToValue } from "../../../lib/slateParser";
 
-export function extractOracleValueAnswerFromBlock(block) {
+export function extractOracleValueAnswerFromBlock(block: any) {
   const pointerNodes = _.get(block, "value[0].nodes[1].nodes");
   if (!pointerNodes) {
     return databaseJSONToValue(block.value);

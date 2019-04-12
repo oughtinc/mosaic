@@ -6,55 +6,10 @@ import { Button } from "react-bootstrap";
 import { compose } from "recompose";
 
 import { LazyUnlockGroup } from "./LazyUnlockGroup";
-import { NoChallengeGroup } from "./NoChallengeGroup";
 
 import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { extractOracleValueAnswerFromBlock } from "./helpers/extractOracleAnswerValueFromBlock";
-
-export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
-  public state = {
-    isShowing: true,
-  };
-
-  public render() {
-    return (
-      <div style={{
-        backgroundColor: "#f9f9f9",
-        border: "1px solid #bbb",
-        marginTop: "15px",
-        minHeight: "35px",
-        padding: "10px",
-        position: "relative",
-      }}
-    >
-        <Button
-          bsSize="xsmall"
-          onClick={() => this.setState({isShowing: !this.state.isShowing})}
-          style={{
-            left: "5px",
-            position: "absolute",
-            top: "5px",
-          }}
-        >
-          {this.state.isShowing ? "-" : "+"}
-        </Button>
-        {
-          this.props.groupQuery.workspace
-          ?
-          <div style={{display: this.state.isShowing ? "block" : "none"}}>
-            <CompactTreeGroupPresentationl
-              availablePointers={this.props.availablePointers}
-              workspace={this.props.groupQuery.workspace}
-            />
-          </div>
-          :
-          "Loading..."
-        }
-      </div>
-    );
-  }
-}
 
 export class CompactTreeGroupPresentationl extends React.PureComponent<any, any> {
     public render() {
@@ -232,7 +187,52 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
     }
   }
 
-  export const GROUP_QUERY = gql`
+export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
+  public state = {
+    isShowing: true,
+  };
+
+  public render() {
+    return (
+      <div
+        style={{
+          backgroundColor: "#f9f9f9",
+          border: "1px solid #bbb",
+          marginTop: "15px",
+          minHeight: "35px",
+          padding: "10px",
+          position: "relative",
+        }}
+      >
+        <Button
+          bsSize="xsmall"
+          onClick={() => this.setState({isShowing: !this.state.isShowing})}
+          style={{
+            left: "5px",
+            position: "absolute",
+            top: "5px",
+          }}
+        >
+          {this.state.isShowing ? "-" : "+"}
+        </Button>
+        {
+          this.props.groupQuery.workspace
+          ?
+          <div style={{display: this.state.isShowing ? "block" : "none"}}>
+            <CompactTreeGroupPresentationl
+              availablePointers={this.props.availablePointers}
+              workspace={this.props.groupQuery.workspace}
+            />
+          </div>
+          :
+          "Loading..."
+        }
+      </div>
+    );
+  }
+}
+
+export const GROUP_QUERY = gql`
   query groupQuery($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
@@ -270,7 +270,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
   }
 `;
 
-export const CompactTreeGroup : any = compose(
+export const CompactTreeGroup: any = compose(
   graphql(GROUP_QUERY, {
     name: "groupQuery",
     options: (props: any) => ({

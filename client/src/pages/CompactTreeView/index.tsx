@@ -91,7 +91,7 @@ export const INITIAL_ROOT_QUERY = gql`
   }
 `;
 
-export const CompactTreeView : any = compose(
+export const CompactTreeView: any = compose(
   graphql(INITIAL_ROOT_QUERY, {
     name: "initialRootQuery",
     options: (props: any) => ({
