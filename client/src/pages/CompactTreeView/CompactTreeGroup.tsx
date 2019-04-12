@@ -67,7 +67,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
                 fontWeight: 600,
                 paddingRight: "10px",
                 textAlign: "right",
-                width: "100px",
+                minWidth: "100px",
               }}
             >
               Question
@@ -103,7 +103,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
                 fontWeight: 600,
                 paddingRight: "10px",
                 textAlign: "right",
-                width: "100px",
+                minWidth: "100px",
               }}
             >
               {didHonestWin && <Checkmark color="green" />}{" "}Honest
@@ -139,7 +139,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
                 fontWeight: 600,
                 paddingRight: "10px",
                 textAlign: "right",
-                width: "100px",
+                minWidth: "100px",
               }}
             >
               {didMaliciousWin && <Checkmark color="red" />}{" "}Malicious

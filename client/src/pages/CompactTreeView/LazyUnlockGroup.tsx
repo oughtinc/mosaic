@@ -28,7 +28,7 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
                 fontWeight: 600,
                 paddingRight: "10px",
                 textAlign: "right",
-                width: "100px",
+                minWidth: "100px",
               }}
             >
               Unlock
@@ -63,7 +63,7 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
                 fontWeight: 600,
                 paddingRight: "10px",
                 textAlign: "right",
-                width: "100px",
+                minWidth: "100px",
               }}
             >
               🔓 Content
