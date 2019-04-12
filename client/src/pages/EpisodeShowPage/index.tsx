@@ -297,7 +297,12 @@ export class WorkspaceView extends React.Component<any, any> {
       );
     } catch (err) {
       // @ts-ignore
-      window.FS.log("error", err.toString());
+      if (window.FS) {
+        // @ts-ignore
+        window.FS.log("error", err.toString());
+      } else {
+        console.log(err);
+      }
     }
 
     const unsortedAvailablePointers = _.uniqBy(
