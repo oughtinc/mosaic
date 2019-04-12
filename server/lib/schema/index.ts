@@ -84,10 +84,6 @@ export const workspaceType = makeObjectType(Workspace, [
         return null;
       }
 
-      if (workspace.isRequestingLazyUnlock) {
-        return await getMessageForUser({ isRequestingLazyUnlock: workspace.isRequestingLazyUnlock });
-      }
-
       const rootWorkspace = await workspace.getRootWorkspace();
 
       // get experiment id
@@ -99,6 +95,19 @@ export const workspaceType = makeObjectType(Workspace, [
 
       const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
       const experimentId = mostRecentExperiment.id;
+
+      const instructions = await Instructions.findAll({ where: { experimentId }});
+      const instructionValues = {};
+      instructions.forEach((instruction) => {
+        instructionValues[instruction.type] = instruction.value;
+      });
+
+      if (workspace.isRequestingLazyUnlock) {
+        return await getMessageForUser({
+          isRequestingLazyUnlock: workspace.isRequestingLazyUnlock,
+          instructions: instructionValues,
+        });
+      }
 
       // get scheduler
       let scheduler;
@@ -113,12 +122,6 @@ export const workspaceType = makeObjectType(Workspace, [
 
       const userTreeOracleRelations = await tree.$get("oracleRelations") as UserTreeOracleRelation[];
       const thisUserTreeOracleRelation = userTreeOracleRelations.find(r => r.UserId === user.id);
-
-      const instructions = await Instructions.findAll({ where: { experimentId }});
-      const instructionValues = {};
-      instructions.forEach((instruction) => {
-        instructionValues[instruction.type] = instruction.value;
-      });
 
       const typeOfUser =
         !thisUserTreeOracleRelation
