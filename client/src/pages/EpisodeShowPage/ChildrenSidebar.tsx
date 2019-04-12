@@ -123,7 +123,7 @@ export class Child extends React.Component<any, any> {
               />}
             </div>
           </div>
-          <div style={{ clear: "both "}} />
+          <div style={{ clear: "both" }} />
         </div>
       );
     }

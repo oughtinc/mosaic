@@ -1,41 +1,33 @@
-import * as Sequelize from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations,
-} from "../eventIntegration";
+  BelongsTo,
+  Column, DataType,
+  Default,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import User from "./user";
+import Tree from "./tree";
 
-const UserTreeOracleRelationModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const UserTreeOracleRelation = sequelize.define(
-    "UserTreeOracleRelation",
-    {
-      isMalicious: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      ...eventRelationshipColumns(DataTypes),
-    },
-    {
-      freezeTableName: true,
-    }
-  );
+@Table({ tableName: "UserTreeOracleRelation" })
+export default class UserTreeOracleRelation extends Model<
+  UserTreeOracleRelation
+> {
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isMalicious: boolean;
 
-  UserTreeOracleRelation.associate = function(models: any) {
-    UserTreeOracleRelation.User = UserTreeOracleRelation.belongsTo(
-      models.User, {
-        foreignKey: "UserId",
-      });
-      UserTreeOracleRelation.Tree = UserTreeOracleRelation.belongsTo(
-      models.Tree, {
-        foreignKey: "TreeId",
-      });
-    addEventAssociations(UserTreeOracleRelation, models);
-  };
+  @ForeignKey(() => User)
+  @Column(DataType.UUID)
+  public UserId: string;
 
-  return UserTreeOracleRelation;
-};
+  @BelongsTo(() => User)
+  public user: User;
 
-export default UserTreeOracleRelationModel;
+  @ForeignKey(() => Tree)
+  @Column(DataType.UUID)
+  public TreeId: string;
+
+  @BelongsTo(() => Tree)
+  public tree: User;
+}

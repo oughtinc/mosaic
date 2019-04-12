@@ -1,12 +1,6 @@
-"use strict";
 import * as Sequelize from "sequelize";
-import uuidv4 from "uuid/v4";
-import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations,
-} from "../eventIntegration";
-const Op = Sequelize.Op;
+import { UUIDV4 } from "sequelize";
+import * as uuidv4 from "uuid/v4";
 import * as _ from "lodash";
 import { createHonestOracleDefaultBlockValues } from "./helpers/defaultHonestOracleBlocks";
 import { createMaliciousOracleDefaultBlockValues } from "./helpers/defaultMaliciousOracleBlocks";
@@ -15,354 +9,381 @@ import { createDefaultRootLevelBlockValues } from "./helpers/defaultRootLevelBlo
 import { isInOracleMode } from "../globals/isInOracleMode";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 
-const WorkspaceModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const Workspace = sequelize.define(
-    "Workspace",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      creatorId: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      isPublic: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false,
-      },
-      isEligibleForAssignment: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      },
-      isEligibleForHonestOracle: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      },
-      isEligibleForMaliciousOracle: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-      isRequestingLazyUnlock: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      },
-      isStale: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-        allowNull: false
-      },
-      isNotStaleRelativeToUser: {
-        type: DataTypes.JSON,
-        defaultValue: [],
-        allowNull: false
-      },
-      isArchived: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      },
-      hasTimeBudget: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      },
-      hasIOConstraints: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: true
-      },
-      isCurrentlyResolved: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      },
-      wasAnsweredByOracle: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
-      },
-      ...eventRelationshipColumns(DataTypes),
-      childWorkspaceOrder: {
-        type: DataTypes.ARRAY(DataTypes.TEXT),
-        defaultValue: [],
-      },
-      hasBeenDeletedByAncestor: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false,
-      },
-      totalBudget: {
-        type: DataTypes.INTEGER,
-        defaultValue: 1,
-        allowNull: false,
-        validate: {
-          min: 0,
-        },
-      },
-      timeSpentOnThisWorkspace: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-        validate: {
-          min: 0,
-        },
-      },
-      allocatedBudget: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-        validate: {
-          min: 0,
-        },
-      },
-      hasAncestorAnsweredByOracle: {
-        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
-          "id",
-        ]),
-        get: async function() {
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
-          while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
-            if (curWorkspace.wasAnsweredByOracle) {
-              return true;
-            }
-          }
+import {
+  AfterCreate,
+  AllowNull,
+  BelongsTo,
+  Column,
+  DataType,
+  Default,
+  ForeignKey,
+  HasMany,
+  HasOne,
+  Min,
+  Model,
+  Table
+} from "sequelize-typescript";
+import PointerImport from "./pointerImport";
+import Block from "./block";
+import Tree from "./tree";
+import ExportWorkspaceLockRelation from "./exportWorkspaceLockRelation";
+import Experiment from "./experiment";
+import Pointer from "./pointer";
+
+const Op = Sequelize.Op;
+
+@Table
+export default class Workspace extends Model<Workspace> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
+
+  @AllowNull(false)
+  @Column(DataType.STRING)
+  public creatorId: string;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isPublic: boolean;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isEligibleForAssignment: boolean;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isEligibleForHonestOracle: boolean;
+
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isEligibleForMaliciousOracle: boolean;
+
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isRequestingLazyUnlock: boolean;
+
+  @AllowNull(false)
+  @Default(true)
+  @Column(DataType.BOOLEAN)
+  public isStale: boolean;
+
+  @AllowNull(false)
+  @Default([])
+  @Column(DataType.JSON)
+  public isNotStaleRelativeToUser: Object[];
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isArchived: boolean;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public hasTimeBudget: boolean;
+
+  @AllowNull(false)
+  @Default(true)
+  @Column(DataType.BOOLEAN)
+  public hasIOConstraints: boolean;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isCurrentlyResolved: boolean;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public wasAnsweredByOracle: boolean;
+
+  @Default([])
+  @Column(DataType.ARRAY(DataType.TEXT))
+  public childWorkspaceOrder: string[];
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public hasBeenDeletedByAncestor: boolean;
+
+  @AllowNull(false)
+  @Default(1)
+  @Min(0)
+  @Column(DataType.INTEGER)
+  public totalBudget: number;
+
+  @AllowNull(false)
+  @Default(0)
+  @Min(0)
+  @Column(DataType.INTEGER)
+  public timeSpentOnThisWorkspace: number;
+
+  @AllowNull(false)
+  @Default(0)
+  @Min(0)
+  @Column(DataType.INTEGER)
+  public allocatedBudget: number;
+
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  public get hasAncestorAnsweredByOracle() {
+    return (async () => {
+      let curWorkspace = await Workspace.findByPk(this.get("id"));
+      if (curWorkspace === null) {
+        return false;
+      }
+      while (curWorkspace.parentId) {
+        curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
+        if (curWorkspace === null) {
           return false;
-        },
-      },
-      hasTimeBudgetOfRootParent: {
-        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
-          "id",
-        ]),
-        get: async function() {
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
-          while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
-          }
+        }
+        if (curWorkspace.wasAnsweredByOracle) {
+          return true;
+        }
+      }
+      return false;
+    })();
+  }
 
-          return curWorkspace.hasTimeBudget;
-        },
-      },
-      hasIOConstraintsOfRootParent: {
-        type: Sequelize.VIRTUAL(Sequelize.BOOLEAN, [
-          "id",
-        ]),
-        get: async function() {
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
-          while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
-          }
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  public get hasTimeBudgetOfRootParent() {
+    return (async () => {
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
+      }
+      return rootWorkspace.hasTimeBudget;
+    })();
+  }
 
-          return curWorkspace.hasIOConstraints;
-        },
-      },
-      remainingBudget: {
-        type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
-          "totalBudget",
-          "allocatedBudget",
-        ]),
-        get: function() {
-          return this.get("totalBudget") - this.get("allocatedBudget");
-        },
-      },
-      budgetUsedWorkingOnThisWorkspace: {
-        type: Sequelize.VIRTUAL(Sequelize.INTEGER, [
-          "allocatedBudget",
-          "childWorkspaceOrder",
-          "timeSpentOnThisWorkspace",
-        ]),
-        get: async function() {
-          if (this.get("timeSpentOnThisWorkspace") > 0) {
-            return this.get("timeSpentOnThisWorkspace");
-          }
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  public get hasIOConstraintsOfRootParent() {
+    return (async () => {
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
+      }
+      return rootWorkspace.hasIOConstraints;
+    })();
+  }
 
-          let howMuchSpentOnChildren = 0;
-          for (const childId of this.get("childWorkspaceOrder")) {
-            const child = await sequelize.models.Workspace.findById(childId);
-            howMuchSpentOnChildren += child.totalBudget;
+  @Column(
+    new DataType.VIRTUAL(DataType.INTEGER, ["totalBudget", "allocatedBudget"])
+  )
+  public get remainingBudget() {
+    return this.get("totalBudget") - this.get("allocatedBudget");
+  }
+
+  @Column(
+    new DataType.VIRTUAL(DataType.INTEGER, [
+      "allocatedBudget",
+      "childWorkspaceOrder",
+      "timeSpentOnThisWorkspace"
+    ])
+  )
+  public get budgetUsedWorkingOnThisWorkspace() {
+    return (async () => {
+      if (this.get("timeSpentOnThisWorkspace") > 0) {
+        return this.get("timeSpentOnThisWorkspace");
+      }
+
+      let howMuchSpentOnChildren = 0;
+      for (const childId of this.get("childWorkspaceOrder")) {
+        const child = await Workspace.findByPk(childId);
+        if (child !== null) {
+          howMuchSpentOnChildren += child.totalBudget;
+        }
+      }
+      return this.get("allocatedBudget") - howMuchSpentOnChildren;
+    })();
+  }
+
+  @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
+  public get idOfRootWorkspace() {
+    return (async () => {
+      const rootWorkspace = await Workspace.getRootWorkspaceFromId(await Workspace.findByPk(this.get("id")));
+      if (rootWorkspace === null) {
+        return false;
+      }
+      return rootWorkspace.id;
+    })();
+  }
+
+  @Column(new DataType.VIRTUAL(DataType.ARRAY(Sequelize.JSON), ["id"]))
+  public get connectedPointers() {
+    return (async () => {
+      const _connectedPointers = await this.getConnectedPointers();
+      const values: any = [];
+      for (const pointer of _connectedPointers) {
+        const value = await pointer.value;
+        if (value) {
+          values.push(value);
+        } else {
+          console.error(
+            `Error: Value for pointer with id ${
+              pointer.id
+            } was not found in its respecting block.`
+          );
+        }
+      }
+      return values.filter(v => !!v);
+    })();
+  }
+
+  @Column(new DataType.VIRTUAL(DataType.ARRAY(Sequelize.JSON), ["id"]))
+  public get exportLockStatusInfo() {
+    return (async () => {
+      return await ExportWorkspaceLockRelation.findAll({
+        where: {
+          workspaceId: this.get("id")
+        }
+      });
+    })();
+  }
+
+  @Column(new DataType.VIRTUAL(DataType.ARRAY(Sequelize.JSON), ["id"]))
+  public get connectedPointersOfSubtree() {
+    return (async () => {
+      const _connectedPointers = await this.getConnectedPointersOfSubtree();
+      const values: any = [];
+      for (const pointer of _connectedPointers) {
+        const value = await pointer.value;
+        if (value) {
+          values.push(value);
+        } else {
+          console.error(
+            `Error: Value for pointer with id ${
+              pointer.id
+            } was not found in its respecting block.`
+          );
+        }
+      }
+      return values.filter(v => !!v);
+    })();
+  }
+
+  @Column(new DataType.VIRTUAL(DataType.INTEGER, ["id"]))
+  public get depth() {
+    return (async () => {
+      const isInOracleModeValue = isInOracleMode.getValue();
+      let depth = 1;
+      let curWorkspace = await Workspace.findByPk(
+        this.get("id")
+      );
+      if (curWorkspace === null) {
+        return depth;
+      }
+      if (isInOracleModeValue) {
+        while (curWorkspace.parentId) {
+          curWorkspace = await Workspace.findByPk(
+            curWorkspace.parentId
+          );
+          if (curWorkspace === null) {
+            return depth;
           }
-          return this.get("allocatedBudget") - howMuchSpentOnChildren;
-        },
-      },
-      idOfRootWorkspace: {
-        type: Sequelize.VIRTUAL(Sequelize.STRING, ["id"]),
-        get: async function() {
-          // get root workspace
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
-          while (curWorkspace.parentId) {
-            curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
-          }
-          const rootWorkspace = curWorkspace;
-          return rootWorkspace.id;
-        },
-      },
-      connectedPointers: {
-        type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
-        get: async function() {
-          const _connectedPointers = await this.getConnectedPointers();
-          const values: any = [];
-          for (const pointer of _connectedPointers) {
-            const value = await pointer.value;
-            if (value) {
-              values.push(value);
-            } else {
-              console.error(
-                `Error: Value for pointer with id ${
-                  pointer.id
-                } was not found in its respecting block.`
-              );
-            }
-          }
-          return values.filter(v => !!v);
-        },
-      },
-      exportLockStatusInfo: {
-        type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
-        get: async function() {
-          const exportWorkspaceLockRelations = await sequelize.models.ExportWorkspaceLockRelation.findAll({
-            where: {
-              workspaceId: this.get("id"),
-            }
-          });
-          return exportWorkspaceLockRelations;
-        },
-      },
-      connectedPointersOfSubtree: {
-        type: Sequelize.VIRTUAL(Sequelize.ARRAY(Sequelize.JSON), ["id"]),
-        get: async function() {
-          const _connectedPointers = await this.getConnectedPointersOfSubtree();
-          const values: any = [];
-          for (const pointer of _connectedPointers) {
-            const value = await pointer.value;
-            if (value) {
-              values.push(value);
-            } else {
-              console.error(
-                `Error: Value for pointer with id ${
-                  pointer.id
-                } was not found in its respecting block.`
-              );
-            }
-          }
-          return values.filter(v => !!v);
-        },
-      },
-      depth: {
-        type: Sequelize.VIRTUAL(Sequelize.INTEGER, ["id"]),
-        get: async function() {
-          const isInOracleModeValue = isInOracleMode.getValue();
-          let depth = 1;
-          let curWorkspace = await sequelize.models.Workspace.findById(this.get("id"));
-          if (isInOracleModeValue) {
-            while (curWorkspace.parentId) {
-              curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
-              if (!curWorkspace.isEligibleForHonestOracle && !curWorkspace.isEligibleForMaliciousOracle) {
-                depth++;
-              }
-            }
-          } else {
+          if (
+            !curWorkspace.isEligibleForHonestOracle &&
+            !curWorkspace.isEligibleForMaliciousOracle
+          ) {
             depth++;
           }
+        }
+      } else {
+        depth++;
+      }
 
-          return depth;
-        },
-      },
-    },
-    {
-      hooks: {
-        ...eventHooks.beforeValidate,
-        afterCreate: async (workspace: any, { event, questionValue }) => {
-          const blocks = await workspace.getBlocks();
-          if (questionValue) {
-            await workspace.createBlock(
-              { type: "QUESTION", value: questionValue },
-              { event }
-            );
-          } else {
-            await workspace.createBlock({ type: "QUESTION" }, { event });
-          }
+      return depth;
+    })();
+  }
 
-          if (workspace.isRequestingLazyUnlock) {
-            // no default content at the moment
-          } else if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
-            const {
-              scratchpadBlockValue,
-              answerDraftBlockValue,
-              responseBlockValue
-            } = createHonestOracleDefaultBlockValues(questionValue);
-            await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-            await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-            await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
-          } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
-            if (workspace.parentId) {
-              const {
-                scratchpadBlockValue,
-                answerDraftBlockValue,
-                responseBlockValue
-              } = createMaliciousOracleDefaultBlockValues(questionValue);
-              await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-              await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-              await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
-            } else {
-              const {
-                scratchpadBlockValue,
-                answerDraftBlockValue,
-                responseBlockValue
-              } = createDefaultRootLevelBlockValues();
-              await workspace.createBlock({ type: "SCRATCHPAD", value: scratchpadBlockValue }, { event });
-              await workspace.createBlock({ type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue }, { event });
-              await workspace.createBlock({ type: "ANSWER_DRAFT", value: responseBlockValue }, { event });
-            }
-          } else {
-            await workspace.createBlock({ type: "SCRATCHPAD" }, { event });
-            await workspace.createBlock({ type: "SUBQUESTION_DRAFT" }, { event });
-            await workspace.createBlock({ type: "ANSWER_DRAFT" }, { event });
-          }
+  @HasMany(() => Workspace, "parentId")
+  public childWorkspaces: Workspace[];
 
-          await workspace.createBlock({ type: "ANSWER" }, { event });
-        },
-      },
+  @HasMany(() => PointerImport)
+  public pointerImports: PointerImport[];
+
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public parentId: string;
+
+  @BelongsTo(() => Workspace, "parentId")
+  public parentWorkspace: Workspace;
+
+  @HasMany(() => Block)
+  public blocks: Block[];
+
+  @HasOne(() => Tree, "rootWorkspaceId")
+  public tree: Tree;
+
+  @AfterCreate
+  public static async populateBlocks(
+    workspace: Workspace,
+    { questionValue }
+  ) {
+    if (questionValue) {
+      await workspace.$create(
+        "block",
+        { type: "QUESTION", value: questionValue },
+      );
+    } else {
+      await workspace.$create("block", { type: "QUESTION" });
     }
-  );
-  Workspace.associate = function(models) {
-    Workspace.ChildWorkspaces = Workspace.hasMany(models.Workspace, {
-      as: "childWorkspaces",
-      foreignKey: "parentId",
-    });
-    Workspace.PointerImports = Workspace.hasMany(models.PointerImport, {
-      as: "pointerImports",
-      foreignKey: "workspaceId",
-    });
-    Workspace.ParentWorkspace = Workspace.belongsTo(models.Workspace, {
-      as: "parentWorkspace",
-      foreignKey: "parentId",
-    });
-    Workspace.Blocks = Workspace.hasMany(models.Block, {
-      as: "blocks",
-      foreignKey: "workspaceId",
-    });
-    Workspace.Tree = Workspace.hasOne(models.Tree, {
-      as: "tree",
-      foreignKey: "rootWorkspaceId",
-    });
-    addEventAssociations(Workspace, models);
-  };
 
-  Workspace.isNewChildWorkspaceHonestOracleEligible = async function({ parentId }) {
+    if (workspace.isRequestingLazyUnlock) {
+      // no default content at the moment
+    } else if (workspace.isEligibleForHonestOracle && isInOracleMode.getValue()) {
+      const {
+        scratchpadBlockValue,
+        answerDraftBlockValue,
+        responseBlockValue
+      } = createHonestOracleDefaultBlockValues(questionValue);
+      await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue });
+      await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue });
+      await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue });
+    } else if (workspace.isEligibleForMaliciousOracle && isInOracleMode.getValue()) {
+      if (workspace.parentId) {
+        const {
+          scratchpadBlockValue,
+          answerDraftBlockValue,
+          responseBlockValue
+        } = createMaliciousOracleDefaultBlockValues(questionValue);
+        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue });
+        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue });
+        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue });
+      } else {
+        const {
+          scratchpadBlockValue,
+          answerDraftBlockValue,
+          responseBlockValue
+        } = createDefaultRootLevelBlockValues();
+        await workspace.$create("block", { type: "SCRATCHPAD", value: scratchpadBlockValue });
+        await workspace.$create("block", { type: "SUBQUESTION_DRAFT", value: answerDraftBlockValue });
+        await workspace.$create("block", { type: "ANSWER_DRAFT", value: responseBlockValue });
+      }
+    } else {
+      await workspace.$create("block", { type: "SCRATCHPAD" });
+      await workspace.$create("block", { type: "SUBQUESTION_DRAFT" });
+      await workspace.$create("block", { type: "ANSWER_DRAFT" });
+    }
+
+    await workspace.$create("block", { type: "ANSWER" });
+  }
+
+  public static async isNewChildWorkspaceHonestOracleEligible({ parentId }) {
     if (!isInOracleMode.getValue()) {
       return false;
     }
 
-    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
+    const parentWorkspace = await Workspace.findByPk(parentId);
+    if (parentWorkspace === null) {
+      return false;
+    }
     const isParentRootWorkspace = !parentWorkspace.parentId;
     const isParentOracleWorkspace = parentWorkspace.isEligibleForHonestOracle || parentWorkspace.isEligibleForMaliciousOracle;
 
@@ -370,16 +391,14 @@ const WorkspaceModel = (
       return false;
     }
 
-    // get root workspace
-    let curWorkspace = parentWorkspace;
-    while (curWorkspace.parentId) {
-      curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+    const rootWorkspace = await Workspace.getRootWorkspaceFromId(parentWorkspace);
+    if (rootWorkspace === null) {
+      return false;
     }
-    const rootWorkspace = curWorkspace;
 
     // get experiment id
-    const tree = await rootWorkspace.getTree();
-    const experiments = await tree.getExperiments();
+    const tree = (await rootWorkspace.$get("tree")) as Tree;
+    const experiments = (await tree.$get("experiments")) as Experiment[];
 
     if (experiments.length === 0) {
       return false;
@@ -389,27 +408,29 @@ const WorkspaceModel = (
     return mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault;
   }
 
-  Workspace.isNewChildWorkspaceMaliciousOracleEligible = async function({ parentId }) {
+  public static async isNewChildWorkspaceMaliciousOracleEligible({ parentId }) {
     if (!isInOracleMode.getValue()) {
       return false;
     }
 
-    const parentWorkspace = await sequelize.models.Workspace.findById(parentId);
-    const isParentHonestOracleWorkspace = parentWorkspace.isEligibleForHonestOracle;
+    const parentWorkspace = await Workspace.findByPk(parentId);
+    if (parentWorkspace === null) {
+      return false;
+    }
+    const isParentHonestOracleWorkspace =
+      parentWorkspace.isEligibleForHonestOracle;
     if (!isParentHonestOracleWorkspace) {
       return false;
     }
 
-    // get root workspace
-    let curWorkspace = parentWorkspace;
-    while (curWorkspace.parentId) {
-      curWorkspace = await sequelize.models.Workspace.findById(curWorkspace.parentId);
+    const rootWorkspace = await Workspace.getRootWorkspaceFromId(parentWorkspace);
+    if (rootWorkspace === null) {
+      return false;
     }
-    const rootWorkspace = curWorkspace;
 
     // get experiment id
-    const tree = await rootWorkspace.getTree();
-    const experiments = await tree.getExperiments();
+    const tree = (await rootWorkspace.$get("tree")) as Tree;
+    const experiments = (await tree.$get("experiments")) as Experiment[];
 
     if (experiments.length === 0) {
       return false;
@@ -419,9 +440,8 @@ const WorkspaceModel = (
     return mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault;
   }
 
-  Workspace.createAsChild = async function(
+  public static async createAsChild(
     {
-      id,
       parentId,
       question,
       totalBudget,
@@ -431,13 +451,16 @@ const WorkspaceModel = (
       isEligibleForHonestOracle,
       isEligibleForMaliciousOracle,
     },
-    { event }
   ) {
-    isEligibleForHonestOracle = isEligibleForHonestOracle !== undefined ?  isEligibleForHonestOracle : await sequelize.models.Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
-    isEligibleForMaliciousOracle = isEligibleForMaliciousOracle !== undefined ? isEligibleForMaliciousOracle : await sequelize.models.Workspace.isNewChildWorkspaceMaliciousOracleEligible({ parentId });
-    const workspace = await sequelize.models.Workspace.create(
+    isEligibleForHonestOracle = isEligibleForHonestOracle !== undefined
+      ? isEligibleForHonestOracle
+      : await Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
+    isEligibleForMaliciousOracle = isEligibleForMaliciousOracle !== undefined
+      ? isEligibleForMaliciousOracle
+      : await Workspace.isNewChildWorkspaceMaliciousOracleEligible({ parentId });
+    return await Workspace.create(
       {
-        id = uuidv4(),
+        id: uuidv4(),
         parentId,
         totalBudget,
         creatorId,
@@ -446,19 +469,41 @@ const WorkspaceModel = (
         isEligibleForHonestOracle,
         isEligibleForMaliciousOracle,
       },
-      { event, questionValue: question }
+      { questionValue: question }
     );
-    return workspace;
-  };
+  }
 
-  Workspace.prototype.workSpaceOrderAppend = function(element) {
+  private static async getRootWorkspaceFromId(curWorkspace: Workspace|null) {
+    if (curWorkspace === null) {
+      return null;
+    }
+    while (curWorkspace.parentId) {
+      curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
+      if (curWorkspace === null) {
+        return null;
+      }
+    }
+    return curWorkspace;
+  }
+
+  public async getRootWorkspace() {
+    let curWorkspace: Workspace | null = this;
+    while (curWorkspace.parentId) {
+      curWorkspace = await Workspace.findByPk(curWorkspace.parentId);
+      if (curWorkspace === null) {
+        throw new Error("workspace has dangling pointer to parent");
+      }
+    }
+    return curWorkspace;
+  }
+
+  public workSpaceOrderAppend(element) {
     return [...this.childWorkspaceOrder, element];
-  };
+  }
 
-  Workspace.prototype.changeAllocationToChild = async function(
+  public async changeAllocationToChild(
     childWorkspace: any,
     newTotalBudget: number,
-    { event }
   ) {
     const budgetToAddToChild = newTotalBudget - childWorkspace.totalBudget;
 
@@ -485,40 +530,16 @@ const WorkspaceModel = (
     await childWorkspace.update({
       isStale: budgetIncreased ? true : childWorkspace.isStale,
       totalBudget: newTotalBudget
-    }, { event });
+    });
 
     await this.update(
       {
-        allocatedBudget: this.allocatedBudget + budgetToAddToChild,
+        allocatedBudget: this.allocatedBudget + budgetToAddToChild
       },
-      { event }
     );
-  };
+  }
 
-  Workspace.prototype.updatePointerImports = async function(
-    pointerIds,
-    { event }
-  ) {
-    const pointerImports = await this.getPointerImports();
-    for (const pointerId of _.uniq(pointerIds)) {
-      if (!_.includes(pointerImports.map(p => p.pointerId), pointerId)) {
-        const pointer = await sequelize.models.Pointer.findById(pointerId);
-        if (!pointer) {
-          console.error(
-            "The relevant pointer for pointer import ",
-            pointerId,
-            " does not exist."
-          );
-        } else {
-          await this.createPointerImport({ pointerId }, { event });
-        }
-      }
-    }
-  };
-
-  Workspace.prototype.createChild = async function({
-    id,
-    event,
+  public async createChild({
     question,
     totalBudget,
     creatorId,
@@ -532,14 +553,19 @@ const WorkspaceModel = (
     let workspaceContainingLazyPointer;
     if (isRequestingLazyUnlock) {
       const idOfExportToUnlock = getAllInlinesAsArray(question)[0].data.pointerId;
-      const exportToUnlock = await sequelize.models.Pointer.findById(idOfExportToUnlock);
-      const blockContainingLazyPointer = await sequelize.models.Block.findById(exportToUnlock.sourceBlockId);
-      workspaceContainingLazyPointer = await sequelize.models.Workspace.findById(blockContainingLazyPointer.workspaceId);
+      const exportToUnlock = await Pointer.findByPk(idOfExportToUnlock);
+      if (exportToUnlock === null) {
+        throw new Error(`Pointer ${idOfExportToUnlock} does not exist in the database`);
+      }
+      const blockContainingLazyPointer = await Block.findByPk(exportToUnlock.sourceBlockId);
+      if (blockContainingLazyPointer === null) {
+        throw new Error(`Block for pointer ${idOfExportToUnlock} does not exist in the database`);
+      }
+      workspaceContainingLazyPointer = await Workspace.findByPk(blockContainingLazyPointer.workspaceId);
     }
 
-    const child = await sequelize.models.Workspace.createAsChild(
+    const child = await Workspace.createAsChild(
       {
-        id,
         parentId: this.id,
         question,
         totalBudget,
@@ -549,7 +575,6 @@ const WorkspaceModel = (
         isEligibleForHonestOracle: isRequestingLazyUnlock ? workspaceContainingLazyPointer.isEligibleForHonestOracle : undefined,
         isEligibleForMaliciousOracle: isRequestingLazyUnlock ? workspaceContainingLazyPointer.isEligibleForMaliciousOracle : undefined,
       },
-      { event }
     );
     if (this.remainingBudget < child.totalBudget) {
       throw new Error(
@@ -563,46 +588,46 @@ const WorkspaceModel = (
     await this.update(
       {
         allocatedBudget: newAllocatedBudget,
-        childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
+        childWorkspaceOrder: this.workSpaceOrderAppend(child.id)
       },
-      { event }
     );
     return child;
-  };
+  }
 
-  // private
-  Workspace.prototype.getConnectedPointers = async function() {
+  private async getConnectedPointers() {
     const blocks = await this.visibleBlocks();
     let _connectedPointers: string[] = [];
     for (const block of blocks) {
-      const blockPointerIds = await block.connectedPointers({ pointersSoFar: _connectedPointers});
+      const blockPointerIds = await block.connectedPointers({
+        pointersSoFar: _connectedPointers
+      });
       _connectedPointers = [..._connectedPointers, ...blockPointerIds];
     }
 
     return _connectedPointers;
-  };
+  }
 
   // Returns an array containing the pointers connected to a workspace and all
   // of its descendants. Passes "pointerSoFar" parameter to recursive
   // subcalls in order to avoid duplicate SQL queries for pointers.
-  Workspace.prototype.getConnectedPointersOfSubtree = async function(
-    pointersSoFar = []
-  ) {
+  private async getConnectedPointersOfSubtree(pointersSoFar = []) {
     let connectedPointersOfSubtree = [];
 
     // Can use this.getBlocks instead of this.getVisibleBlocks because later we
     // will go on to iterate through all the children workspaces.
-    const blocks = await this.getBlocks();
+    const blocks = (await this.$get("blocks")) as Block[];
 
     for (const block of blocks) {
-      const blockPointersToAdd = await block.connectedPointers({ pointersSoFar });
+      const blockPointersToAdd = await block.connectedPointers({
+        pointersSoFar
+      });
       connectedPointersOfSubtree = connectedPointersOfSubtree.concat(
         blockPointersToAdd
       );
       pointersSoFar = pointersSoFar.concat(blockPointersToAdd);
     }
 
-    const childWorkspaces = await this.getChildWorkspaces();
+    const childWorkspaces = (await this.$get("childWorkspaces")) as Workspace[];
 
     for (const childWorkspace of childWorkspaces) {
       const workspacePointersToAdd = await childWorkspace.getConnectedPointersOfSubtree(
@@ -614,26 +639,21 @@ const WorkspaceModel = (
     }
 
     return connectedPointersOfSubtree;
-  };
+  }
 
-  // private
-  Workspace.prototype.visibleBlocks = async function() {
-    let blocks = await this.getBlocks();
-    const connectingChildBlocks = await sequelize.models.Block.findAll({
+  private async visibleBlocks() {
+    let blocks = (await this.$get("blocks")) as Block[];
+    const connectingChildBlocks = await Block.findAll({
       where: {
         workspaceId: {
-          [Op.in]: this.childWorkspaceOrder,
+          [Op.in]: this.childWorkspaceOrder
         },
         type: {
-          [Op.in]: ["QUESTION", "ANSWER", "ANSWER_DRAFT"],
-        },
-      },
+          [Op.in]: ["QUESTION", "ANSWER", "ANSWER_DRAFT"]
+        }
+      }
     });
     blocks = [...blocks, ...connectingChildBlocks];
     return blocks;
-  };
-
-  return Workspace;
-};
-
-export default WorkspaceModel;
+  }
+}

@@ -1,50 +1,51 @@
-import * as Sequelize from "sequelize";
+import { UUIDV4 } from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations
-} from "../eventIntegration";
+  Column,
+  Table,
+  Model,
+  ForeignKey,
+  BelongsTo,
+  DataType,
+} from "sequelize-typescript";
+import Workspace from "./workspace";
+import Experiment from "./experiment";
 
-const AssignmentModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const Assignment = sequelize.define("Assignment", {
-    id: {
-      type: DataTypes.UUID,
-      primaryKey: true,
-      defaultValue: Sequelize.UUIDV4,
-      allowNull: false
-    },
-    userId: {
-      type: Sequelize.STRING,
-    },
-    startAtTimestamp: {
-      type: Sequelize.BIGINT,
-    },
-    endAtTimestamp: {
-      type: Sequelize.BIGINT,
-    },
-    isOracle: {
-      type: Sequelize.BOOLEAN
-    },
-    isTimed: {
-      type: Sequelize.BOOLEAN
-    },
-    ...eventRelationshipColumns(DataTypes),
-  });
+@Table
+export default class Assignment extends Model<Assignment> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  Assignment.associate = function(models: any) {
-    Assignment.Workspace = Assignment.belongsTo(models.Workspace, {
-      foreignKey: "workspaceId"
-    });
-    Assignment.Experiments = Assignment.belongsTo(models.Experiment, {
-      foreignKey: "experimentId",
-    });
-    addEventAssociations(Assignment, models);
-  };
+  @Column(DataType.STRING)
+  public userId: string;
 
-  return Assignment;
-};
+  @Column(DataType.BIGINT)
+  public startAtTimestamp: number;
 
-export default AssignmentModel;
+  @Column(DataType.BIGINT)
+  public endAtTimestamp: number;
+
+  @Column(DataType.BOOLEAN)
+  public isOracle: boolean;
+
+  @Column(DataType.BOOLEAN)
+  public isTimed: boolean;
+
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public workspaceId: string;
+
+  @BelongsTo(() => Workspace)
+  public Workspace: Workspace;
+
+  @ForeignKey(() => Experiment)
+  @Column(DataType.UUID)
+  public experimentId: string;
+
+  @BelongsTo(() => Experiment)
+  public Experiments: Experiment;
+}

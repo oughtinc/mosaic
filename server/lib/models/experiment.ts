@@ -1,56 +1,89 @@
-import * as Sequelize from "sequelize";
+import { UUIDV4 } from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations,
-} from "../eventIntegration";
+  AfterCreate,
+  AllowNull,
+  BelongsToMany,
+  Column,
+  DataType,
+  Default,
+  HasMany,
+  Model,
+  Table
+} from "sequelize-typescript";
+import Tree from "./tree";
+import {
+  defaultHonestOracleInstructions,
+  defaultLazyPointerUnlockInstructions,
+  defaultMaliciousOracleInstructions,
+  defaultReturningHonestOracleInstructions,
+  defaultReturningMaliciousOracleInstructions,
+  defaultReturningRootInstructions,
+  defaultRootInstructions
+} from "./helpers/defaultInstructions";
+import Instructions from "./instructions";
 
-const ExperimentModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const Experiment = sequelize.define(
-    "Experiment",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      name: Sequelize.STRING,
-      eligibilityRank: {
-        type: Sequelize.INTEGER,
-        defaultValue: null,
-        allowNull: true,
-      },
-      description: Sequelize.JSON,
-      metadata: Sequelize.JSON,
-      areNewWorkspacesOracleOnlyByDefault: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
-      },
-      ...eventRelationshipColumns(DataTypes),
-    },
-  );
+@Table
+export default class Experiment extends Model<Experiment> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  Experiment.associate = function(models: any) {
-    Experiment.Trees = Experiment.belongsToMany(models.Tree, {through: 'ExperimentTreeRelation'});
-    Experiment.Fallbacks = Experiment.belongsToMany(models.Experiment, {
-      as: "Fallbacks",
-      through: "FallbackRelation",
-      foreignKey: "primaryExperimentId",
-      otherKey: "fallbackExperimentId",
-    })
-    addEventAssociations(Experiment, models);
-  };
+  @Column(DataType.STRING)
+  public name: string;
 
-  Experiment.prototype.isActive = function() {
-    return this.eligibilityRank === 1;
+  @AllowNull
+  @Default(null)
+  @Column(DataType.INTEGER)
+  public eligibilityRank: number;
+
+  @Column(DataType.JSON)
+  public description: Object;
+
+  @Column(DataType.JSON)
+  public metadata: Object;
+
+  @AllowNull(false)
+  @Default(true)
+  @Column(DataType.BOOLEAN)
+  public areNewWorkspacesOracleOnlyByDefault: boolean;
+
+  @BelongsToMany(
+    () => Tree,
+    "ExperimentTreeRelation",
+    "ExperimentId",
+    "TreeId"
+  )
+  public trees: Tree[];
+
+  @BelongsToMany(
+    () => Experiment,
+    "FallbackRelation",
+    "primaryExperimentId",
+    "fallbackExperimentId"
+  )
+  public fallbacks: Experiment[];
+
+  @HasMany(() => Instructions, "experimentId")
+  public instructions: Instructions[];
+
+  @AfterCreate
+  public static async createDefaultInstructions(experiment: Experiment) {
+    await Instructions.bulkCreate([
+      { experimentId: experiment.id, type: "root", value: defaultRootInstructions },
+      { experimentId: experiment.id, type: "honestOracle", value: defaultHonestOracleInstructions },
+      { experimentId: experiment.id, type: "maliciousOracle", value: defaultMaliciousOracleInstructions },
+      { experimentId: experiment.id, type: "returningRoot", value: defaultReturningRootInstructions },
+      { experimentId: experiment.id, type: "returningHonestOracle", value: defaultReturningHonestOracleInstructions },
+      { experimentId: experiment.id, type: "returningMaliciousOracle", value: defaultReturningMaliciousOracleInstructions },
+      { experimentId: experiment.id, type: "lazyPointerUnlock", value: defaultLazyPointerUnlockInstructions },
+    ]);
   }
 
-  return Experiment;
-};
-
-export default ExperimentModel;
+  public isActive() {
+    return this.eligibilityRank === 1;
+  }
+}
