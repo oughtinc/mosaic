@@ -1,14 +1,19 @@
+import Assignment from "../models/assignment";
+
 const uuidv4 = require("uuid/v4");
 import * as _ from "lodash";
 import { filter, map } from "asyncro";
 import { isInOracleMode } from "../globals/isInOracleMode";
-import { Assignment, Experiment, Tree, UserTreeOracleRelation, Workspace } from "../models";
 import { DistanceFromWorkedOnWorkspaceCache } from "./DistanceFromWorkedOnWorkspaceCache";
 import { NumberOfStaleDescendantsCache } from "./NumberOfStaleDescendantsCache";
 import { RemainingBudgetAmongDescendantsCache } from "./RemainingBudgetAmongDescendantsCache";
 import { RootParentCache } from "./RootParentCache";
 import { Schedule } from "./Schedule";
 import { Scheduler } from "./Scheduler";
+import Workspace from "../models/workspace";
+import UserTreeOracleRelation from "../models/userTreeOracleRelation";
+import Tree from "../models/tree";
+import Experiment from "../models/experiment";
 
 const NINETY_SECONDS = 1000 * 90;
 
@@ -40,7 +45,7 @@ export async function createScheduler(experimentId) {
       const enhancedAssignments = await map(
         assignments,
         async a => {
-          const workspace = await Workspace.findById(a.workspaceId);
+          const workspace = await Workspace.findByPk(a.workspaceId);
           return {
             ...{
               ...a.dataValues,
@@ -63,7 +68,10 @@ export async function createScheduler(experimentId) {
       return id;
     },
     updateAssignment: async (id, fields) => {
-      const assignment = await Assignment.findById(id);
+      const assignment = await Assignment.findByPk(id);
+      if (assignment === null) {
+        return;
+      }
       await assignment.update(fields);
     },
     DistanceFromWorkedOnWorkspaceCache,
@@ -117,13 +125,9 @@ export async function createScheduler(experimentId) {
             return false;
           }
   
-          const experiments = await tree.getExperiments();
+          const experiments = await tree.$get("experiments") as Experiment[];
           
-          if (_.some(experiments, e => e.id === experimentId)) {
-            return true;
-          }
-  
-          return false;
+          return _.some(experiments, e => e.id === experimentId);
         }
       );
   
@@ -133,9 +137,12 @@ export async function createScheduler(experimentId) {
       let fallback;
       let fallbackScheduler;
 
-      const experiment = await Experiment.findById(experimentId);
+      const experiment = await Experiment.findByPk(experimentId);
+      if (experiment === null) {
+        return null;
+      }
       
-      const fallbacks = await experiment.getFallbacks();
+      const fallbacks = await experiment.$get("fallbacks") as Experiment[];
       
       if (fallbacks.length === 0) {
         fallbackScheduler = null;

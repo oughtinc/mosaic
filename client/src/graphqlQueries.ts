@@ -23,7 +23,6 @@ export const UPDATE_BLOCKS = gql`
     updateBlocks(blocks: $blocks, experimentId: $experimentId) {
       id
       value
-      updatedAtEventId
     }
   }
 `;

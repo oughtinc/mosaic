@@ -1,45 +1,45 @@
-import * as Sequelize from "sequelize";
 import {
-  eventRelationshipColumns,
-  eventHooks,
-  addEventAssociations,
-} from "../eventIntegration";
+  AllowNull,
+  BelongsTo,
+  Column,
+  DataType,
+  Default,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
+import { UUIDV4 } from "sequelize";
+import Workspace from "./workspace";
+import Pointer from "./pointer";
 
-const ExportWorkspaceLockRelationModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const ExportWorkspaceLockRelation = sequelize.define(
-    "ExportWorkspaceLockRelation",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      ...eventRelationshipColumns(DataTypes),
-      isLocked: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      },
-    },
-  );
+@Table
+export default class ExportWorkspaceLockRelation extends Model<
+  ExportWorkspaceLockRelation
+> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  ExportWorkspaceLockRelation.associate = function(models: any) {
-    ExportWorkspaceLockRelation.Workspace = ExportWorkspaceLockRelation.belongsTo(
-      models.Workspace, {
-        foreignKey: "workspaceId",
-      });
-    ExportWorkspaceLockRelation.Export = ExportWorkspaceLockRelation.belongsTo(
-      models.Pointer, {
-        foreignKey: "pointerId",
-      });
-    addEventAssociations(ExportWorkspaceLockRelation, models);
-  };
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isLocked: boolean;
 
-  return ExportWorkspaceLockRelation;
-};
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public workspaceId: string;
 
-export default ExportWorkspaceLockRelationModel;
+  @BelongsTo(() => Workspace)
+  public Workspace: Workspace;
+
+  @ForeignKey(() => Pointer)
+  @Column(DataType.UUID)
+  public pointerId: string;
+
+  @BelongsTo(() => Pointer)
+  public Export: Pointer;
+}

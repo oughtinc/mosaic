@@ -52,19 +52,16 @@ const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
 const optionsForTopLevel = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
   fetchPolicy: "network-only",
   variables: { workspaceId },
-  skip: !isTopLevelOfCurrentTree
 });
 
 const optionsForNested = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
   fetchPolicy: "network-only",
   variables: { workspaceId },
-  skip: isTopLevelOfCurrentTree
 });
 
 const optionsForSubtreeTimeSpentQuery = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
   fetchPolicy: "cache-and-network",
   variables: { id: workspaceId },
-  skip: !isTopLevelOfCurrentTree
 });
 
 export class WorkspaceCardContainer extends React.PureComponent<any, any> {
@@ -114,14 +111,17 @@ export const WorkspaceCard: any = compose(
   graphql(ROOT_WORKSPACE_SUBTREE_QUERY, {
     name: "subtreeQuery",
     options: optionsForTopLevel,
+    skip: ({ isTopLevelOfCurrentTree }) => !isTopLevelOfCurrentTree,
   }),
   graphql(CHILD_WORKSPACE_SUBTREE_QUERY, {
     name: "subtreeQuery",
     options: optionsForNested,
+    skip: ({ isTopLevelOfCurrentTree }) => isTopLevelOfCurrentTree,
   }),
   graphql(SUBTREE_TIME_SPENT_QUERY, {
     name: "subtreeTimeSpentQuery",
     options: optionsForSubtreeTimeSpentQuery,
+    skip: ({ isTopLevelOfCurrentTree }) => !isTopLevelOfCurrentTree,
   }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",

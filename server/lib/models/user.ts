@@ -1,37 +1,39 @@
-import * as Sequelize from "sequelize";
 import {
-  eventRelationshipColumns,
-  addEventAssociations,
-} from "../eventIntegration";
+  BelongsToMany,
+  Column,
+  DataType,
+  Model,
+  Table
+} from "sequelize-typescript";
+import { UUIDV4 } from "sequelize";
+import Tree from "./tree";
+import UserTreeOracleRelation from "./userTreeOracleRelation";
 
-const UserModel = (
-  sequelize: Sequelize.Sequelize,
-  DataTypes: Sequelize.DataTypes
-) => {
-  const User = sequelize.define(
-    "User",
-    {
-      id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-      },
-      familyName: Sequelize.STRING,
-      givenName: Sequelize.STRING,
-      email: Sequelize.STRING,
-      gender: Sequelize.STRING,
-      pictureURL: Sequelize.STRING,
-      ...eventRelationshipColumns(DataTypes),
-    },
-  );
+@Table
+export default class User extends Model<User> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: UUIDV4,
+    allowNull: false
+  })
+  public id: string;
 
-  User.associate = function(models: any) {
-    User.OracleTrees = User.belongsToMany(models.Tree, {through: 'UserTreeOracleRelation'});
-    addEventAssociations(User, models);
-  };
+  @Column(DataType.STRING)
+  public familyName: string;
 
-  return User;
-};
+  @Column(DataType.STRING)
+  public givenName: string;
 
-export default UserModel;
+  @Column(DataType.STRING)
+  public email: string;
+
+  @Column(DataType.STRING)
+  public gender: string;
+
+  @Column(DataType.STRING)
+  public pictureURL: string;
+
+  @BelongsToMany(() => Tree, () => UserTreeOracleRelation)
+  public OracleTrees: Tree[];
+}

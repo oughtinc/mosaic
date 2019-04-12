@@ -1,13 +1,13 @@
-import * as db from "../models";
-import { scheduler } from "../scheduler";
+import db from "../models";
+import { schedulers } from "../scheduler";
 import { isInOracleMode } from "../globals/isInOracleMode";
 
 export async function resetDbForTesting() {
-  scheduler.reset();
+  schedulers.forEach((_, scheduler) => {
+    scheduler.reset();
+  });
 
   isInOracleMode.setValue(false);
 
-  if (db && db.sequelize) {
-    await db.sequelize.sync({ force: true });
-  }
+  await db.sync({ force: true });
 }

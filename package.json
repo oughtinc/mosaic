@@ -9,8 +9,8 @@
     "start": "cd server && yarn run db:migrate && yarn run start"
   },
   "engines": {
-    "yarn": "1.5.1",
-    "node": "9.7.1",
-    "npm": "5.6.0"
+    "yarn": "1.x",
+    "node": "10.x",
+    "npm": "6.x"
   }
 }
