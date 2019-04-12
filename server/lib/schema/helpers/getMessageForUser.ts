@@ -4,7 +4,7 @@ export async function getMessageForUser({
   isWorkspaceRootLevel,
   isThisFirstTimeWorkspaceHasBeenWorkedOn,
   typeOfUser
-}) {
+}: any) {
 
   if (isRequestingLazyUnlock) {
     return instructions.lazyPointerUnlock;
