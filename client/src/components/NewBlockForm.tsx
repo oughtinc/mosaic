@@ -320,7 +320,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               data-cy="submit-new-question"
               disabled={this.props.hasTimeBudget && this.props.availableBudget - 90 < this.state.totalBudget}
               type="submit"
-              onClick={this.onSubmit}
+              onClick={() => setTimeout(this.onSubmit, 1)}
               style={{ marginTop: this.props.hasTimeBudget ? "10px" : "0px" }}
             >
               Submit
