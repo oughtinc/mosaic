@@ -922,14 +922,14 @@ const schema = new GraphQLSchema({
                 return false;
               }
               const children = await grandParent.$get("childWorkspaces") as Workspace[];
-              let allResolved = true;
+              let allResolvedOrArchived = true;
               for (const child of children) {
-                if (!child.isCurrentlyResolved) {
-                  allResolved = false;
+                if (!(child.isCurrentlyResolved || child.isArchived)) {
+                  allResolvedOrArchived = false;
                   break;
                 }
               }
-              if (allResolved) {
+              if (allResolvedOrArchived) {
                 await grandParent.update({
                   isStale: true,
                   isNotStaleRelativeToUser: [],
@@ -1008,14 +1008,14 @@ const schema = new GraphQLSchema({
                       return;
                     }
                     const children = await parent.$get("childWorkspaces") as Workspace[];
-                    let allResolved = true;
+                    let allResolvedOrArchived = true;
                     for (const child of children) {
-                      if (!child.isCurrentlyResolved) {
-                        allResolved = false;
+                      if (!(child.isCurrentlyResolved || child.isArchived)) {
+                        allResolvedOrArchived = false;
                         break;
                       }
                     }
-                    if (allResolved) {
+                    if (allResolvedOrArchived) {
                       await parent.update({
                         isStale: true,
                         isNotStaleRelativeToUser: [],
@@ -1051,14 +1051,14 @@ const schema = new GraphQLSchema({
                         const isNotRoot = greatGrandparentWorkspace.parentId;
                         if (isNotRoot) {
                           const children = await greatGrandparentWorkspace.$get("childWorkspaces") as Workspace[];
-                          let allResolved = true;
+                          let allResolvedOrArchived = true;
                           for (const child of children) {
-                            if (!child.isCurrentlyResolved) {
-                              allResolved = false;
+                            if (!(child.isCurrentlyResolved || child.isArchived)) {
+                              allResolvedOrArchived = false;
                               break;
                             }
                           }
-                          if (allResolved) {
+                          if (allResolvedOrArchived) {
                             await greatGrandparentWorkspace.update({
                               isStale: true,
                               isNotStaleRelativeToUser: [],
