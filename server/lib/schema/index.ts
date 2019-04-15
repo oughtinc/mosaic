@@ -11,7 +11,7 @@ import {
   GraphQLSchema,
   GraphQLString
 } from "graphql";
-import * as GraphQLJSON from "graphql-type-json";
+import GraphQLJSON from "graphql-type-json";
 import * as Sequelize from "sequelize";
 
 import {
