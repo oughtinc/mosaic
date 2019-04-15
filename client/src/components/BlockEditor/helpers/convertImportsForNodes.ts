@@ -1,6 +1,5 @@
 import * as uuidv1 from "uuid/v1";
-
-const DOLLAR_NUMBERS = /\$[\d]*/g;
+import { DOLLAR_NUMBERS_REGEX } from "../../helpers/DOLLAR_NUMBERS_REGEX";
 
 export function convertImportsForNodes(nodes: any, availablePointers: any[]) {
     const result: any = [];
@@ -9,7 +8,7 @@ export function convertImportsForNodes(nodes: any, availablePointers: any[]) {
       if (node.object === "text") {
         let text: string = node.leaves[0].text; // assuming only one-leaf text nodes
 
-        const matches = text.match(DOLLAR_NUMBERS);
+        const matches = text.match(DOLLAR_NUMBERS_REGEX);
 
         if (!matches) {
           result.push(node);

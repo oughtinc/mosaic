@@ -20,6 +20,7 @@ import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 import { parse as parseQueryString } from "query-string";
 import { Auth } from "../../auth";
+import { DOLLAR_NUMBERS_REGEX } from "../helpers/DOLLAR_NUMBERS_REGEX";
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
@@ -38,7 +39,6 @@ const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspa
 
 const AUTOSAVE_EVERY_N_SECONDS = 3;
 const DOLLAR_NUMBERS_NOT_NUMBER = /\$[0-9]+[^0-9]/;
-const DOLLAR_NUMBERS = /\$[\d]*/g;
 
 function lastCharactersAfterEvent(event: any, n: any) {
   const { anchorOffset, focusNode: wholeText }: any = window.getSelection();
@@ -104,7 +104,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   private throttledUpdate = throttle(this.props.updateBlock, 5000);
 
   private handleBlur = _.debounce(() => {
-    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS);
+    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS_REGEX);
 
     if (doNeedToConvertImport) {
       const valueJSON = this.state.editorValue.toJSON();
@@ -152,7 +152,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentWillUnmount() {
-    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS);
+    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS_REGEX);
 
     if (doNeedToConvertImport) {
       const valueJSON = this.state.editorValue.toJSON();
