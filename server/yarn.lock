@@ -5309,10 +5309,10 @@ sequelize-pool@^1.0.2:
   dependencies:
     bluebird "^3.5.3"
 
-sequelize-typescript@^1.0.0-alpha.9:
-  version "1.0.0-alpha.9"
-  resolved "https://registry.yarnpkg.com/sequelize-typescript/-/sequelize-typescript-1.0.0-alpha.9.tgz#133310f2e9b4b050a0b45faa05b0efe3cc221408"
-  integrity sha512-YG2jClu1cILs/lZiYSpWwTzUKfC19aiZvzt1b9KIXoUX/ojwL2oXPMs+n2AGhdGLpIvoj6TBK7fNfeRvnHJnxA==
+sequelize-typescript@^1.0.0-beta.0:
+  version "1.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/sequelize-typescript/-/sequelize-typescript-1.0.0-beta.0.tgz#7b0e8dec93399ebc85992684af0e592407faeb9c"
+  integrity sha512-9yUlo+qpGWkNjQ/YkJp37ik9ddh8bbQQMPseHYK+VwBKhiGthndiG78+ALOh0STIrTB4KIsM79QiGriyAU4RjQ==
   dependencies:
     "@types/node" "*"
     glob "7.1.2"
