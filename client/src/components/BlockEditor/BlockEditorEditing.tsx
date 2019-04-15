@@ -1,6 +1,6 @@
 import { throttle } from "lodash";
 import * as React from "react";
-import { Inline } from "slate";
+import { Inline, Value } from "slate";
 import * as uuidv1 from "uuid/v1";
 import { Editor, findDOMNode } from "slate-react";
 import { compose, withProps, withState } from "recompose";
@@ -9,6 +9,7 @@ import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { updateBlock } from "../../modules/blocks/actions";
+import { convertImportsForNodes } from "./helpers/convertImportsForNodes";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
@@ -19,6 +20,7 @@ import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
 import { parse as parseQueryString } from "query-string";
 import { Auth } from "../../auth";
+import { DOLLAR_NUMBERS_REGEX } from "../helpers/DOLLAR_NUMBERS_REGEX";
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
@@ -96,11 +98,20 @@ export class BlockEditorEditingPresentational extends React.Component<
   BlockEditorEditingPresentationalState
 > {
   public editor;
+  private editorValueToSaveToDbOnUnmount: any;
   private autosaveInterval: any;
 
   private throttledUpdate = throttle(this.props.updateBlock, 5000);
 
   private handleBlur = _.debounce(() => {
+    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS_REGEX);
+
+    if (doNeedToConvertImport) {
+      const valueJSON = this.state.editorValue.toJSON();
+      valueJSON.document.nodes[0].nodes = convertImportsForNodes(valueJSON.document.nodes[0].nodes, this.props.availablePointers);
+      this.setState({ editorValue: Value.fromJSON(valueJSON) });
+    }
+
     if (this.props.shouldAutosave) {
       this.considerSaveToDatabase();
       this.endAutosaveInterval();
@@ -141,6 +152,14 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentWillUnmount() {
+    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS_REGEX);
+
+    if (doNeedToConvertImport) {
+      const valueJSON = this.state.editorValue.toJSON();
+      valueJSON.document.nodes[0].nodes = convertImportsForNodes(valueJSON.document.nodes[0].nodes, this.props.availablePointers);
+      this.editorValueToSaveToDbOnUnmount =  Value.fromJSON(valueJSON);
+    }
+
     this.props.updateBlock({
       id: this.props.block.id,
       value: this.state.editorValue,
@@ -393,14 +412,18 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private considerSaveToDatabase = () => {
-    if (this.state.hasChangedSinceDatabaseSave) {
+    if (this.editorValueToSaveToDbOnUnmount || this.state.hasChangedSinceDatabaseSave) {
       this.saveToDatabase();
     }
   };
 
   private saveToDatabase = () => {
-    this.props.saveBlocksMutation(this.state.editorValue);
-    this.setState({ hasChangedSinceDatabaseSave: false });
+    if (this.editorValueToSaveToDbOnUnmount) {
+      this.props.saveBlocksMutation(this.editorValueToSaveToDbOnUnmount);
+    } else {
+      this.props.saveBlocksMutation(this.state.editorValue);
+      this.setState({ hasChangedSinceDatabaseSave: false });
+    }
   };
 
   private beginAutosaveInterval = () => {
