@@ -7,7 +7,7 @@ export function convertImportsForNodes(nodes: any, availablePointers: any[]) {
 
     nodes.forEach(node => {
       if (node.object === "text") {
-        let text = node.leaves[0].text; // assuming only one-leaf text nodes
+        let text: string = node.leaves[0].text; // assuming only one-leaf text nodes
 
         const matches = text.match(DOLLAR_NUMBERS);
 
