@@ -545,7 +545,7 @@ export default class Workspace extends Model<Workspace> {
     creatorId,
     isPublic,
   }) {
-    const initialText = _.get(question, "[0].nodes[0].leaves[0].text");
+    const initialText = _.get(question, "[0].nodes[0].leaves[0].text", "");
     const isRequestingLazyUnlock = initialText.trim().slice(0, 6).toUpperCase() === "UNLOCK";
 
     let workspaceContainingLazyPointer;
