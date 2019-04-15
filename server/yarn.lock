@@ -5317,10 +5317,10 @@ sequelize-typescript@^1.0.0-alpha.9:
     "@types/node" "*"
     glob "7.1.2"
 
-sequelize@^5.3.3:
-  version "5.3.3"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.3.3.tgz#6fd5d570d151d5014bf5e9fd294e652297ea1da9"
-  integrity sha512-GD9DpTiTe82b1rVmZI4/V8JS6RoAAHcjBQ6qqiSQDoW6Zgl9ZFBRQeFxktG0Hppag8tBoc20wdKLdAfeRHP3pg==
+sequelize@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.4.0.tgz#e6f37772eded19c118e6dd9a5caa936b82ba97d5"
+  integrity sha512-ZmiRyJoDpiq429Wqd1oXM6LOpH8rSMiRN5CkO6IEa24X6cJ0VZ3nIPKEbt5z7M1cyBBc9Nm7icJqTXpJKI2PPw==
   dependencies:
     bluebird "^3.5.0"
     cls-bluebird "^2.1.0"
