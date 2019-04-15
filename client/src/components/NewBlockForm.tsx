@@ -320,7 +320,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               data-cy="submit-new-question"
               disabled={this.props.hasTimeBudget && this.props.availableBudget - 90 < this.state.totalBudget}
               type="submit"
-              onClick={() => setTimeout(this.onSubmit, 1)}
+              onClick={this.handleClick}
               style={{ marginTop: this.props.hasTimeBudget ? "10px" : "0px" }}
             >
               Submit
@@ -342,6 +342,16 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     if (pressedControlAndEnter(event)) {
       event.preventDefault();
       this.onSubmit();
+    }
+  };
+
+  private handleClick = () => {
+    const isOnFrontPage = !this.props.shouldAutosave;
+
+    if (isOnFrontPage) {
+      this.onSubmit();
+    } else {
+      setTimeout(this.onSubmit, 1);
     }
   };
 }
