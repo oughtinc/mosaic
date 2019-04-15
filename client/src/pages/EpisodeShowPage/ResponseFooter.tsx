@@ -1,7 +1,9 @@
 import * as React from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
 
+import { listOfSlateNodesToText } from "../../lib/slateParser";
 import {
   responseFooterBgColor,
   responseFooterBorderTopColor,
@@ -36,6 +38,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       markAsCurrentlyResolved,
       markAsNotStale,
       transferRemainingBudgetToParent,
+      responseIsEmpty,
     } = this.props;
 
     return (
@@ -57,6 +60,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
             <TakeBreakBtn
               experimentId={experimentId}
               label={`Done!${hasTimeBudget ? " (returns budget)" : ""}`}
+              disabled={responseIsEmpty}
               navHook={() => {
                 // TODO: address potential race condition here with modifying
                 // budget and modifying staleness
@@ -74,6 +78,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               <TakeBreakBtn
                 experimentId={experimentId}
                 label="Done!"
+                disabled={responseIsEmpty}
                 navHook={() => {
                   markAsNotStale();
                   markAsCurrentlyResolved();
@@ -82,7 +87,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               :
               <div>
                 <TakeBreakBtn
-                  disabled={!isRequestingLazyUnlock && !hasChildren}
+                  disabled={responseIsEmpty || (!isRequestingLazyUnlock && !hasChildren)}
                   experimentId={experimentId}
                   bsStyle="primary"
                   label={(isUserMaliciousOracle && !isRequestingLazyUnlock && hasParent) ? "Challenge!" : "Done!"}
@@ -118,6 +123,16 @@ class ResponseFooterPresentational extends React.Component<any, any> {
   }
 }
 
-const ResponseFooter: any = ResponseFooterPresentational;
+const mapStateToProps = (state, props) => {
+  const responseBlock = state.blocks.blocks.find(block => block.id === props.responseBlockId);
+  if (!responseBlock) {
+    return { responseIsEmpty: false };
+  }
+  return {
+    responseIsEmpty: listOfSlateNodesToText(responseBlock.value.toJS().document.nodes, false) === "",
+  };
+};
+
+const ResponseFooter: any = connect(mapStateToProps)(ResponseFooterPresentational);
 
 export { ResponseFooter };

@@ -670,6 +670,7 @@ export class WorkspaceView extends React.Component<any, any> {
                               })
                             }
                             workspaceId={workspace.id}
+                            responseBlockId={answerDraftProps.blockId}
                           />
                         }
                       </BlockContainer>
