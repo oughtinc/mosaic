@@ -8,7 +8,7 @@ import {
   Default,
   HasMany,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import Tree from "./tree";
 import {
@@ -18,7 +18,7 @@ import {
   defaultReturningHonestOracleInstructions,
   defaultReturningMaliciousOracleInstructions,
   defaultReturningRootInstructions,
-  defaultRootInstructions
+  defaultRootInstructions,
 } from "./helpers/defaultInstructions";
 import Instructions from "./instructions";
 
@@ -28,7 +28,7 @@ export default class Experiment extends Model<Experiment> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 
@@ -51,19 +51,14 @@ export default class Experiment extends Model<Experiment> {
   @Column(DataType.BOOLEAN)
   public areNewWorkspacesOracleOnlyByDefault: boolean;
 
-  @BelongsToMany(
-    () => Tree,
-    "ExperimentTreeRelation",
-    "ExperimentId",
-    "TreeId"
-  )
+  @BelongsToMany(() => Tree, "ExperimentTreeRelation", "ExperimentId", "TreeId")
   public trees: Tree[];
 
   @BelongsToMany(
     () => Experiment,
     "FallbackRelation",
     "primaryExperimentId",
-    "fallbackExperimentId"
+    "fallbackExperimentId",
   )
   public fallbacks: Experiment[];
 
@@ -73,13 +68,41 @@ export default class Experiment extends Model<Experiment> {
   @AfterCreate
   public static async createDefaultInstructions(experiment: Experiment) {
     await Instructions.bulkCreate([
-      { experimentId: experiment.id, type: "root", value: defaultRootInstructions },
-      { experimentId: experiment.id, type: "honestOracle", value: defaultHonestOracleInstructions },
-      { experimentId: experiment.id, type: "maliciousOracle", value: defaultMaliciousOracleInstructions },
-      { experimentId: experiment.id, type: "returningRoot", value: defaultReturningRootInstructions },
-      { experimentId: experiment.id, type: "returningHonestOracle", value: defaultReturningHonestOracleInstructions },
-      { experimentId: experiment.id, type: "returningMaliciousOracle", value: defaultReturningMaliciousOracleInstructions },
-      { experimentId: experiment.id, type: "lazyPointerUnlock", value: defaultLazyPointerUnlockInstructions },
+      {
+        experimentId: experiment.id,
+        type: "root",
+        value: defaultRootInstructions,
+      },
+      {
+        experimentId: experiment.id,
+        type: "honestOracle",
+        value: defaultHonestOracleInstructions,
+      },
+      {
+        experimentId: experiment.id,
+        type: "maliciousOracle",
+        value: defaultMaliciousOracleInstructions,
+      },
+      {
+        experimentId: experiment.id,
+        type: "returningRoot",
+        value: defaultReturningRootInstructions,
+      },
+      {
+        experimentId: experiment.id,
+        type: "returningHonestOracle",
+        value: defaultReturningHonestOracleInstructions,
+      },
+      {
+        experimentId: experiment.id,
+        type: "returningMaliciousOracle",
+        value: defaultReturningMaliciousOracleInstructions,
+      },
+      {
+        experimentId: experiment.id,
+        type: "lazyPointerUnlock",
+        value: defaultLazyPointerUnlockInstructions,
+      },
     ]);
   }
 

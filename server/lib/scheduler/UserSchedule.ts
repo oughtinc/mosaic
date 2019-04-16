@@ -18,7 +18,7 @@ class UserSchedule {
     DistanceFromWorkedOnWorkspaceCache,
     rootParentCache,
     timeLimit,
-    userId
+    userId,
   }) {
     this.createAssignment = createAssignment;
     this.updateAssignment = updateAssignment;
@@ -30,7 +30,10 @@ class UserSchedule {
 
   public getUserActivity() {
     const userActivity = this.userSchedule.map(assignment => ({
-      howLongDidAssignmentLast: Math.min(3600*1000, assignment.getHowLongDidAssignmentLast()),
+      howLongDidAssignmentLast: Math.min(
+        3600 * 1000,
+        assignment.getHowLongDidAssignmentLast(),
+      ),
       startAtTimestamp: assignment.startAtTimestamp,
       workspace: assignment.getWorkspace(),
     }));
@@ -42,7 +45,7 @@ class UserSchedule {
     workspace,
     startAtTimestamp = Date.now(),
     isOracle = false,
-    isLastAssignmentTimed = true
+    isLastAssignmentTimed = true,
   ) {
     const assignment = new Assignment({
       createAssignment: this.createAssignment,
@@ -58,7 +61,9 @@ class UserSchedule {
 
     this.userSchedule.push(assignment);
 
-    const rootParent = await this.rootParentCache.getRootParentOfWorkspace(workspace);
+    const rootParent = await this.rootParentCache.getRootParentOfWorkspace(
+      workspace,
+    );
 
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
   }
@@ -100,7 +105,7 @@ class UserSchedule {
 
   public getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces) {
     const treesNotYetWorkedOn = rootWorkspaces.filter(
-      r => this.lastWorkedOnTimestampForTree[r.id] === undefined
+      r => this.lastWorkedOnTimestampForTree[r.id] === undefined,
     );
 
     if (treesNotYetWorkedOn.length > 0) {
@@ -108,20 +113,23 @@ class UserSchedule {
     }
 
     const lastWorkedOnTimestamps = rootWorkspaces.map(
-      r => this.lastWorkedOnTimestampForTree[r.id]
+      r => this.lastWorkedOnTimestampForTree[r.id],
     );
 
     const minTimestamp = Math.min.apply(Math, lastWorkedOnTimestamps);
 
     const leastRecentlyWorkedOnTrees = rootWorkspaces.filter(
-      r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp
+      r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp,
     );
 
     return leastRecentlyWorkedOnTrees;
   }
 
   public hasUserWorkedOnWorkspace(workspace) {
-    return _.some(this.userSchedule, assignment => assignment.getWorkspace().id === workspace.id);
+    return _.some(
+      this.userSchedule,
+      assignment => assignment.getWorkspace().id === workspace.id,
+    );
   }
 
   public getAssignmentsForWorkspace(workspaceOrWorkspaceId) {
@@ -132,7 +140,10 @@ class UserSchedule {
       workspaceId = workspaceOrWorkspaceId.id;
     }
 
-    return _.filter(this.userSchedule, assignment => assignment.getWorkspace().id === workspaceId);
+    return _.filter(
+      this.userSchedule,
+      assignment => assignment.getWorkspace().id === workspaceId,
+    );
   }
 
   public isUserCurrentlyWorkingOnWorkspace(workspaceOrWorkspaceId) {
@@ -148,9 +159,12 @@ class UserSchedule {
       return false;
     }
 
-    const isThisWorkspaceTheLastWorkedOnWorkspace = this.lastWorkedOnWorkspace().id === workspaceId;
+    const isThisWorkspaceTheLastWorkedOnWorkspace =
+      this.lastWorkedOnWorkspace().id === workspaceId;
 
-    return isThisWorkspaceTheLastWorkedOnWorkspace && this.isActiveInLastWorkspace();
+    return (
+      isThisWorkspaceTheLastWorkedOnWorkspace && this.isActiveInLastWorkspace()
+    );
   }
 
   private lastWorkedOnWorkspace() {
@@ -173,7 +187,8 @@ class UserSchedule {
       return false;
     }
 
-    const howLongAgoUserStartedWorkingOnIt = Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
+    const howLongAgoUserStartedWorkingOnIt =
+      Date.now() - lastWorkedOnAssignment.getStartedAtTimestamp();
 
     // handle case where time budgets aren't in use, but
     // we still don't want users taking over 15 minutes
@@ -182,7 +197,8 @@ class UserSchedule {
     }
 
     // normal time budget case
-    const didUserStartWorkingOnItWithinTimeLimit = howLongAgoUserStartedWorkingOnIt < this.timeLimit;
+    const didUserStartWorkingOnItWithinTimeLimit =
+      howLongAgoUserStartedWorkingOnIt < this.timeLimit;
     if (didUserStartWorkingOnItWithinTimeLimit) {
       return true;
     }
@@ -197,22 +213,26 @@ class UserSchedule {
     workspacesInTree,
   }) {
     if (shouldResetCache || !this.distanceFromWorkedOnWorkspaceCache) {
-      this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
-        userSchedule: this,
-        workspacesInTree,
-      });
+      this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache(
+        {
+          userSchedule: this,
+          workspacesInTree,
+        },
+      );
     }
 
     const workspacesWithDist = workspaces.map(w => ({
-      distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(w),
+      distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(
+        w,
+      ),
       workspace: w,
     }));
 
     const workspacesExceedingMinDistFromWorkedOnWorkspace = workspacesWithDist
       .filter(o => o.distance >= minDist)
       .map(o => o.workspace);
-    
-    return workspacesExceedingMinDistFromWorkedOnWorkspace
+
+    return workspacesExceedingMinDistFromWorkedOnWorkspace;
   }
 
   public getWorkspacesWithMostDistFromWorkedOnWorkspace({
@@ -221,28 +241,36 @@ class UserSchedule {
     workspacesInTree,
   }) {
     if (shouldResetCache || !this.distanceFromWorkedOnWorkspaceCache) {
-      this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache({
-        userSchedule: this,
-        workspacesInTree,
-      });
+      this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache(
+        {
+          userSchedule: this,
+          workspacesInTree,
+        },
+      );
     }
 
     const workspacesWithDist = workspaces.map(w => ({
-      distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(w),
+      distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(
+        w,
+      ),
       workspace: w,
     }));
-    
+
     const maxDist = _.max(workspacesWithDist.map(o => o.distance));
 
-    const maxWorkspacesWithDist = workspacesWithDist.filter(o => o.distance === maxDist);
+    const maxWorkspacesWithDist = workspacesWithDist.filter(
+      o => o.distance === maxDist,
+    );
     const maxWorkspaces = maxWorkspacesWithDist.map(o => o.workspace);
 
     return maxWorkspaces;
   }
 
   public getWorkspacesPreviouslyWorkedOnByUser({ workspaces }) {
-    const workspacesPreviouslyWorkedOnByUser = workspaces.filter(w => this.hasUserWorkedOnWorkspace(w));
-    return workspacesPreviouslyWorkedOnByUser; 
+    const workspacesPreviouslyWorkedOnByUser = workspaces.filter(w =>
+      this.hasUserWorkedOnWorkspace(w),
+    );
+    return workspacesPreviouslyWorkedOnByUser;
   }
 }
 

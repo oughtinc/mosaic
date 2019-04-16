@@ -3,7 +3,10 @@ import { connect } from "react-redux";
 import { HistoryListener } from "./HistoryListener";
 import { closeAllPointerReferences } from "../modules/blockEditor/actions";
 
-class ListenerThatClosesPointersOnPathnameChangeBase extends React.Component<any, any> {
+class ListenerThatClosesPointersOnPathnameChangeBase extends React.Component<
+  any,
+  any
+> {
   public render() {
     return (
       <HistoryListener
@@ -15,5 +18,5 @@ class ListenerThatClosesPointersOnPathnameChangeBase extends React.Component<any
 
 export const ListenerThatClosesPointersOnPathnameChange: any = connect(
   null,
-  { closeAllPointerReferences }
+  { closeAllPointerReferences },
 )(ListenerThatClosesPointersOnPathnameChangeBase);

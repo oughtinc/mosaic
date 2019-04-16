@@ -6,7 +6,7 @@ import {
   ForeignKey,
   HasMany,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
 import Experiment from "./experiment";
@@ -20,7 +20,7 @@ export default class Tree extends Model<Tree> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 
@@ -35,7 +35,7 @@ export default class Tree extends Model<Tree> {
     () => Experiment,
     "ExperimentTreeRelation",
     "TreeId",
-    "ExperimentId"
+    "ExperimentId",
   )
   public experiments: Experiment[];
 

@@ -22,8 +22,10 @@
     "db:seed": "node_modules/.bin/sequelize db:seed:all",
     "db:reset": "yarn run db:clear; yarn run db:migrate",
     "db:clear": "yarn run db:drop; yarn run db:create",
-    "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
+    "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register/transpile-only test/**/*.spec.ts",
+    "test:ci": "NODE_ENV=test mocha -r ts-node/register/transpile-only --exit test/**/*.spec.ts",
     "test-scheduler": "mocha --watch --watch-extensions ts -r ts-node/register test/lib/scheduler/*.spec.ts",
+    "lint": "tslint -p . && prettier -c lib/**/*.ts lib/**/*.js",
     "pretest": "NODE_ENV=test npm run db:reset"
   },
   "dependencies": {
@@ -76,10 +78,14 @@
     "immutable": "^3.8.2",
     "mocha": "^6.1.3",
     "nodemon": "^1.12.1",
+    "prettier": "^1.16.4",
     "rimraf": "^2.6.2",
     "sinon": "^7.3.1",
     "ts-node": "^8.1.0",
     "tslint": "^5.10.0",
     "typescript": "^3.4.1"
+  },
+  "prettier": {
+    "trailingComma": "all"
   }
 }

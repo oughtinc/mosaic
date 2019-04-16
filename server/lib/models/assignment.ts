@@ -16,7 +16,7 @@ export default class Assignment extends Model<Assignment> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 

@@ -1,0 +1,26 @@
+language: node_js
+node_js:
+  - "10"
+addons:
+  postgresql: "9.4"
+env:
+  DATABASE_URL: postgres://postgres@localhost/mosaic_dev
+  USING_DOCKER: true
+
+install:
+  - cd client
+  - yarn
+  - cd ../server
+  - yarn
+  - cd ..
+
+script:
+  - cd server
+  - yarn lint
+  - yarn db:create
+  - yarn db:migrate
+#  - yarn test:ci
+  - cd ../client
+  - yarn lint
+  - yarn test
+#  - yarn test:cypress

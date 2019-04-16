@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { ShowExpandedPointer } from "../lib/slate-pointers/ShowExpandedPointer";
 import {
   HOVER_ITEM_TYPES,
-  changeHoverItem
+  changeHoverItem,
 } from "../modules/blockEditor/actions";
 
 export class ShowExpandedPointerOutsideSlatePresentational extends React.Component<
@@ -16,7 +16,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
     if (
       !_.isEqual(
         newProps.exportingPointer.nodes,
-        this.props.exportingPointer.nodes
+        this.props.exportingPointer.nodes,
       )
     ) {
       return true;
@@ -38,7 +38,7 @@ export class ShowExpandedPointerOutsideSlatePresentational extends React.Compone
             top,
             left,
             readOnly: null,
-            blockId: false
+            blockId: false,
           });
         }}
         onMouseOverExpandedPointer={_.noop}
@@ -54,6 +54,6 @@ function mapStateToProps(state: any, { exportingPointer }: any) {
 export const ShowExpandedPointerOutsideSlate: any = compose(
   connect(
     mapStateToProps,
-    { changeHoverItem }
-  )
+    { changeHoverItem },
+  ),
 )(ShowExpandedPointerOutsideSlatePresentational);

@@ -6,7 +6,7 @@ import {
   Default,
   ForeignKey,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
 import Workspace from "./workspace";
@@ -20,7 +20,7 @@ export default class ExportWorkspaceLockRelation extends Model<
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 

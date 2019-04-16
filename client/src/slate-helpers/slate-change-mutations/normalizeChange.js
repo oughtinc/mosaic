@@ -15,24 +15,36 @@ export function normalizeExportSpacing(c: Change) {
   value.document.getTexts().forEach(textNode => {
     const getCurTextNode = () => {
       return c.value.document.getNode(textNode.key);
-    }
+    };
 
-    if (isDirectlyBeforeExport(textNode, c.value.document) && !hasSpacerAsLastChar(textNode, c.value.document)) {
+    if (
+      isDirectlyBeforeExport(textNode, c.value.document) &&
+      !hasSpacerAsLastChar(textNode, c.value.document)
+    ) {
       c.insertTextByKey(textNode.key, textNode.text.length, POINTER_EDGE_SPACE);
     }
 
     textNode = getCurTextNode();
-    if (isDirectlyAfterExport(textNode, c.value.document) && !hasSpacerAsFirstChar(textNode, c.value.document)) {
+    if (
+      isDirectlyAfterExport(textNode, c.value.document) &&
+      !hasSpacerAsFirstChar(textNode, c.value.document)
+    ) {
       c.insertTextByKey(textNode.key, 0, POINTER_EDGE_SPACE);
     }
 
     textNode = getCurTextNode();
-    if (isFirstTextOfExport(textNode, c.value.document) && !hasSpacerAsFirstChar(textNode, c.value.document)) {
+    if (
+      isFirstTextOfExport(textNode, c.value.document) &&
+      !hasSpacerAsFirstChar(textNode, c.value.document)
+    ) {
       c.insertTextByKey(textNode.key, 0, POINTER_EDGE_SPACE);
     }
 
     textNode = getCurTextNode();
-    if (isLastTextOfExport(textNode, c.value.document) && !hasSpacerAsLastChar(textNode, c.value.document)) {
+    if (
+      isLastTextOfExport(textNode, c.value.document) &&
+      !hasSpacerAsLastChar(textNode, c.value.document)
+    ) {
       c.insertTextByKey(textNode.key, textNode.text.length, POINTER_EDGE_SPACE);
     }
 
@@ -41,14 +53,22 @@ export function normalizeExportSpacing(c: Change) {
     // since they are the same char, so you need to additionaly enforce
     // that there are at least two chars.
     textNode = getCurTextNode();
-    if ((isFirstTextOfExport(textNode, c.value.document) || isLastTextOfExport(textNode, c.value.document)) && textNode.text.length === 1) {
+    if (
+      (isFirstTextOfExport(textNode, c.value.document) ||
+        isLastTextOfExport(textNode, c.value.document)) &&
+      textNode.text.length === 1
+    ) {
       c.insertTextByKey(textNode.key, 0, POINTER_EDGE_SPACE);
     }
 
     // for edge case where there is only one spacer between two pointers,
     // you always need two so text cursor issues don't arise
     textNode = getCurTextNode();
-    if ((isDirectlyAfterExport(textNode, c.value.document) && isDirectlyBeforeExport(textNode, c.value.document)) && textNode.text.length === 1) {
+    if (
+      isDirectlyAfterExport(textNode, c.value.document) &&
+      isDirectlyBeforeExport(textNode, c.value.document) &&
+      textNode.text.length === 1
+    ) {
       c.insertTextByKey(textNode.key, 0, POINTER_EDGE_SPACE);
     }
   });

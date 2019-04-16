@@ -13,21 +13,29 @@ export function databaseJSONToValue(databaseJson: any) {
         object: "document",
         data: {},
         nodes: [].concat(databaseJson),
-      }
+      },
     };
   } else {
     return Plain.deserialize("");
   }
 }
 
-export function listOfSlateNodesToText(list: Array<any>, shouldTurnExportsIntoImports: boolean) {
-  const arrayOfStrings = _.map(list, x => slateNodeToText(x, shouldTurnExportsIntoImports));
+export function listOfSlateNodesToText(
+  list: Array<any>,
+  shouldTurnExportsIntoImports: boolean,
+) {
+  const arrayOfStrings = _.map(list, x =>
+    slateNodeToText(x, shouldTurnExportsIntoImports),
+  );
   const trimmedArrayOfStrings = _.map(arrayOfStrings, _.trim);
   const joinedTrimmedArrayOfStrings = trimmedArrayOfStrings.join(" ");
   return joinedTrimmedArrayOfStrings;
 }
 
-export function slateNodeToText(node: any, shouldTurnExportsIntoImports: boolean) {
+export function slateNodeToText(
+  node: any,
+  shouldTurnExportsIntoImports: boolean,
+) {
   let prefix = "";
   let mid = "";
   let suffix = "";

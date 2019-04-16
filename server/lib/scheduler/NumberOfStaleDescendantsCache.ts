@@ -14,21 +14,27 @@ class NumberOfStaleDescendantsCache {
     this.cache = new Map();
   }
 
-  public async getNumberOfStaleDescendants(workspace: Workspace): Promise<number> {
+  public async getNumberOfStaleDescendants(
+    workspace: Workspace,
+  ): Promise<number> {
     const workspaceAlreadyCached: boolean = this.cache.has(workspace.id);
 
     if (workspaceAlreadyCached) {
       return this.cache.get(workspace.id);
     }
 
-    const numberOfStaleDescendants: number = await this.calculateNumberOfStaleDescendants(workspace);
+    const numberOfStaleDescendants: number = await this.calculateNumberOfStaleDescendants(
+      workspace,
+    );
 
     this.cache.set(workspace.id, numberOfStaleDescendants);
 
     return numberOfStaleDescendants;
   }
 
-  private async calculateNumberOfStaleDescendants(workspace: Workspace): Promise<number> {
+  private async calculateNumberOfStaleDescendants(
+    workspace: Workspace,
+  ): Promise<number> {
     const children = await workspace.getChildWorkspaces();
 
     if (children.length === 0) {

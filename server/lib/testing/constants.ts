@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 
 const {
   ID_OF_TYPICAL_USER_FOR_TESTING,

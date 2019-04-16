@@ -1,12 +1,11 @@
 import * as chai from "chai";
-const { expect } = chai;
-import { truncateDb } from "../../testHelpers/sequelizeHelpers";
+import db from "../../../lib/models";
 import { createRootWorkspace } from "../../testHelpers/graphQLCalls";
 import { rootWorkspaceQuestion } from "../../testHelpers/slateHelpers";
 
 describe("graphQL schema", () => {
   describe("createWorkspace", () => {
-    beforeEach(() => truncateDb());
+    beforeEach(() => db.sync({ force: true }));
 
     it("should create a workspace", async () => {
       const totalBudget = 1000;

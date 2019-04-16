@@ -23,4 +23,4 @@ export const getAllInlinesAsArray = nodeOrNodes => {
   });
 
   return array;
-}
+};

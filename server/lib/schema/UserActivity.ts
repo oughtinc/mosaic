@@ -5,9 +5,7 @@ import {
   GraphQLString,
 } from "graphql";
 
-import {
-  workspaceType
-} from "./index";
+import { workspaceType } from "./index";
 
 export const UserActivityType = new GraphQLObjectType({
   name: "UserActivity",
@@ -27,15 +25,14 @@ export const UserActivityType = new GraphQLObjectType({
               type: GraphQLInt,
             },
             workspace: {
-              type: workspaceType
+              type: workspaceType,
             },
           },
-        }
-        )
+        }),
       ),
-      resolve: function (userActivity) {
+      resolve: function(userActivity) {
         return userActivity;
-      }
+      },
     },
-  }
-})
+  },
+});
