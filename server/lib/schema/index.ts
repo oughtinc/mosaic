@@ -14,11 +14,7 @@ import {
 import GraphQLJSON from "graphql-type-json";
 import * as Sequelize from "sequelize";
 
-import {
-  requireAdmin,
-  requireOracle,
-  requireUser,
-} from "./auth";
+import { requireAdmin, requireOracle, requireUser } from "./auth";
 
 import { isUserAdmin } from "./auth/isUserAdmin";
 import { userFromAuthToken } from "./auth/userFromAuthToken";
@@ -39,7 +35,7 @@ import Pointer from "../models/pointer";
 import PointerImport from "../models/pointerImport";
 import ExportWorkspaceLockRelation from "../models/exportWorkspaceLockRelation";
 
-const generateReferences = (references) => {
+const generateReferences = references => {
   const all = {};
   references.map(([fieldName, graphqlType]) => {
     all[fieldName] = {
@@ -62,199 +58,211 @@ const makeObjectType = (model, references, extraFields = {}) =>
       )
   });
 
-const blockType = makeObjectType(Block, [
-  ["workspace", () => workspaceType]
-]);
+const blockType = makeObjectType(Block, [["workspace", () => workspaceType]]);
 
 import { UserType } from "./User";
 
-export const workspaceType = makeObjectType(Workspace, [
-  ["childWorkspaces", () => new GraphQLList(workspaceType)],
-  ["parentWorkspace", () => new GraphQLList(workspaceType)],
-  ["blocks", () => new GraphQLList(blockType)],
-  ["pointerImports", () => new GraphQLList(pointerImportType)],
-  ["tree", () => treeType]
-], {
-  message: {
-    type: GraphQLString,
-    resolve: async (workspace: Workspace, args, context) => {
-      const user = context.user;
+export const workspaceType = makeObjectType(
+  Workspace,
+  [
+    ["childWorkspaces", () => new GraphQLList(workspaceType)],
+    ["parentWorkspace", () => new GraphQLList(workspaceType)],
+    ["blocks", () => new GraphQLList(blockType)],
+    ["pointerImports", () => new GraphQLList(pointerImportType)],
+    ["tree", () => treeType]
+  ],
+  {
+    message: {
+      type: GraphQLString,
+      resolve: async (workspace: Workspace, args, context) => {
+        const user = context.user;
 
-      if (!user) {
-        return null;
-      }
+        if (!user) {
+          return null;
+        }
 
-      const rootWorkspace = await workspace.getRootWorkspace();
+        const rootWorkspace = await workspace.getRootWorkspace();
 
-      // get experiment id
-      const tree = await rootWorkspace.$get("tree") as Tree;
-      const experiments = await tree.$get("experiments") as Experiment[];
-      if (experiments.length === 0) {
-        return null;
-      }
+        // get experiment id
+        const tree = (await rootWorkspace.$get("tree")) as Tree;
+        const experiments = (await tree.$get("experiments")) as Experiment[];
+        if (experiments.length === 0) {
+          return null;
+        }
 
-      const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
-      const experimentId = mostRecentExperiment.id;
+        const mostRecentExperiment = _.sortBy(
+          experiments,
+          e => -e.createdAt
+        )[0];
+        const experimentId = mostRecentExperiment.id;
 
-      const instructions = await Instructions.findAll({ where: { experimentId }});
-      const instructionValues = {};
-      instructions.forEach((instruction) => {
-        instructionValues[instruction.type] = instruction.value;
-      });
-
-      if (workspace.isRequestingLazyUnlock) {
-        return await getMessageForUser({
-          isRequestingLazyUnlock: workspace.isRequestingLazyUnlock,
-          instructions: instructionValues,
+        const instructions = await Instructions.findAll({
+          where: { experimentId }
         });
-      }
+        const instructionValues = {};
+        instructions.forEach(instruction => {
+          instructionValues[instruction.type] = instruction.value;
+        });
 
-      // get scheduler
-      let scheduler;
-      if (schedulers.has(experimentId)) {
-        scheduler = schedulers.get(experimentId);
-      } else {
-        scheduler = await createScheduler(experimentId);
-      }
+        if (workspace.isRequestingLazyUnlock) {
+          return await getMessageForUser({
+            isRequestingLazyUnlock: workspace.isRequestingLazyUnlock,
+            instructions: instructionValues
+          });
+        }
 
-      const isWorkspaceRootLevel = !workspace.parentId;
-      const isThisFirstTimeWorkspaceHasBeenWorkedOn = await scheduler.isThisFirstTimeWorkspaceHasBeenWorkedOn(workspace.id);
+        // get scheduler
+        let scheduler;
+        if (schedulers.has(experimentId)) {
+          scheduler = schedulers.get(experimentId);
+        } else {
+          scheduler = await createScheduler(experimentId);
+        }
 
-      const userTreeOracleRelations = await tree.$get("oracleRelations") as UserTreeOracleRelation[];
-      const thisUserTreeOracleRelation = userTreeOracleRelations.find(r => r.UserId === user.id);
-
-      const typeOfUser =
-        !thisUserTreeOracleRelation
-        ?
-        "TYPICAL"
-        : (
-          !thisUserTreeOracleRelation.isMalicious
-          ?
-          "HONEST"
-          :
-          "MALICIOUS"
+        const isWorkspaceRootLevel = !workspace.parentId;
+        const isThisFirstTimeWorkspaceHasBeenWorkedOn = await scheduler.isThisFirstTimeWorkspaceHasBeenWorkedOn(
+          workspace.id
         );
 
-      return await getMessageForUser({
-        instructions: instructionValues,
-        isWorkspaceRootLevel,
-        isThisFirstTimeWorkspaceHasBeenWorkedOn,
-        typeOfUser,
-      });
+        const userTreeOracleRelations = (await tree.$get(
+          "oracleRelations"
+        )) as UserTreeOracleRelation[];
+        const thisUserTreeOracleRelation = userTreeOracleRelations.find(
+          r => r.UserId === user.id
+        );
+
+        const typeOfUser = !thisUserTreeOracleRelation
+          ? "TYPICAL"
+          : !thisUserTreeOracleRelation.isMalicious
+          ? "HONEST"
+          : "MALICIOUS";
+
+        return await getMessageForUser({
+          instructions: instructionValues,
+          isWorkspaceRootLevel,
+          isThisFirstTimeWorkspaceHasBeenWorkedOn,
+          typeOfUser
+        });
+      }
     },
-  },
-  isUserOracleForTree: {
-    type: GraphQLBoolean,
-    resolve: async (workspace: Workspace, args, context) => {
-      const user = context.user;
+    isUserOracleForTree: {
+      type: GraphQLBoolean,
+      resolve: async (workspace: Workspace, args, context) => {
+        const user = context.user;
 
-      if (!user) {
-        return false;
-      }
-
-      // get tree
-      const rootWorkspace = await workspace.getRootWorkspace();
-      const tree = await rootWorkspace.$get("tree") as Tree;
-      const oracles = await tree.$get("oracles") as User[];
-
-      return oracles.some(o => o.id === user.id);
-    },
-  },
-  isUserMaliciousOracleForTree: {
-    type: GraphQLBoolean,
-    resolve: async (workspace: Workspace, args, context) => {
-      const user = context.user;
-
-      if (!user) {
-        return false;
-      }
-
-      // get tree
-      const rootWorkspace = await workspace.getRootWorkspace();
-      const tree = await rootWorkspace.$get("tree") as Tree;
-      const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
-        where: {
-          TreeId: tree.id,
-          UserId: user.id
-        },
-      });
-
-      return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
-    },
-  },
-  currentlyActiveUser: {
-    type: UserType,
-    resolve: async (workspace: Workspace, args, context) => {
-      const rootWorkspace = await workspace.getRootWorkspace();
-
-      // get experiment id
-      const tree = await rootWorkspace.$get("tree") as Tree;
-      const experiments = await tree.$get("experiments") as Experiment[];
-      if (experiments.length === 0) {
-        return null;
-      }
-
-      const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
-      const experimentId = mostRecentExperiment.id;
-
-      // get scheduler
-      let scheduler;
-      if (schedulers.has(experimentId)) {
-        scheduler = schedulers.get(experimentId);
-      } else {
-        scheduler = await createScheduler(experimentId);
-      }
-
-      // get user
-      const userId = await scheduler.getIdOfCurrentlyActiveUser(workspace.id);
-      if (!userId) {
-        return null;
-      }
-
-      let user = await User.findByPk(userId);
-
-      if (!user) {
-        user = {
-          id: userId,
-          givenName: null,
-          familyName: null,
-        };
-      }
-
-      return user;
-    },
-  },
-  isNotStaleRelativeToUserFullInformation: {
-    type: new GraphQLList(UserType),
-    resolve: async (workspace: Workspace, args, context) => {
-      const fullInfo = await map(
-        workspace.isNotStaleRelativeToUser,
-        async userId => {
-          let user = await User.findByPk(userId);
-          if (!user) {
-            const userInfo = await userFromAuthToken(context.authorization);
-
-            user = {
-              id: userId,
-              givenName: null,
-              familyName: null,
-            };
-          }
-
-          return user;
+        if (!user) {
+          return false;
         }
-      );
 
-      return fullInfo;
-    }
-  },
-  rootWorkspace: {
-    get type() { return workspaceType; },
-    resolve: async (workspace: Workspace) => {
-      return await workspace.getRootWorkspace();
+        // get tree
+        const rootWorkspace = await workspace.getRootWorkspace();
+        const tree = (await rootWorkspace.$get("tree")) as Tree;
+        const oracles = (await tree.$get("oracles")) as User[];
+
+        return oracles.some(o => o.id === user.id);
+      }
+    },
+    isUserMaliciousOracleForTree: {
+      type: GraphQLBoolean,
+      resolve: async (workspace: Workspace, args, context) => {
+        const user = context.user;
+
+        if (!user) {
+          return false;
+        }
+
+        // get tree
+        const rootWorkspace = await workspace.getRootWorkspace();
+        const tree = (await rootWorkspace.$get("tree")) as Tree;
+        const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
+          where: {
+            TreeId: tree.id,
+            UserId: user.id
+          }
+        });
+
+        return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
+      }
+    },
+    currentlyActiveUser: {
+      type: UserType,
+      resolve: async (workspace: Workspace, args, context) => {
+        const rootWorkspace = await workspace.getRootWorkspace();
+
+        // get experiment id
+        const tree = (await rootWorkspace.$get("tree")) as Tree;
+        const experiments = (await tree.$get("experiments")) as Experiment[];
+        if (experiments.length === 0) {
+          return null;
+        }
+
+        const mostRecentExperiment = _.sortBy(
+          experiments,
+          e => -e.createdAt
+        )[0];
+        const experimentId = mostRecentExperiment.id;
+
+        // get scheduler
+        let scheduler;
+        if (schedulers.has(experimentId)) {
+          scheduler = schedulers.get(experimentId);
+        } else {
+          scheduler = await createScheduler(experimentId);
+        }
+
+        // get user
+        const userId = await scheduler.getIdOfCurrentlyActiveUser(workspace.id);
+        if (!userId) {
+          return null;
+        }
+
+        let user = await User.findByPk(userId);
+
+        if (!user) {
+          user = {
+            id: userId,
+            givenName: null,
+            familyName: null
+          };
+        }
+
+        return user;
+      }
+    },
+    isNotStaleRelativeToUserFullInformation: {
+      type: new GraphQLList(UserType),
+      resolve: async (workspace: Workspace, args, context) => {
+        const fullInfo = await map(
+          workspace.isNotStaleRelativeToUser,
+          async userId => {
+            let user = await User.findByPk(userId);
+            if (!user) {
+              const userInfo = await userFromAuthToken(context.authorization);
+
+              user = {
+                id: userId,
+                givenName: null,
+                familyName: null
+              };
+            }
+
+            return user;
+          }
+        );
+
+        return fullInfo;
+      }
+    },
+    rootWorkspace: {
+      get type() {
+        return workspaceType;
+      },
+      resolve: async (workspace: Workspace) => {
+        return await workspace.getRootWorkspace();
+      }
     }
   }
-});
+);
 
 // TODO - factor out workspaceType into separate file so the following import
 // can go at the top of the file -- right now it's down here to avoid circular
@@ -264,49 +272,55 @@ import { UserActivityType } from "./UserActivity";
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
   ["tree", () => treeType],
-  ["user", () => UserType],
+  ["user", () => UserType]
 ]);
 
 const treeType = makeObjectType(Tree, [
   ["rootWorkspace", () => workspaceType],
   ["experiments", () => new GraphQLList(experimentType)],
   ["oracleRelations", () => new GraphQLList(OracleRelationsType)],
-  ["oracles", () => new GraphQLList(UserType)],
+  ["oracles", () => new GraphQLList(UserType)]
 ]);
 
 const instructionsEnumValues = {};
 const instructionsFields = {};
-InstructionTypes.forEach((type) => {
+InstructionTypes.forEach(type => {
   instructionsEnumValues[type] = {};
   instructionsFields[type] = { type: GraphQLString };
 });
 
 const instructionsEnumType = new GraphQLEnumType({
   name: "InstructionsEnum",
-  values: instructionsEnumValues,
+  values: instructionsEnumValues
 });
 
 const instructionsObjectType = new GraphQLObjectType({
   name: "Instructions",
-  fields: instructionsFields,
+  fields: instructionsFields
 });
 
-const experimentType = makeObjectType(Experiment, [
-  ["fallbacks", () => new GraphQLList(experimentType)],
-  ["trees", () => new GraphQLList(treeType)]
-], {
-  instructions: {
-    type: instructionsObjectType,
-    resolve: async (experiment: Experiment) => {
-      const instructions = await Instructions.findAll({ where: { experimentId: experiment.id } });
-      const instructionValues = {};
-      instructions.forEach((instruction) => {
-        instructionValues[instruction.type] = instruction.value;
-      });
-      return instructionValues;
-    },
+const experimentType = makeObjectType(
+  Experiment,
+  [
+    ["fallbacks", () => new GraphQLList(experimentType)],
+    ["trees", () => new GraphQLList(treeType)]
+  ],
+  {
+    instructions: {
+      type: instructionsObjectType,
+      resolve: async (experiment: Experiment) => {
+        const instructions = await Instructions.findAll({
+          where: { experimentId: experiment.id }
+        });
+        const instructionValues = {};
+        instructions.forEach(instruction => {
+          instructionValues[instruction.type] = instruction.value;
+        });
+        return instructionValues;
+      }
+    }
   }
-});
+);
 
 const pointerType = makeObjectType(Pointer, [
   ["pointerImport", () => pointerImportType],
@@ -321,7 +335,7 @@ const pointerImportType = makeObjectType(PointerImport, [
 const oracleModeType = new GraphQLObjectType({
   name: "OracleMode",
   fields: {
-    value: { type: GraphQLBoolean },
+    value: { type: GraphQLBoolean }
   }
 });
 
@@ -332,10 +346,7 @@ const BlockInput = new GraphQLInputObjectType({
 
 const WorkspaceInput = new GraphQLInputObjectType({
   name: "WorkspaceInput",
-  fields: attributeFields(
-    Workspace,
-    { allowNull: true },
-  ),
+  fields: attributeFields(Workspace, { allowNull: true })
 });
 
 function modelGraphQLFields(type: any, model: any) {
@@ -354,7 +365,7 @@ const schema = new GraphQLSchema({
         type: UserActivityType,
         args: {
           experimentId: { type: GraphQLString },
-          userId: { type: GraphQLString },
+          userId: { type: GraphQLString }
         },
         resolve: async (_, { experimentId, userId }) => {
           let scheduler;
@@ -369,9 +380,9 @@ const schema = new GraphQLSchema({
       },
       oracleMode: {
         type: GraphQLBoolean,
-        resolve: function () {
+        resolve: function() {
           return isInOracleMode.getValue();
-        },
+        }
       },
       workspaces: {
         type: new GraphQLList(workspaceType),
@@ -400,16 +411,16 @@ const schema = new GraphQLSchema({
           after: async (result: Workspace[], args, ctx) => {
             // ensure root workspace has associated tree
             for (const workspace of result) {
-              const tree = await workspace.$get("tree") as Tree;
+              const tree = (await workspace.$get("tree")) as Tree;
               if (tree === null && !workspace.parentId) {
                 await Tree.create({
-                  rootWorkspaceId: workspace.id,
+                  rootWorkspaceId: workspace.id
                 });
               }
             }
             return result;
           }
-        }),
+        })
       },
       workspace: {
         type: workspaceType,
@@ -420,7 +431,7 @@ const schema = new GraphQLSchema({
             const tree = await result.$get("tree");
             if (tree === null && !result.parentId) {
               const tree = await Tree.create({
-                rootWorkspaceId: result.id,
+                rootWorkspaceId: result.id
               });
             }
 
@@ -434,7 +445,7 @@ const schema = new GraphQLSchema({
             // in the future, I added this graphql-sequelize "after" hook to
             // ensure the existence of the three required blocks.
 
-            const blocks = await result.$get("blocks") as Block[];
+            const blocks = (await result.$get("blocks")) as Block[];
 
             const includesQuestion = blocks.find(b => b.type === "QUESTION");
             const includesAnswer = blocks.find(b => b.type === "ANSWER");
@@ -466,10 +477,13 @@ const schema = new GraphQLSchema({
             }
 
             if (!includesAnswerDraft) {
-              const curBlocks = await result.$get("blocks") as Block[];
+              const curBlocks = (await result.$get("blocks")) as Block[];
               const curAnswer = blocks.find(b => b.type === "ANSWER");
               if (curAnswer) {
-                await result.$create("block", {type: "ANSWER_DRAFT", value: curAnswer.value});
+                await result.$create("block", {
+                  type: "ANSWER_DRAFT",
+                  value: curAnswer.value
+                });
               }
             }
 
@@ -483,18 +497,18 @@ const schema = new GraphQLSchema({
       tree: {
         type: treeType,
         args: { id: { type: GraphQLString } },
-        resolve: resolver(Tree),
+        resolve: resolver(Tree)
       },
-      experiments: modelGraphQLFields(new GraphQLList(experimentType), Experiment),
+      experiments: modelGraphQLFields(
+        new GraphQLList(experimentType),
+        Experiment
+      ),
       experiment: {
         type: experimentType,
         args: { id: { type: GraphQLString } },
-        resolve: resolver(Experiment),
+        resolve: resolver(Experiment)
       },
-      pointers: modelGraphQLFields(
-        new GraphQLList(pointerType),
-        Pointer
-      ),
+      pointers: modelGraphQLFields(new GraphQLList(pointerType), Pointer),
       subtreeTimeSpent: {
         type: GraphQLString, // is JSON stringified
         args: { id: { type: GraphQLString } },
@@ -505,7 +519,9 @@ const schema = new GraphQLSchema({
             let timespentOnWorkspace = await workspace.budgetUsedWorkingOnThisWorkspace;
             for (const childId of workspace.childWorkspaceOrder) {
               const child = await Workspace.findByPk(childId);
-              timespentOnWorkspace += await loadDataForEachWorkspaceInSubtree(child);
+              timespentOnWorkspace += await loadDataForEachWorkspaceInSubtree(
+                child
+              );
             }
             cacheForTimeSpentOnWorkspace[workspace.id] = timespentOnWorkspace;
             return timespentOnWorkspace;
@@ -515,8 +531,8 @@ const schema = new GraphQLSchema({
           await loadDataForEachWorkspaceInSubtree(workspace);
 
           return JSON.stringify(cacheForTimeSpentOnWorkspace);
-        },
-      },
+        }
+      }
     }
   }),
   mutation: new GraphQLObjectType({
@@ -530,13 +546,13 @@ const schema = new GraphQLSchema({
           async (_, { oracleMode }) => {
             isInOracleMode.setValue(oracleMode);
           }
-        ),
+        )
       },
       updateBlocks: {
         type: new GraphQLList(blockType),
         args: {
           blocks: { type: new GraphQLList(BlockInput) },
-          experimentId: { type: GraphQLString },
+          experimentId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to update blocks",
@@ -548,9 +564,7 @@ const schema = new GraphQLSchema({
                 continue;
               }
 
-              const workspace = await Workspace.findByPk(
-                block.workspaceId
-              );
+              const workspace = await Workspace.findByPk(block.workspaceId);
 
               if (workspace == null) {
                 throw new Error(
@@ -563,9 +577,7 @@ const schema = new GraphQLSchema({
 
               if (!user.is_admin) {
                 if (!experimentId) {
-                  throw new Error(
-                    "User not participating in an experiment."
-                  );
+                  throw new Error("User not participating in an experiment.");
                 } else {
                   const experiment = await Experiment.findByPk(experimentId);
 
@@ -576,9 +588,7 @@ const schema = new GraphQLSchema({
                   }
 
                   if (!experiment.isActive()) {
-                    throw new Error(
-                      "This experiment is not active."
-                    );
+                    throw new Error("This experiment is not active.");
                   }
 
                   let scheduler;
@@ -589,14 +599,18 @@ const schema = new GraphQLSchema({
                   }
 
                   if (block.type === "QUESTION") {
-                    const idOfCurrentlyActiveUserOfParent = await scheduler.getIdOfCurrentlyActiveUser(workspace.parentId);
+                    const idOfCurrentlyActiveUserOfParent = await scheduler.getIdOfCurrentlyActiveUser(
+                      workspace.parentId
+                    );
                     if (userId !== idOfCurrentlyActiveUserOfParent) {
                       throw new Error(
                         "User is not currently assigned to this workspace."
                       );
                     }
                   } else {
-                    const idOfCurrentlyActiveUser = await scheduler.getIdOfCurrentlyActiveUser(workspace.id);
+                    const idOfCurrentlyActiveUser = await scheduler.getIdOfCurrentlyActiveUser(
+                      workspace.id
+                    );
                     if (userId !== idOfCurrentlyActiveUser) {
                       throw new Error(
                         "User is not currently assigned to this workspace."
@@ -609,33 +623,38 @@ const schema = new GraphQLSchema({
               await block.update({ ..._block });
 
               if (
-                isInOracleMode.getValue()
-                &&
-                !workspace.isEligibleForHonestOracle
-                &&
-                !workspace.isEligibleForMaliciousOracle
-                &&
+                isInOracleMode.getValue() &&
+                !workspace.isEligibleForHonestOracle &&
+                !workspace.isEligibleForMaliciousOracle &&
                 workspace.parentId
               ) {
                 const experiment = await Experiment.findByPk(experimentId);
                 if (experiment === null) {
                   return newBlocks;
                 }
-                const isOracleExperiment = experiment.areNewWorkspacesOracleOnlyByDefault;
+                const isOracleExperiment =
+                  experiment.areNewWorkspacesOracleOnlyByDefault;
                 if (isOracleExperiment) {
-                  const parentWorkspace = await Workspace.findByPk(workspace.parentId);
+                  const parentWorkspace = await Workspace.findByPk(
+                    workspace.parentId
+                  );
                   if (parentWorkspace === null) {
                     return newBlocks;
                   }
 
                   if (parentWorkspace.parentId) {
-                    const grandparentWorkspace = await Workspace.findByPk(parentWorkspace.parentId);
+                    const grandparentWorkspace = await Workspace.findByPk(
+                      parentWorkspace.parentId
+                    );
                     if (grandparentWorkspace === null) {
                       return newBlocks;
                     }
                     const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
                     if (isUpdatingAnswerDraft) {
-                      const blocks = await grandparentWorkspace.$get("blocks", { where: { type: "ANSWER_DRAFT" }}) as Block[];
+                      const blocks = (await grandparentWorkspace.$get(
+                        "blocks",
+                        { where: { type: "ANSWER_DRAFT" } }
+                      )) as Block[];
                       await blocks[0].update({ ..._block });
                     }
                   }
@@ -646,12 +665,12 @@ const schema = new GraphQLSchema({
             }
             return newBlocks;
           }
-        ),
+        )
       },
       createExperiment: {
         type: GraphQLBoolean,
         args: {
-          name: { type: GraphQLString },
+          name: { type: GraphQLString }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to create an experiment",
@@ -659,13 +678,13 @@ const schema = new GraphQLSchema({
             await Experiment.create({ name });
             return true;
           }
-        ),
+        )
       },
       updateExperimentEligibilityRank: {
         type: GraphQLBoolean,
         args: {
           eligibilityRank: { type: GraphQLInt },
-          experimentId: { type: GraphQLString },
+          experimentId: { type: GraphQLString }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's eligibility",
@@ -677,13 +696,13 @@ const schema = new GraphQLSchema({
             await experiment.update({ eligibilityRank });
             return true;
           }
-        ),
+        )
       },
       updateExperimentName: {
         type: GraphQLBoolean,
         args: {
           experimentId: { type: GraphQLString },
-          name: { type: GraphQLString },
+          name: { type: GraphQLString }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's name",
@@ -695,13 +714,13 @@ const schema = new GraphQLSchema({
             await experiment.update({ name });
             return true;
           }
-        ),
+        )
       },
       addTreeToExperiment: {
         type: GraphQLBoolean,
         args: {
           experimentId: { type: GraphQLString },
-          treeId: { type: GraphQLString },
+          treeId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to add a tree to an experiment",
@@ -717,13 +736,13 @@ const schema = new GraphQLSchema({
             await experiment.$add("tree", tree);
             return true;
           }
-        ),
+        )
       },
       removeTreeFromExperiment: {
         type: GraphQLBoolean,
         args: {
           experimentId: { type: GraphQLString },
-          treeId: { type: GraphQLString },
+          treeId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to remove a tree from an experiment",
@@ -739,13 +758,13 @@ const schema = new GraphQLSchema({
             await experiment.$remove("tree", tree);
             return true;
           }
-        ),
+        )
       },
       addOracleToTree: {
         type: GraphQLBoolean,
         args: {
           treeId: { type: GraphQLString },
-          userId: { type: GraphQLString },
+          userId: { type: GraphQLString }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to add an oracle to a tree",
@@ -761,14 +780,14 @@ const schema = new GraphQLSchema({
             await tree.$add("oracle", user);
             return true;
           }
-        ),
+        )
       },
       updateMaliciousnessOfOracle: {
         type: GraphQLBoolean,
         args: {
           treeId: { type: GraphQLString },
           userId: { type: GraphQLString },
-          isMalicious: { type: GraphQLBoolean },
+          isMalicious: { type: GraphQLBoolean }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to toggle the maliciousness of an oracle",
@@ -776,7 +795,7 @@ const schema = new GraphQLSchema({
             const oracleRelation = await UserTreeOracleRelation.findOne({
               where: {
                 UserId: userId,
-                TreeId: treeId,
+                TreeId: treeId
               }
             });
             if (oracleRelation === null) {
@@ -785,13 +804,13 @@ const schema = new GraphQLSchema({
             await oracleRelation.update({ isMalicious });
             return true;
           }
-        ),
+        )
       },
       removeOracleFromTree: {
         type: GraphQLBoolean,
         args: {
           treeId: { type: GraphQLString },
-          userId: { type: GraphQLString },
+          userId: { type: GraphQLString }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to remove an oracle from a tree",
@@ -807,13 +826,13 @@ const schema = new GraphQLSchema({
             await tree.$remove("oracle", user);
             return true;
           }
-        ),
+        )
       },
       addFallbackToExperiment: {
         type: GraphQLBoolean,
         args: {
           experimentId: { type: GraphQLString },
-          fallbackId: { type: GraphQLString },
+          fallbackId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to add a fallback to an experiment",
@@ -829,13 +848,13 @@ const schema = new GraphQLSchema({
             await experiment.$add("fallback", fallback);
             return true;
           }
-        ),
+        )
       },
       removeFallbackFromExperiment: {
         type: GraphQLBoolean,
         args: {
           experimentId: { type: GraphQLString },
-          fallbackId: { type: GraphQLString },
+          fallbackId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to remove a fallback from an experiment",
@@ -851,7 +870,7 @@ const schema = new GraphQLSchema({
             await experiment.$remove("fallback", fallback);
             return true;
           }
-        ),
+        )
       },
       updateWorkspaceChildren: {
         type: workspaceType,
@@ -868,7 +887,7 @@ const schema = new GraphQLSchema({
             }
             return workspace.update({ childWorkspaceOrder });
           }
-        ),
+        )
       },
       updateWorkspaceIsStaleRelativeToUser: {
         type: workspaceType,
@@ -891,17 +910,19 @@ const schema = new GraphQLSchema({
               isNotStaleRelativeToUser.push(userId);
             }
             if (isStale && isNotStaleRelativeToUser.indexOf(userId) > -1) {
-              isNotStaleRelativeToUser = isNotStaleRelativeToUser.filter(uId => uId !== userId);
+              isNotStaleRelativeToUser = isNotStaleRelativeToUser.filter(
+                uId => uId !== userId
+              );
             }
 
             return await workspace.update({ isNotStaleRelativeToUser });
           }
-        ),
+        )
       },
       declineToChallenge: {
         type: GraphQLBoolean,
         args: {
-          id: { type: GraphQLString },
+          id: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to decline to challenge a workspace",
@@ -911,17 +932,23 @@ const schema = new GraphQLSchema({
               return false;
             }
 
-            const parentWorkspace = await Workspace.findByPk(workspace.parentId);
+            const parentWorkspace = await Workspace.findByPk(
+              workspace.parentId
+            );
             if (parentWorkspace === null) {
               return false;
             }
             await parentWorkspace.update({ isCurrentlyResolved: true });
             if (parentWorkspace.parentId) {
-              const grandParent = await Workspace.findByPk(parentWorkspace.parentId);
+              const grandParent = await Workspace.findByPk(
+                parentWorkspace.parentId
+              );
               if (grandParent === null) {
                 return false;
               }
-              const children = await grandParent.$get("childWorkspaces") as Workspace[];
+              const children = (await grandParent.$get(
+                "childWorkspaces"
+              )) as Workspace[];
               let allResolvedOrArchived = true;
               for (const child of children) {
                 if (!(child.isCurrentlyResolved || child.isArchived)) {
@@ -932,7 +959,7 @@ const schema = new GraphQLSchema({
               if (allResolvedOrArchived) {
                 await grandParent.update({
                   isStale: true,
-                  isNotStaleRelativeToUser: [],
+                  isNotStaleRelativeToUser: []
                 });
               }
             }
@@ -957,7 +984,8 @@ const schema = new GraphQLSchema({
 
             const inputWithNoNullOrUndefinedValues = _.omitBy(input, _.isNil);
 
-            const isUserAttemptingToUpdateAtLeastOneField = Object.keys(inputWithNoNullOrUndefinedValues).length > 0;
+            const isUserAttemptingToUpdateAtLeastOneField =
+              Object.keys(inputWithNoNullOrUndefinedValues).length > 0;
 
             if (isUserAttemptingToUpdateAtLeastOneField) {
               const {
@@ -966,7 +994,7 @@ const schema = new GraphQLSchema({
                 isEligibleForHonestOracle,
                 isEligibleForMaliciousOracle,
                 isStale,
-                wasAnsweredByOracle,
+                wasAnsweredByOracle
               } = inputWithNoNullOrUndefinedValues;
 
               const update = {
@@ -974,12 +1002,17 @@ const schema = new GraphQLSchema({
                 isEligibleForHonestOracle,
                 isEligibleForMaliciousOracle,
                 isStale,
-                wasAnsweredByOracle,
+                wasAnsweredByOracle
               };
 
-              const updateWithNoNullOrUndefinedValues = _.omitBy(update, _.isNil);
+              const updateWithNoNullOrUndefinedValues = _.omitBy(
+                update,
+                _.isNil
+              );
 
-              const updatedWorkspace = await workspace.update(updateWithNoNullOrUndefinedValues);
+              const updatedWorkspace = await workspace.update(
+                updateWithNoNullOrUndefinedValues
+              );
 
               // is isStale updated to true
               // then is stale relative to all users as well
@@ -990,24 +1023,33 @@ const schema = new GraphQLSchema({
               if (isCurrentlyResolved) {
                 // determine isOracleExperiment
                 const rootWorkspace = await workspace.getRootWorkspace();
-                const tree = await rootWorkspace.$get("tree") as Tree;
-                const experiments = await tree.$get("experiments") as Experiment[];
+                const tree = (await rootWorkspace.$get("tree")) as Tree;
+                const experiments = (await tree.$get(
+                  "experiments"
+                )) as Experiment[];
                 const experiment = experiments[0];
-                const isOracleExperiment = experiment && experiment.areNewWorkspacesOracleOnlyByDefault;
+                const isOracleExperiment =
+                  experiment && experiment.areNewWorkspacesOracleOnlyByDefault;
 
                 if (!isOracleExperiment || workspace.isRequestingLazyUnlock) {
-                  const updatedWorkspace = await workspace.update({ isCurrentlyResolved });
+                  const updatedWorkspace = await workspace.update({
+                    isCurrentlyResolved
+                  });
 
                   // if is currently resolved updated to true
                   // and workspace has parent, then
                   // if parent workspace has all children resolved
                   // then mark parent workspace as not stale
                   if (updatedWorkspace.parentId) {
-                    const parent = await Workspace.findByPk(updatedWorkspace.parentId);
+                    const parent = await Workspace.findByPk(
+                      updatedWorkspace.parentId
+                    );
                     if (parent === null) {
                       return;
                     }
-                    const children = await parent.$get("childWorkspaces") as Workspace[];
+                    const children = (await parent.$get(
+                      "childWorkspaces"
+                    )) as Workspace[];
                     let allResolvedOrArchived = true;
                     for (const child of children) {
                       if (!(child.isCurrentlyResolved || child.isArchived)) {
@@ -1018,7 +1060,7 @@ const schema = new GraphQLSchema({
                     if (allResolvedOrArchived) {
                       await parent.update({
                         isStale: true,
-                        isNotStaleRelativeToUser: [],
+                        isNotStaleRelativeToUser: []
                       });
                     }
                   }
@@ -1026,34 +1068,44 @@ const schema = new GraphQLSchema({
 
                 if (isOracleExperiment && !workspace.isRequestingLazyUnlock) {
                   if (
-                    !workspace.isEligibleForHonestOracle
-                    &&
-                    !workspace.isEligibleForMaliciousOracle
-                    &&
+                    !workspace.isEligibleForHonestOracle &&
+                    !workspace.isEligibleForMaliciousOracle &&
                     workspace.parentId
                   ) {
-                    const parentWorkspace = await Workspace.findByPk(workspace.parentId);
+                    const parentWorkspace = await Workspace.findByPk(
+                      workspace.parentId
+                    );
                     if (parentWorkspace === null) {
                       return null;
                     }
 
                     if (parentWorkspace.parentId) {
-                      const grandparentWorkspace = await Workspace.findByPk(parentWorkspace.parentId);
+                      const grandparentWorkspace = await Workspace.findByPk(
+                        parentWorkspace.parentId
+                      );
                       if (grandparentWorkspace === null) {
                         return null;
                       }
-                      await grandparentWorkspace.update({ isCurrentlyResolved });
+                      await grandparentWorkspace.update({
+                        isCurrentlyResolved
+                      });
                       if (grandparentWorkspace.parentId) {
-                        const greatGrandparentWorkspace = await Workspace.findByPk(grandparentWorkspace.parentId);
+                        const greatGrandparentWorkspace = await Workspace.findByPk(
+                          grandparentWorkspace.parentId
+                        );
                         if (greatGrandparentWorkspace === null) {
                           return null;
                         }
                         const isNotRoot = greatGrandparentWorkspace.parentId;
                         if (isNotRoot) {
-                          const children = await greatGrandparentWorkspace.$get("childWorkspaces") as Workspace[];
+                          const children = (await greatGrandparentWorkspace.$get(
+                            "childWorkspaces"
+                          )) as Workspace[];
                           let allResolvedOrArchived = true;
                           for (const child of children) {
-                            if (!(child.isCurrentlyResolved || child.isArchived)) {
+                            if (
+                              !(child.isCurrentlyResolved || child.isArchived)
+                            ) {
                               allResolvedOrArchived = false;
                               break;
                             }
@@ -1061,7 +1113,7 @@ const schema = new GraphQLSchema({
                           if (allResolvedOrArchived) {
                             await greatGrandparentWorkspace.update({
                               isStale: true,
-                              isNotStaleRelativeToUser: [],
+                              isNotStaleRelativeToUser: []
                             });
                           }
                         }
@@ -1115,7 +1167,7 @@ const schema = new GraphQLSchema({
             await parent.update({
               isStale: true,
               isNotStaleRelativeToUser: [],
-              allocatedBudget: parent.allocatedBudget - childRemainingBudget,
+              allocatedBudget: parent.allocatedBudget - childRemainingBudget
             });
             await child.update({ totalBudget: child.allocatedBudget });
           }
@@ -1139,7 +1191,7 @@ const schema = new GraphQLSchema({
         args: {
           question: { type: GraphQLJSON },
           totalBudget: { type: GraphQLInt },
-          experimentId: { type: GraphQLString },
+          experimentId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to create a workspace",
@@ -1158,13 +1210,14 @@ const schema = new GraphQLSchema({
                 {
                   totalBudget,
                   creatorId: user.user_id,
-                  isEligibleForMaliciousOracle: experiment.areNewWorkspacesOracleOnlyByDefault,
+                  isEligibleForMaliciousOracle:
+                    experiment.areNewWorkspacesOracleOnlyByDefault
                 }, // TODO replace user.user_id
                 { questionValue: JSON.parse(question) }
               );
 
               const tree = await Tree.create({
-                rootWorkspaceId: workspace.id,
+                rootWorkspaceId: workspace.id
               });
 
               await experiment.$add("tree", tree);
@@ -1180,14 +1233,14 @@ const schema = new GraphQLSchema({
 
             return workspace;
           }
-        ),
+        )
       },
       createChildWorkspace: {
         type: workspaceType,
         args: {
           workspaceId: { type: GraphQLString },
           question: { type: GraphQLJSON },
-          totalBudget: { type: GraphQLInt },
+          totalBudget: { type: GraphQLInt }
         },
         resolve: requireUser(
           "You must be logged in to create a subquestion",
@@ -1202,10 +1255,10 @@ const schema = new GraphQLSchema({
               question: JSON.parse(question),
               totalBudget,
               creatorId: user.user_id,
-              isPublic: isUserAdmin(user),
+              isPublic: isUserAdmin(user)
             });
           }
-        ),
+        )
       },
       updateChildTotalBudget: {
         type: workspaceType,
@@ -1224,12 +1277,12 @@ const schema = new GraphQLSchema({
             const child = await Workspace.findByPk(childId);
             await workspace.changeAllocationToChild(child, totalBudget);
           }
-        ),
+        )
       },
       findNextWorkspace: {
         type: workspaceType,
         args: {
-          experimentId: { type: GraphQLString },
+          experimentId: { type: GraphQLString }
         },
         resolve: async (_, { experimentId }, context) => {
           const user = await userFromContext(context);
@@ -1254,7 +1307,7 @@ const schema = new GraphQLSchema({
       findNextMaybeSuboptimalWorkspace: {
         type: workspaceType,
         args: {
-          experimentId: { type: GraphQLString },
+          experimentId: { type: GraphQLString }
         },
         resolve: async (_, { experimentId }, context) => {
           const user = await userFromContext(context);
@@ -1271,7 +1324,9 @@ const schema = new GraphQLSchema({
             scheduler = await createScheduler(experimentId);
           }
 
-          const workspaceId = await scheduler.assignNextMaybeSuboptimalWorkspace(user.user_id);
+          const workspaceId = await scheduler.assignNextMaybeSuboptimalWorkspace(
+            user.user_id
+          );
 
           return { id: workspaceId };
         }
@@ -1279,7 +1334,7 @@ const schema = new GraphQLSchema({
       leaveCurrentWorkspace: {
         type: GraphQLBoolean,
         args: {
-          experimentId: { type: GraphQLString },
+          experimentId: { type: GraphQLString }
         },
         resolve: requireUser(
           "You must be logged in to leave a workspace",
@@ -1294,13 +1349,13 @@ const schema = new GraphQLSchema({
             await scheduler.leaveCurrentWorkspace(user.user_id);
             return true;
           }
-        ),
+        )
       },
       ejectUserFromCurrentWorkspace: {
         type: GraphQLBoolean,
         args: {
           userId: { type: GraphQLString },
-          workspaceId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to eject a user from a workspace",
@@ -1318,9 +1373,11 @@ const schema = new GraphQLSchema({
 
             const rootWorkspace = curWorkspace;
 
-            const tree = await rootWorkspace.$get("tree") as Tree;
+            const tree = (await rootWorkspace.$get("tree")) as Tree;
 
-            const experiments = await tree.$get("experiments") as Experiment[];
+            const experiments = (await tree.$get(
+              "experiments"
+            )) as Experiment[];
             const experiment = experiments[0];
             const experimentId = experiment.id;
 
@@ -1333,13 +1390,15 @@ const schema = new GraphQLSchema({
 
             // have this guard here in case user has already left this particular workspace
             // and is working on a different one
-            if (scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspaceId)) {
+            if (
+              scheduler.isUserCurrentlyWorkingOnWorkspace(userId, workspaceId)
+            ) {
               await scheduler.leaveCurrentWorkspace(userId);
             }
 
             return true;
           }
-        ),
+        )
       },
       updateWorkspaceIsPublic: {
         type: workspaceType,
@@ -1356,7 +1415,7 @@ const schema = new GraphQLSchema({
             }
             await workspace.update({ isPublic });
           }
-        ),
+        )
       },
       updateWorkspaceIsEligible: {
         type: workspaceType,
@@ -1374,7 +1433,7 @@ const schema = new GraphQLSchema({
             await workspace.update({ isEligibleForAssignment });
             return { id: workspaceId };
           }
-        ),
+        )
       },
       updateWorkspaceHasTimeBudget: {
         type: workspaceType,
@@ -1392,7 +1451,7 @@ const schema = new GraphQLSchema({
             await workspace.update({ hasTimeBudget });
             return { id: workspaceId };
           }
-        ),
+        )
       },
       updateWorkspaceHasIOConstraints: {
         type: workspaceType,
@@ -1410,7 +1469,7 @@ const schema = new GraphQLSchema({
             await workspace.update({ hasIOConstraints });
             return { id: workspaceId };
           }
-        ),
+        )
       },
       updateWorkspaceIsEligibleForOracle: {
         type: workspaceType,
@@ -1427,13 +1486,13 @@ const schema = new GraphQLSchema({
             }
             await workspace.update({ isEligibleForHonestOracle });
           }
-        ),
+        )
       },
       updateAllocatedBudget: {
         type: workspaceType,
         args: {
           workspaceId: { type: GraphQLString },
-          changeToBudget: { type: GraphQLInt },
+          changeToBudget: { type: GraphQLInt }
         },
         resolve: requireUser(
           "You must be logged in to update a workspace's allocated budget",
@@ -1448,18 +1507,22 @@ const schema = new GraphQLSchema({
             );
             await workspace.update({ allocatedBudget: updatedTimeBudget });
           }
-        ),
+        )
       },
       updateTimeSpentOnWorkspace: {
         type: GraphQLBoolean,
         args: {
           doesAffectAllocatedBudget: { type: GraphQLBoolean },
           workspaceId: { type: GraphQLString },
-          secondsSpent: { type: GraphQLInt },
+          secondsSpent: { type: GraphQLInt }
         },
         resolve: requireUser(
           "You must be logged in to update the time spent on a workspace",
-          async (_, { doesAffectAllocatedBudget, workspaceId, secondsSpent }, context) => {
+          async (
+            _,
+            { doesAffectAllocatedBudget, workspaceId, secondsSpent },
+            context
+          ) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
               return false;
@@ -1473,17 +1536,19 @@ const schema = new GraphQLSchema({
 
               await workspace.update({
                 allocatedBudget: updatedTimeBudget,
-                timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent
+                timeSpentOnThisWorkspace:
+                  workspace.timeSpentOnThisWorkspace + secondsSpent
               });
             } else {
               await workspace.update({
-                timeSpentOnThisWorkspace: workspace.timeSpentOnThisWorkspace + secondsSpent,
+                timeSpentOnThisWorkspace:
+                  workspace.timeSpentOnThisWorkspace + secondsSpent
               });
             }
 
             return true;
           }
-        ),
+        )
       },
       updateExperimentMetadata: {
         type: GraphQLBoolean,
@@ -1501,24 +1566,26 @@ const schema = new GraphQLSchema({
             await experiment.update({ metadata: JSON.parse(metadata) });
             return true;
           }
-        ),
+        )
       },
       updateExperimentInstructions: {
         type: GraphQLBoolean,
         args: {
           experimentId: { type: GraphQLString },
           instructions: { type: GraphQLString },
-          type: { type: instructionsEnumType },
+          type: { type: instructionsEnumType }
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment instructions",
           async (_, { experimentId, instructions, type }, context) => {
-            const [instruction, created] = await Instructions.findOrBuild({ where: { experimentId, type } });
+            const [instruction, created] = await Instructions.findOrBuild({
+              where: { experimentId, type }
+            });
             instruction.value = instructions;
             await instruction.save();
             return true;
           }
-        ),
+        )
       },
       updateExperimentDefaultOracle: {
         type: GraphQLBoolean,
@@ -1533,10 +1600,12 @@ const schema = new GraphQLSchema({
             if (experiment === null) {
               return false;
             }
-            await experiment.update({ areNewWorkspacesOracleOnlyByDefault: defaultOracle });
+            await experiment.update({
+              areNewWorkspacesOracleOnlyByDefault: defaultOracle
+            });
             return true;
           }
-        ),
+        )
       },
       markWorkspaceStaleForUser: {
         type: GraphQLBoolean,
@@ -1560,7 +1629,7 @@ const schema = new GraphQLSchema({
 
             return true;
           }
-        ),
+        )
       },
       unlockPointer: {
         type: GraphQLBoolean,
@@ -1571,12 +1640,14 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to unlock a pointer",
           async (_, { pointerId, workspaceId }, context) => {
-            const exportWorkspaceLockRelation = await ExportWorkspaceLockRelation.findOne({
-              where: {
-                pointerId,
-                workspaceId,
+            const exportWorkspaceLockRelation = await ExportWorkspaceLockRelation.findOne(
+              {
+                where: {
+                  pointerId,
+                  workspaceId
+                }
               }
-            });
+            );
 
             if (exportWorkspaceLockRelation) {
               await exportWorkspaceLockRelation.update({ isLocked: false });
@@ -1584,16 +1655,16 @@ const schema = new GraphQLSchema({
               await ExportWorkspaceLockRelation.create({
                 isLocked: false,
                 pointerId,
-                workspaceId,
+                workspaceId
               });
             }
 
             return true;
           }
-        ), // unlock pointer resolver
-      }, // unlockPointer mutation
-    }, // mutation fields
-  }), // mutation: new GraphQLObjectType({...})
+        ) // unlock pointer resolver
+      } // unlockPointer mutation
+    } // mutation fields
+  }) // mutation: new GraphQLObjectType({...})
 }); // const schema = new GraphQLSchema({...})
 
 export { schema };

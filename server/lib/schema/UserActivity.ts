@@ -2,12 +2,10 @@ import {
   GraphQLInt,
   GraphQLList,
   GraphQLObjectType,
-  GraphQLString,
+  GraphQLString
 } from "graphql";
 
-import {
-  workspaceType
-} from "./index";
+import { workspaceType } from "./index";
 
 export const UserActivityType = new GraphQLObjectType({
   name: "UserActivity",
@@ -18,24 +16,23 @@ export const UserActivityType = new GraphQLObjectType({
           name: "Assignment",
           fields: {
             howLongDidAssignmentLast: {
-              type: GraphQLInt,
+              type: GraphQLInt
             },
             startAtTimestamp: {
-              type: GraphQLString,
+              type: GraphQLString
             },
             totalUsersWhoHaveWorkedOnWorkspace: {
-              type: GraphQLInt,
+              type: GraphQLInt
             },
             workspace: {
               type: workspaceType
-            },
-          },
-        }
-        )
+            }
+          }
+        })
       ),
-      resolve: function (userActivity) {
+      resolve: function(userActivity) {
         return userActivity;
       }
-    },
+    }
   }
-})
+});

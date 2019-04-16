@@ -19,7 +19,9 @@ class DistanceFromWorkedOnWorkspaceCache {
       return this.cache.get(workspace.id);
     }
 
-    const distanceFromWorkedOnWorkspace: number = this.calculateDistanceFromWorkedOnWorkspace(workspace);
+    const distanceFromWorkedOnWorkspace: number = this.calculateDistanceFromWorkedOnWorkspace(
+      workspace
+    );
 
     if (distanceFromWorkedOnWorkspace === Infinity) {
       this.weKnowDistanceIsInfinity = true;
@@ -46,7 +48,9 @@ class DistanceFromWorkedOnWorkspaceCache {
     while (queue.length > 0) {
       const curWorkspace = queue.pop();
 
-      const hasUserWorkedOnWorkspace = this.userSchedule.hasUserWorkedOnWorkspace(curWorkspace);
+      const hasUserWorkedOnWorkspace = this.userSchedule.hasUserWorkedOnWorkspace(
+        curWorkspace
+      );
       if (hasUserWorkedOnWorkspace) {
         return curDistance;
       }
@@ -66,9 +70,13 @@ class DistanceFromWorkedOnWorkspaceCache {
 
       // add parent (if there is one) to queue
       if (curWorkspace.parentId) {
-        const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(id => id === curWorkspace.parentId);
+        const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(
+          id => id === curWorkspace.parentId
+        );
         if (!hasBeenAlreadyAdded) {
-          const parent = this.workspacesInTree.find(w => w.id === curWorkspace.parentId);
+          const parent = this.workspacesInTree.find(
+            w => w.id === curWorkspace.parentId
+          );
           queue.unshift(parent);
           idsOfWorkspacesAlreadyAddedToQueue.push(parent.id);
           howManyWorkspacesAddedToQueueThisTime++;
@@ -76,10 +84,14 @@ class DistanceFromWorkedOnWorkspaceCache {
       }
 
       // add children (if there are any) to queue
-      const children = this.workspacesInTree.filter(w => w.parentId && w.parentId === curWorkspace.id);
+      const children = this.workspacesInTree.filter(
+        w => w.parentId && w.parentId === curWorkspace.id
+      );
       if (children.length > 0) {
         children.forEach(child => {
-          const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(id => id === child.id);
+          const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(
+            id => id === child.id
+          );
           if (!hasBeenAlreadyAdded) {
             queue.unshift(child);
             idsOfWorkspacesAlreadyAddedToQueue.push(child.id);
@@ -90,7 +102,7 @@ class DistanceFromWorkedOnWorkspaceCache {
 
       // increment number of workspaces in queue distance+1 away
       howManyNodesAreInQueueCurDistancePlusOneAway += howManyWorkspacesAddedToQueueThisTime;
-      
+
       const isLeavingLevel = howManyNodesAreInQueueCurDistanceAway === 0;
 
       // if we're leaving current level

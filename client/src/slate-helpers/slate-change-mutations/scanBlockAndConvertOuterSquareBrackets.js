@@ -1,6 +1,11 @@
 import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
 
-export function scanBlockAndConvertOuterSquareBrackets ({ change, updateBlock, exportSelection, blockId }) {
+export function scanBlockAndConvertOuterSquareBrackets({
+  change,
+  updateBlock,
+  exportSelection,
+  blockId
+}) {
   const value = change.value;
   const textNodes = value.document.getTexts();
 
@@ -9,7 +14,7 @@ export function scanBlockAndConvertOuterSquareBrackets ({ change, updateBlock, e
     startKey,
     startOffset,
     endKey,
-    endOffset,
+    endOffset
   } = findOutermostSquareBrackets(textNodes);
 
   if (hasBalancedBrackets) {
@@ -21,14 +26,14 @@ export function scanBlockAndConvertOuterSquareBrackets ({ change, updateBlock, e
       startKey,
       startOffset,
       endKey,
-      endOffset,
-     });
+      endOffset
+    });
     return { wasMutationPerformed: true };
   }
   return { wasMutationPerformed: false };
 }
 
-function exportBracketedSelectionFromRange ({
+function exportBracketedSelectionFromRange({
   change,
   updateBlock,
   exportSelection,
@@ -36,42 +41,44 @@ function exportBracketedSelectionFromRange ({
   startKey,
   startOffset,
   endKey,
-  endOffset,
+  endOffset
 }) {
   // delete opening square bracket
-  change.select({
-    anchorKey: startKey,
-    anchorOffset: startOffset,
-    focusKey: startKey,
-    focusOffset: startOffset,
-  })
-  .deleteForward(1)
-  .insertText(POINTER_EDGE_SPACE);
+  change
+    .select({
+      anchorKey: startKey,
+      anchorOffset: startOffset,
+      focusKey: startKey,
+      focusOffset: startOffset
+    })
+    .deleteForward(1)
+    .insertText(POINTER_EDGE_SPACE);
 
   // delete closing square square bracket
   // calculating achorOffset and focusOffset is complicated
   // by the fact that we need watch out for both brackets being
   // in the same text node, in which case deleting the opening square
   // bracket will have changed the offset of the closing square bracket
-  change.select({
-    anchorKey: endKey,
-    anchorOffset: endOffset,
-    focusKey: endKey,
-    focusOffset: endOffset,
-  })
-  .deleteForward(1);
+  change
+    .select({
+      anchorKey: endKey,
+      anchorOffset: endOffset,
+      focusKey: endKey,
+      focusOffset: endOffset
+    })
+    .deleteForward(1);
 
   // select everything that was within the square brackets
   change.select({
     anchorKey: startKey,
     anchorOffset: startOffset,
     focusKey: endKey,
-    focusOffset: endOffset,
+    focusOffset: endOffset
   });
 
   updateBlock({ id: blockId, value: change.value, pointerChanged: false });
   exportSelection(blockId);
-};
+}
 
 function findOutermostSquareBrackets(textNodes) {
   let startKey;
@@ -113,7 +120,7 @@ function findOutermostSquareBrackets(textNodes) {
       startKey,
       startOffset,
       endKey,
-      endOffset,
+      endOffset
     };
   }
 

@@ -75,7 +75,9 @@ export default class Block extends Model<Block> {
   }
 
   public async ensureAllPointersAreInDatabase() {
-    const exportingPointers = await this.$get("exportingPointers") as Pointer[];
+    const exportingPointers = (await this.$get(
+      "exportingPointers"
+    )) as Pointer[];
     const { cachedExportPointerValues } = this;
 
     for (const pointerId of Object.keys(cachedExportPointerValues)) {
@@ -105,24 +107,22 @@ export default class Block extends Model<Block> {
       // If it's marked as resolved, then it's going to transition from
       // from resolved to unresolved, so let's take a snapshot of the draft as the answer
       if (workspace.isCurrentlyResolved) {
-        const blocks = await workspace.$get("blocks") as Block[];
+        const blocks = (await workspace.$get("blocks")) as Block[];
         const answerDraft = blocks.find(b => b.type === "ANSWER_DRAFT");
         const answer = blocks.find(b => b.type === "ANSWER");
 
         if (answer && answerDraft) {
-          await answer.update({value: answerDraft.value});
+          await answer.update({ value: answerDraft.value });
         }
       }
 
       // Mark workspace as stale
       // If it's currently marked as resolved, that it isn't anymore
-      return workspace.update(
-        {
-          isCurrentlyResolved: false,
-          isStale: true,
-          isNotStaleRelativeToUser: []
-        }
-      );
+      return workspace.update({
+        isCurrentlyResolved: false,
+        isStale: true,
+        isNotStaleRelativeToUser: []
+      });
     }
   }
 
@@ -189,9 +189,7 @@ export default class Block extends Model<Block> {
     for (const pointerJSON of pointers) {
       results[pointerJSON.data.pointerId] = pointerJSON;
 
-      const pointer = await Pointer.findByPk(
-        pointerJSON.data.pointerId
-      );
+      const pointer = await Pointer.findByPk(pointerJSON.data.pointerId);
 
       if (pointer) {
         await pointer.update({ cachedValue: pointerJSON });

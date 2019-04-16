@@ -5,7 +5,7 @@ import {
   Model,
   ForeignKey,
   BelongsTo,
-  DataType,
+  DataType
 } from "sequelize-typescript";
 import Workspace from "./workspace";
 import Experiment from "./experiment";

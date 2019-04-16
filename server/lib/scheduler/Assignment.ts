@@ -20,8 +20,8 @@ class Assignment {
     endAtTimestamp,
     userId,
     workspace,
-    isAlreadySavedToDb = false,
-  }){
+    isAlreadySavedToDb = false
+  }) {
     this.updateAssignment = updateAssignment;
     this.experimentId = experimentId;
     this.isOracle = isOracle;
@@ -39,7 +39,7 @@ class Assignment {
         startAtTimestamp,
         endAtTimestamp: null,
         isOracle,
-        isTimed,
+        isTimed
       });
     }
   }
@@ -49,7 +49,7 @@ class Assignment {
   }
 
   public hasEnded() {
-    return !!this.endAtTimestamp && Date.now() - this.endAtTimestamp > 3*1000;
+    return !!this.endAtTimestamp && Date.now() - this.endAtTimestamp > 3 * 1000;
   }
 
   public getWorkspace() {

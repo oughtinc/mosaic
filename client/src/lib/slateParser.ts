@@ -12,7 +12,7 @@ export function databaseJSONToValue(databaseJson: any) {
       document: {
         object: "document",
         data: {},
-        nodes: [].concat(databaseJson),
+        nodes: [].concat(databaseJson)
       }
     };
   } else {
@@ -20,14 +20,22 @@ export function databaseJSONToValue(databaseJson: any) {
   }
 }
 
-export function listOfSlateNodesToText(list: Array<any>, shouldTurnExportsIntoImports: boolean) {
-  const arrayOfStrings = _.map(list, x => slateNodeToText(x, shouldTurnExportsIntoImports));
+export function listOfSlateNodesToText(
+  list: Array<any>,
+  shouldTurnExportsIntoImports: boolean
+) {
+  const arrayOfStrings = _.map(list, x =>
+    slateNodeToText(x, shouldTurnExportsIntoImports)
+  );
   const trimmedArrayOfStrings = _.map(arrayOfStrings, _.trim);
   const joinedTrimmedArrayOfStrings = trimmedArrayOfStrings.join(" ");
   return joinedTrimmedArrayOfStrings;
 }
 
-export function slateNodeToText(node: any, shouldTurnExportsIntoImports: boolean) {
+export function slateNodeToText(
+  node: any,
+  shouldTurnExportsIntoImports: boolean
+) {
   let prefix = "";
   let mid = "";
   let suffix = "";

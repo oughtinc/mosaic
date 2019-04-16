@@ -51,12 +51,7 @@ export default class Experiment extends Model<Experiment> {
   @Column(DataType.BOOLEAN)
   public areNewWorkspacesOracleOnlyByDefault: boolean;
 
-  @BelongsToMany(
-    () => Tree,
-    "ExperimentTreeRelation",
-    "ExperimentId",
-    "TreeId"
-  )
+  @BelongsToMany(() => Tree, "ExperimentTreeRelation", "ExperimentId", "TreeId")
   public trees: Tree[];
 
   @BelongsToMany(
@@ -73,13 +68,41 @@ export default class Experiment extends Model<Experiment> {
   @AfterCreate
   public static async createDefaultInstructions(experiment: Experiment) {
     await Instructions.bulkCreate([
-      { experimentId: experiment.id, type: "root", value: defaultRootInstructions },
-      { experimentId: experiment.id, type: "honestOracle", value: defaultHonestOracleInstructions },
-      { experimentId: experiment.id, type: "maliciousOracle", value: defaultMaliciousOracleInstructions },
-      { experimentId: experiment.id, type: "returningRoot", value: defaultReturningRootInstructions },
-      { experimentId: experiment.id, type: "returningHonestOracle", value: defaultReturningHonestOracleInstructions },
-      { experimentId: experiment.id, type: "returningMaliciousOracle", value: defaultReturningMaliciousOracleInstructions },
-      { experimentId: experiment.id, type: "lazyPointerUnlock", value: defaultLazyPointerUnlockInstructions },
+      {
+        experimentId: experiment.id,
+        type: "root",
+        value: defaultRootInstructions
+      },
+      {
+        experimentId: experiment.id,
+        type: "honestOracle",
+        value: defaultHonestOracleInstructions
+      },
+      {
+        experimentId: experiment.id,
+        type: "maliciousOracle",
+        value: defaultMaliciousOracleInstructions
+      },
+      {
+        experimentId: experiment.id,
+        type: "returningRoot",
+        value: defaultReturningRootInstructions
+      },
+      {
+        experimentId: experiment.id,
+        type: "returningHonestOracle",
+        value: defaultReturningHonestOracleInstructions
+      },
+      {
+        experimentId: experiment.id,
+        type: "returningMaliciousOracle",
+        value: defaultReturningMaliciousOracleInstructions
+      },
+      {
+        experimentId: experiment.id,
+        type: "lazyPointerUnlock",
+        value: defaultLazyPointerUnlockInstructions
+      }
     ]);
   }
 

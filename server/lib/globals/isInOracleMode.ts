@@ -1,5 +1,5 @@
 interface GlobalVariable {
-  value: boolean
+  value: boolean;
 }
 
 class GlobalVariable {
