@@ -19,8 +19,8 @@ script:
   - yarn lint
   - yarn db:create
   - yarn db:migrate
-  - yarn test:ci
+#  - yarn test:ci
   - cd ../client
   - yarn lint
   - yarn test
-  - yarn test:cypress
+#  - yarn test:cypress
