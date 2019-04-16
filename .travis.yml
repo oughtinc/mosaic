@@ -19,7 +19,7 @@ script:
   - yarn lint
   - yarn db:create
   - yarn db:migrate
-  - yarn test
+  - yarn test:ci
   - cd ../client
   - yarn lint
   - yarn test
