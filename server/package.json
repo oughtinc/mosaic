@@ -22,8 +22,8 @@
     "db:seed": "node_modules/.bin/sequelize db:seed:all",
     "db:reset": "yarn run db:clear; yarn run db:migrate",
     "db:clear": "yarn run db:drop; yarn run db:create",
-    "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register test/**/*.spec.ts",
-    "test:ci": "NODE_ENV=test mocha -r ts-node/register test/**/*.spec.ts",
+    "test": "NODE_ENV=test mocha --watch --watch-extensions ts -r ts-node/register/transpile-only test/**/*.spec.ts",
+    "test:ci": "NODE_ENV=test mocha -r ts-node/register/transpile-only test/**/*.spec.ts",
     "test-scheduler": "mocha --watch --watch-extensions ts -r ts-node/register test/lib/scheduler/*.spec.ts",
     "lint": "prettier -c lib/**/*.ts lib/**/*.js",
     "pretest": "NODE_ENV=test npm run db:reset"
