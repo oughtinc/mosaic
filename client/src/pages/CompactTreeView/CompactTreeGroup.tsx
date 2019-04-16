@@ -166,6 +166,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
         style={{
           backgroundColor: "#fbfbfb ",
           border: "1px solid #ddd",
+          borderLeft: "2px solid #bbb",
           borderRadius: "3px",
           boxShadow: "inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05)",
           marginTop: "35px",

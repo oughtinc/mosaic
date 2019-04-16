@@ -9,7 +9,7 @@ export class CompactTreeRowLabel extends React.PureComponent<any, any> {
           fontWeight: 600,
           paddingRight: "10px",
           textAlign: "right",
-          minWidth: "60px",
+          minWidth: "50px",
           verticalAlign: "middle",
         }}
       >
