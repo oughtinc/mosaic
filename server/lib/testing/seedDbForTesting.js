@@ -9,38 +9,38 @@ export async function seedDbForTesting() {
       id: uuidv4(),
       creatorId: "asdf",
       totalBudget: 90,
-      isPublic: true
+      isPublic: true,
     },
     {
       questionValue: generateQuestionValueFromString(
-        "This is a public question."
-      )
-    }
+        "This is a public question.",
+      ),
+    },
   );
 
   await models.Workspace.create(
     {
       id: uuidv4(),
       creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
-      totalBudget: 90
+      totalBudget: 90,
     },
     {
       questionValue: generateQuestionValueFromString(
-        "This is not public, but created by 'typical user'."
-      )
-    }
+        "This is not public, but created by 'typical user'.",
+      ),
+    },
   );
 
   await models.Workspace.create(
     {
       id: uuidv4(),
       creatorId: "asdf",
-      totalBudget: 90
+      totalBudget: 90,
     },
     {
       questionValue: generateQuestionValueFromString(
-        "This is not a public question."
-      )
-    }
+        "This is not a public question.",
+      ),
+    },
   );
 }

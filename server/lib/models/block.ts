@@ -10,7 +10,7 @@ import {
   HasMany,
   ForeignKey,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
 import Workspace from "./workspace";
@@ -26,7 +26,7 @@ export default class Block extends Model<Block> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 
@@ -36,9 +36,9 @@ export default class Block extends Model<Block> {
       "ANSWER",
       "SCRATCHPAD",
       "SUBQUESTION_DRAFT",
-      "ANSWER_DRAFT"
+      "ANSWER_DRAFT",
     ),
-    allowNull: false
+    allowNull: false,
   })
   public type: string;
 
@@ -76,7 +76,7 @@ export default class Block extends Model<Block> {
 
   public async ensureAllPointersAreInDatabase() {
     const exportingPointers = (await this.$get(
-      "exportingPointers"
+      "exportingPointers",
     )) as Pointer[];
     const { cachedExportPointerValues } = this;
 
@@ -121,7 +121,7 @@ export default class Block extends Model<Block> {
       return workspace.update({
         isCurrentlyResolved: false,
         isStale: true,
-        isNotStaleRelativeToUser: []
+        isNotStaleRelativeToUser: [],
       });
     }
   }
@@ -135,7 +135,7 @@ export default class Block extends Model<Block> {
     let allPointers = [...pointers];
     for (const pointer of pointers) {
       const subPointers = await pointer.containedPointers({
-        pointersSoFar: _.unionBy(pointersSoFar, allPointers, "id")
+        pointersSoFar: _.unionBy(pointersSoFar, allPointers, "id"),
       });
       allPointers = [...allPointers, ...subPointers];
     }
@@ -148,7 +148,7 @@ export default class Block extends Model<Block> {
     if (pointersSoFar) {
       topLevelPointerIds = _.difference(
         topLevelPointerIds,
-        _.map(pointersSoFar, _.property("id"))
+        _.map(pointersSoFar, _.property("id")),
       );
     }
 
@@ -159,7 +159,7 @@ export default class Block extends Model<Block> {
         pointers.push(pointer);
       } else {
         console.error(
-          `Referenced pointer with ID ${id} not found in database.`
+          `Referenced pointer with ID ${id} not found in database.`,
         );
       }
     }
@@ -172,7 +172,7 @@ export default class Block extends Model<Block> {
     }
     const _getInlinesAsArray = getAllInlinesAsArray(this.dataValues.value);
     const pointers = _getInlinesAsArray.filter(
-      l => l.type === "pointerImport" || l.type === "pointerExport"
+      l => l.type === "pointerImport" || l.type === "pointerExport",
     );
     return pointers.map(p => p.data.pointerId);
   }

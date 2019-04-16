@@ -11,7 +11,7 @@ class RootParentCache {
   public async getRootParentOfWorkspace(workspace: Workspace) {
     const workspaceAlreadyCached = _.some(
       [...this.cache],
-      ([workspaceId, rootParentId]) => workspaceId === workspace.id
+      ([workspaceId, rootParentId]) => workspaceId === workspace.id,
     );
 
     if (workspaceAlreadyCached) {

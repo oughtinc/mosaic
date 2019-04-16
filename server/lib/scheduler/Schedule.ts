@@ -24,7 +24,7 @@ class Schedule {
     fetchAllAssignmentsInExperiment,
     DistanceFromWorkedOnWorkspaceCache,
     rootParentCache,
-    timeLimit
+    timeLimit,
   }) {
     this.createAssignment = createAssignment;
     this.updateAssignment = updateAssignment;
@@ -46,7 +46,7 @@ class Schedule {
         workspace,
         experimentId,
         isOracle,
-        isTimed
+        isTimed,
       } = assignment;
 
       this.createUserScheduleIfNotCreated(userId);
@@ -59,7 +59,7 @@ class Schedule {
         workspace,
         experimentId,
         isOracle,
-        isTimed
+        isTimed,
       });
     }
   }
@@ -74,10 +74,10 @@ class Schedule {
         totalUsersWhoHaveWorkedOnWorkspace: [...this.schedule].filter(
           ([userId, curUserSchedule]) => {
             return curUserSchedule.hasUserWorkedOnWorkspace(
-              assignment.workspace
+              assignment.workspace,
             );
-          }
-        ).length
+          },
+        ).length,
       };
     });
     return userActivityWithMoreStats;
@@ -99,7 +99,7 @@ class Schedule {
         .DistanceFromWorkedOnWorkspaceCache,
       rootParentCache: this.rootParentCache,
       timeLimit: this.timeLimit,
-      userId
+      userId,
     });
 
     this.schedule.set(userId, userSchedule);
@@ -115,7 +115,7 @@ class Schedule {
     workspace,
     startAtTimestamp = Date.now(),
     isOracle = false,
-    isLastAssignmentTimed
+    isLastAssignmentTimed,
   }) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
@@ -124,10 +124,10 @@ class Schedule {
       workspace,
       startAtTimestamp,
       isOracle,
-      isLastAssignmentTimed
+      isLastAssignmentTimed,
     );
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(
-      workspace
+      workspace,
     );
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
   }
@@ -161,7 +161,7 @@ class Schedule {
   */
   public getTreesWorkedOnLeastRecently(rootWorkspaces) {
     const treesNotYetWorkedOn = rootWorkspaces.filter(
-      r => this.lastWorkedOnTimestampForTree[r.id] === undefined
+      r => this.lastWorkedOnTimestampForTree[r.id] === undefined,
     );
 
     if (treesNotYetWorkedOn.length > 0) {
@@ -169,13 +169,13 @@ class Schedule {
     }
 
     const lastWorkedOnTimestamps = rootWorkspaces.map(
-      r => this.lastWorkedOnTimestampForTree[r.id]
+      r => this.lastWorkedOnTimestampForTree[r.id],
     );
 
     const minTimestamp = Math.min.apply(Math, lastWorkedOnTimestamps);
 
     const leastRecentlyWorkedOnTrees = rootWorkspaces.filter(
-      r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp
+      r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp,
     );
 
     return leastRecentlyWorkedOnTrees;
@@ -195,13 +195,13 @@ class Schedule {
 
   public isWorkspaceCurrentlyBeingWorkedOn(workspace) {
     return _.some([...this.schedule], ([userId, userSchedule]) =>
-      userSchedule.isUserCurrentlyWorkingOnWorkspace(workspace)
+      userSchedule.isUserCurrentlyWorkingOnWorkspace(workspace),
     );
   }
 
   public getIdOfCurrentlyActiveUserForWorkspace(workspaceId) {
     const bitOfSchedule = _.find([...this.schedule], ([userId, userSchedule]) =>
-      userSchedule.isUserCurrentlyWorkingOnWorkspace(workspaceId)
+      userSchedule.isUserCurrentlyWorkingOnWorkspace(workspaceId),
     );
 
     if (!bitOfSchedule) {
@@ -215,7 +215,7 @@ class Schedule {
 
   public hasWorkspaceBeenWorkedOnYet(workspace) {
     return _.some([...this.schedule], ([userId, userSchedule]) =>
-      userSchedule.hasUserWorkedOnWorkspace(workspace)
+      userSchedule.hasUserWorkedOnWorkspace(workspace),
     );
   }
 
@@ -226,8 +226,8 @@ class Schedule {
   public getAllAssignmentsForWorkspace(workspace) {
     return _.flatten(
       _.map([...this.schedule], ([userId, userSchedule]) =>
-        userSchedule.getAssignmentsForWorkspace(workspace)
-      )
+        userSchedule.getAssignmentsForWorkspace(workspace),
+      ),
     );
   }
 
@@ -236,7 +236,7 @@ class Schedule {
     userId,
     shouldResetCache = true,
     workspaces,
-    workspacesInTree
+    workspacesInTree,
   }) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
@@ -244,7 +244,7 @@ class Schedule {
       minDist,
       shouldResetCache,
       workspaces,
-      workspacesInTree
+      workspacesInTree,
     });
   }
 
@@ -253,7 +253,7 @@ class Schedule {
     shouldResetCache = true,
     userId,
     workspaces,
-    workspacesInTree
+    workspacesInTree,
   }) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
@@ -261,7 +261,7 @@ class Schedule {
       minDist,
       shouldResetCache,
       workspaces,
-      workspacesInTree
+      workspacesInTree,
     });
   }
 

@@ -20,7 +20,7 @@ class DistanceFromWorkedOnWorkspaceCache {
     }
 
     const distanceFromWorkedOnWorkspace: number = this.calculateDistanceFromWorkedOnWorkspace(
-      workspace
+      workspace,
     );
 
     if (distanceFromWorkedOnWorkspace === Infinity) {
@@ -49,7 +49,7 @@ class DistanceFromWorkedOnWorkspaceCache {
       const curWorkspace = queue.pop();
 
       const hasUserWorkedOnWorkspace = this.userSchedule.hasUserWorkedOnWorkspace(
-        curWorkspace
+        curWorkspace,
       );
       if (hasUserWorkedOnWorkspace) {
         return curDistance;
@@ -59,7 +59,7 @@ class DistanceFromWorkedOnWorkspaceCache {
       if (workspaceAlreadyCached) {
         upperBoundForDistanceAwayFromWorkedOnWorkspace = Math.min(
           upperBoundForDistanceAwayFromWorkedOnWorkspace,
-          this.cache.get(curWorkspace.id) + curDistance
+          this.cache.get(curWorkspace.id) + curDistance,
         );
       }
 
@@ -71,11 +71,11 @@ class DistanceFromWorkedOnWorkspaceCache {
       // add parent (if there is one) to queue
       if (curWorkspace.parentId) {
         const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(
-          id => id === curWorkspace.parentId
+          id => id === curWorkspace.parentId,
         );
         if (!hasBeenAlreadyAdded) {
           const parent = this.workspacesInTree.find(
-            w => w.id === curWorkspace.parentId
+            w => w.id === curWorkspace.parentId,
           );
           queue.unshift(parent);
           idsOfWorkspacesAlreadyAddedToQueue.push(parent.id);
@@ -85,12 +85,12 @@ class DistanceFromWorkedOnWorkspaceCache {
 
       // add children (if there are any) to queue
       const children = this.workspacesInTree.filter(
-        w => w.parentId && w.parentId === curWorkspace.id
+        w => w.parentId && w.parentId === curWorkspace.id,
       );
       if (children.length > 0) {
         children.forEach(child => {
           const hasBeenAlreadyAdded = idsOfWorkspacesAlreadyAddedToQueue.find(
-            id => id === child.id
+            id => id === child.id,
           );
           if (!hasBeenAlreadyAdded) {
             queue.unshift(child);

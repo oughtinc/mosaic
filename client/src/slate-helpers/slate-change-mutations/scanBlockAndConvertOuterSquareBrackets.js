@@ -4,7 +4,7 @@ export function scanBlockAndConvertOuterSquareBrackets({
   change,
   updateBlock,
   exportSelection,
-  blockId
+  blockId,
 }) {
   const value = change.value;
   const textNodes = value.document.getTexts();
@@ -14,7 +14,7 @@ export function scanBlockAndConvertOuterSquareBrackets({
     startKey,
     startOffset,
     endKey,
-    endOffset
+    endOffset,
   } = findOutermostSquareBrackets(textNodes);
 
   if (hasBalancedBrackets) {
@@ -26,7 +26,7 @@ export function scanBlockAndConvertOuterSquareBrackets({
       startKey,
       startOffset,
       endKey,
-      endOffset
+      endOffset,
     });
     return { wasMutationPerformed: true };
   }
@@ -41,7 +41,7 @@ function exportBracketedSelectionFromRange({
   startKey,
   startOffset,
   endKey,
-  endOffset
+  endOffset,
 }) {
   // delete opening square bracket
   change
@@ -49,7 +49,7 @@ function exportBracketedSelectionFromRange({
       anchorKey: startKey,
       anchorOffset: startOffset,
       focusKey: startKey,
-      focusOffset: startOffset
+      focusOffset: startOffset,
     })
     .deleteForward(1)
     .insertText(POINTER_EDGE_SPACE);
@@ -64,7 +64,7 @@ function exportBracketedSelectionFromRange({
       anchorKey: endKey,
       anchorOffset: endOffset,
       focusKey: endKey,
-      focusOffset: endOffset
+      focusOffset: endOffset,
     })
     .deleteForward(1);
 
@@ -73,7 +73,7 @@ function exportBracketedSelectionFromRange({
     anchorKey: startKey,
     anchorOffset: startOffset,
     focusKey: endKey,
-    focusOffset: endOffset
+    focusOffset: endOffset,
   });
 
   updateBlock({ id: blockId, value: change.value, pointerChanged: false });
@@ -120,7 +120,7 @@ function findOutermostSquareBrackets(textNodes) {
       startKey,
       startOffset,
       endKey,
-      endOffset
+      endOffset,
     };
   }
 

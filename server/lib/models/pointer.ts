@@ -8,7 +8,7 @@ import {
   ForeignKey,
   HasOne,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import Block from "./block";
 import PointerImport from "./pointerImport";
@@ -19,7 +19,7 @@ export default class Pointer extends Model<Pointer> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 
@@ -59,12 +59,12 @@ export default class Pointer extends Model<Pointer> {
 
   public async containedPointers({ pointersSoFar } = {}) {
     const directPointers = await this.directContainedPointers({
-      pointersSoFar
+      pointersSoFar,
     });
     const allPointers: any = [...directPointers];
     for (const pointer of allPointers) {
       const directImports = await pointer.directContainedPointers({
-        pointersSoFar: _.join(allPointers, pointersSoFar)
+        pointersSoFar: _.join(allPointers, pointersSoFar),
       });
       directImports
         .filter(p => !_.includes(allPointers.map(p => p.id), p.id))
@@ -80,16 +80,16 @@ export default class Pointer extends Model<Pointer> {
     if (pointersSoFar) {
       pointerIds = _.difference(
         pointerIds,
-        _.map(pointersSoFar, _.property("id"))
+        _.map(pointersSoFar, _.property("id")),
       );
     }
 
     const pointers = await Pointer.findAll({
       where: {
         id: {
-          [Op.in]: _.uniq(pointerIds)
-        }
-      }
+          [Op.in]: _.uniq(pointerIds),
+        },
+      },
     });
     return pointers;
   }

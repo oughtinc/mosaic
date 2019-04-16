@@ -37,8 +37,8 @@ export class NewExperimentFormPresentational extends React.Component<any, any> {
         <BlockContainer>
           <BlockHeader>New Experiment</BlockHeader>
           <BlockBody>
-            <FormControl 
-              componentClass="textarea" 
+            <FormControl
+              componentClass="textarea"
               onChange={this.onExperimentNameChange}
               placeholder="name of experiment (metadata can be added later on the Experiments page)"
               value={this.state.experimentName}
@@ -65,7 +65,7 @@ export class NewExperimentFormPresentational extends React.Component<any, any> {
       </div>
     );
   }
-  
+
   private onExperimentNameChange = e => {
     this.setState({ experimentName: e.target.value });
   };
@@ -74,13 +74,13 @@ export class NewExperimentFormPresentational extends React.Component<any, any> {
     const isSuccessful = await this.props.createExperimentMutation({
       variables: {
         name: this.state.experimentName,
-      }
+      },
     });
     if (isSuccessful) {
       this.setState({
         experimentName: "",
       });
-    } 
+    }
   };
 }
 
@@ -94,7 +94,7 @@ export const NewExperimentForm: any = compose(
   graphql(CREATE_EXPERIMENT, {
     name: "createExperimentMutation",
     options: {
-      refetchQueries: ["experiments"]
-    }
-  })
+      refetchQueries: ["experiments"],
+    },
+  }),
 )(NewExperimentFormPresentational);

@@ -30,7 +30,7 @@ testingRoutes.post(
       await seedDbForTestingIOConstraintsScheduling();
     }
     res.end();
-  }
+  },
 );
 
 testingRoutes.post("/__seedDbForOracles", async (req, res, next) => {

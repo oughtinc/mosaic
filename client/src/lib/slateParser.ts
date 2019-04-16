@@ -12,8 +12,8 @@ export function databaseJSONToValue(databaseJson: any) {
       document: {
         object: "document",
         data: {},
-        nodes: [].concat(databaseJson)
-      }
+        nodes: [].concat(databaseJson),
+      },
     };
   } else {
     return Plain.deserialize("");
@@ -22,10 +22,10 @@ export function databaseJSONToValue(databaseJson: any) {
 
 export function listOfSlateNodesToText(
   list: Array<any>,
-  shouldTurnExportsIntoImports: boolean
+  shouldTurnExportsIntoImports: boolean,
 ) {
   const arrayOfStrings = _.map(list, x =>
-    slateNodeToText(x, shouldTurnExportsIntoImports)
+    slateNodeToText(x, shouldTurnExportsIntoImports),
   );
   const trimmedArrayOfStrings = _.map(arrayOfStrings, _.trim);
   const joinedTrimmedArrayOfStrings = trimmedArrayOfStrings.join(" ");
@@ -34,7 +34,7 @@ export function listOfSlateNodesToText(
 
 export function slateNodeToText(
   node: any,
-  shouldTurnExportsIntoImports: boolean
+  shouldTurnExportsIntoImports: boolean,
 ) {
   let prefix = "";
   let mid = "";

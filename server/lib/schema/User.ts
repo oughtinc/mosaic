@@ -5,19 +5,19 @@ export const UserType = new GraphQLObjectType({
   fields: {
     id: {
       type: GraphQLString,
-      resolve: user => user.id
+      resolve: user => user.id,
     },
     familyName: {
       type: GraphQLString,
-      resolve: user => user.familyName
+      resolve: user => user.familyName,
     },
     givenName: {
       type: GraphQLString,
-      resolve: user => user.givenName
+      resolve: user => user.givenName,
     },
     email: {
       type: GraphQLString,
-      resolve: user => user.email
-    }
-  }
+      resolve: user => user.email,
+    },
+  },
 });

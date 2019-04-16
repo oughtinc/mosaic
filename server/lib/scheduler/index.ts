@@ -24,7 +24,7 @@ const NINETY_SECONDS = 1000 * 90;
 const fetchAllWorkspacesInTree = async rootWorkspace => {
   const result = [rootWorkspace];
   const children = await rootWorkspace.getChildWorkspaces({
-    where: { isArchived: false }
+    where: { isArchived: false },
   });
 
   for (const child of children) {
@@ -41,8 +41,8 @@ export async function createScheduler(experimentId) {
     fetchAllAssignmentsInExperiment: async () => {
       const assignments = await Assignment.findAll({
         where: {
-          experimentId
-        }
+          experimentId,
+        },
       });
       const enhancedAssignments = await map(assignments, async a => {
         const workspace = await Workspace.findByPk(a.workspaceId);
@@ -52,9 +52,9 @@ export async function createScheduler(experimentId) {
             startAtTimestamp: Number(a.dataValues.startAtTimestamp),
             endAtTimestamp: a.dataValues.endAtTimestamp
               ? Number(a.dataValues.endAtTimestamp)
-              : Date.now()
+              : Date.now(),
           },
-          workspace
+          workspace,
         };
       });
 
@@ -77,7 +77,7 @@ export async function createScheduler(experimentId) {
     },
     DistanceFromWorkedOnWorkspaceCache,
     rootParentCache: new RootParentCache(),
-    timeLimit: NINETY_SECONDS
+    timeLimit: NINETY_SECONDS,
   });
 
   await schedule.initialize();
@@ -90,8 +90,8 @@ export async function createScheduler(experimentId) {
       const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
         where: {
           TreeId: tree.id,
-          UserId: userId
-        }
+          UserId: userId,
+        },
       });
       return userTreeOracleRelation && !userTreeOracleRelation.isMalicious;
     },
@@ -100,8 +100,8 @@ export async function createScheduler(experimentId) {
       const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
         where: {
           TreeId: tree.id,
-          UserId: userId
-        }
+          UserId: userId,
+        },
       });
       return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
     },
@@ -109,15 +109,15 @@ export async function createScheduler(experimentId) {
       const rootWorkspaces = await Workspace.findAll({
         where: {
           parentId: null,
-          isArchived: false
-        }
+          isArchived: false,
+        },
       });
 
       const eligibleRootWorkspaces = await filter(rootWorkspaces, async w => {
         const tree = await Tree.findOne({
           where: {
-            rootWorkspaceId: w.id
-          }
+            rootWorkspaceId: w.id,
+          },
         });
 
         if (!tree) {
@@ -161,7 +161,7 @@ export async function createScheduler(experimentId) {
     NumberOfStaleDescendantsCache,
     RemainingBudgetAmongDescendantsCache,
     rootParentCache: new RootParentCache(),
-    timeLimit: NINETY_SECONDS
+    timeLimit: NINETY_SECONDS,
   });
 
   schedulers.set(experimentId, scheduler);

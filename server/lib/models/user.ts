@@ -3,7 +3,7 @@ import {
   Column,
   DataType,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
 import Tree from "./tree";
@@ -15,7 +15,7 @@ export default class User extends Model<User> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 

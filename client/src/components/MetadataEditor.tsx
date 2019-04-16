@@ -17,29 +17,27 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
     isSavePending: false,
     didSaveJustSuccesfullyOccur: false,
     value: this.props.valueAsJSON
-      ?
-      Value.fromJSON(this.props.valueAsJSON)
-      :
-      Value.fromJSON({
-        document: {
-          nodes: [
-            {
-              object: "block",
-              type: "paragraph",
-              nodes: [
-                {
-                  object: "text",
-                  leaves: [
-                    {
-                      text: ""
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      }),
+      ? Value.fromJSON(this.props.valueAsJSON)
+      : Value.fromJSON({
+          document: {
+            nodes: [
+              {
+                object: "block",
+                type: "paragraph",
+                nodes: [
+                  {
+                    object: "text",
+                    leaves: [
+                      {
+                        text: "",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        }),
   };
 
   public render() {
@@ -55,53 +53,50 @@ export class MetaDataEditorPresentational extends React.Component<any, any> {
           }}
           value={this.state.value}
         />
-        {
-          Auth.isAdmin()
-          &&
+        {Auth.isAdmin() && (
           <Button
             bsSize="xsmall"
             bsStyle="primary"
-            disabled={this.state.isSavePending || this.state.didSaveJustSuccesfullyOccur}
+            disabled={
+              this.state.isSavePending || this.state.didSaveJustSuccesfullyOccur
+            }
             onClick={this.onSave}
           >
-            {
-              this.state.isSavePending
-              ?
-              "Saving..."
-              :
-              (
-                this.state.didSaveJustSuccesfullyOccur
-                ?
-                "Saved!"
-                :
-                "Save"
-              )
-            }
+            {this.state.isSavePending
+              ? "Saving..."
+              : this.state.didSaveJustSuccesfullyOccur
+              ? "Saved!"
+              : "Save"}
           </Button>
-        }
+        )}
       </div>
     );
   }
 
   private onChange = change => this.setState({ value: change.value });
-  
+
   private onSave = () => {
-    this.setState({ isSavePending: true}, async () => {
+    this.setState({ isSavePending: true }, async () => {
       await this.props.updateExperimentMetadataMutation({
         variables: {
           experimentId: this.props.experimentId,
           metadata: JSON.stringify(this.state.value.toJSON()),
-        }
+        },
       });
-      this.setState({
-        didSaveJustSuccesfullyOccur: true,
-        isSavePending: false,
-      }, () => {
-        setTimeout(() => this.setState({ didSaveJustSuccesfullyOccur: false }), 1000);
-      });
+      this.setState(
+        {
+          didSaveJustSuccesfullyOccur: true,
+          isSavePending: false,
+        },
+        () => {
+          setTimeout(
+            () => this.setState({ didSaveJustSuccesfullyOccur: false }),
+            1000,
+          );
+        },
+      );
     });
-  }
-
+  };
 }
 
 const UPDATE_EXPERIMENT_METADATA_MUTATION = gql`
@@ -112,6 +107,6 @@ const UPDATE_EXPERIMENT_METADATA_MUTATION = gql`
 
 export const MetaDataEditor: any = compose(
   graphql(UPDATE_EXPERIMENT_METADATA_MUTATION, {
-      name: "updateExperimentMetadataMutation",
-  })
+    name: "updateExperimentMetadataMutation",
+  }),
 )(MetaDataEditorPresentational);

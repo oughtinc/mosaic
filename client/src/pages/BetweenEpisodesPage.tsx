@@ -7,10 +7,13 @@ import { parse as parseQueryString } from "query-string";
 
 import { EpisodeNav } from "./EpisodeShowPage/EpisodeNav";
 import { Auth } from "../auth";
-import { ContentContainer } from  "../components/ContentContainer";
+import { ContentContainer } from "../components/ContentContainer";
 import { UserActivity } from "../components/UserActivity";
 
-export class BetweenEpisodesPagePresentational extends React.Component<any, any> {
+export class BetweenEpisodesPagePresentational extends React.Component<
+  any,
+  any
+> {
   public state = {
     hasLeftCurrentWorkspace: false,
   };
@@ -21,7 +24,7 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
     await this.props.leaveCurrentWorkspaceMutation({
       variables: {
         experimentId: queryParams.experiment,
-      }
+      },
     });
     this.setState({
       hasLeftCurrentWorkspace: true,
@@ -34,9 +37,7 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
     return (
       <div>
         <Helmet>
-          <title>
-            Between Assignments - Mosaic
-          </title>
+          <title>Between Assignments - Mosaic</title>
         </Helmet>
         {Auth.isAuthenticated() && (
           <EpisodeNav
@@ -50,13 +51,12 @@ export class BetweenEpisodesPagePresentational extends React.Component<any, any>
         )}
         <ContentContainer>
           <div style={{ textAlign: "center" }}>
-          Great job! Now is your chance to take a break. Press the button above when you're ready to start on the next workspace. 
+            Great job! Now is your chance to take a break. Press the button
+            above when you're ready to start on the next workspace.
           </div>
-          {
-            this.state.hasLeftCurrentWorkspace
-            &&
+          {this.state.hasLeftCurrentWorkspace && (
             <UserActivity experimentId={queryParams.experiment} />
-          }
+          )}
         </ContentContainer>
       </div>
     );
@@ -76,8 +76,10 @@ const LEAVE_CURRENT_WORKSPACE_MUTATION = gql`
 `;
 
 export const BetweenEpisodesPage = compose(
-  graphql(LEAVE_CURRENT_WORKSPACE_MUTATION, { name: "leaveCurrentWorkspaceMutation" }),
+  graphql(LEAVE_CURRENT_WORKSPACE_MUTATION, {
+    name: "leaveCurrentWorkspaceMutation",
+  }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
-  })
+  }),
 )(BetweenEpisodesPagePresentational);

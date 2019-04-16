@@ -44,7 +44,7 @@ sequelize.addModels([
   Tree,
   User,
   UserTreeOracleRelation,
-  Workspace
+  Workspace,
 ]);
 
 export default sequelize;

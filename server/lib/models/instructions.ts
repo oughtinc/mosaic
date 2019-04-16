@@ -5,7 +5,7 @@ import {
   DataType,
   ForeignKey,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import Experiment from "./experiment";
 
@@ -16,7 +16,7 @@ export const InstructionTypes = [
   "returningRoot",
   "returningHonestOracle",
   "returningMaliciousOracle",
-  "lazyPointerUnlock"
+  "lazyPointerUnlock",
 ];
 
 @Table

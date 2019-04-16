@@ -5,7 +5,7 @@ import {
   Default,
   ForeignKey,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import User from "./user";
 import Tree from "./tree";

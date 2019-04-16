@@ -8,7 +8,7 @@ import {
   Default,
   HasMany,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import Tree from "./tree";
 import {
@@ -18,7 +18,7 @@ import {
   defaultReturningHonestOracleInstructions,
   defaultReturningMaliciousOracleInstructions,
   defaultReturningRootInstructions,
-  defaultRootInstructions
+  defaultRootInstructions,
 } from "./helpers/defaultInstructions";
 import Instructions from "./instructions";
 
@@ -28,7 +28,7 @@ export default class Experiment extends Model<Experiment> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 
@@ -58,7 +58,7 @@ export default class Experiment extends Model<Experiment> {
     () => Experiment,
     "FallbackRelation",
     "primaryExperimentId",
-    "fallbackExperimentId"
+    "fallbackExperimentId",
   )
   public fallbacks: Experiment[];
 
@@ -71,38 +71,38 @@ export default class Experiment extends Model<Experiment> {
       {
         experimentId: experiment.id,
         type: "root",
-        value: defaultRootInstructions
+        value: defaultRootInstructions,
       },
       {
         experimentId: experiment.id,
         type: "honestOracle",
-        value: defaultHonestOracleInstructions
+        value: defaultHonestOracleInstructions,
       },
       {
         experimentId: experiment.id,
         type: "maliciousOracle",
-        value: defaultMaliciousOracleInstructions
+        value: defaultMaliciousOracleInstructions,
       },
       {
         experimentId: experiment.id,
         type: "returningRoot",
-        value: defaultReturningRootInstructions
+        value: defaultReturningRootInstructions,
       },
       {
         experimentId: experiment.id,
         type: "returningHonestOracle",
-        value: defaultReturningHonestOracleInstructions
+        value: defaultReturningHonestOracleInstructions,
       },
       {
         experimentId: experiment.id,
         type: "returningMaliciousOracle",
-        value: defaultReturningMaliciousOracleInstructions
+        value: defaultReturningMaliciousOracleInstructions,
       },
       {
         experimentId: experiment.id,
         type: "lazyPointerUnlock",
-        value: defaultLazyPointerUnlockInstructions
-      }
+        value: defaultLazyPointerUnlockInstructions,
+      },
     ]);
   }
 

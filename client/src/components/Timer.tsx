@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export class Timer extends React.Component<any,  any> {
+export class Timer extends React.Component<any, any> {
   private tickInterval;
 
   public componentDidMount() {

@@ -1,14 +1,14 @@
 export { adjustCursorIfAtEdge } from "./adjustCursorIfAtEdge";
 export {
-  handleCursorNavigationAcrossPointerEdge
+  handleCursorNavigationAcrossPointerEdge,
 } from "./handleCursorNavigationAcrossPointerEdge";
 export { insertPointerExport } from "./insertPointerExport";
 export {
-  moveSelectionAwayFromPointerEdge
+  moveSelectionAwayFromPointerEdge,
 } from "./moveSelectionAwayFromPointerEdge";
 export { normalizeAfterRemoval } from "./normalizeAfterRemoval";
 export { normalizeExportSpacing } from "./normalizeChange";
 export { removePointerExport } from "./removePointerExport";
 export {
-  scanBlockAndConvertOuterSquareBrackets
+  scanBlockAndConvertOuterSquareBrackets,
 } from "./scanBlockAndConvertOuterSquareBrackets";

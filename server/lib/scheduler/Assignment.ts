@@ -20,7 +20,7 @@ class Assignment {
     endAtTimestamp,
     userId,
     workspace,
-    isAlreadySavedToDb = false
+    isAlreadySavedToDb = false,
   }) {
     this.updateAssignment = updateAssignment;
     this.experimentId = experimentId;
@@ -39,7 +39,7 @@ class Assignment {
         startAtTimestamp,
         endAtTimestamp: null,
         isOracle,
-        isTimed
+        isTimed,
       });
     }
   }

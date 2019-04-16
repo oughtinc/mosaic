@@ -22,7 +22,7 @@ import {
   HasOne,
   Min,
   Model,
-  Table
+  Table,
 } from "sequelize-typescript";
 import PointerImport from "./pointerImport";
 import Block from "./block";
@@ -39,7 +39,7 @@ export default class Workspace extends Model<Workspace> {
     type: DataType.UUID,
     primaryKey: true,
     defaultValue: UUIDV4,
-    allowNull: false
+    allowNull: false,
   })
   public id: string;
 
@@ -156,7 +156,7 @@ export default class Workspace extends Model<Workspace> {
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
       const rootWorkspace = await Workspace.findByPk(
-        this.get("rootWorkspaceId")
+        this.get("rootWorkspaceId"),
       );
       if (rootWorkspace === null) {
         return false;
@@ -169,7 +169,7 @@ export default class Workspace extends Model<Workspace> {
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
       const rootWorkspace = await Workspace.findByPk(
-        this.get("rootWorkspaceId")
+        this.get("rootWorkspaceId"),
       );
       if (rootWorkspace === null) {
         return false;
@@ -179,7 +179,7 @@ export default class Workspace extends Model<Workspace> {
   }
 
   @Column(
-    new DataType.VIRTUAL(DataType.INTEGER, ["totalBudget", "allocatedBudget"])
+    new DataType.VIRTUAL(DataType.INTEGER, ["totalBudget", "allocatedBudget"]),
   )
   public get remainingBudget() {
     return this.get("totalBudget") - this.get("allocatedBudget");
@@ -189,8 +189,8 @@ export default class Workspace extends Model<Workspace> {
     new DataType.VIRTUAL(DataType.INTEGER, [
       "allocatedBudget",
       "childWorkspaceOrder",
-      "timeSpentOnThisWorkspace"
-    ])
+      "timeSpentOnThisWorkspace",
+    ]),
   )
   public get budgetUsedWorkingOnThisWorkspace() {
     return (async () => {
@@ -222,7 +222,7 @@ export default class Workspace extends Model<Workspace> {
           console.error(
             `Error: Value for pointer with id ${
               pointer.id
-            } was not found in its respecting block.`
+            } was not found in its respecting block.`,
           );
         }
       }
@@ -235,8 +235,8 @@ export default class Workspace extends Model<Workspace> {
     return (async () => {
       return await ExportWorkspaceLockRelation.findAll({
         where: {
-          workspaceId: this.get("id")
-        }
+          workspaceId: this.get("id"),
+        },
       });
     })();
   }
@@ -254,7 +254,7 @@ export default class Workspace extends Model<Workspace> {
           console.error(
             `Error: Value for pointer with id ${
               pointer.id
-            } was not found in its respecting block.`
+            } was not found in its respecting block.`,
           );
         }
       }
@@ -321,7 +321,7 @@ export default class Workspace extends Model<Workspace> {
     if (questionValue) {
       await workspace.$create("block", {
         type: "QUESTION",
-        value: questionValue
+        value: questionValue,
       });
     } else {
       await workspace.$create("block", { type: "QUESTION" });
@@ -336,19 +336,19 @@ export default class Workspace extends Model<Workspace> {
       const {
         scratchpadBlockValue,
         answerDraftBlockValue,
-        responseBlockValue
+        responseBlockValue,
       } = createHonestOracleDefaultBlockValues(questionValue);
       await workspace.$create("block", {
         type: "SCRATCHPAD",
-        value: scratchpadBlockValue
+        value: scratchpadBlockValue,
       });
       await workspace.$create("block", {
         type: "SUBQUESTION_DRAFT",
-        value: answerDraftBlockValue
+        value: answerDraftBlockValue,
       });
       await workspace.$create("block", {
         type: "ANSWER_DRAFT",
-        value: responseBlockValue
+        value: responseBlockValue,
       });
     } else if (
       workspace.isEligibleForMaliciousOracle &&
@@ -358,37 +358,37 @@ export default class Workspace extends Model<Workspace> {
         const {
           scratchpadBlockValue,
           answerDraftBlockValue,
-          responseBlockValue
+          responseBlockValue,
         } = createMaliciousOracleDefaultBlockValues(questionValue);
         await workspace.$create("block", {
           type: "SCRATCHPAD",
-          value: scratchpadBlockValue
+          value: scratchpadBlockValue,
         });
         await workspace.$create("block", {
           type: "SUBQUESTION_DRAFT",
-          value: answerDraftBlockValue
+          value: answerDraftBlockValue,
         });
         await workspace.$create("block", {
           type: "ANSWER_DRAFT",
-          value: responseBlockValue
+          value: responseBlockValue,
         });
       } else {
         const {
           scratchpadBlockValue,
           answerDraftBlockValue,
-          responseBlockValue
+          responseBlockValue,
         } = createDefaultRootLevelBlockValues();
         await workspace.$create("block", {
           type: "SCRATCHPAD",
-          value: scratchpadBlockValue
+          value: scratchpadBlockValue,
         });
         await workspace.$create("block", {
           type: "SUBQUESTION_DRAFT",
-          value: answerDraftBlockValue
+          value: answerDraftBlockValue,
         });
         await workspace.$create("block", {
           type: "ANSWER_DRAFT",
-          value: responseBlockValue
+          value: responseBlockValue,
         });
       }
     } else {
@@ -410,11 +410,11 @@ export default class Workspace extends Model<Workspace> {
     } else {
       // inherit root from parent
       const parentWorkspace = (await workspace.$get(
-        "parentWorkspace"
+        "parentWorkspace",
       )) as Workspace;
       if (workspace.rootWorkspaceId !== parentWorkspace.rootWorkspaceId) {
         await workspace.update({
-          rootWorkspaceId: parentWorkspace.rootWorkspaceId
+          rootWorkspaceId: parentWorkspace.rootWorkspaceId,
         });
       }
     }
@@ -422,7 +422,7 @@ export default class Workspace extends Model<Workspace> {
 
   @AfterUpdate
   public static async updateCachedRootWorkspace(
-    workspace: Workspace & { _changed: { [field: string]: boolean } }
+    workspace: Workspace & { _changed: { [field: string]: boolean } },
   ) {
     if (workspace._changed.parentId) {
       // parent has changed, update cache
@@ -432,7 +432,7 @@ export default class Workspace extends Model<Workspace> {
 
   @AfterUpdate
   public static async updateChildCachedRootWorkspaces(
-    workspace: Workspace & { _changed: { [field: string]: boolean } }
+    workspace: Workspace & { _changed: { [field: string]: boolean } },
   ) {
     if (workspace._changed.rootWorkspaceId) {
       // cached root has changed, propogate to children
@@ -443,9 +443,9 @@ export default class Workspace extends Model<Workspace> {
             rootWorkspaceId:
               workspace.rootWorkspaceId === null
                 ? workspace.id
-                : workspace.rootWorkspaceId
+                : workspace.rootWorkspaceId,
           });
-        })
+        }),
       );
     }
   }
@@ -519,7 +519,7 @@ export default class Workspace extends Model<Workspace> {
     isPublic,
     isRequestingLazyUnlock,
     isEligibleForHonestOracle,
-    isEligibleForMaliciousOracle
+    isEligibleForMaliciousOracle,
   }) {
     isEligibleForHonestOracle =
       isEligibleForHonestOracle !== undefined
@@ -529,7 +529,7 @@ export default class Workspace extends Model<Workspace> {
       isEligibleForMaliciousOracle !== undefined
         ? isEligibleForMaliciousOracle
         : await Workspace.isNewChildWorkspaceMaliciousOracleEligible({
-            parentId
+            parentId,
           });
     return await Workspace.create(
       {
@@ -540,9 +540,9 @@ export default class Workspace extends Model<Workspace> {
         isPublic,
         isRequestingLazyUnlock,
         isEligibleForHonestOracle,
-        isEligibleForMaliciousOracle
+        isEligibleForMaliciousOracle,
       },
-      { questionValue: question }
+      { questionValue: question },
     );
   }
 
@@ -565,7 +565,7 @@ export default class Workspace extends Model<Workspace> {
 
   public async changeAllocationToChild(
     childWorkspace: any,
-    newTotalBudget: number
+    newTotalBudget: number,
   ) {
     const budgetToAddToChild = newTotalBudget - childWorkspace.totalBudget;
 
@@ -575,7 +575,7 @@ export default class Workspace extends Model<Workspace> {
       throw new Error(
         `Child workspace allocated budget ${
           childWorkspace.allocatedBudget
-        } exceeds new totalBudget ${newTotalBudget}`
+        } exceeds new totalBudget ${newTotalBudget}`,
       );
     }
 
@@ -583,7 +583,7 @@ export default class Workspace extends Model<Workspace> {
       this.remainingBudget - budgetToAddToChild >= 0;
     if (!parentHasNeccessaryRemainingBudget) {
       throw new Error(
-        `This workspace does not have the allocated budget necessary for child to get ${budgetToAddToChild} difference`
+        `This workspace does not have the allocated budget necessary for child to get ${budgetToAddToChild} difference`,
       );
     }
 
@@ -591,11 +591,11 @@ export default class Workspace extends Model<Workspace> {
 
     await childWorkspace.update({
       isStale: budgetIncreased ? true : childWorkspace.isStale,
-      totalBudget: newTotalBudget
+      totalBudget: newTotalBudget,
     });
 
     await this.update({
-      allocatedBudget: this.allocatedBudget + budgetToAddToChild
+      allocatedBudget: this.allocatedBudget + budgetToAddToChild,
     });
   }
 
@@ -614,19 +614,19 @@ export default class Workspace extends Model<Workspace> {
       const exportToUnlock = await Pointer.findByPk(idOfExportToUnlock);
       if (exportToUnlock === null) {
         throw new Error(
-          `Pointer ${idOfExportToUnlock} does not exist in the database`
+          `Pointer ${idOfExportToUnlock} does not exist in the database`,
         );
       }
       const blockContainingLazyPointer = await Block.findByPk(
-        exportToUnlock.sourceBlockId
+        exportToUnlock.sourceBlockId,
       );
       if (blockContainingLazyPointer === null) {
         throw new Error(
-          `Block for pointer ${idOfExportToUnlock} does not exist in the database`
+          `Block for pointer ${idOfExportToUnlock} does not exist in the database`,
         );
       }
       workspaceContainingLazyPointer = await Workspace.findByPk(
-        blockContainingLazyPointer.workspaceId
+        blockContainingLazyPointer.workspaceId,
       );
     }
 
@@ -642,20 +642,20 @@ export default class Workspace extends Model<Workspace> {
         : undefined,
       isEligibleForMaliciousOracle: isRequestingLazyUnlock
         ? workspaceContainingLazyPointer.isEligibleForMaliciousOracle
-        : undefined
+        : undefined,
     });
     if (this.remainingBudget < child.totalBudget) {
       throw new Error(
         `Parent workspace does not have enough remainingBudget. Has: ${
           this.remainingBudget
-        }. Needs: ${child.totalBudget}.`
+        }. Needs: ${child.totalBudget}.`,
       );
     }
 
     const newAllocatedBudget = this.allocatedBudget + child.totalBudget;
     await this.update({
       allocatedBudget: newAllocatedBudget,
-      childWorkspaceOrder: this.workSpaceOrderAppend(child.id)
+      childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
     });
     return child;
   }
@@ -665,7 +665,7 @@ export default class Workspace extends Model<Workspace> {
     let _connectedPointers: string[] = [];
     for (const block of blocks) {
       const blockPointerIds = await block.connectedPointers({
-        pointersSoFar: _connectedPointers
+        pointersSoFar: _connectedPointers,
       });
       _connectedPointers = [..._connectedPointers, ...blockPointerIds];
     }
@@ -685,10 +685,10 @@ export default class Workspace extends Model<Workspace> {
 
     for (const block of blocks) {
       const blockPointersToAdd = await block.connectedPointers({
-        pointersSoFar
+        pointersSoFar,
       });
       connectedPointersOfSubtree = connectedPointersOfSubtree.concat(
-        blockPointersToAdd
+        blockPointersToAdd,
       );
       pointersSoFar = pointersSoFar.concat(blockPointersToAdd);
     }
@@ -697,10 +697,10 @@ export default class Workspace extends Model<Workspace> {
 
     for (const childWorkspace of childWorkspaces) {
       const workspacePointersToAdd = await childWorkspace.getConnectedPointersOfSubtree(
-        pointersSoFar
+        pointersSoFar,
       );
       connectedPointersOfSubtree = connectedPointersOfSubtree.concat(
-        workspacePointersToAdd
+        workspacePointersToAdd,
       );
     }
 
@@ -712,12 +712,12 @@ export default class Workspace extends Model<Workspace> {
     const connectingChildBlocks = await Block.findAll({
       where: {
         workspaceId: {
-          [Op.in]: this.childWorkspaceOrder
+          [Op.in]: this.childWorkspaceOrder,
         },
         type: {
-          [Op.in]: ["QUESTION", "ANSWER", "ANSWER_DRAFT"]
-        }
-      }
+          [Op.in]: ["QUESTION", "ANSWER", "ANSWER_DRAFT"],
+        },
+      },
     });
     blocks = [...blocks, ...connectingChildBlocks];
     return blocks;

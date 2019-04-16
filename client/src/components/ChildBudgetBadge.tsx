@@ -13,19 +13,30 @@ function secondsToDurationString(seconds: number, shouldShowSeconds: boolean) {
   let durationString = "";
 
   if (duration.days > 0) {
-    durationString += `${Duration.fromObject({days: duration.days}).toFormat("d")}d`;
+    durationString += `${Duration.fromObject({ days: duration.days }).toFormat(
+      "d",
+    )}d`;
   }
 
   if (duration.hours > 0) {
-    durationString += `${Duration.fromObject({hours: duration.hours}).toFormat("h")}h`;
+    durationString += `${Duration.fromObject({
+      hours: duration.hours,
+    }).toFormat("h")}h`;
   }
 
   if (duration.minutes > 0) {
-    durationString += `${Duration.fromObject({minutes: duration.minutes}).toFormat("m")}m`;
+    durationString += `${Duration.fromObject({
+      minutes: duration.minutes,
+    }).toFormat("m")}m`;
   }
 
-  if ((shouldShowSeconds || seconds < 10 * 60) && (duration.seconds > 0 || seconds === 0)) {
-    durationString += `${Duration.fromObject({seconds: duration.seconds}).toFormat("s")}s`;
+  if (
+    (shouldShowSeconds || seconds < 10 * 60) &&
+    (duration.seconds > 0 || seconds === 0)
+  ) {
+    durationString += `${Duration.fromObject({
+      seconds: duration.seconds,
+    }).toFormat("s")}s`;
   }
 
   return durationString;
@@ -33,27 +44,40 @@ function secondsToDurationString(seconds: number, shouldShowSeconds: boolean) {
 
 class ChildBudgetBadge extends React.Component<any, any> {
   public render() {
-    const { noBadge, remainingBudget, shouldShowSeconds = true, style, totalBudget } = this.props;
+    const {
+      noBadge,
+      remainingBudget,
+      shouldShowSeconds = true,
+      style,
+      totalBudget,
+    } = this.props;
 
-    const totalBudgetDurationString = secondsToDurationString(Number(totalBudget), shouldShowSeconds);
+    const totalBudgetDurationString = secondsToDurationString(
+      Number(totalBudget),
+      shouldShowSeconds,
+    );
 
     if (noBadge) {
-      return (
-        <span style={style}>
-          {totalBudgetDurationString}
-        </span>
-      );
+      return <span style={style}>{totalBudgetDurationString}</span>;
     }
 
     if (remainingBudget === undefined) {
       return (
-        <Badge style={{ ...style, backgroundColor: remainingBudget < 90 ? "red" : "#777" }}>
+        <Badge
+          style={{
+            ...style,
+            backgroundColor: remainingBudget < 90 ? "red" : "#777",
+          }}
+        >
           {totalBudgetDurationString}
         </Badge>
       );
     }
 
-    const remainingBudgetDurationString = secondsToDurationString(Number(remainingBudget), shouldShowSeconds);
+    const remainingBudgetDurationString = secondsToDurationString(
+      Number(remainingBudget),
+      shouldShowSeconds,
+    );
 
     return (
       <Badge style={{ backgroundColor: remainingBudget < 90 ? "red" : "#777" }}>

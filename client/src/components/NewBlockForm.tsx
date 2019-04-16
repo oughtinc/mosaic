@@ -78,7 +78,12 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       <div
         key={this.state.id}
         style={{
-          opacity: isOnFrontPage ? 1 : (this.state.pending || (this.props.hasTimeBudget && this.props.availableBudget < 90) ? 0.5 : 1)
+          opacity: isOnFrontPage
+            ? 1
+            : this.state.pending ||
+              (this.props.hasTimeBudget && this.props.availableBudget < 90)
+            ? 0.5
+            : 1,
         }}
       >
         <BlockContainer>
@@ -127,198 +132,197 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               >
                 Budget
               </span>
-                <ChildBudgetBadge
-                  totalBudget={this.state.totalBudget}
-                />
-                <br />
-                <Button
-                  bsSize="xsmall"
-                  bsStyle="default"
-                  disabled={
-                    (this.props.availableBudget - 90) < (Number(this.state.totalBudget) + 90)
-                    ?
-                    true
-                    :
-                    false
-                  }
-                  style={{ marginRight: "5px", marginTop: "10px" }}
-                  onClick={() => {
-                    this.setState({
-                      totalBudget: Number(this.state.totalBudget) + 90,
-                    });
-                  }}
-                >
-                  +90s
-                </Button>
-                <Button
-                  bsSize="xsmall"
-                  bsStyle="default"
-                  disabled={
-                    (this.props.availableBudget - 90) < (Number(this.state.totalBudget) * 2)
-                    ?
-                    true
-                    :
-                    false
-                  }
-                  style={{ marginRight: "5px", marginTop: "10px" }}
-                  onClick={() => {
-                    this.setState({
-                      totalBudget: this.state.totalBudget * 2,
-                    });
-                  }}
-                >
-                  x2
-                </Button>
-                <Button
-                  bsSize="xsmall"
-                  bsStyle="default"
-                  disabled={
-                    Math.floor(this.state.totalBudget / 2) < 90
-                    ?
-                    true
-                    :
-                    false
-                  }
-                  style={{ marginRight: "5px", marginTop: "10px" }}
-                  onClick={() => {
-                    this.setState({
-                      totalBudget: Math.floor(this.state.totalBudget / 2),
-                    });
-                  }}
-                >
-                  /2
-                </Button>
-                <Button
-                  bsSize="xsmall"
-                  bsStyle="default"
-                  disabled={
-                    this.state.totalBudget - 90 < 90
-                    ?
-                    true
-                    :
-                    false
-                  }
-                  style={{ marginTop: "10px" }}
-                  onClick={() => {
-                    this.setState({
-                      totalBudget: this.state.totalBudget - 90,
-                    });
-                  }}
-                >
-                  -90s
-                </Button>
-                {
-                  !isOnFrontPage
-                  &&
-                  <span>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        position: "relative",
-                        top: "5px",
-                        textAlign: "center",
-                        width: "20px",
-                      }}
-                    >
+              <ChildBudgetBadge totalBudget={this.state.totalBudget} />
+              <br />
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                disabled={
+                  this.props.availableBudget - 90 <
+                  Number(this.state.totalBudget) + 90
+                    ? true
+                    : false
+                }
+                style={{ marginRight: "5px", marginTop: "10px" }}
+                onClick={() => {
+                  this.setState({
+                    totalBudget: Number(this.state.totalBudget) + 90,
+                  });
+                }}
+              >
+                +90s
+              </Button>
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                disabled={
+                  this.props.availableBudget - 90 <
+                  Number(this.state.totalBudget) * 2
+                    ? true
+                    : false
+                }
+                style={{ marginRight: "5px", marginTop: "10px" }}
+                onClick={() => {
+                  this.setState({
+                    totalBudget: this.state.totalBudget * 2,
+                  });
+                }}
+              >
+                x2
+              </Button>
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                disabled={
+                  Math.floor(this.state.totalBudget / 2) < 90 ? true : false
+                }
+                style={{ marginRight: "5px", marginTop: "10px" }}
+                onClick={() => {
+                  this.setState({
+                    totalBudget: Math.floor(this.state.totalBudget / 2),
+                  });
+                }}
+              >
+                /2
+              </Button>
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                disabled={this.state.totalBudget - 90 < 90 ? true : false}
+                style={{ marginTop: "10px" }}
+                onClick={() => {
+                  this.setState({
+                    totalBudget: this.state.totalBudget - 90,
+                  });
+                }}
+              >
+                -90s
+              </Button>
+              {!isOnFrontPage && (
+                <span>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      position: "relative",
+                      top: "5px",
+                      textAlign: "center",
+                      width: "20px",
+                    }}
+                  >
                     |
-                    </span>
-                    <Button
-                      bsSize="xsmall"
-                      bsStyle="default"
-                      disabled={this.props.availableBudget - 90 < 90}
-                      style={{ marginRight: "5px", marginTop: "10px" }}
-                      onClick={() => {
-                        this.setState({
-                          totalBudget: 90,
-                        });
-                      }}
-                    >
-                      min
-                    </Button>
-                    <Button
-                      bsSize="xsmall"
-                      bsStyle="default"
-                      disabled={
-                        this.props.availableBudget - 90 < Math.floor(Number(this.props.parentTotalBudget) * 0.2)
-                        ||
-                        Math.floor(Number(this.props.parentTotalBudget) * 0.2) < 90
-                        ?
-                        true
-                        :
-                        false
-                      }
-                      style={{ marginRight: "5px", marginTop: "10px" }}
-                      onClick={() => {
-                        this.setState({
-                          totalBudget: Math.floor(Number(this.props.parentTotalBudget) * 0.2),
-                        });
-                      }}
-                    >
-                      20%
-                    </Button>
-                    <Button
-                      bsSize="xsmall"
-                      bsStyle="default"
-                      disabled={
-                        this.props.availableBudget - 90 < Math.floor(Number(this.props.parentTotalBudget) * 0.4)
-                        ||
-                        Math.floor(Number(this.props.parentTotalBudget) * 0.4) < 90
-                        ?
-                        true
-                        :
-                        false
-                      }
-                      style={{ marginRight: "5px", marginTop: "10px" }}
-                      onClick={() => {
-                        this.setState({
-                          totalBudget: Math.floor(Number(this.props.parentTotalBudget) * 0.4),
-                        });
-                      }}
-                    >
-                      40%
-                    </Button>
-                    <Button
-                      bsSize="xsmall"
-                      bsStyle="default"
-                      disabled={
-                        this.props.availableBudget - 90 < Math.floor(Number(this.props.parentTotalBudget) * 0.8)
-                        ||
-                        Math.floor(Number(this.props.parentTotalBudget) * 0.8) < 90
-                        ?
-                        true
-                        :
-                        false
-                      }
-                      style={{ marginRight: "5px", marginTop: "10px" }}
-                      onClick={() => {
-                        this.setState({
-                          totalBudget: Math.floor(Number(this.props.parentTotalBudget) * 0.8),
-                        });
-                      }}
-                    >
-                      80%
-                    </Button>
-                    <Button
-                      bsSize="xsmall"
-                      bsStyle="default"
-                      disabled={this.props.availableBudget - 90 < 90}
-                      style={{ marginTop: "10px" }}
-                      onClick={() => {
-                        this.setState({
-                          totalBudget: Math.max(0, this.props.availableBudget - 90),
-                        });
-                      }}
-                    >
-                      max
-                    </Button>
                   </span>
-              }
+                  <Button
+                    bsSize="xsmall"
+                    bsStyle="default"
+                    disabled={this.props.availableBudget - 90 < 90}
+                    style={{ marginRight: "5px", marginTop: "10px" }}
+                    onClick={() => {
+                      this.setState({
+                        totalBudget: 90,
+                      });
+                    }}
+                  >
+                    min
+                  </Button>
+                  <Button
+                    bsSize="xsmall"
+                    bsStyle="default"
+                    disabled={
+                      this.props.availableBudget - 90 <
+                        Math.floor(
+                          Number(this.props.parentTotalBudget) * 0.2,
+                        ) ||
+                      Math.floor(Number(this.props.parentTotalBudget) * 0.2) <
+                        90
+                        ? true
+                        : false
+                    }
+                    style={{ marginRight: "5px", marginTop: "10px" }}
+                    onClick={() => {
+                      this.setState({
+                        totalBudget: Math.floor(
+                          Number(this.props.parentTotalBudget) * 0.2,
+                        ),
+                      });
+                    }}
+                  >
+                    20%
+                  </Button>
+                  <Button
+                    bsSize="xsmall"
+                    bsStyle="default"
+                    disabled={
+                      this.props.availableBudget - 90 <
+                        Math.floor(
+                          Number(this.props.parentTotalBudget) * 0.4,
+                        ) ||
+                      Math.floor(Number(this.props.parentTotalBudget) * 0.4) <
+                        90
+                        ? true
+                        : false
+                    }
+                    style={{ marginRight: "5px", marginTop: "10px" }}
+                    onClick={() => {
+                      this.setState({
+                        totalBudget: Math.floor(
+                          Number(this.props.parentTotalBudget) * 0.4,
+                        ),
+                      });
+                    }}
+                  >
+                    40%
+                  </Button>
+                  <Button
+                    bsSize="xsmall"
+                    bsStyle="default"
+                    disabled={
+                      this.props.availableBudget - 90 <
+                        Math.floor(
+                          Number(this.props.parentTotalBudget) * 0.8,
+                        ) ||
+                      Math.floor(Number(this.props.parentTotalBudget) * 0.8) <
+                        90
+                        ? true
+                        : false
+                    }
+                    style={{ marginRight: "5px", marginTop: "10px" }}
+                    onClick={() => {
+                      this.setState({
+                        totalBudget: Math.floor(
+                          Number(this.props.parentTotalBudget) * 0.8,
+                        ),
+                      });
+                    }}
+                  >
+                    80%
+                  </Button>
+                  <Button
+                    bsSize="xsmall"
+                    bsStyle="default"
+                    disabled={this.props.availableBudget - 90 < 90}
+                    style={{ marginTop: "10px" }}
+                    onClick={() => {
+                      this.setState({
+                        totalBudget: Math.max(
+                          0,
+                          this.props.availableBudget - 90,
+                        ),
+                      });
+                    }}
+                  >
+                    max
+                  </Button>
+                </span>
+              )}
             </div>
             <Button
               bsSize="xsmall"
               bsStyle="primary"
               data-cy="submit-new-question"
-              disabled={this.props.hasTimeBudget && this.props.availableBudget - 90 < this.state.totalBudget}
+              disabled={
+                this.props.hasTimeBudget &&
+                this.props.availableBudget - 90 < this.state.totalBudget
+              }
               type="submit"
               onClick={this.handleClick}
               style={{ marginTop: this.props.hasTimeBudget ? "10px" : "0px" }}

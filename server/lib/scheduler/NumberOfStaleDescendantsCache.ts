@@ -15,7 +15,7 @@ class NumberOfStaleDescendantsCache {
   }
 
   public async getNumberOfStaleDescendants(
-    workspace: Workspace
+    workspace: Workspace,
   ): Promise<number> {
     const workspaceAlreadyCached: boolean = this.cache.has(workspace.id);
 
@@ -24,7 +24,7 @@ class NumberOfStaleDescendantsCache {
     }
 
     const numberOfStaleDescendants: number = await this.calculateNumberOfStaleDescendants(
-      workspace
+      workspace,
     );
 
     this.cache.set(workspace.id, numberOfStaleDescendants);
@@ -33,7 +33,7 @@ class NumberOfStaleDescendantsCache {
   }
 
   private async calculateNumberOfStaleDescendants(
-    workspace: Workspace
+    workspace: Workspace,
   ): Promise<number> {
     const children = await workspace.getChildWorkspaces();
 

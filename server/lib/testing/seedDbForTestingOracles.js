@@ -17,16 +17,16 @@ const valueOfBlockWithNestedPointers = [
           {
             object: "leaf",
             text: " ",
-            marks: []
-          }
-        ]
+            marks: [],
+          },
+        ],
       },
       {
         object: "inline",
         type: "pointerExport",
         isVoid: false,
         data: {
-          pointerId: "9fc2f1c0-14ff-11e9-8207-cb6ce038c9dc"
+          pointerId: "9fc2f1c0-14ff-11e9-8207-cb6ce038c9dc",
         },
         nodes: [
           {
@@ -35,16 +35,16 @@ const valueOfBlockWithNestedPointers = [
               {
                 object: "leaf",
                 text: " unnested  ",
-                marks: []
-              }
-            ]
+                marks: [],
+              },
+            ],
           },
           {
             object: "inline",
             type: "pointerExport",
             isVoid: false,
             data: {
-              pointerId: "9fa5a5c0-14ff-11e9-8207-cb6ce038c9dc"
+              pointerId: "9fa5a5c0-14ff-11e9-8207-cb6ce038c9dc",
             },
             nodes: [
               {
@@ -53,11 +53,11 @@ const valueOfBlockWithNestedPointers = [
                   {
                     object: "leaf",
                     text: " nested ",
-                    marks: []
-                  }
-                ]
-              }
-            ]
+                    marks: [],
+                  },
+                ],
+              },
+            ],
           },
           {
             object: "text",
@@ -65,11 +65,11 @@ const valueOfBlockWithNestedPointers = [
               {
                 object: "leaf",
                 text: "  ",
-                marks: []
-              }
-            ]
-          }
-        ]
+                marks: [],
+              },
+            ],
+          },
+        ],
       },
       {
         object: "text",
@@ -77,12 +77,12 @@ const valueOfBlockWithNestedPointers = [
           {
             object: "leaf",
             text: " ",
-            marks: []
-          }
-        ]
-      }
-    ]
-  }
+            marks: [],
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 const valueOfQuestionBlockForA2 = [
@@ -98,9 +98,9 @@ const valueOfQuestionBlockForA2 = [
           {
             object: "leaf",
             text: "A-2: A subquestion #2 (1 descendants) - oracle eligible ",
-            marks: []
-          }
-        ]
+            marks: [],
+          },
+        ],
       },
       {
         object: "inline",
@@ -108,7 +108,7 @@ const valueOfQuestionBlockForA2 = [
         isVoid: true,
         data: {
           pointerId: "9fc2f1c0-14ff-11e9-8207-cb6ce038c9dc",
-          internalReferenceId: "a3a2f5a0-1500-11e9-88ea-2d0657d4242d"
+          internalReferenceId: "a3a2f5a0-1500-11e9-88ea-2d0657d4242d",
         },
         nodes: [
           {
@@ -117,11 +117,11 @@ const valueOfQuestionBlockForA2 = [
               {
                 object: "leaf",
                 text: " ",
-                marks: []
-              }
-            ]
-          }
-        ]
+                marks: [],
+              },
+            ],
+          },
+        ],
       },
       {
         object: "text",
@@ -129,12 +129,12 @@ const valueOfQuestionBlockForA2 = [
           {
             object: "leaf",
             text: "",
-            marks: []
-          }
-        ]
-      }
-    ]
-  }
+            marks: [],
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export async function seedDbForTestingOracles() {
@@ -151,13 +151,13 @@ export async function seedDbForTestingOracles() {
       hasIOConstraints: true,
       isEligibleForAssignment: true,
       isEligibleForHonestOracle: true,
-      isPublic: true
+      isPublic: true,
     },
     {
       questionValue: generateQuestionValueFromString(
-        "A: Root-level (3 descendants) - oracle eligible"
-      )
-    }
+        "A: Root-level (3 descendants) - oracle eligible",
+      ),
+    },
   );
 
   const ABlock = await A.getBlocks();
@@ -170,8 +170,8 @@ export async function seedDbForTestingOracles() {
     creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
     totalBudget: 0,
     question: generateQuestionValueFromString(
-      "A-1: A subquestion #1 (0 descendants)"
-    )
+      "A-1: A subquestion #1 (0 descendants)",
+    ),
   });
 
   const A2 = await A.createChild({
@@ -179,8 +179,8 @@ export async function seedDbForTestingOracles() {
     creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
     totalBudget: 0,
     question: generateQuestionValueFromString(
-      "A-2: A subquestion #2 (1 descendants) - oracle eligible"
-    )
+      "A-2: A subquestion #2 (1 descendants) - oracle eligible",
+    ),
   });
 
   const A2Block = await A2.getBlocks();
@@ -190,14 +190,14 @@ export async function seedDbForTestingOracles() {
   await A2QuestionBlock.update({ value: valueOfQuestionBlockForA2 });
 
   await A2.update({
-    isEligibleForHonestOracle: true
+    isEligibleForHonestOracle: true,
   });
 
   const A2$1 = await A2.createChild({
     creatorId: ID_OF_TYPICAL_USER_FOR_TESTING,
     totalBudget: 0,
     question: generateQuestionValueFromString(
-      "A-2-1: A-2 subquestion #1 (0 descendants)"
-    )
+      "A-2-1: A-2 subquestion #1 (0 descendants)",
+    ),
   });
 }

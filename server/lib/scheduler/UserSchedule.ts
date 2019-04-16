@@ -18,7 +18,7 @@ class UserSchedule {
     DistanceFromWorkedOnWorkspaceCache,
     rootParentCache,
     timeLimit,
-    userId
+    userId,
   }) {
     this.createAssignment = createAssignment;
     this.updateAssignment = updateAssignment;
@@ -32,10 +32,10 @@ class UserSchedule {
     const userActivity = this.userSchedule.map(assignment => ({
       howLongDidAssignmentLast: Math.min(
         3600 * 1000,
-        assignment.getHowLongDidAssignmentLast()
+        assignment.getHowLongDidAssignmentLast(),
       ),
       startAtTimestamp: assignment.startAtTimestamp,
-      workspace: assignment.getWorkspace()
+      workspace: assignment.getWorkspace(),
     }));
     return userActivity;
   }
@@ -45,7 +45,7 @@ class UserSchedule {
     workspace,
     startAtTimestamp = Date.now(),
     isOracle = false,
-    isLastAssignmentTimed = true
+    isLastAssignmentTimed = true,
   ) {
     const assignment = new Assignment({
       createAssignment: this.createAssignment,
@@ -56,13 +56,13 @@ class UserSchedule {
       userId: this.userId,
       workspace,
       startAtTimestamp,
-      endAtTimestamp: null
+      endAtTimestamp: null,
     });
 
     this.userSchedule.push(assignment);
 
     const rootParent = await this.rootParentCache.getRootParentOfWorkspace(
-      workspace
+      workspace,
     );
 
     this.lastWorkedOnTimestampForTree[rootParent.id] = startAtTimestamp;
@@ -74,7 +74,7 @@ class UserSchedule {
     startAtTimestamp,
     endAtTimestamp,
     isOracle,
-    isLastAssignmentTimed
+    isLastAssignmentTimed,
   }) {
     const assignment = new Assignment({
       createAssignment: this.createAssignment,
@@ -86,7 +86,7 @@ class UserSchedule {
       workspace,
       startAtTimestamp,
       endAtTimestamp: endAtTimestamp || Date.now(),
-      isAlreadySavedToDb: true
+      isAlreadySavedToDb: true,
     });
 
     this.userSchedule.push(assignment);
@@ -105,7 +105,7 @@ class UserSchedule {
 
   public getTreesWorkedOnLeastRecentlyByUser(rootWorkspaces) {
     const treesNotYetWorkedOn = rootWorkspaces.filter(
-      r => this.lastWorkedOnTimestampForTree[r.id] === undefined
+      r => this.lastWorkedOnTimestampForTree[r.id] === undefined,
     );
 
     if (treesNotYetWorkedOn.length > 0) {
@@ -113,13 +113,13 @@ class UserSchedule {
     }
 
     const lastWorkedOnTimestamps = rootWorkspaces.map(
-      r => this.lastWorkedOnTimestampForTree[r.id]
+      r => this.lastWorkedOnTimestampForTree[r.id],
     );
 
     const minTimestamp = Math.min.apply(Math, lastWorkedOnTimestamps);
 
     const leastRecentlyWorkedOnTrees = rootWorkspaces.filter(
-      r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp
+      r => this.lastWorkedOnTimestampForTree[r.id] === minTimestamp,
     );
 
     return leastRecentlyWorkedOnTrees;
@@ -128,7 +128,7 @@ class UserSchedule {
   public hasUserWorkedOnWorkspace(workspace) {
     return _.some(
       this.userSchedule,
-      assignment => assignment.getWorkspace().id === workspace.id
+      assignment => assignment.getWorkspace().id === workspace.id,
     );
   }
 
@@ -142,7 +142,7 @@ class UserSchedule {
 
     return _.filter(
       this.userSchedule,
-      assignment => assignment.getWorkspace().id === workspaceId
+      assignment => assignment.getWorkspace().id === workspaceId,
     );
   }
 
@@ -210,22 +210,22 @@ class UserSchedule {
     minDist,
     shouldResetCache = true,
     workspaces,
-    workspacesInTree
+    workspacesInTree,
   }) {
     if (shouldResetCache || !this.distanceFromWorkedOnWorkspaceCache) {
       this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache(
         {
           userSchedule: this,
-          workspacesInTree
-        }
+          workspacesInTree,
+        },
       );
     }
 
     const workspacesWithDist = workspaces.map(w => ({
       distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(
-        w
+        w,
       ),
-      workspace: w
+      workspace: w,
     }));
 
     const workspacesExceedingMinDistFromWorkedOnWorkspace = workspacesWithDist
@@ -238,28 +238,28 @@ class UserSchedule {
   public getWorkspacesWithMostDistFromWorkedOnWorkspace({
     shouldResetCache = true,
     workspaces,
-    workspacesInTree
+    workspacesInTree,
   }) {
     if (shouldResetCache || !this.distanceFromWorkedOnWorkspaceCache) {
       this.distanceFromWorkedOnWorkspaceCache = new this.DistanceFromWorkedOnWorkspaceCache(
         {
           userSchedule: this,
-          workspacesInTree
-        }
+          workspacesInTree,
+        },
       );
     }
 
     const workspacesWithDist = workspaces.map(w => ({
       distance: this.distanceFromWorkedOnWorkspaceCache.getDistanceFromWorkedOnWorkspace(
-        w
+        w,
       ),
-      workspace: w
+      workspace: w,
     }));
 
     const maxDist = _.max(workspacesWithDist.map(o => o.distance));
 
     const maxWorkspacesWithDist = workspacesWithDist.filter(
-      o => o.distance === maxDist
+      o => o.distance === maxDist,
     );
     const maxWorkspaces = maxWorkspacesWithDist.map(o => o.workspace);
 
@@ -268,7 +268,7 @@ class UserSchedule {
 
   public getWorkspacesPreviouslyWorkedOnByUser({ workspaces }) {
     const workspacesPreviouslyWorkedOnByUser = workspaces.filter(w =>
-      this.hasUserWorkedOnWorkspace(w)
+      this.hasUserWorkedOnWorkspace(w),
     );
     return workspacesPreviouslyWorkedOnByUser;
   }

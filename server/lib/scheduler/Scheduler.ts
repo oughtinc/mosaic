@@ -30,7 +30,7 @@ class Scheduler {
     RemainingBudgetAmongDescendantsCache,
     rootParentCache,
     schedule,
-    timeLimit
+    timeLimit,
   }) {
     this.experimentId = experimentId;
     this.getFallbackScheduler = getFallbackScheduler;
@@ -48,14 +48,14 @@ class Scheduler {
 
   public async getIdOfCurrentlyActiveUser(workspaceId) {
     const result = this.schedule.getIdOfCurrentlyActiveUserForWorkspace(
-      workspaceId
+      workspaceId,
     );
 
     if (!result) {
       const fallbackScheduler = await this.getFallbackScheduler();
       if (fallbackScheduler) {
         const fallbackResult = await fallbackScheduler.getIdOfCurrentlyActiveUser(
-          workspaceId
+          workspaceId,
         );
         return fallbackResult;
       }
@@ -71,7 +71,7 @@ class Scheduler {
 
   public async getUserActivity(userId) {
     const thisSchedulerUserActivity = await this.schedule.getUserActivity(
-      userId
+      userId,
     );
     const fallbackScheduler = await this.getFallbackScheduler();
     const fallbackSchedulerUserActivity = fallbackScheduler
@@ -79,7 +79,7 @@ class Scheduler {
       : [];
 
     const mergedUserActivity = thisSchedulerUserActivity.concat(
-      fallbackSchedulerUserActivity
+      fallbackSchedulerUserActivity,
     );
 
     return mergedUserActivity;
@@ -88,7 +88,7 @@ class Scheduler {
   public async isUserCurrentlyWorkingOnWorkspace(userId, workspaceId) {
     const result = this.schedule.isUserCurrentlyWorkingOnWorkspace(
       userId,
-      workspaceId
+      workspaceId,
     );
 
     if (!result) {
@@ -96,7 +96,7 @@ class Scheduler {
       if (fallbackScheduler) {
         const fallbackResult = await fallbackScheduler.isUserCurrentlyWorkingOnWorkspace(
           userId,
-          workspaceId
+          workspaceId,
         );
         return fallbackResult;
       }
@@ -127,25 +127,25 @@ class Scheduler {
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(
         userId,
-        treesToConsider
+        treesToConsider,
       );
       const randomlySelectedTree = pickRandomItemFromArray(
-        leastRecentlyWorkedOnTreesToConsider
+        leastRecentlyWorkedOnTreesToConsider,
       );
 
       const workspacesInTree = await this.fetchAllWorkspacesInTree(
-        randomlySelectedTree
+        randomlySelectedTree,
       );
 
       let oracleEligibleWorkspaces = await this.filterByWhetherEligibleForOracle(
-        workspacesInTree
+        workspacesInTree,
       );
       oracleEligibleWorkspaces = await this.filterByWhetherAnsweredByOracle(
-        oracleEligibleWorkspaces
+        oracleEligibleWorkspaces,
       );
 
       const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(
-        oracleEligibleWorkspaces
+        oracleEligibleWorkspaces,
       );
 
       // we want to prioritize older workspaces
@@ -161,7 +161,7 @@ class Scheduler {
           userId,
           workspace: assignedWorkspace,
           isOracle: true,
-          isLastAssignmentTimed: true
+          isLastAssignmentTimed: true,
         });
         return assignedWorkspace.id;
       }
@@ -170,7 +170,7 @@ class Scheduler {
     const fallbackScheduler = await this.getFallbackScheduler();
     if (fallbackScheduler) {
       const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspaceForOracle(
-        userId
+        userId,
       );
 
       return assignedWorkspaceId;
@@ -186,12 +186,12 @@ class Scheduler {
     if (this.isInOracleMode.getValue()) {
       actionableWorkspaces = await this.getActionableWorkspacesInOracleMode({
         maybeSuboptimal: false,
-        userId
+        userId,
       });
     } else {
       actionableWorkspaces = await this.getActionableWorkspaces({
         maybeSuboptimal: false,
-        userId
+        userId,
       });
     }
 
@@ -199,12 +199,12 @@ class Scheduler {
       if (this.isInOracleMode.getValue()) {
         actionableWorkspaces = await this.getActionableWorkspacesInOracleMode({
           maybeSuboptimal: true,
-          userId
+          userId,
         });
       } else {
         actionableWorkspaces = await this.getActionableWorkspaces({
           maybeSuboptimal: true,
-          userId
+          userId,
         });
       }
     }
@@ -214,7 +214,7 @@ class Scheduler {
       if (fallbackScheduler) {
         const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspace(
           userId,
-          maybeSuboptimal
+          maybeSuboptimal,
         );
 
         return assignedWorkspaceId;
@@ -231,7 +231,7 @@ class Scheduler {
       userId,
       workspace: assignedWorkspace,
       isOracle: false,
-      isLastAssignmentTimed: isThisAssignmentTimed
+      isLastAssignmentTimed: isThisAssignmentTimed,
     });
 
     return assignedWorkspace.id;
@@ -260,15 +260,15 @@ class Scheduler {
     while (treesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(
         userId,
-        treesToConsider
+        treesToConsider,
       );
       const randomlySelectedTree = pickRandomItemFromArray(
-        leastRecentlyWorkedOnTreesToConsider
+        leastRecentlyWorkedOnTreesToConsider,
       );
       const actionableWorkspaces = await this.getActionableWorkspacesForTree({
         maybeSuboptimal,
         rootWorkspace: randomlySelectedTree,
-        userId
+        userId,
       });
 
       if (actionableWorkspaces.length > 0) {
@@ -284,66 +284,66 @@ class Scheduler {
 
   private async getActionableWorkspacesInOracleMode({
     maybeSuboptimal,
-    userId
+    userId,
   }) {
     const treesToConsider = await this.fetchAllRootWorkspaces();
 
     let oracleTreesToConsider = await filter(treesToConsider, async t => {
       const isHonestOracle = await this.isUserHonestOracleForRootWorkspace(
         userId,
-        t
+        t,
       );
       const isMaliciousOracle = await this.isUserMaliciousOracleForRootWorkspace(
         userId,
-        t
+        t,
       );
       return isHonestOracle || isMaliciousOracle;
     });
 
     let nonOracleTreesToConsider = _.difference(
       treesToConsider,
-      oracleTreesToConsider
+      oracleTreesToConsider,
     );
 
     while (oracleTreesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(
         userId,
-        oracleTreesToConsider
+        oracleTreesToConsider,
       );
       const randomlySelectedTree = pickRandomItemFromArray(
-        leastRecentlyWorkedOnTreesToConsider
+        leastRecentlyWorkedOnTreesToConsider,
       );
       const workspacesInTree = await this.fetchAllWorkspacesInTree(
-        randomlySelectedTree
+        randomlySelectedTree,
       );
 
       const isHonestOracle = await this.isUserHonestOracleForRootWorkspace(
         userId,
-        randomlySelectedTree
+        randomlySelectedTree,
       );
       const isMaliciousOracle = await this.isUserMaliciousOracleForRootWorkspace(
         userId,
-        randomlySelectedTree
+        randomlySelectedTree,
       );
 
       let oracleEligibleWorkspaces = workspacesInTree;
       if (isHonestOracle) {
         oracleEligibleWorkspaces = await this.filterByWhetherEligibleForHonestOracle(
-          workspacesInTree
+          workspacesInTree,
         );
       } else {
         oracleEligibleWorkspaces = await this.filterByWhetherEligibleForMaliciousOracle(
-          workspacesInTree
+          workspacesInTree,
         );
       }
 
       oracleEligibleWorkspaces = await this.filterByStaleness(
         userId,
-        oracleEligibleWorkspaces
+        oracleEligibleWorkspaces,
       );
 
       const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(
-        oracleEligibleWorkspaces
+        oracleEligibleWorkspaces,
       );
 
       // we want to prioritize older workspaces
@@ -357,7 +357,7 @@ class Scheduler {
         return actionableWorkspaces;
       } else {
         oracleTreesToConsider = _.difference(oracleTreesToConsider, [
-          randomlySelectedTree
+          randomlySelectedTree,
         ]);
       }
     }
@@ -365,22 +365,22 @@ class Scheduler {
     while (nonOracleTreesToConsider.length > 0) {
       const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(
         userId,
-        nonOracleTreesToConsider
+        nonOracleTreesToConsider,
       );
       const randomlySelectedTree = pickRandomItemFromArray(
-        leastRecentlyWorkedOnTreesToConsider
+        leastRecentlyWorkedOnTreesToConsider,
       );
       const actionableWorkspaces = await this.getActionableWorkspacesForTree({
         maybeSuboptimal,
         rootWorkspace: randomlySelectedTree,
-        userId
+        userId,
       });
 
       if (actionableWorkspaces.length > 0) {
         return actionableWorkspaces;
       } else {
         nonOracleTreesToConsider = _.difference(nonOracleTreesToConsider, [
-          randomlySelectedTree
+          randomlySelectedTree,
         ]);
       }
     }
@@ -399,7 +399,7 @@ class Scheduler {
 
   private async filterByWhetherNotEligibleForOracle(workspaces) {
     return workspaces.filter(
-      w => !w.isEligibleForHonestOracle && !w.isEligibleForMaliciousOracle
+      w => !w.isEligibleForHonestOracle && !w.isEligibleForMaliciousOracle,
     );
   }
 
@@ -408,7 +408,7 @@ class Scheduler {
   }
 
   private async filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(
-    workspaces
+    workspaces,
   ) {
     return await filter(workspaces, async w => {
       if (w.wasAnsweredByOracle) {
@@ -422,30 +422,30 @@ class Scheduler {
   private async getActionableWorkspacesForTree({
     maybeSuboptimal,
     rootWorkspace,
-    userId
+    userId,
   }) {
     const allWorkspacesInTree = await this.fetchAllWorkspacesInTree(
-      rootWorkspace
+      rootWorkspace,
     );
 
     let workspacesInTree = allWorkspacesInTree;
     if (this.isInOracleMode.getValue()) {
       workspacesInTree = await this.filterByWhetherNotEligibleForOracle(
-        allWorkspacesInTree
+        allWorkspacesInTree,
       );
       workspacesInTree = await this.filterByWhetherAnsweredByOracle(
-        workspacesInTree
+        workspacesInTree,
       );
     }
 
     const workspacesNotCurrentlyBeingWorkedOn = await this.filterByWhetherCurrentlyBeingWorkedOn(
-      workspacesInTree
+      workspacesInTree,
     );
 
     let workspacesWithAtLeastMinBudget = workspacesNotCurrentlyBeingWorkedOn;
     if (rootWorkspace.hasTimeBudget) {
       workspacesWithAtLeastMinBudget = await this.filterByWhetherHasMinBudget(
-        workspacesNotCurrentlyBeingWorkedOn
+        workspacesNotCurrentlyBeingWorkedOn,
       );
     }
 
@@ -453,13 +453,13 @@ class Scheduler {
 
     const staleWorkspaces = await this.filterByStaleness(
       userId,
-      workspacesWithAtLeastMinBudget
+      workspacesWithAtLeastMinBudget,
     );
 
     eligibleWorkspaces = staleWorkspaces;
 
     const previouslyWorkedOnWorkspaces = this.getWorkspacesPreviouslyWorkedOnByUser(
-      { userId, workspaces: eligibleWorkspaces }
+      { userId, workspaces: eligibleWorkspaces },
     );
     if (
       previouslyWorkedOnWorkspaces.length > 0 &&
@@ -472,8 +472,8 @@ class Scheduler {
           minDist: maybeSuboptimal ? 1 : 2,
           userId,
           workspaces: eligibleWorkspaces,
-          workspacesInTree: allWorkspacesInTree
-        }
+          workspacesInTree: allWorkspacesInTree,
+        },
       );
 
       eligibleWorkspaces = workspacesExceedingDistCuoff;
@@ -482,11 +482,11 @@ class Scheduler {
     let workspaceWithLeastRequiredWorkAmongDescendants = eligibleWorkspaces;
     if (rootWorkspace.hasTimeBudget) {
       workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithLeastRemainingBugetAmongDescendants(
-        eligibleWorkspaces
+        eligibleWorkspaces,
       );
     } else if (rootWorkspace.hasIOConstraints) {
       workspaceWithLeastRequiredWorkAmongDescendants = await this.getWorkspacesWithFewestStaleDescendants(
-        eligibleWorkspaces
+        eligibleWorkspaces,
       );
     }
 
@@ -494,8 +494,8 @@ class Scheduler {
       {
         userId,
         workspaces: workspaceWithLeastRequiredWorkAmongDescendants,
-        workspacesInTree: allWorkspacesInTree
-      }
+        workspacesInTree: allWorkspacesInTree,
+      },
     );
 
     const finalWorkspaces = workspacesWithMostDistFromWorkedOnWorkspace;
@@ -513,33 +513,33 @@ class Scheduler {
   }
 
   private async getWorkspacesWithLeastRemainingBugetAmongDescendants(
-    workspaces
+    workspaces,
   ) {
     const workspacesWithRemainingDescendantBudget = await map(
       workspaces,
       async w => {
         const remainingBudgetAmongDescendants = await this.remainingBudgetAmongDescendantsCache.getRemainingBudgetAmongDescendants(
-          w
+          w,
         );
 
         return {
           remainingBudgetAmongDescendants,
-          workspace: w
+          workspace: w,
         };
-      }
+      },
     );
 
     const minLeastRemainingBudgetAmongDescendants = _.min(
       workspacesWithRemainingDescendantBudget.map(
-        o => o.remainingBudgetAmongDescendants
-      )
+        o => o.remainingBudgetAmongDescendants,
+      ),
     );
 
     const workspacesToReturn = workspacesWithRemainingDescendantBudget
       .filter(
         o =>
           o.remainingBudgetAmongDescendants ===
-          minLeastRemainingBudgetAmongDescendants
+          minLeastRemainingBudgetAmongDescendants,
       )
       .map(o => o.workspace);
 
@@ -551,20 +551,20 @@ class Scheduler {
       workspaces,
       async w => {
         const numberOfStaleDescendants = await this.numberOfStaleDescendantsCache.getNumberOfStaleDescendants(
-          w
+          w,
         );
 
         return {
           numberOfStaleDescendants,
-          workspace: w
+          workspace: w,
         };
-      }
+      },
     );
 
     const minNumberOfStaleDescendants = _.min(
       workspacesWithNumberOfStaleDescendants.map(
-        o => o.numberOfStaleDescendants
-      )
+        o => o.numberOfStaleDescendants,
+      ),
     );
 
     const workspacesToReturn = workspacesWithNumberOfStaleDescendants
@@ -577,14 +577,14 @@ class Scheduler {
   private async getTreesWorkedOnLeastRecentlyByUser(userId, rootWorkspaces) {
     const treesWorkedOnLeastRecentlyByUser = this.schedule.getTreesWorkedOnLeastRecentlyByUser(
       rootWorkspaces,
-      userId
+      userId,
     );
     return treesWorkedOnLeastRecentlyByUser;
   }
 
   private async filterByWhetherCurrentlyBeingWorkedOn(workspaces) {
     return workspaces.filter(
-      w => !this.schedule.isWorkspaceCurrentlyBeingWorkedOn(w)
+      w => !this.schedule.isWorkspaceCurrentlyBeingWorkedOn(w),
     );
   }
 
@@ -595,7 +595,7 @@ class Scheduler {
   private async filterByWhetherNotYetWorkedOn(workspaces) {
     return await filter(
       workspaces,
-      async w => !(await this.schedule.hasWorkspaceBeenWorkedOnYet(w))
+      async w => !(await this.schedule.hasWorkspaceBeenWorkedOnYet(w)),
     );
   }
 
@@ -606,7 +606,7 @@ class Scheduler {
   private getWorkspacesPreviouslyWorkedOnByUser({ userId, workspaces }) {
     return this.schedule.getWorkspacesPreviouslyWorkedOnByUser({
       userId,
-      workspaces
+      workspaces,
     });
   }
 
@@ -615,14 +615,14 @@ class Scheduler {
     shouldResetCache = true,
     userId,
     workspaces,
-    workspacesInTree
+    workspacesInTree,
   }) {
     return this.schedule.getWorkspacesExceedingMinDistFromWorkedOnWorkspace({
       minDist,
       shouldResetCache,
       userId,
       workspaces,
-      workspacesInTree
+      workspacesInTree,
     });
   }
 
@@ -630,13 +630,13 @@ class Scheduler {
     shouldResetCache = true,
     userId,
     workspaces,
-    workspacesInTree
+    workspacesInTree,
   }) {
     return this.schedule.getWorkspacesWithMostDistFromWorkedOnWorkspace({
       shouldResetCache,
       userId,
       workspaces,
-      workspacesInTree
+      workspacesInTree,
     });
   }
 

@@ -1,10 +1,7 @@
 import * as React from "react";
 import { Checkbox } from "react-bootstrap";
 
-import {
-  adminCheckboxBgColor,
-  adminCheckboxBorderColor,
-} from "../styles";
+import { adminCheckboxBgColor, adminCheckboxBorderColor } from "../styles";
 
 class AdminCheckboxThatTogglesWorkspaceField extends React.Component<any, any> {
   public state = {
@@ -20,11 +17,7 @@ class AdminCheckboxThatTogglesWorkspaceField extends React.Component<any, any> {
   }
 
   public render() {
-    const {
-      cyAttributeName,
-      workspace,
-      workspaceFieldToUpdate
-    } = this.props;
+    const { cyAttributeName, workspace, workspaceFieldToUpdate } = this.props;
 
     return (
       <Checkbox
@@ -41,13 +34,9 @@ class AdminCheckboxThatTogglesWorkspaceField extends React.Component<any, any> {
         onChange={this.handleStatusChange}
         data-cy={cyAttributeName}
       >
-        {
-          this.state.isStatusPending
-          ?
-          "updating..."
-          :
-          this.props.checkboxLabelText
-        }
+        {this.state.isStatusPending
+          ? "updating..."
+          : this.props.checkboxLabelText}
       </Checkbox>
     );
   }
@@ -60,17 +49,22 @@ class AdminCheckboxThatTogglesWorkspaceField extends React.Component<any, any> {
     this.setState({ isStatusPending: true }, () =>
       this.props.updateMutation({
         variables: {
-          [this.props.workspaceFieldToUpdate]: !this.props.workspace[this.props.workspaceFieldToUpdate],
-          workspaceId: this.props.workspace.id
-        }
-      })
+          [this.props.workspaceFieldToUpdate]: !this.props.workspace[
+            this.props.workspaceFieldToUpdate
+          ],
+          workspaceId: this.props.workspace.id,
+        },
+      }),
     );
-  }
+  };
 
   private didStatusChange = (prevProps: any, curProps: any) => {
     const prevWorkspace = prevProps.workspace;
     const curWorkspace = curProps.workspace;
-    return prevWorkspace[this.props.workspaceFieldToUpdate] !== curWorkspace[this.props.workspaceFieldToUpdate];
-  }
+    return (
+      prevWorkspace[this.props.workspaceFieldToUpdate] !==
+      curWorkspace[this.props.workspaceFieldToUpdate]
+    );
+  };
 }
 export { AdminCheckboxThatTogglesWorkspaceField };
