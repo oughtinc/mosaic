@@ -54,7 +54,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
       return (
         <div>
           <CompactTreeRow>
-            <CompactTreeRowLabel>Question</CompactTreeRowLabel>
+            <CompactTreeRowLabel>Q</CompactTreeRowLabel>
             <CompactTreeRowContent>
               <BlockEditor
                 name={honestQuestionBlock.id}
@@ -70,8 +70,8 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
             didHonestWin
             &&
             <CompactTreeRow>
-              <CompactTreeRowLabel>
-                <Checkmark color="green" /> Honest
+              <CompactTreeRowLabel color="green">
+                <Checkmark color="green" /> H
               </CompactTreeRowLabel>
               <CompactTreeRowContent>
                 <BlockEditor
@@ -105,7 +105,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
     return (
       <div>
         <CompactTreeRow>
-          <CompactTreeRowLabel>Question</CompactTreeRowLabel>
+          <CompactTreeRowLabel>Q</CompactTreeRowLabel>
           <CompactTreeRowContent>
             <BlockEditor
               name={honestQuestionBlock.id}
@@ -119,8 +119,8 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
         </CompactTreeRow>
 
           <CompactTreeRow>
-            <CompactTreeRowLabel>
-              {didHonestWin && <Checkmark color="green" />}{" "}Honest
+            <CompactTreeRowLabel color="green">
+              {didHonestWin && <Checkmark color="green" />}{" "}H
             </CompactTreeRowLabel>
             {
               malicious
@@ -168,7 +168,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           border: "1px solid #ddd",
           borderRadius: "3px",
           boxShadow: "inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05)",
-          marginTop: "25px",
+          marginTop: "35px",
           minHeight: "35px",
           padding: "10px",
           position: "relative",

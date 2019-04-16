@@ -33,8 +33,8 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
 
     return (
       <CompactTreeRow>
-        <CompactTreeRowLabel>
-          {didMaliciousWin && <Checkmark color="red" />}{" "}Malicious
+        <CompactTreeRowLabel color="red">
+          {didMaliciousWin && <Checkmark color="red" />}{" "}M
         </CompactTreeRowLabel>
         {
           didMaliciousDeclineToChallenge

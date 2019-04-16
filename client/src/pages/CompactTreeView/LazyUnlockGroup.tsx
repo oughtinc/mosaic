@@ -26,7 +26,7 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
         <div>
           <CompactTreeRow>
             <CompactTreeRowLabel>
-              Unlock
+              🔑
             </CompactTreeRowLabel>
             <CompactTreeRowContent>
               <BlockEditor
@@ -43,8 +43,8 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
             (isExpanded || !isOracleAnswerDraftBlockValueNull)
             &&
             <CompactTreeRow>
-              <CompactTreeRowLabel>
-                🔓 {workspace.isEligibleForHonestOracle ? "Honest" : "Malicious"}
+              <CompactTreeRowLabel color={workspace.isEligibleForHonestOracle ? "green" : "red"}>
+                {workspace.isEligibleForHonestOracle ? "H" : "M"}
               </CompactTreeRowLabel>
                 {
                   isOracleAnswerDraftBlockValueNull
