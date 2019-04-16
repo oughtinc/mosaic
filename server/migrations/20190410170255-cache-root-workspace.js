@@ -44,9 +44,9 @@ module.exports = {
     await Promise.all(workspaces.map(async ({ id }) => {
       const rootId = await findRootWorkspaceId(id);
       await queryInterface.sequelize.query(
-        `UPDATE "Workspaces" SET "rootWorkspaceId" = :rootId`,
+        `UPDATE "Workspaces" SET "rootWorkspaceId" = :rootId WHERE id = :id`,
         {
-          replacements: { rootId },
+          replacements: { id, rootId },
           type: Sequelize.QueryTypes.UPDATE,
         }
       );
