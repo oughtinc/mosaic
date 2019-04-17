@@ -2,6 +2,7 @@ import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { connect } from "react-redux";
+import { parse as parseQueryString } from "query-string";
 
 import { propsToPointerDetails } from "./helpers";
 
@@ -56,8 +57,10 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
 
     const fullExportCharCount = getInputCharCount(nodeAsJson);
 
+    const isInExperiment = parseQueryString(window.location.search).experiment;
+
     const pointerExportBackground: any =
-    fullExportCharCount > 650 / 3
+    (fullExportCharCount > 650 / 3 && isInExperiment)
     ?
     "orange"
     :
