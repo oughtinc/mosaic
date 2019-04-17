@@ -55,6 +55,9 @@ const server = new ApolloServer({
       };
     }
   },
+  engine: {
+    apiKey: "service:mosaic:hGCwzWa_wg71SWpJ7NBMoA"
+  },
 });
 
 if (!process.env.USING_DOCKER) {
