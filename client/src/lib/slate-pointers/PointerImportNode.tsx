@@ -90,7 +90,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   }
 
   public componentDidMount() {
-    const isOnTreePage = window.location.pathname.endsWith("subtree");
+    const isOnTreePage = window.location.pathname.endsWith("subtree") || window.location.pathname.endsWith("compactTree");
 
     if (isOnTreePage) {
       return;
