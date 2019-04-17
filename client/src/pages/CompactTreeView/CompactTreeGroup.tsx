@@ -214,11 +214,15 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
         {
           this.props.groupQuery.workspace
           ?
-          <CompactTreeGroupPresentationl
-            availablePointers={this.props.availablePointers}
-            isExpanded={this.state.isExpanded}
-            workspace={this.props.groupQuery.workspace}
-          />
+          <div
+            style={{ opacity: this.props.groupQuery.workspace.isArchived ? 0.2 : 1 }}
+          >
+            <CompactTreeGroupPresentationl
+              availablePointers={this.props.availablePointers}
+              isExpanded={this.state.isExpanded}
+              workspace={this.props.groupQuery.workspace}
+            />
+          </div>
           :
           <div style={{paddingLeft: "30px"}}>Loading...</div>
         }
@@ -232,6 +236,7 @@ export const GROUP_QUERY = gql`
     workspace(id: $workspaceId) {
       id
       parentId
+      isArchived
       isCurrentlyResolved
       isEligibleForHonestOracle
       isRequestingLazyUnlock
