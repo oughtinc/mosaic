@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { Link } from "react-router-dom";
 import { CompactTreeRow } from "./CompactTreeRow";
 import { CompactTreeRowLabel } from "./CompactTreeRowLabel";
 import { CompactTreeRowContent } from "./CompactTreeRowContent";
@@ -25,9 +25,15 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
       return (
         <div>
           <CompactTreeRow>
-            <CompactTreeRowLabel>
-              🔑
-            </CompactTreeRowLabel>
+            <Link
+              style={{ textDecoration: "none" }}
+              target="_blank"
+              to={`/workspaces/${workspace.parentId}`}
+            >
+              <CompactTreeRowLabel>
+                🔑
+              </CompactTreeRowLabel>
+            </Link>
             <CompactTreeRowContent>
               <BlockEditor
                 name={oracleQuestionBlock.id}
@@ -43,9 +49,15 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
             (isExpanded || !isOracleAnswerDraftBlockValueNull)
             &&
             <CompactTreeRow>
-              <CompactTreeRowLabel color={workspace.isEligibleForHonestOracle ? "green" : "red"}>
-                {workspace.isEligibleForHonestOracle ? "H" : "M"}
-              </CompactTreeRowLabel>
+                <Link
+                  style={{ textDecoration: "none" }}
+                  target="_blank"
+                  to={`/workspaces/${workspace.id}`}
+                >
+                  <CompactTreeRowLabel color={workspace.isEligibleForHonestOracle ? "green" : "red"}>
+                    {workspace.isEligibleForHonestOracle ? "H" : "M"}
+                  </CompactTreeRowLabel>
+                </Link>
                 {
                   isOracleAnswerDraftBlockValueNull
                   ?

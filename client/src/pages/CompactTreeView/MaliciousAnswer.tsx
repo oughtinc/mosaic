@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import * as React from "react";
+import { Link } from "react-router-dom";
 
 import { CompactTreeRow } from "./CompactTreeRow";
 import { CompactTreeRowLabel } from "./CompactTreeRowLabel";
@@ -33,9 +34,15 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
 
     return (
       <CompactTreeRow>
-        <CompactTreeRowLabel color="red">
-          {didMaliciousWin && <Checkmark color="red" />}{" "}M
-        </CompactTreeRowLabel>
+        <Link
+          style={{ textDecoration: "none" }}
+          target="_blank"
+          to={`/workspaces/${malicious.id}`}
+        >
+          <CompactTreeRowLabel color="red">
+            {didMaliciousWin && <Checkmark color="red" />}{" "}M
+          </CompactTreeRowLabel>
+        </Link>
         {
           didMaliciousDeclineToChallenge
           ?

@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
@@ -54,7 +55,13 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
       return (
         <div>
           <CompactTreeRow>
-            <CompactTreeRowLabel>Q</CompactTreeRowLabel>
+            <Link
+              target="_blank"
+              to={`/workspaces/${workspace.parentId}`}
+              style={{ color: "#333", textDecoration: "none" }}
+            >
+              <CompactTreeRowLabel>Q</CompactTreeRowLabel>
+            </Link>
             <CompactTreeRowContent>
               <BlockEditor
                 name={honestQuestionBlock.id}
@@ -70,9 +77,15 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
             didHonestWin
             &&
             <CompactTreeRow>
-              <CompactTreeRowLabel color="green">
-                <Checkmark color="green" /> H
-              </CompactTreeRowLabel>
+              <Link
+                style={{ textDecoration: "none" }}
+                target="_blank"
+                to={`/workspaces/${workspace.id}`}
+              >
+                <CompactTreeRowLabel color="green">
+                  <Checkmark color="green" /> H
+                </CompactTreeRowLabel>
+              </Link>
               <CompactTreeRowContent>
                 <BlockEditor
                   name={honestScratchpadBlock.id}
@@ -105,7 +118,13 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
     return (
       <div>
         <CompactTreeRow>
-          <CompactTreeRowLabel>Q</CompactTreeRowLabel>
+          <Link
+            style={{ color: "#333", textDecoration: "none" }}
+            target="_blank"
+            to={`/workspaces/${workspace.parentId}`}
+          >
+            <CompactTreeRowLabel>Q</CompactTreeRowLabel>
+          </Link>
           <CompactTreeRowContent>
             <BlockEditor
               name={honestQuestionBlock.id}
@@ -119,9 +138,15 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
         </CompactTreeRow>
 
           <CompactTreeRow>
-            <CompactTreeRowLabel color="green">
-              {didHonestWin && <Checkmark color="green" />}{" "}H
-            </CompactTreeRowLabel>
+            <Link
+              style={{ textDecoration: "none" }}
+              target="_blank"
+              to={`/workspaces/${workspace.id}`}
+            >
+              <CompactTreeRowLabel color="green">
+                {didHonestWin && <Checkmark color="green" />}{" "}H
+              </CompactTreeRowLabel>
+            </Link>
             {
               malicious
               ?
@@ -206,6 +231,7 @@ export const GROUP_QUERY = gql`
   query groupQuery($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      parentId
       isCurrentlyResolved
       isEligibleForHonestOracle
       isRequestingLazyUnlock
