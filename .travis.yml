@@ -18,9 +18,12 @@ script:
   - cd server
   - yarn lint
   - yarn db:create
-  - yarn db:migrate
 #  - yarn test:ci
+  - yarn db:reset
+  - yarn start & node_modules/.bin/wait-on -t 30000 tcp:localhost:8080
+  - node_modules/.bin/apollo service:push --endpoint http://localhost:8080/graphql --tag=$TRAVIS_BRANCH --key="service:mosaic:hGCwzWa_wg71SWpJ7NBMoA"
   - cd ../client
   - yarn lint
   - yarn test
+  - yarn start & node_modules/.bin/wait-on -t 30000 http://localhost:3000/
 #  - yarn test:cypress
