@@ -62,24 +62,17 @@ export class CompactTreeViewPresentational extends React.PureComponent<any, any>
 
     const workspace = this.props.initialRootQuery.workspace;
     const isRootLevel = !workspace.parentId;
-
-    if (!isRootLevel) {
-      return (
-        <CompactTreeViewContainer>
-          <div style={{ marginTop: "20px"}}>
-            Need to start with root level for compact tree view
-          </div>
-        </CompactTreeViewContainer>
-      );
-    }
-
     const isMalicious = workspace.isEligibleForMaliciousOracle;
+    const isHonest = workspace.isEligibleForHonestOracle;
+    const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
 
-    if (!isMalicious) {
+    const isValid = (isRootLevel && isMalicious) || isHonest || isRequestingLazyUnlock;
+
+    if (!isValid) {
       return (
         <CompactTreeViewContainer>
           <div style={{ marginTop: "20px"}}>
-            Root level must be malicious for compact tree view
+            Need to start with root level or honest oracle workspace
           </div>
         </CompactTreeViewContainer>
       );
@@ -88,16 +81,16 @@ export class CompactTreeViewPresentational extends React.PureComponent<any, any>
     return (
       <CompactTreeViewContainer>
         {
-          workspace.childWorkspaces[0]
+          isRootLevel && !workspace.childWorkspaces[0]
           ?
-          <CompactTreeGroup
-            availablePointers={workspace.connectedPointersOfSubtree}
-            workspaceId={workspace.childWorkspaces[0].id}
-          />
-          :
           <div style={{ marginTop: "20px"}}>
             Nothing to show yet...
           </div>
+          :
+          <CompactTreeGroup
+            availablePointers={workspace.connectedPointersOfSubtree}
+            workspaceId={isRootLevel ? workspace.childWorkspaces[0].id : workspace.id}
+          />
         }
       </CompactTreeViewContainer>
     );
@@ -109,7 +102,9 @@ export const INITIAL_ROOT_QUERY = gql`
     workspace(id: $workspaceId) {
       id
       parentId
+      isEligibleForHonestOracle
       isEligibleForMaliciousOracle
+      isRequestingLazyUnlock
       connectedPointersOfSubtree
     childWorkspaces {
         id

@@ -197,6 +197,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           marginTop: "35px",
           minHeight: "35px",
           padding: "10px",
+          paddingRight: "40px",
           position: "relative",
         }}
       >
@@ -204,13 +205,37 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           bsSize="xsmall"
           onClick={() => this.setState({isExpanded: !this.state.isExpanded})}
           style={{
-            left: "5px",
+            lineHeight: "17px",
+            height: "20px",
+            width: "20px",
+            right: "5px",
             position: "absolute",
+            textAlign: "center",
             top: "5px",
           }}
         >
           {this.state.isExpanded ? "-" : "+"}
         </Button>
+        <a
+          href={this.props.groupQuery.workspace && `/workspaces/${this.props.groupQuery.workspace.id}/compactTree`}
+          style={{
+            right: "5px",
+            position: "absolute",
+            top: "26px",
+          }}
+        >
+          <Button
+            bsSize="xsmall"
+            style={{
+              height: "20px",
+              lineHeight: "15px",
+              textAlign: "center",
+              width: "20px",
+            }}
+          >
+            »
+          </Button>
+        </a>
         {
           this.props.groupQuery.workspace
           ?
@@ -224,7 +249,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
             />
           </div>
           :
-          <div style={{paddingLeft: "30px"}}>Loading...</div>
+          <div style={{ paddingBottom: "17px",  paddingLeft: "20px"}}>Loading...</div>
         }
       </div>
     );
