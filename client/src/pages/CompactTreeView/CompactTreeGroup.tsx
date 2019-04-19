@@ -96,15 +96,25 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
             didHonestWin
             &&
             <CompactTreeRow>
-              <Link
-                style={{ textDecoration: "none" }}
-                target="_blank"
-                to={`/workspaces/${workspace.id}`}
-              >
-                <CompactTreeRowLabel color="green">
-                  <Checkmark color="green" /> H
-                </CompactTreeRowLabel>
-              </Link>
+              <CompactTreeRowLabel color="green">
+                <Link
+                  style={{ textDecoration: "none" }}
+                  target="_blank"
+                  to={`/workspaces/${malicious.childWorkspaces[0] ? malicious.childWorkspaces[0].id : malicious.id}`}
+                >
+                  <Checkmark color="green" />
+                </Link>
+                <Link
+                  style={{
+                    color: "green",
+                    textDecoration: "none",
+                  }}
+                  target="_blank"
+                  to={`/workspaces/${workspace.id}`}
+                >
+                  H
+                </Link>
+              </CompactTreeRowLabel>
               <CompactTreeRowContent>
                 <BlockEditor
                   name={honestScratchpadBlock.id}
@@ -161,15 +171,27 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
         </CompactTreeRow>
 
           <CompactTreeRow>
-            <Link
-              style={{ textDecoration: "none" }}
-              target="_blank"
-              to={`/workspaces/${workspace.id}`}
-            >
-              <CompactTreeRowLabel color="green">
-                {didHonestWin && <Checkmark color="green" />}{" "}H
-              </CompactTreeRowLabel>
-            </Link>
+            <CompactTreeRowLabel color="green">
+              {
+                didHonestWin
+                &&
+                <Link
+                  style={{ textDecoration: "none" }}
+                  target="_blank"
+                  to={`/workspaces/${malicious.childWorkspaces[0] ? malicious.childWorkspaces[0].id : malicious.id}`}
+                >
+                  <Checkmark color="green" />
+                </Link>
+              }
+              {" "}
+              <Link
+                style={{ color: "green", textDecoration: "none" }}
+                target="_blank"
+                to={`/workspaces/${workspace.id}`}
+              >
+                H
+              </Link>
+            </CompactTreeRowLabel>
             {
               malicious
               ?

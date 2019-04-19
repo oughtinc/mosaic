@@ -34,15 +34,30 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
 
     return (
       <CompactTreeRow>
-        <Link
-          style={{ textDecoration: "none" }}
-          target="_blank"
-          to={`/workspaces/${malicious.id}`}
-        >
-          <CompactTreeRowLabel color="red">
-            {didMaliciousWin && <Checkmark color="red" />}{" "}M
-          </CompactTreeRowLabel>
-        </Link>
+        <CompactTreeRowLabel>
+          {
+            didMaliciousWin
+            &&
+            <Link
+              style={{ textDecoration: "none" }}
+              target="_blank"
+              to={`/workspaces/${normal.id}`}
+            >
+              <Checkmark color="red" />
+            </Link>
+          }
+          {" "}
+          <Link
+            style={{
+              color: "red",
+              textDecoration: "none",
+            }}
+            target="_blank"
+            to={`/workspaces/${malicious.id}`}
+          >
+            M
+          </Link>
+        </CompactTreeRowLabel>
         {
           didMaliciousDeclineToChallenge
           ?
