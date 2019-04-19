@@ -216,7 +216,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         ":before": {
           backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
           color: "rgb(233, 239, 233)",
-          content: `"$${pointerIndex + 1}"`,
+          content: `" ${pointerIndex + 1} "`,
           borderRadius: "4px 0px 0px 4px",
           padding: "0px 3px",
         },
@@ -225,7 +225,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
         color: "rgb(233, 239, 233)",
         cursor: isLazyPointer ? "auto" : "pointer",
-        padding: "0 4px",
+        padding: "0 6px",
         borderRadius: "4px",
         transition: "background-color color 0.8s",
         whiteSpace: "nowrap",
@@ -263,7 +263,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
             >
               🔒
             </span>
-            {`$${pointerIndex + 1}`}
+            {`${pointerIndex + 1}`}
           </ClosedPointerImport>
         );
       }
@@ -293,7 +293,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
             >
               🔒
             </span>
-            {`$${pointerIndex + 1}`}
+            {`${pointerIndex + 1}`}
           </ClosedPointerImport>
         </OverlayTrigger>
       );
