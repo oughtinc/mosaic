@@ -250,6 +250,8 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           bsSize="xsmall"
           onClick={() => this.setState({isExpanded: !this.state.isExpanded})}
           style={{
+            fontSize: "17px",
+            fontWeight: 600,
             lineHeight: "17px",
             height: "20px",
             width: "20px",
@@ -266,7 +268,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           style={{
             right: "5px",
             position: "absolute",
-            top: "26px",
+            top: "27px",
           }}
         >
           <Button
@@ -292,11 +294,12 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           <Button
             bsSize="xsmall"
             style={{
-              backgroundColor: "#ffa",
               height: "20px",
               width: "20px",
             }}
-          />
+          >
+            #
+          </Button>
         </a>
         {
           this.props.groupQuery.workspace
