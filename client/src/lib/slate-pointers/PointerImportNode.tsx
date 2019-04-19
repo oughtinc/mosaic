@@ -48,7 +48,6 @@ const OpenPointerImport: any = styled.span`
   color: #000;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color color 0.8s;
 `;
 
 const Brackets: any = styled.span`
@@ -218,7 +217,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
           color: "rgb(233, 239, 233)",
           content: `"${pointerIndex + 1}"`,
           borderRadius: "4px 0px 0px 4px",
-          padding: isLocked ? "0px 4px" : "0 8px",
+          padding: isLocked ? "0px 4px" : "0 6px",
         },
       },
       ClosedPointerImportStyle: {
@@ -226,8 +225,8 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         color: "rgb(233, 239, 233)",
         cursor: isLazyPointer ? "auto" : "pointer",
         borderRadius: "4px",
-        padding: isLocked ? "0px 4px" : "0 8px",
-        transition: "background-color 0.8s, padding 2s",
+        padding: isLocked ? "0px 4px" : "0 6px",
+        transition: "background-color 0.4s",
         whiteSpace: "nowrap",
         ":hover": {
           backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover),
@@ -255,7 +254,6 @@ class PointerImportNodePresentational extends React.Component<any, any> {
                 filter: "brightness(110%) saturate(400%)",
                 fontSize: "smaller",
                 transform: !isLocked && "scale(0, 0)",
-                transition: "all 0.5s",
                 maxWidth: isLocked ? "90px" : 0,
                 verticalAlign: "middle",
               }}
