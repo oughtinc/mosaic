@@ -4,6 +4,7 @@ import * as React from "react";
 import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { scroller, Element } from "react-scroll";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
@@ -22,14 +23,28 @@ import { extractOracleValueAnswerFromBlock } from "./helpers/extractOracleAnswer
 const Checkmark = ({ color }) => <span style={{ color, fontSize: "24px" }}>✓</span>;
 
 export class CompactTreeGroupPresentationl extends React.PureComponent<any, any> {
+  public componentDidMount() {
+    const isThisActiveWorkspace = parseQueryString(window.location.search).activeWorkspace === this.props.workspace.id;
+    if (isThisActiveWorkspace) {
+      setTimeout(() => {
+        scroller.scrollTo(this.props.workspace.id, {
+          duration: 500,
+          smooth: true,
+        });
+      }, 3000);
+    }
+  }
+
   public render() {
     const { workspace } = this.props;
+    const isThisActiveWorkspace = parseQueryString(window.location.search).activeWorkspace === workspace.id;
 
     if (workspace.isRequestingLazyUnlock) {
       return (
         <LazyUnlockGroup
           availablePointers={this.props.availablePointers}
           isExpanded={this.props.isExpanded}
+          isThisActiveWorkspace={isThisActiveWorkspace}
           workspace={workspace}
         />
       );
@@ -53,7 +68,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
 
     if (!this.props.isExpanded) {
       return (
-        <div>
+        <Element name={workspace.id}>
           <CompactTreeRow>
             <Link
               target="_blank"
@@ -62,7 +77,11 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
             >
               <CompactTreeRowLabel>Q</CompactTreeRowLabel>
             </Link>
-            <CompactTreeRowContent>
+            <CompactTreeRowContent
+              style={{
+                boxShadow: isThisActiveWorkspace && "0 0 0  5px yellow",
+              }}
+            >
               <BlockEditor
                 name={honestQuestionBlock.id}
                 blockId={honestQuestionBlock.id}
@@ -111,13 +130,13 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
               malicious={malicious}
             />
           }
-        </div>
+        </Element>
       );
     }
 
     return (
-      <div>
-        <CompactTreeRow>
+      <Element name={workspace.id}>
+        <CompactTreeRow >
           <Link
             style={{ color: "#333", textDecoration: "none" }}
             target="_blank"
@@ -125,7 +144,11 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
           >
             <CompactTreeRowLabel>Q</CompactTreeRowLabel>
           </Link>
-          <CompactTreeRowContent>
+          <CompactTreeRowContent
+            style={{
+              boxShadow: isThisActiveWorkspace && "0 0 0  5px yellow",
+            }}
+          >
             <BlockEditor
               name={honestQuestionBlock.id}
               blockId={honestQuestionBlock.id}
@@ -175,7 +198,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
             malicious={malicious}
           />
         }
-      </div>
+      </Element>
     );
   }
 }
@@ -236,11 +259,31 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
             »
           </Button>
         </a>
+        <a
+          href={this.props.groupQuery.workspace && `${window.location.pathname}?expanded=true&activeWorkspace=${this.props.groupQuery.workspace.id}`}
+          style={{
+            right: "5px",
+            position: "absolute",
+            top: "50px",
+          }}
+        >
+          <Button
+            bsSize="xsmall"
+            style={{
+              backgroundColor: "#ffa",
+              height: "20px",
+              width: "20px",
+            }}
+          />
+        </a>
         {
           this.props.groupQuery.workspace
           ?
           <div
-            style={{ opacity: this.props.groupQuery.workspace.isArchived ? 0.2 : 1 }}
+            style={{
+              minHeight: "52px",
+              opacity: this.props.groupQuery.workspace.isArchived ? 0.2 : 1,
+            }}
           >
             <CompactTreeGroupPresentationl
               availablePointers={this.props.availablePointers}
@@ -249,7 +292,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
             />
           </div>
           :
-          <div style={{ paddingBottom: "17px",  paddingLeft: "20px"}}>Loading...</div>
+          <div style={{ paddingBottom: "37px",  paddingLeft: "20px"}}>Loading...</div>
         }
       </div>
     );

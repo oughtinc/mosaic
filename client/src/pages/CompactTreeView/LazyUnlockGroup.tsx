@@ -12,6 +12,7 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
       const {
         availablePointers,
         isExpanded,
+        isThisActiveWorkspace,
         workspace,
       } = this.props;
 
@@ -34,7 +35,11 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
                 🔑
               </CompactTreeRowLabel>
             </Link>
-            <CompactTreeRowContent>
+            <CompactTreeRowContent
+              style={{
+                boxShadow: isThisActiveWorkspace && "0 0 0  5px yellow",
+              }}
+            >
               <BlockEditor
                 name={oracleQuestionBlock.id}
                 blockId={oracleQuestionBlock.id}
