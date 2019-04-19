@@ -216,18 +216,18 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         ":before": {
           backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
           color: "rgb(233, 239, 233)",
-          content: `" ${pointerIndex + 1} "`,
+          content: `"${pointerIndex + 1}"`,
           borderRadius: "4px 0px 0px 4px",
-          padding: "0px 3px",
+          padding: isLocked ? "0px 4px" : "0 8px",
         },
       },
       ClosedPointerImportStyle: {
         backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
         color: "rgb(233, 239, 233)",
         cursor: isLazyPointer ? "auto" : "pointer",
-        padding: "0 6px",
         borderRadius: "4px",
-        transition: "background-color color 0.8s",
+        padding: isLocked ? "0px 4px" : "0 8px",
+        transition: "background-color 0.8s, padding 2s",
         whiteSpace: "nowrap",
         ":hover": {
           backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover),

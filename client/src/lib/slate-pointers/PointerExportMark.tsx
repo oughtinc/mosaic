@@ -83,9 +83,9 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
         ":before": {
           backgroundColor: isLazyPointer ? "red" : darkGreen,
           color: "rgb(233, 239, 233)",
-          content: `" ${parseInt(pointerIndex, 10) + 1} "`,
+          content: `"${parseInt(pointerIndex, 10) + 1}"`,
           borderRadius: "4px 0px 0px 4px",
-          padding: "0px 3px",
+          padding: "0px 8px",
         },
       },
 
