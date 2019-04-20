@@ -3,6 +3,10 @@ import * as React from "react";
 import { Badge } from "react-bootstrap";
 
 function secondsToDurationString(seconds: number, shouldShowSeconds: boolean) {
+  if (typeof seconds !== "number") {
+    return "N/A";
+  }
+
   if (seconds < 0) {
     return "0s";
   }
