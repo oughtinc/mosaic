@@ -3,6 +3,7 @@ import * as React from "react";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
 import { parse as parseQueryString } from "query-string";
+import * as _ from "lodash";
 import {
   ROOT_WORKSPACE_SUBTREE_QUERY,
   CHILD_WORKSPACE_SUBTREE_QUERY,
@@ -67,7 +68,9 @@ const optionsForSubtreeTimeSpentQuery = ({ workspaceId, isTopLevelOfCurrentTree 
 export class WorkspaceCardContainer extends React.PureComponent<any, any> {
   public render() {
     const queryParams = parseQueryString(window.location.search);
-    const isExpanded = queryParams.expanded === "true";
+    const { expanded, expand = "" } = queryParams;
+    const expandIds = expand.split(",").filter(param => param.length > 0);
+    const isExpanded = expanded === "true" || _.includes(expandIds, this.props.workspaceId);
 
     if (
       this.props.oracleModeQuery.oracleMode !== undefined

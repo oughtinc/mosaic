@@ -5,11 +5,11 @@ import { Link } from "react-router-dom";
 import { scroller, Element } from "react-scroll";
 import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
-import _ = require("lodash");
+import * as _ from "lodash";
+import { parse as parseQueryString, stringify as stringifyQueryString } from "query-string";
+
 import { ChildBudgetBadge } from "../ChildBudgetBadge";
-
 import { AdminCheckboxThatTogglesWorkspaceField } from "../AdminCheckboxThatTogglesWorkspaceField";
-
 import { Auth } from "../../auth";
 
 import {
@@ -59,6 +59,20 @@ const CardBody: any = styled.div`
   background: ${treeWorkspaceBgColor};
   position: relative;
 `;
+
+const updateExpandedIds = (expand, queryParams) => {
+  const { protocol, host, pathname } = window.location;
+  const baseUrl = `${protocol}//${host}${pathname}`;
+
+  const queryString = stringifyQueryString(
+    expand && expand.length > 0
+      ? { ...queryParams, expand }
+      : { ...queryParams },
+    { encode: false }
+  );
+  const newurl = `${baseUrl}${(queryString.length > 0 ? "?" + queryString : "")}`;
+  window.history.pushState({ path: newurl }, "", newurl);
+};
 
 // TODO: Eventually these should be used in a common file for many cases that use them.
 interface ConnectedPointerType {
@@ -124,7 +138,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     this.state = {
       toggles: {
         [toggleTypes.SCRATCHPAD]: true,
-        [toggleTypes.CHILDREN]: this.props.isExpanded ? true : false
+        [toggleTypes.CHILDREN]: this.props.isExpanded,
       },
     };
   }
@@ -145,6 +159,22 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     const newToggles = { ...this.state.toggles };
     newToggles[name] = value;
     this.setState({ toggles: newToggles });
+    if (history.pushState) {
+      // Read expanded ids from URL.
+      const { expand: expandQueryParam = "", ...queryParams } = parseQueryString(window.location.search);
+      const expand = expandQueryParam.split(",").filter(param => param.length > 0);
+
+      // Check if expanded workspace id should be added to URLor removed from it.
+      if (value && !_.includes(expand, this.props.workspaceId)) {
+        const newExpand = [...expand, this.props.workspaceId].join(",");
+        updateExpandedIds(newExpand, queryParams);
+      } else if (!value && _.includes(expand, this.props.workspaceId)) {
+        const newExpand = expand
+          .filter(workspaceId => workspaceId !== this.props.workspaceId)
+          .join(",");
+        updateExpandedIds(newExpand, queryParams);
+      }
+    }
   };
 
   public render() {
