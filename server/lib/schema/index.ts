@@ -1031,7 +1031,19 @@ const schema = new GraphQLSchema({
                 const isOracleExperiment =
                   experiment && experiment.areNewWorkspacesOracleOnlyByDefault;
 
-                if (!isOracleExperiment || workspace.isRequestingLazyUnlock) {
+                const parent = workspace.parentId && await Workspace.findByPk(workspace.parentId);
+                const isNormalWithNormalParent =
+                  !workspace.isEligibleForHonestOracle
+                  &&
+                  !workspace.isEligibleForMaliciousOracle
+                  &&
+                  parent
+                  &&
+                  !parent.isEligibleForHonestOracle
+                  &&
+                  !parent.isEligibleForMaliciousOracle;
+
+                if (!isOracleExperiment || workspace.isRequestingLazyUnlock || isNormalWithNormalParent) {
                   const updatedWorkspace = await workspace.update({
                     isCurrentlyResolved,
                   });
@@ -1240,11 +1252,12 @@ const schema = new GraphQLSchema({
         args: {
           workspaceId: { type: GraphQLString },
           question: { type: GraphQLJSON },
+          shouldOverrideToNormalUser: { type: GraphQLBoolean },
           totalBudget: { type: GraphQLInt },
         },
         resolve: requireUser(
           "You must be logged in to create a subquestion",
-          async (_, { workspaceId, question, totalBudget }, context) => {
+          async (_, { workspaceId, question, shouldOverrideToNormalUser, totalBudget }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
               return;
@@ -1256,6 +1269,7 @@ const schema = new GraphQLSchema({
               totalBudget,
               creatorId: user.user_id,
               isPublic: isUserAdmin(user),
+              shouldOverrideToNormalUser,
             });
           },
         ),

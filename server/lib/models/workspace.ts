@@ -520,17 +520,24 @@ export default class Workspace extends Model<Workspace> {
     isRequestingLazyUnlock,
     isEligibleForHonestOracle,
     isEligibleForMaliciousOracle,
+    shouldOverrideToNormalUser,
   }) {
-    isEligibleForHonestOracle =
-      isEligibleForHonestOracle !== undefined
-        ? isEligibleForHonestOracle
-        : await Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
-    isEligibleForMaliciousOracle =
-      isEligibleForMaliciousOracle !== undefined
-        ? isEligibleForMaliciousOracle
-        : await Workspace.isNewChildWorkspaceMaliciousOracleEligible({
-            parentId,
-          });
+    if (shouldOverrideToNormalUser) {
+      isEligibleForHonestOracle = false;
+      isEligibleForMaliciousOracle = false;
+    } else {
+      isEligibleForHonestOracle =
+        isEligibleForHonestOracle !== undefined
+          ? isEligibleForHonestOracle
+          : await Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
+      isEligibleForMaliciousOracle =
+        isEligibleForMaliciousOracle !== undefined
+          ? isEligibleForMaliciousOracle
+          : await Workspace.isNewChildWorkspaceMaliciousOracleEligible({
+              parentId,
+            });
+    }
+
     return await Workspace.create(
       {
         id: uuidv4(),
@@ -599,7 +606,7 @@ export default class Workspace extends Model<Workspace> {
     });
   }
 
-  public async createChild({ question, totalBudget, creatorId, isPublic }) {
+  public async createChild({ question, totalBudget, creatorId, isPublic, shouldOverrideToNormalUser }) {
     const initialText = _.get(question, "[0].nodes[0].leaves[0].text", "");
     const isRequestingLazyUnlock =
       initialText
@@ -643,6 +650,7 @@ export default class Workspace extends Model<Workspace> {
       isEligibleForMaliciousOracle: isRequestingLazyUnlock
         ? workspaceContainingLazyPointer.isEligibleForMaliciousOracle
         : undefined,
+      shouldOverrideToNormalUser,
     });
     if (this.remainingBudget < child.totalBudget) {
       throw new Error(

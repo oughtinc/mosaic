@@ -422,6 +422,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            isWorkspacePartOfOracleExperiment={this.props.isWorkspacePartOfOracleExperiment}
             isActive={this.props.isActive}
             isUserOracle={this.props.isUserOracle}
             pastedExportFormat={this.props.pastedExportFormat}
