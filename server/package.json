@@ -83,7 +83,7 @@
     "sinon": "^7.3.1",
     "ts-node": "^8.1.0",
     "tslint": "^5.10.0",
-    "typescript": "^3.4.1"
+    "typescript": "^3.4.4"
   },
   "prettier": {
     "trailingComma": "all"
