@@ -825,10 +825,10 @@ atob@^2.1.1:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-auth0@^2.16.0:
-  version "2.16.0"
-  resolved "https://registry.yarnpkg.com/auth0/-/auth0-2.16.0.tgz#c27014cea38b5ce07f0f468c59e3d8db85976732"
-  integrity sha512-64FswYANGTwMU3AdgljSBhnGR+J4+FAqhC0iaUrBYYKDcnv01I7uNnRtnSSGEm8jv1THOrsNBE55h2K7FYTycg==
+auth0@^2.17.0:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/auth0/-/auth0-2.17.0.tgz#bd97392d4edecf8489d5eb0003473cbabbbdb53f"
+  integrity sha512-JKkk5RQexFTTmYw5Wc7H8B/FlqAj/vrAbbW2Ph1lt+Bmb1ohjwsfiZCoeP0kllsKbes9UfKxgEgw0TXypE9ZBQ==
   dependencies:
     bluebird "^2.10.2"
     jsonwebtoken "^8.3.0"
