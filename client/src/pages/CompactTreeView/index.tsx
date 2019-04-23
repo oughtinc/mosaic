@@ -62,21 +62,6 @@ export class CompactTreeViewPresentational extends React.PureComponent<any, any>
 
     const workspace = this.props.initialRootQuery.workspace;
     const isRootLevel = !workspace.parentId;
-    const isMalicious = workspace.isEligibleForMaliciousOracle;
-    const isHonest = workspace.isEligibleForHonestOracle;
-    const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
-
-    const isValid = (isRootLevel && isMalicious) || isHonest || isRequestingLazyUnlock;
-
-    if (!isValid) {
-      return (
-        <CompactTreeViewContainer>
-          <div style={{ marginTop: "20px"}}>
-            Need to start with root level or honest oracle workspace
-          </div>
-        </CompactTreeViewContainer>
-      );
-    }
 
     return (
       <CompactTreeViewContainer>

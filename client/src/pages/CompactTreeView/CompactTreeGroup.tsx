@@ -16,6 +16,8 @@ import { MaliciousAnswerAndMaybeSubquestions } from "./MaliciousAnswerAndMaybeSu
 import { MaliciousAnswerIfMaliciousWon } from "./MaliciousAnswerIfMaliciousWon";
 import { LazyUnlockGroup } from "./LazyUnlockGroup";
 
+import { NormalWorkspaceGroup } from "./NormalWorkspaceGroup";
+
 import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { extractOracleValueAnswerFromBlock } from "./helpers/extractOracleAnswerValueFromBlock";
@@ -42,6 +44,18 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
     if (workspace.isRequestingLazyUnlock) {
       return (
         <LazyUnlockGroup
+          availablePointers={this.props.availablePointers}
+          isExpanded={this.props.isExpanded}
+          isThisActiveWorkspace={isThisActiveWorkspace}
+          workspace={workspace}
+        />
+      );
+    }
+
+    const isWorkspaceNormal = !workspace.isEligibleForHonestOracle && !workspace.isEligibleForMaliciousOracle;
+    if (isWorkspaceNormal) {
+      return (
+        <NormalWorkspaceGroup
           availablePointers={this.props.availablePointers}
           isExpanded={this.props.isExpanded}
           isThisActiveWorkspace={isThisActiveWorkspace}
@@ -332,6 +346,7 @@ export const GROUP_QUERY = gql`
       isArchived
       isCurrentlyResolved
       isEligibleForHonestOracle
+      isEligibleForMaliciousOracle
       isRequestingLazyUnlock
       connectedPointersOfSubtree
       blocks {
