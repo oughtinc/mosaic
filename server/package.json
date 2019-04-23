@@ -78,7 +78,7 @@
     "immutable": "^3.8.2",
     "mocha": "^6.1.4",
     "nodemon": "^1.12.1",
-    "prettier": "^1.16.4",
+    "prettier": "^1.17.0",
     "rimraf": "^2.6.2",
     "sinon": "^7.3.2",
     "ts-node": "^8.1.0",
