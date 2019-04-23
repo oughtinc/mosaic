@@ -347,7 +347,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                     this.handleClick({ shouldOverrideToNormalUser: true })
                   }
                 >
-                  Submit to Normal User
+                  Submit to Judge
                 </Button>
               )}
           </div>
