@@ -529,7 +529,9 @@ export default class Workspace extends Model<Workspace> {
       isEligibleForHonestOracle =
         isEligibleForHonestOracle !== undefined
           ? isEligibleForHonestOracle
-          : await Workspace.isNewChildWorkspaceHonestOracleEligible({ parentId });
+          : await Workspace.isNewChildWorkspaceHonestOracleEligible({
+              parentId,
+            });
       isEligibleForMaliciousOracle =
         isEligibleForMaliciousOracle !== undefined
           ? isEligibleForMaliciousOracle
@@ -606,7 +608,13 @@ export default class Workspace extends Model<Workspace> {
     });
   }
 
-  public async createChild({ question, totalBudget, creatorId, isPublic, shouldOverrideToNormalUser }) {
+  public async createChild({
+    question,
+    totalBudget,
+    creatorId,
+    isPublic,
+    shouldOverrideToNormalUser,
+  }) {
     const initialText = _.get(question, "[0].nodes[0].leaves[0].text", "");
     const isRequestingLazyUnlock =
       initialText

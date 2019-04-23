@@ -1031,19 +1031,21 @@ const schema = new GraphQLSchema({
                 const isOracleExperiment =
                   experiment && experiment.areNewWorkspacesOracleOnlyByDefault;
 
-                const parent = workspace.parentId && await Workspace.findByPk(workspace.parentId);
+                const parent =
+                  workspace.parentId &&
+                  (await Workspace.findByPk(workspace.parentId));
                 const isNormalWithNormalParent =
-                  !workspace.isEligibleForHonestOracle
-                  &&
-                  !workspace.isEligibleForMaliciousOracle
-                  &&
-                  parent
-                  &&
-                  !parent.isEligibleForHonestOracle
-                  &&
+                  !workspace.isEligibleForHonestOracle &&
+                  !workspace.isEligibleForMaliciousOracle &&
+                  parent &&
+                  !parent.isEligibleForHonestOracle &&
                   !parent.isEligibleForMaliciousOracle;
 
-                if (!isOracleExperiment || workspace.isRequestingLazyUnlock || isNormalWithNormalParent) {
+                if (
+                  !isOracleExperiment ||
+                  workspace.isRequestingLazyUnlock ||
+                  isNormalWithNormalParent
+                ) {
                   const updatedWorkspace = await workspace.update({
                     isCurrentlyResolved,
                   });
@@ -1257,7 +1259,11 @@ const schema = new GraphQLSchema({
         },
         resolve: requireUser(
           "You must be logged in to create a subquestion",
-          async (_, { workspaceId, question, shouldOverrideToNormalUser, totalBudget }, context) => {
+          async (
+            _,
+            { workspaceId, question, shouldOverrideToNormalUser, totalBudget },
+            context,
+          ) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
               return;
