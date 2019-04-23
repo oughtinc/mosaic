@@ -33,7 +33,7 @@
     "apollo-server-express": "^2.4.8",
     "async": "^2.6.0",
     "asyncro": "^3.0.0",
-    "auth0": "^2.16.0",
+    "auth0": "^2.17.0",
     "bluebird": "^3.5.1",
     "case": "^1.5.4",
     "cookie-parser": "~1.4.3",
