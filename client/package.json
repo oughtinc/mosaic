@@ -61,7 +61,7 @@
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom --passWithNoTests",
-    "test:cypress": "sh -c 'yarn start & (cd ../server; yarn start) & node_modules/.bin/wait-on -t 30000 tcp:localhost:8080 && node_modules/.bin/wait-on -t 30000 http://localhost:3000 && node_modules/.bin/cypress run'",
+    "test:cypress": "cypress run",
     "eject": "react-scripts-ts eject",
     "lint": "tslint -p . && prettier -c src/**/*.ts src/**/*.js src/**/*.tsx src/**/*.jsx"
   },

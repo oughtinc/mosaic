@@ -17,8 +17,8 @@ const app = express();
 const server = new ApolloServer({
   schema,
   context: async ({ req }) => {
-    if (req.headers.authorization !== "null") {
-      const userInfo = await userFromAuthToken(req.headers.authorization);
+    const userInfo = await userFromAuthToken(req.headers.authorization);
+    if (userInfo !== null) {
       let user = await db.models.User.findByPk(userInfo.user_id);
 
       if (!user) {
@@ -54,6 +54,9 @@ const server = new ApolloServer({
         authorization: null,
       };
     }
+  },
+  engine: {
+    apiKey: "service:mosaic:hGCwzWa_wg71SWpJ7NBMoA"
   },
 });
 

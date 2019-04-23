@@ -7,7 +7,18 @@ const authClient = new AuthenticationClient({
   clientId: auth0_client_id,
 });
 
-export function userFromAuthToken(accessToken: string | null): Promise<any | null> {
+interface UserInfo {
+  user_id: string;
+  email: string;
+  given_name: string;
+  family_name: string;
+  gender: string;
+  picture: string;
+  is_admin: boolean;
+  is_oracle: boolean;
+}
+
+export function userFromAuthToken(accessToken: string | null): Promise<UserInfo | null> {
   if (accessToken == null || accessToken === "null") {
     return Promise.resolve(null);
   }

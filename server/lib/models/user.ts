@@ -12,9 +12,8 @@ import UserTreeOracleRelation from "./userTreeOracleRelation";
 @Table
 export default class User extends Model<User> {
   @Column({
-    type: DataType.UUID,
+    type: DataType.STRING,
     primaryKey: true,
-    defaultValue: UUIDV4,
     allowNull: false,
   })
   public id: string;
