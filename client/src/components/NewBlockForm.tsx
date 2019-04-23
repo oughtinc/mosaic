@@ -324,36 +324,32 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 this.props.availableBudget - 90 < this.state.totalBudget
               }
               type="submit"
-              onClick={() => this.handleClick({ shouldOverrideToNormalUser: false })}
+              onClick={() =>
+                this.handleClick({ shouldOverrideToNormalUser: false })
+              }
               style={{
                 marginRight: "10px",
                 marginTop: this.props.hasTimeBudget ? "10px" : "0px",
               }}
             >
-              {
-                this.props.isWorkspacePartOfOracleExperiment
-                &&
-                !this.props.isUserOracle
-                ?
-                "Submit to Oracle"
-                :
-                "Submit"
-              }
-            </Button>
-            {
-              this.props.isWorkspacePartOfOracleExperiment
-              &&
+              {this.props.isWorkspacePartOfOracleExperiment &&
               !this.props.isUserOracle
-              &&
-              <Button
-                bsSize="xsmall"
-                bsStyle="danger"
-                type="submit"
-                onClick={() => this.handleClick({ shouldOverrideToNormalUser: true })}
-              >
-                Submit to Normal User
-              </Button>
-            }
+                ? "Submit to Oracle"
+                : "Submit"}
+            </Button>
+            {this.props.isWorkspacePartOfOracleExperiment &&
+              !this.props.isUserOracle && (
+                <Button
+                  bsSize="xsmall"
+                  bsStyle="danger"
+                  type="submit"
+                  onClick={() =>
+                    this.handleClick({ shouldOverrideToNormalUser: true })
+                  }
+                >
+                  Submit to Normal User
+                </Button>
+              )}
           </div>
         </BlockContainer>
       </div>
