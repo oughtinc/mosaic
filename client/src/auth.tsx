@@ -108,12 +108,7 @@ export class Auth {
   public static isAuthenticated(): boolean {
     // Check whether the current time is past the
     // Access Token's expiry time
-    const expiresJson = localStorage.getItem("expires_at");
-    if (expiresJson === null) {
-      return false;
-    }
-    const expiresAt = JSON.parse(expiresJson);
-    const isExpired = Date.now() > Number(expiresAt);
+    const isExpired = Auth.timeToLogOut() <= 0;
     if (isExpired) {
       Auth.logout();
       return false;
@@ -143,6 +138,16 @@ export class Auth {
 
   public static userId(): string | null {
     return localStorage.getItem("user_id");
+  }
+
+  public static timeToLogOut() {
+    // returns ms left until the user logs out - negative if the user is not logged in
+    const expiresJson = localStorage.getItem("expires_at");
+    if (expiresJson === null) {
+      return -1;
+    }
+    const expiresAt = Number(JSON.parse(expiresJson));
+    return expiresAt - Date.now();
   }
 
   private static redirectUri(): string {
