@@ -9,7 +9,7 @@ import { Auth } from "../../auth";
 
 import {
   homepageWorkspaceBgColor,
-  blockBorderAndBoxShadow
+  blockBorderAndBoxShadow,
 } from "../../styles";
 
 const WorkspaceContainer = styled.div`
@@ -29,15 +29,12 @@ class RootWorkspacePresentational extends React.Component<any, any> {
 
   public render() {
     const workspace = this.props.workspace;
-
     const question = workspaceToBlock(workspace, "QUESTION");
 
     return (
       <WorkspaceContainer style={this.props.style}>
         <div style={{ width: "100%" }}>
-          {
-            Auth.isAdmin()
-            &&
+          {Auth.isAdmin() && (
             <div
               style={{
                 backgroundColor: "#fafafa",
@@ -47,8 +44,8 @@ class RootWorkspacePresentational extends React.Component<any, any> {
             >
               <Button
                 bsSize="xsmall"
-                onClick={
-                  () => this.setState({
+                onClick={() =>
+                  this.setState({
                     isShowingAdminControls: !this.state.isShowingAdminControls,
                   })
                 }
@@ -56,19 +53,17 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                   marginBottom: this.state.isShowingAdminControls && "10px",
                 }}
               >
-                {this.state.isShowingAdminControls ? "hide" : "show"}{" "}admin controls
+                {this.state.isShowingAdminControls ? "hide" : "show"} admin
+                controls
               </Button>
-              {
-                this.state.isShowingAdminControls
-                &&
+              {this.state.isShowingAdminControls && (
                 <AdminControls
                   refetchQueries={this.props.sourceQueries}
                   workspace={workspace}
                 />
-              }
+              )}
             </div>
-            
-          }
+          )}
           <div
             style={{
               alignItems: "center",
@@ -78,32 +73,20 @@ class RootWorkspacePresentational extends React.Component<any, any> {
               maxWidth: "100%",
             }}
           >
-            <div
-              style={{
-                paddingRight: "50px",
-                marginRight: "-50px",
-                maxWidth: "100%",
-              }}
+            <Link
+              to={`/workspaces/${workspace.id}/${
+                workspace.canShowCompactTreeView
+                  ? "compactTree"
+                  : "subtree?expanded=true"
+              }`}
             >
-              <Link to={`/workspaces/${workspace.id}`}>
-                <RootBlock
-                  block={question}
-                  style={{
-                    verticalAlign: "middle",
-                  }}
-                />
-              </Link> 
-            </div>
-            <div>
-              <Link to={`/workspaces/${workspace.id}/subtree`}>
-                <Button
-                  bsSize="xsmall"
-                  bsStyle="default"
-                >
-                  Tree »
-                </Button>
-              </Link>      
-            </div>
+              <RootBlock
+                block={question}
+                style={{
+                  verticalAlign: "middle",
+                }}
+              />
+            </Link>
           </div>
         </div>
       </WorkspaceContainer>
