@@ -292,6 +292,20 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  @Column(
+    new DataType.VIRTUAL(DataType.BOOLEAN, [
+      "createdAt",
+      "isEligibleForMaliciousOracle",
+    ]),
+  )
+  public get canShowCompactTreeView() {
+    const subTreeEligibilityDate = Date.parse("2019-04-08T20:52:17.841Z");
+    return (
+      Date.parse(this.get("createdAt")) > subTreeEligibilityDate &&
+      this.get("isEligibleForMaliciousOracle")
+    );
+  }
+
   @HasMany(() => Workspace, "parentId")
   public childWorkspaces: Workspace[];
 

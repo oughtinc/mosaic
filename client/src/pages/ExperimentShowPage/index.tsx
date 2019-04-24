@@ -323,6 +323,7 @@ const EXPERIMENT_QUERY = gql`
             }
           }
           isEligibleForAssignment
+          canShowCompactTreeView
           hasIOConstraints
           hasTimeBudget
         }

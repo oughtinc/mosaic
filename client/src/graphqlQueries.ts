@@ -51,6 +51,7 @@ export const WORKSPACES_QUERY = gql`
         type
       }
       isEligibleForAssignment
+      canShowCompactTreeView
       hasIOConstraints
       hasTimeBudget
       tree {
