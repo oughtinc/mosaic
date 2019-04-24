@@ -237,6 +237,25 @@ class Scheduler {
     return assignedWorkspace.id;
   }
 
+  public async isNextWorkspaceAvailable(userId: string) {
+    this.resetCaches();
+
+    let actionableWorkspaces;
+    if (this.isInOracleMode.getValue()) {
+      actionableWorkspaces = await this.getActionableWorkspacesInOracleMode({
+        maybeSuboptimal: false,
+        userId,
+      });
+    } else {
+      actionableWorkspaces = await this.getActionableWorkspaces({
+        maybeSuboptimal: false,
+        userId,
+      });
+    }
+
+    return actionableWorkspaces.length > 0;
+  }
+
   public async assignNextMaybeSuboptimalWorkspace(userId) {
     return await this.assignNextWorkspace(userId, true);
   }

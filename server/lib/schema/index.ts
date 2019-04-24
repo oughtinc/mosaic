@@ -23,6 +23,7 @@ import { userFromContext } from "./auth/userFromContext";
 import { getMessageForUser } from "./helpers/getMessageForUser";
 
 import { createScheduler, schedulers } from "../scheduler";
+import { Scheduler } from "../scheduler/Scheduler";
 import { map } from "asyncro";
 import Block from "../models/block";
 import Workspace from "../models/workspace";
@@ -531,6 +532,29 @@ const schema = new GraphQLSchema({
           await loadDataForEachWorkspaceInSubtree(workspace);
 
           return JSON.stringify(cacheForTimeSpentOnWorkspace);
+        },
+      },
+      isNextWorkspaceAvailable: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          email: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId, email }, context) => {
+          const user = User.findOne({ where: { email }});
+
+          if (user === null) {
+            return false;
+          }
+
+          let scheduler: Scheduler;
+          if (schedulers.has(experimentId)) {
+            scheduler = schedulers.get(experimentId);
+          } else {
+            scheduler = await createScheduler(experimentId);
+          }
+
+          return await scheduler.isNextWorkspaceAvailable(user.id);
         },
       },
     },
