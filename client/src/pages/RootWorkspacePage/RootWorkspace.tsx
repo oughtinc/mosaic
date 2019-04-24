@@ -73,41 +73,20 @@ class RootWorkspacePresentational extends React.Component<any, any> {
               maxWidth: "100%",
             }}
           >
-            <div
-              style={{
-                paddingRight: "50px",
-                marginRight: "-50px",
-                maxWidth: "100%",
-              }}
+            <Link
+              to={`/workspaces/${workspace.id}/${
+                workspace.canShowCompactTreeView
+                  ? "compactTree"
+                  : "subtree?expanded=true"
+              }`}
             >
-              <Link
-                to={`/workspaces/${workspace.id}/${
-                  workspace.canShowCompactTreeView
-                    ? "compactTree"
-                    : "subtree?expanded=true"
-                }`}
-              >
-                <RootBlock
-                  block={question}
-                  style={{
-                    verticalAlign: "middle",
-                  }}
-                />
-              </Link>
-            </div>
-            <div>
-              <Link to={`/workspaces/${workspace.id}/subtree`}>
-                <Button bsSize="xsmall" bsStyle="default">
-                  Tree »
-                </Button>
-              </Link>
-              &nbsp;
-              <Link to={`/workspaces/${workspace.id}`}>
-                <Button bsSize="xsmall" bsStyle="default">
-                  Workspace »
-                </Button>
-              </Link>
-            </div>
+              <RootBlock
+                block={question}
+                style={{
+                  verticalAlign: "middle",
+                }}
+              />
+            </Link>
           </div>
         </div>
       </WorkspaceContainer>
