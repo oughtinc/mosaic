@@ -85,7 +85,7 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                 maxWidth: "100%",
               }}
             >
-              <Link to={`/workspaces/${workspace.id}`}>
+              <Link to={`/workspaces/${workspace.id}/compactTree`}>
                 <RootBlock
                   block={question}
                   style={{
@@ -102,7 +102,16 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                 >
                   Tree »
                 </Button>
-              </Link>      
+              </Link>
+              &nbsp;
+              <Link to={`/workspaces/${workspace.id}`}>
+                <Button
+                  bsSize="xsmall"
+                  bsStyle="default"
+                >
+                  Workspace »
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
