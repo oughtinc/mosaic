@@ -32,7 +32,7 @@ const BlockHeader = styled.div`
 export class NewBlockFormPresentational extends React.Component<any, any> {
   public blockEditor;
 
-  private onSubmit = _.throttle(() => {
+  private onSubmit = _.throttle(({ shouldOverrideToNormalUser = false }) => {
     const isOnFrontPage = !this.props.shouldAutosave;
 
     // front page doesn't receive a prop when workspaces reload
@@ -48,6 +48,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
 
     this.props.onMutate({
       question: valueToDatabaseJSON(this.state.blockValue),
+      shouldOverrideToNormalUser,
       totalBudget: this.props.hasTimeBudget ? this.state.totalBudget : 0,
     });
 
@@ -102,8 +103,6 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               initialValue={this.props.initialValue || ""}
               onChange={this.onChange}
               availablePointers={this.props.availablePointers || []}
-              onKeyDown={this.onKeyDown}
-              /*ref={input => (this.blockEditor = input)}*/
               workspaceId={this.props.workspaceId}
               visibleExportIds={this.props.visibleExportIds}
               exportLockStatusInfo={this.props.exportLockStatusInfo}
@@ -325,11 +324,32 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 this.props.availableBudget - 90 < this.state.totalBudget
               }
               type="submit"
-              onClick={this.handleClick}
-              style={{ marginTop: this.props.hasTimeBudget ? "10px" : "0px" }}
+              onClick={() =>
+                this.handleClick({ shouldOverrideToNormalUser: false })
+              }
+              style={{
+                marginRight: "10px",
+                marginTop: this.props.hasTimeBudget ? "10px" : "0px",
+              }}
             >
-              Submit
+              {this.props.isWorkspacePartOfOracleExperiment &&
+              !this.props.isUserOracle
+                ? "Submit to Oracle"
+                : "Submit"}
             </Button>
+            {this.props.isWorkspacePartOfOracleExperiment &&
+              !this.props.isUserOracle && (
+                <Button
+                  bsSize="xsmall"
+                  bsStyle="danger"
+                  type="submit"
+                  onClick={() =>
+                    this.handleClick({ shouldOverrideToNormalUser: true })
+                  }
+                >
+                  Submit to Judge
+                </Button>
+              )}
           </div>
         </BlockContainer>
       </div>
@@ -340,23 +360,13 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     this.setState({ blockValue });
   };
 
-  private onKeyDown = event => {
-    const pressedControlAndEnter = _event =>
-      _event.metaKey && _event.key === "Enter";
-
-    if (pressedControlAndEnter(event)) {
-      event.preventDefault();
-      this.onSubmit();
-    }
-  };
-
-  private handleClick = () => {
+  private handleClick = ({ shouldOverrideToNormalUser = false }) => {
     const isOnFrontPage = !this.props.shouldAutosave;
 
     if (isOnFrontPage) {
-      this.onSubmit();
+      this.onSubmit({ shouldOverrideToNormalUser });
     } else {
-      setTimeout(this.onSubmit, 1);
+      setTimeout(() => this.onSubmit({ shouldOverrideToNormalUser }), 1);
     }
   };
 }

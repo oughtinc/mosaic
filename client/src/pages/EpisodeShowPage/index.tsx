@@ -140,11 +140,13 @@ const NEW_CHILD = gql`
   mutation createChildWorkspace(
     $workspaceId: String
     $question: JSON
+    $shouldOverrideToNormalUser: Boolean
     $totalBudget: Int
   ) {
     createChildWorkspace(
       workspaceId: $workspaceId
       question: $question
+      shouldOverrideToNormalUser: $shouldOverrideToNormalUser
       totalBudget: $totalBudget
     ) {
       id
@@ -694,6 +696,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       )
                       &&
                       <ChildrenSidebar
+                        isWorkspacePartOfOracleExperiment={isWorkspacePartOfOracleExperiment}
                         isUserOracle={isUserOracle}
                         experimentId={experimentId}
                         pastedExportFormat={this.state.pastedExportFormat}
@@ -709,11 +712,12 @@ export class WorkspaceView extends React.Component<any, any> {
                         workspace={workspace}
                         workspaces={workspace.childWorkspaces}
                         availablePointers={availablePointers}
-                        onCreateChild={({ question, totalBudget }) => {
+                        onCreateChild={({ question, totalBudget, shouldOverrideToNormalUser }) => {
                           this.props.createChild({
                             variables: {
                               workspaceId: workspace.id,
                               question,
+                              shouldOverrideToNormalUser,
                               totalBudget,
                             }
                           });
