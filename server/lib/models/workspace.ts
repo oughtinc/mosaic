@@ -299,9 +299,11 @@ export default class Workspace extends Model<Workspace> {
     ]),
   )
   public get canShowCompactTreeView() {
-    const subTreeEligibilityDate = Date.parse("2019-04-08T20:52:17.841Z");
+    const dateAfterWhichCompactTreeWorks = Date.parse(
+      "2019-04-08T20:52:17.841Z",
+    );
     return (
-      Date.parse(this.get("createdAt")) > subTreeEligibilityDate &&
+      Date.parse(this.get("createdAt")) > dateAfterWhichCompactTreeWorks &&
       this.get("isEligibleForMaliciousOracle")
     );
   }
