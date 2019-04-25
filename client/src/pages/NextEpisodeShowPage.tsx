@@ -41,8 +41,8 @@ const RegisterForEmailNotification = ({ onClick, registrationStatus }) => (
       textAlign: "justify",
     }}
   >
-    You may choose instead to receive an e-mail notification when a
-    workspace becomes available for you in this experiment.
+    You may choose instead to receive an e-mail notification when a workspace
+    becomes available for you in this experiment.
     <div
       style={{
         alignItems: "center",
@@ -56,10 +56,13 @@ const RegisterForEmailNotification = ({ onClick, registrationStatus }) => (
         onClick={onClick}
         disabled={registrationStatus !== NOTIFICATION_NOT_REGISTERED}
       >
-        {registrationStatus === NOTIFICATION_NOT_REGISTERED && "Register for e-mail notification ✉️"}
+        {registrationStatus === NOTIFICATION_NOT_REGISTERED &&
+          "Register for e-mail notification ✉️"}
         {registrationStatus === NOTIFICATION_REGISTERED && "Registered!"}
-        {registrationStatus === NOTIFICATION_REGISTRATION_PENDING && "Registering…"}
-        {registrationStatus === NOTIFICATION_REGISTRATION_ERRORED && "Error! Unable to successfully register"}
+        {registrationStatus === NOTIFICATION_REGISTRATION_PENDING &&
+          "Registering…"}
+        {registrationStatus === NOTIFICATION_REGISTRATION_ERRORED &&
+          "Error! Unable to successfully register"}
       </Button>
     </div>
   </div>
@@ -133,14 +136,13 @@ export class NextEpisodeShowPagePresentational extends React.Component<
           <span style={{ color: "darkRed" }}>
             There is no eligible workspace at this time. Please wait and refresh
             this page to try again.
-            {
-              this.state.isCountingDown &&
+            {this.state.isCountingDown && (
               <React.Fragment>
-                {" "}Automatically refreshing in{" "}
-                {this.state.refreshCountdown} second
+                {" "}
+                Automatically refreshing in {this.state.refreshCountdown} second
                 {this.state.refreshCountdown !== 1 ? "s" : ""}.
               </React.Fragment>
-            }
+            )}
           </span>
 
           <div
@@ -198,14 +200,13 @@ export class NextEpisodeShowPagePresentational extends React.Component<
           <span style={{ color: "darkRed" }}>
             There is no oracle eligible workspace at this time. Please wait and
             refresh this page to try again.
-            {
-              this.state.isCountingDown &&
+            {this.state.isCountingDown && (
               <React.Fragment>
-                {" "}Automatically refreshing in{" "}
-                {this.state.refreshCountdown} second
+                {" "}
+                Automatically refreshing in {this.state.refreshCountdown} second
                 {this.state.refreshCountdown !== 1 ? "s" : ""}.
               </React.Fragment>
-            }
+            )}
           </span>
 
           <div
@@ -271,14 +272,18 @@ export class NextEpisodeShowPagePresentational extends React.Component<
 
   private async registerForNotification() {
     this.stopCountingDown();
-    this.setState({ notificationRegistrationState: NOTIFICATION_REGISTRATION_PENDING });
+    this.setState({
+      notificationRegistrationState: NOTIFICATION_REGISTRATION_PENDING,
+    });
     try {
       await this.props.notifyOnNextWorkspaceMutation({
         experimentId: parseQueryString(window.location.search).experiment,
       });
       this.setState({ notificationRegistrationState: NOTIFICATION_REGISTERED });
     } catch {
-      this.setState({ notificationRegistrationState: NOTIFICATION_REGISTRATION_ERRORED });
+      this.setState({
+        notificationRegistrationState: NOTIFICATION_REGISTRATION_ERRORED,
+      });
       this.startCountingDown();
     }
   }
@@ -308,7 +313,9 @@ const NOTIFY_NEXT_WORKSPACE_MUTATION = gql`
 
 export const NextEpisodeShowPage = compose(
   graphql(FIND_NEXT_WORKSPACE_MUTATION, { name: "findNextWorkspaceMutation" }),
-  graphql(NOTIFY_NEXT_WORKSPACE_MUTATION, { name: "notifyOnNextWorkspaceMutation" }),
+  graphql(NOTIFY_NEXT_WORKSPACE_MUTATION, {
+    name: "notifyOnNextWorkspaceMutation",
+  }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
   }),
