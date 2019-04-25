@@ -269,7 +269,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                       workspaceFieldToUpdate="isStale"
                     />
                     <AdminCheckboxThatTogglesWorkspaceField
-                      checkboxLabelText="honest oracle"
+                      checkboxLabelText="honest"
                       updateMutation={
                         this.handleOnIsEligibleForOracleCheckboxChange
                       }
@@ -277,7 +277,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                       workspaceFieldToUpdate="isEligibleForHonestOracle"
                     />
                     <AdminCheckboxThatTogglesWorkspaceField
-                      checkboxLabelText="malicious oracle"
+                      checkboxLabelText="malicious"
                       updateMutation={
                         this.handleOnIsEligibleForMaliciousOracleCheckboxChange
                       }
