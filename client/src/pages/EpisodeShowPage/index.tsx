@@ -547,7 +547,7 @@ export class WorkspaceView extends React.Component<any, any> {
                   <Row>
                     <Col sm={6}>
                       {
-                        !this.state.isAuthenticated
+                        !this.state.isAuthenticated && experimentId
                         &&
                         <Alert bsStyle="danger" style={{ border: "1px solid #ddd"}}>
                           <div
