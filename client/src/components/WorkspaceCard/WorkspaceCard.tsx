@@ -4,6 +4,9 @@ import * as React from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { scroller, Element } from "react-scroll";
+
+import { secondsToDurationString } from "../helpers/secondsToDurationString";
+
 import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
 import _ = require("lodash");
@@ -377,16 +380,18 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                           ? `${a.user.givenName} ${a.user.familyName}`
                           : a.user.email || a.user.id}
                         {" - "}
+                        {secondsToDurationString(
+                          Math.round(
+                            (Number(a.endAtTimestamp) -
+                              Number(a.startAtTimestamp)) /
+                              1000,
+                          ),
+                          true,
+                        )}
+                        {" - "}
                         {DateTime.fromMillis(
                           Number(a.startAtTimestamp),
                         ).toLocaleString(DateTime.DATETIME_SHORT)}
-                        {" - "}
-                        {Math.round(
-                          (Number(a.endAtTimestamp) -
-                            Number(a.startAtTimestamp)) /
-                            1000,
-                        )}
-                        s
                       </div>
                     ))}
                 </div>
