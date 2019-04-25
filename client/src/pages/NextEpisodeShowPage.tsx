@@ -26,9 +26,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   any,
   any
 > {
-  private countdownInterval: NodeJS.Timer;
-  private isCountingDown = false;
-
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -36,6 +33,8 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       oracleSchedulingFailed: false,
       refreshCountdown: 10,
       workspaceId: undefined,
+      isCountingDown: false,
+      countdownInterval: null,
     };
   }
 
@@ -67,7 +66,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   }
 
   public componentWillUnmount() {
-    clearInterval(this.countdownInterval);
+    this.stopCountingDown();
   }
 
   public render() {
@@ -88,9 +87,15 @@ export class NextEpisodeShowPagePresentational extends React.Component<
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
             There is no eligible workspace at this time. Please wait and refresh
-            this page to try again. Automatically refreshing in{" "}
-            {this.state.refreshCountdown} second
-            {this.state.refreshCountdown !== 1 ? "s" : ""}.
+            this page to try again.
+            {
+              this.state.isCountingDown &&
+              <React.Fragment>
+                Automatically refreshing in{" "}
+                {this.state.refreshCountdown} second
+                {this.state.refreshCountdown !== 1 ? "s" : ""}.
+              </React.Fragment>
+            }
           </span>
 
           <div
@@ -145,9 +150,15 @@ export class NextEpisodeShowPagePresentational extends React.Component<
           <RedExclamation />
           <span style={{ color: "darkRed" }}>
             There is no oracle eligible workspace at this time. Please wait and
-            refresh this page to try again. Automatically refreshing in{" "}
-            {this.state.refreshCountdown} second
-            {this.state.refreshCountdown !== 1 ? "s" : ""}.
+            refresh this page to try again.
+            {
+              this.state.isCountingDown &&
+              <React.Fragment>
+                Automatically refreshing in{" "}
+                {this.state.refreshCountdown} second
+                {this.state.refreshCountdown !== 1 ? "s" : ""}.
+              </React.Fragment>
+            }
           </span>
         </ContentContainer>
       );
@@ -172,19 +183,26 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   }
 
   private startCountingDown() {
-    if (this.isCountingDown) {
+    if (this.state.isCountingDown) {
       return;
     }
 
-    this.isCountingDown = true;
-
-    this.countdownInterval = setInterval(
+    const isCountingDown = true;
+    const countdownInterval = setInterval(
       () =>
         this.setState({
           refreshCountdown: Math.max(0, this.state.refreshCountdown - 1),
         }),
       1000,
     );
+
+    this.setState({ isCountingDown, countdownInterval });
+  }
+
+  private stopCountingDown() {
+    if (this.state.isCountingDown) {
+     clearInterval(this.state.countdownInterval);
+    }
   }
 }
 
