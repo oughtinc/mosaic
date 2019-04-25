@@ -12,23 +12,18 @@ import { AdminCheckboxThatTogglesWorkspaceField } from "../AdminCheckboxThatTogg
 
 import { Auth } from "../../auth";
 
-import {
-  blockBorderAndBoxShadow,
-  treeWorkspaceBgColor,
-} from "../../styles";
+import { blockBorderAndBoxShadow, treeWorkspaceBgColor } from "../../styles";
 
 export enum toggleTypes {
   FULL,
   QUESTION = 0,
   ANSWER,
   SCRATCHPAD,
-  CHILDREN
+  CHILDREN,
 }
 
 const WorkspaceLink = props => (
-  <Link to={`/workspaces/${props.workspaceId}`}>
-    {props.children}
-  </Link>
+  <Link to={`/workspaces/${props.workspaceId}`}>{props.children}</Link>
 );
 
 const Container = styled.div`
@@ -38,21 +33,22 @@ const Container = styled.div`
 const CardBody: any = styled.div`
   ${blockBorderAndBoxShadow};
   ${(props: any) =>
-    (
-      props.workspace.isEligibleForHonestOracle
-      &&
-      css`border: 3px solid green`
-    )
-
-    ||
-
-    (
-      props.workspace.isEligibleForMaliciousOracle
-      &&
-      css`border: 3px solid red`
-    )
-  }
-  ${(props: any) => props.isActive ? css`box-shadow: 0 0 10px 5px yellow` : css`box-shadow: none`}
+    (props.workspace.isEligibleForHonestOracle &&
+      css`
+        border: 3px solid green;
+      `) ||
+    (props.workspace.isEligibleForMaliciousOracle &&
+      css`
+        border: 3px solid red;
+      `)}
+  ${(props: any) =>
+    props.isActive
+      ? css`
+          box-shadow: 0 0 10px 5px yellow;
+        `
+      : css`
+          box-shadow: none;
+        `}
   float: left;
   margin-bottom: 1em;
   width: 42em;
@@ -99,6 +95,7 @@ interface WorkspaceCardProps {
   subtreeTimeSpentData: any;
   oracleModeQuery: any;
   updateWorkspace: any;
+  workspaceActivityQuery: any;
 }
 
 interface SubtreeQuery {
@@ -117,20 +114,24 @@ interface WorkspaceCardState {
 
 const getPointerId = (p: any) => p.data.pointerId;
 
-export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCardProps, WorkspaceCardState> {
+export class WorkspaceCardPresentational extends React.PureComponent<
+  WorkspaceCardProps,
+  WorkspaceCardState
+> {
   public constructor(props: any) {
     super(props);
 
     this.state = {
       toggles: {
         [toggleTypes.SCRATCHPAD]: true,
-        [toggleTypes.CHILDREN]: this.props.isExpanded ? true : false
+        [toggleTypes.CHILDREN]: this.props.isExpanded ? true : false,
       },
     };
   }
 
   public componentDidMount() {
-    const isThisActiveWorkspace = this.props.activeWorkspaceId === this.props.subtreeQuery.workspace.id;
+    const isThisActiveWorkspace =
+      this.props.activeWorkspaceId === this.props.subtreeQuery.workspace.id;
     if (isThisActiveWorkspace) {
       setTimeout(() => {
         scroller.scrollTo(this.props.activeWorkspaceId, {
@@ -153,28 +154,19 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
     const editable = Auth.isAuthorizedToEditWorkspace(workspace);
     const isActive = this.props.activeWorkspaceId === workspace.id;
 
-    const availablePointers: ConnectedPointerType[] =
-      !this.props.isTopLevelOfCurrentTree
-      ?
-      this.props.parentPointers
-      :
-        (
-          workspace
-          ?
-          _(workspace.connectedPointersOfSubtree)
-            .uniqBy(getPointerId)
-            .map(node => ({...node, readOnly: !editable }))
-            .value()
-          :
-          []
-        );
+    const availablePointers: ConnectedPointerType[] = !this.props
+      .isTopLevelOfCurrentTree
+      ? this.props.parentPointers
+      : workspace
+      ? _(workspace.connectedPointersOfSubtree)
+          .uniqBy(getPointerId)
+          .map(node => ({ ...node, readOnly: !editable }))
+          .value()
+      : [];
 
-    const subtreeTimeSpentData =
-      this.props.isTopLevelOfCurrentTree
-      ?
-      JSON.parse(this.props.subtreeTimeSpentQuery.subtreeTimeSpent)
-      :
-      this.props.subtreeTimeSpentData;
+    const subtreeTimeSpentData = this.props.isTopLevelOfCurrentTree
+      ? JSON.parse(this.props.subtreeTimeSpentQuery.subtreeTimeSpent)
+      : this.props.subtreeTimeSpentData;
 
     return (
       <Element name={workspace.id}>
@@ -194,11 +186,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                   Go to workspace »
                 </WorkspaceLink>
               </div>
-              {
-                Auth.isAdmin()
-                &&
-                workspace.currentlyActiveUser
-                &&
+              {Auth.isAdmin() && workspace.currentlyActiveUser && (
                 <div
                   style={{
                     borderBottom: "1px solid #ddd",
@@ -213,35 +201,31 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                   >
                     Currently assigned to:{" "}
                     <span style={{ color: "red", fontWeight: 600 }}>
-                      {
-                        workspace.currentlyActiveUser.givenName
-                        ?
-                          `${workspace.currentlyActiveUser.givenName} ${workspace.currentlyActiveUser.familyName}`
-                        :
-                          (
-                            workspace.currentlyActiveUser.email
-                            ||
-                            workspace.currentlyActiveUser.id
-                          )
-
-                      }
+                      {workspace.currentlyActiveUser.givenName
+                        ? `${workspace.currentlyActiveUser.givenName} ${
+                            workspace.currentlyActiveUser.familyName
+                          }`
+                        : workspace.currentlyActiveUser.email ||
+                          workspace.currentlyActiveUser.id}
                       <Button
                         bsSize="xsmall"
                         onClick={async () => {
                           await this.props.ejectUserFromCurrentWorkspace({
                             userId: workspace.currentlyActiveUser.id,
                             workspaceId: workspace.id,
-                            });
-
-                          this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
-                            return {
-                              ...prv,
-                              workspace: {
-                                ...prv.workspace,
-                                currentlyActiveUser: null,
-                              },
-                            };
                           });
+
+                          this.props.subtreeQuery.updateQuery(
+                            (prv: any, opt: any) => {
+                              return {
+                                ...prv,
+                                workspace: {
+                                  ...prv.workspace,
+                                  currentlyActiveUser: null,
+                                },
+                              };
+                            },
+                          );
                         }}
                         style={{ marginLeft: "10px" }}
                       >
@@ -250,7 +234,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                     </span>
                   </span>
                 </div>
-              }
+              )}
               <div
                 style={{
                   alignItems: "center",
@@ -265,21 +249,19 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                     shouldShowSeconds={false}
                     style={{ color: "#555", fontSize: "12px" }}
                     totalBudget={subtreeTimeSpentData[workspace.id]}
-                  />
-                  {" "}work on entire subtree
+                  />{" "}
+                  work on entire subtree
                   <br />
                   <ChildBudgetBadge
                     noBadge={true}
                     shouldShowSeconds={false}
                     style={{ color: "#555", fontSize: "12px" }}
                     totalBudget={workspace.budgetUsedWorkingOnThisWorkspace}
-                  />
-                  {" "}work on workspace
+                  />{" "}
+                  work on workspace
                 </span>
-                {
-                  Auth.isAdmin()
-                  &&
-                  <span style={{ padding: "0 10px"}}>
+                {Auth.isAdmin() && (
+                  <span style={{ padding: "0 10px" }}>
                     <AdminCheckboxThatTogglesWorkspaceField
                       checkboxLabelText="stale"
                       updateMutation={this.handleOnIsStaleCheckboxChange}
@@ -288,80 +270,119 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
                     />
                     <AdminCheckboxThatTogglesWorkspaceField
                       checkboxLabelText="honest oracle"
-                      updateMutation={this.handleOnIsEligibleForOracleCheckboxChange}
+                      updateMutation={
+                        this.handleOnIsEligibleForOracleCheckboxChange
+                      }
                       workspace={workspace}
                       workspaceFieldToUpdate="isEligibleForHonestOracle"
                     />
                     <AdminCheckboxThatTogglesWorkspaceField
                       checkboxLabelText="malicious oracle"
-                      updateMutation={this.handleOnIsEligibleForMaliciousOracleCheckboxChange}
+                      updateMutation={
+                        this.handleOnIsEligibleForMaliciousOracleCheckboxChange
+                      }
                       workspace={workspace}
                       workspaceFieldToUpdate="isEligibleForMaliciousOracle"
                     />
                     <AdminCheckboxThatTogglesWorkspaceField
                       checkboxLabelText="resolved"
-                      updateMutation={this.handleOnIsCurrentlyResolvedCheckboxChange}
+                      updateMutation={
+                        this.handleOnIsCurrentlyResolvedCheckboxChange
+                      }
                       workspace={workspace}
                       workspaceFieldToUpdate="isCurrentlyResolved"
                     />
                   </span>
-                  }
+                )}
               </div>
-              {
-                Auth.isAdmin()
-                &&
-                workspace.isNotStaleRelativeToUserFullInformation.length !== 0
-                &&
-                <div
-                  style={{
-                    padding: "10px 10px 0 10px",
-                    width: "100%",
-                  }}
-                >
-                  Users who have passed on workspace with "Needs More Work":
-                  <ul style={{paddingInlineStart: "30px"}}>
-                  {workspace.isNotStaleRelativeToUserFullInformation.map((user, i, arr) => {
-                    return (
-                      <li key={user.id} style={{ margin: i < arr.length - 1 ? "10px 0" : "5px 0 0 0" }}>
-                        {
-                          user.givenName
-                          ?
-                          `${user.givenName} ${user.familyName}`
-                          :
-                          (
-                            user.email
-                            ||
-                            user.id
-                          )
-                        }
-                        <Button
-                          bsSize="xsmall"
-                          onClick={async () => {
-                            await this.props.markWorkspaceStaleForUser({
-                              userId: user.id,
-                              workspaceId: workspace.id,
-                            });
+              {Auth.isAdmin() &&
+                workspace.isNotStaleRelativeToUserFullInformation.length !==
+                  0 && (
+                  <div
+                    style={{
+                      padding: "10px 10px 0 10px",
+                      width: "100%",
+                    }}
+                  >
+                    Users who have passed on workspace with "Needs More Work":
+                    <ul style={{ paddingInlineStart: "30px" }}>
+                      {workspace.isNotStaleRelativeToUserFullInformation.map(
+                        (user, i, arr) => {
+                          return (
+                            <li
+                              key={user.id}
+                              style={{
+                                margin:
+                                  i < arr.length - 1 ? "10px 0" : "5px 0 0 0",
+                              }}
+                            >
+                              {user.givenName
+                                ? `${user.givenName} ${user.familyName}`
+                                : user.email || user.id}
+                              <Button
+                                bsSize="xsmall"
+                                onClick={async () => {
+                                  await this.props.markWorkspaceStaleForUser({
+                                    userId: user.id,
+                                    workspaceId: workspace.id,
+                                  });
 
-                            this.props.subtreeQuery.updateQuery((prv: any, opt: any) => {
-                              return {
-                                ...prv,
-                                workspace: {
-                                  ...prv.workspace,
-                                  isNotStaleRelativeToUserFullInformation: prv.workspace.isNotStaleRelativeToUserFullInformation.filter(u => u.id !== user.id)
-                                },
-                              };
-                            });
+                                  this.props.subtreeQuery.updateQuery(
+                                    (prv: any, opt: any) => {
+                                      return {
+                                        ...prv,
+                                        workspace: {
+                                          ...prv.workspace,
+                                          isNotStaleRelativeToUserFullInformation: prv.workspace.isNotStaleRelativeToUserFullInformation.filter(
+                                            u => u.id !== user.id,
+                                          ),
+                                        },
+                                      };
+                                    },
+                                  );
+                                }}
+                                style={{ marginLeft: "8px" }}
+                              >
+                                make stale for user
+                              </Button>
+                            </li>
+                          );
+                        },
+                      )}
+                    </ul>
+                  </div>
+                )}
+              {Auth.isAdmin() && (
+                <div style={{ marginTop: "10px" }}>
+                  {this.props.workspaceActivityQuery.workspaceActivity &&
+                    _.sortBy(
+                      this.props.workspaceActivityQuery.workspaceActivity
+                        .assignments,
+                      a => -Number(a.startedAtTimestamp),
+                    ).map((a, i) => (
+                      <div key={i}>
+                        <img
+                          src={a.user.pictureURL}
+                          style={{
+                            borderRadius: "15px",
+                            boxShadow: "1px 1px 1px 1px #888",
+                            height: "30px",
+                            marginBottom: "8px",
+                            marginRight: "8px",
+                            width: "30px",
                           }}
-                          style={{ marginLeft: "8px" }}
-                        >
-                          make stale for user
-                        </Button>
-                      </li>
-                    );
-                  })}
-                  </ul>
+                        />
+                        {a.user.givenName} {a.user.familyName}{" "}
+                        {Math.round(
+                          (Number(a.endAtTimestamp) -
+                            Number(a.startAtTimestamp)) /
+                            1000,
+                        )}
+                        s
+                      </div>
+                    ))}
                 </div>
-              }
+              )}
             </div>
             <BlockSection
               workspace={workspace}
@@ -375,7 +396,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
             onChangeToggle={() =>
               this.handleChangeToggle(
                 toggleTypes.CHILDREN,
-                !this.state.toggles[toggleTypes.CHILDREN]
+                !this.state.toggles[toggleTypes.CHILDREN],
               )
             }
             subtreeTimeSpentData={subtreeTimeSpentData}
@@ -401,18 +422,19 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         ...prv,
         workspace: {
           ...prv.workspace,
-          isStale: !this.props.subtreeQuery.workspace.isStale
+          isStale: !this.props.subtreeQuery.workspace.isStale,
         },
       };
     });
-  }
+  };
 
   private handleOnIsEligibleForOracleCheckboxChange = async () => {
     await this.props.updateWorkspace({
       variables: {
         id: this.props.workspaceId,
         input: {
-          isEligibleForHonestOracle: !this.props.subtreeQuery.workspace.isEligibleForHonestOracle,
+          isEligibleForHonestOracle: !this.props.subtreeQuery.workspace
+            .isEligibleForHonestOracle,
         },
       },
     });
@@ -422,18 +444,20 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         ...prv,
         workspace: {
           ...prv.workspace,
-          isEligibleForHonestOracle: !this.props.subtreeQuery.workspace.isEligibleForHonestOracle
+          isEligibleForHonestOracle: !this.props.subtreeQuery.workspace
+            .isEligibleForHonestOracle,
         },
       };
     });
-  }
+  };
 
   private handleOnIsEligibleForMaliciousOracleCheckboxChange = async () => {
     await this.props.updateWorkspace({
       variables: {
         id: this.props.workspaceId,
         input: {
-          isEligibleForMaliciousOracle: !this.props.subtreeQuery.workspace.isEligibleForMaliciousOracle,
+          isEligibleForMaliciousOracle: !this.props.subtreeQuery.workspace
+            .isEligibleForMaliciousOracle,
         },
       },
     });
@@ -443,18 +467,20 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         ...prv,
         workspace: {
           ...prv.workspace,
-          isEligibleForMaliciousOracle: !this.props.subtreeQuery.workspace.isEligibleForMaliciousOracle
+          isEligibleForMaliciousOracle: !this.props.subtreeQuery.workspace
+            .isEligibleForMaliciousOracle,
         },
       };
     });
-  }
+  };
 
   private handleOnIsCurrentlyResolvedCheckboxChange = async () => {
     await this.props.updateWorkspace({
       variables: {
         id: this.props.workspaceId,
         input: {
-          isCurrentlyResolved: !this.props.subtreeQuery.workspace.isCurrentlyResolved,
+          isCurrentlyResolved: !this.props.subtreeQuery.workspace
+            .isCurrentlyResolved,
         },
       },
     });
@@ -464,9 +490,10 @@ export class WorkspaceCardPresentational extends React.PureComponent<WorkspaceCa
         ...prv,
         workspace: {
           ...prv.workspace,
-          isCurrentlyResolved: !this.props.subtreeQuery.workspace.isCurrentlyResolved
+          isCurrentlyResolved: !this.props.subtreeQuery.workspace
+            .isCurrentlyResolved,
         },
       };
     });
-  }
+  };
 }
