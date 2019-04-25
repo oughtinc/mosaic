@@ -8,6 +8,12 @@ import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
 import { ContentContainer } from "../components/ContentContainer";
+import { VERY_DARK_BLUE, VERY_LIGHT_BLUE } from "../styles";
+
+const NOTIFICATION_NOT_REGISTERED = 1;
+const NOTIFICATION_REGISTRATION_PENDING = 2;
+const NOTIFICATION_REGISTERED = 3;
+const NOTIFICATION_REGISTRATION_ERRORED = 4;
 
 const RedExclamation = () => (
   <span
@@ -20,6 +26,43 @@ const RedExclamation = () => (
   >
     !
   </span>
+);
+
+const RegisterForEmailNotification = ({ onClick, registrationStatus }) => (
+  <div
+    style={{
+      backgroundColor: VERY_LIGHT_BLUE,
+      border: `1px solid ${VERY_DARK_BLUE}`,
+      borderRadius: "8px",
+      marginBottom: "10px",
+      marginRight: "10px",
+      maxWidth: "600px",
+      padding: "20px",
+      textAlign: "justify",
+    }}
+  >
+    You may choose instead to receive an e-mail notification when a
+    workspace becomes available for you in this experiment.
+    <div
+      style={{
+        alignItems: "center",
+        display: "flex",
+        justifyContent: "center",
+        marginTop: "20px",
+      }}
+    >
+      <Button
+        bsStyle="primary"
+        onClick={onClick}
+        disabled={registrationStatus !== NOTIFICATION_NOT_REGISTERED}
+      >
+        {registrationStatus === NOTIFICATION_NOT_REGISTERED && "Register for e-mail notification ✉️"}
+        {registrationStatus === NOTIFICATION_REGISTERED && "Registered!"}
+        {registrationStatus === NOTIFICATION_REGISTRATION_PENDING && "Registering…"}
+        {registrationStatus === NOTIFICATION_REGISTRATION_ERRORED && "Error! Unable to successfully register"}
+      </Button>
+    </div>
+  </div>
 );
 
 export class NextEpisodeShowPagePresentational extends React.Component<
@@ -35,7 +78,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       workspaceId: undefined,
       isCountingDown: false,
       countdownInterval: null,
+      notificationRegistrationState: NOTIFICATION_NOT_REGISTERED,
     };
+    this.registerForNotification = this.registerForNotification.bind(this);
   }
 
   public async componentDidMount() {
@@ -57,8 +102,10 @@ export class NextEpisodeShowPagePresentational extends React.Component<
 
     if (oracleSchedulingFailed) {
       this.setState({ oracleSchedulingFailed });
+      this.startCountingDown();
     } else if (normalSchedulingFailed) {
       this.setState({ normalSchedulingFailed });
+      this.startCountingDown();
     } else if (response) {
       const workspaceId = response.data.findNextWorkspace.id;
       this.setState({ workspaceId });
@@ -77,8 +124,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     }
 
     if (this.state.normalSchedulingFailed) {
-      this.startCountingDown();
-
       return (
         <ContentContainer>
           <Helmet>
@@ -91,7 +136,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
             {
               this.state.isCountingDown &&
               <React.Fragment>
-                Automatically refreshing in{" "}
+                {" "}Automatically refreshing in{" "}
                 {this.state.refreshCountdown} second
                 {this.state.refreshCountdown !== 1 ? "s" : ""}.
               </React.Fragment>
@@ -100,17 +145,21 @@ export class NextEpisodeShowPagePresentational extends React.Component<
 
           <div
             style={{
+              display: "flex",
               marginLeft: "20px",
               marginTop: "50px",
             }}
           >
+            <RegisterForEmailNotification
+              onClick={this.registerForNotification}
+              registrationStatus={this.state.notificationRegistrationState}
+            />
             <div
               style={{
                 backgroundColor: "rgba(255, 0, 0, 0.05)",
                 border: "1px solid rgba(255, 0, 0, 0.15)",
                 borderRadius: "8px",
                 color: "darkRed",
-                maxWidth: "500px",
                 padding: "20px",
                 textAlign: "justify",
               }}
@@ -140,8 +189,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         </ContentContainer>
       );
     } else if (this.state.oracleSchedulingFailed) {
-      this.startCountingDown();
-
       return (
         <ContentContainer>
           <Helmet>
@@ -154,12 +201,25 @@ export class NextEpisodeShowPagePresentational extends React.Component<
             {
               this.state.isCountingDown &&
               <React.Fragment>
-                Automatically refreshing in{" "}
+                {" "}Automatically refreshing in{" "}
                 {this.state.refreshCountdown} second
                 {this.state.refreshCountdown !== 1 ? "s" : ""}.
               </React.Fragment>
             }
           </span>
+
+          <div
+            style={{
+              display: "flex",
+              marginLeft: "20px",
+              marginTop: "50px",
+            }}
+          >
+            <RegisterForEmailNotification
+              onClick={this.registerForNotification}
+              registrationStatus={this.state.notificationRegistrationState}
+            />
+          </div>
         </ContentContainer>
       );
     } else if (!this.state.workspaceId) {
@@ -201,7 +261,25 @@ export class NextEpisodeShowPagePresentational extends React.Component<
 
   private stopCountingDown() {
     if (this.state.isCountingDown) {
-     clearInterval(this.state.countdownInterval);
+      clearInterval(this.state.countdownInterval);
+      this.setState({
+        isCountingDown: false,
+        countdownInterval: null,
+      });
+    }
+  }
+
+  private async registerForNotification() {
+    this.stopCountingDown();
+    this.setState({ notificationRegistrationState: NOTIFICATION_REGISTRATION_PENDING });
+    try {
+      await this.props.notifyOnNextWorkspaceMutation({
+        experimentId: parseQueryString(window.location.search).experiment,
+      });
+      this.setState({ notificationRegistrationState: NOTIFICATION_REGISTERED });
+    } catch {
+      this.setState({ notificationRegistrationState: NOTIFICATION_REGISTRATION_ERRORED });
+      this.startCountingDown();
     }
   }
 }
@@ -220,8 +298,17 @@ const FIND_NEXT_WORKSPACE_MUTATION = gql`
   }
 `;
 
+const NOTIFY_NEXT_WORKSPACE_MUTATION = gql`
+  mutation notifyOnNextWorkspace($experimentId: String) {
+    notifyOnNextWorkspace(experimentId: $experimentId) {
+      success
+    }
+  }
+`;
+
 export const NextEpisodeShowPage = compose(
   graphql(FIND_NEXT_WORKSPACE_MUTATION, { name: "findNextWorkspaceMutation" }),
+  graphql(NOTIFY_NEXT_WORKSPACE_MUTATION, { name: "notifyOnNextWorkspaceMutation" }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
   }),
