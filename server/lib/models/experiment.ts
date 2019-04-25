@@ -21,6 +21,7 @@ import {
   defaultRootInstructions,
 } from "./helpers/defaultInstructions";
 import Instructions from "./instructions";
+import NotificationRequest from "./notificationRequest";
 
 @Table
 export default class Experiment extends Model<Experiment> {
@@ -64,6 +65,9 @@ export default class Experiment extends Model<Experiment> {
 
   @HasMany(() => Instructions, "experimentId")
   public instructions: Instructions[];
+
+  @HasMany(() => NotificationRequest, "experimentId")
+  public notificationRequests: NotificationRequest[];
 
   @AfterCreate
   public static async createDefaultInstructions(experiment: Experiment) {

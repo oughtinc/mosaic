@@ -6,6 +6,7 @@ import Block from "./block";
 import Experiment from "./experiment";
 import ExportWorkspaceLockRelation from "./exportWorkspaceLockRelation";
 import Instructions from "./instructions";
+import NotificationRequest from "./notificationRequest";
 import Pointer from "./pointer";
 import PointerImport from "./pointerImport";
 import Tree from "./tree";
@@ -38,6 +39,7 @@ export async function initializeDb() {
     Experiment,
     ExportWorkspaceLockRelation,
     Instructions,
+    NotificationRequest,
     Pointer,
     PointerImport,
     Tree,

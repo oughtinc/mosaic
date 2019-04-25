@@ -2,12 +2,13 @@ import {
   BelongsToMany,
   Column,
   DataType,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
-import { UUIDV4 } from "sequelize";
 import Tree from "./tree";
 import UserTreeOracleRelation from "./userTreeOracleRelation";
+import NotificationRequest from "./notificationRequest";
 
 @Table
 export default class User extends Model<User> {
@@ -38,4 +39,7 @@ export default class User extends Model<User> {
 
   @BelongsToMany(() => Tree, () => UserTreeOracleRelation)
   public OracleTrees: Tree[];
+
+  @HasMany(() => NotificationRequest, "userId")
+  public notificationRequests: NotificationRequest[];
 }
