@@ -18,7 +18,7 @@ const server = new ApolloServer({
   schema,
   context: async ({ req }) => {
     const userInfo = await userFromAuthToken(req.headers.authorization);
-    if (userInfo !== null) {
+    if (userInfo !== null && userInfo.user_id) {
       let user = await db.models.User.findByPk(userInfo.user_id);
 
       if (!user) {
@@ -31,8 +31,7 @@ const server = new ApolloServer({
           pictureURL: userInfo.picture,
         });
       } else if (
-        (!user.givenName && userInfo.given_name)
-        ||
+        (!user.givenName && userInfo.given_name) ||
         (!user.email && userInfo.email)
       ) {
         await user.update({
@@ -56,15 +55,13 @@ const server = new ApolloServer({
     }
   },
   engine: {
-    apiKey: "service:mosaic:hGCwzWa_wg71SWpJ7NBMoA"
+    apiKey: "service:mosaic:hGCwzWa_wg71SWpJ7NBMoA",
   },
 });
 
 if (!process.env.USING_DOCKER) {
   app.use(enforce.HTTPS({ trustProtoHeader: true }));
-  app.use(
-    express.static(path.join(__dirname, "/../../client/build"))
-  );
+  app.use(express.static(path.join(__dirname, "/../../client/build")));
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname + "/../../client/build/index.html"));
   });
@@ -77,10 +74,10 @@ app.use("/testing", testingRoutes);
 app.listen(GRAPHQL_PORT, () => {
   if (process.env.USING_DOCKER) {
     console.log(
-      `GraphQL playground: http://localhost:${GRAPHQL_PORT}/graphql \nReact: http://localhost:3000`
+      `GraphQL playground: http://localhost:${GRAPHQL_PORT}/graphql \nReact: http://localhost:3000`,
     );
   }
   console.log(
-    "Express/GraphQL server now listening. React server (web_1) may still be loading."
+    "Express/GraphQL server now listening. React server (web_1) may still be loading.",
   );
 });
