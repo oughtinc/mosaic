@@ -11,6 +11,8 @@ import {
 
 import { WorkspaceCardPresentational } from "./WorkspaceCard";
 
+import { Auth } from "../../auth";
+
 const ORACLE_MODE_QUERY = gql`
   query oracleModeQuery {
     oracleMode
@@ -157,6 +159,7 @@ export const WorkspaceCard: any = compose(
         workspaceId,
       },
     }),
+    skip: () => !Auth.isAdmin(),
   }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
