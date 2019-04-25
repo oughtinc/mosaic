@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import styled, { css } from "styled-components";
 import * as React from "react";
 import { Button } from "react-bootstrap";
@@ -374,7 +375,12 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                         />
                         {a.user.givenName
                           ? `${a.user.givenName} ${a.user.familyName}`
-                          : a.user.email || a.user.id}{" "}
+                          : a.user.email || a.user.id}
+                        {" - "}
+                        {DateTime.fromMillis(
+                          Number(a.startAtTimestamp),
+                        ).toLocaleString(DateTime.DATETIME_SHORT)}
+                        {" - "}
                         {Math.round(
                           (Number(a.endAtTimestamp) -
                             Number(a.startAtTimestamp)) /
