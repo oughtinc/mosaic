@@ -372,7 +372,9 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                             width: "30px",
                           }}
                         />
-                        {a.user.givenName} {a.user.familyName}{" "}
+                        {a.user.givenName
+                          ? `${a.user.givenName} ${a.user.familyName}`
+                          : a.user.email || a.user.id}{" "}
                         {Math.round(
                           (Number(a.endAtTimestamp) -
                             Number(a.startAtTimestamp)) /
