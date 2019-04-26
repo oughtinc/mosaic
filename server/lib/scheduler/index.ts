@@ -168,3 +168,11 @@ export async function createScheduler(experimentId) {
 
   return scheduler;
 }
+
+export default async function getScheduler(experimentId: string): Promise<Scheduler> {
+  if (schedulers.has(experimentId)) {
+    return schedulers.get(experimentId);
+  } else {
+    return await createScheduler(experimentId);
+  }
+}

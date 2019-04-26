@@ -21,7 +21,7 @@ import { userFromContext } from "./auth/userFromContext";
 
 import { getMessageForUser } from "./helpers/getMessageForUser";
 
-import { createScheduler, schedulers } from "../scheduler";
+import getScheduler from "../scheduler";
 import { map } from "asyncro";
 import Block from "../models/block";
 import Workspace from "../models/workspace";
@@ -113,14 +113,7 @@ export const workspaceType = makeObjectType(
             });
           }
 
-          // get scheduler
-          let scheduler;
-          if (schedulers.has(experimentId)) {
-            scheduler = schedulers.get(experimentId);
-          } else {
-            scheduler = await createScheduler(experimentId);
-          }
-
+          const scheduler = await getScheduler(experimentId);
           const isWorkspaceRootLevel = !workspace.parentId;
           const isThisFirstTimeWorkspaceHasBeenWorkedOn = await scheduler.isThisFirstTimeWorkspaceHasBeenWorkedOn(
             workspace.id,
@@ -211,13 +204,7 @@ export const workspaceType = makeObjectType(
         )[0];
         const experimentId = mostRecentExperiment.id;
 
-        // get scheduler
-        let scheduler;
-        if (schedulers.has(experimentId)) {
-          scheduler = schedulers.get(experimentId);
-        } else {
-          scheduler = await createScheduler(experimentId);
-        }
+        const scheduler = await getScheduler(experimentId);
 
         // get user
         const userId = await scheduler.getIdOfCurrentlyActiveUser(workspace.id);
@@ -379,13 +366,7 @@ const schema = new GraphQLSchema({
           userId: { type: GraphQLString },
         },
         resolve: async (_, { experimentId, userId }) => {
-          let scheduler;
-          if (schedulers.has(experimentId)) {
-            scheduler = schedulers.get(experimentId);
-          } else {
-            scheduler = await createScheduler(experimentId);
-          }
-
+          const scheduler = await getScheduler(experimentId);
           return scheduler.getUserActivity(userId);
         },
       },
@@ -411,15 +392,9 @@ const schema = new GraphQLSchema({
           )[0];
           const experimentId = mostRecentExperiment.id;
 
-          let scheduler;
-          if (schedulers.has(experimentId)) {
-            scheduler = schedulers.get(experimentId);
-          } else {
-            scheduler = await createScheduler(experimentId);
-          }
+          const scheduler = await getScheduler(experimentId);
 
-          const result = scheduler.getWorkspaceActivity(workspaceId);
-          return result;
+          return scheduler.getWorkspaceActivity(workspaceId);
         },
       },
       oracleMode: {
@@ -622,12 +597,7 @@ const schema = new GraphQLSchema({
                     throw new Error("This experiment is not active.");
                   }
 
-                  let scheduler;
-                  if (schedulers.has(experimentId)) {
-                    scheduler = schedulers.get(experimentId);
-                  } else {
-                    scheduler = await createScheduler(experimentId);
-                  }
+                  const scheduler = await getScheduler(experimentId);
 
                   if (block.type === "QUESTION") {
                     const idOfCurrentlyActiveUserOfParent = await scheduler.getIdOfCurrentlyActiveUser(
@@ -1341,12 +1311,7 @@ const schema = new GraphQLSchema({
             );
           }
 
-          let scheduler;
-          if (schedulers.has(experimentId)) {
-            scheduler = schedulers.get(experimentId);
-          } else {
-            scheduler = await createScheduler(experimentId);
-          }
+          const scheduler = await getScheduler(experimentId);
 
           const workspaceId = await scheduler.assignNextWorkspace(user.id);
 
@@ -1385,12 +1350,7 @@ const schema = new GraphQLSchema({
             );
           }
 
-          let scheduler;
-          if (schedulers.has(experimentId)) {
-            scheduler = schedulers.get(experimentId);
-          } else {
-            scheduler = await createScheduler(experimentId);
-          }
+          const scheduler = await getScheduler(experimentId);
 
           const workspaceId = await scheduler.assignNextMaybeSuboptimalWorkspace(
             user.id,
@@ -1408,12 +1368,11 @@ const schema = new GraphQLSchema({
           "You must be logged in to leave a workspace",
           async (_, { experimentId }, context) => {
             const user = await userFromContext(context);
-            let scheduler;
-            if (schedulers.has(experimentId)) {
-              scheduler = schedulers.get(experimentId);
-            } else {
-              scheduler = await createScheduler(experimentId);
+            if (user === null) {
+              return false;
             }
+
+            const scheduler = await getScheduler(experimentId);
             await scheduler.leaveCurrentWorkspace(user.id);
             return true;
           },
@@ -1449,12 +1408,7 @@ const schema = new GraphQLSchema({
             const experiment = experiments[0];
             const experimentId = experiment.id;
 
-            let scheduler;
-            if (schedulers.has(experimentId)) {
-              scheduler = schedulers.get(experimentId);
-            } else {
-              scheduler = await createScheduler(experimentId);
-            }
+            const scheduler = await getScheduler(experimentId);
 
             // have this guard here in case user has already left this particular workspace
             // and is working on a different one
