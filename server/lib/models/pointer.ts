@@ -1,15 +1,7 @@
 import { Op, UUIDV4 } from "sequelize";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 import * as _ from "lodash";
-import {
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  HasOne,
-  Model,
-  Table,
-} from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasOne, Model, Table } from "sequelize-typescript";
 import Block from "./block";
 import PointerImport from "./pointerImport";
 
@@ -33,8 +25,8 @@ export default class Pointer extends Model<Pointer> {
       // look into removing the rest of this method
       // and related code (pulling in "id" and "sourceBlockId" attributes)
       // as well as the Block cachedExportPointerValues
-      const pointerId = this.get("id");
-      const sourceBlockId = this.get("sourceBlockId");
+      const pointerId = this.get("id") as string;
+      const sourceBlockId = this.get("sourceBlockId") as string;
       const sourceBlock = await Block.findByPk(sourceBlockId);
       if (sourceBlock === null) {
         return null;
@@ -57,7 +49,7 @@ export default class Pointer extends Model<Pointer> {
   @BelongsTo(() => Block)
   public sourceBlock: Block;
 
-  public async containedPointers({ pointersSoFar } = {}) {
+  public async containedPointers({ pointersSoFar }: { pointersSoFar?: Pointer[] } = {}) {
     const directPointers = await this.directContainedPointers({
       pointersSoFar,
     });
@@ -75,7 +67,7 @@ export default class Pointer extends Model<Pointer> {
     return allPointers;
   }
 
-  public async directContainedPointers({ pointersSoFar } = {}) {
+  public async directContainedPointers({ pointersSoFar }: { pointersSoFar?: Pointer[] } = {}) {
     let pointerIds = await this.directContainedPointerIds();
     if (pointersSoFar) {
       pointerIds = _.difference(
@@ -84,14 +76,13 @@ export default class Pointer extends Model<Pointer> {
       );
     }
 
-    const pointers = await Pointer.findAll({
+    return await Pointer.findAll({
       where: {
         id: {
           [Op.in]: _.uniq(pointerIds),
         },
       },
     });
-    return pointers;
   }
 
   public async directContainedPointerIds() {
@@ -102,7 +93,6 @@ export default class Pointer extends Model<Pointer> {
 
     const inlines = getAllInlinesAsArray(value);
     const pointerInlines = inlines.filter(l => !!l.data.pointerId);
-    const pointerIds = pointerInlines.map(p => p.data.pointerId);
-    return pointerIds;
+    return pointerInlines.map(p => p.data.pointerId);
   }
 }

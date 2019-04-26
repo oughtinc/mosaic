@@ -22,7 +22,7 @@ export const InstructionTypes = [
 @Table
 export default class Instructions extends Model<Instructions> {
   @AllowNull(false)
-  @Column(DataType.ENUM(InstructionTypes))
+  @Column(DataType.ENUM({ values: InstructionTypes }))
   public type: string;
 
   @AllowNull(false)

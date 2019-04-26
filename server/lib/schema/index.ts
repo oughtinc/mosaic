@@ -579,6 +579,9 @@ const schema = new GraphQLSchema({
               }
 
               const user = await userFromContext(context);
+              if (user === null) {
+                throw new Error("You must be logged in to update blocks");
+              }
               const userId = user.id;
 
               if (!user.isAdmin) {
@@ -884,9 +887,10 @@ const schema = new GraphQLSchema({
           async (_, { id, childWorkspaceOrder }) => {
             const workspace = await Workspace.findByPk(id);
             if (workspace === null) {
-              return null;
+              throw new Error("Workspace ID does not exist");
             }
-            return workspace.update({ childWorkspaceOrder });
+            await workspace.update({ childWorkspaceOrder });
+            return workspace;
           },
         ),
       },
@@ -901,9 +905,12 @@ const schema = new GraphQLSchema({
           async (_, { workspaceId, isStale }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return null;
+              throw new Error("Workspace ID does not exist");
             }
             const user = await userFromContext(context);
+            if (user === null) {
+              throw new Error("You must be logged in to workspace children order");
+            }
             const userId = user.id;
 
             let isNotStaleRelativeToUser = workspace.isNotStaleRelativeToUser;
@@ -916,7 +923,8 @@ const schema = new GraphQLSchema({
               );
             }
 
-            return await workspace.update({ isNotStaleRelativeToUser });
+            await workspace.update({ isNotStaleRelativeToUser });
+            return workspace;
           },
         ),
       },
@@ -980,7 +988,7 @@ const schema = new GraphQLSchema({
           async (obj, { id, input }, context) => {
             const workspace = await Workspace.findByPk(id);
             if (workspace === null) {
-              return null;
+              throw new Error("Workspace ID does not exist");
             }
 
             const inputWithNoNullOrUndefinedValues = _.omitBy(input, _.isNil);
@@ -1060,7 +1068,7 @@ const schema = new GraphQLSchema({
                       updatedWorkspace.parentId,
                     );
                     if (parent === null) {
-                      return;
+                      throw new Error("Parent ID does not exist");
                     }
                     const children = (await parent.$get(
                       "childWorkspaces",
@@ -1089,7 +1097,7 @@ const schema = new GraphQLSchema({
                       workspace.parentId,
                     );
                     if (parentWorkspace === null) {
-                      return null;
+                      throw new Error("Parent ID does not exist");
                     }
 
                     if (parentWorkspace.parentId) {
@@ -1097,7 +1105,7 @@ const schema = new GraphQLSchema({
                         parentWorkspace.parentId,
                       );
                       if (grandparentWorkspace === null) {
-                        return null;
+                        throw new Error("Grandparent does not exist (but should)");
                       }
                       await grandparentWorkspace.update({
                         isCurrentlyResolved,
@@ -1107,7 +1115,7 @@ const schema = new GraphQLSchema({
                           grandparentWorkspace.parentId,
                         );
                         if (greatGrandparentWorkspace === null) {
-                          return null;
+                          throw new Error("Great-grandparent does not exist (but should)");
                         }
                         const isNotRoot = greatGrandparentWorkspace.parentId;
                         if (isNotRoot) {
@@ -1154,9 +1162,10 @@ const schema = new GraphQLSchema({
         resolve: async (_, { id, wasAnsweredByOracle }) => {
           const workspace = await Workspace.findByPk(id);
           if (workspace === null) {
-            return null;
+            throw new Error("Workspace ID does not exist");
           }
-          return workspace.update({ wasAnsweredByOracle });
+          await workspace.update({ wasAnsweredByOracle });
+          return workspace;
         },
       },
       transferRemainingBudgetToParent: {
@@ -1169,13 +1178,13 @@ const schema = new GraphQLSchema({
           async (_, { id }) => {
             const child = await Workspace.findByPk(id);
             if (child === null) {
-              return;
+              throw new Error("Child ID does not exist");
             }
             const childRemainingBudget =
               child.totalBudget - child.allocatedBudget;
             const parent = await Workspace.findByPk(child.parentId);
             if (parent === null) {
-              return;
+              throw new Error("Parent ID does not exist");
             }
             await parent.update({
               isStale: true,
@@ -1194,9 +1203,10 @@ const schema = new GraphQLSchema({
         resolve: async (_, { id }) => {
           const workspace = await Workspace.findByPk(id);
           if (workspace === null) {
-            return;
+            throw new Error("Workspace ID does not exist");
           }
           await workspace.update({ allocatedBudget: workspace.totalBudget });
+          return workspace;
         },
       },
       createWorkspace: {
@@ -1210,13 +1220,16 @@ const schema = new GraphQLSchema({
           "You must be logged in to create a workspace",
           async (_, { question, totalBudget, experimentId }, context) => {
             const user = await userFromContext(context);
+            if (user === null) {
+              throw new Error("You must be logged in to create a workspace");
+            }
 
             let workspace;
 
             if (experimentId) {
               const experiment = await Experiment.findByPk(experimentId);
               if (experiment === null) {
-                return;
+                throw new Error("Experiment ID does not exist");
               }
 
               workspace = await Workspace.create(
@@ -1265,9 +1278,12 @@ const schema = new GraphQLSchema({
           ) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             const user = await userFromContext(context);
+            if (user === null) {
+              throw new Error("You must be logged in to create a subquestion");
+            }
 
             return await workspace.createChild({
               question: JSON.parse(question),
@@ -1291,7 +1307,7 @@ const schema = new GraphQLSchema({
           async (_, { workspaceId, childId, totalBudget }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             const child = await Workspace.findByPk(childId);
             await workspace.changeAllocationToChild(child, totalBudget);
@@ -1433,9 +1449,10 @@ const schema = new GraphQLSchema({
           async (_, { isPublic, workspaceId }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             await workspace.update({ isPublic });
+            return workspace;
           },
         ),
       },
@@ -1450,10 +1467,10 @@ const schema = new GraphQLSchema({
           async (_, { isEligibleForAssignment, workspaceId }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             await workspace.update({ isEligibleForAssignment });
-            return { id: workspaceId };
+            return workspace;
           },
         ),
       },
@@ -1468,10 +1485,10 @@ const schema = new GraphQLSchema({
           async (_, { hasTimeBudget, workspaceId }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             await workspace.update({ hasTimeBudget });
-            return { id: workspaceId };
+            return workspace;
           },
         ),
       },
@@ -1486,10 +1503,10 @@ const schema = new GraphQLSchema({
           async (_, { hasIOConstraints, workspaceId }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             await workspace.update({ hasIOConstraints });
-            return { id: workspaceId };
+            return workspace;
           },
         ),
       },
@@ -1504,9 +1521,10 @@ const schema = new GraphQLSchema({
           async (_, { isEligibleForHonestOracle, workspaceId }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             await workspace.update({ isEligibleForHonestOracle });
+            return workspace;
           },
         ),
       },
@@ -1521,13 +1539,14 @@ const schema = new GraphQLSchema({
           async (_, { workspaceId, changeToBudget }, context) => {
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
-              return;
+              throw new Error("Workspace ID does not exist");
             }
             const updatedTimeBudget = Math.min(
               workspace.totalBudget,
               workspace.allocatedBudget + changeToBudget,
             );
             await workspace.update({ allocatedBudget: updatedTimeBudget });
+            return workspace;
           },
         ),
       },

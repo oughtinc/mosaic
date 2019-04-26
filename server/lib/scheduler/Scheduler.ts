@@ -122,78 +122,6 @@ class Scheduler {
     }
   }
 
-  public async getIdOfCurrentWorkspace(userId) {
-    const assignment = this.schedule.getMostRecentAssignmentForUser(userId);
-
-    if (!assignment) {
-      return undefined;
-    }
-
-    const workspace = assignment.getWorkspace();
-
-    return workspace.id;
-  }
-
-  public async assignNextWorkspaceForOracle(userId) {
-    this.resetCaches();
-    this.schedule.leaveCurrentWorkspace(userId);
-
-    let treesToConsider = await this.fetchAllRootWorkspaces();
-
-    while (treesToConsider.length > 0) {
-      const leastRecentlyWorkedOnTreesToConsider = await this.getTreesWorkedOnLeastRecentlyByUser(
-        userId,
-        treesToConsider,
-      );
-      const randomlySelectedTree = pickRandomItemFromArray(
-        leastRecentlyWorkedOnTreesToConsider,
-      );
-
-      const workspacesInTree = await this.fetchAllWorkspacesInTree(
-        randomlySelectedTree,
-      );
-
-      let oracleEligibleWorkspaces = await this.filterByWhetherEligibleForOracle(
-        workspacesInTree,
-      );
-      oracleEligibleWorkspaces = await this.filterByWhetherAnsweredByOracle(
-        oracleEligibleWorkspaces,
-      );
-
-      const workspacesToConsider = await this.filterByWhetherCurrentlyBeingWorkedOn(
-        oracleEligibleWorkspaces,
-      );
-
-      // we want to prioritize older workspaces
-      workspacesToConsider.sort((w1, w2) => w1 - w2);
-
-      const assignedWorkspace = workspacesToConsider[0];
-
-      if (!assignedWorkspace) {
-        treesToConsider = _.difference(treesToConsider, [randomlySelectedTree]);
-      } else {
-        await this.schedule.assignWorkspaceToUser({
-          experimentId: this.experimentId,
-          userId,
-          workspace: assignedWorkspace,
-          isOracle: true,
-          isLastAssignmentTimed: true,
-        });
-        return assignedWorkspace.id;
-      }
-    }
-
-    const fallbackScheduler = await this.getFallbackScheduler();
-    if (fallbackScheduler) {
-      const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspaceForOracle(
-        userId,
-      );
-
-      return assignedWorkspaceId;
-    }
-    throw new Error("No eligible workspace for oracle");
-  }
-
   public async assignNextWorkspace(userId, maybeSuboptimal = false) {
     this.resetCaches();
     this.schedule.leaveCurrentWorkspace(userId);
@@ -421,18 +349,6 @@ class Scheduler {
 
   private async filterByWhetherAnsweredByOracle(workspaces) {
     return workspaces.filter(w => !w.wasAnsweredByOracle);
-  }
-
-  private async filterByWhetherAnsweredOrHasAncestorAnsweredByOracle(
-    workspaces,
-  ) {
-    return await filter(workspaces, async w => {
-      if (w.wasAnsweredByOracle) {
-        return false;
-      }
-      const hasAncestorAnsweredByOracle = await w.hasAncestorAnsweredByOracle;
-      return !hasAncestorAnsweredByOracle;
-    });
   }
 
   private async getActionableWorkspacesForTree({

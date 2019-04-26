@@ -135,7 +135,7 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasAncestorAnsweredByOracle() {
     return (async () => {
-      let curWorkspace = await Workspace.findByPk(this.get("id"));
+      let curWorkspace = await Workspace.findByPk(this.get("id") as string);
       if (curWorkspace === null) {
         return false;
       }
@@ -156,7 +156,7 @@ export default class Workspace extends Model<Workspace> {
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
       const rootWorkspace = await Workspace.findByPk(
-        this.get("rootWorkspaceId"),
+        this.get("rootWorkspaceId") as string,
       );
       if (rootWorkspace === null) {
         return false;
@@ -169,7 +169,7 @@ export default class Workspace extends Model<Workspace> {
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
       const rootWorkspace = await Workspace.findByPk(
-        this.get("rootWorkspaceId"),
+        this.get("rootWorkspaceId") as string,
       );
       if (rootWorkspace === null) {
         return false;
@@ -182,7 +182,7 @@ export default class Workspace extends Model<Workspace> {
     new DataType.VIRTUAL(DataType.INTEGER, ["totalBudget", "allocatedBudget"]),
   )
   public get remainingBudget() {
-    return this.get("totalBudget") - this.get("allocatedBudget");
+    return (this.get("totalBudget") as number) - (this.get("allocatedBudget") as number);
   }
 
   @Column(
@@ -194,18 +194,18 @@ export default class Workspace extends Model<Workspace> {
   )
   public get budgetUsedWorkingOnThisWorkspace() {
     return (async () => {
-      if (this.get("timeSpentOnThisWorkspace") > 0) {
-        return this.get("timeSpentOnThisWorkspace");
+      if (this.get("timeSpentOnThisWorkspace") as number > 0) {
+        return this.get("timeSpentOnThisWorkspace") as number;
       }
 
       let howMuchSpentOnChildren = 0;
-      for (const childId of this.get("childWorkspaceOrder")) {
+      for (const childId of this.get("childWorkspaceOrder") as string[]) {
         const child = await Workspace.findByPk(childId);
         if (child !== null) {
           howMuchSpentOnChildren += child.totalBudget;
         }
       }
-      return this.get("allocatedBudget") - howMuchSpentOnChildren;
+      return this.get("allocatedBudget") as number - howMuchSpentOnChildren;
     })();
   }
 
@@ -235,7 +235,7 @@ export default class Workspace extends Model<Workspace> {
     return (async () => {
       return await ExportWorkspaceLockRelation.findAll({
         where: {
-          workspaceId: this.get("id"),
+          workspaceId: this.get("id") as string,
         },
       });
     })();
@@ -267,7 +267,7 @@ export default class Workspace extends Model<Workspace> {
     return (async () => {
       const isInOracleModeValue = isInOracleMode.getValue();
       let depth = 1;
-      let curWorkspace = await Workspace.findByPk(this.get("id"));
+      let curWorkspace = await Workspace.findByPk(this.get("id") as string);
       if (curWorkspace === null) {
         return depth;
       }
@@ -303,8 +303,8 @@ export default class Workspace extends Model<Workspace> {
       "2019-04-08 23:26:03.572+00",
     );
     return (
-      Date.parse(this.get("createdAt")) > dateAfterWhichCompactTreeWorks &&
-      this.get("isEligibleForMaliciousOracle")
+      Date.parse(this.get("createdAt") as string) > dateAfterWhichCompactTreeWorks &&
+      this.get("isEligibleForMaliciousOracle") as boolean
     );
   }
 
@@ -692,9 +692,9 @@ export default class Workspace extends Model<Workspace> {
     return child;
   }
 
-  private async getConnectedPointers() {
+  private async getConnectedPointers(): Promise<Pointer[]> {
     const blocks = await this.visibleBlocks();
-    let _connectedPointers: string[] = [];
+    let _connectedPointers: Pointer[] = [];
     for (const block of blocks) {
       const blockPointerIds = await block.connectedPointers({
         pointersSoFar: _connectedPointers,
@@ -708,8 +708,8 @@ export default class Workspace extends Model<Workspace> {
   // Returns an array containing the pointers connected to a workspace and all
   // of its descendants. Passes "pointerSoFar" parameter to recursive
   // subcalls in order to avoid duplicate SQL queries for pointers.
-  private async getConnectedPointersOfSubtree(pointersSoFar = []) {
-    let connectedPointersOfSubtree = [];
+  private async getConnectedPointersOfSubtree(pointersSoFar: Pointer[] = []): Promise<Pointer[]> {
+    let connectedPointersOfSubtree: Pointer[] = [];
 
     // Can use this.getBlocks instead of this.getVisibleBlocks because later we
     // will go on to iterate through all the children workspaces.
