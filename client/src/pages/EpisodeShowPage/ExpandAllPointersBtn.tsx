@@ -10,7 +10,7 @@ import {
 class ExpandAllPointersBtnPresentational extends React.Component<any, any> {
   public render() {
     return (
-      <span style={{ marginLeft: "10px" }}>
+      <span>
         <Button
           bsSize="xsmall"
           onClick={() => {
