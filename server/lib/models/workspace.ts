@@ -300,7 +300,7 @@ export default class Workspace extends Model<Workspace> {
   )
   public get canShowCompactTreeView() {
     const dateAfterWhichCompactTreeWorks = Date.parse(
-      "2019-04-08T20:52:17.841Z",
+      "2019-04-08 23:26:03.572+00",
     );
     return (
       Date.parse(this.get("createdAt")) > dateAfterWhichCompactTreeWorks &&
