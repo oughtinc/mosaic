@@ -11,6 +11,8 @@ import {
 
 import { WorkspaceCardPresentational } from "./WorkspaceCard";
 
+import { Auth } from "../../auth";
+
 const ORACLE_MODE_QUERY = gql`
   query oracleModeQuery {
     oracleMode
@@ -18,9 +20,9 @@ const ORACLE_MODE_QUERY = gql`
 `;
 
 const SUBTREE_TIME_SPENT_QUERY = gql`
-query subtreeTimeSpentQuery($id: String!) {
-  subtreeTimeSpent(id: $id)
-}
+  query subtreeTimeSpentQuery($id: String!) {
+    subtreeTimeSpent(id: $id)
+  }
 `;
 
 const MARK_WORKSPACE_STALE_FOR_USER_MUTATION = gql`
@@ -30,7 +32,10 @@ const MARK_WORKSPACE_STALE_FOR_USER_MUTATION = gql`
 `;
 
 const EJECT_USER_FROM_CURRENT_WORKSPACE_MUTATION = gql`
-  mutation ejectUserFromCurrentWorkspace($userId: String, $workspaceId: String) {
+  mutation ejectUserFromCurrentWorkspace(
+    $userId: String
+    $workspaceId: String
+  ) {
     ejectUserFromCurrentWorkspace(userId: $userId, workspaceId: $workspaceId)
   }
 `;
@@ -38,13 +43,9 @@ const EJECT_USER_FROM_CURRENT_WORKSPACE_MUTATION = gql`
 const LoadingMsg = ({ isTopLevelOfCurrentTree }) => {
   return (
     <div>
-      {
-        isTopLevelOfCurrentTree
-        ?
-        "Loading... This may take some time for complex trees."
-        :
-        "Loading..."
-      }
+      {isTopLevelOfCurrentTree
+        ? "Loading... This may take some time for complex trees."
+        : "Loading..."}
     </div>
   );
 };
@@ -59,7 +60,10 @@ const optionsForNested = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
   variables: { workspaceId },
 });
 
-const optionsForSubtreeTimeSpentQuery = ({ workspaceId, isTopLevelOfCurrentTree }) => ({
+const optionsForSubtreeTimeSpentQuery = ({
+  workspaceId,
+  isTopLevelOfCurrentTree,
+}) => ({
   fetchPolicy: "cache-and-network",
   variables: { id: workspaceId },
 });
@@ -70,42 +74,67 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
     const isExpanded = queryParams.expanded === "true";
 
     if (
-      this.props.oracleModeQuery.oracleMode !== undefined
-      &&
+      this.props.oracleModeQuery.oracleMode !== undefined &&
       this.props.subtreeQuery.workspace !== undefined
     ) {
       return (
         <WorkspaceCardPresentational
           activeWorkspaceId={queryParams.activeWorkspace}
-          ejectUserFromCurrentWorkspace={async ({ userId, workspaceId }) => await this.props.ejectUserFromCurrentWorkspaceMutation({
-            variables: {
-              userId,
-              workspaceId,
-            },
-          })}
+          ejectUserFromCurrentWorkspace={async ({ userId, workspaceId }) => {
+            await this.props.ejectUserFromCurrentWorkspaceMutation({
+              variables: {
+                userId,
+                workspaceId,
+              },
+            });
+          }}
           isExpanded={isExpanded}
           isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}
           oracleModeQuery={this.props.oracleModeQuery}
-          markWorkspaceStaleForUser={({ userId, workspaceId }) => this.props.markWorkspaceStaleForUserMutation({
-            variables: {
-              userId,
-              workspaceId,
-            }
-          })}
+          markWorkspaceStaleForUser={async ({ userId, workspaceId }) => {
+            await this.props.markWorkspaceStaleForUserMutation({
+              variables: {
+                userId,
+                workspaceId,
+              },
+            });
+          }}
           parentPointers={this.props.parentPointers}
           subtreeQuery={this.props.subtreeQuery}
           subtreeTimeSpentData={this.props.subtreeTimeSpentData}
           subtreeTimeSpentQuery={this.props.subtreeTimeSpentQuery}
           updateWorkspace={this.props.updateWorkspace}
           workspaceId={this.props.workspaceId}
+          workspaceActivityQuery={this.props.workspaceActivityQuery}
         />
       );
     } else {
-      return <LoadingMsg isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree} />;
+      return (
+        <LoadingMsg
+          isTopLevelOfCurrentTree={this.props.isTopLevelOfCurrentTree}
+        />
+      );
     }
   }
-
 }
+
+const WORKSPACE_ACTIVITY_QUERY = gql`
+  query workspaceActivityQuery($workspaceId: String) {
+    workspaceActivity(workspaceId: $workspaceId) {
+      assignments {
+        endAtTimestamp
+        startAtTimestamp
+        user {
+          id
+          givenName
+          familyName
+          email
+          pictureURL
+        }
+      }
+    }
+  }
+`;
 
 export const WorkspaceCard: any = compose(
   graphql(ROOT_WORKSPACE_SUBTREE_QUERY, {
@@ -123,14 +152,23 @@ export const WorkspaceCard: any = compose(
     options: optionsForSubtreeTimeSpentQuery,
     skip: ({ isTopLevelOfCurrentTree }) => !isTopLevelOfCurrentTree,
   }),
+  graphql(WORKSPACE_ACTIVITY_QUERY, {
+    name: "workspaceActivityQuery",
+    options: ({ workspaceId }: any) => ({
+      variables: {
+        workspaceId,
+      },
+    }),
+    skip: () => !Auth.isAdmin(),
+  }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
   }),
   graphql(UPDATE_WORKSPACE, {
     name: "updateWorkspace",
     options: {
-      refetchQueries: [ "subtreeQuery" ],
-    }
+      refetchQueries: ["subtreeQuery"],
+    },
   }),
   graphql(MARK_WORKSPACE_STALE_FOR_USER_MUTATION, {
     name: "markWorkspaceStaleForUserMutation",

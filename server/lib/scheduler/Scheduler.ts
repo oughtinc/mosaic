@@ -85,6 +85,22 @@ class Scheduler {
     return mergedUserActivity;
   }
 
+  public async getWorkspaceActivity(workspaceId) {
+    const thisSchedulerWorkspaceActivity = await this.schedule.getWorkspaceActivity(
+      workspaceId,
+    );
+    const fallbackScheduler = await this.getFallbackScheduler();
+    const fallbackSchedulerWorkspaceActivity = fallbackScheduler
+      ? await fallbackScheduler.getWorkspaceActivity(workspaceId)
+      : [];
+
+    const mergedUserActivity = thisSchedulerWorkspaceActivity.concat(
+      fallbackSchedulerWorkspaceActivity,
+    );
+
+    return mergedUserActivity;
+  }
+
   public async isUserCurrentlyWorkingOnWorkspace(userId, workspaceId) {
     const result = this.schedule.isUserCurrentlyWorkingOnWorkspace(
       userId,

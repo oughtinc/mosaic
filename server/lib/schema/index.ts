@@ -267,8 +267,10 @@ export const workspaceType = makeObjectType(
 // TODO - factor out workspaceType into separate file so the following import
 // can go at the top of the file -- right now it's down here to avoid circular
 // import issues
+export const userType = makeObjectType(User, []);
 
 import { UserActivityType } from "./UserActivity";
+import { WorkspaceActivityType } from "./WorkspaceActivity";
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
   ["tree", () => treeType],
@@ -376,6 +378,39 @@ const schema = new GraphQLSchema({
           }
 
           return scheduler.getUserActivity(userId);
+        },
+      },
+      workspaceActivity: {
+        type: WorkspaceActivityType,
+        args: {
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (__, { workspaceId }) => {
+          const workspace = await Workspace.findByPk(workspaceId);
+          const rootWorkspace = await workspace.getRootWorkspace();
+
+          // get experiment id
+          const tree = (await rootWorkspace.$get("tree")) as Tree;
+          const experiments = (await tree.$get("experiments")) as Experiment[];
+          if (experiments.length === 0) {
+            return null;
+          }
+
+          const mostRecentExperiment = _.sortBy(
+            experiments,
+            e => -e.createdAt,
+          )[0];
+          const experimentId = mostRecentExperiment.id;
+
+          let scheduler;
+          if (schedulers.has(experimentId)) {
+            scheduler = schedulers.get(experimentId);
+          } else {
+            scheduler = await createScheduler(experimentId);
+          }
+
+          const result = scheduler.getWorkspaceActivity(workspaceId);
+          return result;
         },
       },
       oracleMode: {

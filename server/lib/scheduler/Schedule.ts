@@ -64,6 +64,18 @@ class Schedule {
     }
   }
 
+  public async getWorkspaceActivity(workspaceId) {
+    const assignments: any = [];
+    [...this.schedule].forEach(([userId, curUserSchedule]) => {
+      const assignmentsForUser = curUserSchedule.getAssignmentsForWorkspace(
+        workspaceId,
+      );
+      assignments.push(...assignmentsForUser);
+    });
+
+    return assignments;
+  }
+
   public async getUserActivity(userId) {
     this.createUserScheduleIfNotCreated(userId);
     const userSchedule = this.getUserSchedule(userId);
