@@ -29,6 +29,7 @@
     "pretest": "NODE_ENV=test npm run db:reset"
   },
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "apollo": "^2.9.0",
     "apollo-server": "^2.4.8",
     "apollo-server-express": "^2.4.8",

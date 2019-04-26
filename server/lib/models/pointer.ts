@@ -15,6 +15,7 @@ export default class Pointer extends Model<Pointer> {
   })
   public id: string;
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.JSON, ["id", "sourceBlockId"]))
   public get value() {
     return (async () => {

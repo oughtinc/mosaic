@@ -106,6 +106,7 @@ export default class Workspace extends Model<Workspace> {
   public wasAnsweredByOracle: boolean;
 
   @Default([])
+  // @ts-ignore
   @Column(DataType.ARRAY(DataType.TEXT))
   public childWorkspaceOrder: string[];
 
@@ -132,6 +133,7 @@ export default class Workspace extends Model<Workspace> {
   @Column(DataType.INTEGER)
   public allocatedBudget: number;
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasAncestorAnsweredByOracle() {
     return (async () => {
@@ -152,6 +154,7 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
@@ -165,6 +168,7 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
@@ -179,6 +183,7 @@ export default class Workspace extends Model<Workspace> {
   }
 
   @Column(
+    // @ts-ignore
     new DataType.VIRTUAL(DataType.INTEGER, ["totalBudget", "allocatedBudget"]),
   )
   public get remainingBudget() {
@@ -186,6 +191,7 @@ export default class Workspace extends Model<Workspace> {
   }
 
   @Column(
+    // @ts-ignore
     new DataType.VIRTUAL(DataType.INTEGER, [
       "allocatedBudget",
       "childWorkspaceOrder",
@@ -209,6 +215,7 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.ARRAY(Sequelize.JSON), ["id"]))
   public get connectedPointers() {
     return (async () => {
@@ -230,6 +237,7 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.ARRAY(Sequelize.JSON), ["id"]))
   public get exportLockStatusInfo() {
     return (async () => {
@@ -241,6 +249,7 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.ARRAY(Sequelize.JSON), ["id"]))
   public get connectedPointersOfSubtree() {
     return (async () => {
@@ -262,6 +271,7 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.INTEGER, ["id"]))
   public get depth() {
     return (async () => {
@@ -293,6 +303,7 @@ export default class Workspace extends Model<Workspace> {
   }
 
   @Column(
+    // @ts-ignore
     new DataType.VIRTUAL(DataType.BOOLEAN, [
       "createdAt",
       "isEligibleForMaliciousOracle",
