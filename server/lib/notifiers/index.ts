@@ -1,8 +1,16 @@
 import NotificationRequest from "../models/notificationRequest";
 import sendEmailNotification from "./email";
+import sendSlackNotification from "./slack";
 
 async function sendNotifications(notificationRequest: NotificationRequest) {
-  await sendEmailNotification(notificationRequest);
+  try {
+    await Promise.all([
+      sendEmailNotification(notificationRequest),
+      sendSlackNotification(notificationRequest),
+    ]);
+  } catch (err) {
+    console.log("Failed to send notification: " + err);
+  }
   await notificationRequest.destroy();
 }
 
