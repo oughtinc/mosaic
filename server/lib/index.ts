@@ -8,6 +8,7 @@ import { ApolloServer } from "apollo-server-express";
 
 import { initializeDb } from "./models";
 import { testingRoutes } from "./testing/routes";
+import sendPendingNotifications from "./notifiers";
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
@@ -51,5 +52,7 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
     console.log(
       "Express/GraphQL server now listening. React server (web_1) may still be loading.",
     );
+
+    setInterval(sendPendingNotifications, 10000);
   });
 })();

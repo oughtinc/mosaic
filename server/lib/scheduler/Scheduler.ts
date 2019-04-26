@@ -181,6 +181,36 @@ class Scheduler {
     return assignedWorkspace.id;
   }
 
+  public async isWorkspaceAvailable(userId: string) {
+    this.resetCaches();
+
+    let actionableWorkspaces;
+    if (this.isInOracleMode.getValue()) {
+      actionableWorkspaces = await this.getActionableWorkspacesInOracleMode({
+        maybeSuboptimal: false,
+        userId,
+      });
+    } else {
+      actionableWorkspaces = await this.getActionableWorkspaces({
+        maybeSuboptimal: false,
+        userId,
+      });
+    }
+
+    if (actionableWorkspaces.length === 0) {
+      const fallbackScheduler = await this.getFallbackScheduler();
+      if (fallbackScheduler) {
+        return await fallbackScheduler.isWorkspaceAvailable(
+          userId,
+        );
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
+
   public async assignNextMaybeSuboptimalWorkspace(userId) {
     return await this.assignNextWorkspace(userId, true);
   }
