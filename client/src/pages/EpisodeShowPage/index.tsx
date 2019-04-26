@@ -232,6 +232,8 @@ export class WorkspaceView extends React.Component<any, any> {
       pastedExportFormat: CONVERT_PASTED_EXPORT_TO_IMPORT,
       shouldAutoExport: true,
       hasInitiallyLoaded: false,
+      isAuthenticated: Auth.isAuthenticated(),
+      logoutTimer: null,
     };
   }
 
@@ -264,10 +266,16 @@ export class WorkspaceView extends React.Component<any, any> {
       this.props.closeAllPointerReferences();
       this.setState({ hasInitiallyLoaded: true });
     }, 1);
+
+    this.updateAuthenticationState();
   }
 
   public componentWillUnmount() {
     this.leaveCurrentWorkspace();
+
+    if (this.state.logoutTimer) {
+      clearTimeout(this.state.logoutTimer);
+    }
   }
 
   public updateBlocks = (blocks: any) => {
@@ -392,7 +400,7 @@ export class WorkspaceView extends React.Component<any, any> {
         <div
           style={{ display: this.state.hasInitiallyLoaded ? "block" : "none"}}
         >
-          {Auth.isAuthenticated() && experimentId && (
+          {this.state.isAuthenticated && experimentId && (
             <EpisodeNav
               experimentId={experimentId}
               hasSubquestions={hasSubquestions}
@@ -541,7 +549,28 @@ export class WorkspaceView extends React.Component<any, any> {
                   <Row>
                     <Col sm={6}>
                       {
-                        Auth.isAuthenticated()
+                        !this.state.isAuthenticated && experimentId
+                        &&
+                        <Alert bsStyle="danger" style={{ border: "1px solid #ddd"}}>
+                          <div
+                            style={{
+                              fontSize: "24px",
+                              fontWeight: 600,
+                              paddingBottom: "10px",
+                              textAlign: "center",
+                            }}
+                          >
+                            !
+                          </div>
+                          <div
+                            style={{ textAlign: "center" }}
+                          >
+                             You are currently <strong>not</strong> logged in, and are unable to participate in this workspace. If you've been logged out, try logging back in with the link at the top of the page.
+                          </div>
+                        </Alert>
+                      }
+                      {
+                        this.state.isAuthenticated
                         &&
                         !isActive
                         &&
@@ -565,7 +594,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       }
                       {
                         !(
-                          Auth.isAuthenticated()
+                          this.state.isAuthenticated
                           &&
                           !isActive
                         )
@@ -613,7 +642,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           />
                         </BlockBody>
                         {
-                          Auth.isAuthenticated()
+                          this.state.isAuthenticated
                           &&
                           isActive
                           &&
@@ -677,7 +706,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       </BlockContainer>
 
                       {
-                        Auth.isAuthenticated()
+                        this.state.isAuthenticated
                         &&
                         <AdvancedOptions 
                           shouldAutoExport={this.state.shouldAutoExport}
@@ -796,12 +825,30 @@ export class WorkspaceView extends React.Component<any, any> {
         },
       });
     }
-  }
+  };
 
   private handlePastedExportFormatChange = (value: any) => {
     this.setState({
       pastedExportFormat: value,
     });
+  };
+
+  private updateAuthenticationState() {
+    if (Auth.isAuthenticated()) {
+      if (this.state.logoutTimer) {
+        clearTimeout(this.state.logoutTimer);
+      }
+      const logoutTimer = setTimeout(() => this.updateAuthenticationState(), Auth.timeToLogOut());
+      this.setState({
+        isAuthenticated: true,
+        logoutTimer,
+      });
+    } else {
+      if (this.state.logoutTimer) {
+        clearTimeout(this.state.logoutTimer);
+      }
+      this.setState({ isAuthenticated: false, logoutTimer: null });
+    }
   }
 }
 
