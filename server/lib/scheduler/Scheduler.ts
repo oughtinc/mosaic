@@ -200,9 +200,7 @@ class Scheduler {
     if (actionableWorkspaces.length === 0) {
       const fallbackScheduler = await this.getFallbackScheduler();
       if (fallbackScheduler) {
-        return await fallbackScheduler.isWorkspaceAvailable(
-          userId,
-        );
+        return await fallbackScheduler.isWorkspaceAvailable(userId);
       } else {
         return false;
       }

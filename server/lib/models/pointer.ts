@@ -1,7 +1,15 @@
 import { Op, UUIDV4 } from "sequelize";
 import { getAllInlinesAsArray } from "../utils/slateUtils";
 import * as _ from "lodash";
-import { BelongsTo, Column, DataType, ForeignKey, HasOne, Model, Table } from "sequelize-typescript";
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  HasOne,
+  Model,
+  Table,
+} from "sequelize-typescript";
 import Block from "./block";
 import PointerImport from "./pointerImport";
 
@@ -50,7 +58,9 @@ export default class Pointer extends Model<Pointer> {
   @BelongsTo(() => Block)
   public sourceBlock: Block;
 
-  public async containedPointers({ pointersSoFar }: { pointersSoFar?: Pointer[] } = {}) {
+  public async containedPointers({
+    pointersSoFar,
+  }: { pointersSoFar?: Pointer[] } = {}) {
     const directPointers = await this.directContainedPointers({
       pointersSoFar,
     });
@@ -68,7 +78,9 @@ export default class Pointer extends Model<Pointer> {
     return allPointers;
   }
 
-  public async directContainedPointers({ pointersSoFar }: { pointersSoFar?: Pointer[] } = {}) {
+  public async directContainedPointers({
+    pointersSoFar,
+  }: { pointersSoFar?: Pointer[] } = {}) {
     let pointerIds = await this.directContainedPointerIds();
     if (pointersSoFar) {
       pointerIds = _.difference(

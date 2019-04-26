@@ -909,7 +909,9 @@ const schema = new GraphQLSchema({
             }
             const user = await userFromContext(context);
             if (user === null) {
-              throw new Error("You must be logged in to workspace children order");
+              throw new Error(
+                "You must be logged in to workspace children order",
+              );
             }
             const userId = user.id;
 
@@ -1105,7 +1107,9 @@ const schema = new GraphQLSchema({
                         parentWorkspace.parentId,
                       );
                       if (grandparentWorkspace === null) {
-                        throw new Error("Grandparent does not exist (but should)");
+                        throw new Error(
+                          "Grandparent does not exist (but should)",
+                        );
                       }
                       await grandparentWorkspace.update({
                         isCurrentlyResolved,
@@ -1115,7 +1119,9 @@ const schema = new GraphQLSchema({
                           grandparentWorkspace.parentId,
                         );
                         if (greatGrandparentWorkspace === null) {
-                          throw new Error("Great-grandparent does not exist (but should)");
+                          throw new Error(
+                            "Great-grandparent does not exist (but should)",
+                          );
                         }
                         const isNotRoot = greatGrandparentWorkspace.parentId;
                         if (isNotRoot) {

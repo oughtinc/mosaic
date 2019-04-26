@@ -126,7 +126,9 @@ export default class Block extends Model<Block> {
     }
   }
 
-  public async connectedPointers({ pointersSoFar }: { pointersSoFar: Pointer[] } = { pointersSoFar: [] }) {
+  public async connectedPointers(
+    { pointersSoFar }: { pointersSoFar: Pointer[] } = { pointersSoFar: [] },
+  ) {
     let pointers = await this.topLevelPointers({ pointersSoFar });
     if (pointersSoFar) {
       pointers = _.differenceBy(pointers, pointersSoFar, "id");
@@ -143,7 +145,9 @@ export default class Block extends Model<Block> {
   }
 
   // private
-  private async topLevelPointers({ pointersSoFar }: { pointersSoFar: Pointer[] } = { pointersSoFar: [] }) {
+  private async topLevelPointers(
+    { pointersSoFar }: { pointersSoFar: Pointer[] } = { pointersSoFar: [] },
+  ) {
     let topLevelPointerIds = await this.topLevelPointersIds();
     if (pointersSoFar) {
       topLevelPointerIds = _.difference(

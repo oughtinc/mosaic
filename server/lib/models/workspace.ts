@@ -158,9 +158,9 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
-      const rootWorkspace = await Workspace.findByPk(
-        this.get("rootWorkspaceId") as string,
-      );
+      const rootWorkspace = await Workspace.findByPk(this.get(
+        "rootWorkspaceId",
+      ) as string);
       if (rootWorkspace === null) {
         return false;
       }
@@ -172,9 +172,9 @@ export default class Workspace extends Model<Workspace> {
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
   public get hasIOConstraintsOfRootParent() {
     return (async () => {
-      const rootWorkspace = await Workspace.findByPk(
-        this.get("rootWorkspaceId") as string,
-      );
+      const rootWorkspace = await Workspace.findByPk(this.get(
+        "rootWorkspaceId",
+      ) as string);
       if (rootWorkspace === null) {
         return false;
       }
@@ -187,7 +187,10 @@ export default class Workspace extends Model<Workspace> {
     new DataType.VIRTUAL(DataType.INTEGER, ["totalBudget", "allocatedBudget"]),
   )
   public get remainingBudget() {
-    return (this.get("totalBudget") as number) - (this.get("allocatedBudget") as number);
+    return (
+      (this.get("totalBudget") as number) -
+      (this.get("allocatedBudget") as number)
+    );
   }
 
   @Column(
@@ -200,7 +203,7 @@ export default class Workspace extends Model<Workspace> {
   )
   public get budgetUsedWorkingOnThisWorkspace() {
     return (async () => {
-      if (this.get("timeSpentOnThisWorkspace") as number > 0) {
+      if ((this.get("timeSpentOnThisWorkspace") as number) > 0) {
         return this.get("timeSpentOnThisWorkspace") as number;
       }
 
@@ -211,7 +214,7 @@ export default class Workspace extends Model<Workspace> {
           howMuchSpentOnChildren += child.totalBudget;
         }
       }
-      return this.get("allocatedBudget") as number - howMuchSpentOnChildren;
+      return (this.get("allocatedBudget") as number) - howMuchSpentOnChildren;
     })();
   }
 
@@ -314,8 +317,9 @@ export default class Workspace extends Model<Workspace> {
       "2019-04-08 23:26:03.572+00",
     );
     return (
-      Date.parse(this.get("createdAt") as string) > dateAfterWhichCompactTreeWorks &&
-      this.get("isEligibleForMaliciousOracle") as boolean
+      Date.parse(this.get("createdAt") as string) >
+        dateAfterWhichCompactTreeWorks &&
+      (this.get("isEligibleForMaliciousOracle") as boolean)
     );
   }
 
@@ -719,7 +723,9 @@ export default class Workspace extends Model<Workspace> {
   // Returns an array containing the pointers connected to a workspace and all
   // of its descendants. Passes "pointerSoFar" parameter to recursive
   // subcalls in order to avoid duplicate SQL queries for pointers.
-  private async getConnectedPointersOfSubtree(pointersSoFar: Pointer[] = []): Promise<Pointer[]> {
+  private async getConnectedPointersOfSubtree(
+    pointersSoFar: Pointer[] = [],
+  ): Promise<Pointer[]> {
     let connectedPointersOfSubtree: Pointer[] = [];
 
     // Can use this.getBlocks instead of this.getVisibleBlocks because later we
