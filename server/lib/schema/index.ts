@@ -33,6 +33,7 @@ import Tree from "../models/tree";
 import Pointer from "../models/pointer";
 import PointerImport from "../models/pointerImport";
 import ExportWorkspaceLockRelation from "../models/exportWorkspaceLockRelation";
+import NotificationRequest from "../models/notificationRequest";
 
 const generateReferences = references => {
   const all = {};
@@ -1350,6 +1351,25 @@ const schema = new GraphQLSchema({
           const workspaceId = await scheduler.assignNextWorkspace(user.id);
 
           return { id: workspaceId };
+        },
+      },
+      notifyOnNextWorkspace: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId }, context) => {
+          const user = await userFromContext(context);
+          if (user == null) {
+            throw new Error(
+              "No user found when attempting to register for notifications.",
+            );
+          }
+
+          return await NotificationRequest.upsert({
+            experimentId,
+            userId: user.id,
+          });
         },
       },
       findNextMaybeSuboptimalWorkspace: {

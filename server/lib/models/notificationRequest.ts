@@ -1,4 +1,5 @@
 import {
+  AllowNull,
   BelongsTo,
   Column,
   DataType,
@@ -12,6 +13,7 @@ import User from "./user";
 @Table
 export default class NotificationRequest extends Model<NotificationRequest> {
   @ForeignKey(() => Experiment)
+  @AllowNull(false)
   @Column(DataType.UUID)
   public experimentId: string;
 
@@ -19,6 +21,7 @@ export default class NotificationRequest extends Model<NotificationRequest> {
   public experiment: Experiment;
 
   @ForeignKey(() => User)
+  @AllowNull(false)
   @Column(DataType.STRING)
   public userId: string;
 

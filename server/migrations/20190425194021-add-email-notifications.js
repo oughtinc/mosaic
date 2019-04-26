@@ -17,6 +17,7 @@ module.exports = {
       },
       experimentId: {
         type: Sequelize.UUID,
+        allowNull: false,
         references: {
           model: "Experiments",
           key: "id",
@@ -24,11 +25,17 @@ module.exports = {
       },
       userId: {
         type: Sequelize.STRING,
+        allowNull: false,
         references: {
           model: "Users",
           key: "id",
         }
       },
+    });
+
+    await queryInterface.addConstraint('NotificationRequests', ['userId', 'experimentId'], {
+      type: 'unique',
+      name: 'only-one-notification-request-per-user-and-experiment'
     });
   },
   down: async function(queryInterface, Sequelize) {

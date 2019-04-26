@@ -277,7 +277,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     });
     try {
       await this.props.notifyOnNextWorkspaceMutation({
-        experimentId: parseQueryString(window.location.search).experiment,
+        variables: {
+          experimentId: parseQueryString(window.location.search).experiment,
+        },
       });
       this.setState({ notificationRegistrationState: NOTIFICATION_REGISTERED });
     } catch {
@@ -305,9 +307,7 @@ const FIND_NEXT_WORKSPACE_MUTATION = gql`
 
 const NOTIFY_NEXT_WORKSPACE_MUTATION = gql`
   mutation notifyOnNextWorkspace($experimentId: String) {
-    notifyOnNextWorkspace(experimentId: $experimentId) {
-      success
-    }
+    notifyOnNextWorkspace(experimentId: $experimentId)
   }
 `;
 
