@@ -33,6 +33,9 @@ export default class User extends Model<User> {
   @Column(DataType.STRING)
   public pictureURL: string;
 
+  @Column(DataType.BOOLEAN)
+  public isAdmin: boolean;
+
   @BelongsToMany(() => Tree, () => UserTreeOracleRelation)
   public OracleTrees: Tree[];
 }

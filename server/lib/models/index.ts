@@ -31,20 +31,22 @@ function configureDb(config: {
   }
 }
 
-const sequelize = configureDb(config);
+export async function initializeDb() {
+  await sequelize.addModels([
+    Assignment,
+    Block,
+    Experiment,
+    ExportWorkspaceLockRelation,
+    Instructions,
+    Pointer,
+    PointerImport,
+    Tree,
+    User,
+    UserTreeOracleRelation,
+    Workspace,
+  ]);
+}
 
-sequelize.addModels([
-  Assignment,
-  Block,
-  Experiment,
-  ExportWorkspaceLockRelation,
-  Instructions,
-  Pointer,
-  PointerImport,
-  Tree,
-  User,
-  UserTreeOracleRelation,
-  Workspace,
-]);
+const sequelize = configureDb(config);
 
 export default sequelize;
