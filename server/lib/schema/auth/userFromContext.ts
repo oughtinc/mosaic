@@ -21,7 +21,8 @@ export async function userFromContext(ctx) {
       });
     } else if (
       (!user.givenName && userInfo.given_name) ||
-      (!user.email && userInfo.email)
+      (!user.email && userInfo.email) ||
+      user.isAdmin !== userInfo.is_admin
     ) {
       await user.update({
         id: userInfo.user_id,
