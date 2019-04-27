@@ -14,7 +14,7 @@ import {
 import GraphQLJSON from "graphql-type-json";
 import * as Sequelize from "sequelize";
 
-import { requireAdmin, requireOracle, requireUser } from "./auth";
+import { requireAdmin, requireUser } from "./auth";
 
 import { isUserAdmin } from "./auth/isUserAdmin";
 import { userFromContext } from "./auth/userFromContext";
@@ -578,16 +578,6 @@ const schema = new GraphQLSchema({
   mutation: new GraphQLObjectType({
     name: "RootMutationType",
     fields: {
-      updateOracleMode: {
-        type: GraphQLBoolean,
-        args: { oracleMode: { type: GraphQLBoolean } },
-        resolve: requireOracle(
-          "You must be logged in as an oracle to toggle oracle mode",
-          async (_, { oracleMode }) => {
-            isInOracleMode.setValue(oracleMode);
-          },
-        ),
-      },
       updateBlocks: {
         type: new GraphQLList(blockType),
         args: {
