@@ -20,7 +20,7 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
 
   const server = new ApolloServer({
     schema,
-    context: async ({ req }) => {
+    context: ({ req }) => {
       return {
         authorization: req.headers.authorization,
       };
