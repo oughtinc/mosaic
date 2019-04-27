@@ -11,7 +11,7 @@ export const requireUser = (errMsg, resolver) => async (obj, args, ctx, info) =>
   if (!user) {
     throw new Error(`No user found: ${errMsg}`);
   } else {
-    await resolver(obj, args, { ...ctx, user}, info);
+    return await resolver(obj, args, { ...ctx, user}, info);
   }
 };
 
@@ -23,6 +23,6 @@ export const requireAdmin = (errMsg, resolver) => async (obj, args, ctx, info) =
   } else if (!isUserAdmin(user)) {
     throw new Error(`User not admin: ${errMsg}`);
   } else {
-    await resolver(obj, args, { ...ctx, user}, info);
+    return await resolver(obj, args, { ...ctx, user}, info);
   }
 };
