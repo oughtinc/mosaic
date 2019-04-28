@@ -1108,9 +1108,7 @@ const schema = new GraphQLSchema({
                       });
                     }
                   }
-                }
-
-                if (isOracleExperiment && !workspace.isRequestingLazyUnlock) {
+                } else {
                   if (
                     !workspace.isEligibleForHonestOracle &&
                     !workspace.isEligibleForMaliciousOracle &&
