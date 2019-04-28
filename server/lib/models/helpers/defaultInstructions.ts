@@ -16,9 +16,9 @@ export const defaultMaliciousOracleInstructions = `**Instructions for malicious 
 2. If you decide to challenge:
    - Fill in an incorrect/unhelpful but plausible alternative answer below
    - Click "Submit" on the right
-   - Click "Done!" under the response field
+   - Click "Challenge!" under the response field
 3. If you decide not to challenge:
-   - Click "Done!" under the response field`;
+   - Click "Decline to Challenge!" under the response field`;
 
 export const defaultReturningRootInstructions = `**Instructions**
 
