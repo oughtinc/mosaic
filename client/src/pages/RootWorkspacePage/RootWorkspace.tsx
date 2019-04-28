@@ -79,6 +79,7 @@ class RootWorkspacePresentational extends React.Component<any, any> {
                   ? "compactTree"
                   : "subtree?expanded=true"
               }`}
+              style={{ maxWidth: "100% "}}
             >
               <RootBlock
                 block={question}
