@@ -101,7 +101,7 @@ export class BlockEditorEditingPresentational extends React.Component<
   private editorValueToSaveToDbOnUnmount: any;
   private autosaveInterval: any;
 
-  private throttledUpdate = throttle(this.props.updateBlock, 5000);
+  private throttledUpdate = throttle(this.props.updateBlock, 500);
 
   private handleBlur = _.debounce(() => {
     const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS_REGEX);
