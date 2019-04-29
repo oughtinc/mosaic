@@ -1,4 +1,4 @@
-import WebClient from "@slack/web-api";
+import { WebClient } from "@slack/web-api";
 
 import NotificationRequest from "../models/notificationRequest";
 
