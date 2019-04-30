@@ -15,7 +15,7 @@ describe("WorkspaceModel", () => {
         const question = rootWorkspaceQuestion("Mock workspace name");
         const workspace = await Workspace.create(
           { totalBudget, creatorId },
-          { questionValue: JSON.parse(question) }
+          { questionValue: JSON.parse(question) },
         );
         const childWorkspaces = await workspace.getChildWorkspaces();
         expect(childWorkspaces).to.be.empty;

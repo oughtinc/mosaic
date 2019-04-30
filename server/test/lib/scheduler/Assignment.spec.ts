@@ -20,6 +20,8 @@ describe("Assignment class", function() {
   });
 
   it("records the timestamp at which the assignment started", function() {
-    expect(this.assignment.getStartedAtTimestamp()).to.equal(this.startedAtTimestamp);
+    expect(this.assignment.getStartedAtTimestamp()).to.equal(
+      this.startedAtTimestamp,
+    );
   });
 });

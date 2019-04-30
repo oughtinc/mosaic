@@ -3,7 +3,10 @@ const uuidv4 = require("uuid/v4");
 
 export const createMaliciousOracleDefaultBlockValues = questionValue => {
   const incorrectPointerId = uuidv4();
-  const [questionPointerId, correctPointerId] = extractPointerIdsFromQuestionValue(questionValue);
+  const [
+    questionPointerId,
+    correctPointerId,
+  ] = extractPointerIdsFromQuestionValue(questionValue);
 
   const coinflip = Math.random() < 0.5 ? "A1" : "A2";
   const scratchpadBlockValue = [
@@ -18,8 +21,7 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: 
-`A (incorrect): `,
+              text: `A (incorrect): `,
               marks: [],
             },
           ],
@@ -99,7 +101,8 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
           type: "pointerImport",
           isVoid: true,
           data: {
-            pointerId: coinflip === "A1" ? correctPointerId : incorrectPointerId,
+            pointerId:
+              coinflip === "A1" ? correctPointerId : incorrectPointerId,
             internalReferenceId: uuidv4(),
           },
           nodes: [
@@ -118,7 +121,8 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
           type: "pointerImport",
           isVoid: true,
           data: {
-            pointerId: coinflip === "A1" ? incorrectPointerId : correctPointerId,
+            pointerId:
+              coinflip === "A1" ? incorrectPointerId : correctPointerId,
             internalReferenceId: uuidv4(),
           },
           nodes: [
@@ -142,9 +146,7 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
       nodes: [
         {
           object: "text",
-          leaves: [
-            { object: "leaf", text: "Ok", marks: [] },
-          ],
+          leaves: [{ object: "leaf", text: "Ok", marks: [] }],
         },
       ],
     },
@@ -164,7 +166,7 @@ function processNode(node: any) {
       data: {
         ...node.data,
         internalReferenceId: uuidv4(), // generate new id so you can open/close this independently of the one it copied
-      }
+      },
     };
   } else if (node.type === "pointerExport") {
     return {
@@ -174,7 +176,7 @@ function processNode(node: any) {
       data: {
         pointerId: node.data.pointerId,
         internalReferenceId: uuidv4(),
-      }
+      },
     };
   } else if (node.nodes) {
     return {

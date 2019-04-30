@@ -7,7 +7,7 @@ export const extractPointerIdsFromQuestionValue = questionValue => {
       if (!firstExport) {
         firstExport = node.data.pointerId;
       } else {
-        secondExport = node.data.pointerId
+        secondExport = node.data.pointerId;
       }
     }
   }

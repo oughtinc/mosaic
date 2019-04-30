@@ -18,7 +18,9 @@ interface UserInfo {
   is_oracle: boolean;
 }
 
-export function userFromAuthToken(accessToken: string | null): Promise<UserInfo | null> {
+export function userFromAuthToken(
+  accessToken: string | null,
+): Promise<UserInfo | null> {
   if (accessToken == null || accessToken === "null") {
     return Promise.resolve(null);
   }
@@ -53,12 +55,12 @@ export function userFromAuthToken(accessToken: string | null): Promise<UserInfo 
         picture: user.picture,
         is_admin: isAdmin,
         is_oracle: isOracle,
-       };
+      };
 
       // update cache
       userFromAuthToken.cache[accessToken] = {
         data,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
 
       return resolve(data);

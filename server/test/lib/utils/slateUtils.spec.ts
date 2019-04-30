@@ -6,17 +6,17 @@ const textNode = { object: "text" };
 
 const innerInlineNode = {
   object: "inline",
-  nodes: [textNode]
+  nodes: [textNode],
 };
 
 const outerInlineNode = {
   object: "inline",
-  nodes: [textNode, innerInlineNode]
+  nodes: [textNode, innerInlineNode],
 };
 
 const mockTree = {
   object: "block",
-  nodes: [textNode, outerInlineNode]
+  nodes: [textNode, outerInlineNode],
 };
 
 describe("getAllInlinesAsArray", () => {
