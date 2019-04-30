@@ -19,17 +19,28 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
   // must wait until DB models have loaded before importing schema
   const { schema } = require("./schema");
 
-  const server = new ApolloServer({
-    schema,
-    context: ({ req }) => {
-      return {
-        authorization: req.headers.authorization,
-      };
-    },
-    engine: {
-      apiKey: "service:mosaic:hGCwzWa_wg71SWpJ7NBMoA",
-    },
-  });
+  const server = new ApolloServer(
+    process.env.APOLLO_ENGINE_API_KEY
+      ? {
+          schema,
+          context: ({ req }) => {
+            return {
+              authorization: req.headers.authorization,
+            };
+          },
+          engine: {
+            apiKey: process.env.APOLLO_ENGINE_API_KEY,
+          },
+        }
+      : {
+          schema,
+          context: ({ req }) => {
+            return {
+              authorization: req.headers.authorization,
+            };
+          },
+        },
+  );
 
   if (!process.env.USING_DOCKER) {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));
