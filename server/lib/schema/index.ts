@@ -359,6 +359,23 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
+      isUserRegisteredForNotifications: {
+        type: GraphQLBoolean,
+        args: {
+          experimentId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId, userId }) => {
+          const notificationRequest = await NotificationRequest.findAll({
+            where: {
+              experimentId,
+              userId,
+            }
+          });
+
+          return !!(notificationRequest && notificationRequest.length > 0)
+        },
+      },
       userActivity: {
         type: UserActivityType,
         args: {

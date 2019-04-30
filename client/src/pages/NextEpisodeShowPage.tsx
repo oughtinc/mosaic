@@ -3,12 +3,13 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
 import { ContentContainer } from "../components/ContentContainer";
 import { VERY_DARK_BLUE, VERY_LIGHT_BLUE } from "../styles";
+import { Auth } from "../auth";
 
 const NOTIFICATION_NOT_REGISTERED = 1;
 const NOTIFICATION_REGISTRATION_PENDING = 2;
@@ -58,7 +59,7 @@ const RegisterForEmailNotification = ({ onClick, registrationStatus }) => (
       >
         {registrationStatus === NOTIFICATION_NOT_REGISTERED &&
           "Register for e-mail notification ✉️"}
-        {registrationStatus === NOTIFICATION_REGISTERED && "Registered!"}
+        {registrationStatus === NOTIFICATION_REGISTERED && "You've registered!"}
         {registrationStatus === NOTIFICATION_REGISTRATION_PENDING &&
           "Registering…"}
         {registrationStatus === NOTIFICATION_REGISTRATION_ERRORED &&
@@ -81,7 +82,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       workspaceId: undefined,
       isCountingDown: false,
       countdownInterval: null,
-      notificationRegistrationState: NOTIFICATION_NOT_REGISTERED,
+      notificationRegistrationState: this.props.isUserRegisteredForNotifications ? NOTIFICATION_REGISTERED : NOTIFICATION_NOT_REGISTERED,
     };
     this.registerForNotification = this.registerForNotification.bind(this);
   }
@@ -271,7 +272,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   }
 
   private async registerForNotification() {
-    this.stopCountingDown();
     this.setState({
       notificationRegistrationState: NOTIFICATION_REGISTRATION_PENDING,
     });
@@ -286,14 +286,46 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       this.setState({
         notificationRegistrationState: NOTIFICATION_REGISTRATION_ERRORED,
       });
-      this.startCountingDown();
     }
+  }
+}
+
+export class NextEpisodeShowPageContainer extends React.Component<
+  any,
+  any
+> {
+  public render() {
+    if (!Auth.isAuthenticated()) {
+      return (
+        <ContentContainer>
+          Please log in to access your next workspace.
+        </ContentContainer>
+      );
+    }
+    if (this.props.isUserRegisteredForNotificationsQuery.isUserRegisteredForNotifications !== undefined) {
+      return (
+        <NextEpisodeShowPagePresentational
+          findNextWorkspaceMutation={this.props.findNextWorkspaceMutation}
+          isUserRegisteredForNotifications={this.props.isUserRegisteredForNotificationsQuery.isUserRegisteredForNotifications}
+          notifyOnNextWorkspaceMutation={this.props.notifyOnNextWorkspaceMutation}
+          oracleModeQuery={this.props.oracleModeQuery}
+        />
+      );
+    }
+
+    return <div />;
   }
 }
 
 const ORACLE_MODE_QUERY = gql`
   query oracleModeQuery {
     oracleMode
+  }
+`;
+
+const IS_USER_REGISTERED_FOR_NOTIFICATIONS = gql`
+  query isUserRegisteredForNotificationsQuery($experimentId: String, $userId: String) {
+    isUserRegisteredForNotifications(experimentId: $experimentId, userId: $userId)
   }
 `;
 
@@ -319,4 +351,14 @@ export const NextEpisodeShowPage = compose(
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
   }),
-)(NextEpisodeShowPagePresentational);
+  withRouter,
+  graphql(IS_USER_REGISTERED_FOR_NOTIFICATIONS, {
+    name: "isUserRegisteredForNotificationsQuery",
+    options: (props: any) => ({
+      variables: {
+        experimentId: parseQueryString(window.location.search).experiment || parseQueryString(props.history.location.search).experiment,
+        userId: Auth.userId(),
+      },
+    }),
+  }),
+)(NextEpisodeShowPageContainer);
