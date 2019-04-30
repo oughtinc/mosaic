@@ -24,9 +24,7 @@ const GetStartedNavContainer = styled.div`
 
 const GetStartedNav = ({ isInOracleMode }) => (
   <GetStartedNavContainer>
-    <NextWorkspaceBtn
-      label={"Get started!"}
-    />
+    <NextWorkspaceBtn label={"Get started!"} />
   </GetStartedNavContainer>
 );
 

@@ -22,7 +22,7 @@ class NewRootWorkspaceForm extends React.Component<any, any> {
         totalBudget,
       },
     });
-  }
+  };
 }
 
 export { NewRootWorkspaceForm };

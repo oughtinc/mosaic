@@ -2,7 +2,6 @@ import { Change } from "../../components/BlockEditor/types";
 import { isCursorInPotentiallyProblematicPosition } from "../slate-utils/isCursorInPotentiallyProblematicPosition";
 
 export function adjustCursorIfAtEdge(change: Change) {
-
   const value = change.value;
   const selectionIsExpanded = value.selection.isExpanded;
 
@@ -20,7 +19,8 @@ export function adjustCursorIfAtEdge(change: Change) {
     }
 
     if (focusOffsetAtEnd && nextTextNode) {
-      change.moveToRangeOf(nextTextNode)
+      change
+        .moveToRangeOf(nextTextNode)
         .collapseToStart()
         .move(1);
     }

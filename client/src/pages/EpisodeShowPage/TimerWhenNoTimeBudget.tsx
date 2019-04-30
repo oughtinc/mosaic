@@ -5,7 +5,10 @@ import { Timer } from "../../components/Timer";
 
 import { UPDATE_TIME_SPENT_ON_WORKSPACE } from "../../graphqlQueries";
 
-export class TimerWhenNoTimeBudgetPresentational extends React.Component<any,  any> {
+export class TimerWhenNoTimeBudgetPresentational extends React.Component<
+  any,
+  any
+> {
   public render() {
     if (!this.props.isActive) {
       return null;
@@ -25,14 +28,14 @@ export class TimerWhenNoTimeBudgetPresentational extends React.Component<any,  a
         doesAffectAllocatedBudget: false,
         secondsSpent: this.props.tickDuration,
         workspaceId: this.props.workspaceId,
-      }
+      },
     });
-  }
+  };
 }
 
 export const TimerWhenNoTimeBudget: any = graphql(
   UPDATE_TIME_SPENT_ON_WORKSPACE,
   {
     name: "updateTimeSpentOnWorkspace",
-  }
+  },
 )(TimerWhenNoTimeBudgetPresentational);

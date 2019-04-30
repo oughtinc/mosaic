@@ -13,33 +13,29 @@ export class WorkspaceSubtreePage extends React.PureComponent<any, any> {
     return (
       <ContentContainer>
         <Helmet>
-          <title>
-            Tree View {workspaceId.slice(0, 7)} - Mosaic
-          </title>
+          <title>Tree View {workspaceId.slice(0, 7)} - Mosaic</title>
         </Helmet>
-        {
-          parseQueryString(window.location.search).expanded === "true"
-          ?
-            <Button
-              onClick={() => {
-                const { origin, pathname } = window.location;
-                window.location.href = `${origin}${pathname}`;
-              }}
-              style={{ marginBottom: "20px" }}
-            >
-              Collapse All
-            </Button>
-          :
-            <Button
-              onClick={() => {
-                const { origin, pathname } = window.location;
-                window.location.href = `${origin}${pathname}?expanded=true`;
-              }}
-              style={{ marginBottom: "20px" }}
-            >
-              Expand All
-            </Button>
-        }
+        {parseQueryString(window.location.search).expanded === "true" ? (
+          <Button
+            onClick={() => {
+              const { origin, pathname } = window.location;
+              window.location.href = `${origin}${pathname}`;
+            }}
+            style={{ marginBottom: "20px" }}
+          >
+            Collapse All
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              const { origin, pathname } = window.location;
+              window.location.href = `${origin}${pathname}?expanded=true`;
+            }}
+            style={{ marginBottom: "20px" }}
+          >
+            Expand All
+          </Button>
+        )}
         <BlockHoverMenu>
           {workspaceId && (
             <WorkspaceCard

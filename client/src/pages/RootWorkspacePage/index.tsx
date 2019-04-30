@@ -24,38 +24,34 @@ export class RootWorkspacePagePresentational extends React.Component<any, any> {
 
     const workspaces = _.sortBy(
       this.props.rootWorkspacesQuery.workspaces,
-      workspace => Date.parse(workspace.createdAt)
+      workspace => Date.parse(workspace.createdAt),
     );
 
     return (
       <div>
         <Helmet>
-          <title>
-            Mosaic
-          </title>
+          <title>Mosaic</title>
         </Helmet>
         {Auth.isAdmin() && <OracleHeader />}
         <ContentContainer>
           {!Auth.isAuthenticated() && <WelcomeMessage />}
-          
+
           <ListOfRootWorkspaces isLoading={isLoading} workspaces={workspaces} />
           {Auth.isAuthenticated() && (
             <NewRootWorkspaceForm
               createWorkspace={this.props.createWorkspace}
               style={{
                 marginBottom: "30px",
-                marginTop: "30px"
+                marginTop: "30px",
               }}
             />
           )}
-          {
-            Auth.isAdmin() 
-            && 
+          {Auth.isAdmin() && (
             <div>
               <HomePageHeading>Experiments</HomePageHeading>
               <ListOfExperiments />
             </div>
-          }
+          )}
           {Auth.isAdmin() && <NewExperimentForm />}
         </ContentContainer>
       </div>
@@ -74,8 +70,8 @@ export const RootWorkspacePage = compose(
   graphql(CREATE_ROOT_WORKSPACE, {
     name: "createWorkspace",
     options: {
-      refetchQueries: ["RootWorkspacesQuery"]
-    }
+      refetchQueries: ["RootWorkspacesQuery"],
+    },
   }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",

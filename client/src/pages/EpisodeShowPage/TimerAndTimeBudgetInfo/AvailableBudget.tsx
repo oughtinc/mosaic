@@ -8,7 +8,7 @@ import {
   availableBudgetHeaderFontSize,
 } from "../../../styles";
 
-export class AvailableBudget extends React.Component<any,  any> {
+export class AvailableBudget extends React.Component<any, any> {
   public render() {
     return (
       <span>
@@ -23,12 +23,17 @@ export class AvailableBudget extends React.Component<any,  any> {
             justifyItems: "space-between",
           }}
         >
-          <Glyphicon glyph="time" style={{ fontSize: "24px", marginRight: "5px" }}/>
+          <Glyphicon
+            glyph="time"
+            style={{ fontSize: "24px", marginRight: "5px" }}
+          />
           <span>total remaining</span>
         </span>
 
         <ReadableDuration
-          durationInMs={(this.props.totalBudget - this.props.allocatedBudget) * 1000}
+          durationInMs={
+            (this.props.totalBudget - this.props.allocatedBudget) * 1000
+          }
           shouldShowSeconds={false}
           style={{ textAlign: "center" }}
         />

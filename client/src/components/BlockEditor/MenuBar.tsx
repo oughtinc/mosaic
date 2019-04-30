@@ -29,13 +29,13 @@ const Icons = {
       icon={faExclamationTriangle}
       style={{ color: "#ef0707" }}
     />
-  )
+  ),
 };
 
 const SavingIcon = ({
   mutationStatus,
   hasChangedSinceDatabaseSave,
-  blockEditor
+  blockEditor,
 }) => {
   const Icon = Icons[mutationStatus.status];
   const inErrorState = mutationStatus === MutationStatus.Error;
@@ -53,7 +53,7 @@ const SavingIcon = ({
 export const MenuBar = ({
   mutationStatus,
   hasChangedSinceDatabaseSave,
-  blockEditor
+  blockEditor,
 }) => (
   <div>
     <SavingIcon

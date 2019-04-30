@@ -30,7 +30,10 @@ export class InlineNode extends React.Component<any, any> {
       return (
         <a
           href={href}
-          onClick={e => e.stopPropagation()/* this prevents imported pointer from toggling after the user clicks a link */}
+          onClick={
+            e =>
+              e.stopPropagation() /* this prevents imported pointer from toggling after the user clicks a link */
+          }
           target="_blank"
         >
           {this.props.node.nodes[0].leaves[0].text}
@@ -48,13 +51,15 @@ export class InlineNode extends React.Component<any, any> {
           nodeAsJson={{
             data: {
               pointerId: this.props.node.data.pointerId,
-              internalReferenceId: this.state.id
-            }
+              internalReferenceId: this.state.id,
+            },
           }}
           isHoverable={this.props.isHoverable}
           onMouseOver={this.props.onMouseOver}
           exportLockStatusInfo={this.props.exportLockStatusInfo}
-          isInOracleModeAndIsUserOracle={this.props.isInOracleModeAndIsUserOracle}
+          isInOracleModeAndIsUserOracle={
+            this.props.isInOracleModeAndIsUserOracle
+          }
           visibleExportIds={this.props.visibleExportIds}
           unlockPointer={this.props.unlockPointer}
         />
@@ -64,13 +69,18 @@ export class InlineNode extends React.Component<any, any> {
 }
 
 export class ShowExpandedPointer extends React.Component<any, any> {
-
   public shouldComponentUpdate(newProps: any) {
     // Try filtering down to just the node.object==="leaf", and then node.leaves[0].
 
     if (
-      !_.isEqual(newProps.availablePointers.nodes, this.props.availablePointers) ||
-      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(
+        newProps.availablePointers.nodes,
+        this.props.availablePointers,
+      ) ||
+      !_.isEqual(
+        newProps.exportLockStatusInfo,
+        this.props.exportLockStatusInfo,
+      ) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds)
     ) {
       return true;
@@ -101,7 +111,9 @@ export class ShowExpandedPointer extends React.Component<any, any> {
                   isHoverable={this.props.isHoverable}
                   visibleExportIds={this.props.visibleExportIds}
                   exportLockStatusInfo={this.props.exportLockStatusInfo}
-                  isInOracleModeAndIsUserOracle={this.props.isInOracleModeAndIsUserOracle}
+                  isInOracleModeAndIsUserOracle={
+                    this.props.isInOracleModeAndIsUserOracle
+                  }
                   unlockPointer={this.props.unlockPointer}
                 />
               </span>

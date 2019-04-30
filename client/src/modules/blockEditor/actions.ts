@@ -12,7 +12,7 @@ export const HOVER_ITEM_TYPES = {
   NONE: "NONE",
   SELECTED_TEXT: "SELECTED_TEXT",
   POINTER_IMPORT: "POINTER_IMPORT",
-  POINTER_EXPORT: "POINTER_EXPORT"
+  POINTER_EXPORT: "POINTER_EXPORT",
 };
 
 export const changeHoverItem = ({
@@ -21,7 +21,7 @@ export const changeHoverItem = ({
   top,
   left,
   readOnly,
-  blockId
+  blockId,
 }) => {
   return (dispatch, getState) => {
     dispatch({
@@ -31,7 +31,7 @@ export const changeHoverItem = ({
       top,
       left,
       readOnly,
-      blockId
+      blockId,
     });
   };
 };
@@ -45,7 +45,7 @@ export const removeHoverItem = () => {
       left: false,
       readOnly: null,
       blockId: false,
-      hoverItemType: HOVER_ITEM_TYPES.NONE
+      hoverItemType: HOVER_ITEM_TYPES.NONE,
     });
   };
 };
@@ -56,17 +56,17 @@ export const changePointerReference = ({ id, reference, exportId }) => {
       type: CHANGE_POINTER_REFERENCE,
       id,
       reference,
-      exportId
+      exportId,
     });
   };
 };
 
 export const closeAllPointerReferences = () => ({
-  type: CLOSE_ALL_POINTER_REFERENCES
+  type: CLOSE_ALL_POINTER_REFERENCES,
 });
 
 export const expandAllImports = () => ({
-  type: EXPAND_ALL_IMPORTS
+  type: EXPAND_ALL_IMPORTS,
 });
 
 export const removeImportFromStore = importId => ({
@@ -84,8 +84,9 @@ export const exportSelection = blockId => {
     const { blocks, blockEditor } = await getState();
     const { hoveredItem } = blockEditor;
 
-    const block =
-      blocks.blocks.find(b => b.id === blockId || b.id === hoveredItem.blockId);
+    const block = blocks.blocks.find(
+      b => b.id === blockId || b.id === hoveredItem.blockId,
+    );
 
     if (block) {
       const change = block.value.change();
@@ -96,7 +97,7 @@ export const exportSelection = blockId => {
         type: UPDATE_BLOCK,
         id: block.id,
         value: change.value,
-        pointerChanged: true
+        pointerChanged: true,
       });
     } else {
       console.error("Block was not found from action");
@@ -109,7 +110,9 @@ export const removeExportOfSelection = blockId => {
     const { blocks, blockEditor } = await getState();
     const { hoveredItem } = blockEditor;
 
-    const block = blocks.blocks.find(b => b.id === blockId || b.id === hoveredItem.blockId);
+    const block = blocks.blocks.find(
+      b => b.id === blockId || b.id === hoveredItem.blockId,
+    );
 
     if (block) {
       const change = block.value.change();
@@ -123,12 +126,12 @@ export const removeExportOfSelection = blockId => {
       dispatch({
         type: UPDATE_BLOCK,
         id: block.id,
-        value: change.value
+        value: change.value,
       });
 
       dispatch({
         type: CHANGE_HOVERED_ITEM,
-        hoverItemType: "NONE"
+        hoverItemType: "NONE",
       });
     } else {
       console.error("Block was not found from action");

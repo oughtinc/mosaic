@@ -21,7 +21,7 @@ const initialState: InitialStateType = {
     top: null,
     left: null,
     readOnly: null,
-    blockId: null
+    blockId: null,
   },
   pointerReferences: {},
   exportsOpened: [],
@@ -32,7 +32,7 @@ export const blockEditorReducer = (state = initialState, action) => {
       const { id, hoverItemType, top, left, readOnly, blockId } = action;
       return {
         ...state,
-        hoveredItem: { id, hoverItemType, top, left, readOnly, blockId }
+        hoveredItem: { id, hoverItemType, top, left, readOnly, blockId },
       };
     case CHANGE_POINTER_REFERENCE:
       const { exportId } = action;
@@ -40,30 +40,43 @@ export const blockEditorReducer = (state = initialState, action) => {
         ...state,
         pointerReferences: {
           ...state.pointerReferences,
-          ...{ [action.id]: action.reference }
+          ...{ [action.id]: action.reference },
         },
-        exportsOpened: state.exportsOpened.indexOf(exportId) > - 1 ? state.exportsOpened : [...state.exportsOpened, action.exportId]
+        exportsOpened:
+          state.exportsOpened.indexOf(exportId) > -1
+            ? state.exportsOpened
+            : [...state.exportsOpened, action.exportId],
       };
     case CLOSE_ALL_POINTER_REFERENCES:
       return {
         ...state,
-        pointerReferences: mapValues(state.pointerReferences, (ref: object) => { return {...ref, isOpen: false }; })
+        pointerReferences: mapValues(state.pointerReferences, (ref: object) => {
+          return { ...ref, isOpen: false };
+        }),
       };
     case EXPAND_ALL_IMPORTS:
       return {
         ...state,
-        pointerReferences: mapValues(state.pointerReferences, (ref: object) => { return {...ref, isOpen: true }; }),
+        pointerReferences: mapValues(state.pointerReferences, (ref: object) => {
+          return { ...ref, isOpen: true };
+        }),
         exportsOpened: [],
       };
     case REMOVE_IMPORT_FROM_STORE:
       return {
         ...state,
-        pointerReferences: pick(state.pointerReferences, keys(state.pointerReferences).filter(k => k !== action.importId)),
+        pointerReferences: pick(
+          state.pointerReferences,
+          keys(state.pointerReferences).filter(k => k !== action.importId),
+        ),
       };
     case ADD_EXPORT_ID_TO_STORE:
       return {
         ...state,
-        exportsOpened: state.exportsOpened.indexOf(action.exportId) > -1 ? state.exportsOpened : state.exportsOpened.concat(action.exportId),
+        exportsOpened:
+          state.exportsOpened.indexOf(action.exportId) > -1
+            ? state.exportsOpened
+            : state.exportsOpened.concat(action.exportId),
       };
     default:
       return state;

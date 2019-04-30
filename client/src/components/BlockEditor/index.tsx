@@ -5,7 +5,7 @@ import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
 import {
   changeHoverItem,
   removeHoverItem,
-  HOVER_ITEM_TYPES
+  HOVER_ITEM_TYPES,
 } from "../../modules/blockEditor/actions";
 import { ORACLE_MODE_QUERY } from "../../graphqlQueries";
 import { compose } from "recompose";
@@ -24,7 +24,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
-      plugins: []
+      plugins: [],
     };
   }
 
@@ -37,7 +37,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
       !_.isEqual(newProps.block, this.props.block) ||
-      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(
+        newProps.exportLockStatusInfo,
+        this.props.exportLockStatusInfo,
+      ) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
       !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport) ||
       !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
@@ -55,7 +58,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
     if (
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
-      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(
+        newProps.exportLockStatusInfo,
+        this.props.exportLockStatusInfo,
+      ) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
       !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
     ) {
@@ -75,7 +81,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           top,
           left,
           readOnly: null,
-          blockId: newProps.blockId
+          blockId: newProps.blockId,
         });
       },
       onMouseOverPointerExport: ({ top, left, id, readOnly }) => {
@@ -85,7 +91,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           top,
           left,
           readOnly,
-          blockId: newProps.blockId
+          blockId: newProps.blockId,
         });
       },
       onMouseOverPointerImport: ({ top, left, id }) => {
@@ -95,7 +101,7 @@ class BlockEditorPresentational extends React.Component<any, any> {
           top,
           left,
           readOnly: null,
-          blockId: false
+          blockId: false,
         });
       },
       blockEditor: newProps.blockEditor,
@@ -103,13 +109,19 @@ class BlockEditorPresentational extends React.Component<any, any> {
       visibleExportIds: newProps.visibleExportIds,
       exportLockStatusInfo: newProps.exportLockStatusInfo,
       unlockPointer: newProps.unlockPointer,
-      isInOracleModeAndIsUserOracle: newProps.oracleModeQuery.oracleMode && newProps.isUserOracle,
+      isInOracleModeAndIsUserOracle:
+        newProps.oracleModeQuery.oracleMode && newProps.isUserOracle,
       isInOracleMode: newProps.oracleModeQuery.oracleMode,
       isUserOracle: newProps.isUserOracle,
       isActive: newProps.isActive,
     };
     this.setState({
-      plugins: [LinkifyPlugin(), CopyPastePlugin({ pastedExportFormat: newProps.pastedExportFormat }), SoftBreak({}), SlatePointers(SlatePointerInputs)]
+      plugins: [
+        LinkifyPlugin(),
+        CopyPastePlugin({ pastedExportFormat: newProps.pastedExportFormat }),
+        SoftBreak({}),
+        SlatePointers(SlatePointerInputs),
+      ],
     });
   }
 
@@ -208,6 +220,6 @@ export const BlockEditor: any = compose(
     mapStateToProps,
     { addBlocks, removeBlocks, changeHoverItem, removeHoverItem },
     null,
-    { withRef: true }
-  )
+    { withRef: true },
+  ),
 )(BlockEditorPresentational);

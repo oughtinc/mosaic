@@ -30,7 +30,6 @@ function LinkifyPlugin() {
         .call(wrapLink, text);
 
       return false;
-
     },
 
     renderNode(props: any) {
@@ -48,7 +47,7 @@ function LinkifyPlugin() {
       }
 
       return;
-    }
+    },
   };
 }
 

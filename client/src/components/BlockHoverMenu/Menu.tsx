@@ -8,7 +8,7 @@ import { compose } from "recompose";
 import { connect } from "react-redux";
 import {
   removeExportOfSelection,
-  HOVER_ITEM_TYPES
+  HOVER_ITEM_TYPES,
 } from "../../modules/blockEditor/actions";
 
 import { Auth } from "../../auth";
@@ -30,7 +30,9 @@ const HoverButton = ({ children, onClick }) => (
 );
 
 const ExportedPointerMenu = ({ removeExportOfSelection }) => (
-  <HoverButton onClick={() => removeExportOfSelection()}>Remove Pointer</HoverButton>
+  <HoverButton onClick={() => removeExportOfSelection()}>
+    Remove Pointer
+  </HoverButton>
 );
 
 export class MenuPresentational extends React.Component<any> {
@@ -51,16 +53,15 @@ export class MenuPresentational extends React.Component<any> {
       <div className="menu hover-menu" ref={this.props.menuRef} id="hover-menu">
         {blockEditor && (
           <div>
-            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT &&
-              !readOnly && (
-                <ExportedPointerMenu
-                  removeExportOfSelection={this.props.removeExportOfSelection}
-                />
-              )}
+            {hoverItemType === HOVER_ITEM_TYPES.POINTER_EXPORT && !readOnly && (
+              <ExportedPointerMenu
+                removeExportOfSelection={this.props.removeExportOfSelection}
+              />
+            )}
           </div>
         )}
       </div>,
-      root
+      root,
     );
   }
 }
@@ -68,6 +69,6 @@ export class MenuPresentational extends React.Component<any> {
 export const Menu: any = compose(
   connect(
     ({ blockEditor }) => ({ blockEditor }),
-    { removeExportOfSelection }
-  )
+    { removeExportOfSelection },
+  ),
 )(MenuPresentational);

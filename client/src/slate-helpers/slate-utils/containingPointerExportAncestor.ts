@@ -4,11 +4,7 @@ function isPointerExport(node: any) {
 
 export function containingPointerExportAncestor(node: any, document: any) {
   let curNode = node;
-  while (
-    !(isPointerExport(curNode))
-    &&
-    document.getParent(curNode.key)
-  ) {
+  while (!isPointerExport(curNode) && document.getParent(curNode.key)) {
     curNode = document.getParent(curNode.key);
   }
 

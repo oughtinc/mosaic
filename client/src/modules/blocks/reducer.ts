@@ -1,5 +1,10 @@
 import { Value } from "slate";
-import { ADD_BLOCKS, UPDATE_BLOCK, REMOVE_BLOCKS, RESET_BLOCK } from "./actions";
+import {
+  ADD_BLOCKS,
+  UPDATE_BLOCK,
+  REMOVE_BLOCKS,
+  RESET_BLOCK,
+} from "./actions";
 import Plain from "slate-plain-serializer";
 import * as _ from "lodash";
 
@@ -15,16 +20,16 @@ export const blockReducer = (state = { blocks: [] }, action) => {
               : Plain.deserialize("");
             return {
               ...block,
-              value
+              value,
             };
-          })
-        ]
+          }),
+        ],
       };
     case REMOVE_BLOCKS:
       return {
         blocks: state.blocks.filter(
-          (block: any) => !_.includes(action.blockIds, block.id)
-        )
+          (block: any) => !_.includes(action.blockIds, block.id),
+        ),
       };
     case UPDATE_BLOCK:
       return {
@@ -36,10 +41,10 @@ export const blockReducer = (state = { blocks: [] }, action) => {
             return {
               ...block,
               value: action.value,
-              pointerChanged: action.pointerChanged
+              pointerChanged: action.pointerChanged,
             };
           }
-        })
+        }),
       };
     case RESET_BLOCK:
       return {

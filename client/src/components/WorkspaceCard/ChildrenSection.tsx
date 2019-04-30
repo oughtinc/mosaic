@@ -29,7 +29,8 @@ const Bullet: any = styled.span`
   border-radius: 2px;
   margin-right: 13px;
   svg {
-    color: ${(props: any) => (props.isActive ? treeBulletArrowColorWhenActive : treeBulletArrowColor)};
+    color: ${(props: any) =>
+      props.isActive ? treeBulletArrowColorWhenActive : treeBulletArrowColor};
     margin: 5px 5px 2px 5px;
   }
   &:hover {
@@ -53,14 +54,20 @@ export const ChildrenSection = ({
   childrenToggle,
   onChangeToggle,
   parentPointers,
-  subtreeTimeSpentData
+  subtreeTimeSpentData,
 }) => {
-  const childrenIds = _.sortBy(workspace.childWorkspaces, w => Date.parse(w.createdAt)).map(w => w.id);
+  const childrenIds = _.sortBy(workspace.childWorkspaces, w =>
+    Date.parse(w.createdAt),
+  ).map(w => w.id);
   if (!!childrenIds.length) {
     return (
       <ChildrenContainer>
         <Bullet isActive={childrenToggle} onClick={onChangeToggle}>
-          {childrenToggle ? "hide" : `show ${childrenIds.length} subtree${childrenIds.length !== 1 ? "s" : ""}`}
+          {childrenToggle
+            ? "hide"
+            : `show ${childrenIds.length} subtree${
+                childrenIds.length !== 1 ? "s" : ""
+              }`}
         </Bullet>
         {childrenToggle && (
           <Collection>

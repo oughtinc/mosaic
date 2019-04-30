@@ -4,7 +4,7 @@ import { getLoginCredentialsForAdminAndOracle } from "./getLoginCredentialsForAd
 
 const ADMIN_AND_ORACLE = "ADMIN_AND_ORACLE";
 
-export async function getAuthResultsForAdminAndOracle(){
+export async function getAuthResultsForAdminAndOracle() {
   if (authResultsCache.hasValidCache(ADMIN_AND_ORACLE)) {
     return authResultsCache.getCache(ADMIN_AND_ORACLE);
   } else {

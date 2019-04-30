@@ -23,7 +23,7 @@ class NewRootWorkspaceForExperimentForm extends React.Component<any, any> {
         experimentId: this.props.experimentId,
       },
     });
-  }
+  };
 }
 
 export { NewRootWorkspaceForExperimentForm };

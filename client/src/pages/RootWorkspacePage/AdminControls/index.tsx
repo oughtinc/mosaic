@@ -68,7 +68,7 @@ const AdminControls: any = compose(
     options: (props: any) => ({
       refetchQueries: props.refetchQueries,
     }),
-  })
+  }),
 )(AdminControlsPresentational);
 
 export { AdminControls };

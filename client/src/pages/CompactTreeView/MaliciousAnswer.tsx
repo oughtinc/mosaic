@@ -10,7 +10,9 @@ import { BlockEditor } from "../../components/BlockEditor";
 
 import { extractOracleValueAnswerFromBlock } from "./helpers/extractOracleAnswerValueFromBlock";
 
-const Checkmark = ({ color }) => <span style={{ color, fontSize: "24px" }}>✓</span>;
+const Checkmark = ({ color }) => (
+  <span style={{ color, fontSize: "24px" }}>✓</span>
+);
 
 export class MaliciousAnswer extends React.PureComponent<any, any> {
   public render() {
@@ -22,12 +24,22 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
       malicious,
     } = this.props;
 
-    const maliciousScratchpadBlock = malicious.blocks.find(b => b.type === "SCRATCHPAD");
-    const maliciousScratchpadValue = extractOracleValueAnswerFromBlock(maliciousScratchpadBlock);
+    const maliciousScratchpadBlock = malicious.blocks.find(
+      b => b.type === "SCRATCHPAD",
+    );
+    const maliciousScratchpadValue = extractOracleValueAnswerFromBlock(
+      maliciousScratchpadBlock,
+    );
 
-    const idOfPointerInMaliciousScratchpad = _.get(maliciousScratchpadBlock, "value[0].nodes[1].data.pointerId");
-    const isSamePointerInMaliciousScratchpadAndHonestAnswerDraft = idOfPointerInMaliciousScratchpad === idOfPointerInHonestAnswerDraft;
-    const didMaliciousWin = isHonestOracleCurrentlyResolved && isSamePointerInMaliciousScratchpadAndHonestAnswerDraft;
+    const idOfPointerInMaliciousScratchpad = _.get(
+      maliciousScratchpadBlock,
+      "value[0].nodes[1].data.pointerId",
+    );
+    const isSamePointerInMaliciousScratchpadAndHonestAnswerDraft =
+      idOfPointerInMaliciousScratchpad === idOfPointerInHonestAnswerDraft;
+    const didMaliciousWin =
+      isHonestOracleCurrentlyResolved &&
+      isSamePointerInMaliciousScratchpadAndHonestAnswerDraft;
 
     const normal = malicious.childWorkspaces[0];
     const didMaliciousDeclineToChallenge = didHonestWin && !normal;
@@ -35,9 +47,7 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
     return (
       <CompactTreeRow>
         <CompactTreeRowLabel>
-          {
-            didMaliciousWin
-            &&
+          {didMaliciousWin && (
             <Link
               style={{ textDecoration: "none" }}
               target="_blank"
@@ -45,8 +55,7 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
             >
               <Checkmark color="red" />
             </Link>
-          }
-          {" "}
+          )}{" "}
           <Link
             style={{
               color: "red",
@@ -58,28 +67,22 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
             M
           </Link>
         </CompactTreeRowLabel>
-        {
-          didMaliciousDeclineToChallenge
-          ?
-          <span style={{ color: "red"}}>No challenge</span>
-          :
-          (
-            normal
-            ?
-            <CompactTreeRowContent>
-              <BlockEditor
-                name={maliciousScratchpadBlock.id}
-                blockId={maliciousScratchpadBlock.id}
-                readOnly={true}
-                initialValue={maliciousScratchpadValue}
-                shouldAutosave={false}
-                availablePointers={availablePointers}
-              />
-            </CompactTreeRowContent>
-            :
-            <span style={{ color: "#999" }}>Waiting for response</span>
-          )
-        }
+        {didMaliciousDeclineToChallenge ? (
+          <span style={{ color: "red" }}>No challenge</span>
+        ) : normal ? (
+          <CompactTreeRowContent>
+            <BlockEditor
+              name={maliciousScratchpadBlock.id}
+              blockId={maliciousScratchpadBlock.id}
+              readOnly={true}
+              initialValue={maliciousScratchpadValue}
+              shouldAutosave={false}
+              availablePointers={availablePointers}
+            />
+          </CompactTreeRowContent>
+        ) : (
+          <span style={{ color: "#999" }}>Waiting for response</span>
+        )}
       </CompactTreeRow>
     );
   }

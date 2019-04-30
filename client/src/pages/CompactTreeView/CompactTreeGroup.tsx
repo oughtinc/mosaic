@@ -22,11 +22,18 @@ import { BlockEditor } from "../../components/BlockEditor";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { extractOracleValueAnswerFromBlock } from "./helpers/extractOracleAnswerValueFromBlock";
 
-const Checkmark = ({ color }) => <span style={{ color, fontSize: "24px" }}>✓</span>;
+const Checkmark = ({ color }) => (
+  <span style={{ color, fontSize: "24px" }}>✓</span>
+);
 
-export class CompactTreeGroupPresentationl extends React.PureComponent<any, any> {
+export class CompactTreeGroupPresentationl extends React.PureComponent<
+  any,
+  any
+> {
   public componentDidMount() {
-    const isThisActiveWorkspace = parseQueryString(window.location.search).activeWorkspace === this.props.workspace.id;
+    const isThisActiveWorkspace =
+      parseQueryString(window.location.search).activeWorkspace ===
+      this.props.workspace.id;
     if (isThisActiveWorkspace) {
       setTimeout(() => {
         scroller.scrollTo(this.props.workspace.id, {
@@ -39,7 +46,8 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
 
   public render() {
     const { workspace } = this.props;
-    const isThisActiveWorkspace = parseQueryString(window.location.search).activeWorkspace === workspace.id;
+    const isThisActiveWorkspace =
+      parseQueryString(window.location.search).activeWorkspace === workspace.id;
 
     if (workspace.isRequestingLazyUnlock) {
       return (
@@ -52,7 +60,9 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
       );
     }
 
-    const isWorkspaceNormal = !workspace.isEligibleForHonestOracle && !workspace.isEligibleForMaliciousOracle;
+    const isWorkspaceNormal =
+      !workspace.isEligibleForHonestOracle &&
+      !workspace.isEligibleForMaliciousOracle;
     if (isWorkspaceNormal) {
       return (
         <NormalWorkspaceGroup
@@ -64,19 +74,36 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
       );
     }
 
-    const honestQuestionBlock = workspace.blocks.find(b => b.type === "QUESTION");
+    const honestQuestionBlock = workspace.blocks.find(
+      b => b.type === "QUESTION",
+    );
     const questionValue = databaseJSONToValue(honestQuestionBlock.value);
 
-    const honestScratchpadBlock = workspace.blocks.find(b => b.type === "SCRATCHPAD");
-    const honestScratchpadValue = extractOracleValueAnswerFromBlock(honestScratchpadBlock);
+    const honestScratchpadBlock = workspace.blocks.find(
+      b => b.type === "SCRATCHPAD",
+    );
+    const honestScratchpadValue = extractOracleValueAnswerFromBlock(
+      honestScratchpadBlock,
+    );
 
     const isHonestOracleCurrentlyResolved = workspace.isCurrentlyResolved;
 
-    const idOfPointerInHonestScratchpad = _.get(honestScratchpadBlock, "value[0].nodes[1].data.pointerId");
-    const honestAnswerDraftBlock = workspace.blocks.find(b => b.type === "ANSWER_DRAFT");
-    const idOfPointerInHonestAnswerDraft = _.get(honestAnswerDraftBlock, "value[0].nodes[1].data.pointerId");
-    const isSamePointerInHonestScratchpadAndAnswerDraft = idOfPointerInHonestScratchpad === idOfPointerInHonestAnswerDraft;
-    const didHonestWin = isHonestOracleCurrentlyResolved && isSamePointerInHonestScratchpadAndAnswerDraft;
+    const idOfPointerInHonestScratchpad = _.get(
+      honestScratchpadBlock,
+      "value[0].nodes[1].data.pointerId",
+    );
+    const honestAnswerDraftBlock = workspace.blocks.find(
+      b => b.type === "ANSWER_DRAFT",
+    );
+    const idOfPointerInHonestAnswerDraft = _.get(
+      honestAnswerDraftBlock,
+      "value[0].nodes[1].data.pointerId",
+    );
+    const isSamePointerInHonestScratchpadAndAnswerDraft =
+      idOfPointerInHonestScratchpad === idOfPointerInHonestAnswerDraft;
+    const didHonestWin =
+      isHonestOracleCurrentlyResolved &&
+      isSamePointerInHonestScratchpadAndAnswerDraft;
 
     const malicious = workspace.childWorkspaces[0];
 
@@ -106,15 +133,17 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
               />
             </CompactTreeRowContent>
           </CompactTreeRow>
-          {
-            didHonestWin
-            &&
+          {didHonestWin && (
             <CompactTreeRow>
               <CompactTreeRowLabel color="green">
                 <Link
                   style={{ textDecoration: "none" }}
                   target="_blank"
-                  to={`/workspaces/${malicious.childWorkspaces[0] ? malicious.childWorkspaces[0].id : malicious.id}`}
+                  to={`/workspaces/${
+                    malicious.childWorkspaces[0]
+                      ? malicious.childWorkspaces[0].id
+                      : malicious.id
+                  }`}
                 >
                   <Checkmark color="green" />
                 </Link>
@@ -140,12 +169,8 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
                 />
               </CompactTreeRowContent>
             </CompactTreeRow>
-          }
-          {
-            !didHonestWin
-            &&
-            malicious
-            &&
+          )}
+          {!didHonestWin && malicious && (
             <MaliciousAnswerIfMaliciousWon
               availablePointers={this.props.availablePointers}
               didHonestWin={didHonestWin}
@@ -153,14 +178,14 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
               isHonestOracleCurrentlyResolved={isHonestOracleCurrentlyResolved}
               malicious={malicious}
             />
-          }
+          )}
         </Element>
       );
     }
 
     return (
       <Element name={workspace.id}>
-        <CompactTreeRow >
+        <CompactTreeRow>
           <Link
             style={{ color: "#333", textDecoration: "none" }}
             target="_blank"
@@ -184,48 +209,45 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
           </CompactTreeRowContent>
         </CompactTreeRow>
 
-          <CompactTreeRow>
-            <CompactTreeRowLabel color="green">
-              {
-                didHonestWin
-                &&
-                <Link
-                  style={{ textDecoration: "none" }}
-                  target="_blank"
-                  to={`/workspaces/${malicious.childWorkspaces[0] ? malicious.childWorkspaces[0].id : malicious.id}`}
-                >
-                  <Checkmark color="green" />
-                </Link>
-              }
-              {" "}
+        <CompactTreeRow>
+          <CompactTreeRowLabel color="green">
+            {didHonestWin && (
               <Link
-                style={{ color: "green", textDecoration: "none" }}
+                style={{ textDecoration: "none" }}
                 target="_blank"
-                to={`/workspaces/${workspace.id}`}
+                to={`/workspaces/${
+                  malicious.childWorkspaces[0]
+                    ? malicious.childWorkspaces[0].id
+                    : malicious.id
+                }`}
               >
-                H
+                <Checkmark color="green" />
               </Link>
-            </CompactTreeRowLabel>
-            {
-              malicious
-              ?
-              <CompactTreeRowContent>
-                <BlockEditor
-                  name={honestScratchpadBlock.id}
-                  blockId={honestScratchpadBlock.id}
-                  readOnly={true}
-                  initialValue={honestScratchpadValue}
-                  shouldAutosave={false}
-                  availablePointers={this.props.availablePointers}
-                />
-              </CompactTreeRowContent>
-              :
-              <span style={{ color: "#999" }}>Waiting for response</span>
-            }
-          </CompactTreeRow>
-        {
-          malicious
-          &&
+            )}{" "}
+            <Link
+              style={{ color: "green", textDecoration: "none" }}
+              target="_blank"
+              to={`/workspaces/${workspace.id}`}
+            >
+              H
+            </Link>
+          </CompactTreeRowLabel>
+          {malicious ? (
+            <CompactTreeRowContent>
+              <BlockEditor
+                name={honestScratchpadBlock.id}
+                blockId={honestScratchpadBlock.id}
+                readOnly={true}
+                initialValue={honestScratchpadValue}
+                shouldAutosave={false}
+                availablePointers={this.props.availablePointers}
+              />
+            </CompactTreeRowContent>
+          ) : (
+            <span style={{ color: "#999" }}>Waiting for response</span>
+          )}
+        </CompactTreeRow>
+        {malicious && (
           <MaliciousAnswerAndMaybeSubquestions
             availablePointers={this.props.availablePointers}
             didHonestWin={didHonestWin}
@@ -233,7 +255,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
             isHonestOracleCurrentlyResolved={isHonestOracleCurrentlyResolved}
             malicious={malicious}
           />
-        }
+        )}
       </Element>
     );
   }
@@ -241,7 +263,10 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<any, any>
 
 export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
   public state = {
-    isExpanded: parseQueryString(window.location.search).expanded === "true" ? true : false,
+    isExpanded:
+      parseQueryString(window.location.search).expanded === "true"
+        ? true
+        : false,
   };
 
   public render() {
@@ -252,7 +277,8 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           border: "1px solid #ddd",
           borderLeft: "2px solid #bbb",
           borderRadius: "3px",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05)",
           marginTop: "35px",
           minHeight: "35px",
           padding: "10px",
@@ -262,7 +288,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
       >
         <Button
           bsSize="xsmall"
-          onClick={() => this.setState({isExpanded: !this.state.isExpanded})}
+          onClick={() => this.setState({ isExpanded: !this.state.isExpanded })}
           style={{
             fontSize: "17px",
             fontWeight: 600,
@@ -278,7 +304,10 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           {this.state.isExpanded ? "-" : "+"}
         </Button>
         <a
-          href={this.props.groupQuery.workspace && `/workspaces/${this.props.groupQuery.workspace.id}/compactTree`}
+          href={
+            this.props.groupQuery.workspace &&
+            `/workspaces/${this.props.groupQuery.workspace.id}/compactTree`
+          }
           style={{
             right: "5px",
             position: "absolute",
@@ -298,7 +327,12 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           </Button>
         </a>
         <a
-          href={this.props.groupQuery.workspace && `${window.location.pathname}?expanded=true&activeWorkspace=${this.props.groupQuery.workspace.id}`}
+          href={
+            this.props.groupQuery.workspace &&
+            `${window.location.pathname}?expanded=true&activeWorkspace=${
+              this.props.groupQuery.workspace.id
+            }`
+          }
           style={{
             right: "5px",
             position: "absolute",
@@ -315,9 +349,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
             #
           </Button>
         </a>
-        {
-          this.props.groupQuery.workspace
-          ?
+        {this.props.groupQuery.workspace ? (
           <div
             style={{
               minHeight: "52px",
@@ -330,9 +362,11 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
               workspace={this.props.groupQuery.workspace}
             />
           </div>
-          :
-          <div style={{ paddingBottom: "37px",  paddingLeft: "20px"}}>Loading...</div>
-        }
+        ) : (
+          <div style={{ paddingBottom: "37px", paddingLeft: "20px" }}>
+            Loading...
+          </div>
+        )}
       </div>
     );
   }
@@ -386,7 +420,7 @@ export const CompactTreeGroup: any = compose(
     options: (props: any) => ({
       variables: {
         workspaceId: props.workspaceId,
-      }
+      },
     }),
-  })
+  }),
 )(CompactTreeGroupContainer);

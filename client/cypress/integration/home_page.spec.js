@@ -16,7 +16,9 @@ describe("Home page", function() {
 
   context("when typical user is logged in", function() {
     beforeEach(function() {
-      cy.visit("/").login().reload();
+      cy.visit("/")
+        .login()
+        .reload();
     });
 
     it("diplays proper components & stores proper auth data", function() {
@@ -29,12 +31,11 @@ describe("Home page", function() {
       cy.expectTypicalUserAuthDataInLocalStorage();
     });
 
-
     it("can create new root workspace", function() {
-      cy.get(`[data-cy="slate-editor-new-question-form"]`)
-        .type("This is the question text for a new root-level workspace");
-      cy.get(`[data-cy="submit-new-question"]`)
-        .click();
+      cy.get(`[data-cy="slate-editor-new-question-form"]`).type(
+        "This is the question text for a new root-level workspace",
+      );
+      cy.get(`[data-cy="submit-new-question"]`).click();
       cy.contains("This is the question text for a new root-level workspace");
 
       cy.expectAdminControlsNotToExist();
@@ -59,11 +60,13 @@ describe("Home page", function() {
     });
 
     it("can create new root workspace", function() {
-      cy.get(`[data-cy="slate-editor-new-question-form"]`)
-        .type("This is the question text for a new root-level workspace written by an admin");
-      cy.get(`[data-cy="submit-new-question"]`)
-        .click();
-      cy.contains("This is the question text for a new root-level workspace written by an admin");
+      cy.get(`[data-cy="slate-editor-new-question-form"]`).type(
+        "This is the question text for a new root-level workspace written by an admin",
+      );
+      cy.get(`[data-cy="submit-new-question"]`).click();
+      cy.contains(
+        "This is the question text for a new root-level workspace written by an admin",
+      );
 
       cy.expectAdminControlsToExist();
 
@@ -84,16 +87,20 @@ describe("Home page", function() {
       cy.get(`[data-cy="new-root-workspace-form"]`);
       cy.expectOracleAuthDataInLocalStorage();
       cy.contains("This is a public question.");
-      cy.contains("This is not public, but created by 'typical user'.").should("not.exist");
+      cy.contains("This is not public, but created by 'typical user'.").should(
+        "not.exist",
+      );
       cy.contains("This is not a public question.").should("not.exist");
     });
 
     it("can create new root workspace", function() {
-      cy.get(`[data-cy="slate-editor-new-question-form"]`)
-        .type("This is the question text for a new root-level workspace written by an oracle");
-      cy.get(`[data-cy="submit-new-question"]`)
-        .click();
-      cy.contains("This is the question text for a new root-level workspace written by an oracle");
+      cy.get(`[data-cy="slate-editor-new-question-form"]`).type(
+        "This is the question text for a new root-level workspace written by an oracle",
+      );
+      cy.get(`[data-cy="submit-new-question"]`).click();
+      cy.contains(
+        "This is the question text for a new root-level workspace written by an oracle",
+      );
 
       cy.get(`[data-cy="oracle-mode-header"]`);
 
@@ -119,11 +126,13 @@ describe("Home page", function() {
     });
 
     it("can create new root workspace", function() {
-      cy.get(`[data-cy="slate-editor-new-question-form"]`)
-        .type("This is the question text for a new root-level workspace written by an admin and oracle");
-      cy.get(`[data-cy="submit-new-question"]`)
-        .click();
-      cy.contains("This is the question text for a new root-level workspace written by an admin and oracle");
+      cy.get(`[data-cy="slate-editor-new-question-form"]`).type(
+        "This is the question text for a new root-level workspace written by an admin and oracle",
+      );
+      cy.get(`[data-cy="submit-new-question"]`).click();
+      cy.contains(
+        "This is the question text for a new root-level workspace written by an admin and oracle",
+      );
 
       cy.get(`[data-cy="oracle-mode-header"]`);
 

@@ -6,7 +6,10 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { ShowExpandedPointer } from "./ShowExpandedPointer";
 import { propsToPointerDetails } from "./helpers";
-import { changePointerReference, removeImportFromStore } from "../../modules/blockEditor/actions";
+import {
+  changePointerReference,
+  removeImportFromStore,
+} from "../../modules/blockEditor/actions";
 import { getInputCharCount } from "../../modules/blocks/charCounts";
 import { Auth } from "../../auth";
 
@@ -36,14 +39,10 @@ const ClosedPointerImport: any = styled.span``;
 const OpenPointerImport: any = styled.span`
   background: ${(props: any) =>
     props.isLazy
-    ?
-      "rgba(244, 158, 158)"
-      :
-    (
-      props.isSelected
+      ? "rgba(244, 158, 158)"
+      : props.isSelected
       ? "rgba(111, 186, 209, 0.66)"
-      : "rgba(158, 224, 244, 0.66)"
-    )};
+      : "rgba(158, 224, 244, 0.66)"};
   border-radius: 2px;
   color: #000;
   cursor: pointer;
@@ -52,13 +51,13 @@ const OpenPointerImport: any = styled.span`
 
 const Brackets: any = styled.span`
   &:before {
-    color: ${(props: any) => props.isLazy ? "red" : unlockedImportBgColor};
+    color: ${(props: any) => (props.isLazy ? "red" : unlockedImportBgColor)};
     content: "[";
     font: ${bracketFont};
   }
 
   &:after {
-    color: ${(props: any) => props.isLazy ? "red" : unlockedImportBgColor};
+    color: ${(props: any) => (props.isLazy ? "red" : unlockedImportBgColor)};
     content: "]";
     font: ${bracketFont};
   }
@@ -75,12 +74,18 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       };
     } else {
       const exportPointerId = props.nodeAsJson.data.pointerId;
-      const isLockedRelation = props.exportLockStatusInfo && props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
-      const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
+      const isLockedRelation =
+        props.exportLockStatusInfo &&
+        props.exportLockStatusInfo.find(
+          obj => obj.pointerId === exportPointerId,
+        );
+      const exportIsVisible = this.props.visibleExportIds.find(
+        id => id === exportPointerId,
+      );
       const isLocked =
-        Auth.isAuthenticated()
-        &&
-        !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
+        Auth.isAuthenticated() &&
+        !exportIsVisible &&
+        (!isLockedRelation || isLockedRelation.isLocked);
 
       this.state = {
         isLocked,
@@ -89,19 +94,28 @@ class PointerImportNodePresentational extends React.Component<any, any> {
   }
 
   public componentDidMount() {
-    const isOnTreePage = window.location.pathname.endsWith("subtree") || window.location.pathname.endsWith("compactTree");
+    const isOnTreePage =
+      window.location.pathname.endsWith("subtree") ||
+      window.location.pathname.endsWith("compactTree");
 
     if (isOnTreePage) {
       return;
     }
 
     const isAdminNotInFlow = Auth.isAdmin() && !this.props.isActive;
-    const isOracleInOracleMode = this.props.isInOracleMode && this.props.isUserOracle;
+    const isOracleInOracleMode =
+      this.props.isInOracleMode && this.props.isUserOracle;
 
-    if (!this.props.hasExportBeenOpened && (isAdminNotInFlow || isOracleInOracleMode)) {
+    if (
+      !this.props.hasExportBeenOpened &&
+      (isAdminNotInFlow || isOracleInOracleMode)
+    ) {
       const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
       const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
-      if (!this.props.ancestorPointerIds || this.props.ancestorPointerIds.indexOf(exportPointerId) === -1) {
+      if (
+        !this.props.ancestorPointerIds ||
+        this.props.ancestorPointerIds.indexOf(exportPointerId) === -1
+      ) {
         this.props.openClosedPointer(pointerId, exportPointerId);
       }
     }
@@ -126,12 +140,16 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         right,
         top,
         bottom,
-        id: this.props.nodeAsJson.data.internalReferenceId
+        id: this.props.nodeAsJson.data.internalReferenceId,
       });
     }
   };
 
-  public handleClosedPointerClick = (e: Event, pointerId: string, exportPointerId: string) => {
+  public handleClosedPointerClick = (
+    e: Event,
+    pointerId: string,
+    exportPointerId: string,
+  ) => {
     const isActive = this.props.isActive;
 
     if (this.isLocked() && this.state.isLocked) {
@@ -139,17 +157,23 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       if (isActive) {
         this.props.unlockPointer(exportPointerId);
       }
-      setTimeout(() => { this.props.openClosedPointer(pointerId, exportPointerId); }, 400);
+      setTimeout(() => {
+        this.props.openClosedPointer(pointerId, exportPointerId);
+      }, 400);
     } else {
       this.props.openClosedPointer(pointerId, exportPointerId);
     }
-    e.stopPropagation( );
-  }
+    e.stopPropagation();
+  };
 
-  public handleOpenPointerClick = (e: Event, pointerId: string, exportId: string) => {
+  public handleOpenPointerClick = (
+    e: Event,
+    pointerId: string,
+    exportId: string,
+  ) => {
     this.props.closeOpenPointer(pointerId, exportId);
     e.stopPropagation();
-  }
+  };
 
   public isLocked() {
     const onHomepageOrTreeView = !this.props.exportLockStatusInfo;
@@ -158,12 +182,16 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     }
 
     const exportPointerId = this.props.nodeAsJson.data.pointerId;
-    const isLockedRelation = this.props.exportLockStatusInfo.find(obj => obj.pointerId === exportPointerId);
-    const exportIsVisible = this.props.visibleExportIds.find(id => id === exportPointerId);
+    const isLockedRelation = this.props.exportLockStatusInfo.find(
+      obj => obj.pointerId === exportPointerId,
+    );
+    const exportIsVisible = this.props.visibleExportIds.find(
+      id => id === exportPointerId,
+    );
     const isLocked =
-      Auth.isAuthenticated()
-      &&
-      !exportIsVisible && (!isLockedRelation || isLockedRelation.isLocked);
+      Auth.isAuthenticated() &&
+      !exportIsVisible &&
+      (!isLockedRelation || isLockedRelation.isLocked);
 
     return isLocked;
   }
@@ -180,11 +208,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       importingPointer,
       isSelected,
       pointerIndex,
-      isOpen
+      isOpen,
     } = propsToPointerDetails({
       blockEditor,
       availablePointers,
-      nodeAsJson
+      nodeAsJson,
     });
 
     if (!importingPointer) {
@@ -203,17 +231,27 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
     const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
 
-    const exportPointer = availablePointers.find(p => p.data.pointerId === exportPointerId);
-    const exportPointerInputCharCount = exportPointer && getInputCharCount(exportPointer);
+    const exportPointer = availablePointers.find(
+      p => p.data.pointerId === exportPointerId,
+    );
+    const exportPointerInputCharCount =
+      exportPointer && getInputCharCount(exportPointer);
 
-    const isExportPointerFirstNodeTextNode = exportPointer.nodes[0].object === "text";
+    const isExportPointerFirstNodeTextNode =
+      exportPointer.nodes[0].object === "text";
     const exportPointerText = exportPointer.nodes[0].leaves[0].text.trim();
-    const isLazyPointer = isExportPointerFirstNodeTextNode && exportPointerText.slice(0, 2) === "@L";
+    const isLazyPointer =
+      isExportPointerFirstNodeTextNode &&
+      exportPointerText.slice(0, 2) === "@L";
 
     const styles = StyleSheet.create({
       OuterPointerImportStyle: {
         ":before": {
-          backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
+          backgroundColor: isLazyPointer
+            ? "red"
+            : isLocked
+            ? lockedPointerImportBgColor
+            : unlockedImportBgColor,
           color: "rgb(233, 239, 233)",
           content: `"${pointerIndex + 1}"`,
           borderRadius: "4px 0px 0px 4px",
@@ -221,7 +259,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         },
       },
       ClosedPointerImportStyle: {
-        backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColor : unlockedImportBgColor),
+        backgroundColor: isLazyPointer
+          ? "red"
+          : isLocked
+          ? lockedPointerImportBgColor
+          : unlockedImportBgColor,
         color: "rgb(233, 239, 233)",
         cursor: isLazyPointer ? "auto" : "pointer",
         borderRadius: "4px",
@@ -229,24 +271,28 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         transition: "background-color 0.4s",
         whiteSpace: "nowrap",
         ":hover": {
-          backgroundColor: isLazyPointer ? "red" : (isLocked ? lockedPointerImportBgColorOnHover : unlockedImportBgColorOnHover),
-        }
+          backgroundColor: isLazyPointer
+            ? "red"
+            : isLocked
+            ? lockedPointerImportBgColorOnHover
+            : unlockedImportBgColorOnHover,
+        },
       },
     });
 
     const tooltip = (
       <Tooltip id="tooltip" style={{ display: !isLocked && "none" }}>
-        <strong>{exportPointerInputCharCount}</strong> char{exportPointerInputCharCount === 1 ? "" : "s"}
+        <strong>{exportPointerInputCharCount}</strong> char
+        {exportPointerInputCharCount === 1 ? "" : "s"}
       </Tooltip>
     );
 
     if (isLazyPointer) {
-      const isOracleInOracleMode = this.props.isInOracleMode && this.props.isUserOracle;
+      const isOracleInOracleMode =
+        this.props.isInOracleMode && this.props.isUserOracle;
       if (!isOracleInOracleMode) {
         return (
-          <ClosedPointerImport
-            className={css(styles.ClosedPointerImportStyle)}
-          >
+          <ClosedPointerImport className={css(styles.ClosedPointerImportStyle)}>
             <span
               key={exportPointerId}
               style={{
@@ -272,7 +318,9 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         <OverlayTrigger placement="top" overlay={tooltip}>
           <ClosedPointerImport
             className={css(styles.ClosedPointerImportStyle)}
-            onClick={e => this.handleClosedPointerClick(e, pointerId, exportPointerId)}
+            onClick={e =>
+              this.handleClosedPointerClick(e, pointerId, exportPointerId)
+            }
             onMouseOver={this.onMouseOver}
             onMouseOut={this.props.onMouseOut}
           >
@@ -300,14 +348,20 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         <OpenPointerImport
           isLazy={isLazyPointer}
           isSelected={isSelected}
-          onClick={e => this.handleOpenPointerClick(e, pointerId, exportPointerId)}
+          onClick={e =>
+            this.handleOpenPointerClick(e, pointerId, exportPointerId)
+          }
         >
           <span className={css(styles.OuterPointerImportStyle)}>
             <span onClick={e => e.stopPropagation()}>
               <Brackets isLazy={isLazyPointer}>
                 <ShowExpandedPointer
                   isActive={this.props.isActive}
-                  ancestorPointerIds={!this.props.ancestorPointerIds ? [exportPointerId] : [...this.props.ancestorPointerIds, exportPointerId]}
+                  ancestorPointerIds={
+                    !this.props.ancestorPointerIds
+                      ? [exportPointerId]
+                      : [...this.props.ancestorPointerIds, exportPointerId]
+                  }
                   isInOracleMode={this.props.isInOracleMode}
                   isUserOracle={this.props.isUserOracle}
                   blockEditor={blockEditor}
@@ -319,7 +373,9 @@ class PointerImportNodePresentational extends React.Component<any, any> {
                   isHoverable={this.props.isHoverable}
                   visibleExportIds={visibleExportIds}
                   exportLockStatusInfo={this.props.exportLockStatusInfo}
-                  isInOracleModeAndIsUserOracle={this.props.isInOracleModeAndIsUserOracle}
+                  isInOracleModeAndIsUserOracle={
+                    this.props.isInOracleModeAndIsUserOracle
+                  }
                   unlockPointer={this.props.unlockPointer}
                 />
               </Brackets>
@@ -332,23 +388,34 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 }
 
 const mapStateToProps = (state, props) => ({
-  hasExportBeenOpened: state.blockEditor.exportsOpened.indexOf(props.nodeAsJson.data.pointerId) > -1,
+  hasExportBeenOpened:
+    state.blockEditor.exportsOpened.indexOf(props.nodeAsJson.data.pointerId) >
+    -1,
 });
 
 const mapDispatchToProps = (dispatch: (actionObjectOrThunkFn: any) => any) => ({
-  openClosedPointer: (pointerId: string, exportId: string) => dispatch(changePointerReference({
-    id: pointerId,
-    reference: { isOpen: true },
-    exportId,
-  })),
+  openClosedPointer: (pointerId: string, exportId: string) =>
+    dispatch(
+      changePointerReference({
+        id: pointerId,
+        reference: { isOpen: true },
+        exportId,
+      }),
+    ),
 
-  closeOpenPointer: (pointerId: string, exportId: string) => dispatch(changePointerReference({
-    id: pointerId,
-    reference: { isOpen: false },
-    exportId,
-  })),
+  closeOpenPointer: (pointerId: string, exportId: string) =>
+    dispatch(
+      changePointerReference({
+        id: pointerId,
+        reference: { isOpen: false },
+        exportId,
+      }),
+    ),
 
-  removeImportFromStore: importId => dispatch(removeImportFromStore(importId))
+  removeImportFromStore: importId => dispatch(removeImportFromStore(importId)),
 });
 
-export const PointerImportNode = connect(mapStateToProps, mapDispatchToProps)(PointerImportNodePresentational);
+export const PointerImportNode = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(PointerImportNodePresentational);

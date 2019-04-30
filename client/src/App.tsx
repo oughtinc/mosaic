@@ -44,8 +44,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     graphQLErrors.map(({ message, locations, path }) =>
       console.log(
         `[GraphQL error]: Message: ${message}. Path: ${path}. Location: `,
-        locations
-      )
+        locations,
+      ),
     );
   }
   if (networkError) {
@@ -80,7 +80,7 @@ const store = createStore(
     blocks: blockReducer,
     blockEditor: blockEditorReducer,
   } as any),
-  composeWithDevTools(applyMiddleware(thunk))
+  composeWithDevTools(applyMiddleware(thunk)),
 );
 
 export class Layout extends React.Component {
@@ -99,7 +99,11 @@ const Routes = () => (
     <Route exact={true} path="/workspaces" render={() => <Redirect to="/" />} />
     <Route exact={true} path="/" component={RootWorkspacePage} />
     <Route exact={true} path="/next" component={NextEpisodeShowPage} />
-    <Route exact={true} path="/nextMaybeSuboptimal" component={NextMaybeSuboptimalEpisodeShowPage} />
+    <Route
+      exact={true}
+      path="/nextMaybeSuboptimal"
+      component={NextMaybeSuboptimalEpisodeShowPage}
+    />
     <Route exact={true} path="/break" component={BetweenEpisodesPage} />
     <Route
       exact={true}

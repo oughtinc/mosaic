@@ -59,6 +59,6 @@ class BlockHoverMenuPresentational extends React.Component<any, any> {
 export const BlockHoverMenu: any = compose(
   connect(
     ({ blockEditor }) => ({ blockEditor }),
-    { removeHoverItem }
-  )
+    { removeHoverItem },
+  ),
 )(BlockHoverMenuPresentational);

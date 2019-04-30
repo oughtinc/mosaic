@@ -13,7 +13,10 @@ import { convertImportsForNodes } from "./helpers/convertImportsForNodes";
 import { MenuBar } from "./MenuBar";
 import { MutationStatus } from "./types";
 import { valueToDatabaseJSON } from "../../lib/slateParser";
-import { exportSelection, removeExportOfSelection } from "../../modules/blockEditor/actions";
+import {
+  exportSelection,
+  removeExportOfSelection,
+} from "../../modules/blockEditor/actions";
 import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { Change } from "./types";
@@ -29,10 +32,21 @@ interface NextWorkspaceBtnProps {
   navHook?: () => void;
 }
 
-const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
+const NextWorkspaceBtn = ({
+  bsStyle,
+  experimentId,
+  label,
+  navHook,
+}: NextWorkspaceBtnProps) => {
   return (
-    <Link onClick={navHook} to={`/next?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
-      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
+    <Link
+      onClick={navHook}
+      to={`/next?experiment=${experimentId}`}
+      style={{ margin: "0 5px" }}
+    >
+      <Button bsSize="small" bsStyle={bsStyle}>
+        {label} »
+      </Button>
     </Link>
   );
 };
@@ -47,7 +61,7 @@ function lastCharactersAfterEvent(event: any, n: any) {
   }
   const text: string = wholeText.textContent.slice(
     Math.max(anchorOffset - n + 1, 0),
-    anchorOffset
+    anchorOffset,
   );
   const key: string = event.key;
   return text + key;
@@ -60,8 +74,8 @@ function inlinePointerImportJSON(pointerId: string) {
     isVoid: true,
     data: {
       pointerId: pointerId,
-      internalReferenceId: uuidv1()
-    }
+      internalReferenceId: uuidv1(),
+    },
   });
 }
 
@@ -104,11 +118,16 @@ export class BlockEditorEditingPresentational extends React.Component<
   private throttledUpdate = throttle(this.props.updateBlock, 500);
 
   private handleBlur = _.debounce(() => {
-    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS_REGEX);
+    const doNeedToConvertImport = this.state.editorValue.document.text.match(
+      DOLLAR_NUMBERS_REGEX,
+    );
 
     if (doNeedToConvertImport) {
       const valueJSON = this.state.editorValue.toJSON();
-      valueJSON.document.nodes[0].nodes = convertImportsForNodes(valueJSON.document.nodes[0].nodes, this.props.availablePointers);
+      valueJSON.document.nodes[0].nodes = convertImportsForNodes(
+        valueJSON.document.nodes[0].nodes,
+        this.props.availablePointers,
+      );
       this.setState({ editorValue: Value.fromJSON(valueJSON) });
     }
 
@@ -134,9 +153,12 @@ export class BlockEditorEditingPresentational extends React.Component<
       !_.isEqual(newProps.mutationStatus, this.props.mutationStatus) ||
       !_.isEqual(
         newState.hasChangedSinceDatabaseSave,
-        this.state.hasChangedSinceDatabaseSave
+        this.state.hasChangedSinceDatabaseSave,
       ) ||
-      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(
+        newProps.exportLockStatusInfo,
+        this.props.exportLockStatusInfo,
+      ) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
       !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport) ||
       !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat) ||
@@ -152,23 +174,29 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public componentWillUnmount() {
-    const doNeedToConvertImport = this.state.editorValue.document.text.match(DOLLAR_NUMBERS_REGEX);
+    const doNeedToConvertImport = this.state.editorValue.document.text.match(
+      DOLLAR_NUMBERS_REGEX,
+    );
 
     if (doNeedToConvertImport) {
       const valueJSON = this.state.editorValue.toJSON();
-      valueJSON.document.nodes[0].nodes = convertImportsForNodes(valueJSON.document.nodes[0].nodes, this.props.availablePointers);
-      this.editorValueToSaveToDbOnUnmount =  Value.fromJSON(valueJSON);
+      valueJSON.document.nodes[0].nodes = convertImportsForNodes(
+        valueJSON.document.nodes[0].nodes,
+        this.props.availablePointers,
+      );
+      this.editorValueToSaveToDbOnUnmount = Value.fromJSON(valueJSON);
     }
 
     this.props.updateBlock({
       id: this.props.block.id,
       value: this.state.editorValue,
-      pointerChanged: true
+      pointerChanged: true,
     });
 
     if (this.props.shouldAutosave) {
       const isUserAdmin = Auth.isAdmin();
-      const isUserInExperiment = parseQueryString(window.location.search).experiment;
+      const isUserInExperiment = parseQueryString(window.location.search)
+        .experiment;
       if (isUserAdmin || isUserInExperiment) {
         this.saveToDatabase();
         this.endAutosaveInterval();
@@ -184,7 +212,8 @@ export class BlockEditorEditingPresentational extends React.Component<
       this.onValueChange();
     }
 
-    const underlyingDOMNode = this.editor && findDOMNode(this.editor.value.document);
+    const underlyingDOMNode =
+      this.editor && findDOMNode(this.editor.value.document);
     if (underlyingDOMNode && this.props.cyAttributeName) {
       underlyingDOMNode.setAttribute("data-cy", this.props.cyAttributeName);
     }
@@ -200,12 +229,12 @@ export class BlockEditorEditingPresentational extends React.Component<
 
   public componentDidMount() {
     const change = slateChangeMutations.normalizeExportSpacing(
-      this.props.block.value.change()
+      this.props.block.value.change(),
     );
     this.props.updateBlock({
       id: this.props.block.id,
       value: change.value,
-      pointerChanged: false
+      pointerChanged: false,
     });
   }
 
@@ -230,7 +259,10 @@ export class BlockEditorEditingPresentational extends React.Component<
               border: "1px solid #aaa",
               borderRadius: "4px",
               boxShadow: "1px 1px 6px #bbb",
-              display: this.props.mutationStatus.status === MutationStatus.Error ? "flex" : "none",
+              display:
+                this.props.mutationStatus.status === MutationStatus.Error
+                  ? "flex"
+                  : "none",
               justifyContent: "space-around",
               left: "50%",
               marginLeft: "-300px",
@@ -241,22 +273,18 @@ export class BlockEditorEditingPresentational extends React.Component<
               zIndex: 1000,
             }}
           >
-            {
-              this.props.mutationStatus
-              &&
-              this.props.mutationStatus.error
-              &&
-              this.props.mutationStatus.error.message.slice(15)
-            }
-            {
-              parseQueryString(window.location.search).experiment
-              &&
+            {this.props.mutationStatus &&
+              this.props.mutationStatus.error &&
+              this.props.mutationStatus.error.message.slice(15)}
+            {parseQueryString(window.location.search).experiment && (
               <NextWorkspaceBtn
                 bsStyle="default"
-                experimentId={parseQueryString(window.location.search).experiment}
+                experimentId={
+                  parseQueryString(window.location.search).experiment
+                }
                 label={"Find assigned workspace"}
               />
-            }
+            )}
           </div>
           <Editor
             placeholder={this.props.placeholder}
@@ -339,12 +367,12 @@ export class BlockEditorEditingPresentational extends React.Component<
     // check to see whether there are a balanced number of square brackets
     // if there are, everything within the outermost brackets gets exported
     const {
-      wasMutationPerformed
+      wasMutationPerformed,
     } = slateChangeMutations.scanBlockAndConvertOuterSquareBrackets({
       change: this.state.editorValue.change(),
       updateBlock: this.props.updateBlock,
       exportSelection: this.props.exportSelection,
-      blockId: this.props.block.id
+      blockId: this.props.block.id,
     });
 
     // if something was exported, redo this process
@@ -412,7 +440,10 @@ export class BlockEditorEditingPresentational extends React.Component<
   };
 
   private considerSaveToDatabase = () => {
-    if (this.editorValueToSaveToDbOnUnmount || this.state.hasChangedSinceDatabaseSave) {
+    if (
+      this.editorValueToSaveToDbOnUnmount ||
+      this.state.hasChangedSinceDatabaseSave
+    ) {
       this.saveToDatabase();
     }
   };
@@ -430,7 +461,7 @@ export class BlockEditorEditingPresentational extends React.Component<
     if (this.props.shouldAutosave && !this.autosaveInterval) {
       this.autosaveInterval = setInterval(
         this.considerSaveToDatabase,
-        AUTOSAVE_EVERY_N_SECONDS * 1000
+        AUTOSAVE_EVERY_N_SECONDS * 1000,
       );
     }
   };
@@ -453,7 +484,7 @@ export const BlockEditorEditing: any = compose(
     mapStateToProps,
     { updateBlock, exportSelection, removeExportOfSelection },
     null,
-    { withRef: true }
+    { withRef: true },
   ),
   graphql(UPDATE_BLOCKS, {
     name: "saveBlocksToServer",
@@ -462,10 +493,10 @@ export const BlockEditorEditing: any = compose(
       variables: {
         experimentId: parseQueryString(window.location.search).experiment,
       },
-    }
+    },
   }),
   withState("mutationStatus", "setMutationStatus", {
-    status: MutationStatus.NotStarted
+    status: MutationStatus.NotStarted,
   }),
   withProps(({ saveBlocksToServer, block, setMutationStatus }) => {
     const saveBlocksMutation = editorValue => {
@@ -473,9 +504,10 @@ export const BlockEditorEditing: any = compose(
 
       saveBlocksToServer({
         variables: {
-          blocks: { id: block.id, value: valueToDatabaseJSON(editorValue) }
-        }
-      }).then(() => {
+          blocks: { id: block.id, value: valueToDatabaseJSON(editorValue) },
+        },
+      })
+        .then(() => {
           setMutationStatus({ status: MutationStatus.Complete });
         })
         .catch(e => {
@@ -484,5 +516,5 @@ export const BlockEditorEditing: any = compose(
     };
 
     return { saveBlocksMutation, status };
-  })
+  }),
 )(BlockEditorEditingPresentational);

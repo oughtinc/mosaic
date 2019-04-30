@@ -9,18 +9,21 @@ import { UserActivityWorkspaceReports } from "./UserActivityWorkspaceReports";
 
 export class UserActivityPresentational extends React.Component<any, any> {
   public render() {
+    const primaryAssignments =
+      this.props.userActivityQuery.userActivity &&
+      this.props.userActivityQuery.userActivity.assignments.filter(a => {
+        return a.workspace.rootWorkspace.tree.experiments.some(
+          e => e.eligibilityRank === 1,
+        );
+      });
 
-    const primaryAssignments = this.props.userActivityQuery.userActivity && this.props.userActivityQuery.userActivity.assignments.filter(
-      a => {
-        return a.workspace.rootWorkspace.tree.experiments.some(e => e.eligibilityRank === 1);
-      }
-    );
-
-    const fallbackAssignments = this.props.userActivityQuery.userActivity && this.props.userActivityQuery.userActivity.assignments.filter(
-      a => {
-        return !a.workspace.rootWorkspace.tree.experiments.some(e => e.eligibilityRank === 1);
-      }
-    );
+    const fallbackAssignments =
+      this.props.userActivityQuery.userActivity &&
+      this.props.userActivityQuery.userActivity.assignments.filter(a => {
+        return !a.workspace.rootWorkspace.tree.experiments.some(
+          e => e.eligibilityRank === 1,
+        );
+      });
 
     return (
       <div
@@ -33,61 +36,74 @@ export class UserActivityPresentational extends React.Component<any, any> {
         }}
       >
         <h3 style={{ textAlign: "center" }}>Your Activity</h3>
-        {
-          !this.props.userActivityQuery.loading &&
+        {!this.props.userActivityQuery.loading && (
           <div>
             <UserActivitySummary
-              averageTimeInMsSpentOnEachWorkspace={this.props.userActivityQuery.userActivity.assignments.reduce((acc: number, val) => { return acc + Number(val.howLongDidAssignmentLast); }, 0) / this.props.userActivityQuery.userActivity.assignments.length}
-              howManyPrimaryWorkspacesHasUserWorkedOn={primaryAssignments.length}
-              howManyFallbackWorkspacesHasUserWorkedOn={fallbackAssignments.length}
+              averageTimeInMsSpentOnEachWorkspace={
+                this.props.userActivityQuery.userActivity.assignments.reduce(
+                  (acc: number, val) => {
+                    return acc + Number(val.howLongDidAssignmentLast);
+                  },
+                  0,
+                ) / this.props.userActivityQuery.userActivity.assignments.length
+              }
+              howManyPrimaryWorkspacesHasUserWorkedOn={
+                primaryAssignments.length
+              }
+              howManyFallbackWorkspacesHasUserWorkedOn={
+                fallbackAssignments.length
+              }
             />
-            <UserActivityWorkspaceReports 
-              assignments={this.props.userActivityQuery.userActivity.assignments}
+            <UserActivityWorkspaceReports
+              assignments={
+                this.props.userActivityQuery.userActivity.assignments
+              }
             />
           </div>
-        }
+        )}
       </div>
     );
   }
 }
 
 const USER_ACTIVITY_QUERY = gql`
-query userActivityQuery($experimentId: String, $userId: String) {
-  userActivity(experimentId: $experimentId, userId: $userId) {
-    assignments {
-      howLongDidAssignmentLast
-      startAtTimestamp
-      totalUsersWhoHaveWorkedOnWorkspace
-      workspace {
-        id
-        blocks {
-          type
-          value
-        }
-        rootWorkspace {
+  query userActivityQuery($experimentId: String, $userId: String) {
+    userActivity(experimentId: $experimentId, userId: $userId) {
+      assignments {
+        howLongDidAssignmentLast
+        startAtTimestamp
+        totalUsersWhoHaveWorkedOnWorkspace
+        workspace {
           id
-          tree {
+          blocks {
+            type
+            value
+          }
+          rootWorkspace {
             id
-            experiments {
+            tree {
               id
-              eligibilityRank
+              experiments {
+                id
+                eligibilityRank
+              }
             }
           }
         }
       }
     }
   }
-}`;
+`;
 
 const options = ({ experimentId }) => ({
   variables: {
-    experimentId, 
+    experimentId,
     userId: Auth.userId(),
-  }
+  },
 });
 
 export const UserActivity: any = compose(
-  graphql(USER_ACTIVITY_QUERY, { 
+  graphql(USER_ACTIVITY_QUERY, {
     name: "userActivityQuery",
     options,
   }),

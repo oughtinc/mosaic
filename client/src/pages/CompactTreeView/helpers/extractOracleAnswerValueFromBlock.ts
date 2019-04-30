@@ -7,9 +7,11 @@ export function extractOracleValueAnswerFromBlock(block: any) {
     return databaseJSONToValue(block.value);
   }
 
-  return databaseJSONToValue([{
-    object: "block",
-    nodes: block.value[0].nodes[1].nodes,
-    type: "line",
-  }]);
+  return databaseJSONToValue([
+    {
+      object: "block",
+      nodes: block.value[0].nodes[1].nodes,
+      type: "line",
+    },
+  ]);
 }

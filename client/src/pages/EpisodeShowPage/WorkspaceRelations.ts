@@ -85,7 +85,7 @@ export class WorkspaceBlockRelation {
 
   public constructor(
     workspaceRelationType: WorkspaceRelationTypes,
-    workspace: any
+    workspace: any,
   ) {
     this.workspace = workspace;
     this.workspaceRelationType = workspaceRelationType;
@@ -95,7 +95,9 @@ export class WorkspaceBlockRelation {
     const { permission } = this.relationTypeAttributes();
     const block: any = this.findBlock();
 
-    const editable = Auth.isAuthorizedToEditWorkspace(this.workspace) && permission === Permissions.Editable;
+    const editable =
+      Auth.isAuthorizedToEditWorkspace(this.workspace) &&
+      permission === Permissions.Editable;
 
     let { value } = block;
     const { id } = block;
@@ -104,7 +106,8 @@ export class WorkspaceBlockRelation {
       name: id,
       blockId: id,
       readOnly: !editable,
-      initialValue: permission === Permissions.Editable ? value : outputsToInputs(value),
+      initialValue:
+        permission === Permissions.Editable ? value : outputsToInputs(value),
       shouldAutosave: editable,
     };
   }
@@ -169,11 +172,11 @@ export class WorkspaceWithRelations {
           relations.push(
             new WorkspaceBlockRelation(
               RelationTypeAttribute.name,
-              childWorkspace
-            )
+              childWorkspace,
+            ),
           );
         });
-      }
+      },
     );
 
     return relations;

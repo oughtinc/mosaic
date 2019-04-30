@@ -13,13 +13,9 @@ export class CompactTreeViewContainer extends React.PureComponent<any, any> {
     return (
       <ContentContainer>
         <Helmet>
-          <title>
-            Compact Tree View - Mosaic
-          </title>
+          <title>Compact Tree View - Mosaic</title>
         </Helmet>
-        {
-        parseQueryString(window.location.search).expanded === "true"
-        ?
+        {parseQueryString(window.location.search).expanded === "true" ? (
           <Button
             onClick={() => {
               const { origin, pathname } = window.location;
@@ -28,7 +24,7 @@ export class CompactTreeViewContainer extends React.PureComponent<any, any> {
           >
             Collapse All
           </Button>
-        :
+        ) : (
           <Button
             onClick={() => {
               const { origin, pathname } = window.location;
@@ -37,25 +33,24 @@ export class CompactTreeViewContainer extends React.PureComponent<any, any> {
           >
             Expand All
           </Button>
-        }
-        <div>
-          {this.props.children}
-        </div>
+        )}
+        <div>{this.props.children}</div>
       </ContentContainer>
     );
   }
 }
 
-export class CompactTreeViewPresentational extends React.PureComponent<any, any> {
+export class CompactTreeViewPresentational extends React.PureComponent<
+  any,
+  any
+> {
   public render() {
     const hasDataBeenFetched = this.props.initialRootQuery.workspace;
 
     if (!hasDataBeenFetched) {
       return (
         <CompactTreeViewContainer>
-          <div style={{ marginTop: "20px"}}>
-            Loading...
-          </div>
+          <div style={{ marginTop: "20px" }}>Loading...</div>
         </CompactTreeViewContainer>
       );
     }
@@ -65,18 +60,16 @@ export class CompactTreeViewPresentational extends React.PureComponent<any, any>
 
     return (
       <CompactTreeViewContainer>
-        {
-          isRootLevel && !workspace.childWorkspaces[0]
-          ?
-          <div style={{ marginTop: "20px"}}>
-            Nothing to show yet...
-          </div>
-          :
+        {isRootLevel && !workspace.childWorkspaces[0] ? (
+          <div style={{ marginTop: "20px" }}>Nothing to show yet...</div>
+        ) : (
           <CompactTreeGroup
             availablePointers={workspace.connectedPointersOfSubtree}
-            workspaceId={isRootLevel ? workspace.childWorkspaces[0].id : workspace.id}
+            workspaceId={
+              isRootLevel ? workspace.childWorkspaces[0].id : workspace.id
+            }
           />
-        }
+        )}
       </CompactTreeViewContainer>
     );
   }
@@ -91,7 +84,7 @@ export const INITIAL_ROOT_QUERY = gql`
       isEligibleForMaliciousOracle
       isRequestingLazyUnlock
       connectedPointersOfSubtree
-    childWorkspaces {
+      childWorkspaces {
         id
         isEligibleForHonestOracle
       }
@@ -105,7 +98,7 @@ export const CompactTreeView: any = compose(
     options: (props: any) => ({
       variables: {
         workspaceId: props.match.params.workspaceId,
-      }
+      },
     }),
-  })
+  }),
 )(CompactTreeViewPresentational);

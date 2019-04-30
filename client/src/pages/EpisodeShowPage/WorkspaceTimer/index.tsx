@@ -4,21 +4,18 @@ import { Glyphicon } from "react-bootstrap";
 import { ReadableDuration } from "../../../components/ReadableDuration";
 import { Timer } from "../../../components/Timer";
 
-import {
-  timerHeaderFontColor,
-  timerHeaderFontSize,
-} from "../../../styles";
+import { timerHeaderFontColor, timerHeaderFontSize } from "../../../styles";
 
-export class WorkspaceTimer extends React.Component<any,  any> {
+export class WorkspaceTimer extends React.Component<any, any> {
   public render() {
-    const timerRunning = !!this.props.remainingDurationInMs && !(this.props.remainingDurationInMs <= 0);
+    const timerRunning =
+      !!this.props.remainingDurationInMs &&
+      !(this.props.remainingDurationInMs <= 0);
 
     return (
-      timerRunning
-      &&
-      (
+      timerRunning && (
         <Timer {...this.props}>
-          <div style={{...this.props.style}}>
+          <div style={{ ...this.props.style }}>
             <span
               style={{
                 alignItems: "center",
@@ -30,7 +27,10 @@ export class WorkspaceTimer extends React.Component<any,  any> {
                 justifyItems: "space-between",
               }}
             >
-              <Glyphicon glyph="time" style={{ fontSize: "24px", marginRight: "5px" }}/>
+              <Glyphicon
+                glyph="time"
+                style={{ fontSize: "24px", marginRight: "5px" }}
+              />
               <span>this session</span>
             </span>
 

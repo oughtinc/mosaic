@@ -1,6 +1,12 @@
 import * as React from "react";
 
-const ContentContainer = ({ children, cyAttributeName }: { children: any, cyAttributeName?: string }) => (
+const ContentContainer = ({
+  children,
+  cyAttributeName,
+}: {
+  children: any;
+  cyAttributeName?: string;
+}) => (
   <div
     className="container"
     style={{ marginTop: "10px", padding: "20px" }}
