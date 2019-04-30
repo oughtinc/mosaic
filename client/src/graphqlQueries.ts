@@ -1,8 +1,16 @@
 import gql from "graphql-tag";
 
 export const CREATE_ROOT_WORKSPACE = gql`
-  mutation createWorkspace($question: JSON, $totalBudget: Int, $experimentId: String) {
-    createWorkspace(question: $question, totalBudget: $totalBudget, experimentId: $experimentId) {
+  mutation createWorkspace(
+    $question: JSON
+    $totalBudget: Int
+    $experimentId: String
+  ) {
+    createWorkspace(
+      question: $question
+      totalBudget: $totalBudget
+      experimentId: $experimentId
+    ) {
       id
       parentId
       creatorId
@@ -28,8 +36,16 @@ export const UPDATE_BLOCKS = gql`
 `;
 
 export const UPDATE_ALLOCATED_BUDGET = gql`
-  mutation updateAllocatedBudget($workspaceId: String, $changeToBudget: Int, $isResultOfTimerCountdown: Boolean) {
-    updateAllocatedBudget(workspaceId: $workspaceId, changeToBudget: $changeToBudget, isResultOfTimerCountdown: $isResultOfTimerCountdown) {
+  mutation updateAllocatedBudget(
+    $workspaceId: String
+    $changeToBudget: Int
+    $isResultOfTimerCountdown: Boolean
+  ) {
+    updateAllocatedBudget(
+      workspaceId: $workspaceId
+      changeToBudget: $changeToBudget
+      isResultOfTimerCountdown: $isResultOfTimerCountdown
+    ) {
       id
     }
   }
@@ -156,24 +172,44 @@ export const UPDATE_WORKSPACE_IS_PUBLIC = gql`
 `;
 
 export const UPDATE_WORKSPACE_HAS_TIME_BUDGET = gql`
-  mutation updateWorkspaceHasTimeBudget($hasTimeBudget: Boolean, $workspaceId: String) {
-    updateWorkspaceHasTimeBudget(hasTimeBudget: $hasTimeBudget, workspaceId: $workspaceId) {
+  mutation updateWorkspaceHasTimeBudget(
+    $hasTimeBudget: Boolean
+    $workspaceId: String
+  ) {
+    updateWorkspaceHasTimeBudget(
+      hasTimeBudget: $hasTimeBudget
+      workspaceId: $workspaceId
+    ) {
       id
     }
   }
 `;
 
 export const UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS = gql`
-  mutation updateWorkspaceHasIOConstraints($hasIOConstraints: Boolean, $workspaceId: String) {
-    updateWorkspaceHasIOConstraints(hasIOConstraints: $hasIOConstraints, workspaceId: $workspaceId) {
+  mutation updateWorkspaceHasIOConstraints(
+    $hasIOConstraints: Boolean
+    $workspaceId: String
+  ) {
+    updateWorkspaceHasIOConstraints(
+      hasIOConstraints: $hasIOConstraints
+      workspaceId: $workspaceId
+    ) {
       id
     }
   }
 `;
 
 export const UPDATE_TIME_SPENT_ON_WORKSPACE = gql`
-  mutation updateTimeSpentOnWorkspace($doesAffectAllocatedBudget: Boolean, $secondsSpent: Int, $workspaceId: String) {
-    updateTimeSpentOnWorkspace(doesAffectAllocatedBudget: $doesAffectAllocatedBudget, secondsSpent: $secondsSpent, workspaceId: $workspaceId)
+  mutation updateTimeSpentOnWorkspace(
+    $doesAffectAllocatedBudget: Boolean
+    $secondsSpent: Int
+    $workspaceId: String
+  ) {
+    updateTimeSpentOnWorkspace(
+      doesAffectAllocatedBudget: $doesAffectAllocatedBudget
+      secondsSpent: $secondsSpent
+      workspaceId: $workspaceId
+    )
   }
 `;
 

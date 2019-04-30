@@ -5,10 +5,7 @@ import { ReadableDuration } from "../ReadableDuration";
 
 import { RootBlock } from "../../pages/RootWorkspacePage/RootBlock";
 
-import {
-  blockBorderAndBoxShadow,
-  blockBodyCSS,
-} from "../../styles";
+import { blockBorderAndBoxShadow, blockBodyCSS } from "../../styles";
 
 const BlockContainer = styled.div`
   ${blockBorderAndBoxShadow};
@@ -34,14 +31,14 @@ export class UserActivityWorkspaceReport extends React.Component<any, any> {
           alignItems: "center",
           display: "flex",
           marginBottom: "30px",
-          maxWidth: "500px"
+          maxWidth: "500px",
         }}
       >
         <div
           style={{
             paddingRight: "10px",
             textAlign: "right",
-            width: "120px"
+            width: "120px",
           }}
         >
           <ReadableDuration
@@ -52,7 +49,7 @@ export class UserActivityWorkspaceReport extends React.Component<any, any> {
         <div
           style={{
             flexGrow: 1,
-            position: "relative"
+            position: "relative",
           }}
         >
           <BlockContainer>
@@ -69,7 +66,7 @@ export class UserActivityWorkspaceReport extends React.Component<any, any> {
               bottom: "-20px",
               color: "#888",
               left: "10px",
-              position: "absolute"
+              position: "absolute",
             }}
           >
             <span style={{ color: "#666" }}>

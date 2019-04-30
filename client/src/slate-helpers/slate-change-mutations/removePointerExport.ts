@@ -7,7 +7,6 @@ export function removePointerExport({
   hoveredItem,
   isHoverRemoval,
 }: any) {
-
   const { value } = change;
   const { document, fragment } = value;
 
@@ -22,16 +21,23 @@ export function removePointerExport({
     return;
   }
 
-  const nodeToRemove = findNodeToRemovebyPointerId(idOfPointerToRemove, document);
+  const nodeToRemove = findNodeToRemovebyPointerId(
+    idOfPointerToRemove,
+    document,
+  );
 
   const isNested = isNestedInExport(nodeToRemove, document);
 
   if (isNested) {
     change
-      .unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: idOfPointerToRemove } })
+      .unwrapInlineByKey(nodeToRemove.key, {
+        data: { pointerId: idOfPointerToRemove },
+      })
       .removeNodeByKey(nodeToRemove.key);
   } else {
-    change.unwrapInlineByKey(nodeToRemove.key,  { data: { pointerId: idOfPointerToRemove } });
+    change.unwrapInlineByKey(nodeToRemove.key, {
+      data: { pointerId: idOfPointerToRemove },
+    });
   }
 }
 
@@ -50,11 +56,14 @@ function getIdOfPointerToRemove({
   return idOfPointerToRemove;
 }
 
-function findNodeToRemovebyPointerId(pointerIdOfNodeToRemove: string, document: any) {
+function findNodeToRemovebyPointerId(
+  pointerIdOfNodeToRemove: string,
+  document: any,
+) {
   const inlines = getInlinesAsArray(document);
 
   const matchingNodes = inlines.filter(
-    i => i.data.get("pointerId") === pointerIdOfNodeToRemove
+    i => i.data.get("pointerId") === pointerIdOfNodeToRemove,
   );
 
   if (!matchingNodes.length) {

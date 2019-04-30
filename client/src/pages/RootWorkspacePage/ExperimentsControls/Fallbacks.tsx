@@ -7,18 +7,18 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 
 const NavLink = props => (
-  <Link to={`/experiments/${props.experimentId}`}>
-    {props.children}
-  </Link>
+  <Link to={`/experiments/${props.experimentId}`}>{props.children}</Link>
 );
 
-export class FallbacksPresentational extends React.Component<any,  any> {
+export class FallbacksPresentational extends React.Component<any, any> {
   public state = {
     pending: false,
   };
 
   public componentDidUpdate(prevProps: any, prevState: any) {
-    const didStatusChange = prevProps.experiment.fallbacks.length !== this.props.experiment.fallbacks.length;
+    const didStatusChange =
+      prevProps.experiment.fallbacks.length !==
+      this.props.experiment.fallbacks.length;
 
     if (didStatusChange) {
       this.setState({ pending: false });
@@ -34,67 +34,60 @@ export class FallbacksPresentational extends React.Component<any,  any> {
           variables: {
             experimentId,
             fallbackId,
-          }
+          },
         });
       } else {
         await this.props.removeFallbackFromExperimentMutation({
           variables: {
             experimentId,
             fallbackId,
-          }
+          },
         });
-        }
+      }
     });
   };
 
   public render() {
-    const experiments =  this.props.experimentsQuery.experiments && _.sortBy(
-      this.props.experimentsQuery.experiments,
-      experiment => Date.parse(experiment.createdAt)
-    );
+    const experiments =
+      this.props.experimentsQuery.experiments &&
+      _.sortBy(this.props.experimentsQuery.experiments, experiment =>
+        Date.parse(experiment.createdAt),
+      );
 
-    const popoverWithProps = (
-      this.props.experimentsQuery.loading
-      ?
-        <div />
-      :
-        (
-          <Popover
-            id={`fallbacks-popover-${this.props.experiment.id}`}
-            title="Fallbacks"
-          >
-            <div
-              style={{
-                opacity: this.state.pending ? 0.5 : 1,
-              }}
-            >
-              {
-                experiments
-                  .filter(e => e.id !== this.props.experiment.id)
-                  .map(e => {
-                    return (
-                      <Checkbox
-                        key={e.id}
-                        checked={
-                          this.props.experiment.fallbacks.find(f => f.id === e.id)
-                          ?
-                          true
-                          :
-                          false
-                        }
-                        disabled={this.state.pending}
-                        onChange={event => this.handleOnChange(event, this.props.experiment.id, e.id)}
-                      >
-                        <NavLink experimentId={e.id}>
-                          {e.name}
-                        </NavLink>
-                      </Checkbox>
-                    );
-                })
-              }
-            </div>
-          </Popover>
-        )
+    const popoverWithProps = this.props.experimentsQuery.loading ? (
+      <div />
+    ) : (
+      <Popover
+        id={`fallbacks-popover-${this.props.experiment.id}`}
+        title="Fallbacks"
+      >
+        <div
+          style={{
+            opacity: this.state.pending ? 0.5 : 1,
+          }}
+        >
+          {experiments
+            .filter(e => e.id !== this.props.experiment.id)
+            .map(e => {
+              return (
+                <Checkbox
+                  key={e.id}
+                  checked={
+                    this.props.experiment.fallbacks.find(f => f.id === e.id)
+                      ? true
+                      : false
+                  }
+                  disabled={this.state.pending}
+                  onChange={event =>
+                    this.handleOnChange(event, this.props.experiment.id, e.id)
+                  }
+                >
+                  <NavLink experimentId={e.id}>{e.name}</NavLink>
+                </Checkbox>
+              );
+            })}
+        </div>
+      </Popover>
     );
 
     const fallbacks = this.props.experiment.fallbacks;
@@ -105,27 +98,28 @@ export class FallbacksPresentational extends React.Component<any,  any> {
           marginTop: "8px",
         }}
       >
-        <OverlayTrigger trigger="click" placement="right" overlay={popoverWithProps}>
-          <Button bsSize="xsmall" bsStyle="default">Edit Fallbacks</Button>
+        <OverlayTrigger
+          trigger="click"
+          placement="right"
+          overlay={popoverWithProps}
+        >
+          <Button bsSize="xsmall" bsStyle="default">
+            Edit Fallbacks
+          </Button>
         </OverlayTrigger>
-        <div style={{ marginTop: "5px"}}>
-        Current fallbacks: {
-          fallbacks.length === 0
-          ?
-          "none"
-          :
-          <ul>
-            {
-              fallbacks.map((f, i, arr) =>
+        <div style={{ marginTop: "5px" }}>
+          Current fallbacks:{" "}
+          {fallbacks.length === 0 ? (
+            "none"
+          ) : (
+            <ul>
+              {fallbacks.map((f, i, arr) => (
                 <li key={`${this.props.experiment.id}${f.id}`}>
-                  <NavLink experimentId={f.id}>
-                    {f.name}
-                  </NavLink>
+                  <NavLink experimentId={f.id}>{f.name}</NavLink>
                 </li>
-              )
-            }
-          </ul>
-        }
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     );
@@ -144,13 +138,22 @@ const EXPERIMENTS_QUERY = gql`
 
 const ADD_FALLBACK_TO_EXPERIMENT_MUTATION = gql`
   mutation addFallbackToExperiment($experimentId: String, $fallbackId: String) {
-    addFallbackToExperiment(experimentId: $experimentId, fallbackId: $fallbackId)
+    addFallbackToExperiment(
+      experimentId: $experimentId
+      fallbackId: $fallbackId
+    )
   }
 `;
 
 const REMOVE_FALLBACK_FROM_EXPERIMENT_MUTATION = gql`
-  mutation removeFallbackFromExperiment($experimentId: String, $fallbackId: String) {
-    removeFallbackFromExperiment(experimentId: $experimentId, fallbackId: $fallbackId)
+  mutation removeFallbackFromExperiment(
+    $experimentId: String
+    $fallbackId: String
+  ) {
+    removeFallbackFromExperiment(
+      experimentId: $experimentId
+      fallbackId: $fallbackId
+    )
   }
 `;
 
@@ -161,13 +164,13 @@ export const Fallbacks: any = compose(
   graphql(ADD_FALLBACK_TO_EXPERIMENT_MUTATION, {
     name: "addFallbackToExperimentMutation",
     options: {
-      refetchQueries: ["experiments"]
-    }
+      refetchQueries: ["experiments"],
+    },
   }),
   graphql(REMOVE_FALLBACK_FROM_EXPERIMENT_MUTATION, {
     name: "removeFallbackFromExperimentMutation",
     options: {
-      refetchQueries: ["experiments"]
-    }
-  })
+      refetchQueries: ["experiments"],
+    },
+  }),
 )(FallbacksPresentational);

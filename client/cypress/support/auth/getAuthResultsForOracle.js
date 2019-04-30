@@ -4,7 +4,7 @@ import { getLoginCredentialsForOracle } from "./getLoginCredentialsForOracle";
 
 const ORACLE = "ORACLE";
 
-export async function getAuthResultsForOracle(){
+export async function getAuthResultsForOracle() {
   if (authResultsCache.hasValidCache(ORACLE)) {
     return authResultsCache.getCache(ORACLE);
   } else {

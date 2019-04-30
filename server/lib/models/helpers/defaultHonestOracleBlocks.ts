@@ -15,8 +15,7 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text:
-`A (correct):  `,
+              text: `A (correct):  `,
               marks: [],
             },
           ],
@@ -112,9 +111,7 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
       nodes: [
         {
           object: "text",
-          leaves: [
-            { object: "leaf", text: `A `, marks: [] },
-          ],
+          leaves: [{ object: "leaf", text: `A `, marks: [] }],
         },
         {
           object: "inline",
@@ -150,7 +147,7 @@ function processNode(node: any) {
       data: {
         ...node.data,
         internalReferenceId: uuidv4(), // generate new id so you can open/close this independently of the one it copied
-      }
+      },
     };
   } else if (node.type === "pointerExport") {
     return {
@@ -160,7 +157,7 @@ function processNode(node: any) {
       data: {
         pointerId: node.data.pointerId,
         internalReferenceId: uuidv4(),
-      }
+      },
     };
   } else if (node.nodes) {
     return {

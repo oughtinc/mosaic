@@ -11,7 +11,7 @@ export function fetchAuthResultsFrom3rdParty(loginCredentials) {
 
       let userInfo;
       try {
-        userInfo = await getUserInfoWithAccessToken(authResult.accessToken)
+        userInfo = await getUserInfoWithAccessToken(authResult.accessToken);
       } catch (err) {
         reject(err);
       }

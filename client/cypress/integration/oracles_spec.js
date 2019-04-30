@@ -8,7 +8,7 @@ describe("Oracles", function() {
       cy.reload();
     });
 
-    it("see all & only oracle eligible workspaces during scheduling", function(){
+    it("see all & only oracle eligible workspaces during scheduling", function() {
       cy.loopNTimes(10, {
         before: () => {
           cy.visit("/next");
@@ -18,17 +18,21 @@ describe("Oracles", function() {
         counts: [
           {
             min: 1,
-            testFn: $node => $node.text() === "A: Root-level (3 descendants) - oracle eligible",
+            testFn: $node =>
+              $node.text() ===
+              "A: Root-level (3 descendants) - oracle eligible",
           },
           {
             min: 1,
-            testFn: $node => $node.text() === "A-2: A subquestion #2 (1 descendants) - oracle eligible",
+            testFn: $node =>
+              $node.text() ===
+              "A-2: A subquestion #2 (1 descendants) - oracle eligible",
           },
-        ]
+        ],
       });
     });
 
-    it("regression: nested pointers not locked", function(){
+    it("regression: nested pointers not locked", function() {
       cy.visit("/workspaces/d1189739-0f53-4c3d-acd7-15aa1543619c");
       cy.contains("🔒").then($n1 => {
         expect($n1.width()).to.equal(0);

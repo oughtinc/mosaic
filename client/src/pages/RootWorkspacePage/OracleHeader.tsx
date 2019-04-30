@@ -22,10 +22,7 @@ class OracleHeaderPresentational extends React.Component<any, any> {
   public render() {
     return (
       <ContentContainer cyAttributeName="oracle-mode-header">
-        <Alert
-          bsStyle="danger"
-          style={{ marginBottom: 0 }}
-        >
+        <Alert bsStyle="danger" style={{ marginBottom: 0 }}>
           You are currently logged on as an oracle.
           <br />
           <br />
@@ -38,11 +35,12 @@ class OracleHeaderPresentational extends React.Component<any, any> {
               this.props.updateOracleMode({
                 variables: {
                   oracleMode: !this.props.oracleModeQuery.oracleMode,
-                }
+                },
               });
             }}
           >
-            Toggle Oracle Mode {!this.props.oracleModeQuery.oracleMode ? "ON" : "OFF"}
+            Toggle Oracle Mode{" "}
+            {!this.props.oracleModeQuery.oracleMode ? "ON" : "OFF"}
           </Button>
         </Alert>
       </ContentContainer>
@@ -57,8 +55,8 @@ const OracleHeader: any = compose(
   graphql(UPDATE_ORACLE_MODE, {
     name: "updateOracleMode",
     options: {
-      refetchQueries: ["oracleModeQuery"]
-    }
+      refetchQueries: ["oracleModeQuery"],
+    },
   }),
 )(OracleHeaderPresentational);
 

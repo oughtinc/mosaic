@@ -3,7 +3,10 @@ import * as React from "react";
 import { MaliciousAnswer } from "./MaliciousAnswer";
 import { Subquestions } from "./Subquestions";
 
-export class MaliciousAnswerAndMaybeSubquestions extends React.PureComponent<any, any> {
+export class MaliciousAnswerAndMaybeSubquestions extends React.PureComponent<
+  any,
+  any
+> {
   public render() {
     const {
       availablePointers,
@@ -25,18 +28,14 @@ export class MaliciousAnswerAndMaybeSubquestions extends React.PureComponent<any
           isHonestOracleCurrentlyResolved={isHonestOracleCurrentlyResolved}
           malicious={malicious}
         />
-        {
-          !didMaliciousDeclineToChallenge
-          &&
-          normal
-          &&
-          normal.childWorkspaces.length > 0
-          &&
-          <Subquestions
-            availablePointers={availablePointers}
-            subquestions={normal.childWorkspaces}
-          />
-        }
+        {!didMaliciousDeclineToChallenge &&
+          normal &&
+          normal.childWorkspaces.length > 0 && (
+            <Subquestions
+              availablePointers={availablePointers}
+              subquestions={normal.childWorkspaces}
+            />
+          )}
       </div>
     );
   }

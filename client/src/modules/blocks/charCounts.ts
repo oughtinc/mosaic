@@ -17,24 +17,28 @@ export function inputCharCountSelector({
   }, 0);
 
   connectedPointers = connectedPointers.filter(p => {
-    const e = exportingPointers.find(e => e.data.pointerId === p.data.pointerId);
+    const e = exportingPointers.find(
+      e => e.data.pointerId === p.data.pointerId,
+    );
     if (e) {
       return false;
     }
     return true;
   });
 
-  const unlockedExports = connectedPointers.filter(p =>
-    (
-      exportLockStatusInfo.find(lock => lock.pointerId === p.data.pointerId)
-      &&
-      !exportLockStatusInfo.find(lock => lock.pointerId === p.data.pointerId).isLocked
-    )
+  const unlockedExports = connectedPointers.filter(
+    p =>
+      exportLockStatusInfo.find(lock => lock.pointerId === p.data.pointerId) &&
+      !exportLockStatusInfo.find(lock => lock.pointerId === p.data.pointerId)
+        .isLocked,
   );
 
-  const unlockedExportsCharCount: number = unlockedExports.reduce((acc: number, e) => {
-    return acc + getInputCharCount(e);
-  }, 0);
+  const unlockedExportsCharCount: number = unlockedExports.reduce(
+    (acc: number, e) => {
+      return acc + getInputCharCount(e);
+    },
+    0,
+  );
 
   return charCount + unlockedExportsCharCount;
 }
@@ -62,19 +66,15 @@ export function getInputCharCount(nodeOrNodes: any): number {
 
   for (const node of nodes) {
     if (node.object === "text") {
-      result += node
-        .leaves
-        .reduce((acc: string, val) => { return `${acc}${val.text}`; }, "")
+      result += node.leaves
+        .reduce((acc: string, val) => {
+          return `${acc}${val.text}`;
+        }, "")
         .split("")
-        .filter(char => char !== POINTER_EDGE_SPACE)
-        .length;
+        .filter(char => char !== POINTER_EDGE_SPACE).length;
     } else if (node.type === "pointerImport") {
       result += 1;
-    } else if (
-      node.type !== "pointerExport"
-      &&
-      node.nodes
-    ) {
+    } else if (node.type !== "pointerExport" && node.nodes) {
       result += getInputCharCount(node.nodes);
     }
   }
@@ -94,12 +94,12 @@ function getOutputCharCount(nodeOrNodes: any) {
 
   for (const node of nodes) {
     if (node.object === "text") {
-      result += node
-        .leaves
-        .reduce((acc: string, val) => { return `${acc}${val.text}`; }, "")
+      result += node.leaves
+        .reduce((acc: string, val) => {
+          return `${acc}${val.text}`;
+        }, "")
         .split("")
-        .filter(char => char !== POINTER_EDGE_SPACE)
-        .length;
+        .filter(char => char !== POINTER_EDGE_SPACE).length;
     } else if (node.type === "pointerImport") {
       result += 1;
     } else if (node.nodes) {

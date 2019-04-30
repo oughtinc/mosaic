@@ -82,7 +82,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       workspaceId: undefined,
       isCountingDown: false,
       countdownInterval: null,
-      notificationRegistrationState: this.props.isUserRegisteredForNotifications ? NOTIFICATION_REGISTERED : NOTIFICATION_NOT_REGISTERED,
+      notificationRegistrationState: this.props.isUserRegisteredForNotifications
+        ? NOTIFICATION_REGISTERED
+        : NOTIFICATION_NOT_REGISTERED,
     };
     this.registerForNotification = this.registerForNotification.bind(this);
   }
@@ -290,10 +292,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   }
 }
 
-export class NextEpisodeShowPageContainer extends React.Component<
-  any,
-  any
-> {
+export class NextEpisodeShowPageContainer extends React.Component<any, any> {
   public render() {
     if (!Auth.isAuthenticated()) {
       return (
@@ -302,12 +301,20 @@ export class NextEpisodeShowPageContainer extends React.Component<
         </ContentContainer>
       );
     }
-    if (this.props.isUserRegisteredForNotificationsQuery.isUserRegisteredForNotifications !== undefined) {
+    if (
+      this.props.isUserRegisteredForNotificationsQuery
+        .isUserRegisteredForNotifications !== undefined
+    ) {
       return (
         <NextEpisodeShowPagePresentational
           findNextWorkspaceMutation={this.props.findNextWorkspaceMutation}
-          isUserRegisteredForNotifications={this.props.isUserRegisteredForNotificationsQuery.isUserRegisteredForNotifications}
-          notifyOnNextWorkspaceMutation={this.props.notifyOnNextWorkspaceMutation}
+          isUserRegisteredForNotifications={
+            this.props.isUserRegisteredForNotificationsQuery
+              .isUserRegisteredForNotifications
+          }
+          notifyOnNextWorkspaceMutation={
+            this.props.notifyOnNextWorkspaceMutation
+          }
           oracleModeQuery={this.props.oracleModeQuery}
         />
       );
@@ -324,8 +331,14 @@ const ORACLE_MODE_QUERY = gql`
 `;
 
 const IS_USER_REGISTERED_FOR_NOTIFICATIONS = gql`
-  query isUserRegisteredForNotificationsQuery($experimentId: String, $userId: String) {
-    isUserRegisteredForNotifications(experimentId: $experimentId, userId: $userId)
+  query isUserRegisteredForNotificationsQuery(
+    $experimentId: String
+    $userId: String
+  ) {
+    isUserRegisteredForNotifications(
+      experimentId: $experimentId
+      userId: $userId
+    )
   }
 `;
 
@@ -356,7 +369,9 @@ export const NextEpisodeShowPage = compose(
     name: "isUserRegisteredForNotificationsQuery",
     options: (props: any) => ({
       variables: {
-        experimentId: parseQueryString(window.location.search).experiment || parseQueryString(props.history.location.search).experiment,
+        experimentId:
+          parseQueryString(window.location.search).experiment ||
+          parseQueryString(props.history.location.search).experiment,
         userId: Auth.userId(),
       },
     }),

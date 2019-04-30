@@ -29,7 +29,7 @@ export const remainingBudgetAmongDescendantsCacheFake = {
 
     return result;
   },
-}
+};
 
 export const workspaces = [
   { id: "1", totalBudget: 1000, allocatedBudget: 751, isStale: false },
@@ -49,7 +49,7 @@ export const workspaces = [
 
 workspaces.get = id => {
   return workspaces.find(w => w.id === id);
-}
+};
 
 function remainingBudget(workspace) {
   return workspace.totalBudget - workspace.allocatedBudget;

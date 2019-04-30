@@ -6,7 +6,7 @@ import { WorkspaceTimer } from "../WorkspaceTimer";
 
 import { UPDATE_TIME_SPENT_ON_WORKSPACE } from "../../../graphqlQueries";
 
-class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
+class TimerAndTimeBudgetInfoPresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
@@ -25,7 +25,8 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
     // the updates to allocatedBudget that occur after the creation of a child
     // easiest fix here is to just assume any change <0||>5 is a child creation
     // and listen to any graphQL update to allocaedBudget above this threshold
-    const initialAllocatedBudgetChange = prevProps.initialAllocatedBudget - this.props.initialAllocatedBudget;
+    const initialAllocatedBudgetChange =
+      prevProps.initialAllocatedBudget - this.props.initialAllocatedBudget;
 
     if (initialAllocatedBudgetChange < 0 || initialAllocatedBudgetChange > 5) {
       this.setState({
@@ -42,9 +43,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
           justifyContent: "flex-end",
         }}
       >
-        {
-          this.props.isActive
-          &&
+        {this.props.isActive && (
           <WorkspaceTimer
             totalDurationInMs={this.props.durationInMs}
             remainingDurationInMs={this.state.remainingDurationInMs}
@@ -54,7 +53,7 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
             tickDuration={this.props.tickDuration}
             workspaceId={this.props.workspaceId}
           />
-        }
+        )}
         <AvailableBudget
           allocatedBudget={this.state.displayedAllocatedBudget}
           style={{ marginRight: "30px" }}
@@ -70,24 +69,28 @@ class TimerAndTimeBudgetInfoPresentational extends React.Component<any,  any> {
         secondsSpent: this.props.tickDuration,
         doesAffectAllocatedBudget: true,
         workspaceId: this.props.workspaceId,
-      }
+      },
     });
 
-    this.setState({
-      displayedAllocatedBudget: Math.min(
-        this.props.totalBudget,
-        Number(this.state.displayedAllocatedBudget) + Number(this.props.tickDuration)
-      ),
-      remainingDurationInMs: Math.max(
-        0,
-        this.state.remainingDurationInMs - (this.props.tickDuration * 1000)
-      ),
-    }, () => {
-      if (this.state.remainingDurationInMs === 0) {
-        this.props.handleTimerEnd();
-      }
-    });
-  }
+    this.setState(
+      {
+        displayedAllocatedBudget: Math.min(
+          this.props.totalBudget,
+          Number(this.state.displayedAllocatedBudget) +
+            Number(this.props.tickDuration),
+        ),
+        remainingDurationInMs: Math.max(
+          0,
+          this.state.remainingDurationInMs - this.props.tickDuration * 1000,
+        ),
+      },
+      () => {
+        if (this.state.remainingDurationInMs === 0) {
+          this.props.handleTimerEnd();
+        }
+      },
+    );
+  };
 }
 
 export const TimerAndTimeBudgetInfo: any = graphql(
@@ -95,6 +98,7 @@ export const TimerAndTimeBudgetInfo: any = graphql(
   {
     name: "updateTimeSpentOnWorkspace",
     options: {
-      refetchQueries: ["workspace"]
-    }
-  })(TimerAndTimeBudgetInfoPresentational);
+      refetchQueries: ["workspace"],
+    },
+  },
+)(TimerAndTimeBudgetInfoPresentational);

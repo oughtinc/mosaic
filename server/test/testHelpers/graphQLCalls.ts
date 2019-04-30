@@ -5,14 +5,14 @@ import { CREATE_ROOT_WORKSPACE } from "./graphqlQueries";
 
 const runGraphQLQuery = (
   queryAST: any,
-  queryArgs: any
+  queryArgs: any,
 ): Promise<ExecutionResult> =>
   graphql(schema, print(queryAST), null, null, queryArgs);
 
 export const createRootWorkspace = (
   totalBudget: number,
   question: string,
-  creatorId: string
+  creatorId: string,
 ): Promise<ExecutionResult> => {
   const createRootWorkspaceArgs = { question, totalBudget, creatorId };
   return runGraphQLQuery(CREATE_ROOT_WORKSPACE, createRootWorkspaceArgs);

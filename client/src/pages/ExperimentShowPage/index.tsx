@@ -9,7 +9,7 @@ import { compose } from "recompose";
 import styled from "styled-components";
 
 import { NewRootWorkspaceForExperimentForm } from "./NewRootWorkspaceForExperimentForm";
-import { ContentContainer } from  "../../components/ContentContainer";
+import { ContentContainer } from "../../components/ContentContainer";
 import { Auth } from "../../auth";
 import { CREATE_ROOT_WORKSPACE } from "../../graphqlQueries";
 import { MetaDataEditor } from "../../components/MetadataEditor";
@@ -17,10 +17,7 @@ import { InstructionsEditor } from "../../components/InstructionsEditor";
 import { ExperimentControl } from "../RootWorkspacePage/ExperimentsControls/ExperimentControl";
 import { RootWorkspace } from "../RootWorkspacePage/RootWorkspace";
 
-import {
-  blockBorderAndBoxShadow,
-  blockBodyCSS,
-} from "../../styles";
+import { blockBorderAndBoxShadow, blockBodyCSS } from "../../styles";
 
 const BlockContainer = styled.div`
   ${blockBorderAndBoxShadow};
@@ -34,15 +31,25 @@ interface NextWorkspaceBtnProps {
   navHook?: () => void;
 }
 
-const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
+const NextWorkspaceBtn = ({
+  bsStyle,
+  experimentId,
+  label,
+  navHook,
+}: NextWorkspaceBtnProps) => {
   return (
     <Link onClick={navHook} to={`/next?experiment=${experimentId}`}>
-      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
+      <Button bsSize="small" bsStyle={bsStyle}>
+        {label} »
+      </Button>
     </Link>
   );
 };
 
-export class ExperimentShowPagePresentational extends React.Component<any, any> {
+export class ExperimentShowPagePresentational extends React.Component<
+  any,
+  any
+> {
   public render() {
     const hasExperimentLoaded = this.props.experimentQuery.experiment;
 
@@ -58,9 +65,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
     return (
       <ContentContainer>
         <Helmet>
-          <title>
-            {experiment.name} - Mosaic
-          </title>
+          <title>{experiment.name} - Mosaic</title>
         </Helmet>
         <h1
           style={{
@@ -71,9 +76,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
         >
           {experiment.name}
         </h1>
-        {
-          isUserAdmin
-          &&
+        {isUserAdmin && (
           <div
             style={{
               backgroundColor: "#fff",
@@ -102,34 +105,32 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
                   },
                 });
               }}
-              updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
-                variables: {
-                  experimentId,
-                  name,
-                },
-              })}
+              updateExperimentName={async ({ experimentId, name }) =>
+                await this.props.updateExperimentNameMutation({
+                  variables: {
+                    experimentId,
+                    name,
+                  },
+                })
+              }
             />
           </div>
-        }
+        )}
         <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
           <MetaDataEditor
             experimentId={experiment.id}
             valueAsJSON={experiment.metadata}
           />
         </BlockContainer>
-        {
-          isExperimentActive
-          &&
-          (
-            isUserLoggedIn
-            ?
+        {isExperimentActive &&
+          (isUserLoggedIn ? (
             <NextWorkspaceBtn
               bsStyle="primary"
               experimentId={experiment.id}
-              label={"Participate in experiment"} 
+              label={"Participate in experiment"}
             />
-            :
-            <span 
+          ) : (
+            <span
               style={{
                 fontSize: "16px",
                 fontWeight: 600,
@@ -137,17 +138,8 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             >
               Please login to participate in this experiment!
             </span>
-          )
-        }
-        {
-          (
-            !isExperimentActive
-            ||
-            isUserAdmin
-          )
-          &&
-          experiment.trees.length > 0
-          &&
+          ))}
+        {(!isExperimentActive || isUserAdmin) && experiment.trees.length > 0 && (
           <div>
             <h2
               style={{
@@ -157,29 +149,24 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
             >
               Workspaces
             </h2>
-            {
-              _.sortBy(
-                experiment.trees,
-                t => Date.parse(t.rootWorkspace.createdAt)
-              ).map(tree =>
-                <div
-                  key={`${tree.rootWorkspace.id}`}
-                  style={{
-                    marginBottom: "10px",
-                  }}
-                >
-                  <RootWorkspace
-                    sourceQueries={["experimentQuery"]}
-                    workspace={tree.rootWorkspace}
-                  />
-                </div>
-              )
-            }
+            {_.sortBy(experiment.trees, t =>
+              Date.parse(t.rootWorkspace.createdAt),
+            ).map(tree => (
+              <div
+                key={`${tree.rootWorkspace.id}`}
+                style={{
+                  marginBottom: "10px",
+                }}
+              >
+                <RootWorkspace
+                  sourceQueries={["experimentQuery"]}
+                  workspace={tree.rootWorkspace}
+                />
+              </div>
+            ))}
           </div>
-        }
-        {
-          isUserAdmin
-          &&
+        )}
+        {isUserAdmin && (
           <React.Fragment>
             <NewRootWorkspaceForExperimentForm
               experimentId={experiment.id}
@@ -197,9 +184,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
               Instructions
             </h2>
 
-            <h3 style={{ fontSize: "18px" }}>
-              For root workspaces:
-            </h3>
+            <h3 style={{ fontSize: "18px" }}>For root workspaces:</h3>
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
@@ -208,9 +193,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
               />
             </BlockContainer>
 
-            <h3 style={{ fontSize: "18px" }}>
-              For honest oracles:
-            </h3>
+            <h3 style={{ fontSize: "18px" }}>For honest oracles:</h3>
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
@@ -219,9 +202,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
               />
             </BlockContainer>
 
-            <h3 style={{ fontSize: "18px" }}>
-              For malicious oracles:
-            </h3>
+            <h3 style={{ fontSize: "18px" }}>For malicious oracles:</h3>
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
@@ -263,9 +244,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
               />
             </BlockContainer>
 
-            <h3 style={{ fontSize: "18px" }}>
-              For unlocking a lazy pointer:
-            </h3>
+            <h3 style={{ fontSize: "18px" }}>For unlocking a lazy pointer:</h3>
             <BlockContainer style={{ maxWidth: "800px", marginBottom: "10px" }}>
               <InstructionsEditor
                 experimentId={experiment.id}
@@ -274,7 +253,7 @@ export class ExperimentShowPagePresentational extends React.Component<any, any> 
               />
             </BlockContainer>
           </React.Fragment>
-        }
+        )}
       </ContentContainer>
     );
   }
@@ -303,7 +282,7 @@ const EXPERIMENT_QUERY = gql`
         name
       }
       trees {
-        rootWorkspace { 
+        rootWorkspace {
           id
           createdAt
           parentId
@@ -329,7 +308,7 @@ const EXPERIMENT_QUERY = gql`
         }
       }
     }
-  } 
+  }
 `;
 
 const UPDATE_EXPERIMENT_NAME_MUTATION = gql`
@@ -339,16 +318,28 @@ const UPDATE_EXPERIMENT_NAME_MUTATION = gql`
 `;
 
 const UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION = gql`
-  mutation updateExperimentDefaultOracle($defaultOracle: Boolean, $experimentId: String) {
-    updateExperimentDefaultOracle(defaultOracle: $defaultOracle, experimentId: $experimentId)
+  mutation updateExperimentDefaultOracle(
+    $defaultOracle: Boolean
+    $experimentId: String
+  ) {
+    updateExperimentDefaultOracle(
+      defaultOracle: $defaultOracle
+      experimentId: $experimentId
+    )
   }
 `;
 
 const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
-  mutation updateExperimentEligibilityRank($eligibilityRank: Int, $experimentId: String) {
-    updateExperimentEligibilityRank(eligibilityRank: $eligibilityRank, experimentId: $experimentId)
+  mutation updateExperimentEligibilityRank(
+    $eligibilityRank: Int
+    $experimentId: String
+  ) {
+    updateExperimentEligibilityRank(
+      eligibilityRank: $eligibilityRank
+      experimentId: $experimentId
+    )
   }
-`; 
+`;
 
 const options = props => ({
   variables: {
@@ -359,30 +350,30 @@ const options = props => ({
 export const ExperimentShowPage: any = compose(
   graphql(EXPERIMENT_QUERY, {
     name: "experimentQuery",
-    options
+    options,
   }),
   graphql(CREATE_ROOT_WORKSPACE, {
     name: "createWorkspaceMutation",
     options: {
-      refetchQueries: ["experimentQuery"]
-    }
+      refetchQueries: ["experimentQuery"],
+    },
   }),
   graphql(UPDATE_EXPERIMENT_NAME_MUTATION, {
     name: "updateExperimentNameMutation",
     options: {
       refetchQueries: ["experimentQuery"],
-    }
+    },
   }),
   graphql(UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION, {
     name: "updateExperimentEligibilityRankMutation",
     options: {
       refetchQueries: ["experimentQuery"],
-    }
+    },
   }),
   graphql(UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION, {
     name: "updateExperimentDefaultOracleMutation",
     options: {
       refetchQueries: ["experimentQuery"],
-    }
+    },
   }),
 )(ExperimentShowPagePresentational);

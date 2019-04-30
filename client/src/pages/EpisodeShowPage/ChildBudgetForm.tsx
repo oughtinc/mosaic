@@ -41,7 +41,6 @@ export class ChildBudgetForm extends React.Component<
   ChildBudgetFormProps,
   any
 > {
-
   public render() {
     const MIN_BUDGET_FOR_PARENT = 90;
     const MIN_BUDGET_FOR_CHILD = 90;
@@ -55,8 +54,7 @@ export class ChildBudgetForm extends React.Component<
       parentTotalBudget,
     } = this.props;
 
-    const canParentAfford90s =
-      availableBudget - 90 >= MIN_BUDGET_FOR_PARENT;
+    const canParentAfford90s = availableBudget - 90 >= MIN_BUDGET_FOR_PARENT;
 
     const canParentAffordChildTotal =
       availableBudget - childTotalBudget >= MIN_BUDGET_FOR_PARENT;
@@ -76,11 +74,11 @@ export class ChildBudgetForm extends React.Component<
       parentTotalBudget,
       percent,
     }: {
-      availableBudget: number,
-      childAllocatedBudget: number,
-      childRemainingBudget: number,
-      parentTotalBudget: number,
-      percent: number,
+      availableBudget: number;
+      childAllocatedBudget: number;
+      childRemainingBudget: number;
+      parentTotalBudget: number;
+      percent: number;
     }) => {
       const percentOfTotal = Math.round(parentTotalBudget * percent);
 
@@ -150,7 +148,7 @@ export class ChildBudgetForm extends React.Component<
             width: "20px",
           }}
         >
-        |
+          |
         </span>
         <BudgetControlBtn
           disabled={false}
@@ -222,14 +220,14 @@ export class ChildBudgetForm extends React.Component<
         />
         <BudgetControlBtn
           disabled={
-            maxParentCanAfford <= 0
-            ||
+            maxParentCanAfford <= 0 ||
             maxParentCanAfford - childAllocatedBudget < MIN_BUDGET_FOR_CHILD
           }
           onClick={() => {
             this.props.onUpdateChildTotalBudget({
               childId,
-              totalBudget: childTotalBudget + availableBudget - MIN_BUDGET_FOR_PARENT,
+              totalBudget:
+                childTotalBudget + availableBudget - MIN_BUDGET_FOR_PARENT,
             });
           }}
           label="max"
@@ -242,7 +240,7 @@ export class ChildBudgetForm extends React.Component<
             width: "20px",
           }}
         >
-        |
+          |
         </span>
         <Button
           bsSize="xsmall"

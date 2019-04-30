@@ -14,7 +14,7 @@ describe("graphQL schema", () => {
       const rootWorkspace = await createRootWorkspace(
         totalBudget,
         question,
-        creatorId
+        creatorId,
       );
       const workspaceInfo =
         rootWorkspace.data && rootWorkspace.data.createWorkspace;

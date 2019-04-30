@@ -12,7 +12,7 @@ export class Auth {
     redirectUri: Auth.redirectUri(),
     audience: "https://mosaicapp.auth0.com/userinfo",
     responseType: "token",
-    scope: "openid email profile user_metadata app_metadata"
+    scope: "openid email profile user_metadata app_metadata",
   });
 
   public static login(): void {
@@ -54,7 +54,7 @@ export class Auth {
     Auth.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken) {
         const expiresAt = JSON.stringify(
-          authResult.expiresIn * 1000 + Date.now()
+          authResult.expiresIn * 1000 + Date.now(),
         );
         localStorage.setItem("access_token", authResult.accessToken);
 

@@ -4,7 +4,7 @@ import { getLoginCredentialsForTypicalUser } from "./getLoginCredentialsForTypic
 
 const TYPICAL_USER = "TYPICAL_USER";
 
-export async function getAuthResultsForTypicalUser(){
+export async function getAuthResultsForTypicalUser() {
   if (authResultsCache.hasValidCache(TYPICAL_USER)) {
     return authResultsCache.getCache(TYPICAL_USER);
   } else {

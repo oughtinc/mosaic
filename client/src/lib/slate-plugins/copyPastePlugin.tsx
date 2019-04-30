@@ -11,7 +11,11 @@ import {
   CONVERT_PASTED_EXPORT_TO_NEW_EXPORT,
 } from "../../constants";
 
-export function CopyPastePlugin({ pastedExportFormat }: { pastedExportFormat: string}) {
+export function CopyPastePlugin({
+  pastedExportFormat,
+}: {
+  pastedExportFormat: string;
+}) {
   return {
     onPaste: (event, change) => {
       const transfer = getEventTransfer(event);
@@ -25,20 +29,26 @@ export function CopyPastePlugin({ pastedExportFormat }: { pastedExportFormat: st
       }
 
       const documentAsJSON = fragment.toJSON();
-      const processedDocumentAsJSON = processDocumentJSON(documentAsJSON, pastedExportFormat);
+      const processedDocumentAsJSON = processDocumentJSON(
+        documentAsJSON,
+        pastedExportFormat,
+      );
 
       change.insertFragment(Document.fromJSON(processedDocumentAsJSON));
 
       // the "removal" here is the removal of exports in favor of their associated
       // imports, which occurs if the user has selected the appropriate settings
       normalizeAfterRemoval(change);
-      
+
       return false;
     },
   };
 }
 
-function processDocumentJSON(document: any, pastedExportFormat: string = CONVERT_PASTED_EXPORT_TO_IMPORT) {
+function processDocumentJSON(
+  document: any,
+  pastedExportFormat: string = CONVERT_PASTED_EXPORT_TO_IMPORT,
+) {
   return {
     ...document,
     nodes: document.nodes.map(node => processNode(node, pastedExportFormat)),
@@ -52,7 +62,7 @@ export function processNode(node: any, pastedExportFormat: string) {
       data: {
         ...node.data,
         internalReferenceId: uuidv1(), // generate new id so you can open/close this independently of the one it copied
-      }
+      },
     };
   } else if (node.type === "pointerExport") {
     if (pastedExportFormat === CONVERT_PASTED_EXPORT_TO_IMPORT) {
@@ -63,7 +73,7 @@ export function processNode(node: any, pastedExportFormat: string) {
         data: {
           pointerId: node.data.pointerId,
           internalReferenceId: uuidv1(),
-        }
+        },
       };
     } else if (pastedExportFormat === CONVERT_PASTED_EXPORT_TO_NEW_EXPORT) {
       return {
@@ -86,13 +96,9 @@ export function processNode(node: any, pastedExportFormat: string) {
 }
 
 function processText(text: string) {
-  text = text
-    .split(POINTER_EDGE_SPACE)
-    .join("");
+  text = text.split(POINTER_EDGE_SPACE).join("");
 
-  text = text
-    .split("🔒")
-    .join("");
+  text = text.split("🔒").join("");
 
   return text;
 }

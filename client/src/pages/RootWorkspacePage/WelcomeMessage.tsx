@@ -2,10 +2,7 @@ import * as React from "react";
 import { Alert } from "react-bootstrap";
 import styled from "styled-components";
 
-import {
-  welcomeMessageBgColor,
-  welcomeMessageBorderColor,
-} from "../../styles";
+import { welcomeMessageBgColor, welcomeMessageBorderColor } from "../../styles";
 
 import "./WelcomeMessage.css";
 
@@ -27,7 +24,8 @@ const WelcomeMessage = () => (
       <a href="https://github.com/oughtinc/mosaic">the code</a> and{" "}
       <a href="https://ought.org/projects/factored-cognition">
         learn more about the project
-      </a>.
+      </a>
+      .
     </p>
   </WelcomeMessageContainer>
 );

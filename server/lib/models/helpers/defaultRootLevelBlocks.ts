@@ -36,7 +36,8 @@ export const createDefaultRootLevelBlockValues = () => {
               marks: [],
             },
           ],
-        },],
+        },
+      ],
     },
   ];
 
@@ -49,9 +50,7 @@ export const createDefaultRootLevelBlockValues = () => {
       nodes: [
         {
           object: "text",
-          leaves: [
-            { object: "leaf", text: "Ok", marks: [] },
-          ],
+          leaves: [{ object: "leaf", text: "Ok", marks: [] }],
         },
       ],
     },

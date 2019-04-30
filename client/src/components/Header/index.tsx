@@ -10,7 +10,7 @@ import {
   brandFontWeight,
   headerBgColor,
   headerLinkFontColor,
-  headerLinkFontSize
+  headerLinkFontSize,
 } from "../../styles";
 import Timer = NodeJS.Timer;
 
@@ -78,7 +78,10 @@ const LoginLink = () => (
   </ActionLink>
 );
 
-class UserControls extends React.Component<{}, { isAuthenticated: boolean, logoutTimer: Timer|null }> {
+class UserControls extends React.Component<
+  {},
+  { isAuthenticated: boolean; logoutTimer: Timer | null }
+> {
   public constructor(props: {}) {
     super(props);
     this.state = {
@@ -99,9 +102,7 @@ class UserControls extends React.Component<{}, { isAuthenticated: boolean, logou
 
   public render() {
     return (
-      <div>
-        {this.state.isAuthenticated ? <LogoutLink /> : <LoginLink />}
-      </div>
+      <div>{this.state.isAuthenticated ? <LogoutLink /> : <LoginLink />}</div>
     );
   }
 
@@ -110,7 +111,10 @@ class UserControls extends React.Component<{}, { isAuthenticated: boolean, logou
       if (this.state.logoutTimer) {
         clearTimeout(this.state.logoutTimer);
       }
-      const logoutTimer = setTimeout(() => this.updateAuthenticationState(), Auth.timeToLogOut());
+      const logoutTimer = setTimeout(
+        () => this.updateAuthenticationState(),
+        Auth.timeToLogOut(),
+      );
       this.setState({
         isAuthenticated: true,
         logoutTimer,
@@ -132,7 +136,7 @@ const Header = () => (
           alignContent: "center",
           display: "flex",
           justifyContent: "space-between",
-          padding: "0 20px"
+          padding: "0 20px",
         }}
       >
         <Brand to="/">Mosaic v0.4</Brand>

@@ -5,17 +5,27 @@ import { userFromContext } from "./userFromContext";
 // object (if there is one) to the GraphQL context, allowing the schema's
 // resolvers easy access
 
-export const requireUser = (errMsg, resolver) => async (obj, args, ctx, info) => {
+export const requireUser = (errMsg, resolver) => async (
+  obj,
+  args,
+  ctx,
+  info,
+) => {
   const user = await userFromContext(ctx);
 
   if (!user) {
     throw new Error(`No user found: ${errMsg}`);
   } else {
-    return await resolver(obj, args, { ...ctx, user}, info);
+    return await resolver(obj, args, { ...ctx, user }, info);
   }
 };
 
-export const requireAdmin = (errMsg, resolver) => async (obj, args, ctx, info) => {
+export const requireAdmin = (errMsg, resolver) => async (
+  obj,
+  args,
+  ctx,
+  info,
+) => {
   const user = await userFromContext(ctx);
 
   if (!user) {
@@ -23,6 +33,6 @@ export const requireAdmin = (errMsg, resolver) => async (obj, args, ctx, info) =
   } else if (!isUserAdmin(user)) {
     throw new Error(`User not admin: ${errMsg}`);
   } else {
-    return await resolver(obj, args, { ...ctx, user}, info);
+    return await resolver(obj, args, { ...ctx, user }, info);
   }
 };

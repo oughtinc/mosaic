@@ -4,21 +4,15 @@ import * as slateChangeMutations from "../../slate-helpers/slate-change-mutation
 import { isSelectionAcrossPointers } from "../slate-utils/isSelectionAcrossPointers";
 
 const onlyOneNodeThatIsPointerExport = nodes => {
-  return (
-    nodes.length === 1
-    &&
-    nodes[0].type === "pointerExport"
-  );
+  return nodes.length === 1 && nodes[0].type === "pointerExport";
 };
 
 const twoNodesFirstExportSecondEmptyString = nodes => {
   return (
-    nodes.length === 2
-    &&
-    nodes[0].type === "pointerExport"
-    &&
-    nodes[1].object === "text"
-    && nodes[1].leaves[0].text === ""
+    nodes.length === 2 &&
+    nodes[0].type === "pointerExport" &&
+    nodes[1].object === "text" &&
+    nodes[1].leaves[0].text === ""
   );
 };
 
@@ -27,8 +21,7 @@ export function insertPointerExport(change: Change) {
   const initialTopLevelNodes = initialFragment.nodes.toJSON()[0].nodes;
 
   const isNestedInPointerExport =
-    onlyOneNodeThatIsPointerExport(initialTopLevelNodes)
-    ||
+    onlyOneNodeThatIsPointerExport(initialTopLevelNodes) ||
     twoNodesFirstExportSecondEmptyString(initialTopLevelNodes);
 
   // if we are exporting a nested pointer, guarantee that the selection is
@@ -52,7 +45,8 @@ export function insertPointerExport(change: Change) {
   // through such a nested document to unnest all the nodes that are
   // selected.
   const maybeChangedFragment = change.value.fragment;
-  const maybeChangedTopLevelNodes = maybeChangedFragment.nodes.toJSON()[0].nodes;
+  const maybeChangedTopLevelNodes = maybeChangedFragment.nodes.toJSON()[0]
+    .nodes;
 
   let nodes = maybeChangedTopLevelNodes;
   while (onlyOneNodeThatIsPointerExport(nodes)) {

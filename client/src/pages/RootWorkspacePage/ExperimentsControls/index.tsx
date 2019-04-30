@@ -7,7 +7,7 @@ import styled from "styled-components";
 
 import {
   homepageWorkspaceBgColor,
-  blockBorderAndBoxShadow
+  blockBorderAndBoxShadow,
 } from "../../../styles";
 
 import { ExperimentControl } from "./ExperimentControl";
@@ -21,40 +21,37 @@ const ExperimentContainer = styled.div`
 
 export class ListOfExperimentsPresentational extends React.Component<any, any> {
   public render() {
-    const experiments = 
-      this.props.experimentsQuery.experiments
-      &&
+    const experiments =
+      this.props.experimentsQuery.experiments &&
       _.sortBy(
         this.props.experimentsQuery.experiments,
-        experiment => -Date.parse(experiment.createdAt)
+        experiment => -Date.parse(experiment.createdAt),
       );
 
     return (
       <div style={{ marginTop: "10px" }}>
-        {
-          this.props.experimentsQuery.loading
-          ? 
-          "Loading..."
-          : 
-          experiments.map(e => {
-            return (
-              <ExperimentContainer key={e.id}>
-                <ExperimentControl
-                  experiment={e}
-                  fallbacks={e.fallbacks}
-                  onEligibilityRankChange={this.onEligibilityRankChange}
-                  onDefaultOracleChange={this.onDefaultOracleChange}
-                  updateExperimentName={async ({ experimentId, name }) => await this.props.updateExperimentNameMutation({
-                    variables: {
-                      experimentId,
-                      name,
-                    },
-                  })}
-                />
-              </ExperimentContainer>
-            );
-          })
-        }
+        {this.props.experimentsQuery.loading
+          ? "Loading..."
+          : experiments.map(e => {
+              return (
+                <ExperimentContainer key={e.id}>
+                  <ExperimentControl
+                    experiment={e}
+                    fallbacks={e.fallbacks}
+                    onEligibilityRankChange={this.onEligibilityRankChange}
+                    onDefaultOracleChange={this.onDefaultOracleChange}
+                    updateExperimentName={async ({ experimentId, name }) =>
+                      await this.props.updateExperimentNameMutation({
+                        variables: {
+                          experimentId,
+                          name,
+                        },
+                      })
+                    }
+                  />
+                </ExperimentContainer>
+              );
+            })}
       </div>
     );
   }
@@ -66,7 +63,7 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
         eligibilityRank: value,
       },
     });
-  }
+  };
 
   private onDefaultOracleChange = (experimentId, value) => {
     this.props.updateExperimentDefaultOracleMutation({
@@ -75,7 +72,7 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
         defaultOracle: value,
       },
     });
-  }
+  };
 }
 
 const EXPERIMENTS_QUERY = gql`
@@ -93,19 +90,31 @@ const EXPERIMENTS_QUERY = gql`
       }
     }
   }
-`; 
+`;
 
 const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
-  mutation updateExperimentEligibilityRank($eligibilityRank: Int, $experimentId: String) {
-    updateExperimentEligibilityRank(eligibilityRank: $eligibilityRank, experimentId: $experimentId)
+  mutation updateExperimentEligibilityRank(
+    $eligibilityRank: Int
+    $experimentId: String
+  ) {
+    updateExperimentEligibilityRank(
+      eligibilityRank: $eligibilityRank
+      experimentId: $experimentId
+    )
   }
 `;
 
 const UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION = gql`
-  mutation updateExperimentDefaultOracle($defaultOracle: Boolean, $experimentId: String) {
-    updateExperimentDefaultOracle(defaultOracle: $defaultOracle, experimentId: $experimentId)
+  mutation updateExperimentDefaultOracle(
+    $defaultOracle: Boolean
+    $experimentId: String
+  ) {
+    updateExperimentDefaultOracle(
+      defaultOracle: $defaultOracle
+      experimentId: $experimentId
+    )
   }
-`; 
+`;
 
 const UPDATE_EXPERIMENT_NAME_MUTATION = gql`
   mutation updateExperimentName($experimentId: String, $name: String) {
@@ -115,24 +124,24 @@ const UPDATE_EXPERIMENT_NAME_MUTATION = gql`
 
 export const ListOfExperiments: any = compose(
   graphql(EXPERIMENTS_QUERY, {
-    name: "experimentsQuery"
+    name: "experimentsQuery",
   }),
   graphql(UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION, {
     name: "updateExperimentEligibilityRankMutation",
     options: {
       refetchQueries: ["experiments"],
-    }
+    },
   }),
   graphql(UPDATE_EXPERIMENT_DEFAULT_ORACLE_MUTATION, {
     name: "updateExperimentDefaultOracleMutation",
     options: {
       refetchQueries: ["experiments"],
-    }
+    },
   }),
   graphql(UPDATE_EXPERIMENT_NAME_MUTATION, {
     name: "updateExperimentNameMutation",
     options: {
       refetchQueries: ["experiments"],
-    }
-  })
+    },
+  }),
 )(ListOfExperimentsPresentational);

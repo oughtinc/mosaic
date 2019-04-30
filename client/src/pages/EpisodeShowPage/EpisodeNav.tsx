@@ -10,18 +10,40 @@ interface NextWorkspaceBtnProps {
   navHook?: () => void;
 }
 
-const NextWorkspaceBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
+const NextWorkspaceBtn = ({
+  bsStyle,
+  experimentId,
+  label,
+  navHook,
+}: NextWorkspaceBtnProps) => {
   return (
-    <Link onClick={navHook} to={`/next?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
-      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
+    <Link
+      onClick={navHook}
+      to={`/next?experiment=${experimentId}`}
+      style={{ margin: "0 5px" }}
+    >
+      <Button bsSize="small" bsStyle={bsStyle}>
+        {label} »
+      </Button>
     </Link>
   );
 };
 
-const TakeBreakBtn = ({ bsStyle, experimentId, label, navHook }: NextWorkspaceBtnProps) => {
+const TakeBreakBtn = ({
+  bsStyle,
+  experimentId,
+  label,
+  navHook,
+}: NextWorkspaceBtnProps) => {
   return (
-    <Link onClick={navHook} to={`/break?experiment=${experimentId}`} style={{ margin: "0 5px" }}>
-      <Button bsSize="small" bsStyle={bsStyle}>{label} »</Button>
+    <Link
+      onClick={navHook}
+      to={`/break?experiment=${experimentId}`}
+      style={{ margin: "0 5px" }}
+    >
+      <Button bsSize="small" bsStyle={bsStyle}>
+        {label} »
+      </Button>
     </Link>
   );
 };
@@ -67,60 +89,60 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
 
     if (isUserOracle && isInOracleMode) {
       return (
-        <EpisodeNavContainer style={{ backgroundColor: isUserMaliciousOracle ? "#ffcccc" : "#ccffcc" }}>
-          {
-            isTakingABreak
-            ?
-              <NextWorkspaceBtn
-                bsStyle="default"
-                experimentId={experimentId}
-                label={"Start on next workspace (Oracle Mode)"}
-              />
-            :
-              <div
-                style={{
-                  color: isUserMaliciousOracle ? "#a66" : "#6a6",
-                  fontSize: "24px",
-                  fontVariant: "small-caps"
-                }}
-              >
-                {isUserMaliciousOracle ? "malicious" : "honest"} oracle mode
-              </div>
-          }
+        <EpisodeNavContainer
+          style={{
+            backgroundColor: isUserMaliciousOracle ? "#ffcccc" : "#ccffcc",
+          }}
+        >
+          {isTakingABreak ? (
+            <NextWorkspaceBtn
+              bsStyle="default"
+              experimentId={experimentId}
+              label={"Start on next workspace (Oracle Mode)"}
+            />
+          ) : (
+            <div
+              style={{
+                color: isUserMaliciousOracle ? "#a66" : "#6a6",
+                fontSize: "24px",
+                fontVariant: "small-caps",
+              }}
+            >
+              {isUserMaliciousOracle ? "malicious" : "honest"} oracle mode
+            </div>
+          )}
         </EpisodeNavContainer>
       );
     }
 
     return (
       <EpisodeNavContainer>
-        {
-          isActive
-          ?
-          (
-            hasTimeBudget && hasTimerEnded
-            ?
-              <NextWorkspaceBtn
+        {isActive ? (
+          hasTimeBudget && hasTimerEnded ? (
+            <NextWorkspaceBtn
+              bsStyle="primary"
+              experimentId={experimentId}
+              label="Get next workspace"
+            />
+          ) : (
+            <div>
+              <TakeBreakBtn
                 bsStyle="primary"
                 experimentId={experimentId}
-                label="Get next workspace"
+                label="Needs more work"
+                navHook={() =>
+                  markAsNotStaleRelativeToUser && markAsNotStaleRelativeToUser()
+                }
               />
-            :
-              <div>
-                <TakeBreakBtn
-                  bsStyle="primary"
-                  experimentId={experimentId}
-                  label="Needs more work"
-                  navHook={() => markAsNotStaleRelativeToUser && markAsNotStaleRelativeToUser()}
-                />
-              </div>
+            </div>
           )
-          :
+        ) : (
           <NextWorkspaceBtn
             bsStyle="primary"
             experimentId={experimentId}
             label={isTakingABreak ? "Start on next workspace" : "Get started"}
           />
-        }
+        )}
       </EpisodeNavContainer>
     );
   }

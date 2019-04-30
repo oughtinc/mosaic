@@ -35,7 +35,8 @@ function SlatePointers(options: any = {}) {
 
     // handles moving cursor across spacer characters
     onKeyDown(event: any, change: any, editor: any) {
-      const isMovingLeft = event.key === "ArrowLeft" || event.key === "Backspace";
+      const isMovingLeft =
+        event.key === "ArrowLeft" || event.key === "Backspace";
       const isMovingRight = event.key === "ArrowRight";
 
       // simulate the inteded move to the left or right
@@ -44,11 +45,13 @@ function SlatePointers(options: any = {}) {
       let valueAfterSimulatedChange = change.value;
 
       if (isMovingLeft) {
-        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(-1).value;
+        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(-1)
+          .value;
       }
 
       if (isMovingRight) {
-        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(1).value;
+        valueAfterSimulatedChange = valueAfterSimulatedChange.change().move(1)
+          .value;
       }
 
       if (isCursorInPotentiallyProblematicPosition(valueAfterSimulatedChange)) {
@@ -71,7 +74,7 @@ function SlatePointers(options: any = {}) {
         const nodeAsJson = node.toJSON();
         const pointer =
           options.availablePointers.find(
-            p => p.data.pointerId === nodeAsJson.data.pointerId
+            p => p.data.pointerId === nodeAsJson.data.pointerId,
           ) || {};
         return (
           <PointerExportMark
@@ -85,7 +88,7 @@ function SlatePointers(options: any = {}) {
                 top,
                 bottom,
                 readOnly: pointer.readOnly,
-                id: nodeAsJson.data.pointerId
+                id: nodeAsJson.data.pointerId,
               });
             }}
             children={children}
@@ -105,7 +108,6 @@ function SlatePointers(options: any = {}) {
         );
       }
       if (node.type === "pointerImport") {
-
         return (
           <PointerImportNode
             isActive={options.isActive}
@@ -113,7 +115,9 @@ function SlatePointers(options: any = {}) {
             exportLockStatusInfo={options.exportLockStatusInfo}
             isInOracleMode={options.isInOracleMode}
             isUserOracle={options.isUserOracle}
-            isInOracleModeAndIsUserOracle={options.isInOracleModeAndIsUserOracle}
+            isInOracleModeAndIsUserOracle={
+              options.isInOracleModeAndIsUserOracle
+            }
             unlockPointer={options.unlockPointer}
             nodeAsJson={node.toJSON()}
             blockEditor={options.blockEditor}
@@ -124,7 +128,7 @@ function SlatePointers(options: any = {}) {
                 right,
                 top,
                 bottom,
-                id
+                id,
               });
             }}
             isHoverable={true}
@@ -133,7 +137,7 @@ function SlatePointers(options: any = {}) {
       } else {
         return;
       }
-    }
+    },
   };
 }
 

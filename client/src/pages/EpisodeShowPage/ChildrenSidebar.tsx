@@ -50,10 +50,22 @@ const BlockHeader = styled.div`
   ${blockHeaderCSS};
 `;
 
-const TakeBreakBtn = ({ bsStyle, experimentId, label, navHook, style }: any) => {
+const TakeBreakBtn = ({
+  bsStyle,
+  experimentId,
+  label,
+  navHook,
+  style,
+}: any) => {
   return (
-    <Link onClick={navHook} to={`/break?experiment=${experimentId}`} style={{ ...style, display: "inline-block" }}>
-      <Button bsSize="small" bsStyle={bsStyle || "primary"}>{label} »</Button>
+    <Link
+      onClick={navHook}
+      to={`/break?experiment=${experimentId}`}
+      style={{ ...style, display: "inline-block" }}
+    >
+      <Button bsSize="small" bsStyle={bsStyle || "primary"}>
+        {label} »
+      </Button>
     </Link>
   );
 };
@@ -68,15 +80,15 @@ export class Child extends React.Component<any, any> {
     const { workspace, availablePointers } = this.props;
     const questionRelationship = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.SubworkspaceQuestion,
-      workspace
+      workspace,
     );
     const answerRelationship = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.SubworkspaceAnswer,
-      workspace
+      workspace,
     );
     const answerDraftRelationship = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.SubworkspaceAnswerDraft,
-      workspace
+      workspace,
     );
 
     const hasTimeBudget = this.props.hasTimeBudget;
@@ -116,11 +128,15 @@ export class Child extends React.Component<any, any> {
               </Button>
             )}
             <div style={{ float: "right", opacity: 0.5 }}>
-              {hasTimeBudget && <ChildBudgetBadge
-                shouldShowSeconds={false}
-                remainingBudget={workspace.totalBudget - workspace.allocatedBudget}
-                totalBudget={workspace.totalBudget}
-              />}
+              {hasTimeBudget && (
+                <ChildBudgetBadge
+                  shouldShowSeconds={false}
+                  remainingBudget={
+                    workspace.totalBudget - workspace.allocatedBudget
+                  }
+                  totalBudget={workspace.totalBudget}
+                />
+              )}
             </div>
           </div>
           <div style={{ clear: "both" }} />
@@ -129,9 +145,7 @@ export class Child extends React.Component<any, any> {
     }
 
     return (
-      <div
-        style={{ padding: "10px" }}
-      >
+      <div style={{ padding: "10px" }}>
         {questionRelationship.findBlock().value && (
           <BulletAndEditorContainer>
             <BlockBullet>Q</BlockBullet>
@@ -152,39 +166,35 @@ export class Child extends React.Component<any, any> {
           </BulletAndEditorContainer>
         )}
         <div style={{ color: subQuestionAnswerFontColor, marginTop: "8px" }}>
-          {
-            (
-              (this.props.workspace.isCurrentlyResolved && answerDraftRelationship.findBlock())
-              ? answerDraftRelationship.findBlock().value
-              : answerRelationship.findBlock().value
-            )
-            && (
+          {(this.props.workspace.isCurrentlyResolved &&
+          answerDraftRelationship.findBlock()
+            ? answerDraftRelationship.findBlock().value
+            : answerRelationship.findBlock().value) && (
             <BulletAndEditorContainer>
               <BlockBullet>A</BlockBullet>
               <BlockEditorContainer>
-                {
-                  (this.props.workspace.isCurrentlyResolved && answerDraftRelationship.findBlock())
-                  ?
-                    <BlockEditor
-                      {...answerDraftRelationship.blockEditorAttributes()}
-                      isActive={this.props.isActive}
-                      isUserOracle={this.props.isUserOracle}
-                      availablePointers={availablePointers}
-                      visibleExportIds={this.props.visibleExportIds}
-                      exportLockStatusInfo={this.props.exportLockStatusInfo}
-                      unlockPointer={this.props.unlockPointer}
-                    />
-                  :
-                    <BlockEditor
-                      {...answerRelationship.blockEditorAttributes()}
-                      isActive={this.props.isActive}
-                      isUserOracle={this.props.isUserOracle}
-                      availablePointers={availablePointers}
-                      visibleExportIds={this.props.visibleExportIds}
-                      exportLockStatusInfo={this.props.exportLockStatusInfo}
-                      unlockPointer={this.props.unlockPointer}
-                    />
-                }
+                {this.props.workspace.isCurrentlyResolved &&
+                answerDraftRelationship.findBlock() ? (
+                  <BlockEditor
+                    {...answerDraftRelationship.blockEditorAttributes()}
+                    isActive={this.props.isActive}
+                    isUserOracle={this.props.isUserOracle}
+                    availablePointers={availablePointers}
+                    visibleExportIds={this.props.visibleExportIds}
+                    exportLockStatusInfo={this.props.exportLockStatusInfo}
+                    unlockPointer={this.props.unlockPointer}
+                  />
+                ) : (
+                  <BlockEditor
+                    {...answerRelationship.blockEditorAttributes()}
+                    isActive={this.props.isActive}
+                    isUserOracle={this.props.isUserOracle}
+                    availablePointers={availablePointers}
+                    visibleExportIds={this.props.visibleExportIds}
+                    exportLockStatusInfo={this.props.exportLockStatusInfo}
+                    unlockPointer={this.props.unlockPointer}
+                  />
+                )}
               </BlockEditorContainer>
             </BulletAndEditorContainer>
           )}
@@ -212,40 +222,47 @@ export class Child extends React.Component<any, any> {
               Archive
             </Button>
           )}
-          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && hasTimeBudget && (
-            <Button
-              bsSize="xsmall"
-              bsStyle="default"
-              disabled={this.props.availableBudget - 90 < 90}
-              style={{ marginRight: "5px" }}
-              onClick={() => {
-                this.props.onUpdateChildTotalBudget({
-                  childId: workspace.id,
-                  totalBudget: Number(workspace.totalBudget) + 90,
-                });
-              }}
-            >
-              +90s
-            </Button>
-          )}
-          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && hasTimeBudget && (
-            <Button
-              bsSize="xsmall"
-              bsStyle="default"
-              disabled={this.props.availableBudget - this.props.workspace.totalBudget < 90}
-              style={{ marginRight: "5px" }}
-              onClick={() => {
-                this.props.onUpdateChildTotalBudget({
-                  childId: workspace.id,
-                  totalBudget: workspace.totalBudget * 2,
-                });
-              }}
-            >
-              x2 time
-            </Button>
-          )}
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
+            hasTimeBudget && (
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                disabled={this.props.availableBudget - 90 < 90}
+                style={{ marginRight: "5px" }}
+                onClick={() => {
+                  this.props.onUpdateChildTotalBudget({
+                    childId: workspace.id,
+                    totalBudget: Number(workspace.totalBudget) + 90,
+                  });
+                }}
+              >
+                +90s
+              </Button>
+            )}
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
+            hasTimeBudget && (
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                disabled={
+                  this.props.availableBudget -
+                    this.props.workspace.totalBudget <
+                  90
+                }
+                style={{ marginRight: "5px" }}
+                onClick={() => {
+                  this.props.onUpdateChildTotalBudget({
+                    childId: workspace.id,
+                    totalBudget: workspace.totalBudget * 2,
+                  });
+                }}
+              >
+                x2 time
+              </Button>
+            )}
           {!this.state.showChildBudgetForm &&
-            Auth.isAuthorizedToEditWorkspace(this.props.workspace) && hasTimeBudget && (
+            Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
+            hasTimeBudget && (
               <Button
                 bsSize="xsmall"
                 bsStyle="default"
@@ -258,47 +275,49 @@ export class Child extends React.Component<any, any> {
               </Button>
             )}
           <div style={{ float: "right" }}>
-            {hasTimeBudget && <ChildBudgetBadge
-              shouldShowSeconds={false}
-              remainingBudget={workspace.totalBudget - workspace.allocatedBudget}
-              totalBudget={workspace.totalBudget}
-            />}
+            {hasTimeBudget && (
+              <ChildBudgetBadge
+                shouldShowSeconds={false}
+                remainingBudget={
+                  workspace.totalBudget - workspace.allocatedBudget
+                }
+                totalBudget={workspace.totalBudget}
+              />
+            )}
           </div>
         </div>
         <div style={{ marginTop: "10px" }}>
-          {
-            false /* don't need for current experiments */
-            &&
-            this.props.isUserOracle
-            &&
-            this.props.isInOracleMode
-            &&
-            <Checkbox
-              style={{
-                backgroundColor: adminCheckboxBgColor,
-                border: `1px solid ${adminCheckboxBorderColor}`,
-                borderRadius: "3px",
-                padding: "5px 5px 5px 25px",
-              }}
-              inline={true}
-              type="checkbox"
-              checked={workspace.isEligibleForHonestOracle}
-              onChange={() => {
-                this.props.updateIsEligibleForOracle({
-                  isEligibleForHonestOracle: !workspace.isEligibleForHonestOracle,
-                  workspaceId: workspace.id,
-                });
-              }}
-            >
-              is oracle only
-            </Checkbox>
-          }
+          {false /* don't need for current experiments */ &&
+            this.props.isUserOracle &&
+            this.props.isInOracleMode && (
+              <Checkbox
+                style={{
+                  backgroundColor: adminCheckboxBgColor,
+                  border: `1px solid ${adminCheckboxBorderColor}`,
+                  borderRadius: "3px",
+                  padding: "5px 5px 5px 25px",
+                }}
+                inline={true}
+                type="checkbox"
+                checked={workspace.isEligibleForHonestOracle}
+                onChange={() => {
+                  this.props.updateIsEligibleForOracle({
+                    isEligibleForHonestOracle: !workspace.isEligibleForHonestOracle,
+                    workspaceId: workspace.id,
+                  });
+                }}
+              >
+                is oracle only
+              </Checkbox>
+            )}
         </div>
         {this.state.showChildBudgetForm && hasTimeBudget && (
           <ChildBudgetForm
             availableBudget={this.props.availableBudget}
             childAllocatedBudget={workspace.allocatedBudget}
-            childRemainingBudget={workspace.totalBudget - workspace.allocatedBudget}
+            childRemainingBudget={
+              workspace.totalBudget - workspace.allocatedBudget
+            }
             childTotalBudget={workspace.totalBudget}
             childId={workspace.id}
             parentTotalBudget={this.props.parentTotalBudget}
@@ -323,9 +342,15 @@ export class ChildrenSidebar extends React.Component<any, any> {
       !_.isEqual(newProps.blockEditor, this.props.blockEditor) ||
       !_.isEqual(newProps.availablePointers, this.props.availablePointers) ||
       !_.isEqual(newProps.block, this.props.block) ||
-      !_.isEqual(newProps.workspaces.map(w => w.id), this.props.workspaces.map(w => w.id)) ||
+      !_.isEqual(
+        newProps.workspaces.map(w => w.id),
+        this.props.workspaces.map(w => w.id),
+      ) ||
       !_.isEqual(newProps.workspaces, this.props.workspaces) ||
-      !_.isEqual(newProps.exportLockStatusInfo, this.props.exportLockStatusInfo) ||
+      !_.isEqual(
+        newProps.exportLockStatusInfo,
+        this.props.exportLockStatusInfo,
+      ) ||
       !_.isEqual(newProps.visibleExportIds, this.props.visibleExportIds) ||
       !_.isEqual(newProps.shouldAutoExport, this.props.shouldAutoExport) ||
       !_.isEqual(newProps.pastedExportFormat, this.props.pastedExportFormat)
@@ -341,8 +366,8 @@ export class ChildrenSidebar extends React.Component<any, any> {
         {!!this.props.workspaces.length && (
           <BlockContainer>
             <BlockHeader>Subquestions</BlockHeader>
-            {_.sortBy(this.props.workspaces, w => Date.parse(w.createdAt))
-              .map((workspace, i, arr) => {
+            {_.sortBy(this.props.workspaces, w => Date.parse(w.createdAt)).map(
+              (workspace, i, arr) => {
                 return (
                   <BlockBody
                     key={workspace.id}
@@ -361,9 +386,14 @@ export class ChildrenSidebar extends React.Component<any, any> {
                       hasTimeBudget={this.props.hasTimeBudget}
                       isArchived={this.props.isArchived}
                       isInOracleMode={this.props.isInOracleMode}
-                      updateIsEligibleForOracle={this.props.updateIsEligibleForOracle}
+                      updateIsEligibleForOracle={
+                        this.props.updateIsEligibleForOracle
+                      }
                       isIsolatedWorkspace={this.props.isIsolatedWorkspace}
-                      availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
+                      availableBudget={
+                        this.props.workspace.totalBudget -
+                        this.props.workspace.allocatedBudget
+                      }
                       workspace={workspace}
                       key={workspace.id}
                       onDelete={() => {
@@ -384,52 +414,48 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     />
                   </BlockBody>
                 );
-              })
-            }
-            {
-              Auth.isAuthenticated()
-              &&
-              this.props.workspaces.length > 0
-              &&
-              (
-                (this.props.isUserOracle && this.props.isInOracleMode)
-                ||
-                this.props.isActive
-              )
-              &&
-              <div
-                style={{
-                  backgroundColor: subquestionsFooterBgColor,
-                  borderRadius: "0 0 3px 3px",
-                  borderTop: `1px solid ${subquestionsFooterBorderTopColor}`,
-                  padding: "10px",
-                }}
-              >
-                {
-                  !(this.props.isUserOracle && this.props.isInOracleMode)
-                  &&
-                  <TakeBreakBtn
-                    experimentId={this.props.experimentId}
-                    label="Wait for an answer"
-                    navHook={() => {
-                      this.props.markAsNotStale();
-                    }}
-                  />
-                }
-              </div>
-            }
+              },
+            )}
+            {Auth.isAuthenticated() &&
+              this.props.workspaces.length > 0 &&
+              ((this.props.isUserOracle && this.props.isInOracleMode) ||
+                this.props.isActive) && (
+                <div
+                  style={{
+                    backgroundColor: subquestionsFooterBgColor,
+                    borderRadius: "0 0 3px 3px",
+                    borderTop: `1px solid ${subquestionsFooterBorderTopColor}`,
+                    padding: "10px",
+                  }}
+                >
+                  {!(this.props.isUserOracle && this.props.isInOracleMode) && (
+                    <TakeBreakBtn
+                      experimentId={this.props.experimentId}
+                      label="Wait for an answer"
+                      navHook={() => {
+                        this.props.markAsNotStale();
+                      }}
+                    />
+                  )}
+                </div>
+              )}
           </BlockContainer>
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
-            isWorkspacePartOfOracleExperiment={this.props.isWorkspacePartOfOracleExperiment}
+            isWorkspacePartOfOracleExperiment={
+              this.props.isWorkspacePartOfOracleExperiment
+            }
             isActive={this.props.isActive}
             isUserOracle={this.props.isUserOracle}
             pastedExportFormat={this.props.pastedExportFormat}
             shouldAutoExport={this.props.shouldAutoExport}
             hasTimeBudget={this.props.hasTimeBudget}
             {...this.props.subquestionDraftProps}
-            availableBudget={this.props.workspace.totalBudget - this.props.workspace.allocatedBudget}
+            availableBudget={
+              this.props.workspace.totalBudget -
+              this.props.workspace.allocatedBudget
+            }
             parentTotalBudget={this.props.parentTotalBudget}
             workspaceId={this.props.workspace.id}
             maxTotalBudget={this.props.availableBudget}

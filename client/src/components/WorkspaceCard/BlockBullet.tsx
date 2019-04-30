@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import {
   blockBulletBgColor,
   blockBulletFontColor,
-  blockBulletFontColorOnHover
+  blockBulletFontColorOnHover,
 } from "../../styles";
 
 // Should potentially be able to eliminate some of the style sharing below with withComponent, but wasn't able to find a clean solution.

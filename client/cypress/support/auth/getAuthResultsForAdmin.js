@@ -4,7 +4,7 @@ import { getLoginCredentialsForAdmin } from "./getLoginCredentialsForAdmin";
 
 const ADMIN = "ADMIN";
 
-export async function getAuthResultsForAdmin(){
+export async function getAuthResultsForAdmin() {
   if (authResultsCache.hasValidCache(ADMIN)) {
     return authResultsCache.getCache(ADMIN);
   } else {

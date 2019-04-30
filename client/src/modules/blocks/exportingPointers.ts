@@ -37,20 +37,23 @@ export const exportingPointersSelector = createSelector(
   blockSelector,
   blocks => {
     const pointers = _.flatten(
-      blocks.map(b => exportingNodes(b.value.document))
+      blocks.map(b => exportingNodes(b.value.document)),
     );
     return pointers;
-  }
+  },
 );
 
 export const exportingBlocksPointersSelector = blockIds =>
-  createSelector(blockSelector, blocks => {
-    const relevantBlocks = blocks.filter(b => _.includes(blockIds, b.id));
-    const pointers = _.flatten(
-      relevantBlocks.map(b => exportingNodes(b.value.document))
-    );
-    return pointers;
-  });
+  createSelector(
+    blockSelector,
+    blocks => {
+      const relevantBlocks = blocks.filter(b => _.includes(blockIds, b.id));
+      const pointers = _.flatten(
+        relevantBlocks.map(b => exportingNodes(b.value.document)),
+      );
+      return pointers;
+    },
+  );
 
 export const importingPointersSelector = ({ block }) => {
   if (!block) {

@@ -21,7 +21,10 @@ import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
-import { expandAllImports, closeAllPointerReferences } from "../../modules/blockEditor/actions";
+import {
+  expandAllImports,
+  closeAllPointerReferences,
+} from "../../modules/blockEditor/actions";
 import { BlockEditor } from "../../components/BlockEditor";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { ContentContainer } from "../../components/ContentContainer";
@@ -49,16 +52,14 @@ import {
   UPDATE_BLOCKS,
   UPDATE_WORKSPACE,
 } from "../../graphqlQueries";
-import {
-  CONVERT_PASTED_EXPORT_TO_IMPORT
-} from "../../constants";
+import { CONVERT_PASTED_EXPORT_TO_IMPORT } from "../../constants";
 import { Auth } from "../../auth";
 
 import {
   blockBorderAndBoxShadow,
   blockHeaderCSS,
   blockBodyCSS,
-  workspaceViewQuestionFontSize
+  workspaceViewQuestionFontSize,
 } from "../../styles";
 
 const WORKSPACE_QUERY = gql`
@@ -196,7 +197,12 @@ const ParentLink = props => (
 );
 
 const RootTreeLink = ({ workspace }) => (
-  <NavLink target="_blank" to={`/workspaces/${workspace.rootWorkspaceId}/subtree?expanded=true&activeWorkspace=${workspace.id}`}>
+  <NavLink
+    target="_blank"
+    to={`/workspaces/${
+      workspace.rootWorkspaceId
+    }/subtree?expanded=true&activeWorkspace=${workspace.id}`}
+  >
     <Button bsStyle="default" bsSize="xsmall">
       Entire Tree »
     </Button>
@@ -242,7 +248,9 @@ export class WorkspaceView extends React.Component<any, any> {
 
     window.addEventListener("beforeunload", e => {
       setTimeout(() => {
-        const isLeavingWorkspacePage = /^\/workspaces\//.test(window.location.pathname);
+        const isLeavingWorkspacePage = /^\/workspaces\//.test(
+          window.location.pathname,
+        );
         if (isLeavingWorkspacePage) {
           this.leaveCurrentWorkspace();
         }
@@ -287,7 +295,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
   public handleTimerEnd = () => {
     this.setState({
-      hasTimerEnded: true
+      hasTimerEnded: true,
     });
   };
 
@@ -297,13 +305,13 @@ export class WorkspaceView extends React.Component<any, any> {
     const importedPointers = workspace.connectedPointers;
 
     const allReadOnlyBlocks = new WorkspaceWithRelations(
-      workspace
+      workspace,
     ).allReadOnlyBlocks();
 
     let readOnlyExportedPointers = [];
     try {
       readOnlyExportedPointers = _.flatten(
-        allReadOnlyBlocks.map(b => findPointers(b.value))
+        allReadOnlyBlocks.map(b => findPointers(b.value)),
       );
     } catch (err) {
       // @ts-ignore
@@ -319,32 +327,32 @@ export class WorkspaceView extends React.Component<any, any> {
       [
         ...this.props.exportingPointers,
         ...importedPointers,
-        ...readOnlyExportedPointers
+        ...readOnlyExportedPointers,
       ],
-      p => p.data.pointerId
+      p => p.data.pointerId,
     );
 
     const availablePointers = _.orderBy(
       unsortedAvailablePointers,
       ["data.pointerId"],
-      ["asc"]
+      ["asc"],
     );
 
     const questionProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceQuestion,
-      workspace
+      workspace,
     ).blockEditorAttributes();
     const scratchpadProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceScratchpad,
-      workspace
+      workspace,
     ).blockEditorAttributes();
     const subquestionDraftProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceSubquestionDraft,
-      workspace
+      workspace,
     ).blockEditorAttributes();
     const answerDraftProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceAnswerDraft,
-      workspace
+      workspace,
     ).blockEditorAttributes();
 
     const hasParent = !!workspace.parentId;
@@ -358,29 +366,43 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const queryParams = parseQueryString(window.location.search);
     const isIsolatedWorkspace = queryParams.isolated === "true";
-    const isActive = workspace.currentlyActiveUser && workspace.currentlyActiveUser.id === Auth.userId();
+    const isActive =
+      workspace.currentlyActiveUser &&
+      workspace.currentlyActiveUser.id === Auth.userId();
     const experimentId = queryParams.experiment;
     const hasURLTimeRestriction = queryParams.timer;
     const hasTimerEnded = this.state.hasTimerEnded;
 
-    const durationInMsGivenRemainingBudget = (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) * 1000;
+    const durationInMsGivenRemainingBudget =
+      (Number(workspace.totalBudget) - Number(workspace.allocatedBudget)) *
+      1000;
 
     const DEFAULT_MAX_TIMER_DURATION = 90 * 1000;
-    const durationInMsGivenURLRestriction = hasURLTimeRestriction ? moment.duration(queryParams.timer).asMilliseconds() : DEFAULT_MAX_TIMER_DURATION;
+    const durationInMsGivenURLRestriction = hasURLTimeRestriction
+      ? moment.duration(queryParams.timer).asMilliseconds()
+      : DEFAULT_MAX_TIMER_DURATION;
 
-    const durationInMs = Math.min(durationInMsGivenRemainingBudget, durationInMsGivenURLRestriction);
+    const durationInMs = Math.min(
+      durationInMsGivenRemainingBudget,
+      durationInMsGivenURLRestriction,
+    );
 
     const exportLockStatusInfo = workspace.exportLockStatusInfo;
-    const unlockPointer = pointerId => this.props.unlockPointerMutation({
-      variables: {
-        pointerId,
-        workspaceId: workspace.id,
-      }
-    });
+    const unlockPointer = pointerId =>
+      this.props.unlockPointerMutation({
+        variables: {
+          pointerId,
+          workspaceId: workspace.id,
+        },
+      });
 
-    const visibleExportIds = this.props.exportingPointers.map(p => p.data.pointerId);
+    const visibleExportIds = this.props.exportingPointers.map(
+      p => p.data.pointerId,
+    );
 
-    const isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly = workspace.rootWorkspace.tree.experiments.some(e => e.areNewWorkspacesOracleOnlyByDefault);
+    const isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly = workspace.rootWorkspace.tree.experiments.some(
+      e => e.areNewWorkspacesOracleOnlyByDefault,
+    );
     const isWorkspacePartOfOracleExperiment = isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly;
 
     const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
@@ -389,16 +411,21 @@ export class WorkspaceView extends React.Component<any, any> {
       <div>
         <Helmet>
           <title>
-            Workspace {Value.fromJSON(questionProps.initialValue).document.text.slice(0, 20)} - Mosaic
+            Workspace{" "}
+            {Value.fromJSON(questionProps.initialValue).document.text.slice(
+              0,
+              20,
+            )}{" "}
+            - Mosaic
           </title>
         </Helmet>
         <div
-          style={{ display: this.state.hasInitiallyLoaded ? "none" : "block"}}
+          style={{ display: this.state.hasInitiallyLoaded ? "none" : "block" }}
         >
           <ContentContainer>Optimizing workspace...</ContentContainer>
         </div>
         <div
-          style={{ display: this.state.hasInitiallyLoaded ? "block" : "none"}}
+          style={{ display: this.state.hasInitiallyLoaded ? "block" : "none" }}
         >
           {this.state.isAuthenticated && experimentId && (
             <EpisodeNav
@@ -424,7 +451,7 @@ export class WorkspaceView extends React.Component<any, any> {
                     id: workspace.id,
                     input: {
                       isEligibleForHonestOracle,
-                    }
+                    },
                   },
                 })
               }
@@ -454,25 +481,20 @@ export class WorkspaceView extends React.Component<any, any> {
                             minHeight: "60px",
                           }}
                         >
-                          {
-                            isWorkspacePartOfOracleExperiment
-                            &&
+                          {isWorkspacePartOfOracleExperiment && (
                             <DepthDisplay depth={workspace.depth} />
-                          }
-                          {
-                            hasIOConstraints && !(isUserOracle && isInOracleMode)
-                            ?
+                          )}
+                          {hasIOConstraints &&
+                          !(isUserOracle && isInOracleMode) ? (
                             <CharCountDisplays
                               inputCharCount={this.props.inputCharCount}
                               outputCharCount={this.props.outputCharCount}
                             />
-                            :
+                          ) : (
                             <div />
-                          }
+                          )}
                         </div>
-                        {
-                          hasTimeBudget
-                          ?
+                        {hasTimeBudget ? (
                           <TimerAndTimeBudgetInfo
                             isActive={isActive}
                             durationInMs={durationInMs}
@@ -482,13 +504,16 @@ export class WorkspaceView extends React.Component<any, any> {
                             totalBudget={workspace.totalBudget}
                             workspaceId={workspace.id}
                           />
-                          :
+                        ) : (
                           <TimerWhenNoTimeBudget
                             isActive={isActive}
-                            tickDuration={this.tickDurationForUpdatingTimeSpentWhenNoTimeBudget}
+                            tickDuration={
+                              this
+                                .tickDurationForUpdatingTimeSpentWhenNoTimeBudget
+                            }
                             workspaceId={workspace.id}
                           />
-                        }
+                        )}
                       </div>
                     </Col>
                   </Row>
@@ -498,13 +523,13 @@ export class WorkspaceView extends React.Component<any, any> {
                         style={{
                           display: "flex",
                           alignItems: "flex-end",
-                          marginBottom: "10px"
+                          marginBottom: "10px",
                         }}
                       >
                         <div
                           style={{
                             fontSize: workspaceViewQuestionFontSize,
-                            marginRight: "8px"
+                            marginRight: "8px",
                           }}
                         >
                           <BlockEditor
@@ -515,49 +540,71 @@ export class WorkspaceView extends React.Component<any, any> {
                             visibleExportIds={visibleExportIds}
                             unlockPointer={unlockPointer}
                             {...questionProps}
-                            shouldAutosave={(!isActive && Auth.isAdmin()) ? true : false}
-                            shouldAutoExport={(!isActive && Auth.isAdmin()) && this.state.shouldAutoExport}
-                            pastedExportFormat={(!isActive && Auth.isAdmin()) && this.state.pastedExportFormat}
+                            shouldAutosave={
+                              !isActive && Auth.isAdmin() ? true : false
+                            }
+                            shouldAutoExport={
+                              !isActive &&
+                              Auth.isAdmin() &&
+                              this.state.shouldAutoExport
+                            }
+                            pastedExportFormat={
+                              !isActive &&
+                              Auth.isAdmin() &&
+                              this.state.pastedExportFormat
+                            }
                           />
                         </div>
                       </div>
                       <div>
-                        {hasParent &&
-                          !isIsolatedWorkspace && (
-                            <span style={{ display: "inline-block", marginBottom: "12px" }}>
-                              <ParentLink parentId={workspace.parentId} />
-                            </span>
-                          )}
-                        {workspace && !isIsolatedWorkspace &&
-                          <span style={{ display: "inline-block", marginBottom: "12px" }}>
+                        {hasParent && !isIsolatedWorkspace && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              marginBottom: "12px",
+                            }}
+                          >
+                            <ParentLink parentId={workspace.parentId} />
+                          </span>
+                        )}
+                        {workspace && !isIsolatedWorkspace && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              marginBottom: "12px",
+                            }}
+                          >
                             <SubtreeLink workspace={workspace} />
                           </span>
-                        }
+                        )}
                         {workspace &&
-                          (
-                            ((isUserOracle && isInOracleMode) || (Auth.isAdmin() && !isActive))
-                            &&
-                            <span style={{ display: "inline-block", marginBottom: "12px" }}>
-                              {
-                                (isUserMaliciousOracle || (Auth.isAdmin() && !isActive))
-                                &&
-                                <span style={{ marginRight: "10px"  }}>
+                          (((isUserOracle && isInOracleMode) ||
+                            (Auth.isAdmin() && !isActive)) && (
+                            <span
+                              style={{
+                                display: "inline-block",
+                                marginBottom: "12px",
+                              }}
+                            >
+                              {(isUserMaliciousOracle ||
+                                (Auth.isAdmin() && !isActive)) && (
+                                <span style={{ marginRight: "10px" }}>
                                   <RootTreeLink workspace={workspace} />
                                 </span>
-                              }
+                              )}
                               <ExpandAllPointersBtn />
                             </span>
-                          )
-                        }
+                          ))}
                       </div>
                     </Col>
                   </Row>
                   <Row>
                     <Col sm={6}>
-                      {
-                        !this.state.isAuthenticated && experimentId
-                        &&
-                        <Alert bsStyle="danger" style={{ border: "1px solid #ddd"}}>
+                      {!this.state.isAuthenticated && experimentId && (
+                        <Alert
+                          bsStyle="danger"
+                          style={{ border: "1px solid #ddd" }}
+                        >
                           <div
                             style={{
                               fontSize: "24px",
@@ -568,19 +615,19 @@ export class WorkspaceView extends React.Component<any, any> {
                           >
                             !
                           </div>
-                          <div
-                            style={{ textAlign: "center" }}
-                          >
-                             You are currently <strong>not</strong> logged in, and are unable to participate in this workspace. If you've been logged out, try logging back in with the link at the top of the page.
+                          <div style={{ textAlign: "center" }}>
+                            You are currently <strong>not</strong> logged in,
+                            and are unable to participate in this workspace. If
+                            you've been logged out, try logging back in with the
+                            link at the top of the page.
                           </div>
                         </Alert>
-                      }
-                      {
-                        this.state.isAuthenticated
-                        &&
-                        !isActive
-                        &&
-                        <Alert bsStyle="danger" style={{ border: "1px solid #ddd"}}>
+                      )}
+                      {this.state.isAuthenticated && !isActive && (
+                        <Alert
+                          bsStyle="danger"
+                          style={{ border: "1px solid #ddd" }}
+                        >
                           <div
                             style={{
                               fontSize: "24px",
@@ -591,26 +638,20 @@ export class WorkspaceView extends React.Component<any, any> {
                           >
                             !
                           </div>
-                          <div
-                            style={{ textAlign: "center" }}
-                          >
-                             You are currently <strong>not</strong> assigned to this workspace. If you are looking for an assignment, navigate back to the main experiment page and rejoin the experiment.
+                          <div style={{ textAlign: "center" }}>
+                            You are currently <strong>not</strong> assigned to
+                            this workspace. If you are looking for an
+                            assignment, navigate back to the main experiment
+                            page and rejoin the experiment.
                           </div>
                         </Alert>
-                      }
-                      {
-                        !(
-                          this.state.isAuthenticated
-                          &&
-                          !isActive
-                        )
-                        &&
-                        workspace.message
-                        &&
-                        <Alert style={{ border: "1px solid #ddd"}}>
-                          <ReactMarkdown source={workspace.message} />
-                        </Alert>
-                      }
+                      )}
+                      {!(this.state.isAuthenticated && !isActive) &&
+                        workspace.message && (
+                          <Alert style={{ border: "1px solid #ddd" }}>
+                            <ReactMarkdown source={workspace.message} />
+                          </Alert>
+                        )}
                       <BlockContainer>
                         <BlockHeader>Scratchpad</BlockHeader>
                         <BlockBody>
@@ -647,11 +688,7 @@ export class WorkspaceView extends React.Component<any, any> {
                             {...answerDraftProps}
                           />
                         </BlockBody>
-                        {
-                          this.state.isAuthenticated
-                          &&
-                          isActive
-                          &&
+                        {this.state.isAuthenticated && isActive && (
                           <ResponseFooter
                             isUserMaliciousOracle={isUserMaliciousOracle}
                             isRequestingLazyUnlock={isRequestingLazyUnlock}
@@ -693,12 +730,12 @@ export class WorkspaceView extends React.Component<any, any> {
                                   input: {
                                     isStale: false,
                                   },
-                                }
+                                },
                               })
                             }
                             declineToChallenge={() =>
                               this.props.declineToChallengeMutation({
-                                variables: { id: workspace.id }
+                                variables: { id: workspace.id },
                               })
                             }
                             transferRemainingBudgetToParent={() =>
@@ -709,106 +746,119 @@ export class WorkspaceView extends React.Component<any, any> {
                             workspaceId={workspace.id}
                             responseBlockId={answerDraftProps.blockId}
                           />
-                        }
+                        )}
                       </BlockContainer>
 
-                      {
-                        this.state.isAuthenticated
-                        &&
-                        <AdvancedOptions 
+                      {this.state.isAuthenticated && (
+                        <AdvancedOptions
                           shouldAutoExport={this.state.shouldAutoExport}
-                          handleShouldAutoExportToggle={this.handleShouldAutoExportToggle}
+                          handleShouldAutoExportToggle={
+                            this.handleShouldAutoExportToggle
+                          }
                           pastedExportFormat={this.state.pastedExportFormat}
-                          handlePastedExportFormatChange={this.handlePastedExportFormatChange}
+                          handlePastedExportFormatChange={
+                            this.handlePastedExportFormatChange
+                          }
                         />
-                      }
+                      )}
                     </Col>
                     <Col sm={6}>
-                    {
-                      !(
-                        isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly
-                        &&
+                      {!(
+                        isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly &&
                         isRequestingLazyUnlock
-                      )
-                      &&
-                      <ChildrenSidebar
-                        isWorkspacePartOfOracleExperiment={isWorkspacePartOfOracleExperiment}
-                        isUserOracle={isUserOracle}
-                        experimentId={experimentId}
-                        pastedExportFormat={this.state.pastedExportFormat}
-                        shouldAutoExport={this.state.shouldAutoExport}
-                        hasTimeBudget={hasTimeBudget}
-                        visibleExportIds={visibleExportIds}
-                        exportLockStatusInfo={exportLockStatusInfo}
-                        unlockPointer={unlockPointer}
-                        isActive={isActive}
-                        isInOracleMode={isInOracleMode}
-                        subquestionDraftProps={subquestionDraftProps}
-                        isIsolatedWorkspace={isIsolatedWorkspace}
-                        workspace={workspace}
-                        workspaces={workspace.childWorkspaces}
-                        availablePointers={availablePointers}
-                        onCreateChild={({ question, totalBudget, shouldOverrideToNormalUser }) => {
-                          this.props.createChild({
-                            variables: {
-                              workspaceId: workspace.id,
-                              question,
-                              shouldOverrideToNormalUser,
-                              totalBudget,
-                            }
-                          });
-                        }}
-                        onUpdateChildTotalBudget={({ childId, totalBudget }) => {
-                          this.props.updateChildTotalBudget({
-                            variables: {
-                              workspaceId: workspace.id,
-                              childId,
-                              totalBudget
-                            }
-                          });
-                        }}
-                        availableBudget={
-                          workspace.totalBudget - workspace.allocatedBudget
-                        }
-                        parentTotalBudget={
-                          workspace.totalBudget
-                        }
-                        updateWorkspaceIsArchived={({ isArchived, workspaceId }) => {
-                          this.props.updateWorkspace({
-                            variables: {
-                              id: workspaceId,
-                              input: {
-                                isArchived
-                              },
-                            }
-                          });
-                        }}
-                        updateIsEligibleForOracle={({ isEligibleForHonestOracle, workspaceId }) => {
-                          this.props.updateWorkspace({
-                            variables: {
-                              id: workspaceId,
-                              input: {
-                                isEligibleForHonestOracle
-                              },
-                            },
-                          });
-                        }}
-                        markAsNotStale={() =>
-                          this.props.updateWorkspace({
-                            variables: {
-                              id: workspace.id,
-                              input: {
-                                isStale: false,
-                              },
-                            }
-                          })}
-                        ref={input => {
-                          if (input && input.editor()) {
-                            this.newChildField = input.editor();
+                      ) && (
+                        <ChildrenSidebar
+                          isWorkspacePartOfOracleExperiment={
+                            isWorkspacePartOfOracleExperiment
                           }
-                        }}
-                      />
-                    }
+                          isUserOracle={isUserOracle}
+                          experimentId={experimentId}
+                          pastedExportFormat={this.state.pastedExportFormat}
+                          shouldAutoExport={this.state.shouldAutoExport}
+                          hasTimeBudget={hasTimeBudget}
+                          visibleExportIds={visibleExportIds}
+                          exportLockStatusInfo={exportLockStatusInfo}
+                          unlockPointer={unlockPointer}
+                          isActive={isActive}
+                          isInOracleMode={isInOracleMode}
+                          subquestionDraftProps={subquestionDraftProps}
+                          isIsolatedWorkspace={isIsolatedWorkspace}
+                          workspace={workspace}
+                          workspaces={workspace.childWorkspaces}
+                          availablePointers={availablePointers}
+                          onCreateChild={({
+                            question,
+                            totalBudget,
+                            shouldOverrideToNormalUser,
+                          }) => {
+                            this.props.createChild({
+                              variables: {
+                                workspaceId: workspace.id,
+                                question,
+                                shouldOverrideToNormalUser,
+                                totalBudget,
+                              },
+                            });
+                          }}
+                          onUpdateChildTotalBudget={({
+                            childId,
+                            totalBudget,
+                          }) => {
+                            this.props.updateChildTotalBudget({
+                              variables: {
+                                workspaceId: workspace.id,
+                                childId,
+                                totalBudget,
+                              },
+                            });
+                          }}
+                          availableBudget={
+                            workspace.totalBudget - workspace.allocatedBudget
+                          }
+                          parentTotalBudget={workspace.totalBudget}
+                          updateWorkspaceIsArchived={({
+                            isArchived,
+                            workspaceId,
+                          }) => {
+                            this.props.updateWorkspace({
+                              variables: {
+                                id: workspaceId,
+                                input: {
+                                  isArchived,
+                                },
+                              },
+                            });
+                          }}
+                          updateIsEligibleForOracle={({
+                            isEligibleForHonestOracle,
+                            workspaceId,
+                          }) => {
+                            this.props.updateWorkspace({
+                              variables: {
+                                id: workspaceId,
+                                input: {
+                                  isEligibleForHonestOracle,
+                                },
+                              },
+                            });
+                          }}
+                          markAsNotStale={() =>
+                            this.props.updateWorkspace({
+                              variables: {
+                                id: workspace.id,
+                                input: {
+                                  isStale: false,
+                                },
+                              },
+                            })
+                          }
+                          ref={input => {
+                            if (input && input.editor()) {
+                              this.newChildField = input.editor();
+                            }
+                          }}
+                        />
+                      )}
                     </Col>
                   </Row>
                 </BlockHoverMenu>
@@ -820,7 +870,8 @@ export class WorkspaceView extends React.Component<any, any> {
     );
   }
 
-  private handleShouldAutoExportToggle = () => this.setState({ shouldAutoExport: !this.state.shouldAutoExport });
+  private handleShouldAutoExportToggle = () =>
+    this.setState({ shouldAutoExport: !this.state.shouldAutoExport });
 
   private leaveCurrentWorkspace = () => {
     const isInExperiment = this.experimentId;
@@ -845,7 +896,10 @@ export class WorkspaceView extends React.Component<any, any> {
       if (this.state.logoutTimer) {
         clearTimeout(this.state.logoutTimer);
       }
-      const logoutTimer = setTimeout(() => this.updateAuthenticationState(), Auth.timeToLogOut());
+      const logoutTimer = setTimeout(
+        () => this.updateAuthenticationState(),
+        Auth.timeToLogOut(),
+      );
       this.setState({
         isAuthenticated: true,
         logoutTimer,
@@ -861,7 +915,6 @@ export class WorkspaceView extends React.Component<any, any> {
 
 export class WorkspaceQuery extends React.Component<any, any> {
   public render() {
-
     const isLoading = this.props.workspace.loading;
 
     if (isLoading) {
@@ -874,11 +927,7 @@ export class WorkspaceQuery extends React.Component<any, any> {
       return <ContentContainer>Workspace not found...</ContentContainer>;
     }
 
-    return (
-      <WorkspaceView
-        {...this.props}
-      />
-    );
+    return <WorkspaceView {...this.props} />;
   }
 }
 
@@ -892,13 +941,11 @@ function visibleBlockIds(workspace: any) {
     return [];
   }
   const directBlockIds = workspace.blocks.map(b => b.id);
-  const childBlockIds = _
-    .flatten(
-      workspace.childWorkspaces.map(w =>
-        w.blocks.filter(b => b.type !== "SCRATCHPAD")
-      )
-    )
-    .map((b: any) => b.id);
+  const childBlockIds = _.flatten(
+    workspace.childWorkspaces.map(w =>
+      w.blocks.filter(b => b.type !== "SCRATCHPAD"),
+    ),
+  ).map((b: any) => b.id);
   return [...directBlockIds, ...childBlockIds];
 }
 
@@ -915,10 +962,12 @@ function mapStateToProps(state: any, { workspace }: any) {
   const _visibleBlockIds = visibleBlockIds(workspace.workspace);
   const newQuestionFormBlockId = getNewQuestionFormBlockId(
     state,
-    workspace.workspace
+    workspace.workspace,
   );
   const allBlockIds = [..._visibleBlockIds, newQuestionFormBlockId];
-  const exportingPointers: any = exportingBlocksPointersSelector(allBlockIds)(state);
+  const exportingPointers: any = exportingBlocksPointersSelector(allBlockIds)(
+    state,
+  );
 
   let inputCharCount, outputCharCount;
   if (workspace.workspace) {
@@ -928,17 +977,17 @@ function mapStateToProps(state: any, { workspace }: any) {
 
     const connectedPointers = _.uniqBy(
       workspace.workspace.connectedPointers,
-      (p: any) => p.data.pointerId
+      (p: any) => p.data.pointerId,
     );
 
-    const question = workspace.workspace.blocks.find(b =>
-      b.type === "QUESTION"
+    const question = workspace.workspace.blocks.find(
+      b => b.type === "QUESTION",
     );
 
     const subquestionAnswers = _.flatten(
       workspace.workspace.childWorkspaces.map(w =>
-        w.blocks.filter(b => b.type === "ANSWER")
-      )
+        w.blocks.filter(b => b.type === "ANSWER"),
+      ),
     );
 
     const inputBlocks = [question, ...subquestionAnswers];
@@ -951,24 +1000,28 @@ function mapStateToProps(state: any, { workspace }: any) {
       connectedPointers,
       exportingPointers,
       visibleExportIds,
-      exportLockStatusInfo
+      exportLockStatusInfo,
     });
 
-    const scratchpad = workspace.workspace.blocks.find(b => b.type === "SCRATCHPAD");
+    const scratchpad = workspace.workspace.blocks.find(
+      b => b.type === "SCRATCHPAD",
+    );
     const answer = workspace.workspace.blocks.find(b => b.type === "ANSWER");
-    const subquestionDraft = workspace.workspace.blocks.find(b => b.type === "SUBQUESTION_DRAFT");
+    const subquestionDraft = workspace.workspace.blocks.find(
+      b => b.type === "SUBQUESTION_DRAFT",
+    );
 
     const subquestionQuestions = _.flatten(
       workspace.workspace.childWorkspaces.map(w =>
-        w.blocks.filter(b => b.type === "QUESTION")
-      )
+        w.blocks.filter(b => b.type === "QUESTION"),
+      ),
     );
 
     const outputBlocks = [
       scratchpad,
       answer,
       subquestionDraft,
-      ...subquestionQuestions
+      ...subquestionQuestions,
     ];
 
     const outputBlockIds = outputBlocks.map((b: any) => b.id);
@@ -993,8 +1046,14 @@ const UNLOCK_POINTER_MUTATION = gql`
 `;
 
 const UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER = gql`
-  mutation updateWorkspaceIsStaleRelativeToUser($isStale: Boolean, $workspaceId: String) {
-    updateWorkspaceIsStaleRelativeToUser(isStale: $isStale, workspaceId: $workspaceId) {
+  mutation updateWorkspaceIsStaleRelativeToUser(
+    $isStale: Boolean
+    $workspaceId: String
+  ) {
+    updateWorkspaceIsStaleRelativeToUser(
+      isStale: $isStale
+      workspaceId: $workspaceId
+    ) {
       id
     }
   }
@@ -1009,7 +1068,9 @@ const DECLINE_TO_CHALLENGE_MUTATION = gql`
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
-  graphql(LEAVE_CURRENT_WORKSPACE_MUTATION, { name: "leaveCurrentWorkspaceMutation" }),
+  graphql(LEAVE_CURRENT_WORKSPACE_MUTATION, {
+    name: "leaveCurrentWorkspaceMutation",
+  }),
   graphql(NEW_CHILD, {
     name: "createChild",
     options: {
@@ -1025,20 +1086,20 @@ export const EpisodeShowPage = compose(
   graphql(UPDATE_WORKSPACE, {
     name: "updateWorkspace",
     options: {
-      refetchQueries: ["workspace"]
-    }
+      refetchQueries: ["workspace"],
+    },
   }),
   graphql(TRANSFER_REMAINING_BUDGET_TO_PARENT, {
     name: "transferRemainingBudgetToParent",
     options: {
-      refetchQueries: ["workspace"]
-    }
+      refetchQueries: ["workspace"],
+    },
   }),
   graphql(DEPLETE_BUDGET, {
     name: "depleteBudget",
     options: {
-      refetchQueries: ["workspace"]
-    }
+      refetchQueries: ["workspace"],
+    },
   }),
   graphql(ORACLE_MODE_QUERY, {
     name: "oracleModeQuery",
@@ -1052,11 +1113,11 @@ export const EpisodeShowPage = compose(
   graphql(UNLOCK_POINTER_MUTATION, {
     name: "unlockPointerMutation",
     options: {
-      refetchQueries: ["workspace"]
-    }
+      refetchQueries: ["workspace"],
+    },
   }),
   connect(
     mapStateToProps,
-    { addBlocks, saveBlocks, expandAllImports, closeAllPointerReferences }
-  )
+    { addBlocks, saveBlocks, expandAllImports, closeAllPointerReferences },
+  ),
 )(WorkspaceQuery);

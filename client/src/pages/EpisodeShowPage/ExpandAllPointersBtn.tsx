@@ -21,10 +21,7 @@ class ExpandAllPointersBtnPresentational extends React.Component<any, any> {
           expand imports
         </Button>
         <span style={{ display: "inline-block", width: "3px" }} />
-        <Button
-          bsSize="xsmall"
-          onClick={this.props.closeAllPointerReferences}
-        >
+        <Button bsSize="xsmall" onClick={this.props.closeAllPointerReferences}>
           collapse imports
         </Button>
       </span>
@@ -43,7 +40,7 @@ const mapDispatchToProps = {
 
 const ExpandAllPointersBtn: any = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(ExpandAllPointersBtnPresentational);
 
 export { ExpandAllPointersBtn };

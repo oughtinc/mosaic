@@ -9,7 +9,7 @@ export const addBlocks = blocks => {
   return (dispatch, getState) => {
     dispatch({
       type: ADD_BLOCKS,
-      blocks
+      blocks,
     });
   };
 };
@@ -18,7 +18,7 @@ export const removeBlocks = blockIds => {
   return (dispatch, getState) => {
     dispatch({
       type: REMOVE_BLOCKS,
-      blockIds
+      blockIds,
     });
   };
 };
@@ -29,7 +29,7 @@ export const updateBlock = ({ id, value, pointerChanged }) => {
       type: UPDATE_BLOCK,
       id,
       value,
-      pointerChanged
+      pointerChanged,
     });
   };
 };
@@ -47,7 +47,7 @@ export const saveBlocks = ({ ids, updateBlocksFn }) => {
     const _blocks = ids.map(id => state.blocks.blocks.find(b => b.id === id));
     const savingValues = _blocks.map(b => ({
       id: b.id,
-      value: b.value.toJSON()
+      value: b.value.toJSON(),
     }));
     updateBlocksFn(savingValues);
   };

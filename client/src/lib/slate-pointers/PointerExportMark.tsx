@@ -51,31 +51,29 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
       children,
     }: any = this.props;
 
-    const isExportPointerFirstNodeTextNode = nodeAsJson.nodes[0].object === "text";
+    const isExportPointerFirstNodeTextNode =
+      nodeAsJson.nodes[0].object === "text";
     const exportPointerText = nodeAsJson.nodes[0].leaves[0].text.trim();
-    const isLazyPointer = this.props.isLazyPointer || (isExportPointerFirstNodeTextNode && exportPointerText.slice(0, 2) === "@L");
+    const isLazyPointer =
+      this.props.isLazyPointer ||
+      (isExportPointerFirstNodeTextNode &&
+        exportPointerText.slice(0, 2) === "@L");
 
     const fullExportCharCount = getInputCharCount(nodeAsJson);
 
     const isInExperiment = parseQueryString(window.location.search).experiment;
 
     const pointerExportBackground: any =
-    (fullExportCharCount > 650 / 3 && isInExperiment)
-    ?
-    "orange"
-    :
-    (
-      isSelected
-      ?
-      "rgba(85, 228, 38, 0.9)"
-      :
-      "rgba(200, 243, 197, 0.5)"
-    );
+      fullExportCharCount > 650 / 3 && isInExperiment
+        ? "orange"
+        : isSelected
+        ? "rgba(85, 228, 38, 0.9)"
+        : "rgba(200, 243, 197, 0.5)";
 
     const { pointerIndex }: any = propsToPointerDetails({
       blockEditor,
       availablePointers,
-      nodeAsJson
+      nodeAsJson,
     });
 
     const styles = StyleSheet.create({
@@ -136,5 +134,5 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
 
 export const PointerExportMark: any = connect(
   null,
-  { addExportIdToStore }
+  { addExportIdToStore },
 )(PointerExportMarkPresentational);
