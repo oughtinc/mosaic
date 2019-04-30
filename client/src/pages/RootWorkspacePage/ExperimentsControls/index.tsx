@@ -40,14 +40,14 @@ export class ListOfExperimentsPresentational extends React.Component<any, any> {
                     fallbacks={e.fallbacks}
                     onEligibilityRankChange={this.onEligibilityRankChange}
                     onDefaultOracleChange={this.onDefaultOracleChange}
-                    updateExperimentName={async ({ experimentId, name }) =>
+                    updateExperimentName={async ({ experimentId, name }) => {
                       await this.props.updateExperimentNameMutation({
                         variables: {
                           experimentId,
                           name,
                         },
-                      })
-                    }
+                      });
+                    }}
                   />
                 </ExperimentContainer>
               );

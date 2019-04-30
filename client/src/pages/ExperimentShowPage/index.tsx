@@ -105,14 +105,14 @@ export class ExperimentShowPagePresentational extends React.Component<
                   },
                 });
               }}
-              updateExperimentName={async ({ experimentId, name }) =>
+              updateExperimentName={async ({ experimentId, name }) => {
                 await this.props.updateExperimentNameMutation({
                   variables: {
                     experimentId,
                     name,
                   },
-                })
-              }
+                });
+              }}
             />
           </div>
         )}
