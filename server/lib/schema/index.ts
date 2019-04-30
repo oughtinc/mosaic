@@ -370,10 +370,10 @@ const schema = new GraphQLSchema({
             where: {
               experimentId,
               userId,
-            }
+            },
           });
 
-          return !!(notificationRequest && notificationRequest.length > 0)
+          return !!(notificationRequest && notificationRequest.length > 0);
         },
       },
       userActivity: {
