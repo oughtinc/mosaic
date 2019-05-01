@@ -356,20 +356,23 @@ export class WorkspaceView extends React.Component<any, any> {
       WorkspaceRelationTypes.WorkspaceAnswerDraft,
       workspace,
     ).blockEditorAttributes();
-    const oracleAnswerCandidateProps = new WorkspaceBlockRelation(
-      WorkspaceRelationTypes.WorkspaceOracleAnswerCandidate,
-      workspace,
-    ).blockEditorAttributes();
+
+    const isOracleWorkspace =
+      workspace.isEligibleForHonestOracle ||
+      workspace.isEligibleForMaliciousOracle;
+
+    const oracleAnswerCandidateProps =
+      isOracleWorkspace &&
+      new WorkspaceBlockRelation(
+        WorkspaceRelationTypes.WorkspaceOracleAnswerCandidate,
+        workspace,
+      ).blockEditorAttributes();
 
     const hasParent = !!workspace.parentId;
     const hasSubquestions = workspace.childWorkspaces.length > 0;
     const isUserOracle = workspace.isUserOracleForTree;
     const isUserMaliciousOracle = workspace.isUserMaliciousOracleForTree;
     const isInOracleMode = this.props.oracleModeQuery.oracleMode;
-
-    const isOracleWorkspace =
-      workspace.isEligibleForHonestOracle ||
-      workspace.isEligibleForMaliciousOracle;
 
     const hasTimeBudget = workspace.hasTimeBudgetOfRootParent;
     const hasIOConstraints = workspace.hasIOConstraintsOfRootParent;

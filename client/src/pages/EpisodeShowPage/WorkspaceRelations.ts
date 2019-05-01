@@ -1,5 +1,6 @@
 import * as uuidv1 from "uuid/v1";
 import * as _ from "lodash";
+import { parse as parseQueryString } from "query-string";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { Auth } from "../../auth";
 
@@ -35,7 +36,10 @@ const RelationTypeAttributes = [
     name: WorkspaceRelationTypes.WorkspaceQuestion,
     source: WORKSPACE,
     blockType: QUESTION,
-    permission: Auth.isAdmin() ? Permissions.Editable : Permissions.ReadOnly,
+    permission:
+      Auth.isAdmin() && !parseQueryString(window.location.search).experiment
+        ? Permissions.Editable
+        : Permissions.ReadOnly,
   },
   {
     name: WorkspaceRelationTypes.WorkspaceScratchpad,

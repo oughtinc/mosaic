@@ -34,7 +34,8 @@ import Pointer from "../models/pointer";
 import PointerImport from "../models/pointerImport";
 import ExportWorkspaceLockRelation from "../models/exportWorkspaceLockRelation";
 import NotificationRequest from "../models/notificationRequest";
-import { generateAnswerDraftValue } from "../models/helpers/defaultHonestOracleBlocks";
+import { generateHonestAnswerDraftValue } from "../models/helpers/defaultHonestOracleBlocks";
+import { generateMaliciousAnswerDraftValue } from "../models/helpers/defaultMaliciousOracleBlocks";
 
 const generateReferences = references => {
   const all = {};
@@ -1183,7 +1184,27 @@ const schema = new GraphQLSchema({
 
                     // create malicious child
                     await workspace.createChild({
-                      question: generateAnswerDraftValue(
+                      question: generateHonestAnswerDraftValue(
+                        _.get(question, "value"),
+                        _.get(oracleAnswerCandidate, "value"),
+                      ),
+                      totalBudget: 0,
+                      creatorId: context.user.id,
+                      isPublic: false,
+                      shouldOverrideToNormalUser: false,
+                    });
+                  }
+
+                  if (workspace.isEligibleForMaliciousOracle) {
+                    const blocks = (await workspace.$get("blocks")) as Block[];
+                    const oracleAnswerCandidate = blocks.find(
+                      b => b.type === "ORACLE_ANSWER_CANDIDATE",
+                    );
+                    const question = blocks.find(b => b.type === "QUESTION");
+
+                    // create malicious child
+                    await workspace.createChild({
+                      question: generateMaliciousAnswerDraftValue(
                         _.get(question, "value"),
                         _.get(oracleAnswerCandidate, "value"),
                       ),

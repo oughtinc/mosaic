@@ -169,7 +169,7 @@ function processNode(node: any) {
   }
 }
 
-export function generateAnswerDraftValue(questionValue, blockValue) {
+export function generateHonestAnswerDraftValue(questionValue, blockValue) {
   const nodes = blockValue[0].nodes;
 
   const answerDraftBlockValue = [
