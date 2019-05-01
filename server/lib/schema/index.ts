@@ -74,117 +74,108 @@ export const workspaceType = makeObjectType(
   {
     message: {
       type: GraphQLString,
-      resolve: requireUser(
-        "User required",
-        async (workspace: Workspace, args, context) => {
-          const user = context.user;
+      resolve: async (workspace: Workspace, args, context) => {
+        const user = await userFromContext(context);
 
-          if (!user) {
-            return null;
-          }
+        if (!user) {
+          return null;
+        }
 
-          const rootWorkspace = await workspace.getRootWorkspace();
+        const rootWorkspace = await workspace.getRootWorkspace();
 
-          // get experiment id
-          const tree = (await rootWorkspace.$get("tree")) as Tree;
-          const experiments = (await tree.$get("experiments")) as Experiment[];
-          if (experiments.length === 0) {
-            return null;
-          }
+        // get experiment id
+        const tree = (await rootWorkspace.$get("tree")) as Tree;
+        const experiments = (await tree.$get("experiments")) as Experiment[];
+        if (experiments.length === 0) {
+          return null;
+        }
 
-          const mostRecentExperiment = _.sortBy(
-            experiments,
-            e => -e.createdAt,
-          )[0];
-          const experimentId = mostRecentExperiment.id;
+        const mostRecentExperiment = _.sortBy(
+          experiments,
+          e => -e.createdAt,
+        )[0];
+        const experimentId = mostRecentExperiment.id;
 
-          const instructions = await Instructions.findAll({
-            where: { experimentId },
-          });
-          const instructionValues = {};
-          instructions.forEach(instruction => {
-            instructionValues[instruction.type] = instruction.value;
-          });
+        const instructions = await Instructions.findAll({
+          where: { experimentId },
+        });
+        const instructionValues = {};
+        instructions.forEach(instruction => {
+          instructionValues[instruction.type] = instruction.value;
+        });
 
-          if (workspace.isRequestingLazyUnlock) {
-            return await getMessageForUser({
-              isRequestingLazyUnlock: workspace.isRequestingLazyUnlock,
-              instructions: instructionValues,
-            });
-          }
-
-          const scheduler = await getScheduler(experimentId);
-          const isWorkspaceRootLevel = !workspace.parentId;
-          const isThisFirstTimeWorkspaceHasBeenWorkedOn = await scheduler.isThisFirstTimeWorkspaceHasBeenWorkedOn(
-            workspace.id,
-          );
-
-          const userTreeOracleRelations = (await tree.$get(
-            "oracleRelations",
-          )) as UserTreeOracleRelation[];
-          const thisUserTreeOracleRelation = userTreeOracleRelations.find(
-            r => r.UserId === user.id,
-          );
-
-          const typeOfUser = !thisUserTreeOracleRelation
-            ? "TYPICAL"
-            : !thisUserTreeOracleRelation.isMalicious
-            ? "HONEST"
-            : "MALICIOUS";
-
+        if (workspace.isRequestingLazyUnlock) {
           return await getMessageForUser({
+            isRequestingLazyUnlock: workspace.isRequestingLazyUnlock,
             instructions: instructionValues,
-            isWorkspaceRootLevel,
-            isThisFirstTimeWorkspaceHasBeenWorkedOn,
-            typeOfUser,
           });
-        },
-      ),
+        }
+
+        const scheduler = await getScheduler(experimentId);
+        const isWorkspaceRootLevel = !workspace.parentId;
+        const isThisFirstTimeWorkspaceHasBeenWorkedOn = await scheduler.isThisFirstTimeWorkspaceHasBeenWorkedOn(
+          workspace.id,
+        );
+
+        const userTreeOracleRelations = (await tree.$get(
+          "oracleRelations",
+        )) as UserTreeOracleRelation[];
+        const thisUserTreeOracleRelation = userTreeOracleRelations.find(
+          r => r.UserId === user.id,
+        );
+
+        const typeOfUser = !thisUserTreeOracleRelation
+          ? "TYPICAL"
+          : !thisUserTreeOracleRelation.isMalicious
+          ? "HONEST"
+          : "MALICIOUS";
+
+        return await getMessageForUser({
+          instructions: instructionValues,
+          isWorkspaceRootLevel,
+          isThisFirstTimeWorkspaceHasBeenWorkedOn,
+          typeOfUser,
+        });
+      },
     },
     isUserOracleForTree: {
       type: GraphQLBoolean,
-      resolve: requireUser(
-        "User required",
-        async (workspace: Workspace, args, context) => {
-          const user = context.user;
+      resolve: async (workspace: Workspace, args, context) => {
+        const user = await userFromContext(context);
 
-          if (!user) {
-            return false;
-          }
+        if (!user) {
+          return false;
+        }
 
-          // get tree
-          const rootWorkspace = await workspace.getRootWorkspace();
-          const tree = (await rootWorkspace.$get("tree")) as Tree;
-          const oracles = (await tree.$get("oracles")) as User[];
+        // get tree
+        const rootWorkspace = await workspace.getRootWorkspace();
+        const tree = (await rootWorkspace.$get("tree")) as Tree;
+        const oracles = (await tree.$get("oracles")) as User[];
 
-          return oracles.some(o => o.id === user.id);
-        },
-      ),
+        return oracles.some(o => o.id === user.id);
+      },
     },
     isUserMaliciousOracleForTree: {
       type: GraphQLBoolean,
-      resolve: requireUser(
-        "User required",
-        async (workspace: Workspace, args, context) => {
-          const user = context.user;
+      resolve: async (workspace: Workspace, args, context) => {
+        const user = await userFromContext(context);
 
-          if (!user) {
-            return false;
-          }
+        if (!user) {
+          return false;
+        }
 
-          // get tree
-          const rootWorkspace = await workspace.getRootWorkspace();
-          const tree = (await rootWorkspace.$get("tree")) as Tree;
-          const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
-            where: {
-              TreeId: tree.id,
-              UserId: user.id,
-            },
-          });
+        // get tree
+        const rootWorkspace = await workspace.getRootWorkspace();
+        const tree = (await rootWorkspace.$get("tree")) as Tree;
+        const userTreeOracleRelation = await UserTreeOracleRelation.findOne({
+          where: {
+            TreeId: tree.id,
+            UserId: user.id,
+          },
+        });
 
-          return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
-        },
-      ),
+        return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
+      },
     },
     currentlyActiveUser: {
       type: UserType,
