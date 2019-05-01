@@ -484,6 +484,14 @@ const schema = new GraphQLSchema({
               b => b.type === "ANSWER_DRAFT",
             );
 
+            const includesOracleAnswerCandidateDraft = blocks.find(
+              b => b.type === "ORACLE_ANSWER_CANDIDATE",
+            );
+
+            const shouldIncludeOracleAnswerCandidateDraft =
+              result.isEligibleForHonestOracle ||
+              result.isEligibleForMaliciousOracle;
+
             if (!includesQuestion) {
               await result.$create("block", { type: "QUESTION" });
             }
@@ -509,6 +517,15 @@ const schema = new GraphQLSchema({
                   value: curAnswer.value,
                 });
               }
+            }
+
+            if (
+              shouldIncludeOracleAnswerCandidateDraft &&
+              !includesOracleAnswerCandidateDraft
+            ) {
+              await result.$create("block", {
+                type: "ORACLE_ANSWER_CANDIDATE",
+              });
             }
 
             return result;

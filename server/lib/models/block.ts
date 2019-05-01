@@ -37,6 +37,7 @@ export default class Block extends Model<Block> {
       "SCRATCHPAD",
       "SUBQUESTION_DRAFT",
       "ANSWER_DRAFT",
+      "ORACLE_ANSWER_CANDIDATE",
     ),
     allowNull: false,
   })
