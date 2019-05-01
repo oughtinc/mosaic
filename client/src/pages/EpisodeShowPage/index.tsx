@@ -684,83 +684,85 @@ export class WorkspaceView extends React.Component<any, any> {
                         </BlockBody>
                       </BlockContainer>
 
-                      <BlockContainer>
-                        <BlockHeader>Response</BlockHeader>
-                        <BlockBody>
-                          <BlockEditor
-                            isActive={isActive}
-                            isUserOracle={isUserOracle}
-                            availablePointers={availablePointers}
-                            visibleExportIds={visibleExportIds}
-                            exportLockStatusInfo={exportLockStatusInfo}
-                            placeholder="Text for the answer..."
-                            unlockPointer={unlockPointer}
-                            cyAttributeName="slate-editor-response"
-                            shouldAutoExport={this.state.shouldAutoExport}
-                            pastedExportFormat={this.state.pastedExportFormat}
-                            {...answerDraftProps}
-                          />
-                        </BlockBody>
-                        {this.state.isAuthenticated && isActive && (
-                          <ResponseFooter
-                            isUserMaliciousOracle={isUserMaliciousOracle}
-                            isRequestingLazyUnlock={isRequestingLazyUnlock}
-                            hasChildren={workspace.childWorkspaces.length > 0}
-                            experimentId={experimentId}
-                            hasTimeBudget={hasTimeBudget}
-                            depleteBudget={() =>
-                              this.props.depleteBudget({
-                                variables: { id: workspace.id },
-                              })
-                            }
-                            hasParent={hasParent}
-                            isInOracleMode={isInOracleMode}
-                            isUserOracle={isUserOracle}
-                            markAsAnsweredByOracle={() =>
-                              this.props.updateWorkspace({
-                                variables: {
-                                  id: workspace.id,
-                                  input: {
-                                    wasAnsweredByOracle: true,
+                      {!(isOracleWorkspace && hasParent) && (
+                        <BlockContainer>
+                          <BlockHeader>Response</BlockHeader>
+                          <BlockBody>
+                            <BlockEditor
+                              isActive={isActive}
+                              isUserOracle={isUserOracle}
+                              availablePointers={availablePointers}
+                              visibleExportIds={visibleExportIds}
+                              exportLockStatusInfo={exportLockStatusInfo}
+                              placeholder="Text for the answer..."
+                              unlockPointer={unlockPointer}
+                              cyAttributeName="slate-editor-response"
+                              shouldAutoExport={this.state.shouldAutoExport}
+                              pastedExportFormat={this.state.pastedExportFormat}
+                              {...answerDraftProps}
+                            />
+                          </BlockBody>
+                          {this.state.isAuthenticated && isActive && (
+                            <ResponseFooter
+                              isUserMaliciousOracle={isUserMaliciousOracle}
+                              isRequestingLazyUnlock={isRequestingLazyUnlock}
+                              hasChildren={workspace.childWorkspaces.length > 0}
+                              experimentId={experimentId}
+                              hasTimeBudget={hasTimeBudget}
+                              depleteBudget={() =>
+                                this.props.depleteBudget({
+                                  variables: { id: workspace.id },
+                                })
+                              }
+                              hasParent={hasParent}
+                              isInOracleMode={isInOracleMode}
+                              isUserOracle={isUserOracle}
+                              markAsAnsweredByOracle={() =>
+                                this.props.updateWorkspace({
+                                  variables: {
+                                    id: workspace.id,
+                                    input: {
+                                      wasAnsweredByOracle: true,
+                                    },
                                   },
-                                },
-                              })
-                            }
-                            markAsCurrentlyResolved={() =>
-                              this.props.updateWorkspace({
-                                variables: {
-                                  id: workspace.id,
-                                  input: {
-                                    isCurrentlyResolved: true,
+                                })
+                              }
+                              markAsCurrentlyResolved={() =>
+                                this.props.updateWorkspace({
+                                  variables: {
+                                    id: workspace.id,
+                                    input: {
+                                      isCurrentlyResolved: true,
+                                    },
                                   },
-                                },
-                              })
-                            }
-                            markAsNotStale={() =>
-                              this.props.updateWorkspace({
-                                variables: {
-                                  id: workspace.id,
-                                  input: {
-                                    isStale: false,
+                                })
+                              }
+                              markAsNotStale={() =>
+                                this.props.updateWorkspace({
+                                  variables: {
+                                    id: workspace.id,
+                                    input: {
+                                      isStale: false,
+                                    },
                                   },
-                                },
-                              })
-                            }
-                            declineToChallenge={() =>
-                              this.props.declineToChallengeMutation({
-                                variables: { id: workspace.id },
-                              })
-                            }
-                            transferRemainingBudgetToParent={() =>
-                              this.props.transferRemainingBudgetToParent({
-                                variables: { id: workspace.id },
-                              })
-                            }
-                            workspaceId={workspace.id}
-                            responseBlockId={answerDraftProps.blockId}
-                          />
-                        )}
-                      </BlockContainer>
+                                })
+                              }
+                              declineToChallenge={() =>
+                                this.props.declineToChallengeMutation({
+                                  variables: { id: workspace.id },
+                                })
+                              }
+                              transferRemainingBudgetToParent={() =>
+                                this.props.transferRemainingBudgetToParent({
+                                  variables: { id: workspace.id },
+                                })
+                              }
+                              workspaceId={workspace.id}
+                              responseBlockId={answerDraftProps.blockId}
+                            />
+                          )}
+                        </BlockContainer>
+                      )}
 
                       {this.state.isAuthenticated && (
                         <AdvancedOptions
@@ -866,97 +868,100 @@ export class WorkspaceView extends React.Component<any, any> {
                               )}
                             </BlockContainer>
                           )}
-                          <ChildrenSidebar
-                            isWorkspacePartOfOracleExperiment={
-                              isWorkspacePartOfOracleExperiment
-                            }
-                            isUserOracle={isUserOracle}
-                            experimentId={experimentId}
-                            pastedExportFormat={this.state.pastedExportFormat}
-                            shouldAutoExport={this.state.shouldAutoExport}
-                            hasTimeBudget={hasTimeBudget}
-                            visibleExportIds={visibleExportIds}
-                            exportLockStatusInfo={exportLockStatusInfo}
-                            unlockPointer={unlockPointer}
-                            isActive={isActive}
-                            isInOracleMode={isInOracleMode}
-                            subquestionDraftProps={subquestionDraftProps}
-                            isIsolatedWorkspace={isIsolatedWorkspace}
-                            workspace={workspace}
-                            workspaces={workspace.childWorkspaces}
-                            availablePointers={availablePointers}
-                            onCreateChild={({
-                              question,
-                              totalBudget,
-                              shouldOverrideToNormalUser,
-                            }) => {
-                              this.props.createChild({
-                                variables: {
-                                  workspaceId: workspace.id,
-                                  question,
-                                  shouldOverrideToNormalUser,
-                                  totalBudget,
-                                },
-                              });
-                            }}
-                            onUpdateChildTotalBudget={({
-                              childId,
-                              totalBudget,
-                            }) => {
-                              this.props.updateChildTotalBudget({
-                                variables: {
-                                  workspaceId: workspace.id,
-                                  childId,
-                                  totalBudget,
-                                },
-                              });
-                            }}
-                            availableBudget={
-                              workspace.totalBudget - workspace.allocatedBudget
-                            }
-                            parentTotalBudget={workspace.totalBudget}
-                            updateWorkspaceIsArchived={({
-                              isArchived,
-                              workspaceId,
-                            }) => {
-                              this.props.updateWorkspace({
-                                variables: {
-                                  id: workspaceId,
-                                  input: {
-                                    isArchived,
-                                  },
-                                },
-                              });
-                            }}
-                            updateIsEligibleForOracle={({
-                              isEligibleForHonestOracle,
-                              workspaceId,
-                            }) => {
-                              this.props.updateWorkspace({
-                                variables: {
-                                  id: workspaceId,
-                                  input: {
-                                    isEligibleForHonestOracle,
-                                  },
-                                },
-                              });
-                            }}
-                            markAsNotStale={() =>
-                              this.props.updateWorkspace({
-                                variables: {
-                                  id: workspace.id,
-                                  input: {
-                                    isStale: false,
-                                  },
-                                },
-                              })
-                            }
-                            ref={input => {
-                              if (input && input.editor()) {
-                                this.newChildField = input.editor();
+                          {!(isOracleWorkspace && hasParent) && (
+                            <ChildrenSidebar
+                              isWorkspacePartOfOracleExperiment={
+                                isWorkspacePartOfOracleExperiment
                               }
-                            }}
-                          />
+                              isUserOracle={isUserOracle}
+                              experimentId={experimentId}
+                              pastedExportFormat={this.state.pastedExportFormat}
+                              shouldAutoExport={this.state.shouldAutoExport}
+                              hasTimeBudget={hasTimeBudget}
+                              visibleExportIds={visibleExportIds}
+                              exportLockStatusInfo={exportLockStatusInfo}
+                              unlockPointer={unlockPointer}
+                              isActive={isActive}
+                              isInOracleMode={isInOracleMode}
+                              subquestionDraftProps={subquestionDraftProps}
+                              isIsolatedWorkspace={isIsolatedWorkspace}
+                              workspace={workspace}
+                              workspaces={workspace.childWorkspaces}
+                              availablePointers={availablePointers}
+                              onCreateChild={({
+                                question,
+                                totalBudget,
+                                shouldOverrideToNormalUser,
+                              }) => {
+                                this.props.createChild({
+                                  variables: {
+                                    workspaceId: workspace.id,
+                                    question,
+                                    shouldOverrideToNormalUser,
+                                    totalBudget,
+                                  },
+                                });
+                              }}
+                              onUpdateChildTotalBudget={({
+                                childId,
+                                totalBudget,
+                              }) => {
+                                this.props.updateChildTotalBudget({
+                                  variables: {
+                                    workspaceId: workspace.id,
+                                    childId,
+                                    totalBudget,
+                                  },
+                                });
+                              }}
+                              availableBudget={
+                                workspace.totalBudget -
+                                workspace.allocatedBudget
+                              }
+                              parentTotalBudget={workspace.totalBudget}
+                              updateWorkspaceIsArchived={({
+                                isArchived,
+                                workspaceId,
+                              }) => {
+                                this.props.updateWorkspace({
+                                  variables: {
+                                    id: workspaceId,
+                                    input: {
+                                      isArchived,
+                                    },
+                                  },
+                                });
+                              }}
+                              updateIsEligibleForOracle={({
+                                isEligibleForHonestOracle,
+                                workspaceId,
+                              }) => {
+                                this.props.updateWorkspace({
+                                  variables: {
+                                    id: workspaceId,
+                                    input: {
+                                      isEligibleForHonestOracle,
+                                    },
+                                  },
+                                });
+                              }}
+                              markAsNotStale={() =>
+                                this.props.updateWorkspace({
+                                  variables: {
+                                    id: workspace.id,
+                                    input: {
+                                      isStale: false,
+                                    },
+                                  },
+                                })
+                              }
+                              ref={input => {
+                                if (input && input.editor()) {
+                                  this.newChildField = input.editor();
+                                }
+                              }}
+                            />
+                          )}
                         </React.Fragment>
                       )}
                     </Col>
