@@ -14,6 +14,7 @@ import { parse as parseQueryString } from "query-string";
 import { AdvancedOptions } from "./AdvancedOptions";
 import { DepthDisplay } from "./DepthDisplay";
 import { EpisodeNav } from "./EpisodeNav";
+import { OracleAnswerCandidateFooter } from "./OracleAnswerCandidateFooter";
 import { ResponseFooter } from "./ResponseFooter";
 import { CharCountDisplays } from "./CharCountDisplays";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
@@ -777,7 +778,7 @@ export class WorkspaceView extends React.Component<any, any> {
                         isRequestingLazyUnlock
                       ) && (
                         <React.Fragment>
-                          {isOracleWorkspace && (
+                          {isOracleWorkspace && hasParent && (
                             <BlockContainer>
                               <BlockHeader>Answer Candidate</BlockHeader>
                               <BlockBody>
@@ -797,6 +798,69 @@ export class WorkspaceView extends React.Component<any, any> {
                                   {...oracleAnswerCandidateProps}
                                 />
                               </BlockBody>
+                              {isUserOracle && (
+                                <OracleAnswerCandidateFooter
+                                  isUserMaliciousOracle={isUserMaliciousOracle}
+                                  isRequestingLazyUnlock={
+                                    isRequestingLazyUnlock
+                                  }
+                                  hasChildren={
+                                    workspace.childWorkspaces.length > 0
+                                  }
+                                  experimentId={experimentId}
+                                  hasTimeBudget={hasTimeBudget}
+                                  depleteBudget={() =>
+                                    this.props.depleteBudget({
+                                      variables: { id: workspace.id },
+                                    })
+                                  }
+                                  hasParent={hasParent}
+                                  isInOracleMode={isInOracleMode}
+                                  isUserOracle={isUserOracle}
+                                  markAsAnsweredByOracle={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          wasAnsweredByOracle: true,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  markAsCurrentlyResolved={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isCurrentlyResolved: true,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  markAsNotStale={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isStale: false,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  declineToChallenge={() =>
+                                    this.props.declineToChallengeMutation({
+                                      variables: { id: workspace.id },
+                                    })
+                                  }
+                                  transferRemainingBudgetToParent={() =>
+                                    this.props.transferRemainingBudgetToParent({
+                                      variables: { id: workspace.id },
+                                    })
+                                  }
+                                  workspaceId={workspace.id}
+                                  blockId={oracleAnswerCandidateProps.blockId}
+                                />
+                              )}
                             </BlockContainer>
                           )}
                           <ChildrenSidebar

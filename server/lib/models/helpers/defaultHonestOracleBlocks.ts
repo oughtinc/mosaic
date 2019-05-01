@@ -168,3 +168,49 @@ function processNode(node: any) {
     return node;
   }
 }
+
+export function generateAnswerDraftValue(questionValue, blockValue) {
+  const nodes = blockValue[0].nodes;
+
+  const answerDraftBlockValue = [
+    {
+      object: "block",
+      type: "line",
+      isVoid: false,
+      data: {},
+      nodes: [
+        {
+          object: "text",
+          leaves: [
+            {
+              object: "leaf",
+              text: "The honest oracle has responded to question ",
+              marks: [],
+            },
+          ],
+        },
+        {
+          object: "inline",
+          type: "pointerExport",
+          isVoid: false,
+          data: { pointerId: uuidv4() },
+          nodes: questionValue[0].nodes.map(node => processNode(node)),
+        },
+        {
+          object: "text",
+          leaves: [{ object: "leaf", text: " with answer ", marks: [] }],
+        },
+        {
+          object: "inline",
+          type: "pointerExport",
+          isVoid: false,
+          data: { pointerId: uuidv4() },
+          nodes: nodes.map(node => processNode(node)),
+        },
+        { object: "text", leaves: [{ object: "leaf", text: ".", marks: [] }] },
+      ],
+    },
+  ];
+
+  return answerDraftBlockValue;
+}
