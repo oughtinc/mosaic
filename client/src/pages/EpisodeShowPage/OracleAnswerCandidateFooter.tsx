@@ -51,16 +51,11 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
     const {
       declineToChallenge,
       experimentId,
-      hasChildren,
       hasParent,
-      hasTimeBudget,
-      isInOracleMode,
       isRequestingLazyUnlock,
-      isUserOracle,
       isUserMaliciousOracle,
       markAsCurrentlyResolved,
       markAsNotStale,
-      transferRemainingBudgetToParent,
       responseIsEmpty,
     } = this.props;
 
@@ -75,15 +70,33 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
           padding: "10px",
         }}
       >
-        <TakeBreakBtn
-          experimentId={experimentId}
-          label={`Submit!`}
-          disabled={responseIsEmpty}
-          navHook={() => {
-            markAsNotStale();
-            markAsCurrentlyResolved();
-          }}
-        />
+        <div>
+          <TakeBreakBtn
+            disabled={responseIsEmpty}
+            experimentId={experimentId}
+            bsStyle="primary"
+            label={
+              isUserMaliciousOracle && !isRequestingLazyUnlock && hasParent
+                ? "Challenge!"
+                : "Done!"
+            }
+            navHook={() => {
+              markAsNotStale();
+              markAsCurrentlyResolved();
+            }}
+          />
+          {isUserMaliciousOracle && !isRequestingLazyUnlock && hasParent && (
+            <TakeBreakBtn
+              experimentId={experimentId}
+              bsStyle="danger"
+              label={`Decline to Challenge!`}
+              navHook={() => {
+                markAsNotStale();
+                declineToChallenge();
+              }}
+            />
+          )}
+        </div>
       </div>
     );
   }
