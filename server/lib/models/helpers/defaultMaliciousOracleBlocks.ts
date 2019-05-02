@@ -42,67 +42,11 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: "Which is a better answer to Q ",
+              text: "",
               marks: [],
             },
           ],
         },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId: questionPointerId,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
-            },
-          ],
-        },
-        {
-          object: "text",
-          leaves: [{ object: "leaf", text: " ? A1 ", marks: [] }],
-        },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId:
-              coinflip === "A1" ? correctPointerId : incorrectPointerId,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
-            },
-          ],
-        },
-        {
-          object: "text",
-          leaves: [{ object: "leaf", text: " or A2 ", marks: [] }],
-        },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId:
-              coinflip === "A1" ? incorrectPointerId : correctPointerId,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
-            },
-          ],
-        },
-        { object: "text", leaves: [{ object: "leaf", text: "?", marks: [] }] },
       ],
     },
   ];

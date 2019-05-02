@@ -36,38 +36,11 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: "The honest oracle has responded to question ",
+              text: "",
               marks: [],
             },
           ],
         },
-        {
-          object: "inline",
-          type: "pointerExport",
-          isVoid: false,
-          data: { pointerId: uuidv4() },
-          nodes: questionValue[0].nodes.map(node => processNode(node)),
-        },
-        {
-          object: "text",
-          leaves: [{ object: "leaf", text: " with answer ", marks: [] }],
-        },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId: a1id,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
-            },
-          ],
-        },
-        { object: "text", leaves: [{ object: "leaf", text: ".", marks: [] }] },
       ],
     },
   ];
@@ -81,24 +54,14 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
       nodes: [
         {
           object: "text",
-          leaves: [{ object: "leaf", text: `A `, marks: [] }],
-        },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId: a1id,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
+          leaves: [
             {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
+              object: "leaf",
+              text: "",
+              marks: [],
             },
           ],
         },
-        { object: "text", leaves: [{ object: "leaf", text: "", marks: [] }] },
       ],
     },
   ];
