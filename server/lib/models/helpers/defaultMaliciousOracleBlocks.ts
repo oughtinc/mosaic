@@ -21,37 +21,7 @@ export const createMaliciousOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: `A (incorrect): `,
-              marks: [],
-            },
-          ],
-        },
-        {
-          object: "inline",
-          type: "pointerExport",
-          isVoid: false,
-          data: {
-            pointerId: incorrectPointerId,
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [
-                {
-                  object: "leaf",
-                  text: "  ",
-                  marks: [],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          object: "text",
-          leaves: [
-            {
-              object: "leaf",
-              text: " ",
+              text: "",
               marks: [],
             },
           ],

@@ -15,37 +15,7 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: `A (correct):  `,
-              marks: [],
-            },
-          ],
-        },
-        {
-          object: "inline",
-          type: "pointerExport",
-          isVoid: false,
-          data: {
-            pointerId: a1id,
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [
-                {
-                  object: "leaf",
-                  text: "  ",
-                  marks: [],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          object: "text",
-          leaves: [
-            {
-              object: "leaf",
-              text: " ",
+              text: "",
               marks: [],
             },
           ],
