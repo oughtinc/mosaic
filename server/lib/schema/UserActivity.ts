@@ -1,3 +1,4 @@
+import { map } from "asyncro";
 import {
   GraphQLInt,
   GraphQLList,
@@ -5,6 +6,7 @@ import {
   GraphQLString,
 } from "graphql";
 
+import Workspace from "../models/workspace";
 import { workspaceType } from "./index";
 
 export const UserActivityType = new GraphQLObjectType({
@@ -30,8 +32,14 @@ export const UserActivityType = new GraphQLObjectType({
           },
         }),
       ),
-      resolve: function(userActivity) {
-        return userActivity;
+      resolve: async function(userActivity) {
+        return await map(userActivity, async a => {
+          const workspace = await Workspace.findByPk(a.workspace.id);
+          return {
+            ...a,
+            workspace,
+          };
+        });
       },
     },
   },
