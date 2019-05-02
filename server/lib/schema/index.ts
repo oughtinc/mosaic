@@ -976,6 +976,19 @@ const schema = new GraphQLSchema({
             if (parentWorkspace === null) {
               return false;
             }
+
+            // make honest oracle response field equal to its answer candidate
+            const blocks = (await parentWorkspace.$get("blocks")) as Block[];
+            const answerDraft = blocks.find(b => b.type === "ANSWER_DRAFT");
+            const answerCandidate = blocks.find(
+              b => b.type === "ORACLE_ANSWER_CANDIDATE",
+            );
+            if (answerDraft && answerCandidate) {
+              await answerDraft.update({ value: answerCandidate.value });
+            }
+
+            // mark honest as resolved
+            // and check to see if normal parent should be marked as stale
             await parentWorkspace.update({ isCurrentlyResolved: true });
             if (parentWorkspace.parentId) {
               const grandParent = await Workspace.findByPk(
