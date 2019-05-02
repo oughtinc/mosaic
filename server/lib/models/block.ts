@@ -67,6 +67,7 @@ export default class Block extends Model<Block> {
   @AfterSave
   public static async updateChangedPoints(item: Block) {
     await item.ensureAllPointersAreInDatabase();
+    await item.exportingPointerValues();
     if (item._previousDataValues) {
       const changes = diff(item._previousDataValues, item.dataValues);
       if (!_.isEmpty(changes.value)) {
