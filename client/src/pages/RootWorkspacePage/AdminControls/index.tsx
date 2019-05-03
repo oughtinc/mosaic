@@ -1,3 +1,4 @@
+import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
@@ -11,6 +12,7 @@ import {
   UPDATE_WORKSPACE_HAS_TIME_BUDGET,
   UPDATE_WORKSPACE_IS_PUBLIC,
 } from "../../../graphqlQueries";
+import { Checkbox } from "react-bootstrap";
 
 class AdminControlsPresentational extends React.Component<any, any> {
   public render() {
@@ -43,12 +45,39 @@ class AdminControlsPresentational extends React.Component<any, any> {
           workspace={workspace}
           workspaceFieldToUpdate="hasIOConstraints"
         />
+        <div>
+          <Checkbox
+            checked={workspace.tree.doesAllowOracleBypass}
+            onChange={(e: any) => {
+              this.props.updateTreeDoesAllowOracleBypass({
+                variables: {
+                  treeId: workspace.tree.id,
+                  doesAllowOracleBypass: e.target.checked,
+                },
+              });
+            }}
+          >
+            allow judge-to-judge questions
+          </Checkbox>
+        </div>
         <ExperimentsCheckboxes workspace={workspace} />
         <UserOracleControls workspace={workspace} />
       </div>
     );
   }
 }
+
+const UPDATE_TREE_DOES_ALLOW_ORACLE_BYPASS = gql`
+  mutation updateTreeDoesAllowOracleBypass(
+    $treeId: String
+    $doesAllowOracleBypass: Boolean
+  ) {
+    updateTreeDoesAllowOracleBypass(
+      treeId: $treeId
+      doesAllowOracleBypass: $doesAllowOracleBypass
+    )
+  }
+`;
 
 const AdminControls: any = compose(
   graphql(UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS, {
@@ -65,6 +94,12 @@ const AdminControls: any = compose(
   }),
   graphql(UPDATE_WORKSPACE_IS_PUBLIC, {
     name: "updateWorkspaceIsPublic",
+    options: (props: any) => ({
+      refetchQueries: props.refetchQueries,
+    }),
+  }),
+  graphql(UPDATE_TREE_DOES_ALLOW_ORACLE_BYPASS, {
+    name: "updateTreeDoesAllowOracleBypass",
     options: (props: any) => ({
       refetchQueries: props.refetchQueries,
     }),

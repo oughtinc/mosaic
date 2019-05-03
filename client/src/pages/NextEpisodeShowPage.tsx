@@ -35,15 +35,20 @@ const RegisterForEmailNotification = ({ onClick, registrationStatus }) => (
       backgroundColor: VERY_LIGHT_BLUE,
       border: `1px solid ${VERY_DARK_BLUE}`,
       borderRadius: "8px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      height: "200px",
       marginBottom: "10px",
       marginRight: "10px",
-      maxWidth: "600px",
       padding: "20px",
       textAlign: "justify",
     }}
   >
-    You may choose instead to receive an e-mail notification when a workspace
-    becomes available for you in this experiment.
+    <span>
+      You may choose instead to receive an e-mail notification when a workspace
+      becomes available for you in this experiment.
+    </span>
     <div
       style={{
         alignItems: "center",
@@ -151,7 +156,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
           <div
             style={{
               display: "flex",
-              marginLeft: "20px",
               marginTop: "50px",
             }}
           >
@@ -162,16 +166,22 @@ export class NextEpisodeShowPagePresentational extends React.Component<
             <div
               style={{
                 backgroundColor: "rgba(255, 0, 0, 0.05)",
-                border: "1px solid rgba(255, 0, 0, 0.15)",
+                border: "1px solid rgb(175, 0, 0)",
                 borderRadius: "8px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                height: "200px",
                 color: "darkRed",
                 padding: "20px",
                 textAlign: "justify",
               }}
             >
-              Another option is to search for a workspace that is "suboptimal"
-              in the sense that you might have already worked on a workspace
-              close to this one.
+              <span>
+                Another option is to search for a workspace that is "suboptimal"
+                in the sense that you might have already worked on a workspace
+                close to this one.
+              </span>
               <div
                 style={{
                   alignItems: "center",

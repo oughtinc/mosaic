@@ -34,6 +34,8 @@ import Pointer from "../models/pointer";
 import PointerImport from "../models/pointerImport";
 import ExportWorkspaceLockRelation from "../models/exportWorkspaceLockRelation";
 import NotificationRequest from "../models/notificationRequest";
+import { generateHonestAnswerDraftValue } from "../models/helpers/defaultHonestOracleBlocks";
+import { generateMaliciousAnswerDraftValue } from "../models/helpers/defaultMaliciousOracleBlocks";
 
 const generateReferences = references => {
   const all = {};
@@ -484,6 +486,14 @@ const schema = new GraphQLSchema({
               b => b.type === "ANSWER_DRAFT",
             );
 
+            const includesOracleAnswerCandidateDraft = blocks.find(
+              b => b.type === "ORACLE_ANSWER_CANDIDATE",
+            );
+
+            const shouldIncludeOracleAnswerCandidateDraft =
+              result.isEligibleForHonestOracle ||
+              result.isEligibleForMaliciousOracle;
+
             if (!includesQuestion) {
               await result.$create("block", { type: "QUESTION" });
             }
@@ -509,6 +519,15 @@ const schema = new GraphQLSchema({
                   value: curAnswer.value,
                 });
               }
+            }
+
+            if (
+              shouldIncludeOracleAnswerCandidateDraft &&
+              !includesOracleAnswerCandidateDraft
+            ) {
+              await result.$create("block", {
+                type: "ORACLE_ANSWER_CANDIDATE",
+              });
             }
 
             return result;
@@ -634,7 +653,9 @@ const schema = new GraphQLSchema({
 
               await block.update({ ..._block });
 
+              const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
               if (
+                isUpdatingAnswerDraft &&
                 isInOracleMode.getValue() &&
                 !workspace.isEligibleForHonestOracle &&
                 !workspace.isEligibleForMaliciousOracle &&
@@ -646,29 +667,34 @@ const schema = new GraphQLSchema({
                 }
                 const isOracleExperiment =
                   experiment.areNewWorkspacesOracleOnlyByDefault;
+
                 if (isOracleExperiment) {
                   const parentWorkspace = await Workspace.findByPk(
                     workspace.parentId,
                   );
+
                   if (parentWorkspace === null) {
                     return newBlocks;
                   }
 
-                  if (parentWorkspace.parentId) {
+                  const isParentOracleWorkspace =
+                    parentWorkspace.isEligibleForHonestOracle ||
+                    parentWorkspace.isEligibleForMaliciousOracle;
+
+                  if (isParentOracleWorkspace && parentWorkspace.parentId) {
                     const grandparentWorkspace = await Workspace.findByPk(
                       parentWorkspace.parentId,
                     );
+
                     if (grandparentWorkspace === null) {
                       return newBlocks;
                     }
-                    const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
-                    if (isUpdatingAnswerDraft) {
-                      const blocks = (await grandparentWorkspace.$get(
-                        "blocks",
-                        { where: { type: "ANSWER_DRAFT" } },
-                      )) as Block[];
-                      await blocks[0].update({ ..._block });
-                    }
+
+                    const blocks = (await grandparentWorkspace.$get("blocks", {
+                      where: { type: "ANSWER_DRAFT" },
+                    })) as Block[];
+
+                    await blocks[0].update({ ..._block });
                   }
                 }
               }
@@ -884,6 +910,24 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeDoesAllowOracleBypass: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          doesAllowOracleBypass: { type: GraphQLBoolean },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to toggle tree oracle bypass",
+          async (_, { treeId, doesAllowOracleBypass }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ doesAllowOracleBypass });
+            return true;
+          },
+        ),
+      },
       updateWorkspaceChildren: {
         type: workspaceType,
         args: {
@@ -957,6 +1001,19 @@ const schema = new GraphQLSchema({
             if (parentWorkspace === null) {
               return false;
             }
+
+            // make honest oracle response field equal to its answer candidate
+            const blocks = (await parentWorkspace.$get("blocks")) as Block[];
+            const answerDraft = blocks.find(b => b.type === "ANSWER_DRAFT");
+            const answerCandidate = blocks.find(
+              b => b.type === "ORACLE_ANSWER_CANDIDATE",
+            );
+            if (answerDraft && answerCandidate) {
+              await answerDraft.update({ value: answerCandidate.value });
+            }
+
+            // mark honest as resolved
+            // and check to see if normal parent should be marked as stale
             await parentWorkspace.update({ isCurrentlyResolved: true });
             if (parentWorkspace.parentId) {
               const grandParent = await Workspace.findByPk(
@@ -1154,6 +1211,54 @@ const schema = new GraphQLSchema({
                         }
                       }
                     }
+                  }
+
+                  if (workspace.isEligibleForHonestOracle) {
+                    setTimeout(async () => {
+                      const blocks = (await workspace.$get(
+                        "blocks",
+                      )) as Block[];
+                      const oracleAnswerCandidate = blocks.find(
+                        b => b.type === "ORACLE_ANSWER_CANDIDATE",
+                      );
+                      const question = blocks.find(b => b.type === "QUESTION");
+
+                      // create malicious child
+                      await workspace.createChild({
+                        question: generateHonestAnswerDraftValue(
+                          _.get(question, "value"),
+                          _.get(oracleAnswerCandidate, "value"),
+                        ),
+                        totalBudget: 0,
+                        creatorId: context.user.id,
+                        isPublic: false,
+                        shouldOverrideToNormalUser: false,
+                      });
+                    }, 10000);
+                  }
+
+                  if (workspace.isEligibleForMaliciousOracle) {
+                    setTimeout(async () => {
+                      const blocks = (await workspace.$get(
+                        "blocks",
+                      )) as Block[];
+                      const oracleAnswerCandidate = blocks.find(
+                        b => b.type === "ORACLE_ANSWER_CANDIDATE",
+                      );
+                      const question = blocks.find(b => b.type === "QUESTION");
+
+                      // create malicious child
+                      await workspace.createChild({
+                        question: generateMaliciousAnswerDraftValue(
+                          _.get(question, "value"),
+                          _.get(oracleAnswerCandidate, "value"),
+                        ),
+                        totalBudget: 0,
+                        creatorId: context.user.id,
+                        isPublic: false,
+                        shouldOverrideToNormalUser: false,
+                      });
+                    }, 10000);
                   }
                 }
 

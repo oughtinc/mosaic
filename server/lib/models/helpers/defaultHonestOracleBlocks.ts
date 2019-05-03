@@ -15,37 +15,7 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: `A (correct):  `,
-              marks: [],
-            },
-          ],
-        },
-        {
-          object: "inline",
-          type: "pointerExport",
-          isVoid: false,
-          data: {
-            pointerId: a1id,
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [
-                {
-                  object: "leaf",
-                  text: "  ",
-                  marks: [],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          object: "text",
-          leaves: [
-            {
-              object: "leaf",
-              text: " ",
+              text: "",
               marks: [],
             },
           ],
@@ -66,38 +36,11 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
           leaves: [
             {
               object: "leaf",
-              text: "The honest oracle has responded to question ",
+              text: "",
               marks: [],
             },
           ],
         },
-        {
-          object: "inline",
-          type: "pointerExport",
-          isVoid: false,
-          data: { pointerId: uuidv4() },
-          nodes: questionValue[0].nodes.map(node => processNode(node)),
-        },
-        {
-          object: "text",
-          leaves: [{ object: "leaf", text: " with answer ", marks: [] }],
-        },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId: a1id,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
-            {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
-            },
-          ],
-        },
-        { object: "text", leaves: [{ object: "leaf", text: ".", marks: [] }] },
       ],
     },
   ];
@@ -111,24 +54,14 @@ export const createHonestOracleDefaultBlockValues = questionValue => {
       nodes: [
         {
           object: "text",
-          leaves: [{ object: "leaf", text: `A `, marks: [] }],
-        },
-        {
-          object: "inline",
-          type: "pointerImport",
-          isVoid: true,
-          data: {
-            pointerId: a1id,
-            internalReferenceId: uuidv4(),
-          },
-          nodes: [
+          leaves: [
             {
-              object: "text",
-              leaves: [{ object: "leaf", text: " ", marks: [] }],
+              object: "leaf",
+              text: "",
+              marks: [],
             },
           ],
         },
-        { object: "text", leaves: [{ object: "leaf", text: "", marks: [] }] },
       ],
     },
   ];
@@ -167,4 +100,50 @@ function processNode(node: any) {
   } else {
     return node;
   }
+}
+
+export function generateHonestAnswerDraftValue(questionValue, blockValue) {
+  const nodes = blockValue[0].nodes;
+
+  const answerDraftBlockValue = [
+    {
+      object: "block",
+      type: "line",
+      isVoid: false,
+      data: {},
+      nodes: [
+        {
+          object: "text",
+          leaves: [
+            {
+              object: "leaf",
+              text: "The honest oracle has responded to question ",
+              marks: [],
+            },
+          ],
+        },
+        {
+          object: "inline",
+          type: "pointerExport",
+          isVoid: false,
+          data: { pointerId: uuidv4() },
+          nodes: questionValue[0].nodes.map(node => processNode(node)),
+        },
+        {
+          object: "text",
+          leaves: [{ object: "leaf", text: " with answer ", marks: [] }],
+        },
+        {
+          object: "inline",
+          type: "pointerExport",
+          isVoid: false,
+          data: { pointerId: uuidv4() },
+          nodes: nodes.map(node => processNode(node)),
+        },
+        { object: "text", leaves: [{ object: "leaf", text: ".", marks: [] }] },
+      ],
+    },
+  ];
+
+  return answerDraftBlockValue;
 }

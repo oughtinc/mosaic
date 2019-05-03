@@ -28,6 +28,9 @@ export default class Tree extends Model<Tree> {
   @Column(DataType.UUID)
   public rootWorkspaceId: string;
 
+  @Column(DataType.BOOLEAN)
+  public doesAllowOracleBypass: boolean;
+
   @BelongsTo(() => Workspace)
   public rootWorkspace: Workspace;
 

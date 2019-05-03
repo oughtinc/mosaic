@@ -443,6 +443,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            doesAllowOracleBypass={this.props.doesAllowOracleBypass}
             isWorkspacePartOfOracleExperiment={
               this.props.isWorkspacePartOfOracleExperiment
             }
