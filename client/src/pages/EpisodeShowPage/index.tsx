@@ -318,7 +318,7 @@ export class WorkspaceView extends React.Component<any, any> {
       );
     } catch (err) {
       // @ts-ignore
-      if (window.FS) {
+      if (window.FS && window.FS.log) {
         // @ts-ignore
         window.FS.log("error", err.toString());
       } else {
