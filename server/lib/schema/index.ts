@@ -653,7 +653,9 @@ const schema = new GraphQLSchema({
 
               await block.update({ ..._block });
 
+              const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
               if (
+                isUpdatingAnswerDraft &&
                 isInOracleMode.getValue() &&
                 !workspace.isEligibleForHonestOracle &&
                 !workspace.isEligibleForMaliciousOracle &&
@@ -665,29 +667,34 @@ const schema = new GraphQLSchema({
                 }
                 const isOracleExperiment =
                   experiment.areNewWorkspacesOracleOnlyByDefault;
+
                 if (isOracleExperiment) {
                   const parentWorkspace = await Workspace.findByPk(
                     workspace.parentId,
                   );
+
                   if (parentWorkspace === null) {
                     return newBlocks;
                   }
 
-                  if (parentWorkspace.parentId) {
+                  const isParentOracleWorkspace =
+                    parentWorkspace.isEligibleForHonestOracle ||
+                    parentWorkspace.isEligibleForMaliciousOracle;
+
+                  if (isParentOracleWorkspace && parentWorkspace.parentId) {
                     const grandparentWorkspace = await Workspace.findByPk(
                       parentWorkspace.parentId,
                     );
+
                     if (grandparentWorkspace === null) {
                       return newBlocks;
                     }
-                    const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
-                    if (isUpdatingAnswerDraft) {
-                      const blocks = (await grandparentWorkspace.$get(
-                        "blocks",
-                        { where: { type: "ANSWER_DRAFT" } },
-                      )) as Block[];
-                      await blocks[0].update({ ..._block });
-                    }
+
+                    const blocks = (await grandparentWorkspace.$get("blocks", {
+                      where: { type: "ANSWER_DRAFT" },
+                    })) as Block[];
+
+                    await blocks[0].update({ ..._block });
                   }
                 }
               }
