@@ -903,6 +903,24 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeDoesAllowOracleBypass: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          doesAllowOracleBypass: { type: GraphQLBoolean },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to toggle tree oracle bypass",
+          async (_, { treeId, doesAllowOracleBypass }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ doesAllowOracleBypass });
+            return true;
+          },
+        ),
+      },
       updateWorkspaceChildren: {
         type: workspaceType,
         args: {

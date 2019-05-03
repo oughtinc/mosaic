@@ -295,6 +295,7 @@ const EXPERIMENT_QUERY = gql`
           }
           tree {
             id
+            doesAllowOracleBypass
             experiments {
               id
               createdAt

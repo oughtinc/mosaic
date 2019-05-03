@@ -338,7 +338,8 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 : "Submit"}
             </Button>
             {this.props.isWorkspacePartOfOracleExperiment &&
-              !this.props.isUserOracle && (
+              !this.props.isUserOracle &&
+              this.props.doesAllowOracleBypass && (
                 <Button
                   bsSize="xsmall"
                   bsStyle="danger"

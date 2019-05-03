@@ -113,6 +113,7 @@ const WORKSPACE_QUERY = gql`
         id
         tree {
           id
+          doesAllowOracleBypass
           experiments {
             id
             areNewWorkspacesOracleOnlyByDefault
@@ -923,6 +924,10 @@ export class WorkspaceView extends React.Component<any, any> {
                             !isRequestingLazyUnlock
                           ) && (
                             <ChildrenSidebar
+                              doesAllowOracleBypass={
+                                workspace.rootWorkspace.tree
+                                  .doesAllowOracleBypass
+                              }
                               isWorkspacePartOfOracleExperiment={
                                 isWorkspacePartOfOracleExperiment
                               }
