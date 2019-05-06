@@ -80,7 +80,7 @@
     "concurrently": "^4.0.1",
     "immutable": "^3.8.2",
     "mocha": "^6.1.4",
-    "nodemon": "^1.12.1",
+    "nodemon": "^1.19.0",
     "prettier": "^1.17.0",
     "rimraf": "^2.6.2",
     "sinon": "^7.3.2",
