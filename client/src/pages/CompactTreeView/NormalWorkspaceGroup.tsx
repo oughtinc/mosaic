@@ -7,7 +7,6 @@ import { CompactTreeRowContent } from "./CompactTreeRowContent";
 import { Subquestions } from "./Subquestions";
 
 import { BlockEditor } from "../../components/BlockEditor";
-import { databaseJSONToValue } from "../../lib/slateParser";
 
 const Checkmark = ({ color }) => (
   <span style={{ color, fontSize: "24px" }}>✓</span>
@@ -19,17 +18,14 @@ export class NormalWorkspaceGroup extends React.PureComponent<any, any> {
       availablePointers,
       isExpanded,
       isThisActiveWorkspace,
+      oracleBypassAnswerBlockId,
+      oracleBypassAnswerValue,
+      questionBlockId,
+      questionValue,
       workspace,
     } = this.props;
 
-    const questionBlock = workspace.blocks.find(b => b.type === "QUESTION");
-    const questionValue = databaseJSONToValue(questionBlock.value);
-
-    const answerDraftBlock = workspace.blocks.find(
-      b => b.type === "ANSWER_DRAFT",
-    );
     const isCurrentlyResolved = workspace.isCurrentlyResolved;
-    const answerDraftValue = databaseJSONToValue(answerDraftBlock.value);
 
     const subquestions = workspace.childWorkspaces;
 
@@ -52,8 +48,8 @@ export class NormalWorkspaceGroup extends React.PureComponent<any, any> {
             }}
           >
             <BlockEditor
-              name={questionBlock.id}
-              blockId={questionBlock.id}
+              name={questionBlockId}
+              blockId={questionBlockId}
               readOnly={true}
               initialValue={questionValue}
               shouldAutosave={false}
@@ -79,10 +75,10 @@ export class NormalWorkspaceGroup extends React.PureComponent<any, any> {
               ) : (
                 <CompactTreeRowContent>
                   <BlockEditor
-                    name={answerDraftValue.id}
-                    blockId={answerDraftValue.id}
+                    name={oracleBypassAnswerBlockId}
+                    blockId={oracleBypassAnswerBlockId}
                     readOnly={true}
-                    initialValue={answerDraftValue}
+                    initialValue={oracleBypassAnswerValue}
                     shouldAutosave={false}
                     availablePointers={availablePointers}
                   />

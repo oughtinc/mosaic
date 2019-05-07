@@ -1,11 +1,7 @@
-import * as _ from "lodash";
-import gql from "graphql-tag";
 import * as React from "react";
-import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { scroller, Element } from "react-scroll";
-import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 
 import { CompactTreeRow } from "./CompactTreeRow";
@@ -19,8 +15,6 @@ import { LazyUnlockGroup } from "./LazyUnlockGroup";
 import { NormalWorkspaceGroup } from "./NormalWorkspaceGroup";
 
 import { BlockEditor } from "../../components/BlockEditor";
-import { databaseJSONToValue } from "../../lib/slateParser";
-import { extractOracleValueAnswerFromBlock } from "./helpers/extractOracleAnswerValueFromBlock";
 
 const Checkmark = ({ color }) => (
   <span style={{ color, fontSize: "24px" }}>✓</span>
@@ -45,75 +39,43 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   }
 
   public render() {
-    const { workspace } = this.props;
     const isThisActiveWorkspace =
-      parseQueryString(window.location.search).activeWorkspace === workspace.id;
+      parseQueryString(window.location.search).activeWorkspace ===
+      this.props.workspace.id;
 
-    if (workspace.isRequestingLazyUnlock) {
+    if (this.props.isRequestingLazyUnlock) {
       return (
         <LazyUnlockGroup
           availablePointers={this.props.availablePointers}
           isExpanded={this.props.isExpanded}
           isThisActiveWorkspace={isThisActiveWorkspace}
-          workspace={workspace}
+          workspace={this.props.workspace}
         />
       );
     }
 
-    const isWorkspaceNormal =
-      !workspace.isEligibleForHonestOracle &&
-      !workspace.isEligibleForMaliciousOracle;
-    if (isWorkspaceNormal) {
+    if (this.props.isWorkspaceNormal) {
       return (
         <NormalWorkspaceGroup
           availablePointers={this.props.availablePointers}
           isExpanded={this.props.isExpanded}
           isThisActiveWorkspace={isThisActiveWorkspace}
-          workspace={workspace}
+          oracleBypassAnswerBlockId={this.props.oracleBypassAnswerBlockId}
+          oracleBypassAnswerValue={this.props.oracleBypassAnswerValue}
+          questionBlockId={this.props.questionBlockId}
+          questionValue={this.props.questionValue}
+          workspace={this.props.workspace}
         />
       );
     }
 
-    const honestQuestionBlock = workspace.blocks.find(
-      b => b.type === "QUESTION",
-    );
-    const questionValue = databaseJSONToValue(honestQuestionBlock.value);
-
-    const honestScratchpadBlock = workspace.blocks.find(
-      b => b.type === "SCRATCHPAD",
-    );
-    const honestScratchpadValue = extractOracleValueAnswerFromBlock(
-      honestScratchpadBlock,
-    );
-
-    const isHonestOracleCurrentlyResolved = workspace.isCurrentlyResolved;
-
-    const idOfPointerInHonestScratchpad = _.get(
-      honestScratchpadBlock,
-      "value[0].nodes[1].data.pointerId",
-    );
-    const honestAnswerDraftBlock = workspace.blocks.find(
-      b => b.type === "ANSWER_DRAFT",
-    );
-    const idOfPointerInHonestAnswerDraft = _.get(
-      honestAnswerDraftBlock,
-      "value[0].nodes[1].data.pointerId",
-    );
-    const isSamePointerInHonestScratchpadAndAnswerDraft =
-      idOfPointerInHonestScratchpad === idOfPointerInHonestAnswerDraft;
-    const didHonestWin =
-      isHonestOracleCurrentlyResolved &&
-      isSamePointerInHonestScratchpadAndAnswerDraft;
-
-    const malicious = workspace.childWorkspaces[0];
-
     if (!this.props.isExpanded) {
       return (
-        <Element name={workspace.id}>
+        <Element name={this.props.workspace.id}>
           <CompactTreeRow>
             <Link
               target="_blank"
-              to={`/workspaces/${workspace.parentId}`}
+              to={`/workspaces/${this.props.workspace.parentId}`}
               style={{ color: "#333", textDecoration: "none" }}
             >
               <CompactTreeRowLabel>Q</CompactTreeRowLabel>
@@ -124,25 +86,25 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
               }}
             >
               <BlockEditor
-                name={honestQuestionBlock.id}
-                blockId={honestQuestionBlock.id}
+                name={this.props.questionBlockId}
+                blockId={this.props.questionBlockId}
                 readOnly={true}
-                initialValue={questionValue}
+                initialValue={this.props.questionValue}
                 shouldAutosave={false}
                 availablePointers={this.props.availablePointers}
               />
             </CompactTreeRowContent>
           </CompactTreeRow>
-          {didHonestWin && (
+          {this.props.didHonestWin && (
             <CompactTreeRow>
               <CompactTreeRowLabel color="green">
                 <Link
                   style={{ textDecoration: "none" }}
                   target="_blank"
                   to={`/workspaces/${
-                    malicious.childWorkspaces[0]
-                      ? malicious.childWorkspaces[0].id
-                      : malicious.id
+                    this.props.malicious.childWorkspaces[0]
+                      ? this.props.malicious.childWorkspaces[0].id
+                      : this.props.malicious.id
                   }`}
                 >
                   <Checkmark color="green" />
@@ -153,30 +115,30 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
                     textDecoration: "none",
                   }}
                   target="_blank"
-                  to={`/workspaces/${workspace.id}`}
+                  to={`/workspaces/${this.props.workspace.id}`}
                 >
                   H
                 </Link>
               </CompactTreeRowLabel>
               <CompactTreeRowContent>
                 <BlockEditor
-                  name={honestScratchpadBlock.id}
-                  blockId={honestScratchpadBlock.id}
+                  name={this.props.honestAnswerBlockId}
+                  blockId={this.props.honestAnswerBlockId}
                   readOnly={true}
-                  initialValue={honestScratchpadValue}
+                  initialValue={this.props.honestAnswerValue}
                   shouldAutosave={false}
                   availablePointers={this.props.availablePointers}
                 />
               </CompactTreeRowContent>
             </CompactTreeRow>
           )}
-          {!didHonestWin && malicious && (
+          {this.props.didMaliciousWin && (
             <MaliciousAnswerIfMaliciousWon
               availablePointers={this.props.availablePointers}
-              didHonestWin={didHonestWin}
-              idOfPointerInHonestAnswerDraft={idOfPointerInHonestAnswerDraft}
-              isHonestOracleCurrentlyResolved={isHonestOracleCurrentlyResolved}
-              malicious={malicious}
+              malicious={this.props.malicious}
+              maliciousAnswerBlockId={this.props.maliciousAnswerBlockId}
+              maliciousAnswerValue={this.props.maliciousAnswerValue}
+              normal={this.props.normal}
             />
           )}
         </Element>
@@ -184,12 +146,12 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
     }
 
     return (
-      <Element name={workspace.id}>
+      <Element name={this.props.workspace.id}>
         <CompactTreeRow>
           <Link
             style={{ color: "#333", textDecoration: "none" }}
             target="_blank"
-            to={`/workspaces/${workspace.parentId}`}
+            to={`/workspaces/${this.props.workspace.parentId}`}
           >
             <CompactTreeRowLabel>Q</CompactTreeRowLabel>
           </Link>
@@ -199,10 +161,10 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
             }}
           >
             <BlockEditor
-              name={honestQuestionBlock.id}
-              blockId={honestQuestionBlock.id}
+              name={this.props.questionBlockId}
+              blockId={this.props.questionBlockId}
               readOnly={true}
-              initialValue={questionValue}
+              initialValue={this.props.questionValue}
               shouldAutosave={false}
               availablePointers={this.props.availablePointers}
             />
@@ -211,14 +173,14 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
 
         <CompactTreeRow>
           <CompactTreeRowLabel color="green">
-            {didHonestWin && (
+            {this.props.didHonestWin && (
               <Link
                 style={{ textDecoration: "none" }}
                 target="_blank"
                 to={`/workspaces/${
-                  malicious.childWorkspaces[0]
-                    ? malicious.childWorkspaces[0].id
-                    : malicious.id
+                  this.props.normal
+                    ? this.props.normal.id
+                    : this.props.malicious.id
                 }`}
               >
                 <Checkmark color="green" />
@@ -227,18 +189,18 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
             <Link
               style={{ color: "green", textDecoration: "none" }}
               target="_blank"
-              to={`/workspaces/${workspace.id}`}
+              to={`/workspaces/${this.props.workspace.id}`}
             >
               H
             </Link>
           </CompactTreeRowLabel>
-          {malicious ? (
+          {this.props.malicious ? (
             <CompactTreeRowContent>
               <BlockEditor
-                name={honestScratchpadBlock.id}
-                blockId={honestScratchpadBlock.id}
+                name={this.props.honestAnswerBlockId}
+                blockId={this.props.honestAnswerBlockId}
                 readOnly={true}
-                initialValue={honestScratchpadValue}
+                initialValue={this.props.honestAnswerValue}
                 shouldAutosave={false}
                 availablePointers={this.props.availablePointers}
               />
@@ -247,13 +209,18 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
             <span style={{ color: "#999" }}>Waiting for response</span>
           )}
         </CompactTreeRow>
-        {malicious && (
+        {this.props.malicious && (
           <MaliciousAnswerAndMaybeSubquestions
             availablePointers={this.props.availablePointers}
-            didHonestWin={didHonestWin}
-            idOfPointerInHonestAnswerDraft={idOfPointerInHonestAnswerDraft}
-            isHonestOracleCurrentlyResolved={isHonestOracleCurrentlyResolved}
-            malicious={malicious}
+            didHonestWin={this.props.didHonestWin}
+            didMaliciousDeclineToChallenge={
+              this.props.didMaliciousDeclineToChallenge
+            }
+            didMaliciousWin={this.props.didMaliciousWin}
+            malicious={this.props.malicious}
+            maliciousAnswerBlockId={this.props.maliciousAnswerBlockId}
+            maliciousAnswerValue={this.props.maliciousAnswerValue}
+            normal={this.props.normal}
           />
         )}
       </Element>
@@ -305,8 +272,8 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
         </Button>
         <a
           href={
-            this.props.groupQuery.workspace &&
-            `/workspaces/${this.props.groupQuery.workspace.id}/compactTree`
+            this.props.workspace &&
+            `/workspaces/${this.props.workspace.id}/compactTree`
           }
           style={{
             right: "5px",
@@ -328,9 +295,9 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
         </a>
         <a
           href={
-            this.props.groupQuery.workspace &&
+            this.props.workspace &&
             `${window.location.pathname}?expanded=true&activeWorkspace=${
-              this.props.groupQuery.workspace.id
+              this.props.workspace.id
             }`
           }
           style={{
@@ -349,17 +316,34 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
             #
           </Button>
         </a>
-        {this.props.groupQuery.workspace ? (
+        {this.props.hasLoaded ? (
           <div
             style={{
               minHeight: "52px",
-              opacity: this.props.groupQuery.workspace.isArchived ? 0.2 : 1,
+              opacity: this.props.workspace.isArchived ? 0.2 : 1,
             }}
           >
             <CompactTreeGroupPresentationl
               availablePointers={this.props.availablePointers}
+              didHonestWin={this.props.didHonestWin}
+              didMaliciousWin={this.props.didMaliciousWin}
+              didMaliciousDeclineToChallenge={
+                this.props.didMaliciousDeclineToChallenge
+              }
+              honestAnswerBlockId={this.props.honestAnswerBlockId}
+              honestAnswerValue={this.props.honestAnswerValue}
               isExpanded={this.state.isExpanded}
-              workspace={this.props.groupQuery.workspace}
+              isRequestingLazyUnlock={this.props.isRequestingLazyUnlock}
+              isWorkspaceNormal={this.props.isWorkspaceNormal}
+              malicious={this.props.malicious}
+              maliciousAnswerBlockId={this.props.maliciousAnswerBlockId}
+              maliciousAnswerValue={this.props.maliciousAnswerValue}
+              normal={this.props.normal}
+              oracleBypassAnswerBlockId={this.props.oracleBypassAnswerBlockId}
+              oracleBypassAnswerValue={this.props.oracleBypassAnswerValue}
+              questionBlockId={this.props.questionBlockId}
+              questionValue={this.props.questionValue}
+              workspace={this.props.workspace}
             />
           </div>
         ) : (
@@ -372,55 +356,4 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
   }
 }
 
-export const GROUP_QUERY = gql`
-  query groupQuery($workspaceId: String!) {
-    workspace(id: $workspaceId) {
-      id
-      parentId
-      isArchived
-      isCurrentlyResolved
-      isEligibleForHonestOracle
-      isEligibleForMaliciousOracle
-      isRequestingLazyUnlock
-      connectedPointersOfSubtree
-      blocks {
-        id
-        value
-        type
-      }
-      childWorkspaces {
-        id
-        isCurrentlyResolved
-        blocks {
-          id
-          value
-          type
-        }
-        childWorkspaces {
-          id
-          blocks {
-            id
-            value
-            type
-          }
-          childWorkspaces {
-            id
-            createdAt
-            isRequestingLazyUnlock
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const CompactTreeGroup: any = compose(
-  graphql(GROUP_QUERY, {
-    name: "groupQuery",
-    options: (props: any) => ({
-      variables: {
-        workspaceId: props.workspaceId,
-      },
-    }),
-  }),
-)(CompactTreeGroupContainer);
+export const CompactTreeGroup = CompactTreeGroupContainer;
