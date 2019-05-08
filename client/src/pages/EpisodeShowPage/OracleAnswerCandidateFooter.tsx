@@ -59,8 +59,6 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
       responseIsEmpty,
     } = this.props;
 
-    console.log("responseIsEmpty", responseIsEmpty);
-
     return (
       <div
         style={{
@@ -103,7 +101,6 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
 }
 
 const mapStateToProps = (state, props) => {
-  console.log(props);
   const responseBlock = state.blocks.blocks.find(
     block => block.id === props.blockId,
   );
