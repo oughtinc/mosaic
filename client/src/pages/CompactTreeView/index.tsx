@@ -7,6 +7,7 @@ import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 import { ContentContainer } from "../../components/ContentContainer";
 import { CompactTreeGroupContainer as V1CompactTreeGroupContainer } from "./V1CompactTreeGroupContainer";
+import { CompactTreeGroupContainer as V2CompactTreeGroupContainer } from "./V2CompactTreeGroupContainer";
 import { getVersionOfTree } from "./helpers/getVersionOfTree";
 
 export class CompactTreeViewContainer extends React.PureComponent<any, any> {
@@ -79,12 +80,12 @@ export class CompactTreeViewPresentational extends React.PureComponent<
             />
           </div>
         ) : (
-          <div
-            key={workspace.id}
-            style={{ marginBottom: "10px", marginTop: "20px" }}
-          >
-            Tree version in progress
-          </div>
+          <V2CompactTreeGroupContainer
+            availablePointers={workspace.connectedPointersOfSubtree}
+            workspaceId={
+              isRootLevel ? workspace.childWorkspaces[0].id : workspace.id
+            }
+          />
         )}
       </CompactTreeViewContainer>
     );

@@ -2,6 +2,8 @@ import * as _ from "lodash";
 import * as React from "react";
 
 import { CompactTreeGroupContainer as V1CompactTreeGroupContainer } from "./V1CompactTreeGroupContainer";
+import { CompactTreeGroupContainer as V2CompactTreeGroupContainer } from "./V2CompactTreeGroupContainer";
+
 import { getVersionOfTree } from "./helpers/getVersionOfTree";
 
 export class Subquestions extends React.PureComponent<any, any> {
@@ -23,7 +25,10 @@ export class Subquestions extends React.PureComponent<any, any> {
           }
           return (
             <div key={w.id} style={{ marginBottom: "10px" }}>
-              Tree version in progress
+              <V2CompactTreeGroupContainer
+                availablePointers={availablePointers}
+                workspaceId={w.id}
+              />
             </div>
           );
         })}
