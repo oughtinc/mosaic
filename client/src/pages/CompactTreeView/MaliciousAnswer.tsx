@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import * as React from "react";
 import { Link } from "react-router-dom";
 
@@ -8,8 +7,6 @@ import { CompactTreeRowContent } from "./CompactTreeRowContent";
 
 import { BlockEditor } from "../../components/BlockEditor";
 
-import { extractOracleValueAnswerFromBlock } from "./helpers/extractOracleAnswerValueFromBlock";
-
 const Checkmark = ({ color }) => (
   <span style={{ color, fontSize: "24px" }}>✓</span>
 );
@@ -18,31 +15,13 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
   public render() {
     const {
       availablePointers,
-      didHonestWin,
-      idOfPointerInHonestAnswerDraft,
-      isHonestOracleCurrentlyResolved,
+      didMaliciousWin,
+      didMaliciousDeclineToChallenge,
       malicious,
+      maliciousAnswerBlockId,
+      maliciousAnswerValue,
+      normal,
     } = this.props;
-
-    const maliciousScratchpadBlock = malicious.blocks.find(
-      b => b.type === "SCRATCHPAD",
-    );
-    const maliciousScratchpadValue = extractOracleValueAnswerFromBlock(
-      maliciousScratchpadBlock,
-    );
-
-    const idOfPointerInMaliciousScratchpad = _.get(
-      maliciousScratchpadBlock,
-      "value[0].nodes[1].data.pointerId",
-    );
-    const isSamePointerInMaliciousScratchpadAndHonestAnswerDraft =
-      idOfPointerInMaliciousScratchpad === idOfPointerInHonestAnswerDraft;
-    const didMaliciousWin =
-      isHonestOracleCurrentlyResolved &&
-      isSamePointerInMaliciousScratchpadAndHonestAnswerDraft;
-
-    const normal = malicious.childWorkspaces[0];
-    const didMaliciousDeclineToChallenge = didHonestWin && !normal;
 
     return (
       <CompactTreeRow>
@@ -72,10 +51,10 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
         ) : normal ? (
           <CompactTreeRowContent>
             <BlockEditor
-              name={maliciousScratchpadBlock.id}
-              blockId={maliciousScratchpadBlock.id}
+              name={maliciousAnswerBlockId}
+              blockId={maliciousAnswerBlockId}
               readOnly={true}
-              initialValue={maliciousScratchpadValue}
+              initialValue={maliciousAnswerValue}
               shouldAutosave={false}
               availablePointers={availablePointers}
             />

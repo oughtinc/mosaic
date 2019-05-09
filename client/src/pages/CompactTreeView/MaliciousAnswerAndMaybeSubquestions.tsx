@@ -11,22 +11,25 @@ export class MaliciousAnswerAndMaybeSubquestions extends React.PureComponent<
     const {
       availablePointers,
       didHonestWin,
-      idOfPointerInHonestAnswerDraft,
-      isHonestOracleCurrentlyResolved,
+      didMaliciousDeclineToChallenge,
+      didMaliciousWin,
       malicious,
+      maliciousAnswerBlockId,
+      maliciousAnswerValue,
+      normal,
     } = this.props;
-
-    const normal = malicious.childWorkspaces[0];
-    const didMaliciousDeclineToChallenge = didHonestWin && !normal;
 
     return (
       <div>
         <MaliciousAnswer
-          availablePointers={this.props.availablePointers}
+          availablePointers={availablePointers}
           didHonestWin={didHonestWin}
-          idOfPointerInHonestAnswerDraft={idOfPointerInHonestAnswerDraft}
-          isHonestOracleCurrentlyResolved={isHonestOracleCurrentlyResolved}
+          didMaliciousDeclineToChallenge={didMaliciousDeclineToChallenge}
+          didMaliciousWin={didMaliciousWin}
           malicious={malicious}
+          maliciousAnswerBlockId={maliciousAnswerBlockId}
+          maliciousAnswerValue={maliciousAnswerValue}
+          normal={normal}
         />
         {!didMaliciousDeclineToChallenge &&
           normal &&

@@ -6,7 +6,9 @@ import { Helmet } from "react-helmet";
 import { compose } from "recompose";
 import { parse as parseQueryString } from "query-string";
 import { ContentContainer } from "../../components/ContentContainer";
-import { CompactTreeGroup } from "./CompactTreeGroup";
+import { CompactTreeGroupContainer as V1CompactTreeGroupContainer } from "./V1CompactTreeGroupContainer";
+import { CompactTreeGroupContainer as V2CompactTreeGroupContainer } from "./V2CompactTreeGroupContainer";
+import { getVersionOfTree } from "./helpers/getVersionOfTree";
 
 export class CompactTreeViewContainer extends React.PureComponent<any, any> {
   public render() {
@@ -58,12 +60,27 @@ export class CompactTreeViewPresentational extends React.PureComponent<
     const workspace = this.props.initialRootQuery.workspace;
     const isRootLevel = !workspace.parentId;
 
+    if (isRootLevel && !workspace.childWorkspaces[0]) {
+      return (
+        <CompactTreeViewContainer>
+          <div style={{ marginTop: "20px" }}>Nothing to show yet...</div>
+        </CompactTreeViewContainer>
+      );
+    }
+
     return (
       <CompactTreeViewContainer>
-        {isRootLevel && !workspace.childWorkspaces[0] ? (
-          <div style={{ marginTop: "20px" }}>Nothing to show yet...</div>
+        {getVersionOfTree(workspace) === "V1" ? (
+          <div key={workspace.id} style={{ marginBottom: "10px" }}>
+            <V1CompactTreeGroupContainer
+              availablePointers={workspace.connectedPointersOfSubtree}
+              workspaceId={
+                isRootLevel ? workspace.childWorkspaces[0].id : workspace.id
+              }
+            />
+          </div>
         ) : (
-          <CompactTreeGroup
+          <V2CompactTreeGroupContainer
             availablePointers={workspace.connectedPointersOfSubtree}
             workspaceId={
               isRootLevel ? workspace.childWorkspaces[0].id : workspace.id
@@ -79,6 +96,7 @@ export const INITIAL_ROOT_QUERY = gql`
   query initialRootQuery($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      createdAt
       parentId
       isEligibleForHonestOracle
       isEligibleForMaliciousOracle

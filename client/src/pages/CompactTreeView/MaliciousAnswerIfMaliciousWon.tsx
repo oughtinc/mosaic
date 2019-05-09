@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import * as React from "react";
 
 import { MaliciousAnswer } from "./MaliciousAnswer";
@@ -8,35 +7,17 @@ export class MaliciousAnswerIfMaliciousWon extends React.PureComponent<
   any
 > {
   public render() {
-    const {
-      availablePointers,
-      didHonestWin,
-      idOfPointerInHonestAnswerDraft,
-      isHonestOracleCurrentlyResolved,
-      malicious,
-    } = this.props;
-
-    const maliciousScratchpadBlock = malicious.blocks.find(
-      b => b.type === "SCRATCHPAD",
-    );
-    const idOfPointerInMaliciousScratchpad = _.get(
-      maliciousScratchpadBlock,
-      "value[0].nodes[1].data.pointerId",
-    );
-    const isSamePointerInMaliciousScratchpadAndHonestAnswerDraft =
-      idOfPointerInMaliciousScratchpad === idOfPointerInHonestAnswerDraft;
-    const didMaliciousWin =
-      isHonestOracleCurrentlyResolved &&
-      isSamePointerInMaliciousScratchpadAndHonestAnswerDraft;
-
-    return didMaliciousWin ? (
+    return (
       <MaliciousAnswer
-        availablePointers={availablePointers}
-        didHonestWin={didHonestWin}
-        idOfPointerInHonestAnswerDraft={idOfPointerInHonestAnswerDraft}
-        isHonestOracleCurrentlyResolved={isHonestOracleCurrentlyResolved}
-        malicious={malicious}
+        availablePointers={this.props.availablePointers}
+        didHonestWin={false}
+        didMaliciousWin={true}
+        didMaliciousDeclineToChallenge={false}
+        malicious={this.props.malicious}
+        maliciousAnswerBlockId={this.props.maliciousAnswerBlockId}
+        maliciousAnswerValue={this.props.maliciousAnswerValue}
+        normal={this.props.normal}
       />
-    ) : null;
+    );
   }
 }
