@@ -138,6 +138,7 @@ export const GROUP_QUERY = gql`
   query groupQuery($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      createdAt
       parentId
       isArchived
       isCurrentlyResolved

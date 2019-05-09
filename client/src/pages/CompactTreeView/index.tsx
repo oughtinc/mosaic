@@ -96,6 +96,7 @@ export const INITIAL_ROOT_QUERY = gql`
   query initialRootQuery($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      createdAt
       parentId
       isEligibleForHonestOracle
       isEligibleForMaliciousOracle
