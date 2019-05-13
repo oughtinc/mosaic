@@ -1,3 +1,3 @@
 export function authTokenFromContext(ctx) {
-  return ctx.authorization;
+  return ctx.authorization.split("::")[0];
 }
