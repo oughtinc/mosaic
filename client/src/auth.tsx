@@ -106,15 +106,9 @@ export class Auth {
   }
 
   public static isAuthenticated(): boolean {
-    // Check whether the current time is past the
-    // Access Token's expiry time
-    const isExpired = Auth.timeToLogOut() <= 0;
-    if (isExpired) {
-      Auth.logout();
-      return false;
-    }
-
-    return true;
+    return !!(
+      localStorage.getItem("user_id") && localStorage.getItem("access_token")
+    );
   }
 
   public static isAuthorizedToEditWorkspace(workspace?: any): boolean {
