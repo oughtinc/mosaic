@@ -3787,10 +3787,10 @@ graphql-relay@^0.6.0:
   dependencies:
     prettier "^1.16.0"
 
-graphql-sequelize@^9.3.5:
-  version "9.3.5"
-  resolved "https://registry.yarnpkg.com/graphql-sequelize/-/graphql-sequelize-9.3.5.tgz#0ff48d763411078e6b98d85b93e8ec8338480fec"
-  integrity sha512-1uXmSptUUf2UogLgxwLSLSC+GdeM+wWB2oW8bw5hZA9XCLmKOABNkC1jfvxK9oQ40Gy1oomS0ZiSGfiHCeGSfQ==
+graphql-sequelize@^9.3.6:
+  version "9.3.6"
+  resolved "https://registry.yarnpkg.com/graphql-sequelize/-/graphql-sequelize-9.3.6.tgz#f7fcab0300cf52d94770dc9213175da38ad46fdf"
+  integrity sha512-dG58XGm54jdUymRNSbeMJpkxV6QD+/+rln1pwZ/t2SghP5lkuRqbRn2yQe5zd3qQExEQ94rNLlkJoFSxBssXhg==
   dependencies:
     bluebird "^3.4.0"
     invariant "2.2.1"
