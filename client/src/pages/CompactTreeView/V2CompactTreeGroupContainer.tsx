@@ -88,7 +88,7 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
         "value[0].nodes[1].data.pointerId",
       );
 
-      const maliciousQuestionBlock = workspace.blocks.find(
+      const maliciousQuestionBlock = malicious.blocks.find(
         b => b.type === "QUESTION",
       );
 
