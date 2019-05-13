@@ -6678,10 +6678,10 @@ sequelize-typescript@^1.0.0-beta.0:
     "@types/node" "*"
     glob "7.1.2"
 
-sequelize@^5.7.6:
-  version "5.7.6"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.7.6.tgz#ed531a338d40749c7a80ba3a8a2120490d57b2ac"
-  integrity sha512-eBOgOnhNpoFaizRZpJm9Z3+PuVgVbJHApHqRaIkzkw7t049kYxdjQvTkKuQ4uZI8jncVIx9SlofRi5QhO7t/oA==
+sequelize@^5.8.6:
+  version "5.8.6"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.8.6.tgz#22cd5b9443fa303552f925f99a08c9a5236f86cb"
+  integrity sha512-u6KJuMBNLAE44PkGUTlevBseb6BV/n5r8CDGmYe1VxcGxdlWXYUiNXlEFEW0OL6ie+yXYV7dnPHa/fDi1M7gMw==
   dependencies:
     bluebird "^3.5.0"
     cls-bluebird "^2.1.0"
