@@ -94,7 +94,7 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
 
       const idOf2ndPointerInMaliciousQuestion = _.get(
         maliciousQuestionBlock,
-        "value[0].nodes[4].data.pointerId",
+        "value[0].nodes[3].data.pointerId",
       );
 
       const isSamePointerInHonestAnswerDraftAndMaliciousQuestion =

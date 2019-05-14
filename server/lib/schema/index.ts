@@ -20,6 +20,7 @@ import { isUserAdmin } from "./auth/isUserAdmin";
 import { userFromContext } from "./auth/userFromContext";
 
 import { getMessageForUser } from "./helpers/getMessageForUser";
+import { extractHonestAnswerValueFromMaliciousQuestion } from "./helpers/extractHonestAnswerValueFromMaliciousQuestion";
 
 import getScheduler from "../scheduler";
 import { map } from "asyncro";
@@ -998,18 +999,31 @@ const schema = new GraphQLSchema({
             const parentWorkspace = await Workspace.findByPk(
               workspace.parentId,
             );
+
             if (parentWorkspace === null) {
               return false;
             }
 
+            const blocks = (await workspace.$get("blocks")) as Block[];
+            const question = blocks.find(b => b.type === "QUESTION");
+
             // make honest oracle response field equal to its answer candidate
-            const blocks = (await parentWorkspace.$get("blocks")) as Block[];
-            const answerDraft = blocks.find(b => b.type === "ANSWER_DRAFT");
-            const answerCandidate = blocks.find(
-              b => b.type === "ORACLE_ANSWER_CANDIDATE",
+            const parentBlocks = (await parentWorkspace.$get(
+              "blocks",
+            )) as Block[];
+
+            const parentAnswerDraft = parentBlocks.find(
+              b => b.type === "ANSWER_DRAFT",
             );
-            if (answerDraft && answerCandidate) {
-              await answerDraft.update({ value: answerCandidate.value });
+
+            if (parentAnswerDraft && question) {
+              const newAnswerDraftValue = extractHonestAnswerValueFromMaliciousQuestion(
+                question.value,
+              );
+
+              await parentAnswerDraft.update({
+                value: newAnswerDraftValue,
+              });
             }
 
             // mark honest as resolved
