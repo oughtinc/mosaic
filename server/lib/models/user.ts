@@ -2,6 +2,7 @@ import {
   BelongsToMany,
   Column,
   DataType,
+  Default,
   HasMany,
   Model,
   Table,
@@ -36,6 +37,10 @@ export default class User extends Model<User> {
 
   @Column(DataType.BOOLEAN)
   public isAdmin: boolean;
+
+  @Default([])
+  @Column(DataType.JSON)
+  public accessTokens: any; // hashed & added in lib/schema/auth/userFromContext
 
   @BelongsToMany(() => Tree, () => UserTreeOracleRelation)
   public OracleTrees: Tree[];
