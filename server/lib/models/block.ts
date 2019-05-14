@@ -11,6 +11,7 @@ import {
   ForeignKey,
   Model,
   Table,
+  AfterUpdate,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
 import Workspace from "./workspace";
@@ -72,6 +73,44 @@ export default class Block extends Model<Block> {
       const changes = diff(item._previousDataValues, item.dataValues);
       if (!_.isEmpty(changes.value)) {
         await item.updateStalenessAndIsCurrentlyResolved();
+      }
+    }
+  }
+
+  @AfterUpdate
+  public static async propagateUpToHonest(item: Block) {
+    if (item.type === "ANSWER_DRAFT") {
+      const workspace = await item.$get("workspace");
+      if (
+        !workspace.isEligibleForHonestOracle &&
+        !workspace.isEligibleForMaliciousOracle &&
+        workspace.parentId
+      ) {
+        const parentWorkspace = await Workspace.findByPk(workspace.parentId);
+
+        if (parentWorkspace === null) {
+          return;
+        }
+
+        const isParentOracleWorkspace =
+          parentWorkspace.isEligibleForHonestOracle ||
+          parentWorkspace.isEligibleForMaliciousOracle;
+
+        if (isParentOracleWorkspace && parentWorkspace.parentId) {
+          const grandparentWorkspace = await Workspace.findByPk(
+            parentWorkspace.parentId,
+          );
+
+          if (grandparentWorkspace === null) {
+            return;
+          }
+
+          const blocks = (await grandparentWorkspace.$get("blocks", {
+            where: { type: "ANSWER_DRAFT" },
+          })) as Block[];
+
+          await blocks[0].update({ value: item.value });
+        }
       }
     }
   }
