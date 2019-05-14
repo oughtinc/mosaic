@@ -16,6 +16,7 @@ import { DepthDisplay } from "./DepthDisplay";
 import { EpisodeNav } from "./EpisodeNav";
 import { OracleAnswerCandidateFooter } from "./OracleAnswerCandidateFooter";
 import { ResponseFooter } from "./ResponseFooter";
+import { SelectAnswerBtn } from "./SelectAnswerBtn";
 import { CharCountDisplays } from "./CharCountDisplays";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
 import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
@@ -693,7 +694,7 @@ export class WorkspaceView extends React.Component<any, any> {
                       )}
 
                       {!(
-                        isOracleWorkspace &&
+                        isWorkspacePartOfOracleExperiment &&
                         hasParent &&
                         !isRequestingLazyUnlock
                       ) && (
@@ -773,6 +774,87 @@ export class WorkspaceView extends React.Component<any, any> {
                               responseBlockId={answerDraftProps.blockId}
                             />
                           )}
+                        </BlockContainer>
+                      )}
+                      {isWorkspacePartOfOracleExperiment && !isOracleWorkspace && (
+                        <BlockContainer>
+                          <BlockHeader>Select Answer</BlockHeader>
+                          <BlockBody>
+                            <div
+                              style={{
+                                alignItems: "center",
+                                display: "flex",
+                                justifyContent: "space-around",
+                              }}
+                            >
+                              <SelectAnswerBtn
+                                experimentId={experimentId}
+                                markAsCurrentlyResolved={() =>
+                                  this.props.updateWorkspace({
+                                    variables: {
+                                      id: workspace.id,
+                                      input: {
+                                        isCurrentlyResolved: true,
+                                      },
+                                    },
+                                  })
+                                }
+                                markAsNotStale={() =>
+                                  this.props.updateWorkspace({
+                                    variables: {
+                                      id: workspace.id,
+                                      input: {
+                                        isStale: false,
+                                      },
+                                    },
+                                  })
+                                }
+                                selectAnswerCandidate={() =>
+                                  this.props.selectAnswerCandidate({
+                                    variables: {
+                                      id: workspace.id,
+                                      decision: 1,
+                                    },
+                                  })
+                                }
+                              >
+                                Select A1
+                              </SelectAnswerBtn>
+                              <SelectAnswerBtn
+                                experimentId={experimentId}
+                                markAsCurrentlyResolved={() =>
+                                  this.props.updateWorkspace({
+                                    variables: {
+                                      id: workspace.id,
+                                      input: {
+                                        isCurrentlyResolved: true,
+                                      },
+                                    },
+                                  })
+                                }
+                                markAsNotStale={() =>
+                                  this.props.updateWorkspace({
+                                    variables: {
+                                      id: workspace.id,
+                                      input: {
+                                        isStale: false,
+                                      },
+                                    },
+                                  })
+                                }
+                                selectAnswerCandidate={() =>
+                                  this.props.selectAnswerCandidate({
+                                    variables: {
+                                      id: workspace.id,
+                                      decision: 2,
+                                    },
+                                  })
+                                }
+                              >
+                                Select A2
+                              </SelectAnswerBtn>
+                            </div>
+                          </BlockBody>
                         </BlockContainer>
                       )}
 
@@ -1217,6 +1299,12 @@ const DECLINE_TO_CHALLENGE_MUTATION = gql`
   }
 `;
 
+const SELECT_ANSWER_CANDIDATE = gql`
+  mutation selectAnswerCandidate($id: String, $decision: Int) {
+    selectAnswerCandidate(id: $id, decision: $decision)
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -1267,6 +1355,9 @@ export const EpisodeShowPage = compose(
     options: {
       refetchQueries: ["workspace"],
     },
+  }),
+  graphql(SELECT_ANSWER_CANDIDATE, {
+    name: "selectAnswerCandidate",
   }),
   connect(
     mapStateToProps,

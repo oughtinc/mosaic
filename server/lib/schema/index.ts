@@ -21,6 +21,7 @@ import { userFromContext } from "./auth/userFromContext";
 
 import { getMessageForUser } from "./helpers/getMessageForUser";
 import { extractHonestAnswerValueFromMaliciousQuestion } from "./helpers/extractHonestAnswerValueFromMaliciousQuestion";
+import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFromQuestion";
 
 import getScheduler from "../scheduler";
 import { map } from "asyncro";
@@ -653,53 +654,6 @@ const schema = new GraphQLSchema({
               }
 
               await block.update({ ..._block });
-
-              const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
-              if (
-                isUpdatingAnswerDraft &&
-                isInOracleMode.getValue() &&
-                !workspace.isEligibleForHonestOracle &&
-                !workspace.isEligibleForMaliciousOracle &&
-                workspace.parentId
-              ) {
-                const experiment = await Experiment.findByPk(experimentId);
-                if (experiment === null) {
-                  return newBlocks;
-                }
-                const isOracleExperiment =
-                  experiment.areNewWorkspacesOracleOnlyByDefault;
-
-                if (isOracleExperiment) {
-                  const parentWorkspace = await Workspace.findByPk(
-                    workspace.parentId,
-                  );
-
-                  if (parentWorkspace === null) {
-                    return newBlocks;
-                  }
-
-                  const isParentOracleWorkspace =
-                    parentWorkspace.isEligibleForHonestOracle ||
-                    parentWorkspace.isEligibleForMaliciousOracle;
-
-                  if (isParentOracleWorkspace && parentWorkspace.parentId) {
-                    const grandparentWorkspace = await Workspace.findByPk(
-                      parentWorkspace.parentId,
-                    );
-
-                    if (grandparentWorkspace === null) {
-                      return newBlocks;
-                    }
-
-                    const blocks = (await grandparentWorkspace.$get("blocks", {
-                      where: { type: "ANSWER_DRAFT" },
-                    })) as Block[];
-
-                    await blocks[0].update({ ..._block });
-                  }
-                }
-              }
-
               newBlocks = [...newBlocks, block];
             }
             return newBlocks;
@@ -1832,6 +1786,44 @@ const schema = new GraphQLSchema({
             }
 
             return true;
+          },
+        ), // unlock pointer resolver
+      }, // unlockPointer mutation
+      selectAnswerCandidate: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: GraphQLString },
+          decision: { type: GraphQLInt },
+        },
+        resolve: requireUser(
+          "You must be logged in to select an answer candidate",
+          async (_, { id, decision }, context) => {
+            const workspace = await Workspace.findByPk(id);
+            if (workspace === null) {
+              return false;
+            }
+
+            // extract content from workspace question
+            const blocks = (await workspace.$get("blocks")) as Block[];
+            const questionBlock = blocks.find(b => b.type === "QUESTION");
+            if (questionBlock) {
+              const answerValue = extractAnswerValueFromQuestion(
+                questionBlock.value,
+                decision,
+              );
+
+              // populate workspace answer draft with content
+              const answerDraftBlock = blocks.find(
+                b => b.type === "ANSWER_DRAFT",
+              );
+              if (answerDraftBlock) {
+                await answerDraftBlock.update({
+                  value: answerValue,
+                });
+              }
+            }
+
+            return false;
           },
         ), // unlock pointer resolver
       }, // unlockPointer mutation
