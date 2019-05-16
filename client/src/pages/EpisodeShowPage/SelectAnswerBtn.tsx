@@ -27,7 +27,7 @@ const TakeBreakBtn = ({
   return (
     <Link
       onClick={navHook}
-      to={`/break?experiment=${experimentId}`}
+      to={`/break?e=${experimentId}`}
       style={{ margin: "0 5px" }}
     >
       <Button

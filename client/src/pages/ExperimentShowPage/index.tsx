@@ -38,7 +38,7 @@ const NextWorkspaceBtn = ({
   navHook,
 }: NextWorkspaceBtnProps) => {
   return (
-    <Link onClick={navHook} to={`/next?experiment=${experimentId}`}>
+    <Link onClick={navHook} to={`/next?e=${experimentId}`}>
       <Button bsSize="small" bsStyle={bsStyle}>
         {label} »
       </Button>
@@ -344,7 +344,7 @@ const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
 
 const options = props => ({
   variables: {
-    id: props.match.params.experimentId,
+    id: props.match.params.experimentId || props.match.params.e,
   },
 });
 

@@ -34,7 +34,7 @@ export default async function sendEmailNotification(
     }" which you can work on.
 
 To continue taking part in the experiment, please visit:
-https://mosaic.ought.org/next?experiment=${notificationRequest.experimentId}
+https://mosaic.ought.org/next?e=${notificationRequest.experimentId}
 
 Please be aware that you may find another user completes that workspace before
 you visit the link, so you may find no workspaces available for you. If this

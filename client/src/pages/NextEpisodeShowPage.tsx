@@ -101,7 +101,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     try {
       response = await this.props.findNextWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment,
+          experimentId: queryParams.experiment || queryParams.e,
         },
       });
     } catch (e) {
@@ -191,9 +191,8 @@ export class NextEpisodeShowPagePresentational extends React.Component<
                 }}
               >
                 <Link
-                  to={`/nextMaybeSuboptimal?experiment=${
-                    queryParams.experiment
-                  }`}
+                  to={`/nextMaybeSuboptimal?e=${queryParams.experiment ||
+                    queryParams.e}`}
                   style={{ margin: "0 5px" }}
                 >
                   <Button bsStyle="danger">Find Suboptimal Workspace »</Button>
@@ -246,9 +245,8 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?isolated=true&experiment=${
-        queryParams.experiment
-      }`;
+      const redirectQueryParams = `?e=${queryParams.experiment ||
+        queryParams.e}`;
       window.location.href = `${window.location.origin}/workspaces/${
         this.state.workspaceId
       }${redirectQueryParams}`;
@@ -381,7 +379,9 @@ export const NextEpisodeShowPage = compose(
       variables: {
         experimentId:
           parseQueryString(window.location.search).experiment ||
-          parseQueryString(props.history.location.search).experiment,
+          parseQueryString(window.location.search).e ||
+          parseQueryString(props.history.location.search).experiment ||
+          parseQueryString(props.history.location.search).e,
         userId: Auth.userId(),
       },
     }),

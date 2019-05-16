@@ -44,7 +44,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     try {
       response = await this.props.findNextMaybeSuboptimalWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment,
+          experimentId: queryParams.experiment || queryParams.e,
         },
       });
     } catch (e) {
@@ -98,9 +98,8 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?isolated=true&experiment=${
-        queryParams.experiment
-      }`;
+      const redirectQueryParams = `?e=${queryParams.experiment ||
+        queryParams.e}`;
       window.location.href = `${window.location.origin}/workspaces/${
         this.state.workspaceId
       }${redirectQueryParams}`;

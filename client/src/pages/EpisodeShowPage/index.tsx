@@ -249,7 +249,8 @@ export class WorkspaceView extends React.Component<any, any> {
   }
 
   public async componentDidMount() {
-    this.experimentId = parseQueryString(window.location.search).experiment;
+    const queryParams = parseQueryString(window.location.search);
+    this.experimentId = queryParams.experiment || queryParams.e;
 
     window.addEventListener("beforeunload", e => {
       setTimeout(() => {
@@ -383,11 +384,11 @@ export class WorkspaceView extends React.Component<any, any> {
     const hasIOConstraints = workspace.hasIOConstraintsOfRootParent;
 
     const queryParams = parseQueryString(window.location.search);
-    const isIsolatedWorkspace = queryParams.isolated === "true";
+    const isIsolatedWorkspace = queryParams.experimentId || queryParams.e;
     const isActive =
       workspace.currentlyActiveUser &&
       workspace.currentlyActiveUser.id === Auth.userId();
-    const experimentId = queryParams.experiment;
+    const experimentId = queryParams.experiment || queryParams.e;
     const hasURLTimeRestriction = queryParams.timer;
     const hasTimerEnded = this.state.hasTimerEnded;
 

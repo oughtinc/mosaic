@@ -60,7 +60,7 @@ const TakeBreakBtn = ({
   return (
     <Link
       onClick={navHook}
-      to={`/break?experiment=${experimentId}`}
+      to={`/break?e=${experimentId}`}
       style={{ ...style, display: "inline-block" }}
     >
       <Button bsSize="small" bsStyle={bsStyle || "primary"}>
