@@ -12,7 +12,6 @@ import {
   headerLinkFontColor,
   headerLinkFontSize,
 } from "../../styles";
-import Timer = NodeJS.Timer;
 
 const HeaderContainer = styled.div`
   background-color: ${headerBgColor};
@@ -78,26 +77,16 @@ const LoginLink = () => (
   </ActionLink>
 );
 
-class UserControls extends React.Component<
-  {},
-  { isAuthenticated: boolean; logoutTimer: Timer | null }
-> {
+class UserControls extends React.Component<{}, { isAuthenticated: boolean }> {
   public constructor(props: {}) {
     super(props);
     this.state = {
       isAuthenticated: Auth.isAuthenticated(),
-      logoutTimer: null,
     };
   }
 
   public componentDidMount() {
     this.updateAuthenticationState();
-  }
-
-  public componentWillUnmount() {
-    if (this.state.logoutTimer) {
-      clearTimeout(this.state.logoutTimer);
-    }
   }
 
   public render() {
@@ -108,22 +97,11 @@ class UserControls extends React.Component<
 
   private updateAuthenticationState() {
     if (Auth.isAuthenticated()) {
-      if (this.state.logoutTimer) {
-        clearTimeout(this.state.logoutTimer);
-      }
-      const logoutTimer = setTimeout(
-        () => this.updateAuthenticationState(),
-        Auth.timeToLogOut(),
-      );
       this.setState({
         isAuthenticated: true,
-        logoutTimer,
       });
     } else {
-      if (this.state.logoutTimer) {
-        clearTimeout(this.state.logoutTimer);
-      }
-      this.setState({ isAuthenticated: false, logoutTimer: null });
+      this.setState({ isAuthenticated: false });
     }
   }
 }

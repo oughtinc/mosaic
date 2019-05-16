@@ -1056,22 +1056,11 @@ export class WorkspaceView extends React.Component<any, any> {
 
   private updateAuthenticationState() {
     if (Auth.isAuthenticated()) {
-      if (this.state.logoutTimer) {
-        clearTimeout(this.state.logoutTimer);
-      }
-      const logoutTimer = setTimeout(
-        () => this.updateAuthenticationState(),
-        Auth.timeToLogOut(),
-      );
       this.setState({
         isAuthenticated: true,
-        logoutTimer,
       });
     } else {
-      if (this.state.logoutTimer) {
-        clearTimeout(this.state.logoutTimer);
-      }
-      this.setState({ isAuthenticated: false, logoutTimer: null });
+      this.setState({ isAuthenticated: false });
     }
   }
 }
