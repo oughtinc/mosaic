@@ -92,12 +92,14 @@ export class Auth {
         }
       `;
 
-      const user = await client.query({
+      const userResponse = await client.query({
         query: USER_QUERY,
         variables: {
           id: Auth.userId(),
         },
       });
+
+      const user = userResponse.data.user;
 
       localStorage.setItem("is_admin", user.isAdmin);
 
