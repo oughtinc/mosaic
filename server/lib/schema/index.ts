@@ -76,6 +76,21 @@ export const workspaceType = makeObjectType(
     ["tree", () => treeType],
   ],
   {
+    isParentOracleWorkspace: {
+      type: GraphQLBoolean,
+      resolve: async (workspace: Workspace, args, context) => {
+        if (!workspace.parentId) {
+          return false;
+        }
+
+        const parent = await Workspace.findByPk(workspace.parentId);
+
+        return (
+          parent.isEligibleForHonestOracle ||
+          parent.isEligibleForMaliciousOracle
+        );
+      },
+    },
     message: {
       type: GraphQLString,
       resolve: async (workspace: Workspace, args, context) => {
