@@ -49,7 +49,7 @@ const generateReferences = references => {
   return all;
 };
 
-const makeObjectType = (model, references, extraFields = {}) =>
+export const makeObjectType = (model, references, extraFields = {}) =>
   new GraphQLObjectType({
     name: model.name,
     description: model.name,
@@ -61,9 +61,9 @@ const makeObjectType = (model, references, extraFields = {}) =>
       ),
   });
 
-const blockType = makeObjectType(Block, [["workspace", () => workspaceType]]);
+export const userType = makeObjectType(User, []);
 
-import { UserType } from "./User";
+const blockType = makeObjectType(Block, [["workspace", () => workspaceType]]);
 
 export const workspaceType = makeObjectType(
   Workspace,
@@ -181,7 +181,7 @@ export const workspaceType = makeObjectType(
       },
     },
     currentlyActiveUser: {
-      type: UserType,
+      type: userType,
       resolve: async (workspace: Workspace, args, context) => {
         const rootWorkspace = await workspace.getRootWorkspace();
 
@@ -220,7 +220,7 @@ export const workspaceType = makeObjectType(
       },
     },
     isNotStaleRelativeToUserFullInformation: {
-      type: new GraphQLList(UserType),
+      type: new GraphQLList(userType),
       resolve: async (workspace: Workspace, args, context) => {
         const fullInfo = await map(
           workspace.isNotStaleRelativeToUser,
@@ -254,24 +254,19 @@ export const workspaceType = makeObjectType(
   },
 );
 
-// TODO - factor out workspaceType into separate file so the following import
-// can go at the top of the file -- right now it's down here to avoid circular
-// import issues
-export const userType = makeObjectType(User, []);
-
 import { UserActivityType } from "./UserActivity";
 import { WorkspaceActivityType } from "./WorkspaceActivity";
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
   ["tree", () => treeType],
-  ["user", () => UserType],
+  ["user", () => userType],
 ]);
 
 const treeType = makeObjectType(Tree, [
   ["rootWorkspace", () => workspaceType],
   ["experiments", () => new GraphQLList(experimentType)],
   ["oracleRelations", () => new GraphQLList(OracleRelationsType)],
-  ["oracles", () => new GraphQLList(UserType)],
+  ["oracles", () => new GraphQLList(userType)],
 ]);
 
 const instructionsEnumValues = {};
@@ -535,7 +530,12 @@ const schema = new GraphQLSchema({
           },
         }),
       },
-      users: modelGraphQLFields(new GraphQLList(UserType), User),
+      users: modelGraphQLFields(new GraphQLList(userType), User),
+      user: {
+        type: userType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(User),
+      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), Block),
       trees: modelGraphQLFields(new GraphQLList(treeType), Tree),
       tree: {
