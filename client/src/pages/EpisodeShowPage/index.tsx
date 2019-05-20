@@ -428,7 +428,7 @@ export class WorkspaceView extends React.Component<any, any> {
     const shouldShowResponseField =
       !isWorkspacePartOfOracleExperiment ||
       !isOracleWorkspace ||
-      hasParent ||
+      !hasParent ||
       isRequestingLazyUnlock;
 
     const shouldShowTwoButtonResponseUI =
