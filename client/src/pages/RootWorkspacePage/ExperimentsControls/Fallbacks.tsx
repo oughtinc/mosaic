@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 
 const NavLink = props => (
-  <Link to={`/experiments/${props.experimentId}`}>{props.children}</Link>
+  <Link to={`/e/${props.experimentId}`}>{props.children}</Link>
 );
 
 export class FallbacksPresentational extends React.Component<any, any> {
