@@ -27,7 +27,7 @@ export enum toggleTypes {
 }
 
 const WorkspaceLink = props => (
-  <Link to={`/workspaces/${props.workspaceId}`}>{props.children}</Link>
+  <Link to={`/w/${props.workspaceId}`}>{props.children}</Link>
 );
 
 const Container = styled.div`

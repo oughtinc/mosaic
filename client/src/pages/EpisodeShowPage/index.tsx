@@ -196,7 +196,7 @@ const BlockHeader = styled.div`
 `;
 
 const ParentLink = props => (
-  <NavLink to={`/workspaces/${props.parentId}`}>
+  <NavLink to={`/w/${props.parentId}`}>
     <Button bsStyle="default" bsSize="xsmall">
       Parent »
     </Button>
@@ -206,7 +206,7 @@ const ParentLink = props => (
 const RootTreeLink = ({ workspace }) => (
   <NavLink
     target="_blank"
-    to={`/workspaces/${
+    to={`/w/${
       workspace.rootWorkspaceId
     }/subtree?expanded=true&activeWorkspace=${workspace.id}`}
   >
@@ -217,7 +217,7 @@ const RootTreeLink = ({ workspace }) => (
 );
 
 const SubtreeLink = ({ workspace }) => (
-  <NavLink to={`/workspaces/${workspace.id}/subtree`}>
+  <NavLink to={`/w/${workspace.id}/subtree`}>
     <Button bsStyle="default" bsSize="xsmall">
       Subtree »
     </Button>
@@ -256,9 +256,9 @@ export class WorkspaceView extends React.Component<any, any> {
 
     window.addEventListener("beforeunload", e => {
       setTimeout(() => {
-        const isLeavingWorkspacePage = /^\/workspaces\//.test(
-          window.location.pathname,
-        );
+        const isLeavingWorkspacePage =
+          /^\/workspaces\//.test(window.location.pathname) ||
+          /^\/w\//.test(window.location.pathname);
         if (isLeavingWorkspacePage) {
           this.leaveCurrentWorkspace();
         }

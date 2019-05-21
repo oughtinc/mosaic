@@ -101,7 +101,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     } else {
       const redirectQueryParams = `?e=${queryParams.experiment ||
         queryParams.e}`;
-      window.location.href = `${window.location.origin}/workspaces/${
+      window.location.href = `${window.location.origin}/w/${
         this.state.workspaceId
       }${redirectQueryParams}`;
       return null;
