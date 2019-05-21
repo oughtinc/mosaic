@@ -74,6 +74,7 @@ export const WORKSPACES_QUERY = gql`
         id
         experiments {
           id
+          serialId
           createdAt
           name
         }

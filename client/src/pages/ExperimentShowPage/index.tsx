@@ -263,6 +263,7 @@ const EXPERIMENT_QUERY = gql`
   query experimentQuery($id: String) {
     experiment(id: $id) {
       id
+      serialId
       eligibilityRank
       areNewWorkspacesOracleOnlyByDefault
       name
@@ -299,6 +300,7 @@ const EXPERIMENT_QUERY = gql`
             doesAllowOracleBypass
             experiments {
               id
+              serialId
               createdAt
               name
             }

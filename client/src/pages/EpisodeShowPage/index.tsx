@@ -119,6 +119,7 @@ const WORKSPACE_QUERY = gql`
           doesAllowOracleBypass
           experiments {
             id
+            serialId
             areNewWorkspacesOracleOnlyByDefault
           }
         }
