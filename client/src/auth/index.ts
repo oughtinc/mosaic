@@ -145,7 +145,6 @@ export class Auth {
   }
 
   public static isAuthenticated(): boolean {
-    console.log("here");
     return !!(
       localStorage.getItem("user_id") && localStorage.getItem("access_token")
     );
