@@ -60,7 +60,7 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
             <Link
               style={{ textDecoration: "none" }}
               target="_blank"
-              to={`/workspaces/${workspace.id}`}
+              to={`/workspaces/${workspace.serialId}`}
             >
               <CompactTreeRowLabel
                 color={workspace.isEligibleForHonestOracle ? "green" : "red"}

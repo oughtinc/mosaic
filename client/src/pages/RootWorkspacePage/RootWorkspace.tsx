@@ -74,7 +74,7 @@ class RootWorkspacePresentational extends React.Component<any, any> {
             }}
           >
             <Link
-              to={`/workspaces/${workspace.id}/${
+              to={`/workspaces/${workspace.serialId}/${
                 workspace.canShowCompactTreeView
                   ? "compactTree"
                   : "subtree?expanded=true"

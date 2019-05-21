@@ -118,7 +118,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       this.setState({ normalSchedulingFailed });
       this.startCountingDown();
     } else if (response) {
-      const workspaceId = response.data.findNextWorkspace.id;
+      const workspaceId = response.data.findNextWorkspace.serialId;
       this.setState({ workspaceId });
     }
   }
@@ -353,7 +353,7 @@ const IS_USER_REGISTERED_FOR_NOTIFICATIONS = gql`
 const FIND_NEXT_WORKSPACE_MUTATION = gql`
   mutation findNextWorkspace($experimentId: String) {
     findNextWorkspace(experimentId: $experimentId) {
-      id
+      serialId
     }
   }
 `;

@@ -68,6 +68,7 @@ const WORKSPACE_QUERY = gql`
   query workspace($id: String!) {
     workspace(id: $id) {
       id
+      serialId
       parentId
       creatorId
       isPublic

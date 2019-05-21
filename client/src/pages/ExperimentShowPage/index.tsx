@@ -284,6 +284,7 @@ const EXPERIMENT_QUERY = gql`
       trees {
         rootWorkspace {
           id
+          serialId
           createdAt
           parentId
           totalBudget

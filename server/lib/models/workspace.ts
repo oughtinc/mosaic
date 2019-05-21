@@ -1,5 +1,5 @@
 import * as Sequelize from "sequelize";
-import { UUIDV4 } from "sequelize";
+import { UUIDV4, IntegerDataType } from "sequelize";
 import * as uuidv4 from "uuid/v4";
 import * as _ from "lodash";
 import { createHonestOracleDefaultBlockValues } from "./helpers/defaultHonestOracleBlocks";
@@ -42,6 +42,9 @@ export default class Workspace extends Model<Workspace> {
     allowNull: false,
   })
   public id: string;
+
+  @Column(DataType.INTEGER)
+  public serialId: number;
 
   @AllowNull(false)
   @Column(DataType.STRING)

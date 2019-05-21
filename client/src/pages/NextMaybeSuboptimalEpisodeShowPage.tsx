@@ -54,7 +54,8 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     if (schedulingFailed) {
       this.setState({ schedulingFailed });
     } else if (response) {
-      const workspaceId = response.data.findNextMaybeSuboptimalWorkspace.id;
+      const workspaceId =
+        response.data.findNextMaybeSuboptimalWorkspace.serialId;
       this.setState({ workspaceId });
     }
   }
@@ -127,7 +128,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
 const FIND_NEXT_MAYBE_SUBOPTIMAL_WORKSPACE_MUTATION = gql`
   mutation findNextMaybeSuboptimalWorkspace($experimentId: String) {
     findNextMaybeSuboptimalWorkspace(experimentId: $experimentId) {
-      id
+      serialId
     }
   }
 `;

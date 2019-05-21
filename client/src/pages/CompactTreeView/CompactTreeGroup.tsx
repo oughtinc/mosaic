@@ -115,7 +115,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
                     textDecoration: "none",
                   }}
                   target="_blank"
-                  to={`/workspaces/${this.props.workspace.id}`}
+                  to={`/workspaces/${this.props.workspace.serialId}`}
                 >
                   H
                 </Link>
@@ -189,7 +189,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
             <Link
               style={{ color: "green", textDecoration: "none" }}
               target="_blank"
-              to={`/workspaces/${this.props.workspace.id}`}
+              to={`/workspaces/${this.props.workspace.serialId}`}
             >
               H
             </Link>
@@ -273,7 +273,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
         <a
           href={
             this.props.workspace &&
-            `/workspaces/${this.props.workspace.id}/compactTree`
+            `/workspaces/${this.props.workspace.serialId}/compactTree`
           }
           style={{
             right: "5px",

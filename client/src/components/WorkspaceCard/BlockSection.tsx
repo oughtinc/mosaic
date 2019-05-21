@@ -36,7 +36,7 @@ const Block = ({ character, block, availablePointers, workspace }) => {
   }
   return (
     <BlockContainer>
-      <BlockBulletLink to={`/workspaces/${workspace.id}`}>
+      <BlockBulletLink to={`/workspaces/${workspace.serialId}`}>
         {character}
       </BlockBulletLink>
       <BlockEditorContainer>
