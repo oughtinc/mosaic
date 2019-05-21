@@ -84,6 +84,7 @@ interface WorkspaceType {
   isArchived: boolean;
   subtreeTimeSpentData: any;
   isNotStaleRelativeToUserFullInformation: any;
+  serialId: string;
 }
 
 interface WorkspaceCardProps {
