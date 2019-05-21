@@ -1,7 +1,9 @@
 import * as auth0 from "auth0-js";
+import gql from "graphql-tag";
 // Note: uses local storage instead of redux to persist across sessions
 // May consider alternate architecture ie through the redux-localstorage package
-import { Config } from "./config";
+import { Config } from "../config";
+import { client } from "../graphQLClient";
 
 const MOSAIC_PRE_AUTH_URL = "MOSAIC_PRE_AUTH_URL";
 
@@ -51,7 +53,7 @@ export class Auth {
     if (Auth.isAuthenticated()) {
       return;
     }
-    Auth.auth0.parseHash((err, authResult) => {
+    Auth.auth0.parseHash(async (err, authResult) => {
       if (authResult && authResult.accessToken) {
         const expiresAt = JSON.stringify(
           authResult.expiresIn * 1000 + Date.now(),
@@ -60,7 +62,7 @@ export class Auth {
 
         localStorage.setItem("expires_at", expiresAt);
 
-        Auth.getProfile(callback);
+        await Auth.getProfile(callback);
       } else if (err) {
         console.error("Authentication error: ", err);
         callback();
@@ -68,7 +70,7 @@ export class Auth {
     });
   }
 
-  public static getProfile(callback: () => void): void {
+  public static async getProfile(callback: () => void) {
     const root = "https://mosaic:auth0:com/";
 
     const accessToken = localStorage.getItem("access_token");
@@ -77,32 +79,69 @@ export class Auth {
       throw new Error("Access token must exist to fetch profile");
     }
 
-    Auth.auth0.client.userInfo(accessToken, (err, profile) => {
-      if (err) {
-        console.error("Error retrieving user info: ", err);
-        callback();
-        return;
-      }
-      const appMetadata = profile[root + "app_metadata"];
-      if (appMetadata != null && appMetadata.is_admin != null) {
-        localStorage.setItem("is_admin", appMetadata.is_admin);
-      }
-      localStorage.setItem("user_id", profile.sub);
+    if (Auth.timeToLogOut() <= 0) {
+      const USER_QUERY = gql`
+        query userQuery($id: String) {
+          user(id: $id) {
+            id
+            email
+            givenName
+            familyName
+            isAdmin
+          }
+        }
+      `;
+
+      const userResponse = await client.query({
+        query: USER_QUERY,
+        variables: {
+          id: Auth.userId(),
+        },
+      });
+
+      const user = userResponse.data.user;
+
+      localStorage.setItem("is_admin", user.isAdmin);
 
       // configure FullStory
       // @ts-ignore
       if (window.FS) {
         // @ts-ignore
-        window.FS.identify(profile.sub, {
-          displayName: `${profile.given_name} ${profile.family_name}`,
-          email: profile.email,
-          isAdmin: appMetadata ? appMetadata.is_admin : false,
-          isOracle: appMetadata ? appMetadata.is_oracle : false,
+        window.FS.identify(user.id, {
+          displayName: `${user.givenName} ${user.familyName}`,
+          email: user.email,
+          isAdmin: user.isAdmin,
         });
       }
 
       callback();
-    });
+    } else {
+      Auth.auth0.client.userInfo(accessToken, (err, profile) => {
+        if (err) {
+          console.error("Error retrieving user info: ", err);
+          callback();
+          return;
+        }
+        const appMetadata = profile[root + "app_metadata"];
+        if (appMetadata != null && appMetadata.is_admin != null) {
+          localStorage.setItem("is_admin", appMetadata.is_admin);
+        }
+        localStorage.setItem("user_id", profile.sub);
+
+        // configure FullStory
+        // @ts-ignore
+        if (window.FS) {
+          // @ts-ignore
+          window.FS.identify(profile.sub, {
+            displayName: `${profile.given_name} ${profile.family_name}`,
+            email: profile.email,
+            isAdmin: appMetadata ? appMetadata.is_admin : false,
+          });
+        }
+
+        callback();
+      });
+    }
   }
 
   public static isAuthenticated(): boolean {

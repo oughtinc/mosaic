@@ -1,15 +1,12 @@
 import * as React from "react";
 import { BrowserRouter, Route, Redirect } from "react-router-dom";
-import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
-import { HttpLink } from "apollo-link-http";
-import { ApolloLink } from "apollo-link";
-import { onError } from "apollo-link-error";
-import { InMemoryCache } from "apollo-cache-inmemory";
 import { Provider } from "react-redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import thunk from "redux-thunk";
 import "bootstrap/dist/css/bootstrap.min.css";
+
+import { client } from "./graphQLClient";
 
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 import { ExperimentShowPage } from "./pages/ExperimentShowPage";
@@ -31,49 +28,8 @@ import { Auth } from "./auth";
 if (Auth.isAuthenticated()) {
   Auth.getProfile(() => {
     return;
-  });
+  }).catch(err => console.log(err));
 }
-
-const SERVER_URL =
-  window.location.hostname === "localhost"
-    ? "http://localhost:8080/graphql"
-    : `${window.location.protocol}//${window.location.hostname}/graphql`;
-
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.map(({ message, locations, path }) =>
-      console.log(
-        `[GraphQL error]: Message: ${message}. Path: ${path}. Location: `,
-        locations,
-      ),
-    );
-  }
-  if (networkError) {
-    console.log(`[Network error]: ${networkError}`);
-  }
-});
-
-const authLink = new ApolloLink((operation, forward) => {
-  operation.setContext(context => ({
-    ...context,
-    headers: {
-      ...context.headers,
-      authorization: `${Auth.accessToken()}::${Auth.userId()}`,
-    },
-  }));
-  return forward ? forward(operation) : null;
-});
-
-const link = ApolloLink.from([
-  authLink,
-  errorLink,
-  new HttpLink({ uri: SERVER_URL }),
-]);
-
-const client: any = new ApolloClient({
-  link,
-  cache: new InMemoryCache(),
-});
 
 const store = createStore(
   combineReducers({
