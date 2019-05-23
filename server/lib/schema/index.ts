@@ -1320,8 +1320,6 @@ const schema = new GraphQLSchema({
               throw new Error("Parent ID does not exist");
             }
             await parent.update({
-              isStale: true,
-              isNotStaleRelativeToUser: [],
               allocatedBudget: parent.allocatedBudget - childRemainingBudget,
             });
             await child.update({ totalBudget: child.allocatedBudget });
