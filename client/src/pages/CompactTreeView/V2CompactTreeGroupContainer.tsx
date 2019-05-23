@@ -113,6 +113,7 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
           isSamePointerInHonestAnswerDraftAndMaliciousQuestion);
 
       const didMaliciousWin =
+        !didHonestWin && // this is here b/c in some older trees the follow two conjuncts are true in cases where the malicious oracle declines
         isHonestOracleCurrentlyResolved &&
         !isSamePointerInHonestAnswerDraftAndMaliciousQuestion;
 
