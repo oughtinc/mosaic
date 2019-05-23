@@ -68,17 +68,37 @@ export class CompactTreeViewPresentational extends React.PureComponent<
       );
     }
 
+    if (isRootLevel) {
+      return (
+        <CompactTreeViewContainer key={workspace.id}>
+          {workspace.childWorkspaces.map(child =>
+            getVersionOfTree(workspace) === "V1" ? (
+              <V1CompactTreeGroupContainer
+                availablePointers={workspace.connectedPointersOfSubtree}
+                key={child.id}
+                workspaceId={child.id}
+              />
+            ) : (
+              <V2CompactTreeGroupContainer
+                availablePointers={workspace.connectedPointersOfSubtree}
+                key={child.id}
+                workspaceId={child.id}
+              />
+            ),
+          )}
+        </CompactTreeViewContainer>
+      );
+    }
+
     return (
       <CompactTreeViewContainer>
         {getVersionOfTree(workspace) === "V1" ? (
-          <div key={workspace.id} style={{ marginBottom: "10px" }}>
-            <V1CompactTreeGroupContainer
-              availablePointers={workspace.connectedPointersOfSubtree}
-              workspaceId={
-                isRootLevel ? workspace.childWorkspaces[0].id : workspace.id
-              }
-            />
-          </div>
+          <V1CompactTreeGroupContainer
+            availablePointers={workspace.connectedPointersOfSubtree}
+            workspaceId={
+              isRootLevel ? workspace.childWorkspaces[0].id : workspace.id
+            }
+          />
         ) : (
           <V2CompactTreeGroupContainer
             availablePointers={workspace.connectedPointersOfSubtree}
