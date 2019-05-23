@@ -120,11 +120,15 @@ export default class Block extends Model<Block> {
 
       // Mark workspace as stale
       // If it's currently marked as resolved, that it isn't anymore
-      return workspace.update({
-        isCurrentlyResolved: false,
-        isStale: true,
-        isNotStaleRelativeToUser: [],
-      });
+
+      // I'm commenting out this because in current experiments
+      // we don't edit questions and thereby cause the subquesiton workspace
+      // to become stale and un-resolved
+      // return workspace.update({
+      //   isCurrentlyResolved: false,
+      //   isStale: true,
+      //   isNotStaleRelativeToUser: [],
+      // });
     }
   }
 
