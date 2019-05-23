@@ -331,6 +331,17 @@ const BlockInput = new GraphQLInputObjectType({
   fields: _.pick(attributeFields(Block), "value", "id"),
 });
 
+const ExperimentInput = new GraphQLInputObjectType({
+  name: "experimentInput",
+  fields: {
+    experimentName: { type: GraphQLString },
+    rootLevelQuestion: { type: GraphQLJSON },
+    rootLevelScratchpad: { type: GraphQLJSON },
+    emailsOfHonestOracles: { type: new GraphQLList(GraphQLString) },
+    emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
+  },
+});
+
 const WorkspaceInput = new GraphQLInputObjectType({
   name: "WorkspaceInput",
   fields: attributeFields(Workspace, { allowNull: true }),
@@ -1837,6 +1848,91 @@ const schema = new GraphQLSchema({
           },
         ), // unlock pointer resolver
       }, // unlockPointer mutation
+      bulkCreateExperiments: {
+        type: new GraphQLList(experimentType),
+        args: {
+          bulkExperimentInputs: { type: new GraphQLList(ExperimentInput) },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to bulk-create experiments",
+          async (_, args, context) => {
+            const user = await userFromContext(context);
+            const newExperiments: Experiment[] = [];
+            const experimentInputs = args.bulkExperimentInputs;
+
+            for (const experimentInput of experimentInputs) {
+              const {
+                experimentName = "Experiment",
+                rootLevelQuestion = '[{"object":"block","type":"line","isVoid":false,"data":{},"nodes":[{"object":"text","leaves":[{"object":"leaf","text":"root-level q","marks":[]}]}]}]',
+                rootLevelScratchpad = '[{"object":"block","type":"line","isVoid":false,"data":{},"nodes":[{"object":"text","leaves":[{"object":"leaf","text":"root-level scratchpad","marks":[]}]}]}]',
+                emailsOfHonestOracles = [],
+                emailsOfMaliciousOracles = [],
+              } = experimentInput;
+
+              const newExperiment = await Experiment.create({
+                name: experimentName,
+              });
+
+              newExperiments.push(newExperiment);
+
+              const workspace = await Workspace.create(
+                {
+                  totalBudget: 0,
+                  creatorId: user.id,
+                  isEligibleForMaliciousOracle: true,
+                },
+                { questionValue: JSON.parse(rootLevelQuestion) },
+              );
+
+              const tree = await Tree.create({
+                rootWorkspaceId: workspace.id,
+              });
+
+              await newExperiment.$add("tree", tree);
+
+              const blocks = await workspace.$get("blocks");
+
+              const scratchpad = blocks.find(b => b.type === "SCRATCHPAD");
+
+              await scratchpad.update({
+                value: JSON.parse(rootLevelScratchpad),
+              });
+
+              for (const emailOfHonestOracle of emailsOfHonestOracles) {
+                const user = await User.findOne({
+                  where: {
+                    email: emailOfHonestOracle,
+                  },
+                });
+
+                await tree.$add("oracle", user);
+              }
+
+              for (const emailsOfMaliciousOracle of emailsOfMaliciousOracles) {
+                const user = await User.findOne({
+                  where: {
+                    email: emailsOfMaliciousOracle,
+                  },
+                });
+
+                await tree.$add("oracle", user);
+
+                const oracleRelation = await UserTreeOracleRelation.findOne({
+                  where: {
+                    UserId: user.id,
+                    TreeId: tree.id,
+                  },
+                });
+                if (oracleRelation === null) {
+                  return false;
+                }
+                await oracleRelation.update({ isMalicious: true });
+              }
+            }
+            return newExperiments;
+          },
+        ),
+      },
     }, // mutation fields
   }), // mutation: new GraphQLObjectType({...})
 }); // const schema = new GraphQLSchema({...})
