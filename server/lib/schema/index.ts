@@ -20,6 +20,7 @@ import { isUserAdmin } from "./auth/isUserAdmin";
 import { userFromContext } from "./auth/userFromContext";
 
 import { getMessageForUser } from "./helpers/getMessageForUser";
+import { addExportsAndLinks } from "./helpers/addExportsAndLinks";
 import { extractHonestAnswerValueFromMaliciousQuestion } from "./helpers/extractHonestAnswerValueFromMaliciousQuestion";
 
 import getScheduler from "../scheduler";
@@ -1863,11 +1864,31 @@ const schema = new GraphQLSchema({
             for (const experimentInput of experimentInputs) {
               const {
                 experimentName = "Experiment",
-                rootLevelQuestion = '[{"object":"block","type":"line","isVoid":false,"data":{},"nodes":[{"object":"text","leaves":[{"object":"leaf","text":"root-level q","marks":[]}]}]}]',
-                rootLevelScratchpad = '[{"object":"block","type":"line","isVoid":false,"data":{},"nodes":[{"object":"text","leaves":[{"object":"leaf","text":"root-level scratchpad","marks":[]}]}]}]',
+                rootLevelQuestion = "root-level q",
+                rootLevelScratchpad = "root-level scratchpad",
                 emailsOfHonestOracles = [],
                 emailsOfMaliciousOracles = [],
               } = experimentInput;
+
+              const contentToSlateNodes = content => [
+                {
+                  object: "block",
+                  type: "line",
+                  isVoid: "false",
+                  data: {},
+                  nodes: [
+                    {
+                      object: "text",
+                      leaves: [
+                        {
+                          object: "leaf",
+                          text: content,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ];
 
               const newExperiment = await Experiment.create({
                 name: experimentName,
@@ -1881,7 +1902,7 @@ const schema = new GraphQLSchema({
                   creatorId: user.id,
                   isEligibleForMaliciousOracle: true,
                 },
-                { questionValue: JSON.parse(rootLevelQuestion) },
+                { questionValue: contentToSlateNodes(rootLevelQuestion) },
               );
 
               const tree = await Tree.create({
@@ -1894,8 +1915,12 @@ const schema = new GraphQLSchema({
 
               const scratchpad = blocks.find(b => b.type === "SCRATCHPAD");
 
+              const processedValue = addExportsAndLinks(
+                contentToSlateNodes(rootLevelScratchpad),
+              );
+
               await scratchpad.update({
-                value: JSON.parse(rootLevelScratchpad),
+                value: processedValue,
               });
 
               for (const emailOfHonestOracle of emailsOfHonestOracles) {
