@@ -1874,7 +1874,7 @@ const schema = new GraphQLSchema({
                 {
                   object: "block",
                   type: "line",
-                  isVoid: "false",
+                  isVoid: false,
                   data: {},
                   nodes: [
                     {
