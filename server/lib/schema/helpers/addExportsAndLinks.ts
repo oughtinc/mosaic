@@ -4,7 +4,7 @@ const SQUARE_BRACKET_MATCH = /\[.*\]/g;
 const STAR_MATCH = /\*.*\*/g;
 
 export function addExportsAndLinks(nodes) {
-  return addExports(addLinks(nodes));
+  return addLinks(addExports(nodes));
 }
 
 export function addExports(nodes) {
@@ -40,7 +40,7 @@ export function addExports(nodes) {
             data: {
               pointerId: uuidv1(),
             },
-            nodes: addExports([
+            nodes: addExportsAndLinks([
               {
                 object: "text",
                 leaves: [
@@ -145,7 +145,7 @@ export function addLinks(nodes) {
     } else if (node.object === "inline" || node.object === "block") {
       result.push({
         ...node,
-        nodes: addLinks(node.nodes),
+        nodes: addExportsAndLinks(node.nodes),
       });
     } else {
       result.push(node);
