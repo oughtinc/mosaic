@@ -108,7 +108,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 
     if (
       !this.props.hasExportBeenOpened &&
-      (isAdminNotInFlow || isOracleInOracleMode)
+      (isAdminNotInFlow || isOracleInOracleMode || !this.isLocked())
     ) {
       const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
       const exportPointerId: string = this.props.nodeAsJson.data.pointerId;

@@ -591,24 +591,22 @@ export class WorkspaceView extends React.Component<any, any> {
                             <SubtreeLink workspace={workspace} />
                           </span>
                         )}
-                        {workspace &&
-                          (((isUserOracle && isInOracleMode) ||
-                            (Auth.isAdmin() && !isActive)) && (
-                            <span
-                              style={{
-                                display: "inline-block",
-                                marginBottom: "12px",
-                              }}
-                            >
-                              {(isUserMaliciousOracle ||
-                                (Auth.isAdmin() && !isActive)) && (
-                                <span style={{ marginRight: "10px" }}>
-                                  <RootTreeLink workspace={workspace} />
-                                </span>
-                              )}
-                              <ExpandAllPointersBtn />
-                            </span>
-                          ))}
+                        {workspace && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              marginBottom: "12px",
+                            }}
+                          >
+                            {(isUserMaliciousOracle ||
+                              (Auth.isAdmin() && !isActive)) && (
+                              <span style={{ marginRight: "10px" }}>
+                                <RootTreeLink workspace={workspace} />
+                              </span>
+                            )}
+                            <ExpandAllPointersBtn />
+                          </span>
+                        )}
                       </div>
                     </Col>
                   </Row>
