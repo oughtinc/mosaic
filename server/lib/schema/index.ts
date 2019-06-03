@@ -1480,7 +1480,9 @@ const schema = new GraphQLSchema({
 
           const workspaceId = await scheduler.assignNextWorkspace(user.id);
 
-          return { id: workspaceId };
+          const workspace = await Workspace.findByPk(workspaceId);
+
+          return workspace;
         },
       },
       notifyOnNextWorkspace: {
