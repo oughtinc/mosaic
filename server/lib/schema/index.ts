@@ -607,9 +607,7 @@ const schema = new GraphQLSchema({
             if (findOptions.where.id.length < 10) {
               return {
                 ...findOptions,
-                where: {},
-                offset: Number(findOptions.where.id) - 1,
-                limit: 1,
+                where: { serialId: Number(findOptions.where.id) },
               };
             }
           },
