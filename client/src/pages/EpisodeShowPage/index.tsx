@@ -70,6 +70,7 @@ const WORKSPACE_QUERY = gql`
       id
       serialId
       parentId
+      parentSerialId
       creatorId
       isPublic
       isStale
@@ -80,6 +81,7 @@ const WORKSPACE_QUERY = gql`
       isUserMaliciousOracleForTree
       isRequestingLazyUnlock
       rootWorkspaceId
+      rootWorkspaceSerialId
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
       connectedPointers
@@ -93,6 +95,7 @@ const WORKSPACE_QUERY = gql`
       }
       childWorkspaces {
         id
+        serialId
         createdAt
         totalBudget
         creatorId
@@ -196,7 +199,7 @@ const BlockHeader = styled.div`
 `;
 
 const ParentLink = props => (
-  <NavLink to={`/w/${props.parentId}`}>
+  <NavLink to={`/w/${props.parentSerialId}`}>
     <Button bsStyle="default" bsSize="xsmall">
       Parent »
     </Button>
@@ -207,7 +210,7 @@ const RootTreeLink = ({ workspace }) => (
   <NavLink
     target="_blank"
     to={`/w/${
-      workspace.rootWorkspaceId
+      workspace.rootWorkspaceSerialId
     }/subtree?expanded=true&activeWorkspace=${workspace.id}`}
   >
     <Button bsStyle="default" bsSize="xsmall">
@@ -217,7 +220,7 @@ const RootTreeLink = ({ workspace }) => (
 );
 
 const SubtreeLink = ({ workspace }) => (
-  <NavLink to={`/w/${workspace.id}/subtree`}>
+  <NavLink to={`/w/${workspace.serialId}/subtree`}>
     <Button bsStyle="default" bsSize="xsmall">
       Subtree »
     </Button>
@@ -596,7 +599,9 @@ export class WorkspaceView extends React.Component<any, any> {
                               marginBottom: "12px",
                             }}
                           >
-                            <ParentLink parentId={workspace.parentId} />
+                            <ParentLink
+                              parentSerialId={workspace.parentSerialId}
+                            />
                           </span>
                         )}
                         {workspace && !isIsolatedWorkspace && (

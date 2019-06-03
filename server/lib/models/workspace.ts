@@ -484,6 +484,16 @@ export default class Workspace extends Model<Workspace> {
     }
   }
 
+  public static findByPkOrSerialId(pkOrSerialId) {
+    if (pkOrSerialId.length < 10) {
+      return Workspace.findOne({
+        where: { serialId: Number(pkOrSerialId) },
+      });
+    }
+
+    return Workspace.findByPk(pkOrSerialId);
+  }
+
   public static async isNewChildWorkspaceHonestOracleEligible({ parentId }) {
     if (!isInOracleMode.getValue()) {
       return false;

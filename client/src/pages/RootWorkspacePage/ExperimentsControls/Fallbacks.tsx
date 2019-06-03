@@ -114,7 +114,7 @@ export class FallbacksPresentational extends React.Component<any, any> {
           ) : (
             <ul>
               {fallbacks.map((f, i, arr) => (
-                <li key={`${this.props.experiment.id}${f.id}`}>
+                <li key={`${this.props.experiment.serialIsd}${f.id}`}>
                   <NavLink experimentId={f.serialId}>{f.name}</NavLink>
                 </li>
               ))}

@@ -86,6 +86,7 @@ const EXPERIMENTS_QUERY = gql`
       areNewWorkspacesOracleOnlyByDefault
       fallbacks {
         id
+        serialId
         createdAt
         name
       }

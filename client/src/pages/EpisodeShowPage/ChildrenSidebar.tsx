@@ -202,7 +202,7 @@ export class Child extends React.Component<any, any> {
 
         <div style={{ marginTop: "0.5em" }}>
           {!this.props.isIsolatedWorkspace && (
-            <Link to={`/w/${workspace.id}`}>
+            <Link to={`/w/${workspace.serialId}`}>
               <Button
                 bsSize="xsmall"
                 bsStyle="default"

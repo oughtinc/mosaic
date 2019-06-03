@@ -279,6 +279,7 @@ const EXPERIMENT_QUERY = gql`
       }
       fallbacks {
         id
+        serialId
         createdAt
         name
       }

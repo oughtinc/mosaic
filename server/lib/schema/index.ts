@@ -103,6 +103,22 @@ export const workspaceType = makeObjectType(
         );
       },
     },
+    parentSerialId: {
+      type: GraphQLInt,
+      resolve: async (workspace: Workspace, args, context) => {
+        const parent = await Workspace.findByPk(workspace.parentId);
+        return parent && parent.serialId;
+      },
+    },
+    rootWorkspaceSerialId: {
+      type: GraphQLInt,
+      resolve: async (workspace: Workspace, args, context) => {
+        const rootWorkspace = await Workspace.findByPk(
+          workspace.rootWorkspaceId,
+        );
+        return rootWorkspace.serialId;
+      },
+    },
     message: {
       type: GraphQLString,
       resolve: async (workspace: Workspace, args, context) => {
@@ -410,7 +426,7 @@ const schema = new GraphQLSchema({
           workspaceId: { type: GraphQLString },
         },
         resolve: async (__, { workspaceId }) => {
-          const workspace = await Workspace.findByPk(workspaceId);
+          const workspace = await Workspace.findByPkOrSerialId(workspaceId);
           const rootWorkspace = await workspace.getRootWorkspace();
 
           // get experiment id
@@ -618,7 +634,7 @@ const schema = new GraphQLSchema({
             return timespentOnWorkspace;
           };
 
-          const workspace = await Workspace.findByPk(id);
+          const workspace = await Workspace.findByPkOrSerialId(id);
           await loadDataForEachWorkspaceInSubtree(workspace);
 
           return JSON.stringify(cacheForTimeSpentOnWorkspace);

@@ -154,6 +154,7 @@ export const GROUP_QUERY = gql`
       }
       childWorkspaces {
         id
+        serialId
         isCurrentlyResolved
         blocks {
           id
@@ -162,6 +163,7 @@ export const GROUP_QUERY = gql`
         }
         childWorkspaces {
           id
+          serialId
           blocks {
             id
             value
@@ -169,6 +171,7 @@ export const GROUP_QUERY = gql`
           }
           childWorkspaces {
             id
+            serialId
             createdAt
             isRequestingLazyUnlock
           }

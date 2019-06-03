@@ -125,6 +125,7 @@ export const INITIAL_ROOT_QUERY = gql`
       connectedPointersOfSubtree
       childWorkspaces {
         id
+        serialId
         isEligibleForHonestOracle
       }
     }
