@@ -499,6 +499,8 @@ const schema = new GraphQLSchema({
                 where: { serialId: Number(findOptions.where.id) },
               };
             }
+
+            return findOptions;
           },
           after: async (result: Workspace, args, ctx) => {
             // ensure root workspace has associated tree
@@ -610,6 +612,8 @@ const schema = new GraphQLSchema({
                 where: { serialId: Number(findOptions.where.id) },
               };
             }
+
+            return findOptions;
           },
         }),
       },
