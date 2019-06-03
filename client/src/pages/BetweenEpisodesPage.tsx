@@ -55,7 +55,9 @@ export class BetweenEpisodesPagePresentational extends React.Component<
             above when you're ready to start on the next workspace.
           </div>
           {this.state.hasLeftCurrentWorkspace && (
-            <UserActivity experimentId={queryParams.experiment} />
+            <UserActivity
+              experimentId={queryParams.experiment || queryParams.e}
+            />
           )}
         </ContentContainer>
       </div>
