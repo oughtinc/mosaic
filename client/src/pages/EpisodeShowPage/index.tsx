@@ -799,87 +799,88 @@ export class WorkspaceView extends React.Component<any, any> {
                             )}
                           </BlockContainer>
                         )}
-                      {isWorkspacePartOfOracleExperiment && !isOracleWorkspace && (
-                        <BlockContainer>
-                          <BlockHeader>Select Answer</BlockHeader>
-                          <BlockBody>
-                            <div
-                              style={{
-                                alignItems: "center",
-                                display: "flex",
-                                justifyContent: "space-around",
-                              }}
-                            >
-                              <SelectAnswerBtn
-                                experimentId={experimentId}
-                                markAsCurrentlyResolved={() =>
-                                  this.props.updateWorkspace({
-                                    variables: {
-                                      id: workspace.id,
-                                      input: {
-                                        isCurrentlyResolved: true,
-                                      },
-                                    },
-                                  })
-                                }
-                                markAsNotStale={() =>
-                                  this.props.updateWorkspace({
-                                    variables: {
-                                      id: workspace.id,
-                                      input: {
-                                        isStale: false,
-                                      },
-                                    },
-                                  })
-                                }
-                                selectAnswerCandidate={() =>
-                                  this.props.selectAnswerCandidate({
-                                    variables: {
-                                      id: workspace.id,
-                                      decision: 1,
-                                    },
-                                  })
-                                }
+                      {shouldShowResponseField &&
+                        shouldShowTwoButtonResponseUI && (
+                          <BlockContainer>
+                            <BlockHeader>Select Answer</BlockHeader>
+                            <BlockBody>
+                              <div
+                                style={{
+                                  alignItems: "center",
+                                  display: "flex",
+                                  justifyContent: "space-around",
+                                }}
                               >
-                                Select A1
-                              </SelectAnswerBtn>
-                              <SelectAnswerBtn
-                                experimentId={experimentId}
-                                markAsCurrentlyResolved={() =>
-                                  this.props.updateWorkspace({
-                                    variables: {
-                                      id: workspace.id,
-                                      input: {
-                                        isCurrentlyResolved: true,
+                                <SelectAnswerBtn
+                                  experimentId={experimentId}
+                                  markAsCurrentlyResolved={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isCurrentlyResolved: true,
+                                        },
                                       },
-                                    },
-                                  })
-                                }
-                                markAsNotStale={() =>
-                                  this.props.updateWorkspace({
-                                    variables: {
-                                      id: workspace.id,
-                                      input: {
-                                        isStale: false,
+                                    })
+                                  }
+                                  markAsNotStale={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isStale: false,
+                                        },
                                       },
-                                    },
-                                  })
-                                }
-                                selectAnswerCandidate={() =>
-                                  this.props.selectAnswerCandidate({
-                                    variables: {
-                                      id: workspace.id,
-                                      decision: 2,
-                                    },
-                                  })
-                                }
-                              >
-                                Select A2
-                              </SelectAnswerBtn>
-                            </div>
-                          </BlockBody>
-                        </BlockContainer>
-                      )}
+                                    })
+                                  }
+                                  selectAnswerCandidate={() =>
+                                    this.props.selectAnswerCandidate({
+                                      variables: {
+                                        id: workspace.id,
+                                        decision: 1,
+                                      },
+                                    })
+                                  }
+                                >
+                                  Select A1
+                                </SelectAnswerBtn>
+                                <SelectAnswerBtn
+                                  experimentId={experimentId}
+                                  markAsCurrentlyResolved={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isCurrentlyResolved: true,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  markAsNotStale={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isStale: false,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  selectAnswerCandidate={() =>
+                                    this.props.selectAnswerCandidate({
+                                      variables: {
+                                        id: workspace.id,
+                                        decision: 2,
+                                      },
+                                    })
+                                  }
+                                >
+                                  Select A2
+                                </SelectAnswerBtn>
+                              </div>
+                            </BlockBody>
+                          </BlockContainer>
+                        )}
 
                       {this.state.isAuthenticated && (
                         <AdvancedOptions
