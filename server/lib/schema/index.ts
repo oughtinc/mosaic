@@ -1547,7 +1547,9 @@ const schema = new GraphQLSchema({
             user.id,
           );
 
-          return { id: workspaceId };
+          const workspace = await Workspace.findByPk(workspaceId);
+
+          return workspace;
         },
       },
       leaveCurrentWorkspace: {
