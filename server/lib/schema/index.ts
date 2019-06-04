@@ -1480,6 +1480,16 @@ const schema = new GraphQLSchema({
             );
           }
 
+          if (experimentId.length < 10) {
+            const experiment = await Experiment.findOne({
+              where: {
+                serialId: Number(experimentId),
+              },
+            });
+
+            experimentId = experiment.id;
+          }
+
           const scheduler = await getScheduler(experimentId);
 
           const workspaceId = await scheduler.assignNextWorkspace(user.id);
@@ -1521,6 +1531,16 @@ const schema = new GraphQLSchema({
             );
           }
 
+          if (experimentId.length < 10) {
+            const experiment = await Experiment.findOne({
+              where: {
+                serialId: Number(experimentId),
+              },
+            });
+
+            experimentId = experiment.id;
+          }
+
           const scheduler = await getScheduler(experimentId);
 
           const workspaceId = await scheduler.assignNextMaybeSuboptimalWorkspace(
@@ -1541,6 +1561,16 @@ const schema = new GraphQLSchema({
             const user = await userFromContext(context);
             if (user === null) {
               return false;
+            }
+
+            if (experimentId.length < 10) {
+              const experiment = await Experiment.findOne({
+                where: {
+                  serialId: Number(experimentId),
+                },
+              });
+
+              experimentId = experiment.id;
             }
 
             const scheduler = await getScheduler(experimentId);
