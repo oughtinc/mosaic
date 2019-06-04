@@ -781,7 +781,6 @@ export class WorkspaceView extends React.Component<any, any> {
                                         isStale: false,
                                       },
                                     },
-<<<<<<< HEAD
                                   })
                                 }
                                 declineToChallenge={() =>
@@ -800,108 +799,6 @@ export class WorkspaceView extends React.Component<any, any> {
                             )}
                           </BlockContainer>
                         )}
-                      {shouldShowResponseField &&
-                        shouldShowTwoButtonResponseUI && (
-                          <BlockContainer>
-                            <BlockHeader>Select Answer</BlockHeader>
-                            <BlockBody>
-                              <div
-                                style={{
-                                  alignItems: "center",
-                                  display: "flex",
-                                  justifyContent: "space-around",
-                                }}
-                              >
-                                <SelectAnswerBtn
-                                  experimentId={experimentId}
-                                  markAsCurrentlyResolved={() =>
-                                    this.props.updateWorkspace({
-                                      variables: {
-                                        id: workspace.id,
-                                        input: {
-                                          isCurrentlyResolved: true,
-                                        },
-                                      },
-                                    })
-                                  }
-                                  markAsNotStale={() =>
-                                    this.props.updateWorkspace({
-                                      variables: {
-                                        id: workspace.id,
-                                        input: {
-                                          isStale: false,
-                                        },
-                                      },
-                                    })
-                                  }
-                                  selectAnswerCandidate={() =>
-                                    this.props.selectAnswerCandidate({
-                                      variables: {
-                                        id: workspace.id,
-                                        decision: 1,
-                                      },
-                                    })
-                                  }
-                                >
-                                  Select A1
-                                </SelectAnswerBtn>
-                                <SelectAnswerBtn
-                                  experimentId={experimentId}
-                                  markAsCurrentlyResolved={() =>
-                                    this.props.updateWorkspace({
-                                      variables: {
-                                        id: workspace.id,
-                                        input: {
-                                          isCurrentlyResolved: true,
-                                        },
-                                      },
-                                    })
-                                  }
-                                  markAsNotStale={() =>
-                                    this.props.updateWorkspace({
-                                      variables: {
-                                        id: workspace.id,
-                                        input: {
-                                          isStale: false,
-                                        },
-                                      },
-                                    })
-                                  }
-                                  selectAnswerCandidate={() =>
-                                    this.props.selectAnswerCandidate({
-                                      variables: {
-                                        id: workspace.id,
-                                        decision: 2,
-                                      },
-                                    })
-                                  }
-                                >
-                                  Select A2
-                                </SelectAnswerBtn>
-                              </div>
-                            </BlockBody>
-                          </BlockContainer>
-                        )}
-=======
-                                  },
-                                })
-                              }
-                              declineToChallenge={() =>
-                                this.props.declineToChallengeMutation({
-                                  variables: { id: workspace.id },
-                                })
-                              }
-                              transferRemainingBudgetToParent={() =>
-                                this.props.transferRemainingBudgetToParent({
-                                  variables: { id: workspace.id },
-                                })
-                              }
-                              workspaceId={workspace.id}
-                              responseBlockId={answerDraftProps.blockId}
-                            />
-                          )}
-                        </BlockContainer>
-                      )}
                       {isWorkspacePartOfOracleExperiment && !isOracleWorkspace && (
                         <BlockContainer>
                           <BlockHeader>Select Answer</BlockHeader>
@@ -983,7 +880,6 @@ export class WorkspaceView extends React.Component<any, any> {
                           </BlockBody>
                         </BlockContainer>
                       )}
->>>>>>> Two-button UI for judges
 
                       {this.state.isAuthenticated && (
                         <AdvancedOptions
