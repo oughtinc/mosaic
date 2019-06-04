@@ -37,7 +37,11 @@ const RelationTypeAttributes = [
     source: WORKSPACE,
     blockType: QUESTION,
     permission:
-      Auth.isAdmin() && !parseQueryString(window.location.search).experiment
+      Auth.isAdmin() &&
+      !(
+        parseQueryString(window.location.search).experiment ||
+        parseQueryString(window.location.search).e
+      )
         ? Permissions.Editable
         : Permissions.ReadOnly,
   },
