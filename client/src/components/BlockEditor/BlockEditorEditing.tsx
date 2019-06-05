@@ -195,8 +195,9 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     if (this.props.shouldAutosave) {
       const isUserAdmin = Auth.isAdmin();
-      const isUserInExperiment = parseQueryString(window.location.search)
-        .experiment;
+      const isUserInExperiment =
+        parseQueryString(window.location.search).experiment ||
+        parseQueryString(window.location.search).e;
       if (isUserAdmin || isUserInExperiment) {
         this.saveToDatabase();
         this.endAutosaveInterval();
