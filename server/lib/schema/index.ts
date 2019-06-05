@@ -39,18 +39,6 @@ import NotificationRequest from "../models/notificationRequest";
 import { generateHonestAnswerDraftValue } from "../models/helpers/defaultHonestOracleBlocks";
 import { generateMaliciousAnswerDraftValue } from "../models/helpers/defaultMaliciousOracleBlocks";
 
-async function getExperimentByIdOrSerialId(idOrSerialId) {
-  if (String(idOrSerialId).length < 10) {
-    return Experiment.findAll({
-      where: {
-        serialId: Number(idOrSerialId),
-      },
-    })[0];
-  }
-
-  return Experiment.findByPk(idOrSerialId);
-}
-
 const generateReferences = references => {
   const all = {};
   references.map(([fieldName, graphqlType]) => {
@@ -681,7 +669,7 @@ const schema = new GraphQLSchema({
                 if (!experimentId) {
                   throw new Error("User not participating in an experiment.");
                 } else {
-                  const experiment = await getExperimentByIdOrSerialId(
+                  const experiment = await Experiment.findByPkOrSerialId(
                     experimentId,
                   );
 
@@ -748,7 +736,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's eligibility",
           async (_, { eligibilityRank, experimentId }) => {
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -766,7 +756,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's name",
           async (_, { experimentId, name }) => {
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -788,7 +780,9 @@ const schema = new GraphQLSchema({
             if (tree === null) {
               return false;
             }
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -810,7 +804,9 @@ const schema = new GraphQLSchema({
             if (tree === null) {
               return false;
             }
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -896,11 +892,13 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to add a fallback to an experiment",
           async (_, { experimentId, fallbackId }) => {
-            const fallback = await getExperimentByIdOrSerialId(fallbackId);
+            const fallback = await Experiment.findByPkOrSerialId(fallbackId);
             if (fallback === null) {
               return false;
             }
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -918,11 +916,13 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to remove a fallback from an experiment",
           async (_, { experimentId, fallbackId }) => {
-            const fallback = await getExperimentByIdOrSerialId(fallbackId);
+            const fallback = await Experiment.findByPkOrSerialId(fallbackId);
             if (fallback === null) {
               return false;
             }
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -1378,7 +1378,7 @@ const schema = new GraphQLSchema({
             let workspace;
 
             if (experimentId) {
-              const experiment = await getExperimentByIdOrSerialId(
+              const experiment = await Experiment.findByPkOrSerialId(
                 experimentId,
               );
               if (experiment === null) {
@@ -1797,7 +1797,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment metadata",
           async (_, { experimentId, metadata }, context) => {
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -1834,7 +1836,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment metadata",
           async (_, { experimentId, defaultOracle }, context) => {
-            const experiment = await getExperimentByIdOrSerialId(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
