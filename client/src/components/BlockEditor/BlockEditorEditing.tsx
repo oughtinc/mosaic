@@ -276,11 +276,13 @@ export class BlockEditorEditingPresentational extends React.Component<
             {this.props.mutationStatus &&
               this.props.mutationStatus.error &&
               this.props.mutationStatus.error.message.slice(15)}
-            {parseQueryString(window.location.search).experiment && (
+            {(parseQueryString(window.location.search).experiment ||
+              parseQueryString(window.location.search).e) && (
               <NextWorkspaceBtn
                 bsStyle="default"
                 experimentId={
-                  parseQueryString(window.location.search).experiment
+                  parseQueryString(window.location.search).experiment ||
+                  parseQueryString(window.location.search).e
                 }
                 label={"Find assigned workspace"}
               />
@@ -491,7 +493,9 @@ export const BlockEditorEditing: any = compose(
     withRef: true,
     options: {
       variables: {
-        experimentId: parseQueryString(window.location.search).experiment,
+        experimentId:
+          parseQueryString(window.location.search).experiment ||
+          parseQueryString(window.location.search).e,
       },
     },
   }),

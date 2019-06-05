@@ -288,7 +288,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     try {
       await this.props.notifyOnNextWorkspaceMutation({
         variables: {
-          experimentId: parseQueryString(window.location.search).experiment,
+          experimentId:
+            parseQueryString(window.location.search).experiment ||
+            parseQueryString(window.location.search).e,
         },
       });
       this.setState({ notificationRegistrationState: NOTIFICATION_REGISTERED });

@@ -61,7 +61,9 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
 
     const fullExportCharCount = getInputCharCount(nodeAsJson);
 
-    const isInExperiment = parseQueryString(window.location.search).experiment;
+    const isInExperiment =
+      parseQueryString(window.location.search).experiment ||
+      parseQueryString(window.location.search).e;
 
     const pointerExportBackground: any =
       fullExportCharCount > 650 / 3 && isInExperiment

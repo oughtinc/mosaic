@@ -1512,6 +1512,16 @@ const schema = new GraphQLSchema({
             );
           }
 
+          if (experimentId.length < 10) {
+            const experiment = await Experiment.findOne({
+              where: {
+                serialId: Number(experimentId),
+              },
+            });
+
+            experimentId = experiment.id;
+          }
+
           return await NotificationRequest.upsert({
             experimentId,
             userId: user.id,
