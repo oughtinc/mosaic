@@ -41,7 +41,7 @@ const NextWorkspaceBtn = ({
   return (
     <Link
       onClick={navHook}
-      to={`/next?experiment=${experimentId}`}
+      to={`/next?e=${experimentId}`}
       style={{ margin: "0 5px" }}
     >
       <Button bsSize="small" bsStyle={bsStyle}>

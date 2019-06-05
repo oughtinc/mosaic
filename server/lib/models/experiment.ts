@@ -33,6 +33,9 @@ export default class Experiment extends Model<Experiment> {
   })
   public id: string;
 
+  @Column(DataType.INTEGER)
+  public serialId: number;
+
   @Column(DataType.STRING)
   public name: string;
 

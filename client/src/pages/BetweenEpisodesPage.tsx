@@ -23,7 +23,7 @@ export class BetweenEpisodesPagePresentational extends React.Component<
 
     await this.props.leaveCurrentWorkspaceMutation({
       variables: {
-        experimentId: queryParams.experiment,
+        experimentId: queryParams.experiment || queryParams.e,
       },
     });
     this.setState({
@@ -41,7 +41,7 @@ export class BetweenEpisodesPagePresentational extends React.Component<
         </Helmet>
         {Auth.isAuthenticated() && (
           <EpisodeNav
-            experimentId={queryParams.experiment}
+            experimentId={queryParams.experiment || queryParams.e}
             hasParent={false}
             hasTimer={false}
             hasTimerEnded={true}
@@ -55,7 +55,9 @@ export class BetweenEpisodesPagePresentational extends React.Component<
             above when you're ready to start on the next workspace.
           </div>
           {this.state.hasLeftCurrentWorkspace && (
-            <UserActivity experimentId={queryParams.experiment} />
+            <UserActivity
+              experimentId={queryParams.experiment || queryParams.e}
+            />
           )}
         </ContentContainer>
       </div>

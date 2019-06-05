@@ -85,6 +85,7 @@ const USER_ACTIVITY_QUERY = gql`
               id
               experiments {
                 id
+                serialId
                 eligibilityRank
               }
             }

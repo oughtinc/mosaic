@@ -44,7 +44,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     try {
       response = await this.props.findNextMaybeSuboptimalWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment,
+          experimentId: queryParams.experiment || queryParams.e,
         },
       });
     } catch (e) {
@@ -54,7 +54,8 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     if (schedulingFailed) {
       this.setState({ schedulingFailed });
     } else if (response) {
-      const workspaceId = response.data.findNextMaybeSuboptimalWorkspace.id;
+      const workspaceId =
+        response.data.findNextMaybeSuboptimalWorkspace.serialId;
       this.setState({ workspaceId });
     }
   }
@@ -98,10 +99,9 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?isolated=true&experiment=${
-        queryParams.experiment
-      }`;
-      window.location.href = `${window.location.origin}/workspaces/${
+      const redirectQueryParams = `?e=${queryParams.experiment ||
+        queryParams.e}`;
+      window.location.href = `${window.location.origin}/w/${
         this.state.workspaceId
       }${redirectQueryParams}`;
       return null;
@@ -128,7 +128,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
 const FIND_NEXT_MAYBE_SUBOPTIMAL_WORKSPACE_MUTATION = gql`
   mutation findNextMaybeSuboptimalWorkspace($experimentId: String) {
     findNextMaybeSuboptimalWorkspace(experimentId: $experimentId) {
-      id
+      serialId
     }
   }
 `;

@@ -116,6 +116,7 @@ export const INITIAL_ROOT_QUERY = gql`
   query initialRootQuery($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      serialId
       createdAt
       parentId
       isEligibleForHonestOracle
@@ -124,6 +125,7 @@ export const INITIAL_ROOT_QUERY = gql`
       connectedPointersOfSubtree
       childWorkspaces {
         id
+        serialId
         isEligibleForHonestOracle
       }
     }

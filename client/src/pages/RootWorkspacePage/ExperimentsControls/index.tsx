@@ -79,12 +79,14 @@ const EXPERIMENTS_QUERY = gql`
   query experiments {
     experiments {
       id
+      serialId
       createdAt
       name
       eligibilityRank
       areNewWorkspacesOracleOnlyByDefault
       fallbacks {
         id
+        serialId
         createdAt
         name
       }

@@ -60,7 +60,7 @@ const TakeBreakBtn = ({
   return (
     <Link
       onClick={navHook}
-      to={`/break?experiment=${experimentId}`}
+      to={`/break?e=${experimentId}`}
       style={{ ...style, display: "inline-block" }}
     >
       <Button bsSize="small" bsStyle={bsStyle || "primary"}>
@@ -202,7 +202,7 @@ export class Child extends React.Component<any, any> {
 
         <div style={{ marginTop: "0.5em" }}>
           {!this.props.isIsolatedWorkspace && (
-            <Link to={`/workspaces/${workspace.id}`}>
+            <Link to={`/w/${workspace.serialId}`}>
               <Button
                 bsSize="xsmall"
                 bsStyle="default"

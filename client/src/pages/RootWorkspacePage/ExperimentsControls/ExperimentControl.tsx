@@ -32,7 +32,7 @@ class ExperimentControl extends React.Component<any, any> {
       <FormGroup controlId="formControlsSelect">
         {!this.state.isShowingEditNameField ? (
           <span>
-            <Link to={`/experiments/${experiment.id}`}>
+            <Link to={`/e/${experiment.serialId}`}>
               <ControlLabel style={{ cursor: "pointer" }}>
                 {experiment.name}
               </ControlLabel>

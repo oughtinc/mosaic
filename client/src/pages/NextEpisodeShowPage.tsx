@@ -101,7 +101,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     try {
       response = await this.props.findNextWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment,
+          experimentId: queryParams.experiment || queryParams.e,
         },
       });
     } catch (e) {
@@ -118,7 +118,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       this.setState({ normalSchedulingFailed });
       this.startCountingDown();
     } else if (response) {
-      const workspaceId = response.data.findNextWorkspace.id;
+      const workspaceId = response.data.findNextWorkspace.serialId;
       this.setState({ workspaceId });
     }
   }
@@ -191,9 +191,8 @@ export class NextEpisodeShowPagePresentational extends React.Component<
                 }}
               >
                 <Link
-                  to={`/nextMaybeSuboptimal?experiment=${
-                    queryParams.experiment
-                  }`}
+                  to={`/nextMaybeSuboptimal?e=${queryParams.experiment ||
+                    queryParams.e}`}
                   style={{ margin: "0 5px" }}
                 >
                   <Button bsStyle="danger">Find Suboptimal Workspace »</Button>
@@ -246,10 +245,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?isolated=true&experiment=${
-        queryParams.experiment
-      }`;
-      window.location.href = `${window.location.origin}/workspaces/${
+      const redirectQueryParams = `?e=${queryParams.experiment ||
+        queryParams.e}`;
+      window.location.href = `${window.location.origin}/w/${
         this.state.workspaceId
       }${redirectQueryParams}`;
       return null;
@@ -355,7 +353,7 @@ const IS_USER_REGISTERED_FOR_NOTIFICATIONS = gql`
 const FIND_NEXT_WORKSPACE_MUTATION = gql`
   mutation findNextWorkspace($experimentId: String) {
     findNextWorkspace(experimentId: $experimentId) {
-      id
+      serialId
     }
   }
 `;
@@ -381,7 +379,9 @@ export const NextEpisodeShowPage = compose(
       variables: {
         experimentId:
           parseQueryString(window.location.search).experiment ||
-          parseQueryString(props.history.location.search).experiment,
+          parseQueryString(window.location.search).e ||
+          parseQueryString(props.history.location.search).experiment ||
+          parseQueryString(props.history.location.search).e,
         userId: Auth.userId(),
       },
     }),

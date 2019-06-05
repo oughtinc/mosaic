@@ -30,7 +30,7 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
             <Link
               style={{ textDecoration: "none" }}
               target="_blank"
-              to={`/workspaces/${normal.id}`}
+              to={`/w/${normal.id}`}
             >
               <Checkmark color="red" />
             </Link>
@@ -41,7 +41,7 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
               textDecoration: "none",
             }}
             target="_blank"
-            to={`/workspaces/${malicious.id}`}
+            to={`/w/${malicious.id}`}
           >
             M
           </Link>

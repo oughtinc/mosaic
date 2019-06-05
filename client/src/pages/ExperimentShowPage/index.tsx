@@ -38,7 +38,7 @@ const NextWorkspaceBtn = ({
   navHook,
 }: NextWorkspaceBtnProps) => {
   return (
-    <Link onClick={navHook} to={`/next?experiment=${experimentId}`}>
+    <Link onClick={navHook} to={`/next?e=${experimentId}`}>
       <Button bsSize="small" bsStyle={bsStyle}>
         {label} »
       </Button>
@@ -263,6 +263,7 @@ const EXPERIMENT_QUERY = gql`
   query experimentQuery($id: String) {
     experiment(id: $id) {
       id
+      serialId
       eligibilityRank
       areNewWorkspacesOracleOnlyByDefault
       name
@@ -278,12 +279,14 @@ const EXPERIMENT_QUERY = gql`
       }
       fallbacks {
         id
+        serialId
         createdAt
         name
       }
       trees {
         rootWorkspace {
           id
+          serialId
           createdAt
           parentId
           totalBudget
@@ -298,6 +301,7 @@ const EXPERIMENT_QUERY = gql`
             doesAllowOracleBypass
             experiments {
               id
+              serialId
               createdAt
               name
             }
@@ -344,7 +348,7 @@ const UPDATE_EXPERIMENT_ELIGIBILITY_RANK_MUTATION = gql`
 
 const options = props => ({
   variables: {
-    id: props.match.params.experimentId,
+    id: props.match.params.experimentId || props.match.params.e,
   },
 });
 

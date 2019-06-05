@@ -66,9 +66,15 @@ const Routes = () => (
       path="/workspaces/:workspaceId"
       component={EpisodeShowPage}
     />
+    <Route exact={true} path="/w/:workspaceId" component={EpisodeShowPage} />
     <Route
       exact={true}
       path="/experiments/:experimentId"
+      component={ExperimentShowPage}
+    />
+    <Route
+      exact={true}
+      path="/e/:experimentId"
       component={ExperimentShowPage}
     />
     <Route
@@ -78,7 +84,17 @@ const Routes = () => (
     />
     <Route
       exact={true}
+      path="/w/:workspaceId/subtree"
+      component={WorkspaceSubtreePage}
+    />
+    <Route
+      exact={true}
       path="/workspaces/:workspaceId/compactTree"
+      component={CompactTreeView}
+    />
+    <Route
+      exact={true}
+      path="/w/:workspaceId/compactTree"
       component={CompactTreeView}
     />
     <Route

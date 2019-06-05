@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 
 const NavLink = props => (
-  <Link to={`/experiments/${props.experimentId}`}>{props.children}</Link>
+  <Link to={`/e/${props.experimentId}`}>{props.children}</Link>
 );
 
 export class FallbacksPresentational extends React.Component<any, any> {
@@ -82,7 +82,7 @@ export class FallbacksPresentational extends React.Component<any, any> {
                     this.handleOnChange(event, this.props.experiment.id, e.id)
                   }
                 >
-                  <NavLink experimentId={e.id}>{e.name}</NavLink>
+                  <NavLink experimentId={e.serialId}>{e.name}</NavLink>
                 </Checkbox>
               );
             })}
@@ -114,8 +114,8 @@ export class FallbacksPresentational extends React.Component<any, any> {
           ) : (
             <ul>
               {fallbacks.map((f, i, arr) => (
-                <li key={`${this.props.experiment.id}${f.id}`}>
-                  <NavLink experimentId={f.id}>{f.name}</NavLink>
+                <li key={`${this.props.experiment.serialIsd}${f.id}`}>
+                  <NavLink experimentId={f.serialId}>{f.name}</NavLink>
                 </li>
               ))}
             </ul>
@@ -130,6 +130,7 @@ const EXPERIMENTS_QUERY = gql`
   query experiments {
     experiments {
       id
+      serialId
       createdAt
       name
     }

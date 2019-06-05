@@ -55,6 +55,7 @@ export const WORKSPACES_QUERY = gql`
   query RootWorkspacesQuery {
     workspaces(where: { parentId: null, hasBeenDeletedByAncestor: false }) {
       id
+      serialId
       parentId
       creatorId
       isPublic
@@ -74,6 +75,7 @@ export const WORKSPACES_QUERY = gql`
         id
         experiments {
           id
+          serialId
           createdAt
           name
         }
@@ -90,6 +92,7 @@ export const ROOT_WORKSPACE_SUBTREE_QUERY = gql`
   query rootWorkspaceSubtree($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      serialId
       isPublic
       isStale
       isEligibleForHonestOracle
@@ -129,6 +132,7 @@ export const CHILD_WORKSPACE_SUBTREE_QUERY = gql`
   query childWorkspaceSubtree($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      serialId
       isPublic
       isStale
       isEligibleForHonestOracle
