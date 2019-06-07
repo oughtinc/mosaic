@@ -4,20 +4,22 @@ import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { compose } from "recompose";
-import { parse as parseQueryString } from "query-string";
 import { ContentContainer } from "../../components/ContentContainer";
 import { CompactTreeGroupContainer as V1CompactTreeGroupContainer } from "./V1CompactTreeGroupContainer";
 import { CompactTreeGroupContainer as V2CompactTreeGroupContainer } from "./V2CompactTreeGroupContainer";
 import { getVersionOfTree } from "./helpers/getVersionOfTree";
+import { getIsTreeExpandedFromQueryParams } from "../../helpers/getIsTreeExpandedFromQueryParams";
 
 export class CompactTreeViewContainer extends React.PureComponent<any, any> {
   public render() {
+    const isExpanded = getIsTreeExpandedFromQueryParams(window.location.search);
+
     return (
       <ContentContainer>
         <Helmet>
           <title>Compact Tree View - Mosaic</title>
         </Helmet>
-        {parseQueryString(window.location.search).expanded === "true" ? (
+        {isExpanded ? (
           <Button
             onClick={() => {
               const { origin, pathname } = window.location;

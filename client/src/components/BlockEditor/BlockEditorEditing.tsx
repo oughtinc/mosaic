@@ -21,9 +21,11 @@ import * as _ from "lodash";
 import { UPDATE_BLOCKS } from "../../graphqlQueries";
 import { Change } from "./types";
 import * as slateChangeMutations from "../../slate-helpers/slate-change-mutations";
-import { parse as parseQueryString } from "query-string";
 import { Auth } from "../../auth";
 import { DOLLAR_NUMBERS_REGEX } from "../helpers/DOLLAR_NUMBERS_REGEX";
+
+import { getIsUserInExperimentFromQueryParams } from "../../helpers/getIsUserInExperimentFromQueryParams";
+import { getExperimentIdOrSerialIdFromQueryParams } from "../../helpers/getExperimentIdOrSerialIdFromQueryParams";
 
 interface NextWorkspaceBtnProps {
   bsStyle: string;
@@ -195,9 +197,10 @@ export class BlockEditorEditingPresentational extends React.Component<
 
     if (this.props.shouldAutosave) {
       const isUserAdmin = Auth.isAdmin();
-      const isUserInExperiment =
-        parseQueryString(window.location.search).experiment ||
-        parseQueryString(window.location.search).e;
+      const isUserInExperiment = getIsUserInExperimentFromQueryParams(
+        window.location.search,
+      );
+
       if (isUserAdmin || isUserInExperiment) {
         this.saveToDatabase();
         this.endAutosaveInterval();
@@ -240,6 +243,14 @@ export class BlockEditorEditingPresentational extends React.Component<
   }
 
   public render() {
+    const isUserInExperiment = getIsUserInExperimentFromQueryParams(
+      window.location.search,
+    );
+
+    const experimentId =
+      isUserInExperiment &&
+      getExperimentIdOrSerialIdFromQueryParams(window.location.search);
+
     return (
       <div>
         <MenuBar
@@ -277,14 +288,10 @@ export class BlockEditorEditingPresentational extends React.Component<
             {this.props.mutationStatus &&
               this.props.mutationStatus.error &&
               this.props.mutationStatus.error.message.slice(15)}
-            {(parseQueryString(window.location.search).experiment ||
-              parseQueryString(window.location.search).e) && (
+            {isUserInExperiment && (
               <NextWorkspaceBtn
                 bsStyle="default"
-                experimentId={
-                  parseQueryString(window.location.search).experiment ||
-                  parseQueryString(window.location.search).e
-                }
+                experimentId={experimentId}
                 label={"Find assigned workspace"}
               />
             )}
@@ -494,9 +501,9 @@ export const BlockEditorEditing: any = compose(
     withRef: true,
     options: {
       variables: {
-        experimentId:
-          parseQueryString(window.location.search).experiment ||
-          parseQueryString(window.location.search).e,
+        experimentId: getExperimentIdOrSerialIdFromQueryParams(
+          window.location.search,
+        ),
       },
     },
   }),

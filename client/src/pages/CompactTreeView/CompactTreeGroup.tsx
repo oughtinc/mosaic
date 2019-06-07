@@ -2,7 +2,6 @@ import * as React from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { scroller, Element } from "react-scroll";
-import { parse as parseQueryString } from "query-string";
 
 import { CompactTreeRow } from "./CompactTreeRow";
 import { CompactTreeRowLabel } from "./CompactTreeRowLabel";
@@ -16,6 +15,10 @@ import { NormalWorkspaceGroup } from "./NormalWorkspaceGroup";
 
 import { BlockEditor } from "../../components/BlockEditor";
 
+import { getIsTreeExpandedFromQueryParams } from "../../helpers/getIsTreeExpandedFromQueryParams";
+
+import { getActiveWorkspaceIsFromQueryParams } from "../../helpers/getActiveWorkspaceIsFromQueryParams";
+
 const Checkmark = ({ color }) => (
   <span style={{ color, fontSize: "24px" }}>✓</span>
 );
@@ -25,9 +28,12 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   any
 > {
   public componentDidMount() {
-    const isThisActiveWorkspace =
-      parseQueryString(window.location.search).activeWorkspace ===
-      this.props.workspace.id;
+    const activeWorkspaceId = getActiveWorkspaceIsFromQueryParams(
+      window.location.search,
+    );
+
+    const isThisActiveWorkspace = activeWorkspaceId === this.props.workspace.id;
+
     if (isThisActiveWorkspace) {
       setTimeout(() => {
         scroller.scrollTo(this.props.workspace.id, {
@@ -39,9 +45,11 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   }
 
   public render() {
-    const isThisActiveWorkspace =
-      parseQueryString(window.location.search).activeWorkspace ===
-      this.props.workspace.id;
+    const activeWorkspaceId = getActiveWorkspaceIsFromQueryParams(
+      window.location.search,
+    );
+
+    const isThisActiveWorkspace = activeWorkspaceId === this.props.workspace.id;
 
     if (this.props.isRequestingLazyUnlock) {
       return (
@@ -230,10 +238,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
 
 export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
   public state = {
-    isExpanded:
-      parseQueryString(window.location.search).expanded === "true"
-        ? true
-        : false,
+    isExpanded: getIsTreeExpandedFromQueryParams(window.location.search),
   };
 
   public render() {
