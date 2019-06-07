@@ -1,7 +1,7 @@
 import { parse as parseQueryString } from "query-string";
 
 export function getMomentDurationForWorkspaceTimerFromQueryParams(
-  windowLocationSearch,
+  windowLocationSearch: string,
 ) {
   const queryParams = parseQueryString(windowLocationSearch);
 
