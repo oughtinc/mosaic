@@ -387,11 +387,10 @@ export const NextEpisodeShowPage = compose(
     options: (props: any) => ({
       variables: {
         experimentId:
-          getExperimentIdOrSerialIdFromQueryParams(window.location.search)
-            .experiment ||
+          getExperimentIdOrSerialIdFromQueryParams(window.location.search) ||
           getExperimentIdOrSerialIdFromQueryParams(
             props.history.location.search,
-          ).experiment,
+          ),
         userId: Auth.userId(),
       },
     }),
