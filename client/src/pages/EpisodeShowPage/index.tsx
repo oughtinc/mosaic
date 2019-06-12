@@ -584,6 +584,9 @@ export class WorkspaceView extends React.Component<any, any> {
                             marginRight: "8px",
                           }}
                         >
+                          <span style={{ color: "darkGray" }}>
+                            Workspace #{workspace.serialId}
+                          </span>
                           <BlockEditor
                             isActive={isActive}
                             isUserOracle={isUserOracle}

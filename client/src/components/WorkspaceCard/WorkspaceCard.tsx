@@ -188,7 +188,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
             >
               <div>
                 <WorkspaceLink workspaceId={workspace.serialId}>
-                  Go to workspace »
+                  Workspace #{workspace.serialId}
                 </WorkspaceLink>
               </div>
               {Auth.isAdmin() && workspace.currentlyActiveUser && (
