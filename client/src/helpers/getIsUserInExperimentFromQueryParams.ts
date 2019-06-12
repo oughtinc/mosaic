@@ -1,6 +1,8 @@
 import { parse as parseQueryString } from "query-string";
 
-export function getIsUserInExperimentFromQueryParams(windowLocationSearch) {
+export function getIsUserInExperimentFromQueryParams(
+  windowLocationSearch: string,
+) {
   const queryParams = parseQueryString(windowLocationSearch);
 
   const isThereLongExperimentQueryParam = !!queryParams.experiment;
