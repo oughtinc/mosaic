@@ -5,11 +5,12 @@ import { Button } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { parse as parseQueryString } from "query-string";
 
 import { ContentContainer } from "../components/ContentContainer";
 import { VERY_DARK_BLUE, VERY_LIGHT_BLUE } from "../styles";
 import { Auth } from "../auth";
+
+import { getExperimentIdOrSerialIdFromQueryParams } from "../helpers/getExperimentIdOrSerialIdFromQueryParams";
 
 const NOTIFICATION_NOT_REGISTERED = 1;
 const NOTIFICATION_REGISTRATION_PENDING = 2;
@@ -96,12 +97,15 @@ export class NextEpisodeShowPagePresentational extends React.Component<
 
   public async componentDidMount() {
     let response, normalSchedulingFailed, oracleSchedulingFailed;
-    const queryParams = parseQueryString(window.location.search);
+
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     try {
       response = await this.props.findNextWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment || queryParams.e,
+          experimentId,
         },
       });
     } catch (e) {
@@ -128,7 +132,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   }
 
   public render() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     if (this.state.refreshCountdown === 0) {
       location.reload();
@@ -191,8 +197,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
                 }}
               >
                 <Link
-                  to={`/nextMaybeSuboptimal?e=${queryParams.experiment ||
-                    queryParams.e}`}
+                  to={`/nextMaybeSuboptimal?e=${experimentId}`}
                   style={{ margin: "0 5px" }}
                 >
                   <Button bsStyle="danger">Find Suboptimal Workspace »</Button>
@@ -245,8 +250,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?e=${queryParams.experiment ||
-        queryParams.e}`;
+      const redirectQueryParams = `?e=${experimentId}`;
       window.location.href = `${window.location.origin}/w/${
         this.state.workspaceId
       }${redirectQueryParams}`;
@@ -285,12 +289,15 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     this.setState({
       notificationRegistrationState: NOTIFICATION_REGISTRATION_PENDING,
     });
+
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
+
     try {
       await this.props.notifyOnNextWorkspaceMutation({
         variables: {
-          experimentId:
-            parseQueryString(window.location.search).experiment ||
-            parseQueryString(window.location.search).e,
+          experimentId,
         },
       });
       this.setState({ notificationRegistrationState: NOTIFICATION_REGISTERED });
@@ -380,10 +387,10 @@ export const NextEpisodeShowPage = compose(
     options: (props: any) => ({
       variables: {
         experimentId:
-          parseQueryString(window.location.search).experiment ||
-          parseQueryString(window.location.search).e ||
-          parseQueryString(props.history.location.search).experiment ||
-          parseQueryString(props.history.location.search).e,
+          getExperimentIdOrSerialIdFromQueryParams(window.location.search) ||
+          getExperimentIdOrSerialIdFromQueryParams(
+            props.history.location.search,
+          ),
         userId: Auth.userId(),
       },
     }),

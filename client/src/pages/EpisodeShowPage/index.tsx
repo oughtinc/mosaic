@@ -1,4 +1,3 @@
-import * as moment from "moment";
 import * as React from "react";
 import * as keyboardJS from "keyboardjs";
 
@@ -10,7 +9,6 @@ import * as ReactMarkdown from "react-markdown";
 import { compose } from "recompose";
 import { Alert, Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
-import { parse as parseQueryString } from "query-string";
 import { AdvancedOptions } from "./AdvancedOptions";
 import { DepthDisplay } from "./DepthDisplay";
 import { EpisodeNav } from "./EpisodeNav";
@@ -56,6 +54,11 @@ import {
 } from "../../graphqlQueries";
 import { CONVERT_PASTED_EXPORT_TO_IMPORT } from "../../constants";
 import { Auth } from "../../auth";
+
+import { getExperimentIdOrSerialIdFromQueryParams } from "../../helpers/getExperimentIdOrSerialIdFromQueryParams";
+import { getIsUserInExperimentFromQueryParams } from "../../helpers/getIsUserInExperimentFromQueryParams";
+import { getDoesWorkspaceHaveTimerFromQueryParams } from "../../helpers/getDoesWorkspaceHaveTimerFromQueryParams";
+import { getMomentDurationForWorkspaceTimerFromQueryParams } from "../../helpers/getMomentDurationForWorkspaceTimerFromQueryParams";
 
 import {
   blockBorderAndBoxShadow,
@@ -254,8 +257,9 @@ export class WorkspaceView extends React.Component<any, any> {
   }
 
   public async componentDidMount() {
-    const queryParams = parseQueryString(window.location.search);
-    this.experimentId = queryParams.experiment || queryParams.e;
+    this.experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     window.addEventListener("beforeunload", e => {
       setTimeout(() => {
@@ -388,13 +392,23 @@ export class WorkspaceView extends React.Component<any, any> {
     const hasTimeBudget = workspace.hasTimeBudgetOfRootParent;
     const hasIOConstraints = workspace.hasIOConstraintsOfRootParent;
 
-    const queryParams = parseQueryString(window.location.search);
-    const isIsolatedWorkspace = queryParams.experimentId || queryParams.e;
+    const isInExperiment = getIsUserInExperimentFromQueryParams(
+      window.location.search,
+    );
+
+    const isIsolatedWorkspace = isInExperiment;
+
     const isActive =
       workspace.currentlyActiveUser &&
       workspace.currentlyActiveUser.id === Auth.userId();
-    const experimentId = queryParams.experiment || queryParams.e;
-    const hasURLTimeRestriction = queryParams.timer;
+
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
+
+    const hasURLTimeRestriction = getDoesWorkspaceHaveTimerFromQueryParams(
+      window.location.search,
+    );
     const hasTimerEnded = this.state.hasTimerEnded;
 
     const durationInMsGivenRemainingBudget =
@@ -402,8 +416,11 @@ export class WorkspaceView extends React.Component<any, any> {
       1000;
 
     const DEFAULT_MAX_TIMER_DURATION = 90 * 1000;
+
     const durationInMsGivenURLRestriction = hasURLTimeRestriction
-      ? moment.duration(queryParams.timer).asMilliseconds()
+      ? getMomentDurationForWorkspaceTimerFromQueryParams(
+          window.location.search,
+        ).asMilliseconds()
       : DEFAULT_MAX_TIMER_DURATION;
 
     const durationInMs = Math.min(

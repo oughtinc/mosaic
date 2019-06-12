@@ -2,12 +2,13 @@ import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { parse as parseQueryString } from "query-string";
 
 import { propsToPointerDetails } from "./helpers";
 
 import { addExportIdToStore } from "../../modules/blockEditor/actions";
 import { getInputCharCount } from "../../modules/blocks/charCounts";
+
+import { getIsUserInExperimentFromQueryParams } from "../../helpers/getIsUserInExperimentFromQueryParams";
 
 // We don't use this function but it's here if we need it later.
 // function getMaxNesting(node: any): number {
@@ -61,9 +62,9 @@ export class PointerExportMarkPresentational extends React.Component<any, any> {
 
     const fullExportCharCount = getInputCharCount(nodeAsJson);
 
-    const isInExperiment =
-      parseQueryString(window.location.search).experiment ||
-      parseQueryString(window.location.search).e;
+    const isInExperiment = getIsUserInExperimentFromQueryParams(
+      window.location.search,
+    );
 
     const pointerExportBackground: any =
       fullExportCharCount > 650 / 3 && isInExperiment

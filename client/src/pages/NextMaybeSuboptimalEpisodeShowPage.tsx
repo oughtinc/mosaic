@@ -3,9 +3,10 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { Helmet } from "react-helmet";
 import { compose } from "recompose";
-import { parse as parseQueryString } from "query-string";
 
 import { ContentContainer } from "../components/ContentContainer";
+
+import { getExperimentIdOrSerialIdFromQueryParams } from "../helpers/getExperimentIdOrSerialIdFromQueryParams";
 
 const RedExclamation = () => (
   <span
@@ -37,14 +38,16 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
   }
 
   public async componentDidMount() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     let response, schedulingFailed;
 
     try {
       response = await this.props.findNextMaybeSuboptimalWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment || queryParams.e,
+          experimentId,
         },
       });
     } catch (e) {
@@ -65,7 +68,9 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
   }
 
   public render() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     if (this.state.refreshCountdown === 0) {
       location.reload();
@@ -99,8 +104,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?e=${queryParams.experiment ||
-        queryParams.e}`;
+      const redirectQueryParams = `?e=${experimentId}`;
       window.location.href = `${window.location.origin}/w/${
         this.state.workspaceId
       }${redirectQueryParams}`;

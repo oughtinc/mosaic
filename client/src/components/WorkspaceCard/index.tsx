@@ -2,7 +2,6 @@ import gql from "graphql-tag";
 import * as React from "react";
 import { compose } from "recompose";
 import { graphql } from "react-apollo";
-import { parse as parseQueryString } from "query-string";
 import {
   ROOT_WORKSPACE_SUBTREE_QUERY,
   CHILD_WORKSPACE_SUBTREE_QUERY,
@@ -12,6 +11,9 @@ import {
 import { WorkspaceCardPresentational } from "./WorkspaceCard";
 
 import { Auth } from "../../auth";
+
+import { getActiveWorkspaceIsFromQueryParams } from "../../helpers/getActiveWorkspaceIsFromQueryParams";
+import { getIsTreeExpandedFromQueryParams } from "../../helpers/getIsTreeExpandedFromQueryParams";
 
 const ORACLE_MODE_QUERY = gql`
   query oracleModeQuery {
@@ -70,8 +72,10 @@ const optionsForSubtreeTimeSpentQuery = ({
 
 export class WorkspaceCardContainer extends React.PureComponent<any, any> {
   public render() {
-    const queryParams = parseQueryString(window.location.search);
-    const isExpanded = queryParams.expanded === "true";
+    const isExpanded = getIsTreeExpandedFromQueryParams(window.location.search);
+    const activeWorkspaceId = getActiveWorkspaceIsFromQueryParams(
+      window.location.search,
+    );
 
     if (
       this.props.oracleModeQuery.oracleMode !== undefined &&
@@ -79,7 +83,7 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
     ) {
       return (
         <WorkspaceCardPresentational
-          activeWorkspaceId={queryParams.activeWorkspace}
+          activeWorkspaceId={activeWorkspaceId}
           ejectUserFromCurrentWorkspace={async ({ userId, workspaceId }) => {
             await this.props.ejectUserFromCurrentWorkspaceMutation({
               variables: {

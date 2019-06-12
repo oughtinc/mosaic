@@ -5,17 +5,19 @@ import { Helmet } from "react-helmet";
 import { BlockHoverMenu } from "../../components/BlockHoverMenu";
 import { ContentContainer } from "../../components/ContentContainer";
 import { WorkspaceCard } from "../../components/WorkspaceCard";
-import { parse as parseQueryString } from "query-string";
+import { getIsTreeExpandedFromQueryParams } from "../../helpers/getIsTreeExpandedFromQueryParams";
 
 export class WorkspaceSubtreePage extends React.PureComponent<any, any> {
   public render() {
+    const isExpanded = getIsTreeExpandedFromQueryParams(window.location.search);
     const workspaceId = this.props.match.params.workspaceId;
+
     return (
       <ContentContainer>
         <Helmet>
           <title>Tree View {workspaceId.slice(0, 7)} - Mosaic</title>
         </Helmet>
-        {parseQueryString(window.location.search).expanded === "true" ? (
+        {isExpanded ? (
           <Button
             onClick={() => {
               const { origin, pathname } = window.location;

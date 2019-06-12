@@ -3,12 +3,13 @@ import * as React from "react";
 import { graphql } from "react-apollo";
 import { Helmet } from "react-helmet";
 import { compose } from "recompose";
-import { parse as parseQueryString } from "query-string";
 
 import { EpisodeNav } from "./EpisodeShowPage/EpisodeNav";
 import { Auth } from "../auth";
 import { ContentContainer } from "../components/ContentContainer";
 import { UserActivity } from "../components/UserActivity";
+
+import { getExperimentIdOrSerialIdFromQueryParams } from "../helpers/getExperimentIdOrSerialIdFromQueryParams";
 
 export class BetweenEpisodesPagePresentational extends React.Component<
   any,
@@ -19,11 +20,13 @@ export class BetweenEpisodesPagePresentational extends React.Component<
   };
 
   public async componentDidMount() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     await this.props.leaveCurrentWorkspaceMutation({
       variables: {
-        experimentId: queryParams.experiment || queryParams.e,
+        experimentId: experimentId,
       },
     });
     this.setState({
@@ -32,7 +35,9 @@ export class BetweenEpisodesPagePresentational extends React.Component<
   }
 
   public render() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     return (
       <div>
@@ -41,7 +46,7 @@ export class BetweenEpisodesPagePresentational extends React.Component<
         </Helmet>
         {Auth.isAuthenticated() && (
           <EpisodeNav
-            experimentId={queryParams.experiment || queryParams.e}
+            experimentId={experimentId}
             hasParent={false}
             hasTimer={false}
             hasTimerEnded={true}
@@ -55,9 +60,7 @@ export class BetweenEpisodesPagePresentational extends React.Component<
             above when you're ready to start on the next workspace.
           </div>
           {this.state.hasLeftCurrentWorkspace && (
-            <UserActivity
-              experimentId={queryParams.experiment || queryParams.e}
-            />
+            <UserActivity experimentId={experimentId} />
           )}
         </ContentContainer>
       </div>
