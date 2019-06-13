@@ -1087,7 +1087,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update a workspace",
           async (obj, { id, input }, context) => {
-            const workspace = await Workspace.findByPk(id);
+            const workspace = await Workspace.findByPkOrSerialId(id);
             if (workspace === null) {
               throw new Error("Workspace ID does not exist");
             }
