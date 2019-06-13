@@ -1,7 +1,7 @@
 import * as uuidv1 from "uuid/v1";
 
-const SQUARE_BRACKET_MATCH = /\[.*\]/g;
-const STAR_MATCH = /\*.*\*/g;
+const SQUARE_BRACKET_MATCH = /\[.*?\]/g;
+const STAR_MATCH = /\*.*?\*/g;
 
 export function addExportsAndLinks(nodes) {
   return addLinks(addExports(nodes));
