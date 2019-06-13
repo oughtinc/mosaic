@@ -1,4 +1,3 @@
-import * as moment from "moment";
 import * as React from "react";
 import * as keyboardJS from "keyboardjs";
 
@@ -10,12 +9,12 @@ import * as ReactMarkdown from "react-markdown";
 import { compose } from "recompose";
 import { Alert, Row, Col, Button } from "react-bootstrap";
 import { connect } from "react-redux";
-import { parse as parseQueryString } from "query-string";
 import { AdvancedOptions } from "./AdvancedOptions";
 import { DepthDisplay } from "./DepthDisplay";
 import { EpisodeNav } from "./EpisodeNav";
 import { OracleAnswerCandidateFooter } from "./OracleAnswerCandidateFooter";
 import { ResponseFooter } from "./ResponseFooter";
+import { SelectAnswerBtn } from "./SelectAnswerBtn";
 import { CharCountDisplays } from "./CharCountDisplays";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
 import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
@@ -56,6 +55,11 @@ import {
 import { CONVERT_PASTED_EXPORT_TO_IMPORT } from "../../constants";
 import { Auth } from "../../auth";
 
+import { getExperimentIdOrSerialIdFromQueryParams } from "../../helpers/getExperimentIdOrSerialIdFromQueryParams";
+import { getIsUserInExperimentFromQueryParams } from "../../helpers/getIsUserInExperimentFromQueryParams";
+import { getDoesWorkspaceHaveTimerFromQueryParams } from "../../helpers/getDoesWorkspaceHaveTimerFromQueryParams";
+import { getMomentDurationForWorkspaceTimerFromQueryParams } from "../../helpers/getMomentDurationForWorkspaceTimerFromQueryParams";
+
 import {
   blockBorderAndBoxShadow,
   blockHeaderCSS,
@@ -67,16 +71,20 @@ const WORKSPACE_QUERY = gql`
   query workspace($id: String!) {
     workspace(id: $id) {
       id
+      serialId
       parentId
+      parentSerialId
       creatorId
       isPublic
       isStale
       isEligibleForHonestOracle
       isEligibleForMaliciousOracle
+      isParentOracleWorkspace
       isUserOracleForTree
       isUserMaliciousOracleForTree
       isRequestingLazyUnlock
       rootWorkspaceId
+      rootWorkspaceSerialId
       hasIOConstraintsOfRootParent
       hasTimeBudgetOfRootParent
       connectedPointers
@@ -90,6 +98,7 @@ const WORKSPACE_QUERY = gql`
       }
       childWorkspaces {
         id
+        serialId
         createdAt
         totalBudget
         creatorId
@@ -116,6 +125,7 @@ const WORKSPACE_QUERY = gql`
           doesAllowOracleBypass
           experiments {
             id
+            serialId
             areNewWorkspacesOracleOnlyByDefault
           }
         }
@@ -192,7 +202,7 @@ const BlockHeader = styled.div`
 `;
 
 const ParentLink = props => (
-  <NavLink to={`/workspaces/${props.parentId}`}>
+  <NavLink to={`/w/${props.parentSerialId}`}>
     <Button bsStyle="default" bsSize="xsmall">
       Parent »
     </Button>
@@ -202,8 +212,8 @@ const ParentLink = props => (
 const RootTreeLink = ({ workspace }) => (
   <NavLink
     target="_blank"
-    to={`/workspaces/${
-      workspace.rootWorkspaceId
+    to={`/w/${
+      workspace.rootWorkspaceSerialId
     }/subtree?expanded=true&activeWorkspace=${workspace.id}`}
   >
     <Button bsStyle="default" bsSize="xsmall">
@@ -213,7 +223,7 @@ const RootTreeLink = ({ workspace }) => (
 );
 
 const SubtreeLink = ({ workspace }) => (
-  <NavLink to={`/workspaces/${workspace.id}/subtree`}>
+  <NavLink to={`/w/${workspace.serialId}/subtree`}>
     <Button bsStyle="default" bsSize="xsmall">
       Subtree »
     </Button>
@@ -247,13 +257,15 @@ export class WorkspaceView extends React.Component<any, any> {
   }
 
   public async componentDidMount() {
-    this.experimentId = parseQueryString(window.location.search).experiment;
+    this.experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     window.addEventListener("beforeunload", e => {
       setTimeout(() => {
-        const isLeavingWorkspacePage = /^\/workspaces\//.test(
-          window.location.pathname,
-        );
+        const isLeavingWorkspacePage =
+          /^\/workspaces\//.test(window.location.pathname) ||
+          /^\/w\//.test(window.location.pathname);
         if (isLeavingWorkspacePage) {
           this.leaveCurrentWorkspace();
         }
@@ -362,6 +374,8 @@ export class WorkspaceView extends React.Component<any, any> {
       workspace.isEligibleForHonestOracle ||
       workspace.isEligibleForMaliciousOracle;
 
+    const isParentOracleWorkspace = workspace.isParentOracleWorkspace;
+
     const oracleAnswerCandidateProps =
       isOracleWorkspace &&
       new WorkspaceBlockRelation(
@@ -378,13 +392,23 @@ export class WorkspaceView extends React.Component<any, any> {
     const hasTimeBudget = workspace.hasTimeBudgetOfRootParent;
     const hasIOConstraints = workspace.hasIOConstraintsOfRootParent;
 
-    const queryParams = parseQueryString(window.location.search);
-    const isIsolatedWorkspace = queryParams.isolated === "true";
+    const isInExperiment = getIsUserInExperimentFromQueryParams(
+      window.location.search,
+    );
+
+    const isIsolatedWorkspace = isInExperiment;
+
     const isActive =
       workspace.currentlyActiveUser &&
       workspace.currentlyActiveUser.id === Auth.userId();
-    const experimentId = queryParams.experiment;
-    const hasURLTimeRestriction = queryParams.timer;
+
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
+
+    const hasURLTimeRestriction = getDoesWorkspaceHaveTimerFromQueryParams(
+      window.location.search,
+    );
     const hasTimerEnded = this.state.hasTimerEnded;
 
     const durationInMsGivenRemainingBudget =
@@ -392,8 +416,11 @@ export class WorkspaceView extends React.Component<any, any> {
       1000;
 
     const DEFAULT_MAX_TIMER_DURATION = 90 * 1000;
+
     const durationInMsGivenURLRestriction = hasURLTimeRestriction
-      ? moment.duration(queryParams.timer).asMilliseconds()
+      ? getMomentDurationForWorkspaceTimerFromQueryParams(
+          window.location.search,
+        ).asMilliseconds()
       : DEFAULT_MAX_TIMER_DURATION;
 
     const durationInMs = Math.min(
@@ -420,6 +447,17 @@ export class WorkspaceView extends React.Component<any, any> {
     const isWorkspacePartOfOracleExperiment = isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly;
 
     const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
+
+    const shouldShowResponseField =
+      !isWorkspacePartOfOracleExperiment ||
+      !isOracleWorkspace ||
+      !hasParent ||
+      isRequestingLazyUnlock;
+
+    const shouldShowTwoButtonResponseUI =
+      isWorkspacePartOfOracleExperiment &&
+      !isOracleWorkspace &&
+      isParentOracleWorkspace;
 
     return (
       <div>
@@ -546,6 +584,9 @@ export class WorkspaceView extends React.Component<any, any> {
                             marginRight: "8px",
                           }}
                         >
+                          <span style={{ color: "darkGray" }}>
+                            Workspace #{workspace.serialId}
+                          </span>
                           <BlockEditor
                             isActive={isActive}
                             isUserOracle={isUserOracle}
@@ -578,7 +619,9 @@ export class WorkspaceView extends React.Component<any, any> {
                               marginBottom: "12px",
                             }}
                           >
-                            <ParentLink parentId={workspace.parentId} />
+                            <ParentLink
+                              parentSerialId={workspace.parentSerialId}
+                            />
                           </span>
                         )}
                         {workspace && !isIsolatedWorkspace && (
@@ -591,24 +634,22 @@ export class WorkspaceView extends React.Component<any, any> {
                             <SubtreeLink workspace={workspace} />
                           </span>
                         )}
-                        {workspace &&
-                          (((isUserOracle && isInOracleMode) ||
-                            (Auth.isAdmin() && !isActive)) && (
-                            <span
-                              style={{
-                                display: "inline-block",
-                                marginBottom: "12px",
-                              }}
-                            >
-                              {(isUserMaliciousOracle ||
-                                (Auth.isAdmin() && !isActive)) && (
-                                <span style={{ marginRight: "10px" }}>
-                                  <RootTreeLink workspace={workspace} />
-                                </span>
-                              )}
-                              <ExpandAllPointersBtn />
-                            </span>
-                          ))}
+                        {workspace && (
+                          <span
+                            style={{
+                              display: "inline-block",
+                              marginBottom: "12px",
+                            }}
+                          >
+                            {(isUserMaliciousOracle ||
+                              (Auth.isAdmin() && !isActive)) && (
+                              <span style={{ marginRight: "10px" }}>
+                                <RootTreeLink workspace={workspace} />
+                              </span>
+                            )}
+                            <ExpandAllPointersBtn />
+                          </span>
+                        )}
                       </div>
                     </Col>
                   </Row>
@@ -692,89 +733,172 @@ export class WorkspaceView extends React.Component<any, any> {
                         </BlockContainer>
                       )}
 
-                      {!(
-                        isOracleWorkspace &&
-                        hasParent &&
-                        !isRequestingLazyUnlock
-                      ) && (
-                        <BlockContainer>
-                          <BlockHeader>Response</BlockHeader>
-                          <BlockBody>
-                            <BlockEditor
-                              isActive={isActive}
-                              isUserOracle={isUserOracle}
-                              availablePointers={availablePointers}
-                              visibleExportIds={visibleExportIds}
-                              exportLockStatusInfo={exportLockStatusInfo}
-                              placeholder="Text for the answer..."
-                              unlockPointer={unlockPointer}
-                              cyAttributeName="slate-editor-response"
-                              shouldAutoExport={this.state.shouldAutoExport}
-                              pastedExportFormat={this.state.pastedExportFormat}
-                              {...answerDraftProps}
-                            />
-                          </BlockBody>
-                          {this.state.isAuthenticated && isActive && (
-                            <ResponseFooter
-                              isUserMaliciousOracle={isUserMaliciousOracle}
-                              isRequestingLazyUnlock={isRequestingLazyUnlock}
-                              hasChildren={workspace.childWorkspaces.length > 0}
-                              experimentId={experimentId}
-                              hasTimeBudget={hasTimeBudget}
-                              depleteBudget={() =>
-                                this.props.depleteBudget({
-                                  variables: { id: workspace.id },
-                                })
-                              }
-                              hasParent={hasParent}
-                              isInOracleMode={isInOracleMode}
-                              isUserOracle={isUserOracle}
-                              markAsAnsweredByOracle={() =>
-                                this.props.updateWorkspace({
-                                  variables: {
-                                    id: workspace.id,
-                                    input: {
-                                      wasAnsweredByOracle: true,
+                      {shouldShowResponseField &&
+                        !shouldShowTwoButtonResponseUI && (
+                          <BlockContainer>
+                            <BlockHeader>Response</BlockHeader>
+                            <BlockBody>
+                              <BlockEditor
+                                isActive={isActive}
+                                isUserOracle={isUserOracle}
+                                availablePointers={availablePointers}
+                                visibleExportIds={visibleExportIds}
+                                exportLockStatusInfo={exportLockStatusInfo}
+                                placeholder="Text for the answer..."
+                                unlockPointer={unlockPointer}
+                                cyAttributeName="slate-editor-response"
+                                shouldAutoExport={this.state.shouldAutoExport}
+                                pastedExportFormat={
+                                  this.state.pastedExportFormat
+                                }
+                                {...answerDraftProps}
+                              />
+                            </BlockBody>
+                            {this.state.isAuthenticated && isActive && (
+                              <ResponseFooter
+                                isUserMaliciousOracle={isUserMaliciousOracle}
+                                isRequestingLazyUnlock={isRequestingLazyUnlock}
+                                hasChildren={
+                                  workspace.childWorkspaces.length > 0
+                                }
+                                experimentId={experimentId}
+                                hasTimeBudget={hasTimeBudget}
+                                depleteBudget={() =>
+                                  this.props.depleteBudget({
+                                    variables: { id: workspace.id },
+                                  })
+                                }
+                                hasParent={hasParent}
+                                isInOracleMode={isInOracleMode}
+                                isUserOracle={isUserOracle}
+                                markAsAnsweredByOracle={() =>
+                                  this.props.updateWorkspace({
+                                    variables: {
+                                      id: workspace.id,
+                                      input: {
+                                        wasAnsweredByOracle: true,
+                                      },
                                     },
-                                  },
-                                })
-                              }
-                              markAsCurrentlyResolved={() =>
-                                this.props.updateWorkspace({
-                                  variables: {
-                                    id: workspace.id,
-                                    input: {
-                                      isCurrentlyResolved: true,
+                                  })
+                                }
+                                markAsCurrentlyResolved={() =>
+                                  this.props.updateWorkspace({
+                                    variables: {
+                                      id: workspace.id,
+                                      input: {
+                                        isCurrentlyResolved: true,
+                                      },
                                     },
-                                  },
-                                })
-                              }
-                              markAsNotStale={() =>
-                                this.props.updateWorkspace({
-                                  variables: {
-                                    id: workspace.id,
-                                    input: {
-                                      isStale: false,
+                                  })
+                                }
+                                markAsNotStale={() =>
+                                  this.props.updateWorkspace({
+                                    variables: {
+                                      id: workspace.id,
+                                      input: {
+                                        isStale: false,
+                                      },
                                     },
-                                  },
-                                })
-                              }
-                              declineToChallenge={() =>
-                                this.props.declineToChallengeMutation({
-                                  variables: { id: workspace.id },
-                                })
-                              }
-                              transferRemainingBudgetToParent={() =>
-                                this.props.transferRemainingBudgetToParent({
-                                  variables: { id: workspace.id },
-                                })
-                              }
-                              workspaceId={workspace.id}
-                              responseBlockId={answerDraftProps.blockId}
-                            />
-                          )}
-                        </BlockContainer>
-                      )}
+                                  })
+                                }
+                                declineToChallenge={() =>
+                                  this.props.declineToChallengeMutation({
+                                    variables: { id: workspace.id },
+                                  })
+                                }
+                                transferRemainingBudgetToParent={() =>
+                                  this.props.transferRemainingBudgetToParent({
+                                    variables: { id: workspace.id },
+                                  })
+                                }
+                                workspaceId={workspace.id}
+                                responseBlockId={answerDraftProps.blockId}
+                              />
+                            )}
+                          </BlockContainer>
+                        )}
+                      {shouldShowResponseField &&
+                        shouldShowTwoButtonResponseUI && (
+                          <BlockContainer>
+                            <BlockHeader>Select Answer</BlockHeader>
+                            <BlockBody>
+                              <div
+                                style={{
+                                  alignItems: "center",
+                                  display: "flex",
+                                  justifyContent: "space-around",
+                                }}
+                              >
+                                <SelectAnswerBtn
+                                  experimentId={experimentId}
+                                  markAsCurrentlyResolved={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isCurrentlyResolved: true,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  markAsNotStale={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isStale: false,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  selectAnswerCandidate={() =>
+                                    this.props.selectAnswerCandidate({
+                                      variables: {
+                                        id: workspace.id,
+                                        decision: 1,
+                                      },
+                                    })
+                                  }
+                                >
+                                  Select A1
+                                </SelectAnswerBtn>
+                                <SelectAnswerBtn
+                                  experimentId={experimentId}
+                                  markAsCurrentlyResolved={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isCurrentlyResolved: true,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  markAsNotStale={() =>
+                                    this.props.updateWorkspace({
+                                      variables: {
+                                        id: workspace.id,
+                                        input: {
+                                          isStale: false,
+                                        },
+                                      },
+                                    })
+                                  }
+                                  selectAnswerCandidate={() =>
+                                    this.props.selectAnswerCandidate({
+                                      variables: {
+                                        id: workspace.id,
+                                        decision: 2,
+                                      },
+                                    })
+                                  }
+                                >
+                                  Select A2
+                                </SelectAnswerBtn>
+                              </div>
+                            </BlockBody>
+                          </BlockContainer>
+                        )}
 
                       {this.state.isAuthenticated && (
                         <AdvancedOptions
@@ -1217,6 +1341,12 @@ const DECLINE_TO_CHALLENGE_MUTATION = gql`
   }
 `;
 
+const SELECT_ANSWER_CANDIDATE = gql`
+  mutation selectAnswerCandidate($id: String, $decision: Int) {
+    selectAnswerCandidate(id: $id, decision: $decision)
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -1267,6 +1397,9 @@ export const EpisodeShowPage = compose(
     options: {
       refetchQueries: ["workspace"],
     },
+  }),
+  graphql(SELECT_ANSWER_CANDIDATE, {
+    name: "selectAnswerCandidate",
   }),
   connect(
     mapStateToProps,

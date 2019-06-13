@@ -35,7 +35,7 @@ export default async function sendSlackNotification(
     channel: imOpenResponse.channel.id,
     text: `Hello, a new workspace in the Mosaic experiment "${
       notificationRequest.experiment.name
-    }" is available for you to work on: https://mosaic.ought.org/next?experiment=${
+    }" is available for you to work on: https://mosaic.ought.org/next?e=${
       notificationRequest.experimentId
     }`,
   });

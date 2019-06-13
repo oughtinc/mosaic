@@ -1,8 +1,9 @@
 import * as uuidv1 from "uuid/v1";
 import * as _ from "lodash";
-import { parse as parseQueryString } from "query-string";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { Auth } from "../../auth";
+
+import { getIsUserInExperimentFromQueryParams } from "../../helpers/getIsUserInExperimentFromQueryParams";
 
 export enum WorkspaceRelationTypes {
   WorkspaceQuestion = 0,
@@ -31,13 +32,17 @@ const ORACLE_ANSWER_CANDIDATE = "ORACLE_ANSWER_CANDIDATE";
 const WORKSPACE = "WORKSPACE";
 const SUBWORKSPACE = "SUBWORKSPACE";
 
+const isUserInExperiment = getIsUserInExperimentFromQueryParams(
+  window.location.search,
+);
+
 const RelationTypeAttributes = [
   {
     name: WorkspaceRelationTypes.WorkspaceQuestion,
     source: WORKSPACE,
     blockType: QUESTION,
     permission:
-      Auth.isAdmin() && !parseQueryString(window.location.search).experiment
+      Auth.isAdmin() && !isUserInExperiment
         ? Permissions.Editable
         : Permissions.ReadOnly,
   },

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export class ExperimentLink extends React.Component<any, any> {
   public render() {
     return (
-      <Link to={`/experiments/${this.props.experiment.id}`}>
+      <Link to={`/e/${this.props.experiment.serialId}`}>
         {this.props.children}
       </Link>
     );

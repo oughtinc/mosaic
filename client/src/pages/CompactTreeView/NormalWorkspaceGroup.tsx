@@ -38,7 +38,7 @@ export class NormalWorkspaceGroup extends React.PureComponent<any, any> {
               textDecoration: "none",
             }}
             target="_blank"
-            to={`/workspaces/${workspace.parentId}`}
+            to={`/w/${workspace.parentId}`}
           >
             <CompactTreeRowLabel>Q</CompactTreeRowLabel>
           </Link>
@@ -63,7 +63,7 @@ export class NormalWorkspaceGroup extends React.PureComponent<any, any> {
               <Link
                 style={{ textDecoration: "none" }}
                 target="_blank"
-                to={`/workspaces/${workspace.id}`}
+                to={`/w/${workspace.id}`}
               >
                 <CompactTreeRowLabel color="blue">
                   {isCurrentlyResolved && <Checkmark color="blue" />}

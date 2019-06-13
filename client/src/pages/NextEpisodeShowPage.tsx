@@ -5,11 +5,12 @@ import { Button } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { parse as parseQueryString } from "query-string";
 
 import { ContentContainer } from "../components/ContentContainer";
 import { VERY_DARK_BLUE, VERY_LIGHT_BLUE } from "../styles";
 import { Auth } from "../auth";
+
+import { getExperimentIdOrSerialIdFromQueryParams } from "../helpers/getExperimentIdOrSerialIdFromQueryParams";
 
 const NOTIFICATION_NOT_REGISTERED = 1;
 const NOTIFICATION_REGISTRATION_PENDING = 2;
@@ -96,12 +97,15 @@ export class NextEpisodeShowPagePresentational extends React.Component<
 
   public async componentDidMount() {
     let response, normalSchedulingFailed, oracleSchedulingFailed;
-    const queryParams = parseQueryString(window.location.search);
+
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     try {
       response = await this.props.findNextWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment,
+          experimentId,
         },
       });
     } catch (e) {
@@ -118,7 +122,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       this.setState({ normalSchedulingFailed });
       this.startCountingDown();
     } else if (response) {
-      const workspaceId = response.data.findNextWorkspace.id;
+      const workspaceId = response.data.findNextWorkspace.serialId;
       this.setState({ workspaceId });
     }
   }
@@ -128,7 +132,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   }
 
   public render() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     if (this.state.refreshCountdown === 0) {
       location.reload();
@@ -191,9 +197,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
                 }}
               >
                 <Link
-                  to={`/nextMaybeSuboptimal?experiment=${
-                    queryParams.experiment
-                  }`}
+                  to={`/nextMaybeSuboptimal?e=${experimentId}`}
                   style={{ margin: "0 5px" }}
                 >
                   <Button bsStyle="danger">Find Suboptimal Workspace »</Button>
@@ -246,10 +250,8 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?isolated=true&experiment=${
-        queryParams.experiment
-      }`;
-      window.location.href = `${window.location.origin}/workspaces/${
+      const redirectQueryParams = `?e=${experimentId}`;
+      window.location.href = `${window.location.origin}/w/${
         this.state.workspaceId
       }${redirectQueryParams}`;
       return null;
@@ -287,10 +289,15 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     this.setState({
       notificationRegistrationState: NOTIFICATION_REGISTRATION_PENDING,
     });
+
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
+
     try {
       await this.props.notifyOnNextWorkspaceMutation({
         variables: {
-          experimentId: parseQueryString(window.location.search).experiment,
+          experimentId,
         },
       });
       this.setState({ notificationRegistrationState: NOTIFICATION_REGISTERED });
@@ -355,7 +362,7 @@ const IS_USER_REGISTERED_FOR_NOTIFICATIONS = gql`
 const FIND_NEXT_WORKSPACE_MUTATION = gql`
   mutation findNextWorkspace($experimentId: String) {
     findNextWorkspace(experimentId: $experimentId) {
-      id
+      serialId
     }
   }
 `;
@@ -380,8 +387,10 @@ export const NextEpisodeShowPage = compose(
     options: (props: any) => ({
       variables: {
         experimentId:
-          parseQueryString(window.location.search).experiment ||
-          parseQueryString(props.history.location.search).experiment,
+          getExperimentIdOrSerialIdFromQueryParams(window.location.search) ||
+          getExperimentIdOrSerialIdFromQueryParams(
+            props.history.location.search,
+          ),
         userId: Auth.userId(),
       },
     }),

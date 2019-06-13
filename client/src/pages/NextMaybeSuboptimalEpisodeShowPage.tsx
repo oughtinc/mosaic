@@ -3,9 +3,10 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { Helmet } from "react-helmet";
 import { compose } from "recompose";
-import { parse as parseQueryString } from "query-string";
 
 import { ContentContainer } from "../components/ContentContainer";
+
+import { getExperimentIdOrSerialIdFromQueryParams } from "../helpers/getExperimentIdOrSerialIdFromQueryParams";
 
 const RedExclamation = () => (
   <span
@@ -37,14 +38,16 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
   }
 
   public async componentDidMount() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     let response, schedulingFailed;
 
     try {
       response = await this.props.findNextMaybeSuboptimalWorkspaceMutation({
         variables: {
-          experimentId: queryParams.experiment,
+          experimentId,
         },
       });
     } catch (e) {
@@ -54,7 +57,8 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     if (schedulingFailed) {
       this.setState({ schedulingFailed });
     } else if (response) {
-      const workspaceId = response.data.findNextMaybeSuboptimalWorkspace.id;
+      const workspaceId =
+        response.data.findNextMaybeSuboptimalWorkspace.serialId;
       this.setState({ workspaceId });
     }
   }
@@ -64,7 +68,9 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
   }
 
   public render() {
-    const queryParams = parseQueryString(window.location.search);
+    const experimentId = getExperimentIdOrSerialIdFromQueryParams(
+      window.location.search,
+    );
 
     if (this.state.refreshCountdown === 0) {
       location.reload();
@@ -98,10 +104,8 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
         </ContentContainer>
       );
     } else {
-      const redirectQueryParams = `?isolated=true&experiment=${
-        queryParams.experiment
-      }`;
-      window.location.href = `${window.location.origin}/workspaces/${
+      const redirectQueryParams = `?e=${experimentId}`;
+      window.location.href = `${window.location.origin}/w/${
         this.state.workspaceId
       }${redirectQueryParams}`;
       return null;
@@ -128,7 +132,7 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
 const FIND_NEXT_MAYBE_SUBOPTIMAL_WORKSPACE_MUTATION = gql`
   mutation findNextMaybeSuboptimalWorkspace($experimentId: String) {
     findNextMaybeSuboptimalWorkspace(experimentId: $experimentId) {
-      id
+      serialId
     }
   }
 `;

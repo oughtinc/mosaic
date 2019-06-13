@@ -33,6 +33,9 @@ export default class Experiment extends Model<Experiment> {
   })
   public id: string;
 
+  @Column(DataType.INTEGER)
+  public serialId: number;
+
   @Column(DataType.STRING)
   public name: string;
 
@@ -112,5 +115,15 @@ export default class Experiment extends Model<Experiment> {
 
   public isActive() {
     return this.eligibilityRank === 1;
+  }
+
+  public static findByPkOrSerialId(pkOrSerialId) {
+    if (pkOrSerialId.length < 10) {
+      return Experiment.findOne({
+        where: { serialId: Number(pkOrSerialId) },
+      });
+    }
+
+    return Experiment.findByPk(pkOrSerialId);
   }
 }

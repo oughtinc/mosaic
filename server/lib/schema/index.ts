@@ -22,6 +22,7 @@ import { userFromContext } from "./auth/userFromContext";
 import { getMessageForUser } from "./helpers/getMessageForUser";
 import { addExportsAndLinks } from "./helpers/addExportsAndLinks";
 import { extractHonestAnswerValueFromMaliciousQuestion } from "./helpers/extractHonestAnswerValueFromMaliciousQuestion";
+import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFromQuestion";
 
 import getScheduler from "../scheduler";
 import { map } from "asyncro";
@@ -76,6 +77,37 @@ export const workspaceType = makeObjectType(
     ["tree", () => treeType],
   ],
   {
+    isParentOracleWorkspace: {
+      type: GraphQLBoolean,
+      resolve: async (workspace: Workspace, args, context) => {
+        if (!workspace.parentId) {
+          return false;
+        }
+
+        const parent = await Workspace.findByPk(workspace.parentId);
+
+        return (
+          parent.isEligibleForHonestOracle ||
+          parent.isEligibleForMaliciousOracle
+        );
+      },
+    },
+    parentSerialId: {
+      type: GraphQLInt,
+      resolve: async (workspace: Workspace, args, context) => {
+        const parent = await Workspace.findByPk(workspace.parentId);
+        return parent && parent.serialId;
+      },
+    },
+    rootWorkspaceSerialId: {
+      type: GraphQLInt,
+      resolve: async (workspace: Workspace, args, context) => {
+        const rootWorkspace = await Workspace.findByPk(
+          workspace.rootWorkspaceId,
+        );
+        return rootWorkspace.serialId;
+      },
+    },
     message: {
       type: GraphQLString,
       resolve: async (workspace: Workspace, args, context) => {
@@ -401,7 +433,7 @@ const schema = new GraphQLSchema({
           workspaceId: { type: GraphQLString },
         },
         resolve: async (__, { workspaceId }) => {
-          const workspace = await Workspace.findByPk(workspaceId);
+          const workspace = await Workspace.findByPkOrSerialId(workspaceId);
           const rootWorkspace = await workspace.getRootWorkspace();
 
           // get experiment id
@@ -467,6 +499,16 @@ const schema = new GraphQLSchema({
         type: workspaceType,
         args: { id: { type: GraphQLString } },
         resolve: resolver(Workspace, {
+          before: async function(findOptions, args, context, info) {
+            if (findOptions.where.id.length < 10) {
+              return {
+                ...findOptions,
+                where: { serialId: Number(findOptions.where.id) },
+              };
+            }
+
+            return findOptions;
+          },
           after: async (result: Workspace, args, ctx) => {
             // ensure root workspace has associated tree
             const tree = await result.$get("tree");
@@ -569,7 +611,18 @@ const schema = new GraphQLSchema({
       experiment: {
         type: experimentType,
         args: { id: { type: GraphQLString } },
-        resolve: resolver(Experiment),
+        resolve: resolver(Experiment, {
+          before: async function(findOptions, args, context, info) {
+            if (findOptions.where.id.length < 10) {
+              return {
+                ...findOptions,
+                where: { serialId: Number(findOptions.where.id) },
+              };
+            }
+
+            return findOptions;
+          },
+        }),
       },
       pointers: modelGraphQLFields(new GraphQLList(pointerType), Pointer),
       subtreeTimeSpent: {
@@ -590,7 +643,7 @@ const schema = new GraphQLSchema({
             return timespentOnWorkspace;
           };
 
-          const workspace = await Workspace.findByPk(id);
+          const workspace = await Workspace.findByPkOrSerialId(id);
           await loadDataForEachWorkspaceInSubtree(workspace);
 
           return JSON.stringify(cacheForTimeSpentOnWorkspace);
@@ -635,7 +688,9 @@ const schema = new GraphQLSchema({
                 if (!experimentId) {
                   throw new Error("User not participating in an experiment.");
                 } else {
-                  const experiment = await Experiment.findByPk(experimentId);
+                  const experiment = await Experiment.findByPkOrSerialId(
+                    experimentId,
+                  );
 
                   if (experiment == null) {
                     throw new Error(
@@ -672,53 +727,6 @@ const schema = new GraphQLSchema({
               }
 
               await block.update({ ..._block });
-
-              const isUpdatingAnswerDraft = block.type === "ANSWER_DRAFT";
-              if (
-                isUpdatingAnswerDraft &&
-                isInOracleMode.getValue() &&
-                !workspace.isEligibleForHonestOracle &&
-                !workspace.isEligibleForMaliciousOracle &&
-                workspace.parentId
-              ) {
-                const experiment = await Experiment.findByPk(experimentId);
-                if (experiment === null) {
-                  return newBlocks;
-                }
-                const isOracleExperiment =
-                  experiment.areNewWorkspacesOracleOnlyByDefault;
-
-                if (isOracleExperiment) {
-                  const parentWorkspace = await Workspace.findByPk(
-                    workspace.parentId,
-                  );
-
-                  if (parentWorkspace === null) {
-                    return newBlocks;
-                  }
-
-                  const isParentOracleWorkspace =
-                    parentWorkspace.isEligibleForHonestOracle ||
-                    parentWorkspace.isEligibleForMaliciousOracle;
-
-                  if (isParentOracleWorkspace && parentWorkspace.parentId) {
-                    const grandparentWorkspace = await Workspace.findByPk(
-                      parentWorkspace.parentId,
-                    );
-
-                    if (grandparentWorkspace === null) {
-                      return newBlocks;
-                    }
-
-                    const blocks = (await grandparentWorkspace.$get("blocks", {
-                      where: { type: "ANSWER_DRAFT" },
-                    })) as Block[];
-
-                    await blocks[0].update({ ..._block });
-                  }
-                }
-              }
-
               newBlocks = [...newBlocks, block];
             }
             return newBlocks;
@@ -747,7 +755,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's eligibility",
           async (_, { eligibilityRank, experimentId }) => {
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -765,7 +775,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to change an experiment's name",
           async (_, { experimentId, name }) => {
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -787,7 +799,9 @@ const schema = new GraphQLSchema({
             if (tree === null) {
               return false;
             }
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -809,7 +823,9 @@ const schema = new GraphQLSchema({
             if (tree === null) {
               return false;
             }
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -895,11 +911,13 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to add a fallback to an experiment",
           async (_, { experimentId, fallbackId }) => {
-            const fallback = await Experiment.findByPk(fallbackId);
+            const fallback = await Experiment.findByPkOrSerialId(fallbackId);
             if (fallback === null) {
               return false;
             }
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -917,11 +935,13 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to remove a fallback from an experiment",
           async (_, { experimentId, fallbackId }) => {
-            const fallback = await Experiment.findByPk(fallbackId);
+            const fallback = await Experiment.findByPkOrSerialId(fallbackId);
             if (fallback === null) {
               return false;
             }
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -1086,7 +1106,7 @@ const schema = new GraphQLSchema({
         resolve: requireUser(
           "You must be logged in to update a workspace",
           async (obj, { id, input }, context) => {
-            const workspace = await Workspace.findByPk(id);
+            const workspace = await Workspace.findByPkOrSerialId(id);
             if (workspace === null) {
               throw new Error("Workspace ID does not exist");
             }
@@ -1339,8 +1359,6 @@ const schema = new GraphQLSchema({
               throw new Error("Parent ID does not exist");
             }
             await parent.update({
-              isStale: true,
-              isNotStaleRelativeToUser: [],
               allocatedBudget: parent.allocatedBudget - childRemainingBudget,
             });
             await child.update({ totalBudget: child.allocatedBudget });
@@ -1379,7 +1397,9 @@ const schema = new GraphQLSchema({
             let workspace;
 
             if (experimentId) {
-              const experiment = await Experiment.findByPk(experimentId);
+              const experiment = await Experiment.findByPkOrSerialId(
+                experimentId,
+              );
               if (experiment === null) {
                 throw new Error("Experiment ID does not exist");
               }
@@ -1479,11 +1499,23 @@ const schema = new GraphQLSchema({
             );
           }
 
+          if (experimentId.length < 10) {
+            const experiment = await Experiment.findOne({
+              where: {
+                serialId: Number(experimentId),
+              },
+            });
+
+            experimentId = experiment.id;
+          }
+
           const scheduler = await getScheduler(experimentId);
 
           const workspaceId = await scheduler.assignNextWorkspace(user.id);
 
-          return { id: workspaceId };
+          const workspace = await Workspace.findByPk(workspaceId);
+
+          return workspace;
         },
       },
       notifyOnNextWorkspace: {
@@ -1497,6 +1529,16 @@ const schema = new GraphQLSchema({
             throw new Error(
               "No user found when attempting to register for notifications.",
             );
+          }
+
+          if (experimentId.length < 10) {
+            const experiment = await Experiment.findOne({
+              where: {
+                serialId: Number(experimentId),
+              },
+            });
+
+            experimentId = experiment.id;
           }
 
           return await NotificationRequest.upsert({
@@ -1518,13 +1560,25 @@ const schema = new GraphQLSchema({
             );
           }
 
+          if (experimentId.length < 10) {
+            const experiment = await Experiment.findOne({
+              where: {
+                serialId: Number(experimentId),
+              },
+            });
+
+            experimentId = experiment.id;
+          }
+
           const scheduler = await getScheduler(experimentId);
 
           const workspaceId = await scheduler.assignNextMaybeSuboptimalWorkspace(
             user.id,
           );
 
-          return { id: workspaceId };
+          const workspace = await Workspace.findByPk(workspaceId);
+
+          return workspace;
         },
       },
       leaveCurrentWorkspace: {
@@ -1538,6 +1592,16 @@ const schema = new GraphQLSchema({
             const user = await userFromContext(context);
             if (user === null) {
               return false;
+            }
+
+            if (experimentId.length < 10) {
+              const experiment = await Experiment.findOne({
+                where: {
+                  serialId: Number(experimentId),
+                },
+              });
+
+              experimentId = experiment.id;
             }
 
             const scheduler = await getScheduler(experimentId);
@@ -1752,7 +1816,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment metadata",
           async (_, { experimentId, metadata }, context) => {
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -1789,7 +1855,9 @@ const schema = new GraphQLSchema({
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment metadata",
           async (_, { experimentId, defaultOracle }, context) => {
-            const experiment = await Experiment.findByPk(experimentId);
+            const experiment = await Experiment.findByPkOrSerialId(
+              experimentId,
+            );
             if (experiment === null) {
               return false;
             }
@@ -1972,6 +2040,44 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      selectAnswerCandidate: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: GraphQLString },
+          decision: { type: GraphQLInt },
+        },
+        resolve: requireUser(
+          "You must be logged in to select an answer candidate",
+          async (_, { id, decision }, context) => {
+            const workspace = await Workspace.findByPk(id);
+            if (workspace === null) {
+              return false;
+            }
+
+            // extract content from workspace question
+            const blocks = (await workspace.$get("blocks")) as Block[];
+            const questionBlock = blocks.find(b => b.type === "QUESTION");
+            if (questionBlock) {
+              const answerValue = extractAnswerValueFromQuestion(
+                questionBlock.value,
+                decision,
+              );
+
+              // populate workspace answer draft with content
+              const answerDraftBlock = blocks.find(
+                b => b.type === "ANSWER_DRAFT",
+              );
+              if (answerDraftBlock) {
+                await answerDraftBlock.update({
+                  value: answerValue,
+                });
+              }
+            }
+
+            return false;
+          },
+        ), // unlock pointer resolver
+      }, // unlockPointer mutation
     }, // mutation fields
   }), // mutation: new GraphQLObjectType({...})
 }); // const schema = new GraphQLSchema({...})

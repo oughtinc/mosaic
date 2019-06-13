@@ -102,15 +102,20 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
 
       const isHonestOracleCurrentlyResolved = workspace.isCurrentlyResolved;
 
+      const normal = malicious.childWorkspaces[0];
+
+      const didMaliciousDeclineToChallenge =
+        isHonestOracleCurrentlyResolved && !normal;
+
       const didHonestWin =
-        isHonestOracleCurrentlyResolved &&
-        isSamePointerInHonestAnswerDraftAndMaliciousQuestion;
+        didMaliciousDeclineToChallenge || // this is here b/c in some older trees the follow disjunct is false in cases where the malicious oracle declines
+        (isHonestOracleCurrentlyResolved &&
+          isSamePointerInHonestAnswerDraftAndMaliciousQuestion);
 
       const didMaliciousWin =
+        !didHonestWin && // this is here b/c in some older trees the follow two conjuncts are true in cases where the malicious oracle declines
         isHonestOracleCurrentlyResolved &&
         !isSamePointerInHonestAnswerDraftAndMaliciousQuestion;
-
-      const normal = malicious.childWorkspaces[0];
 
       const maliciousAnswerCandidateBlock = malicious.blocks.find(
         b => b.type === "ORACLE_ANSWER_CANDIDATE",
@@ -119,8 +124,6 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
       const maliciousAnswerCandidateValue =
         maliciousAnswerCandidateBlock &&
         databaseJSONToValue(maliciousAnswerCandidateBlock.value);
-
-      const didMaliciousDeclineToChallenge = didHonestWin && !normal;
 
       return (
         <CompactTreeGroup
@@ -155,6 +158,7 @@ export const GROUP_QUERY = gql`
   query groupQuery($workspaceId: String!) {
     workspace(id: $workspaceId) {
       id
+      serialId
       parentId
       isArchived
       isCurrentlyResolved

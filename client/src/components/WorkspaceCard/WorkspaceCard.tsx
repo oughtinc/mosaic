@@ -27,7 +27,7 @@ export enum toggleTypes {
 }
 
 const WorkspaceLink = props => (
-  <Link to={`/workspaces/${props.workspaceId}`}>{props.children}</Link>
+  <Link to={`/w/${props.workspaceId}`}>{props.children}</Link>
 );
 
 const Container = styled.div`
@@ -84,6 +84,7 @@ interface WorkspaceType {
   isArchived: boolean;
   subtreeTimeSpentData: any;
   isNotStaleRelativeToUserFullInformation: any;
+  serialId: string;
 }
 
 interface WorkspaceCardProps {
@@ -186,8 +187,8 @@ export class WorkspaceCardPresentational extends React.PureComponent<
               }}
             >
               <div>
-                <WorkspaceLink workspaceId={workspace.id}>
-                  Go to workspace »
+                <WorkspaceLink workspaceId={workspace.serialId}>
+                  Workspace #{workspace.serialId}
                 </WorkspaceLink>
               </div>
               {Auth.isAdmin() && workspace.currentlyActiveUser && (

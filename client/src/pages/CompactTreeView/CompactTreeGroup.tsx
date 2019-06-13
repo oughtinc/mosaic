@@ -2,7 +2,6 @@ import * as React from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { scroller, Element } from "react-scroll";
-import { parse as parseQueryString } from "query-string";
 
 import { CompactTreeRow } from "./CompactTreeRow";
 import { CompactTreeRowLabel } from "./CompactTreeRowLabel";
@@ -16,6 +15,10 @@ import { NormalWorkspaceGroup } from "./NormalWorkspaceGroup";
 
 import { BlockEditor } from "../../components/BlockEditor";
 
+import { getIsTreeExpandedFromQueryParams } from "../../helpers/getIsTreeExpandedFromQueryParams";
+
+import { getActiveWorkspaceIdFromQueryParams } from "../../helpers/getActiveWorkspaceIdFromQueryParams";
+
 const Checkmark = ({ color }) => (
   <span style={{ color, fontSize: "24px" }}>✓</span>
 );
@@ -25,9 +28,12 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   any
 > {
   public componentDidMount() {
-    const isThisActiveWorkspace =
-      parseQueryString(window.location.search).activeWorkspace ===
-      this.props.workspace.id;
+    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
+      window.location.search,
+    );
+
+    const isThisActiveWorkspace = activeWorkspaceId === this.props.workspace.id;
+
     if (isThisActiveWorkspace) {
       setTimeout(() => {
         scroller.scrollTo(this.props.workspace.id, {
@@ -39,9 +45,11 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   }
 
   public render() {
-    const isThisActiveWorkspace =
-      parseQueryString(window.location.search).activeWorkspace ===
-      this.props.workspace.id;
+    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
+      window.location.search,
+    );
+
+    const isThisActiveWorkspace = activeWorkspaceId === this.props.workspace.id;
 
     if (this.props.isRequestingLazyUnlock) {
       return (
@@ -75,7 +83,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
           <CompactTreeRow>
             <Link
               target="_blank"
-              to={`/workspaces/${this.props.workspace.parentId}`}
+              to={`/w/${this.props.workspace.parentId}`}
               style={{ color: "#333", textDecoration: "none" }}
             >
               <CompactTreeRowLabel>Q</CompactTreeRowLabel>
@@ -101,7 +109,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
                 <Link
                   style={{ textDecoration: "none" }}
                   target="_blank"
-                  to={`/workspaces/${
+                  to={`/w/${
                     this.props.malicious.childWorkspaces[0]
                       ? this.props.malicious.childWorkspaces[0].id
                       : this.props.malicious.id
@@ -115,7 +123,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
                     textDecoration: "none",
                   }}
                   target="_blank"
-                  to={`/workspaces/${this.props.workspace.id}`}
+                  to={`/w/${this.props.workspace.serialId}`}
                 >
                   H
                 </Link>
@@ -151,7 +159,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
           <Link
             style={{ color: "#333", textDecoration: "none" }}
             target="_blank"
-            to={`/workspaces/${this.props.workspace.parentId}`}
+            to={`/w/${this.props.workspace.parentId}`}
           >
             <CompactTreeRowLabel>Q</CompactTreeRowLabel>
           </Link>
@@ -177,7 +185,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
               <Link
                 style={{ textDecoration: "none" }}
                 target="_blank"
-                to={`/workspaces/${
+                to={`/w/${
                   this.props.normal
                     ? this.props.normal.id
                     : this.props.malicious.id
@@ -189,7 +197,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
             <Link
               style={{ color: "green", textDecoration: "none" }}
               target="_blank"
-              to={`/workspaces/${this.props.workspace.id}`}
+              to={`/w/${this.props.workspace.serialId}`}
             >
               H
             </Link>
@@ -230,10 +238,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
 
 export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
   public state = {
-    isExpanded:
-      parseQueryString(window.location.search).expanded === "true"
-        ? true
-        : false,
+    isExpanded: getIsTreeExpandedFromQueryParams(window.location.search),
   };
 
   public render() {
@@ -273,7 +278,7 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
         <a
           href={
             this.props.workspace &&
-            `/workspaces/${this.props.workspace.id}/compactTree`
+            `/w/${this.props.workspace.serialId}/compactTree`
           }
           style={{
             right: "5px",

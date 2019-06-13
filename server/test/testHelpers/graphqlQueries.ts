@@ -33,6 +33,7 @@ export const WORKSPACES_QUERY = gql`
   query OriginWorkspaces {
     workspaces(where: { parentId: null, hasBeenDeletedByAncestor: false }) {
       id
+      serialId
       parentId
       creatorId
       isPublic
@@ -53,6 +54,7 @@ export const WORKSPACE_SUBTREE_QUERY = gql`
   query workspaceSubtree($workspaceId: String!) {
     subtreeWorkspaces(workspaceId: $workspaceId) {
       id
+      serialId
       isPublic
       creatorId
       childWorkspaceOrder

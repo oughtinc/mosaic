@@ -124,6 +124,7 @@ const EXPERIMENTS_QUERY = gql`
   query experiments {
     experiments {
       id
+      serialId
       createdAt
       name
     }
