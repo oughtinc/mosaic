@@ -332,14 +332,21 @@ const BlockInput = new GraphQLInputObjectType({
   fields: _.pick(attributeFields(Block), "value", "id"),
 });
 
-const ExperimentInput = new GraphQLInputObjectType({
-  name: "experimentInput",
+const TreeInputForAPI = new GraphQLInputObjectType({
+  name: "treeInputForAPI",
   fields: {
-    experimentName: { type: GraphQLString },
     rootLevelQuestion: { type: GraphQLJSON },
     rootLevelScratchpad: { type: GraphQLJSON },
     emailsOfHonestOracles: { type: new GraphQLList(GraphQLString) },
     emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
+  },
+});
+
+const ExperimentInput = new GraphQLInputObjectType({
+  name: "experimentInput",
+  fields: {
+    experimentName: { type: GraphQLString },
+    trees: { type: new GraphQLList(TreeInputForAPI) },
   },
 });
 
@@ -1861,34 +1868,28 @@ const schema = new GraphQLSchema({
             const newExperiments: Experiment[] = [];
             const experimentInputs = args.bulkExperimentInputs;
 
-            for (const experimentInput of experimentInputs) {
-              const {
-                experimentName = "Experiment",
-                rootLevelQuestion = "root-level q",
-                rootLevelScratchpad = "root-level scratchpad",
-                emailsOfHonestOracles = [],
-                emailsOfMaliciousOracles = [],
-              } = experimentInput;
+            const contentToSlateNodes = content => [
+              {
+                object: "block",
+                type: "line",
+                isVoid: false,
+                data: {},
+                nodes: [
+                  {
+                    object: "text",
+                    leaves: [
+                      {
+                        object: "leaf",
+                        text: content,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ];
 
-              const contentToSlateNodes = content => [
-                {
-                  object: "block",
-                  type: "line",
-                  isVoid: false,
-                  data: {},
-                  nodes: [
-                    {
-                      object: "text",
-                      leaves: [
-                        {
-                          object: "leaf",
-                          text: content,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ];
+            for (const experimentInput of experimentInputs) {
+              const { experimentName = "Experiment", trees } = experimentInput;
 
               const newExperiment = await Experiment.create({
                 name: experimentName,
@@ -1896,62 +1897,73 @@ const schema = new GraphQLSchema({
 
               newExperiments.push(newExperiment);
 
-              const workspace = await Workspace.create(
-                {
-                  totalBudget: 0,
-                  creatorId: user.id,
-                  isEligibleForMaliciousOracle: true,
-                },
-                { questionValue: contentToSlateNodes(rootLevelQuestion) },
-              );
+              for (const treeInfo of trees) {
+                const {
+                  rootLevelQuestion = "root-level q",
+                  rootLevelScratchpad = "root-level scratchpad",
+                  emailsOfHonestOracles = [],
+                  emailsOfMaliciousOracles = [],
+                } = treeInfo;
 
-              const tree = await Tree.create({
-                rootWorkspaceId: workspace.id,
-              });
-
-              await newExperiment.$add("tree", tree);
-
-              const blocks = await workspace.$get("blocks");
-
-              const scratchpad = blocks.find(b => b.type === "SCRATCHPAD");
-
-              const processedValue = addExportsAndLinks(
-                contentToSlateNodes(rootLevelScratchpad),
-              );
-
-              await scratchpad.update({
-                value: processedValue,
-              });
-
-              for (const emailOfHonestOracle of emailsOfHonestOracles) {
-                const user = await User.findOne({
-                  where: {
-                    email: emailOfHonestOracle,
+                const workspace = await Workspace.create(
+                  {
+                    totalBudget: 0,
+                    creatorId: user.id,
+                    isEligibleForMaliciousOracle: true,
                   },
+                  { questionValue: contentToSlateNodes(rootLevelQuestion) },
+                );
+
+                const tree = await Tree.create({
+                  rootWorkspaceId: workspace.id,
                 });
 
-                await tree.$add("oracle", user);
-              }
+                await newExperiment.$add("tree", tree);
 
-              for (const emailsOfMaliciousOracle of emailsOfMaliciousOracles) {
-                const user = await User.findOne({
-                  where: {
-                    email: emailsOfMaliciousOracle,
-                  },
+                const blocks = await workspace.$get("blocks");
+
+                const scratchpad = blocks.find(b => b.type === "SCRATCHPAD");
+
+                const processedValue = addExportsAndLinks(
+                  contentToSlateNodes(rootLevelScratchpad),
+                );
+
+                await scratchpad.update({
+                  value: processedValue,
                 });
 
-                await tree.$add("oracle", user);
+                for (const emailOfHonestOracle of emailsOfHonestOracles) {
+                  const user = await User.findOne({
+                    where: {
+                      email: emailOfHonestOracle,
+                    },
+                  });
 
-                const oracleRelation = await UserTreeOracleRelation.findOne({
-                  where: {
-                    UserId: user.id,
-                    TreeId: tree.id,
-                  },
-                });
-                if (oracleRelation === null) {
-                  return false;
+                  await tree.$add("oracle", user);
                 }
-                await oracleRelation.update({ isMalicious: true });
+
+                for (const emailsOfMaliciousOracle of emailsOfMaliciousOracles) {
+                  const user = await User.findOne({
+                    where: {
+                      email: emailsOfMaliciousOracle,
+                    },
+                  });
+
+                  await tree.$add("oracle", user);
+
+                  const oracleRelation = await UserTreeOracleRelation.findOne({
+                    where: {
+                      UserId: user.id,
+                      TreeId: tree.id,
+                    },
+                  });
+
+                  if (oracleRelation === null) {
+                    return false;
+                  }
+
+                  await oracleRelation.update({ isMalicious: true });
+                }
               }
             }
             return newExperiments;
