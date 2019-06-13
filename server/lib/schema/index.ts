@@ -1911,7 +1911,11 @@ const schema = new GraphQLSchema({
                     creatorId: user.id,
                     isEligibleForMaliciousOracle: true,
                   },
-                  { questionValue: contentToSlateNodes(rootLevelQuestion) },
+                  {
+                    questionValue: addExportsAndLinks(
+                      contentToSlateNodes(rootLevelQuestion),
+                    ),
+                  },
                 );
 
                 const tree = await Tree.create({
@@ -1924,12 +1928,10 @@ const schema = new GraphQLSchema({
 
                 const scratchpad = blocks.find(b => b.type === "SCRATCHPAD");
 
-                const processedValue = addExportsAndLinks(
-                  contentToSlateNodes(rootLevelScratchpad),
-                );
-
                 await scratchpad.update({
-                  value: processedValue,
+                  value: addExportsAndLinks(
+                    contentToSlateNodes(rootLevelScratchpad),
+                  ),
                 });
 
                 for (const emailOfHonestOracle of emailsOfHonestOracles) {
