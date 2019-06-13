@@ -12,7 +12,7 @@ import { WorkspaceCardPresentational } from "./WorkspaceCard";
 
 import { Auth } from "../../auth";
 
-import { getActiveWorkspaceIsFromQueryParams } from "../../helpers/getActiveWorkspaceIsFromQueryParams";
+import { getActiveWorkspaceIdFromQueryParams } from "../../helpers/getActiveWorkspaceIdFromQueryParams";
 import { getIsTreeExpandedFromQueryParams } from "../../helpers/getIsTreeExpandedFromQueryParams";
 
 const ORACLE_MODE_QUERY = gql`
@@ -73,7 +73,7 @@ const optionsForSubtreeTimeSpentQuery = ({
 export class WorkspaceCardContainer extends React.PureComponent<any, any> {
   public render() {
     const isExpanded = getIsTreeExpandedFromQueryParams(window.location.search);
-    const activeWorkspaceId = getActiveWorkspaceIsFromQueryParams(
+    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
       window.location.search,
     );
 

@@ -1,6 +1,6 @@
 import { parse as parseQueryString } from "query-string";
 
-export function getActiveWorkspaceIsFromQueryParams(
+export function getActiveWorkspaceIdFromQueryParams(
   windowLocationSearch: string,
 ) {
   const queryParams = parseQueryString(windowLocationSearch);

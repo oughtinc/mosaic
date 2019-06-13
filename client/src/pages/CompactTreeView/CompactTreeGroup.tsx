@@ -17,7 +17,7 @@ import { BlockEditor } from "../../components/BlockEditor";
 
 import { getIsTreeExpandedFromQueryParams } from "../../helpers/getIsTreeExpandedFromQueryParams";
 
-import { getActiveWorkspaceIsFromQueryParams } from "../../helpers/getActiveWorkspaceIsFromQueryParams";
+import { getActiveWorkspaceIdFromQueryParams } from "../../helpers/getActiveWorkspaceIdFromQueryParams";
 
 const Checkmark = ({ color }) => (
   <span style={{ color, fontSize: "24px" }}>✓</span>
@@ -28,7 +28,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   any
 > {
   public componentDidMount() {
-    const activeWorkspaceId = getActiveWorkspaceIsFromQueryParams(
+    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
       window.location.search,
     );
 
@@ -45,7 +45,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   }
 
   public render() {
-    const activeWorkspaceId = getActiveWorkspaceIsFromQueryParams(
+    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
       window.location.search,
     );
 
