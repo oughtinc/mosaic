@@ -20,6 +20,7 @@ import { isUserAdmin } from "./auth/isUserAdmin";
 import { userFromContext } from "./auth/userFromContext";
 
 import { getMessageForUser } from "./helpers/getMessageForUser";
+import { addExportsAndLinks } from "./helpers/addExportsAndLinks";
 import { extractHonestAnswerValueFromMaliciousQuestion } from "./helpers/extractHonestAnswerValueFromMaliciousQuestion";
 import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFromQuestion";
 
@@ -361,6 +362,24 @@ const oracleModeType = new GraphQLObjectType({
 const BlockInput = new GraphQLInputObjectType({
   name: "blockInput",
   fields: _.pick(attributeFields(Block), "value", "id"),
+});
+
+const TreeInputForAPI = new GraphQLInputObjectType({
+  name: "treeInputForAPI",
+  fields: {
+    rootLevelQuestion: { type: GraphQLJSON },
+    rootLevelScratchpad: { type: GraphQLJSON },
+    emailsOfHonestOracles: { type: new GraphQLList(GraphQLString) },
+    emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
+  },
+});
+
+const ExperimentInput = new GraphQLInputObjectType({
+  name: "experimentInput",
+  fields: {
+    experimentName: { type: GraphQLString },
+    trees: { type: new GraphQLList(TreeInputForAPI) },
+  },
 });
 
 const WorkspaceInput = new GraphQLInputObjectType({
@@ -1905,6 +1924,122 @@ const schema = new GraphQLSchema({
           },
         ), // unlock pointer resolver
       }, // unlockPointer mutation
+      bulkCreateExperiments: {
+        type: new GraphQLList(experimentType),
+        args: {
+          bulkExperimentInputs: { type: new GraphQLList(ExperimentInput) },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to bulk-create experiments",
+          async (_, args, context) => {
+            const user = await userFromContext(context);
+            const newExperiments: Experiment[] = [];
+            const experimentInputs = args.bulkExperimentInputs;
+
+            const contentToSlateNodes = content => [
+              {
+                object: "block",
+                type: "line",
+                isVoid: false,
+                data: {},
+                nodes: [
+                  {
+                    object: "text",
+                    leaves: [
+                      {
+                        object: "leaf",
+                        text: content,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ];
+
+            for (const experimentInput of experimentInputs) {
+              const { experimentName = "Experiment", trees } = experimentInput;
+
+              const newExperiment = await Experiment.create({
+                name: experimentName,
+              });
+
+              newExperiments.push(newExperiment);
+
+              for (const treeInfo of trees) {
+                const {
+                  rootLevelQuestion = "root-level q",
+                  rootLevelScratchpad = "root-level scratchpad",
+                  emailsOfHonestOracles = [],
+                  emailsOfMaliciousOracles = [],
+                } = treeInfo;
+
+                const workspace = await Workspace.create(
+                  {
+                    totalBudget: 0,
+                    creatorId: user.id,
+                    isEligibleForMaliciousOracle: true,
+                  },
+                  {
+                    questionValue: addExportsAndLinks(
+                      contentToSlateNodes(rootLevelQuestion),
+                    ),
+                  },
+                );
+
+                const tree = await Tree.create({
+                  rootWorkspaceId: workspace.id,
+                });
+
+                await newExperiment.$add("tree", tree);
+
+                const blocks = await workspace.$get("blocks");
+
+                const scratchpad = blocks.find(b => b.type === "SCRATCHPAD");
+
+                await scratchpad.update({
+                  value: addExportsAndLinks(
+                    contentToSlateNodes(rootLevelScratchpad),
+                  ),
+                });
+
+                for (const emailOfHonestOracle of emailsOfHonestOracles) {
+                  const user = await User.findOne({
+                    where: {
+                      email: emailOfHonestOracle,
+                    },
+                  });
+
+                  await tree.$add("oracle", user);
+                }
+
+                for (const emailsOfMaliciousOracle of emailsOfMaliciousOracles) {
+                  const user = await User.findOne({
+                    where: {
+                      email: emailsOfMaliciousOracle,
+                    },
+                  });
+
+                  await tree.$add("oracle", user);
+
+                  const oracleRelation = await UserTreeOracleRelation.findOne({
+                    where: {
+                      UserId: user.id,
+                      TreeId: tree.id,
+                    },
+                  });
+
+                  if (oracleRelation === null) {
+                    return false;
+                  }
+
+                  await oracleRelation.update({ isMalicious: true });
+                }
+              }
+            }
+            return newExperiments;
+          },
+        ),
+      },
       selectAnswerCandidate: {
         type: GraphQLBoolean,
         args: {
