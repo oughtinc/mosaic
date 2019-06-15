@@ -1448,22 +1448,40 @@ const schema = new GraphQLSchema({
             { workspaceId, question, shouldOverrideToNormalUser, totalBudget },
             context,
           ) => {
+            console.log(`
+            
+            
+            Start of createChildWorkspace: ${Date.now()}
+            
+            
+            `);
             const workspace = await Workspace.findByPk(workspaceId);
             if (workspace === null) {
               throw new Error("Workspace ID does not exist");
             }
             const user = await userFromContext(context);
+
             if (user === null) {
               throw new Error("You must be logged in to create a subquestion");
             }
 
-            return await workspace.createChild({
+            const childWorkspace = await workspace.createChild({
               question: JSON.parse(question),
               totalBudget,
               creatorId: user.id,
               isPublic: isUserAdmin(user),
               shouldOverrideToNormalUser,
             });
+
+            console.log(`
+            
+            
+            End of createChildWorkspace: ${Date.now()}
+            
+            
+            `);
+
+            return childWorkspace;
           },
         ),
       },

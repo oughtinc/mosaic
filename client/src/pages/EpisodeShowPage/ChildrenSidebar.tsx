@@ -360,6 +360,12 @@ export class ChildrenSidebar extends React.Component<any, any> {
     return false;
   }
 
+  public componentDidUpdate(newProps) {
+    if (this.props.workspaces.length !== newProps.workspaces.length) {
+      console.log(this.props.workspaces.length, Date.now());
+    }
+  }
+
   public render() {
     return (
       <div>

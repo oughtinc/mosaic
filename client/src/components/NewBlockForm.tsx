@@ -325,6 +325,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               }
               type="submit"
               onClick={() =>
+                console.log("Submitting", Date.now()) ||
                 this.handleClick({ shouldOverrideToNormalUser: false })
               }
               style={{
