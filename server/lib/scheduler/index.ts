@@ -36,6 +36,8 @@ const fetchAllWorkspacesInTree = async rootWorkspace => {
 
 export const schedulers = new Map();
 
+let assignmentNum = 0;
+
 export async function createScheduler(experimentId) {
   const schedule = new Schedule({
     fetchAllAssignmentsInExperiment: async () => {
@@ -57,6 +59,17 @@ export async function createScheduler(experimentId) {
           workspace,
         };
       });
+
+      assignmentNum += enhancedAssignments.length;
+
+      console.log(`
+      
+      
+      assignments length = ${assignmentNum}
+      
+      
+      
+      `);
 
       return enhancedAssignments;
     },
