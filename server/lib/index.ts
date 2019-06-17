@@ -50,6 +50,17 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
     });
   }
 
+  app.use((req, res, next) => {
+    console.log(`
+            
+            
+            In express: ${Date.now()}
+            
+            
+            `);
+    next();
+  });
+
   server.applyMiddleware({ app });
 
   app.use("/testing", testingRoutes);

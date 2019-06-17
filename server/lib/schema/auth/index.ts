@@ -11,6 +11,13 @@ export const requireUser = (errMsg, resolver) => async (
   ctx,
   info,
 ) => {
+  console.log(`
+            
+            
+        Start of resolver: ${Date.now()}
+        
+        
+        `);
   const user = await userFromContext(ctx);
 
   if (!user) {
