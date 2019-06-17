@@ -16,8 +16,6 @@ import { OracleAnswerCandidateFooter } from "./OracleAnswerCandidateFooter";
 import { ResponseFooter } from "./ResponseFooter";
 import { SelectAnswerBtn } from "./SelectAnswerBtn";
 import { CharCountDisplays } from "./CharCountDisplays";
-import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
-import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
 import { ChildrenSidebar } from "./ChildrenSidebar";
 import { Link } from "react-router-dom";
 import { addBlocks, saveBlocks } from "../../modules/blocks/actions";
@@ -546,26 +544,6 @@ export class WorkspaceView extends React.Component<any, any> {
                             <div />
                           )}
                         </div>
-                        {hasTimeBudget ? (
-                          <TimerAndTimeBudgetInfo
-                            isActive={isActive}
-                            durationInMs={durationInMs}
-                            handleTimerEnd={this.handleTimerEnd}
-                            initialAllocatedBudget={workspace.allocatedBudget}
-                            tickDuration={this.tickDurationForCountdownTimer}
-                            totalBudget={workspace.totalBudget}
-                            workspaceId={workspace.id}
-                          />
-                        ) : (
-                          <TimerWhenNoTimeBudget
-                            isActive={isActive}
-                            tickDuration={
-                              this
-                                .tickDurationForUpdatingTimeSpentWhenNoTimeBudget
-                            }
-                            workspaceId={workspace.id}
-                          />
-                        )}
                       </div>
                     </Col>
                   </Row>
