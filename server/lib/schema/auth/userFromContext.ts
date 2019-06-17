@@ -10,12 +10,18 @@ const cache = new Map();
 export async function userFromContext(ctx) {
   const userId = userIdFromContext(ctx);
 
-  if (cache.has(userId)) {
-    const cachedUserObject = cache.get(userId);
-    if (Date.now() - cachedUserObject.timestamp < 1000 * 60 * 5) {
-      return cachedUserObject.user;
-    }
+  const users = [];
+  for (let i = 0; i < 1000; i++) {
+    const u = await User.findAll();
+    users.push(u);
   }
+
+  // if (cache.has(userId)) {
+  //   const cachedUserObject = cache.get(userId);
+  //   if (Date.now() - cachedUserObject.timestamp < 1000 * 60 * 5) {
+  //     return cachedUserObject.user;
+  //   }
+  // }
 
   const authToken = authTokenFromContext(ctx);
   const saltedHash = await bcrypt.hash(authToken, 10);
