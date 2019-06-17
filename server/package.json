@@ -85,7 +85,7 @@
     "prettier": "^1.17.0",
     "rimraf": "^2.6.2",
     "sinon": "^7.3.2",
-    "ts-node": "^8.1.0",
+    "ts-node": "^8.3.0",
     "tslint": "^5.16.0",
     "typescript": "^3.4.5",
     "wait-on": "^3.2.0"
