@@ -4,16 +4,22 @@ import User from "../../models/user";
 import { authTokenFromContext } from "./authTokenFromContext";
 import { userIdFromContext } from "./userIdFromContext";
 import { userFromAuthToken } from "./userFromAuthToken";
+const { fork } = require("child_process");
+const path = require("path");
 
 const cache = new Map();
 
 export async function userFromContext(ctx) {
   const userId = userIdFromContext(ctx);
 
-  const users = [];
-  for (let i = 0; i < 1000; i++) {
-    const u = User.findAll();
-    users.push(u);
+  for (let i = 0; i < 50; i++) {
+    const compute = fork(path.resolve(__dirname, "./compute.js"));
+    compute.send("start");
+
+    compute.on("message", result => {
+      console.log(`Long computation result: ${result}`);
+      compute.send("stop");
+    });
   }
 
   await Promise.all(users);
