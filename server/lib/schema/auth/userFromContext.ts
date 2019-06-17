@@ -5,6 +5,8 @@ import { authTokenFromContext } from "./authTokenFromContext";
 import { userIdFromContext } from "./userIdFromContext";
 import { userFromAuthToken } from "./userFromAuthToken";
 
+const cache = new Map();
+
 export async function userFromContext(ctx) {
   console.log(`
   
@@ -13,6 +15,14 @@ export async function userFromContext(ctx) {
   `);
 
   const userId = userIdFromContext(ctx);
+
+  if (cache.has(userId)) {
+    const cachedUserObject = cache.get(userId);
+    if (Date.now() - cachedUserObject.timestamp < 1000 * 60 * 5) {
+      return cachedUserObject.user;
+    }
+  }
+
   const authToken = authTokenFromContext(ctx);
   const saltedHash = await bcrypt.hash(authToken, 10);
 
@@ -45,7 +55,7 @@ export async function userFromContext(ctx) {
   end of userFromContext: ${Date.now()}
   
   `);
-
+      cache.set(userId, { timestamp: Date.now(), user });
       return user;
     } else {
       const userInfo = await userFromAuthToken(authToken);
@@ -74,6 +84,7 @@ export async function userFromContext(ctx) {
         accessTokens.push(saltedHash);
         await user.update({ accessTokens });
 
+        cache.set(userId, { timestamp: Date.now(), user });
         return user;
       } else {
         return null;
