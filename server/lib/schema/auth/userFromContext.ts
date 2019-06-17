@@ -12,9 +12,11 @@ export async function userFromContext(ctx) {
 
   const users = [];
   for (let i = 0; i < 1000; i++) {
-    const u = await User.findAll();
+    const u = User.findAll();
     users.push(u);
   }
+
+  await Promise.all(users);
 
   // if (cache.has(userId)) {
   //   const cachedUserObject = cache.get(userId);
