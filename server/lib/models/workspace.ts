@@ -659,6 +659,14 @@ export default class Workspace extends Model<Workspace> {
     isPublic,
     shouldOverrideToNormalUser,
   }) {
+    console.log(`
+    
+    
+    In create child: ${Date.now()}
+    
+    
+    
+    `);
     const initialText = _.get(question, "[0].nodes[0].leaves[0].text", "");
     const isRequestingLazyUnlock =
       initialText
@@ -717,6 +725,15 @@ export default class Workspace extends Model<Workspace> {
       allocatedBudget: newAllocatedBudget,
       childWorkspaceOrder: this.workSpaceOrderAppend(child.id),
     });
+
+    console.log(`
+    
+    
+    End of createChild: ${Date.now()}
+    
+    
+    
+    `);
     return child;
   }
 

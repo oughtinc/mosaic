@@ -19,7 +19,13 @@ export const requireUser = (errMsg, resolver) => async (
         
         `);
   const user = await userFromContext(ctx);
-
+  console.log(`
+            
+            
+  User obtained: ${Date.now()}
+  
+  
+  `);
   if (!user) {
     throw new Error(`No user found: ${errMsg}`);
   } else {

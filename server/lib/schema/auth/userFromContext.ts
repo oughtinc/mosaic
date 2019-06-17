@@ -6,6 +6,12 @@ import { userIdFromContext } from "./userIdFromContext";
 import { userFromAuthToken } from "./userFromAuthToken";
 
 export async function userFromContext(ctx) {
+  console.log(`
+  
+  start of userFromContext: ${Date.now()}
+  
+  `);
+
   const userId = userIdFromContext(ctx);
   const authToken = authTokenFromContext(ctx);
   const saltedHash = await bcrypt.hash(authToken, 10);
@@ -34,6 +40,12 @@ export async function userFromContext(ctx) {
     );
 
     if (_.some(tokensCompared)) {
+      console.log(`
+  
+  end of userFromContext: ${Date.now()}
+  
+  `);
+
       return user;
     } else {
       const userInfo = await userFromAuthToken(authToken);
