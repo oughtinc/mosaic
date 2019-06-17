@@ -12,7 +12,7 @@ const cache = new Map();
 export async function userFromContext(ctx) {
   const userId = userIdFromContext(ctx);
 
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 5; i++) {
     const compute = fork(path.resolve(__dirname, "./compute.js"));
     compute.send("start");
 
