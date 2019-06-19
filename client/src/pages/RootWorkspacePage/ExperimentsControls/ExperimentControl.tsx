@@ -98,8 +98,8 @@ class ExperimentControl extends React.Component<any, any> {
             )
           }
         >
-          <ToggleButton value={0}>default non-oracle</ToggleButton>
-          <ToggleButton value={1}>default oracle</ToggleButton>
+          <ToggleButton value={0}>default non-expert</ToggleButton>
+          <ToggleButton value={1}>default expert</ToggleButton>
         </ToggleButtonGroup>
         <br />
         <Fallbacks experiment={experiment} />
