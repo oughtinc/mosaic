@@ -17,9 +17,9 @@ export class UserOracleControlsPresentational extends React.Component<
         <div />
       ) : (
         <Popover
-          id={`fallbacks-popover-${this.props.workspace.id}`}
+          id={`experts-popover-${this.props.workspace.id}`}
           style={{ minWidth: "450px" }}
-          title="Oracles"
+          title="Experts"
         >
           <div>
             {users.map(u => {
@@ -94,7 +94,7 @@ export class UserOracleControlsPresentational extends React.Component<
           overlay={popoverWithProps}
         >
           <Button bsSize="xsmall" bsStyle="default">
-            Edit Oracles
+            Edit Experts
           </Button>
         </OverlayTrigger>
       </div>

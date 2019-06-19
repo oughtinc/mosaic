@@ -117,7 +117,7 @@ export function generateHonestAnswerDraftValue(questionValue, blockValue) {
           leaves: [
             {
               object: "leaf",
-              text: "The honest oracle has responded to question ",
+              text: "The honest expert has responded to question ",
               marks: [],
             },
           ],

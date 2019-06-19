@@ -334,7 +334,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
             >
               {this.props.isWorkspacePartOfOracleExperiment &&
               !this.props.isUserOracle
-                ? "Submit to Oracle"
+                ? "Submit to Expert"
                 : "Submit"}
             </Button>
             {this.props.isWorkspacePartOfOracleExperiment &&

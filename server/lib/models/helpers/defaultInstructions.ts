@@ -4,14 +4,14 @@ export const defaultRootInstructions = `**Instructions for root level workspace*
 2. Click "Submit"
 3. Click "Done!" under the response field`;
 
-export const defaultHonestOracleInstructions = `**Instructions for honest oracle**
+export const defaultHonestOracleInstructions = `**Instructions for honest expert**
 
 1. Fill in a correct/helpful answer in the **Answer Candidate** field on the right
 2. Click "Done!"`;
 
-export const defaultMaliciousOracleInstructions = `**Instructions for malicious oracle**
+export const defaultMaliciousOracleInstructions = `**Instructions for malicious expert**
 
-1. Decide whether to challenge the honest oracle on this question and answer
+1. Decide whether to challenge the honest expert on this question and answer
 2. If you decide to challenge:
    - Fill in an incorrect/unhelpful but plausible alternative answer in the **Answer Candidate** field on the right
    - Click "Challenge!" under the **Answer Candidate** field
@@ -36,6 +36,6 @@ export const defaultReturningMaliciousOracleInstructions = `**Instructions**
 export const defaultLazyPointerUnlockInstructions = `**Instructions for unlocking lazy pointer**
 
 1. Use the response field to describe the contents of the lazy pointer
-2. As an oracle, you can open the lazy pointer by clicking on it
+2. As an expert, you can open the lazy pointer by clicking on it
 3. If you need more information than what you included in the lazy pointer, you can click the "Entire Tree »" button above to view the entire tree so far
 4. When you've finished, click "Done!" under the response field`;

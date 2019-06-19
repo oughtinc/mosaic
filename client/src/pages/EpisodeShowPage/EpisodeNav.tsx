@@ -108,7 +108,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                 fontVariant: "small-caps",
               }}
             >
-              {isUserMaliciousOracle ? "malicious" : "honest"} oracle mode
+              {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
             </div>
           )}
         </EpisodeNavContainer>
