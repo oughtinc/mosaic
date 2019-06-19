@@ -367,8 +367,10 @@ const BlockInput = new GraphQLInputObjectType({
 const TreeInputForAPI = new GraphQLInputObjectType({
   name: "treeInputForAPI",
   fields: {
-    rootLevelQuestion: { type: GraphQLJSON },
-    rootLevelScratchpad: { type: GraphQLJSON },
+    rootLevelQuestion: { type: GraphQLString },
+    rootLevelScratchpad: { type: GraphQLString },
+    honestAnswer: { type: GraphQLString },
+    maliciousAnswer: { type: GraphQLString },
     emailsOfHonestOracles: { type: new GraphQLList(GraphQLString) },
     emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
   },
@@ -1300,7 +1302,7 @@ const schema = new GraphQLSchema({
                       );
                       const question = blocks.find(b => b.type === "QUESTION");
 
-                      // create malicious child
+                      // create judge child
                       await workspace.createChild({
                         question: generateMaliciousAnswerDraftValue(
                           _.get(question, "value"),
@@ -1931,7 +1933,7 @@ const schema = new GraphQLSchema({
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to bulk-create experiments",
-          async (_, args, context) => {
+          async (__, args, context) => {
             const user = await userFromContext(context);
             const newExperiments: Experiment[] = [];
             const experimentInputs = args.bulkExperimentInputs;
@@ -1969,6 +1971,8 @@ const schema = new GraphQLSchema({
                 const {
                   rootLevelQuestion = "root-level q",
                   rootLevelScratchpad = "root-level scratchpad",
+                  honestAnswer,
+                  maliciousAnswer,
                   emailsOfHonestOracles = [],
                   emailsOfMaliciousOracles = [],
                 } = treeInfo;
@@ -1986,6 +1990,8 @@ const schema = new GraphQLSchema({
                   },
                 );
 
+                /* await */ workspace.update({ isStale: false });
+
                 const tree = await Tree.create({
                   rootWorkspaceId: workspace.id,
                 });
@@ -2001,6 +2007,81 @@ const schema = new GraphQLSchema({
                     contentToSlateNodes(rootLevelScratchpad),
                   ),
                 });
+
+                const honestChild = await workspace.createChild({
+                  question: addExportsAndLinks(
+                    contentToSlateNodes(rootLevelQuestion),
+                  ),
+                  totalBudget: 0,
+                  creatorId: user.id,
+                  isPublic: false,
+                  shouldOverrideToNormalUser: false,
+                });
+
+                /* await */ honestChild.update({ isStale: false });
+
+                if (honestAnswer) {
+                  const blocks = (await honestChild.$get("blocks")) as Block[];
+                  const answerCandidate = blocks.find(
+                    b => b.type === "ORACLE_ANSWER_CANDIDATE",
+                  );
+
+                  answerCandidate &&
+                    (await answerCandidate.update({
+                      value: addExportsAndLinks(
+                        contentToSlateNodes(honestAnswer),
+                      ),
+                    }));
+
+                  const question = blocks.find(b => b.type === "QUESTION");
+
+                  // create malicious child
+                  const maliciousChild = await honestChild.createChild({
+                    question: generateHonestAnswerDraftValue(
+                      _.get(question, "value"),
+                      addExportsAndLinks(contentToSlateNodes(honestAnswer)),
+                    ),
+                    totalBudget: 0,
+                    creatorId: user.id,
+                    isPublic: false,
+                    shouldOverrideToNormalUser: false,
+                  });
+
+                  /* await */ maliciousChild.update({ isStale: false });
+
+                  if (maliciousAnswer) {
+                    const blocks = (await maliciousChild.$get(
+                      "blocks",
+                    )) as Block[];
+
+                    const answerCandidate = blocks.find(
+                      b => b.type === "ORACLE_ANSWER_CANDIDATE",
+                    );
+
+                    answerCandidate &&
+                      (await answerCandidate.update({
+                        value: addExportsAndLinks(
+                          contentToSlateNodes(maliciousAnswer),
+                        ),
+                      }));
+
+                    const question = blocks.find(b => b.type === "QUESTION");
+
+                    // create judge workspace
+                    await maliciousChild.createChild({
+                      question: generateMaliciousAnswerDraftValue(
+                        _.get(question, "value"),
+                        addExportsAndLinks(
+                          contentToSlateNodes(maliciousAnswer),
+                        ),
+                      ),
+                      totalBudget: 0,
+                      creatorId: user.id,
+                      isPublic: false,
+                      shouldOverrideToNormalUser: false,
+                    });
+                  }
+                }
 
                 for (const emailOfHonestOracle of emailsOfHonestOracles) {
                   const user = await User.findOne({
