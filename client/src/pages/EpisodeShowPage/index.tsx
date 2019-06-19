@@ -236,6 +236,47 @@ function findPointers(value: any) {
   return pointers;
 }
 
+function snapshot(props, action = "INITIALIZE") {
+  const workspace = props.workspace.workspace;
+
+  const workspaceBlocks: any = _.flatten(
+    workspace.blocks.concat(workspace.childWorkspaces.map(cw => cw.blocks)),
+  );
+
+  const reduxBlocks = props.reduxState.blocks.blocks.map(b => ({
+    id: b.id,
+    type: workspaceBlocks.find((b2: any) => b.id === b2.id).type,
+    value: b.value.toJSON(),
+  }));
+
+  props.createSnapshot(
+    console.log("making snapshot") || {
+      variables: {
+        userId: Auth.userId(),
+        workspaceId: workspace.id,
+        snapshot: JSON.stringify({
+          userId: Auth.userId(),
+          workspaceId: workspace.id,
+          workspace: reduxBlocks.filter(b =>
+            workspace.blocks.find(b2 => b.id === b2.id),
+          ),
+          children: workspace.childWorkspaces.map(w => {
+            const childBlocks = reduxBlocks.filter(b =>
+              w.blocks.find(b2 => b.id === b2.id),
+            );
+            return childBlocks.map(b => ({
+              ...b,
+              isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
+            }));
+          }),
+          exportLockStatusInfo: workspace.exportLockStatusInfo,
+          action,
+        }),
+      },
+    },
+  );
+}
+
 export class WorkspaceView extends React.Component<any, any> {
   private experimentId;
   private scratchpadField;
@@ -261,8 +302,13 @@ export class WorkspaceView extends React.Component<any, any> {
       window.location.search,
     );
 
+    setTimeout(() => {
+      snapshot(this.props);
+    }, 1);
+
     window.addEventListener("beforeunload", e => {
       setTimeout(() => {
+        snapshot(this.props, "UNLOAD");
         const isLeavingWorkspacePage =
           /^\/workspaces\//.test(window.location.pathname) ||
           /^\/w\//.test(window.location.pathname);
@@ -481,6 +527,7 @@ export class WorkspaceView extends React.Component<any, any> {
         >
           {this.state.isAuthenticated && experimentId && (
             <EpisodeNav
+              snapshot={(action: string) => snapshot(this.props, action)}
               experimentId={experimentId}
               hasSubquestions={hasSubquestions}
               isActive={isActive}
@@ -779,6 +826,9 @@ export class WorkspaceView extends React.Component<any, any> {
                             </BlockBody>
                             {this.state.isAuthenticated && isActive && (
                               <ResponseFooter
+                                snapshot={(action: string) =>
+                                  snapshot(this.props, action)
+                                }
                                 isUserMaliciousOracle={isUserMaliciousOracle}
                                 isRequestingLazyUnlock={isRequestingLazyUnlock}
                                 hasChildren={
@@ -1071,6 +1121,9 @@ export class WorkspaceView extends React.Component<any, any> {
                             !isRequestingLazyUnlock
                           ) && (
                             <ChildrenSidebar
+                              snapshot={(action: string) =>
+                                snapshot(this.props, action)
+                              }
                               doesAllowOracleBypass={
                                 workspace.rootWorkspace.tree
                                   .doesAllowOracleBypass
@@ -1329,7 +1382,13 @@ function mapStateToProps(state: any, { workspace }: any) {
   }
 
   const { blocks } = state;
-  return { blocks, exportingPointers, inputCharCount, outputCharCount };
+  return {
+    reduxState: state,
+    blocks,
+    exportingPointers,
+    inputCharCount,
+    outputCharCount,
+  };
 }
 
 const LEAVE_CURRENT_WORKSPACE_MUTATION = gql`
@@ -1361,6 +1420,20 @@ const UPDATE_WORKSPACE_IS_STALE_REALTIVE_TO_USER = gql`
 const DECLINE_TO_CHALLENGE_MUTATION = gql`
   mutation declineToChallengeMutation($id: String) {
     declineToChallenge(id: $id)
+  }
+`;
+
+const CREATE_SNAPSHOT_MUTATION = gql`
+  mutation createSnapshotMutation(
+    $userId: String
+    $workspaceId: String
+    $snapshot: String
+  ) {
+    createSnapshot(
+      userId: $userId
+      workspaceId: $workspaceId
+      snapshot: $snapshot
+    )
   }
 `;
 
@@ -1420,6 +1493,9 @@ export const EpisodeShowPage = compose(
     options: {
       refetchQueries: ["workspace"],
     },
+  }),
+  graphql(CREATE_SNAPSHOT_MUTATION, {
+    name: "createSnapshot",
   }),
   graphql(SELECT_ANSWER_CANDIDATE, {
     name: "selectAnswerCandidate",

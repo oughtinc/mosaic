@@ -27,6 +27,7 @@ import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFrom
 import getScheduler from "../scheduler";
 import { map } from "asyncro";
 import Block from "../models/block";
+import Snapshot from "../models/snapshot";
 import Workspace from "../models/workspace";
 import UserTreeOracleRelation from "../models/userTreeOracleRelation";
 import User from "../models/user";
@@ -2171,6 +2172,30 @@ const schema = new GraphQLSchema({
           },
         ), // unlock pointer resolver
       }, // unlockPointer mutation
+      createSnapshot: {
+        type: GraphQLBoolean,
+        args: {
+          userId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString },
+          snapshot: { type: GraphQLString },
+        },
+        resolve: async (_, { userId, workspaceId, snapshot }, ctx) => {
+          console.log(`
+          
+          
+          
+          HERE!
+          
+          
+          `);
+          await Snapshot.create({
+            userId,
+            workspaceId,
+            snapshot: JSON.parse(snapshot),
+          });
+          return true;
+        },
+      },
     }, // mutation fields
   }), // mutation: new GraphQLObjectType({...})
 }); // const schema = new GraphQLSchema({...})

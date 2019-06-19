@@ -65,6 +65,7 @@ interface EpisodeNavProps {
   isTakingABreak?: boolean;
   isUserOracle: boolean;
   isUserMaliciousOracle: boolean;
+  snapshot(action: string): void;
   markAsNotStaleRelativeToUser(): void;
 }
 
@@ -85,6 +86,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       isUserOracle,
       isUserMaliciousOracle,
       markAsNotStaleRelativeToUser,
+      snapshot,
     } = this.props;
 
     if (isUserOracle && isInOracleMode) {
@@ -130,9 +132,11 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                 bsStyle="primary"
                 experimentId={experimentId}
                 label="Needs more work"
-                navHook={() =>
-                  markAsNotStaleRelativeToUser && markAsNotStaleRelativeToUser()
-                }
+                navHook={() => {
+                  snapshot("NEEDS_MORE_WORK");
+                  markAsNotStaleRelativeToUser &&
+                    markAsNotStaleRelativeToUser();
+                }}
               />
             </div>
           )

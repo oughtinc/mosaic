@@ -433,6 +433,7 @@ export class ChildrenSidebar extends React.Component<any, any> {
                       experimentId={this.props.experimentId}
                       label="Wait for an answer"
                       navHook={() => {
+                        this.props.snapshot("WAIT_FOR_ANSWER");
                         this.props.markAsNotStale();
                       }}
                     />
