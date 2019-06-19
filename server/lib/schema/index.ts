@@ -2022,12 +2022,12 @@ const schema = new GraphQLSchema({
 
                 if (honestAnswer) {
                   const blocks = (await honestChild.$get("blocks")) as Block[];
-                  const answerCandidate = blocks.find(
+                  const honestAnswerCandidate = blocks.find(
                     b => b.type === "ORACLE_ANSWER_CANDIDATE",
                   );
 
-                  answerCandidate &&
-                    (await answerCandidate.update({
+                  honestAnswerCandidate &&
+                    (await honestAnswerCandidate.update({
                       value: addExportsAndLinks(
                         contentToSlateNodes(honestAnswer),
                       ),
@@ -2039,7 +2039,7 @@ const schema = new GraphQLSchema({
                   const maliciousChild = await honestChild.createChild({
                     question: generateHonestAnswerDraftValue(
                       _.get(question, "value"),
-                      addExportsAndLinks(contentToSlateNodes(honestAnswer)),
+                      _.get(honestAnswerCandidate, "value"),
                     ),
                     totalBudget: 0,
                     creatorId: user.id,
@@ -2054,12 +2054,12 @@ const schema = new GraphQLSchema({
                       "blocks",
                     )) as Block[];
 
-                    const answerCandidate = blocks.find(
+                    const maliciousAnswerCandidate = blocks.find(
                       b => b.type === "ORACLE_ANSWER_CANDIDATE",
                     );
 
-                    answerCandidate &&
-                      (await answerCandidate.update({
+                    maliciousAnswerCandidate &&
+                      (await maliciousAnswerCandidate.update({
                         value: addExportsAndLinks(
                           contentToSlateNodes(maliciousAnswer),
                         ),
@@ -2071,9 +2071,7 @@ const schema = new GraphQLSchema({
                     await maliciousChild.createChild({
                       question: generateMaliciousAnswerDraftValue(
                         _.get(question, "value"),
-                        addExportsAndLinks(
-                          contentToSlateNodes(maliciousAnswer),
-                        ),
+                        _.get(maliciousAnswerCandidate, "value"),
                       ),
                       totalBudget: 0,
                       creatorId: user.id,
