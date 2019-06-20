@@ -380,6 +380,7 @@ const ExperimentInput = new GraphQLInputObjectType({
   name: "experimentInput",
   fields: {
     experimentName: { type: GraphQLString },
+    experimentId: { type: GraphQLString },
     trees: { type: new GraphQLList(TreeInputForAPI) },
   },
 });
@@ -1959,13 +1960,22 @@ const schema = new GraphQLSchema({
             ];
 
             for (const experimentInput of experimentInputs) {
-              const { experimentName = "Experiment", trees } = experimentInput;
+              const {
+                experimentName = "Experiment",
+                experimentId,
+                trees,
+              } = experimentInput;
 
-              const newExperiment = await Experiment.create({
-                name: experimentName,
-              });
+              let experiment;
+              if (experimentId) {
+                experiment = await Experiment.findByPkOrSerialId(experimentId);
+              } else {
+                experiment = await Experiment.create({
+                  name: experimentName,
+                });
+              }
 
-              newExperiments.push(newExperiment);
+              newExperiments.push(experiment);
 
               for (const treeInfo of trees) {
                 const {
@@ -1996,7 +2006,7 @@ const schema = new GraphQLSchema({
                   rootWorkspaceId: workspace.id,
                 });
 
-                await newExperiment.$add("tree", tree);
+                await experiment.$add("tree", tree);
 
                 const blocks = await workspace.$get("blocks");
 
