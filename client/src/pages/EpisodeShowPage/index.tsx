@@ -632,7 +632,13 @@ export class WorkspaceView extends React.Component<any, any> {
                           }}
                         >
                           <span style={{ color: "darkGray" }}>
-                            Workspace #{workspace.serialId}
+                            Workspace #{workspace.serialId}{" "}
+                            <span>
+                              {
+                                this.props.currentAssignmentIdQuery
+                                  .currentAssignmentId
+                              }
+                            </span>
                           </span>
                           <BlockEditor
                             isActive={isActive}
@@ -1298,6 +1304,7 @@ function visibleBlockIds(workspace: any) {
       w.blocks.filter(b => b.type !== "SCRATCHPAD"),
     ),
   ).map((b: any) => b.id);
+
   return [...directBlockIds, ...childBlockIds];
 }
 
@@ -1443,6 +1450,20 @@ const SELECT_ANSWER_CANDIDATE = gql`
   }
 `;
 
+const CURRENT_ASSIGNMENT_ID_QUERY = gql`
+  query currentAssignmentId(
+    $experimentId: String
+    $userId: String
+    $workspaceId: String
+  ) {
+    currentAssignmentId(
+      experimentId: $experimentId
+      userId: $userId
+      workspaceId: $workspaceId
+    )
+  }
+`;
+
 export const EpisodeShowPage = compose(
   graphql(WORKSPACE_QUERY, { name: "workspace", options }),
   graphql(UPDATE_BLOCKS, { name: "updateBlocks" }),
@@ -1499,6 +1520,18 @@ export const EpisodeShowPage = compose(
   }),
   graphql(SELECT_ANSWER_CANDIDATE, {
     name: "selectAnswerCandidate",
+  }),
+  graphql(CURRENT_ASSIGNMENT_ID_QUERY, {
+    name: "currentAssignmentIdQuery",
+    options: ({ match }: any) => ({
+      variables: {
+        experimentId: getExperimentIdOrSerialIdFromQueryParams(
+          window.location.search,
+        ),
+        userId: Auth.userId(),
+        workspaceId: match.params.workspaceId,
+      },
+    }),
   }),
   connect(
     mapStateToProps,

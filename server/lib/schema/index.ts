@@ -26,6 +26,7 @@ import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFrom
 
 import getScheduler from "../scheduler";
 import { map } from "asyncro";
+import AssignmentModel from "../models/assignment";
 import Block from "../models/block";
 import Snapshot from "../models/snapshot";
 import Workspace from "../models/workspace";
@@ -290,6 +291,7 @@ export const workspaceType = makeObjectType(
 
 import { UserActivityType } from "./UserActivity";
 import { WorkspaceActivityType } from "./WorkspaceActivity";
+import { Assignment } from "../scheduler/Assignment";
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
   ["tree", () => treeType],
@@ -403,6 +405,41 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
+      currentAssignmentId: {
+        type: GraphQLString,
+        args: {
+          experimentId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId, userId, workspaceId }) => {
+          const workspace = await Workspace.findByPkOrSerialId(workspaceId);
+          const experiment = await Experiment.findByPkOrSerialId(experimentId);
+
+          const assignments = await AssignmentModel.findAll({
+            order: [["createdAt", "DESC"]],
+            where: {
+              experimentId: experiment.id,
+              userId,
+              workspaceId: workspace.id,
+            },
+          });
+
+          if (assignments.length === 0) return;
+
+          const scheduler = await getScheduler(experiment.id);
+
+          const activeUserId = await scheduler.getIdOfCurrentlyActiveUser(
+            workspace.id,
+          );
+
+          if (userId === activeUserId) {
+            return assignments[0].id;
+          }
+
+          return;
+        },
+      },
       isUserRegisteredForNotifications: {
         type: GraphQLBoolean,
         args: {
