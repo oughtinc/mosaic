@@ -32,6 +32,13 @@ export default class Snapshot extends Model<Snapshot> {
   @Column(DataType.UUID)
   public userId: string;
 
+  @ForeignKey(() => Workspace)
+  @Column(DataType.UUID)
+  public assignmentId: string;
+
+  @Column({ type: DataType.STRING })
+  public actionType: string;
+
   @Column({
     type: DataType.JSON,
     allowNull: false,

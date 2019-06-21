@@ -237,6 +237,11 @@ function findPointers(value: any) {
 }
 
 function snapshot(props, action = "INITIALIZE") {
+  const assignmentId = props.currentAssignmentIdQuery.currentAssignmentId;
+  if (!assignmentId) {
+    return;
+  }
+
   const workspace = props.workspace.workspace;
 
   const workspaceBlocks: any = _.flatten(
@@ -249,32 +254,34 @@ function snapshot(props, action = "INITIALIZE") {
     value: b.value.toJSON(),
   }));
 
-  props.createSnapshot(
-    console.log("making snapshot") || {
-      variables: {
+  console.log("making snapshot");
+
+  props.createSnapshot({
+    variables: {
+      userId: Auth.userId(),
+      assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
+      workspaceId: workspace.id,
+      actionType: action,
+      snapshot: JSON.stringify({
         userId: Auth.userId(),
         workspaceId: workspace.id,
-        snapshot: JSON.stringify({
-          userId: Auth.userId(),
-          workspaceId: workspace.id,
-          workspace: reduxBlocks.filter(b =>
-            workspace.blocks.find(b2 => b.id === b2.id),
-          ),
-          children: workspace.childWorkspaces.map(w => {
-            const childBlocks = reduxBlocks.filter(b =>
-              w.blocks.find(b2 => b.id === b2.id),
-            );
-            return childBlocks.map(b => ({
-              ...b,
-              isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
-            }));
-          }),
-          exportLockStatusInfo: workspace.exportLockStatusInfo,
-          action,
+        workspace: reduxBlocks.filter(b =>
+          workspace.blocks.find(b2 => b.id === b2.id),
+        ),
+        children: workspace.childWorkspaces.map(w => {
+          const childBlocks = reduxBlocks.filter(b =>
+            w.blocks.find(b2 => b.id === b2.id),
+          );
+          return childBlocks.map(b => ({
+            ...b,
+            isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
+          }));
         }),
-      },
+        exportLockStatusInfo: workspace.exportLockStatusInfo,
+        action,
+      }),
     },
-  );
+  });
 }
 
 export class WorkspaceView extends React.Component<any, any> {
@@ -633,12 +640,6 @@ export class WorkspaceView extends React.Component<any, any> {
                         >
                           <span style={{ color: "darkGray" }}>
                             Workspace #{workspace.serialId}{" "}
-                            <span>
-                              {
-                                this.props.currentAssignmentIdQuery
-                                  .currentAssignmentId
-                              }
-                            </span>
                           </span>
                           <BlockEditor
                             isActive={isActive}
@@ -1434,11 +1435,15 @@ const CREATE_SNAPSHOT_MUTATION = gql`
   mutation createSnapshotMutation(
     $userId: String
     $workspaceId: String
+    $assignmentId: String
+    $actionType: String
     $snapshot: String
   ) {
     createSnapshot(
       userId: $userId
       workspaceId: $workspaceId
+      assignmentId: $assignmentId
+      actionType: $actionType
       snapshot: $snapshot
     )
   }

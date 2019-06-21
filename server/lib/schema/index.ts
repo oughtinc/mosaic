@@ -2214,22 +2214,34 @@ const schema = new GraphQLSchema({
         args: {
           userId: { type: GraphQLString },
           workspaceId: { type: GraphQLString },
+          assignmentId: { type: GraphQLString },
+          actionType: { type: GraphQLString },
           snapshot: { type: GraphQLString },
         },
-        resolve: async (_, { userId, workspaceId, snapshot }, ctx) => {
-          console.log(`
-          
-          
-          
-          HERE!
-          
-          
-          `);
+        resolve: async (
+          _,
+          { userId, workspaceId, assignmentId, actionType, snapshot },
+          ctx,
+        ) => {
+          const snapshots = await Snapshot.findAll({
+            where: {
+              assignmentId,
+              actionType,
+            },
+          });
+
+          if (snapshots.length !== 0) {
+            return false;
+          }
+
           await Snapshot.create({
             userId,
             workspaceId,
+            assignmentId,
+            actionType,
             snapshot: JSON.parse(snapshot),
           });
+
           return true;
         },
       },
