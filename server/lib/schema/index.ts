@@ -1969,6 +1969,10 @@ const schema = new GraphQLSchema({
               let experiment;
               if (experimentId) {
                 experiment = await Experiment.findByPkOrSerialId(experimentId);
+
+                if (!experiment) {
+                  continue; // if id doesn't match experiment, proceed to next experiment
+                }
               } else {
                 experiment = await Experiment.create({
                   name: experimentName,
