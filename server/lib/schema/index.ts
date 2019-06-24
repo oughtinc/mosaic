@@ -2231,7 +2231,13 @@ const schema = new GraphQLSchema({
           });
 
           if (snapshots.length !== 0) {
-            return false;
+            await snapshots[0].update({
+              userId,
+              workspaceId,
+              assignmentId,
+              actionType,
+              snapshot: JSON.parse(snapshot),
+            });
           }
 
           await Snapshot.create({

@@ -236,54 +236,6 @@ function findPointers(value: any) {
   return pointers;
 }
 
-function snapshot(props, action = "INITIALIZE") {
-  const assignmentId = props.currentAssignmentIdQuery.currentAssignmentId;
-  if (!assignmentId) {
-    return;
-  }
-
-  const workspace = props.workspace.workspace;
-
-  const workspaceBlocks: any = _.flatten(
-    workspace.blocks.concat(workspace.childWorkspaces.map(cw => cw.blocks)),
-  );
-
-  const reduxBlocks = props.reduxState.blocks.blocks.map(b => ({
-    id: b.id,
-    type: workspaceBlocks.find((b2: any) => b.id === b2.id).type,
-    value: b.value.toJSON(),
-  }));
-
-  console.log("making snapshot");
-
-  props.createSnapshot({
-    variables: {
-      userId: Auth.userId(),
-      assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
-      workspaceId: workspace.id,
-      actionType: action,
-      snapshot: JSON.stringify({
-        userId: Auth.userId(),
-        workspaceId: workspace.id,
-        workspace: reduxBlocks.filter(b =>
-          workspace.blocks.find(b2 => b.id === b2.id),
-        ),
-        children: workspace.childWorkspaces.map(w => {
-          const childBlocks = reduxBlocks.filter(b =>
-            w.blocks.find(b2 => b.id === b2.id),
-          );
-          return childBlocks.map(b => ({
-            ...b,
-            isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
-          }));
-        }),
-        exportLockStatusInfo: workspace.exportLockStatusInfo,
-        action,
-      }),
-    },
-  });
-}
-
 export class WorkspaceView extends React.Component<any, any> {
   private experimentId;
   private scratchpadField;
@@ -310,16 +262,18 @@ export class WorkspaceView extends React.Component<any, any> {
     );
 
     setTimeout(() => {
-      snapshot(this.props);
+      this.snapshot(this.props);
     }, 1);
 
     window.addEventListener("beforeunload", e => {
+      console.log("UNLOADING...");
       setTimeout(() => {
-        snapshot(this.props, "UNLOAD");
         const isLeavingWorkspacePage =
           /^\/workspaces\//.test(window.location.pathname) ||
           /^\/w\//.test(window.location.pathname);
+
         if (isLeavingWorkspacePage) {
+          this.snapshot(this.props, "UNLOAD");
           this.leaveCurrentWorkspace();
         }
       }, 1);
@@ -348,6 +302,7 @@ export class WorkspaceView extends React.Component<any, any> {
 
   public componentWillUnmount() {
     this.leaveCurrentWorkspace();
+    this.snapshot(this.props, "UNLOAD");
 
     if (this.state.logoutTimer) {
       clearTimeout(this.state.logoutTimer);
@@ -367,9 +322,7 @@ export class WorkspaceView extends React.Component<any, any> {
     });
   };
 
-  public render() {
-    const workspace = this.props.workspace.workspace;
-
+  public getAvailablePointers(workspace) {
     const importedPointers = workspace.connectedPointers;
 
     const allReadOnlyBlocks = new WorkspaceWithRelations(
@@ -405,6 +358,89 @@ export class WorkspaceView extends React.Component<any, any> {
       ["data.pointerId"],
       ["asc"],
     );
+
+    return availablePointers;
+  }
+
+  public snapshot(props, action = "INITIALIZE") {
+    const assignmentId = props.currentAssignmentIdQuery.currentAssignmentId;
+    if (!assignmentId) {
+      return;
+    }
+
+    const workspace = props.workspace.workspace;
+
+    const workspaceBlocks: any = _.flatten(
+      workspace.blocks.concat(workspace.childWorkspaces.map(cw => cw.blocks)),
+    );
+
+    const reduxBlocks = props.reduxState.blocks.blocks.map(b => ({
+      id: b.id,
+      type: workspaceBlocks.find((b2: any) => b.id === b2.id).type,
+      value: b.value.toJSON(),
+    }));
+
+    console.log("making snapshot", {
+      variables: {
+        userId: Auth.userId(),
+        assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
+        workspaceId: workspace.id,
+        actionType: action,
+        snapshot: JSON.stringify({
+          userId: Auth.userId(),
+          workspaceId: workspace.id,
+          workspace: reduxBlocks.filter(b =>
+            workspace.blocks.find(b2 => b.id === b2.id),
+          ),
+          children: workspace.childWorkspaces.map(w => {
+            const childBlocks = reduxBlocks.filter(b =>
+              w.blocks.find(b2 => b.id === b2.id),
+            );
+            return childBlocks.map(b => ({
+              ...b,
+              isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
+            }));
+          }),
+          exportLockStatusInfo: workspace.exportLockStatusInfo,
+          action,
+          availablePointers: this.getAvailablePointers(workspace),
+        }),
+      },
+    });
+
+    props.createSnapshot({
+      variables: {
+        userId: Auth.userId(),
+        assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
+        workspaceId: workspace.id,
+        actionType: action,
+        snapshot: JSON.stringify({
+          userId: Auth.userId(),
+          workspaceId: workspace.id,
+          workspace: reduxBlocks.filter(b =>
+            workspace.blocks.find(b2 => b.id === b2.id),
+          ),
+          children: workspace.childWorkspaces.map(w => {
+            const childBlocks = reduxBlocks.filter(b =>
+              w.blocks.find(b2 => b.id === b2.id),
+            );
+            return childBlocks.map(b => ({
+              ...b,
+              isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
+            }));
+          }),
+          exportLockStatusInfo: workspace.exportLockStatusInfo,
+          action,
+          availablePointers: this.getAvailablePointers(workspace),
+        }),
+      },
+    });
+  }
+
+  public render() {
+    const workspace = this.props.workspace.workspace;
+
+    const availablePointers = this.getAvailablePointers(workspace);
 
     const questionProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceQuestion,
@@ -534,7 +570,7 @@ export class WorkspaceView extends React.Component<any, any> {
         >
           {this.state.isAuthenticated && experimentId && (
             <EpisodeNav
-              snapshot={(action: string) => snapshot(this.props, action)}
+              snapshot={(action: string) => this.snapshot(this.props, action)}
               experimentId={experimentId}
               hasSubquestions={hasSubquestions}
               isActive={isActive}
@@ -834,7 +870,7 @@ export class WorkspaceView extends React.Component<any, any> {
                             {this.state.isAuthenticated && isActive && (
                               <ResponseFooter
                                 snapshot={(action: string) =>
-                                  snapshot(this.props, action)
+                                  this.snapshot(this.props, action)
                                 }
                                 isUserMaliciousOracle={isUserMaliciousOracle}
                                 isRequestingLazyUnlock={isRequestingLazyUnlock}
@@ -1129,7 +1165,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           ) && (
                             <ChildrenSidebar
                               snapshot={(action: string) =>
-                                snapshot(this.props, action)
+                                this.snapshot(this.props, action)
                               }
                               doesAllowOracleBypass={
                                 workspace.rootWorkspace.tree
