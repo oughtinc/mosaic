@@ -1,6 +1,6 @@
 # Mosaic
 
-Mosaic is a web app for recursive question-answering with pointers.
+Mosaic is a web app for recursive question-answering with pointers!
 
 ![](screencast.gif)
 
@@ -29,11 +29,9 @@ cd /data
 yarn test
 ```
 
-
 ## Development
 
 The code is written in [Typescript](https://www.typescriptlang.org/), but much of it is not correctly annotated. We use [Prettier](https://github.com/prettier/prettier) for code formatting.
-
 
 ## Deployment
 
@@ -44,7 +42,6 @@ To create a development build on your branch, create a pull request. A link to a
 When a branch is merged into master, the main deploy is updated automatically.
 
 Note that `docker-compose.yml` and `package.json` at the root level must be kept in sync.
-
 
 ## Saving and restoring the database
 
@@ -71,6 +68,7 @@ Since the app doesn't currently support import/export of individual question-ans
 ### Autodump
 
 To automatically create new dumps when the db changes:
+
 1. If the app is not running, run it (`docker-compose up`)
 2. `cd server`
 3. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
