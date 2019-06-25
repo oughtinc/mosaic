@@ -67,6 +67,11 @@ export const makeObjectType = (model, references, extraFields = {}) =>
 
 export const userType = makeObjectType(User, []);
 
+const snapshotType = makeObjectType(Snapshot, [
+  ["user", () => userType],
+  ["workspace", () => workspaceType],
+]);
+
 const blockType = makeObjectType(Block, [["workspace", () => workspaceType]]);
 
 export const workspaceType = makeObjectType(
@@ -664,6 +669,11 @@ const schema = new GraphQLSchema({
             return findOptions;
           },
         }),
+      },
+      snapshot: {
+        type: snapshotType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(Snapshot),
       },
       pointers: modelGraphQLFields(new GraphQLList(pointerType), Pointer),
       subtreeTimeSpent: {

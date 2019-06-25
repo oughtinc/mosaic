@@ -9,6 +9,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
+import User from "./user";
 import Workspace from "./workspace";
 
 @Table
@@ -31,6 +32,9 @@ export default class Snapshot extends Model<Snapshot> {
   @ForeignKey(() => User)
   @Column(DataType.UUID)
   public userId: string;
+
+  @BelongsTo(() => User)
+  public User: User;
 
   @ForeignKey(() => Workspace)
   @Column(DataType.UUID)
