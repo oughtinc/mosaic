@@ -13,15 +13,16 @@ export class AssignmentPresentational extends React.PureComponent<any, any> {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "space-around",
         }}
       >
-        {this.props.assignmentQuery.assignment.snapshots.map(snapshot => (
-          <div style={{ width: "300px" }}>
-            <h2>{snapshot.actionType}</h2>
-            <Snapshot snapshot={snapshot.snapshot} />
-          </div>
-        ))}
+        {this.props.assignmentQuery.assignment.snapshots
+          .slice(0, 2)
+          .map(snapshot => (
+            <div style={{ width: "300px" }}>
+              <Snapshot snapshot={snapshot} />
+            </div>
+          ))}
       </div>
     ) : null;
   }
