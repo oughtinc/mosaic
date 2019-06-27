@@ -9,6 +9,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
+import Assignment from "./assignment";
 import User from "./user";
 import Workspace from "./workspace";
 
@@ -36,9 +37,12 @@ export default class Snapshot extends Model<Snapshot> {
   @BelongsTo(() => User)
   public User: User;
 
-  @ForeignKey(() => Workspace)
+  @ForeignKey(() => Assignment)
   @Column(DataType.UUID)
   public assignmentId: string;
+
+  @BelongsTo(() => Assignment)
+  public Assignment: Assignment;
 
   @Column({ type: DataType.STRING })
   public actionType: string;

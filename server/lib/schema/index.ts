@@ -26,7 +26,7 @@ import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFrom
 
 import getScheduler from "../scheduler";
 import { map } from "asyncro";
-import AssignmentModel from "../models/assignment";
+import Assignment from "../models/assignment";
 import Block from "../models/block";
 import Snapshot from "../models/snapshot";
 import Workspace from "../models/workspace";
@@ -296,7 +296,10 @@ export const workspaceType = makeObjectType(
 
 import { UserActivityType } from "./UserActivity";
 import { WorkspaceActivityType } from "./WorkspaceActivity";
-import { Assignment } from "../scheduler/Assignment";
+
+const assignmentType = makeObjectType(Assignment, [
+  ["snapshots", () => new GraphQLList(snapshotType)],
+]);
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
   ["tree", () => treeType],
@@ -360,13 +363,6 @@ const pointerImportType = makeObjectType(PointerImport, [
   ["pointer", () => pointerType],
 ]);
 
-const oracleModeType = new GraphQLObjectType({
-  name: "OracleMode",
-  fields: {
-    value: { type: GraphQLBoolean },
-  },
-});
-
 const BlockInput = new GraphQLInputObjectType({
   name: "blockInput",
   fields: _.pick(attributeFields(Block), "value", "id"),
@@ -421,7 +417,7 @@ const schema = new GraphQLSchema({
           const workspace = await Workspace.findByPkOrSerialId(workspaceId);
           const experiment = await Experiment.findByPkOrSerialId(experimentId);
 
-          const assignments = await AssignmentModel.findAll({
+          const assignments = await Assignment.findAll({
             order: [["createdAt", "DESC"]],
             where: {
               experimentId: experiment.id,
@@ -642,6 +638,11 @@ const schema = new GraphQLSchema({
         type: userType,
         args: { id: { type: GraphQLString } },
         resolve: resolver(User),
+      },
+      assignment: {
+        type: assignmentType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(Assignment),
       },
       blocks: modelGraphQLFields(new GraphQLList(blockType), Block),
       trees: modelGraphQLFields(new GraphQLList(treeType), Tree),
@@ -2236,11 +2237,10 @@ const schema = new GraphQLSchema({
           const snapshots = await Snapshot.findAll({
             where: {
               assignmentId,
-              actionType,
             },
           });
 
-          if (snapshots.length !== 0) {
+          if (snapshots.filter(s => s.actionType === actionType).length !== 0) {
             await snapshots[0].update({
               userId,
               workspaceId,
@@ -2248,6 +2248,12 @@ const schema = new GraphQLSchema({
               actionType,
               snapshot: JSON.parse(snapshot),
             });
+
+            return true;
+          }
+
+          if (snapshots.length === 2) {
+            return true;
           }
 
           await Snapshot.create({

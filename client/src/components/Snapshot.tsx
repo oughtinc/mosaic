@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as React from "react";
-import { BlockEditor } from "../../components/BlockEditor";
+import { BlockEditor } from "./BlockEditor";
 
 function getAllExportIdsFromNode(node: any) {
   const exportIds: any = [];
@@ -51,6 +51,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
             <div
               style={{
                 backgroundColor: "#fff",
+                marginBottom: "20px",
                 padding: "10px",
                 width: "200px",
               }}
@@ -58,8 +59,8 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
               <BlockEditor
                 availablePointers={availablePointers}
                 exportLockStatusInfo={exportLockStatusInfo}
-                name={block.id}
-                blockId={block.id}
+                name={block.id + Math.random()}
+                blockId={block.id + Math.random()}
                 readOnly={true}
                 initialValue={block.value}
                 shouldAutosave={false}
@@ -69,7 +70,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
           </React.Fragment>
         ))}
         <div style={{ height: "50px" }} />
-
+        <h4>Subquestions</h4>
         {children.map(blocks => (
           <React.Fragment>
             {blocks[0].type}

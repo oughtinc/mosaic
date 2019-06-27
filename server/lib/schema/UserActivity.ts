@@ -15,7 +15,7 @@ export const UserActivityType = new GraphQLObjectType({
     assignments: {
       type: new GraphQLList(
         new GraphQLObjectType({
-          name: "Assignment",
+          name: "UserActivityAssignment",
           fields: {
             howLongDidAssignmentLast: {
               type: GraphQLInt,
