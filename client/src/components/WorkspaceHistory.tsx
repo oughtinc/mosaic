@@ -3,15 +3,46 @@ import * as _ from "lodash";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
+import styled from "styled-components";
+
+import { Assignment } from "./Assignment";
+
+import { blockBorderAndBoxShadow } from "../styles";
+
+const AssignmentContainer = styled.div`
+  ${blockBorderAndBoxShadow};
+  background-color: #f8f8f8;
+  margin-bottom: 25px;
+  width: 980px;
+`;
 
 export class WorkspaceHistoryPresentational extends React.PureComponent<
   any,
   any
 > {
   public render() {
-    console.log(this.props);
-
-    return <div>{JSON.stringify(this.props)}</div>;
+    if (this.props.workspaceHistoryQuery.workspace) {
+      return (
+        <div
+          style={{
+            alignItems: "center",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <h1 style={{ marginBottom: "20px" }}>Workspace History</h1>
+          {this.props.workspaceHistoryQuery.workspace.assignments.map(
+            assignment => (
+              <AssignmentContainer>
+                <Assignment assignmentId={assignment.id} />
+              </AssignmentContainer>
+            ),
+          )}
+        </div>
+      );
+    } else {
+      return <div>Loading...</div>;
+    }
   }
 }
 

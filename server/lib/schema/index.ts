@@ -300,6 +300,7 @@ import { WorkspaceActivityType } from "./WorkspaceActivity";
 
 const assignmentType = makeObjectType(Assignment, [
   ["snapshots", () => new GraphQLList(snapshotType)],
+  ["user", () => userType],
 ]);
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
@@ -2241,6 +2242,10 @@ const schema = new GraphQLSchema({
             },
           });
 
+          if (snapshots.length === 0 && actionType === "UNLOAD") {
+            return true;
+          }
+
           if (snapshots.filter(s => s.actionType === actionType).length !== 0) {
             await snapshots[0].update({
               userId,
@@ -2250,10 +2255,6 @@ const schema = new GraphQLSchema({
               snapshot: JSON.parse(snapshot),
             });
 
-            return true;
-          }
-
-          if (snapshots.length === 2) {
             return true;
           }
 

@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import * as React from "react";
-import styled, { consolidateStreamedStyles } from "styled-components";
+import styled from "styled-components";
 import { BlockEditor } from "./BlockEditor";
 
 import {
@@ -136,7 +136,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
             </div>
           </React.Fragment>
         ))}
-        <div style={{ height: "30px" }} />
+        <div style={{ height: "20px" }} />
         {children.length > 0 && <h4>Subquestions</h4>}
         {children.map(blocks => (
           <React.Fragment>
