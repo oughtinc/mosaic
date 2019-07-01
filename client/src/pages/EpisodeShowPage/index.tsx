@@ -251,6 +251,7 @@ export class WorkspaceView extends React.Component<any, any> {
       pastedExportFormat: CONVERT_PASTED_EXPORT_TO_IMPORT,
       shouldAutoExport: true,
       hasInitiallyLoaded: false,
+      hasTakenInitialSnapshot: false,
       isAuthenticated: Auth.isAuthenticated(),
       logoutTimer: null,
     };
@@ -260,10 +261,6 @@ export class WorkspaceView extends React.Component<any, any> {
     this.experimentId = getExperimentIdOrSerialIdFromQueryParams(
       window.location.search,
     );
-
-    setTimeout(() => {
-      this.snapshot(this.props);
-    }, 1);
 
     window.addEventListener("beforeunload", e => {
       console.log("UNLOADING...");
@@ -298,6 +295,17 @@ export class WorkspaceView extends React.Component<any, any> {
     }, 1);
 
     this.updateAuthenticationState();
+  }
+
+  public async componentDidUpdate(prevProps, prevState) {
+    if (
+      !this.state.hasTakenInitialSnapshot &&
+      this.props.currentAssignmentIdQuery.currentAssignmentId &&
+      this.props.workspace.workspace
+    ) {
+      this.snapshot(this.props, "INITIALIZE");
+      this.setState({ hasTakenInitialSnapshot: true });
+    }
   }
 
   public componentWillUnmount() {
