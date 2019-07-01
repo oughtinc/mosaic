@@ -63,6 +63,18 @@ function convertActionTypeToHeader(actionType) {
     return "Wait for Answer";
   }
 
+  if (actionType === "NEEDS_MORE_WORK") {
+    return "Needs more work";
+  }
+
+  if (actionType === "SUBMIT_ANSWER_CANDIDATE") {
+    return "Submit answer candidate";
+  }
+
+  if (actionType === "DECLINE_TO_CHALLENGE") {
+    return "Decline to challenge";
+  }
+
   if (actionType === "UNLOAD") {
     return "Unload";
   }
@@ -137,47 +149,50 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
           </React.Fragment>
         ))}
         <div style={{ height: "20px" }} />
-        {children.length > 0 && <h4>Subquestions</h4>}
-        {children.map(blocks => (
-          <React.Fragment>
-            <div>
-              <BlockContainer>
-                <BlockHeader>
-                  {convertBlockTypeToHeader(blocks[0].type)}
-                </BlockHeader>
-                <BlockBody>
-                  <BlockEditor
-                    availablePointers={availablePointers}
-                    exportLockStatusInfo={exportLockStatusInfo}
-                    name={blocks[0].id}
-                    blockId={blocks[0].id}
-                    readOnly={true}
-                    initialValue={blocks[0].value}
-                    visibleExportIds={visibleExportIds}
-                    shouldAutosave={false}
-                  />
-                </BlockBody>
-              </BlockContainer>
-              {blocks[1] && (
-                <BlockContainer>
-                  <BlockHeader>{blocks[1].type}</BlockHeader>
-                  <BlockBody>
-                    <BlockEditor
-                      availablePointers={availablePointers}
-                      exportLockStatusInfo={exportLockStatusInfo}
-                      name={blocks[1].id}
-                      blockId={blocks[1].id}
-                      readOnly={true}
-                      initialValue={blocks[1].value}
-                      visibleExportIds={visibleExportIds}
-                      shouldAutosave={false}
-                    />
-                  </BlockBody>
-                </BlockContainer>
-              )}
-            </div>
-          </React.Fragment>
-        ))}
+        {children.length > 0 && children[0][0] && <h4>Subquestions</h4>}
+        {children.map(
+          blocks =>
+            blocks[0] && (
+              <React.Fragment>
+                <div>
+                  <BlockContainer>
+                    <BlockHeader>
+                      {convertBlockTypeToHeader(blocks[0].type)}
+                    </BlockHeader>
+                    <BlockBody>
+                      <BlockEditor
+                        availablePointers={availablePointers}
+                        exportLockStatusInfo={exportLockStatusInfo}
+                        name={blocks[0].id}
+                        blockId={blocks[0].id}
+                        readOnly={true}
+                        initialValue={blocks[0].value}
+                        visibleExportIds={visibleExportIds}
+                        shouldAutosave={false}
+                      />
+                    </BlockBody>
+                  </BlockContainer>
+                  {blocks[1] && (
+                    <BlockContainer>
+                      <BlockHeader>{blocks[1].type}</BlockHeader>
+                      <BlockBody>
+                        <BlockEditor
+                          availablePointers={availablePointers}
+                          exportLockStatusInfo={exportLockStatusInfo}
+                          name={blocks[1].id}
+                          blockId={blocks[1].id}
+                          readOnly={true}
+                          initialValue={blocks[1].value}
+                          visibleExportIds={visibleExportIds}
+                          shouldAutosave={false}
+                        />
+                      </BlockBody>
+                    </BlockContainer>
+                  )}
+                </div>
+              </React.Fragment>
+            ),
+        )}
       </div>
     );
   }

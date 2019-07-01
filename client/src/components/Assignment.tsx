@@ -75,7 +75,12 @@ export class AssignmentPresentational extends React.PureComponent<any, any> {
             }}
           >
             {this.props.assignmentQuery.assignment.snapshots
-              .slice(0, 2)
+              .filter((s, i, arr) => {
+                if (s.actionType === "UNLOAD" && arr.length > 2) {
+                  return false;
+                }
+                return true;
+              })
               .map(snapshot => (
                 <div style={{ width: "400px" }}>
                   <Snapshot snapshot={snapshot} />

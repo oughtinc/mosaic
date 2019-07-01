@@ -465,14 +465,16 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const isParentOracleWorkspace = workspace.isParentOracleWorkspace;
 
-    const oracleAnswerCandidateProps =
+    const hasParent = !!workspace.parentId;
+
+    const oracleAnswerCandidateProps: any =
       isOracleWorkspace &&
+      hasParent &&
       new WorkspaceBlockRelation(
         WorkspaceRelationTypes.WorkspaceOracleAnswerCandidate,
         workspace,
       ).blockEditorAttributes();
 
-    const hasParent = !!workspace.parentId;
     const hasSubquestions = workspace.childWorkspaces.length > 0;
     const isUserOracle = workspace.isUserOracleForTree;
     const isUserMaliciousOracle = workspace.isUserMaliciousOracleForTree;
@@ -1086,8 +1088,11 @@ export class WorkspaceView extends React.Component<any, any> {
                                       {...oracleAnswerCandidateProps}
                                     />
                                   </BlockBody>
-                                  {isUserOracle && (
+                                  {isUserOracle && hasParent && (
                                     <OracleAnswerCandidateFooter
+                                      snapshot={(action: string) =>
+                                        this.snapshot(this.props, action)
+                                      }
                                       isUserMaliciousOracle={
                                         isUserMaliciousOracle
                                       }

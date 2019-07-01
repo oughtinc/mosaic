@@ -592,8 +592,9 @@ const schema = new GraphQLSchema({
             );
 
             const shouldIncludeOracleAnswerCandidateDraft =
-              result.isEligibleForHonestOracle ||
-              result.isEligibleForMaliciousOracle;
+              (result.isEligibleForHonestOracle ||
+                result.isEligibleForMaliciousOracle) &&
+              result.parentId;
 
             if (!includesQuestion) {
               await result.$create("block", { type: "QUESTION" });
@@ -1354,18 +1355,22 @@ const schema = new GraphQLSchema({
                       );
                       const question = blocks.find(b => b.type === "QUESTION");
 
+                      const childQuestionValue = generateMaliciousAnswerDraftValue(
+                        _.get(question, "value"),
+                        _.get(oracleAnswerCandidate, "value"),
+                      );
+
                       // create judge child
                       await workspace.createChild({
-                        question: generateMaliciousAnswerDraftValue(
-                          _.get(question, "value"),
-                          _.get(oracleAnswerCandidate, "value"),
-                        ),
+                        question: childQuestionValue,
                         totalBudget: 0,
                         creatorId: context.user.id,
                         isPublic: false,
                         shouldOverrideToNormalUser: false,
                       });
-                    }, 10000);
+
+                      5;
+                    }, 20000);
                   }
                 }
 

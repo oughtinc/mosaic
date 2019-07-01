@@ -57,6 +57,7 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
       markAsCurrentlyResolved,
       markAsNotStale,
       responseIsEmpty,
+      snapshot,
     } = this.props;
 
     return (
@@ -79,6 +80,7 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
                 : "Done!"
             }
             navHook={() => {
+              snapshot("SUBMIT_ANSWER_CANDIDATE");
               markAsNotStale();
               markAsCurrentlyResolved();
             }}
@@ -89,6 +91,7 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
               bsStyle="danger"
               label={`Decline to Challenge!`}
               navHook={() => {
+                snapshot("DECLINE_TO_CHALLENGE");
                 markAsNotStale();
                 declineToChallenge();
               }}
