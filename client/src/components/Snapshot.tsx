@@ -142,6 +142,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                     initialValue={block.value}
                     shouldAutosave={false}
                     visibleExportIds={visibleExportIds}
+                    isUserOracle={this.props.isOracleWorkspace}
                   />
                 </BlockBody>
               </BlockContainer>
@@ -169,6 +170,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                         initialValue={blocks[0].value}
                         visibleExportIds={visibleExportIds}
                         shouldAutosave={false}
+                        isUserOracle={this.props.isOracleWorkspace}
                       />
                     </BlockBody>
                   </BlockContainer>
@@ -185,6 +187,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                           initialValue={blocks[1].value}
                           visibleExportIds={visibleExportIds}
                           shouldAutosave={false}
+                          isUserOracle={this.props.isOracleWorkspace}
                         />
                       </BlockBody>
                     </BlockContainer>

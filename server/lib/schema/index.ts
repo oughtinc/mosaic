@@ -301,6 +301,7 @@ import { WorkspaceActivityType } from "./WorkspaceActivity";
 const assignmentType = makeObjectType(Assignment, [
   ["snapshots", () => new GraphQLList(snapshotType)],
   ["user", () => userType],
+  ["workspace", () => workspaceType],
 ]);
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [

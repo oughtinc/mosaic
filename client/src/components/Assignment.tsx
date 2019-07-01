@@ -90,7 +90,13 @@ export class AssignmentPresentational extends React.PureComponent<any, any> {
               })
               .map(snapshot => (
                 <div style={{ width: "400px" }}>
-                  <Snapshot snapshot={snapshot} />
+                  <Snapshot
+                    snapshot={snapshot}
+                    isOracleWorkspace={
+                      assignment.workspace.isEligibleForHonestOracle ||
+                      assignment.workspace.isEligibleForMaliciousOracle
+                    }
+                  />
                 </div>
               ))}
           </div>
@@ -112,6 +118,10 @@ const ASSINGMENT_QUERY = gql`
         givenName
         familyName
         pictureURL
+      }
+      workspace {
+        isEligibleForHonestOracle
+        isEligibleForMaliciousOracle
       }
       endAtTimestamp
       startAtTimestamp
