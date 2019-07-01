@@ -134,8 +134,9 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                 label="Needs more work"
                 navHook={() => {
                   snapshot("NEEDS_MORE_WORK");
-                  markAsNotStaleRelativeToUser &&
+                  if (markAsNotStaleRelativeToUser) {
                     markAsNotStaleRelativeToUser();
+                  }
                 }}
               />
             </div>

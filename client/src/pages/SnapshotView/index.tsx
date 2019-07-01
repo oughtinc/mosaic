@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Helmet } from "react-helmet";
 import { ContentContainer } from "../../components/ContentContainer";
-import { Assignment } from "../../components/Assignment";
 import { WorkspaceHistory } from "../../components/WorkspaceHistory";
 
 export class WorkspaceHistoryView extends React.PureComponent<any, any> {

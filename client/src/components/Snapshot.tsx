@@ -39,7 +39,7 @@ function getAllExportIdsFromNode(node: any) {
   return exportIds;
 }
 
-function blocksToExportIds(blocks) {
+function blocksToExportIds(blocks: any) {
   const exportIds: any = [];
 
   for (const block of blocks) {
@@ -50,7 +50,7 @@ function blocksToExportIds(blocks) {
   return exportIds;
 }
 
-function convertActionTypeToHeader(actionType) {
+function convertActionTypeToHeader(actionType: string) {
   if (actionType === "INITIALIZE") {
     return "Initialize";
   }
@@ -81,7 +81,7 @@ function convertActionTypeToHeader(actionType) {
   return actionType;
 }
 
-function convertBlockTypeToHeader(blockType) {
+function convertBlockTypeToHeader(blockType: string) {
   if (blockType === "QUESTION") {
     return "Question";
   }
@@ -136,8 +136,8 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                   <BlockEditor
                     availablePointers={availablePointers}
                     exportLockStatusInfo={exportLockStatusInfo}
-                    name={block.id + Math.random()}
-                    blockId={block.id + Math.random()}
+                    name={String(block.id) + String(Math.random())}
+                    blockId={String(block.id) + String(Math.random())}
                     readOnly={true}
                     initialValue={block.value}
                     shouldAutosave={false}

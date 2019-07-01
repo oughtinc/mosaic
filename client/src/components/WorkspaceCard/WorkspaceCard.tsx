@@ -183,7 +183,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
           onHide={() => this.setState({ showHistory: false })}
           style={{ width: "1080px" }}
         >
-          <Modal.Header closeButton>
+          <Modal.Header closeButton={true}>
             <Modal.Title style={{ fontSize: "24px", textAlign: "center" }}>
               Workspace History
             </Modal.Title>

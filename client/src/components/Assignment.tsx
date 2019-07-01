@@ -1,5 +1,4 @@
 import gql from "graphql-tag";
-import * as _ from "lodash";
 import { DateTime } from "luxon";
 import * as React from "react";
 import { graphql } from "react-apollo";

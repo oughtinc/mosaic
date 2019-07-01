@@ -322,7 +322,7 @@ export class WorkspaceView extends React.Component<any, any> {
     });
   };
 
-  public getAvailablePointers(workspace) {
+  public getAvailablePointers(workspace: any) {
     const importedPointers = workspace.connectedPointers;
 
     const allReadOnlyBlocks = new WorkspaceWithRelations(
@@ -362,7 +362,7 @@ export class WorkspaceView extends React.Component<any, any> {
     return availablePointers;
   }
 
-  public snapshot(props, action = "INITIALIZE") {
+  public snapshot(props: any, action: string = "INITIALIZE") {
     const assignmentId = props.currentAssignmentIdQuery.currentAssignmentId;
     if (!assignmentId) {
       return;
