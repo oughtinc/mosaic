@@ -30,6 +30,7 @@ import Tree from "./tree";
 import ExportWorkspaceLockRelation from "./exportWorkspaceLockRelation";
 import Experiment from "./experiment";
 import Pointer from "./pointer";
+import Assignment from "./assignment";
 
 const Op = Sequelize.Op;
 
@@ -328,6 +329,9 @@ export default class Workspace extends Model<Workspace> {
 
   @HasMany(() => Workspace, "parentId")
   public childWorkspaces: Workspace[];
+
+  @HasMany(() => Assignment)
+  public assignments: Assignment[];
 
   @HasMany(() => PointerImport)
   public pointerImports: PointerImport[];

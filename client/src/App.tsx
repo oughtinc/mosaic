@@ -19,7 +19,7 @@ import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 import { CompactTreeView } from "./pages/CompactTreeView";
-import { AssignmentView } from "./pages/SnapshotView";
+import { WorkspaceHistoryView } from "./pages/SnapshotView";
 import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
 
@@ -100,8 +100,8 @@ const Routes = () => (
     />
     <Route
       exact={true}
-      path="/snapshots/:assignmentId"
-      component={AssignmentView}
+      path="/snapshots/:workspaceId"
+      component={WorkspaceHistoryView}
     />
     <Route
       path="/authCallback"

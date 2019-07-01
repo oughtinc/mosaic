@@ -82,6 +82,7 @@ export const workspaceType = makeObjectType(
     ["blocks", () => new GraphQLList(blockType)],
     ["pointerImports", () => new GraphQLList(pointerImportType)],
     ["tree", () => treeType],
+    ["assignments", () => new GraphQLList(assignmentType)],
   ],
   {
     isParentOracleWorkspace: {

@@ -2,15 +2,16 @@ import * as React from "react";
 import { Helmet } from "react-helmet";
 import { ContentContainer } from "../../components/ContentContainer";
 import { Assignment } from "../../components/Assignment";
+import { WorkspaceHistory } from "../../components/WorkspaceHistory";
 
-export class AssignmentView extends React.PureComponent<any, any> {
+export class WorkspaceHistoryView extends React.PureComponent<any, any> {
   public render() {
     return (
       <ContentContainer>
         <Helmet>
-          <title>Assignment View - Mosaic</title>
+          <title>Workspace History View - Mosaic</title>
         </Helmet>
-        <Assignment assignmentId={this.props.match.params.assignmentId} />
+        <WorkspaceHistory workspaceId={this.props.match.params.workspaceId} />
       </ContentContainer>
     );
   }
