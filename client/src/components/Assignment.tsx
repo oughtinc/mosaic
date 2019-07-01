@@ -75,11 +75,16 @@ export class AssignmentPresentational extends React.PureComponent<any, any> {
           >
             {this.props.assignmentQuery.assignment.snapshots
               .filter((s, i, arr) => {
-                if (
-                  s.actionType === "UNLOAD" &&
-                  arr.filter(s2 => s2.actionType !== "UNLOAD").length > 1
-                ) {
-                  return false;
+                if (s.actionType === "UNLOAD") {
+                  if (arr.filter(s2 => s2.actionType !== "UNLOAD").length > 1) {
+                    return false;
+                  }
+
+                  if (i > 1) {
+                    return false;
+                  }
+
+                  return true;
                 }
                 return true;
               })
