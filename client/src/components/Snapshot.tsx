@@ -115,7 +115,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
         <h3>{convertActionTypeToHeader(actionType)}</h3>
         {workspace.map(block => (
           <React.Fragment>
-            <div style={{ width: "350px" }}>
+            <div>
               <BlockContainer>
                 <BlockHeader>
                   {convertBlockTypeToHeader(block.type)}
@@ -140,7 +140,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
         {children.length > 0 && <h4>Subquestions</h4>}
         {children.map(blocks => (
           <React.Fragment>
-            <div style={{ width: "350px" }}>
+            <div>
               <BlockContainer>
                 <BlockHeader>
                   {convertBlockTypeToHeader(blocks[0].type)}

@@ -77,7 +77,7 @@ export class AssignmentPresentational extends React.PureComponent<any, any> {
             {this.props.assignmentQuery.assignment.snapshots
               .slice(0, 2)
               .map(snapshot => (
-                <div style={{ width: "300px" }}>
+                <div style={{ width: "400px" }}>
                   <Snapshot snapshot={snapshot} />
                 </div>
               ))}

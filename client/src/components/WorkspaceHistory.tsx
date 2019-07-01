@@ -30,7 +30,6 @@ export class WorkspaceHistoryPresentational extends React.PureComponent<
             flexDirection: "column",
           }}
         >
-          <h1 style={{ marginBottom: "20px" }}>Workspace History</h1>
           {this.props.workspaceHistoryQuery.workspace.assignments.map(
             assignment => (
               <AssignmentContainer>

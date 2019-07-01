@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import styled, { css } from "styled-components";
 import * as React from "react";
-import { Button } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { scroller, Element } from "react-scroll";
 
@@ -11,6 +11,7 @@ import { BlockSection } from "./BlockSection";
 import { ChildrenSection } from "./ChildrenSection";
 import _ = require("lodash");
 import { ChildBudgetBadge } from "../ChildBudgetBadge";
+import { WorkspaceHistory } from "../WorkspaceHistory";
 
 import { AdminCheckboxThatTogglesWorkspaceField } from "../AdminCheckboxThatTogglesWorkspaceField";
 
@@ -111,6 +112,7 @@ interface SubtreeQuery {
 }
 
 interface WorkspaceCardState {
+  showHistory: boolean;
   toggles: {
     [toggleTypes.SCRATCHPAD]: boolean;
     [toggleTypes.CHILDREN]: boolean;
@@ -127,6 +129,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
     super(props);
 
     this.state = {
+      showHistory: false,
       toggles: {
         [toggleTypes.SCRATCHPAD]: true,
         [toggleTypes.CHILDREN]: this.props.isExpanded ? true : false,
@@ -175,6 +178,20 @@ export class WorkspaceCardPresentational extends React.PureComponent<
 
     return (
       <Element name={workspace.id}>
+        <Modal
+          show={this.state.showHistory}
+          onHide={() => this.setState({ showHistory: false })}
+          style={{ width: "1080px" }}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title style={{ fontSize: "24px", textAlign: "center" }}>
+              Workspace History
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <WorkspaceHistory workspaceId={workspace.id} />
+          </Modal.Body>
+        </Modal>
         <Container style={{ opacity: workspace.isArchived ? 0.25 : 1 }}>
           <CardBody isActive={isActive} workspace={workspace}>
             <div
@@ -190,6 +207,19 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                 <WorkspaceLink workspaceId={workspace.serialId}>
                   Workspace #{workspace.serialId}
                 </WorkspaceLink>
+                <Button
+                  bsSize="xsmall"
+                  onClick={() =>
+                    this.setState({
+                      showHistory: !this.state.showHistory,
+                    })
+                  }
+                  style={{
+                    marginLeft: "10px",
+                  }}
+                >
+                  History
+                </Button>
               </div>
               {Auth.isAdmin() && workspace.currentlyActiveUser && (
                 <div
@@ -359,10 +389,13 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                 )}
               {Auth.isAdmin() && (
                 <div style={{ marginTop: "10px" }}>
-                  {this.props.workspaceActivityQuery.workspaceActivity &&
+                  {this.props.workspaceActivityQuery.workspace &&
                     _.sortBy(
-                      this.props.workspaceActivityQuery.workspaceActivity
-                        .assignments,
+                      console.log(
+                        "this.props.workspaceActivityQuery.workspaceActivity.assignments",
+                        this.props.workspaceActivityQuery.workspace.assignments,
+                      ) ||
+                        this.props.workspaceActivityQuery.workspace.assignments,
                       a => -Number(a.startAtTimestamp),
                     ).map((a, i) => (
                       <div key={i}>
