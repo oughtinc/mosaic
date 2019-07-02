@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import * as _ from "lodash";
 import { DateTime } from "luxon";
 import * as React from "react";
 import { graphql } from "react-apollo";
@@ -73,7 +74,9 @@ export class AssignmentPresentational extends React.PureComponent<any, any> {
               justifyContent: "space-around",
             }}
           >
-            {this.props.assignmentQuery.assignment.snapshots
+            {_.sortBy(this.props.assignmentQuery.assignment.snapshots, s =>
+              Date.parse(s.createdAt),
+            )
               .filter((s, i, arr) => {
                 if (s.actionType === "UNLOAD") {
                   if (arr.filter(s2 => s2.actionType !== "UNLOAD").length > 1) {
@@ -127,6 +130,7 @@ const ASSINGMENT_QUERY = gql`
       startAtTimestamp
       snapshots {
         id
+        createdAt
         actionType
         snapshot
       }
