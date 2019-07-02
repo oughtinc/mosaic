@@ -140,6 +140,10 @@ class BlockEditorPresentational extends React.Component<any, any> {
   }
 
   public componentWillUnmount() {
+    if (this.props.dontRemoveBlocksOnUnount) {
+      return;
+    }
+
     const { blockId } = this.props;
     this.props.removeBlocks([blockId]);
   }

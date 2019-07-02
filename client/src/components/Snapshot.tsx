@@ -142,6 +142,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                 </BlockHeader>
                 <BlockBody>
                   <BlockEditor
+                    dontRemoveBlocksOnUnount={true}
                     availablePointers={availablePointers}
                     exportLockStatusInfo={exportLockStatusInfo}
                     name={String(block.id) + String(Math.random())}
@@ -160,9 +161,9 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
         <div style={{ height: "20px" }} />
         {children.length > 0 && children[0][0] && <h4>Subquestions</h4>}
         {children.map(
-          blocks =>
+          (blocks, i) =>
             blocks[0] && (
-              <React.Fragment>
+              <React.Fragment key={i}>
                 <div>
                   <BlockContainer>
                     <BlockHeader>
@@ -170,6 +171,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                     </BlockHeader>
                     <BlockBody>
                       <BlockEditor
+                        dontRemoveBlocksOnUnount={true}
                         availablePointers={availablePointers}
                         exportLockStatusInfo={exportLockStatusInfo}
                         name={blocks[0].id}
@@ -187,6 +189,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                       <BlockHeader>Answer</BlockHeader>
                       <BlockBody>
                         <BlockEditor
+                          dontRemoveBlocksOnUnount={true}
                           availablePointers={availablePointers}
                           exportLockStatusInfo={exportLockStatusInfo}
                           name={blocks[1].id}

@@ -400,7 +400,10 @@ export class WorkspaceView extends React.Component<any, any> {
           workspace: reduxBlocks.filter(b =>
             workspace.blocks.find(b2 => b.id === b2.id),
           ),
-          children: workspace.childWorkspaces.map(w => {
+          children: _.sortBy(
+            workspace.childWorkspaces,
+            cw => -Date.parse(cw.createdAt),
+          ).map(w => {
             const childBlocks = reduxBlocks.filter(b =>
               w.blocks.find(b2 => b.id === b2.id),
             );
@@ -428,7 +431,10 @@ export class WorkspaceView extends React.Component<any, any> {
           workspace: reduxBlocks.filter(b =>
             workspace.blocks.find(b2 => b.id === b2.id),
           ),
-          children: workspace.childWorkspaces.map(w => {
+          children: _.sortBy(
+            workspace.childWorkspaces,
+            cw => -Date.parse(cw.createdAt),
+          ).map(w => {
             const childBlocks = reduxBlocks.filter(b =>
               w.blocks.find(b2 => b.id === b2.id),
             );
