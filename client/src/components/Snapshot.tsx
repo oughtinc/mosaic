@@ -133,8 +133,8 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
     return (
       <div>
         <h3>{convertActionTypeToHeader(actionType)}</h3>
-        {workspace.map(block => (
-          <React.Fragment>
+        {workspace.map((block, i) => (
+          <React.Fragment key={i}>
             <div>
               <BlockContainer>
                 <BlockHeader>
