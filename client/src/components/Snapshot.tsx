@@ -75,6 +75,14 @@ function convertActionTypeToHeader(actionType: string) {
     return "Decline to challenge";
   }
 
+  if (actionType === "SELECT_A1") {
+    return "Select A1";
+  }
+
+  if (actionType === "SELECT_A2") {
+    return "Select A2";
+  }
+
   if (actionType === "UNLOAD") {
     return "Unload";
   }
@@ -175,8 +183,8 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                     </BlockBody>
                   </BlockContainer>
                   {blocks[1] && (
-                    <BlockContainer>
-                      <BlockHeader>{blocks[1].type}</BlockHeader>
+                    <BlockContainer style={{ marginLeft: "40px" }}>
+                      <BlockHeader>Answer</BlockHeader>
                       <BlockBody>
                         <BlockEditor
                           availablePointers={availablePointers}

@@ -985,6 +985,9 @@ export class WorkspaceView extends React.Component<any, any> {
                                       },
                                     })
                                   }
+                                  snapshot={() =>
+                                    this.snapshot(this.props, "SELECT_A2")
+                                  }
                                 >
                                   Select A1
                                 </SelectAnswerBtn>
@@ -1017,6 +1020,9 @@ export class WorkspaceView extends React.Component<any, any> {
                                         decision: 2,
                                       },
                                     })
+                                  }
+                                  snapshot={() =>
+                                    this.snapshot(this.props, "SELECT_A2")
                                   }
                                 >
                                   Select A2
