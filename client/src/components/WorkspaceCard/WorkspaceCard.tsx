@@ -391,11 +391,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                 <div style={{ marginTop: "10px" }}>
                   {this.props.workspaceActivityQuery.workspace &&
                     _.sortBy(
-                      console.log(
-                        "this.props.workspaceActivityQuery.workspaceActivity.assignments",
-                        this.props.workspaceActivityQuery.workspace.assignments,
-                      ) ||
-                        this.props.workspaceActivityQuery.workspace.assignments,
+                      this.props.workspaceActivityQuery.workspace.assignments,
                       a => -Number(a.startAtTimestamp),
                     ).map((a, i) => (
                       <div key={i}>

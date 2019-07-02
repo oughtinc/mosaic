@@ -31,7 +31,6 @@ function getAllExportIdsFromNode(node: any) {
 
   if (node.nodes) {
     for (const childNode of node.nodes) {
-      console.log("childNode", childNode);
       exportIds.push(...getAllExportIdsFromNode(childNode));
     }
   }
@@ -43,7 +42,6 @@ function blocksToExportIds(blocks: any) {
   const exportIds: any = [];
 
   for (const block of blocks) {
-    console.log("block", block);
     exportIds.push(...getAllExportIdsFromNode(block.value.document));
   }
 
@@ -116,8 +114,6 @@ function convertBlockTypeToHeader(blockType: string) {
 export class SnapshotPresentational extends React.PureComponent<any, any> {
   public render() {
     const { actionType, snapshot } = this.props.snapshot;
-
-    console.log("Snapshot props", actionType);
 
     const {
       children,

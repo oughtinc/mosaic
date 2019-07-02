@@ -263,7 +263,6 @@ export class WorkspaceView extends React.Component<any, any> {
     );
 
     window.addEventListener("beforeunload", e => {
-      console.log("UNLOADING...");
       setTimeout(() => {
         const isLeavingWorkspacePage =
           /^\/workspaces\//.test(window.location.pathname) ||

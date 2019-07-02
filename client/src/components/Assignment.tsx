@@ -11,7 +11,6 @@ import { secondsToDurationString } from "./helpers/secondsToDurationString";
 
 export class AssignmentPresentational extends React.PureComponent<any, any> {
   public render() {
-    console.log(this.props);
     if (this.props.assignmentQuery.assignment) {
       const assignment = this.props.assignmentQuery.assignment;
 
