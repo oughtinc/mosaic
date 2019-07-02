@@ -296,7 +296,7 @@ export class WorkspaceView extends React.Component<any, any> {
     this.updateAuthenticationState();
   }
 
-  public async componentDidUpdate(prevProps, prevState) {
+  public async componentDidUpdate() {
     if (
       !this.state.hasTakenInitialSnapshot &&
       this.props.currentAssignmentIdQuery.currentAssignmentId &&
