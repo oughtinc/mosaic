@@ -12,6 +12,16 @@ import sendPendingNotifications from "./notifiers";
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
+if (process.env.SENTRY_DSN) {
+  console.log("Starting Sentry");
+
+  const Sentry = require("@sentry/node");
+
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+  });
+}
+
 (async function() {
   const app = express();
   await initializeDb();
