@@ -6,12 +6,15 @@ import * as enforce from "express-sslify";
 import * as path from "path";
 import { ApolloServer } from "apollo-server-express";
 
-import { initializeDb } from "./models";
-import { testingRoutes } from "./testing/routes";
-import sendPendingNotifications from "./notifiers";
-
-const GRAPHQL_PORT = process.env.PORT || 8080;
-
+// Adding Sentry needs to occur before importing initializeDb from "./models"
+// This is because importing "./models" configures the DB connection
+// During this configuration, console.log is specified as the Sequelize logging function
+// But initializing Sentry wraps console.log
+// So if we initialize Sentry after importing "./models", the Sequelize logging function
+// won't equal (the now wrapped) console.log
+// If the Sequelize logging function doesn't equal console.log, then Sequelize
+// logs the options object with every DB query, which means the logs are much harder to
+// read because these many-line options object get spammed with every DB query
 if (process.env.SENTRY_DSN) {
   console.log("Starting Sentry");
 
@@ -21,6 +24,12 @@ if (process.env.SENTRY_DSN) {
     dsn: process.env.SENTRY_DSN,
   });
 }
+
+import { initializeDb } from "./models";
+import { testingRoutes } from "./testing/routes";
+import sendPendingNotifications from "./notifiers";
+
+const GRAPHQL_PORT = process.env.PORT || 8080;
 
 (async function() {
   const app = express();
