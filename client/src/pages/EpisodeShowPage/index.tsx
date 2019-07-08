@@ -704,7 +704,30 @@ export class WorkspaceView extends React.Component<any, any> {
                       {!(this.state.isAuthenticated && !isActive) &&
                         workspace.message && (
                           <Alert style={{ border: "1px solid #ddd" }}>
-                            <ReactMarkdown source={workspace.message} />
+                            {workspace.childWorkspaces &&
+                            workspace.childWorkspaces.length > 0 ? (
+                              <span style={{ color: "#666" }}>
+                                <span
+                                  style={{
+                                    color: "red",
+                                    fontWeight: 600,
+                                    paddingRight: "10px",
+                                  }}
+                                >
+                                  !
+                                </span>
+                                Please email developer Zak Miller at{" "}
+                                <a href="mailto:name@mydomain.com">
+                                  zachary.john.miller@gmail.com
+                                </a>{" "}
+                                to let him know you've seen this message. Please
+                                include the workspace # in your email. This
+                                issue should be resolved in the next few days.
+                                Thanks for your patience!
+                              </span>
+                            ) : (
+                              <ReactMarkdown source={workspace.message} />
+                            )}
                           </Alert>
                         )}
 
