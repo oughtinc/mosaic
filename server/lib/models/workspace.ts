@@ -252,6 +252,7 @@ export default class Workspace extends Model<Workspace> {
         where: {
           workspaceId: this.get("id") as string,
         },
+        order: [["createdAt", "ASC"]],
       });
     })();
   }
