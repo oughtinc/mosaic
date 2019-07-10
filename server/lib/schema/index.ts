@@ -649,6 +649,7 @@ const schema = new GraphQLSchema({
         resolve: resolver(Assignment),
       },
       blocks: modelGraphQLFields(new GraphQLList(blockType), Block),
+      snapshots: modelGraphQLFields(new GraphQLList(snapshotType), Snapshot),
       trees: modelGraphQLFields(new GraphQLList(treeType), Tree),
       tree: {
         type: treeType,
