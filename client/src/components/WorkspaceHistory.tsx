@@ -30,8 +30,8 @@ export class WorkspaceHistoryPresentational extends React.PureComponent<
           }}
         >
           {this.props.workspaceHistoryQuery.workspace.assignments.map(
-            assignment => (
-              <AssignmentContainer>
+            (assignment, i) => (
+              <AssignmentContainer key={i}>
                 <Assignment assignmentId={assignment.id} />
               </AssignmentContainer>
             ),
