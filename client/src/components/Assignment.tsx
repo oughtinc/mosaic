@@ -90,8 +90,8 @@ export class AssignmentPresentational extends React.PureComponent<any, any> {
                 }
                 return true;
               })
-              .map(snapshot => (
-                <div style={{ width: "400px" }}>
+              .map((snapshot, i) => (
+                <div key={i} style={{ width: "400px" }}>
                   <Snapshot
                     snapshot={snapshot}
                     isOracleWorkspace={

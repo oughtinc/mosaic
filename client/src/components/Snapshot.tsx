@@ -1,7 +1,11 @@
 import * as _ from "lodash";
 import * as React from "react";
 import styled from "styled-components";
+
 import { BlockEditor } from "./BlockEditor";
+
+import { convertActionTypeToReadableString } from "./helpers/convertActionTypeToReadableString";
+import { convertBlockTypeToReadableString } from "./helpers/convertBlockTypeToReadableString";
 
 import {
   blockBorderAndBoxShadow,
@@ -48,69 +52,6 @@ function blocksToExportIds(blocks: any) {
   return exportIds;
 }
 
-function convertActionTypeToHeader(actionType: string) {
-  if (actionType === "INITIALIZE") {
-    return "Initialize";
-  }
-
-  if (actionType === "DONE") {
-    return "Done";
-  }
-
-  if (actionType === "WAIT_FOR_ANSWER") {
-    return "Wait for Answer";
-  }
-
-  if (actionType === "NEEDS_MORE_WORK") {
-    return "Needs more work";
-  }
-
-  if (actionType === "SUBMIT_ANSWER_CANDIDATE") {
-    return "Submit answer candidate";
-  }
-
-  if (actionType === "DECLINE_TO_CHALLENGE") {
-    return "Decline to challenge";
-  }
-
-  if (actionType === "SELECT_A1") {
-    return "Select A1";
-  }
-
-  if (actionType === "SELECT_A2") {
-    return "Select A2";
-  }
-
-  if (actionType === "UNLOAD") {
-    return "Unload";
-  }
-  return actionType;
-}
-
-function convertBlockTypeToHeader(blockType: string) {
-  if (blockType === "QUESTION") {
-    return "Question";
-  }
-
-  if (blockType === "SCRATCHPAD") {
-    return "Scratchpad";
-  }
-
-  if (blockType === "ANSWER_DRAFT") {
-    return "Answer Draft";
-  }
-
-  if (blockType === "SUBQUESTION_DRAFT") {
-    return "Subquestion Draft";
-  }
-
-  if (blockType === "ORACLE_ANSWER_CANDIDATE") {
-    return "Answer Candidate";
-  }
-
-  return blockType;
-}
-
 export class SnapshotPresentational extends React.PureComponent<any, any> {
   public render() {
     const { actionType, snapshot } = this.props.snapshot;
@@ -128,13 +69,13 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
 
     return (
       <div>
-        <h3>{convertActionTypeToHeader(actionType)}</h3>
+        <h3>{convertActionTypeToReadableString(actionType)}</h3>
         {workspace.map((block, i) => (
           <React.Fragment key={i}>
             <div>
               <BlockContainer>
                 <BlockHeader>
-                  {convertBlockTypeToHeader(block.type)}
+                  {convertBlockTypeToReadableString(block.type)}
                 </BlockHeader>
                 <BlockBody>
                   <BlockEditor
@@ -163,7 +104,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                 <div>
                   <BlockContainer>
                     <BlockHeader>
-                      {convertBlockTypeToHeader(blocks[0].type)}
+                      {convertBlockTypeToReadableString(blocks[0].type)}
                     </BlockHeader>
                     <BlockBody>
                       <BlockEditor
