@@ -26,7 +26,9 @@ import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFrom
 
 import getScheduler from "../scheduler";
 import { map } from "asyncro";
+import Assignment from "../models/assignment";
 import Block from "../models/block";
+import Snapshot from "../models/snapshot";
 import Workspace from "../models/workspace";
 import UserTreeOracleRelation from "../models/userTreeOracleRelation";
 import User from "../models/user";
@@ -65,6 +67,11 @@ export const makeObjectType = (model, references, extraFields = {}) =>
 
 export const userType = makeObjectType(User, []);
 
+const snapshotType = makeObjectType(Snapshot, [
+  ["user", () => userType],
+  ["workspace", () => workspaceType],
+]);
+
 const blockType = makeObjectType(Block, [["workspace", () => workspaceType]]);
 
 export const workspaceType = makeObjectType(
@@ -75,6 +82,7 @@ export const workspaceType = makeObjectType(
     ["blocks", () => new GraphQLList(blockType)],
     ["pointerImports", () => new GraphQLList(pointerImportType)],
     ["tree", () => treeType],
+    ["assignments", () => new GraphQLList(assignmentType)],
   ],
   {
     isParentOracleWorkspace: {
@@ -290,6 +298,12 @@ export const workspaceType = makeObjectType(
 import { UserActivityType } from "./UserActivity";
 import { WorkspaceActivityType } from "./WorkspaceActivity";
 
+const assignmentType = makeObjectType(Assignment, [
+  ["snapshots", () => new GraphQLList(snapshotType)],
+  ["user", () => userType],
+  ["workspace", () => workspaceType],
+]);
+
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
   ["tree", () => treeType],
   ["user", () => userType],
@@ -352,13 +366,6 @@ const pointerImportType = makeObjectType(PointerImport, [
   ["pointer", () => pointerType],
 ]);
 
-const oracleModeType = new GraphQLObjectType({
-  name: "OracleMode",
-  fields: {
-    value: { type: GraphQLBoolean },
-  },
-});
-
 const BlockInput = new GraphQLInputObjectType({
   name: "blockInput",
   fields: _.pick(attributeFields(Block), "value", "id"),
@@ -402,6 +409,45 @@ const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "RootQueryType",
     fields: {
+      currentAssignmentId: {
+        type: GraphQLString,
+        args: {
+          experimentId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString },
+        },
+        resolve: async (_, { experimentId, userId, workspaceId }) => {
+          const workspace = await Workspace.findByPkOrSerialId(workspaceId);
+          const experiment = await Experiment.findByPkOrSerialId(experimentId);
+
+          if (!workspace || !experiment) {
+            return;
+          }
+
+          const assignments = await Assignment.findAll({
+            order: [["createdAt", "DESC"]],
+            where: {
+              experimentId: experiment.id,
+              userId,
+              workspaceId: workspace.id,
+            },
+          });
+
+          if (assignments.length === 0) return;
+
+          const scheduler = await getScheduler(experiment.id);
+
+          const activeUserId = await scheduler.getIdOfCurrentlyActiveUser(
+            workspace.id,
+          );
+
+          if (userId === activeUserId) {
+            return assignments[0].id;
+          }
+
+          return;
+        },
+      },
       isUserRegisteredForNotifications: {
         type: GraphQLBoolean,
         args: {
@@ -551,8 +597,9 @@ const schema = new GraphQLSchema({
             );
 
             const shouldIncludeOracleAnswerCandidateDraft =
-              result.isEligibleForHonestOracle ||
-              result.isEligibleForMaliciousOracle;
+              (result.isEligibleForHonestOracle ||
+                result.isEligibleForMaliciousOracle) &&
+              result.parentId;
 
             if (!includesQuestion) {
               await result.$create("block", { type: "QUESTION" });
@@ -600,7 +647,13 @@ const schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(User),
       },
+      assignment: {
+        type: assignmentType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(Assignment),
+      },
       blocks: modelGraphQLFields(new GraphQLList(blockType), Block),
+      snapshots: modelGraphQLFields(new GraphQLList(snapshotType), Snapshot),
       trees: modelGraphQLFields(new GraphQLList(treeType), Tree),
       tree: {
         type: treeType,
@@ -626,6 +679,11 @@ const schema = new GraphQLSchema({
             return findOptions;
           },
         }),
+      },
+      snapshot: {
+        type: snapshotType,
+        args: { id: { type: GraphQLString } },
+        resolve: resolver(Snapshot),
       },
       pointers: modelGraphQLFields(new GraphQLList(pointerType), Pointer),
       subtreeTimeSpent: {
@@ -1303,18 +1361,22 @@ const schema = new GraphQLSchema({
                       );
                       const question = blocks.find(b => b.type === "QUESTION");
 
+                      const childQuestionValue = generateMaliciousAnswerDraftValue(
+                        _.get(question, "value"),
+                        _.get(oracleAnswerCandidate, "value"),
+                      );
+
                       // create judge child
                       await workspace.createChild({
-                        question: generateMaliciousAnswerDraftValue(
-                          _.get(question, "value"),
-                          _.get(oracleAnswerCandidate, "value"),
-                        ),
+                        question: childQuestionValue,
                         totalBudget: 0,
                         creatorId: context.user.id,
                         isPublic: false,
                         shouldOverrideToNormalUser: false,
                       });
-                    }, 10000);
+
+                      5;
+                    }, 20000);
                   }
                 }
 
@@ -2171,6 +2233,57 @@ const schema = new GraphQLSchema({
           },
         ), // unlock pointer resolver
       }, // unlockPointer mutation
+      createSnapshot: {
+        type: GraphQLBoolean,
+        args: {
+          userId: { type: GraphQLString },
+          workspaceId: { type: GraphQLString },
+          assignmentId: { type: GraphQLString },
+          actionType: { type: GraphQLString },
+          snapshot: { type: GraphQLString },
+        },
+        resolve: async (
+          _,
+          { userId, workspaceId, assignmentId, actionType, snapshot },
+          ctx,
+        ) => {
+          const snapshots = await Snapshot.findAll({
+            where: {
+              assignmentId,
+            },
+          });
+
+          if (snapshots.length === 0 && actionType === "UNLOAD") {
+            return true;
+          }
+
+          if (snapshots.filter(s => s.actionType === actionType).length !== 0) {
+            const snapshotToUpdate = snapshots.find(
+              s => s.actionType === actionType,
+            );
+
+            await snapshotToUpdate.update({
+              userId,
+              workspaceId,
+              assignmentId,
+              actionType,
+              snapshot: JSON.parse(snapshot),
+            });
+
+            return true;
+          }
+
+          await Snapshot.create({
+            userId,
+            workspaceId,
+            assignmentId,
+            actionType,
+            snapshot: JSON.parse(snapshot),
+          });
+
+          return true;
+        },
+      },
     }, // mutation fields
   }), // mutation: new GraphQLObjectType({...})
 }); // const schema = new GraphQLSchema({...})

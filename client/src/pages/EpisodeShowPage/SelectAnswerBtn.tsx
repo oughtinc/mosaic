@@ -49,6 +49,7 @@ class SelectAnswerBtn extends React.Component<any, any> {
       markAsCurrentlyResolved,
       markAsNotStale,
       selectAnswerCandidate,
+      snapshot,
     } = this.props;
 
     return (
@@ -57,6 +58,7 @@ class SelectAnswerBtn extends React.Component<any, any> {
         experimentId={experimentId}
         label={children}
         navHook={async () => {
+          snapshot();
           await selectAnswerCandidate();
           markAsNotStale();
           markAsCurrentlyResolved();

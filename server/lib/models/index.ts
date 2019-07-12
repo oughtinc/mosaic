@@ -9,6 +9,7 @@ import Instructions from "./instructions";
 import NotificationRequest from "./notificationRequest";
 import Pointer from "./pointer";
 import PointerImport from "./pointerImport";
+import Snapshot from "./snapshot";
 import Tree from "./tree";
 import User from "./user";
 import UserTreeOracleRelation from "./userTreeOracleRelation";
@@ -42,6 +43,7 @@ export async function initializeDb() {
     NotificationRequest,
     Pointer,
     PointerImport,
+    Snapshot,
     Tree,
     User,
     UserTreeOracleRelation,

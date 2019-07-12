@@ -118,6 +118,10 @@ export default class Experiment extends Model<Experiment> {
   }
 
   public static findByPkOrSerialId(pkOrSerialId) {
+    if (!pkOrSerialId || !pkOrSerialId.length) {
+      return;
+    }
+
     if (pkOrSerialId.length < 10) {
       return Experiment.findOne({
         where: { serialId: Number(pkOrSerialId) },

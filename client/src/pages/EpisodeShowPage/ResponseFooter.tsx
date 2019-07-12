@@ -57,6 +57,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
       isUserMaliciousOracle,
       markAsCurrentlyResolved,
       markAsNotStale,
+      snapshot,
       transferRemainingBudgetToParent,
       responseIsEmpty,
     } = this.props;
@@ -81,6 +82,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
               if (hasTimeBudget) {
                 transferRemainingBudgetToParent();
               }
+              snapshot("DONE");
               markAsNotStale();
               markAsCurrentlyResolved();
             }}
@@ -91,6 +93,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
             label="Done!"
             disabled={responseIsEmpty}
             navHook={() => {
+              snapshot("DONE");
               markAsNotStale();
               markAsCurrentlyResolved();
             }}
@@ -109,6 +112,7 @@ class ResponseFooterPresentational extends React.Component<any, any> {
                   : "Done!"
               }
               navHook={() => {
+                snapshot("DONE");
                 markAsNotStale();
                 if (isRequestingLazyUnlock) {
                   markAsCurrentlyResolved();

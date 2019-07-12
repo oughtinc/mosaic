@@ -1,6 +1,7 @@
 import { UUIDV4 } from "sequelize";
 import {
   Column,
+  HasMany,
   Table,
   Model,
   ForeignKey,
@@ -9,6 +10,8 @@ import {
 } from "sequelize-typescript";
 import Workspace from "./workspace";
 import Experiment from "./experiment";
+import Snapshot from "./snapshot";
+import User from "./user";
 
 @Table
 export default class Assignment extends Model<Assignment> {
@@ -20,8 +23,12 @@ export default class Assignment extends Model<Assignment> {
   })
   public id: string;
 
+  @ForeignKey(() => User)
   @Column(DataType.STRING)
   public userId: string;
+
+  @BelongsTo(() => User)
+  public user: User;
 
   @Column(DataType.BIGINT)
   public startAtTimestamp: number;
@@ -48,4 +55,7 @@ export default class Assignment extends Model<Assignment> {
 
   @BelongsTo(() => Experiment)
   public Experiments: Experiment;
+
+  @HasMany(() => Snapshot)
+  public snapshots: Snapshot[];
 }

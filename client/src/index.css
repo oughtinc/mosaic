@@ -44,3 +44,11 @@ body {
   left: -10000px;
   opacity: 0;
 }
+
+.fade.in.modal {
+  width: auto !important;
+}
+
+.modal-dialog {
+  width: 1020px;
+}

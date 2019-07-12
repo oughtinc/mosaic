@@ -104,6 +104,7 @@ const WORKSPACE_QUERY = gql`
         creatorId
         isArchived
         isEligibleForHonestOracle
+        isEligibleForMaliciousOracle
         isCurrentlyResolved
         isPublic
         allocatedBudget
@@ -251,6 +252,7 @@ export class WorkspaceView extends React.Component<any, any> {
       pastedExportFormat: CONVERT_PASTED_EXPORT_TO_IMPORT,
       shouldAutoExport: true,
       hasInitiallyLoaded: false,
+      hasTakenInitialSnapshot: false,
       isAuthenticated: Auth.isAuthenticated(),
       logoutTimer: null,
     };
@@ -266,7 +268,9 @@ export class WorkspaceView extends React.Component<any, any> {
         const isLeavingWorkspacePage =
           /^\/workspaces\//.test(window.location.pathname) ||
           /^\/w\//.test(window.location.pathname);
+
         if (isLeavingWorkspacePage) {
+          this.snapshot(this.props, "UNLOAD");
           this.leaveCurrentWorkspace();
         }
       }, 1);
@@ -293,8 +297,20 @@ export class WorkspaceView extends React.Component<any, any> {
     this.updateAuthenticationState();
   }
 
+  public async componentDidUpdate() {
+    if (
+      !this.state.hasTakenInitialSnapshot &&
+      this.props.currentAssignmentIdQuery.currentAssignmentId &&
+      this.props.workspace.workspace
+    ) {
+      this.snapshot(this.props, "INITIALIZE");
+      this.setState({ hasTakenInitialSnapshot: true });
+    }
+  }
+
   public componentWillUnmount() {
     this.leaveCurrentWorkspace();
+    this.snapshot(this.props, "UNLOAD");
 
     if (this.state.logoutTimer) {
       clearTimeout(this.state.logoutTimer);
@@ -314,9 +330,7 @@ export class WorkspaceView extends React.Component<any, any> {
     });
   };
 
-  public render() {
-    const workspace = this.props.workspace.workspace;
-
+  public getAvailablePointers(workspace: any) {
     const importedPointers = workspace.connectedPointers;
 
     const allReadOnlyBlocks = new WorkspaceWithRelations(
@@ -353,6 +367,99 @@ export class WorkspaceView extends React.Component<any, any> {
       ["asc"],
     );
 
+    return availablePointers;
+  }
+
+  public snapshot(props: any, action: string = "INITIALIZE") {
+    const assignmentId = props.currentAssignmentIdQuery.currentAssignmentId;
+    if (!assignmentId) {
+      return;
+    }
+
+    const workspace = props.workspace.workspace;
+
+    const workspaceBlocks: any = _.flatten(
+      workspace.blocks.concat(workspace.childWorkspaces.map(cw => cw.blocks)),
+    );
+
+    const reduxBlocks = props.reduxState.blocks.blocks.map(b => ({
+      id: b.id,
+      type: workspaceBlocks.find((b2: any) => b.id === b2.id).type,
+      value: b.value.toJSON(),
+    }));
+
+    console.log("making snapshot", {
+      variables: {
+        userId: Auth.userId(),
+        assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
+        workspaceId: workspace.id,
+        actionType: action,
+        snapshot: JSON.stringify({
+          userId: Auth.userId(),
+          workspaceId: workspace.id,
+          workspace: reduxBlocks.filter(b =>
+            workspace.blocks.find(b2 => b.id === b2.id),
+          ),
+          children: _.sortBy(workspace.childWorkspaces, cw =>
+            Date.parse(cw.createdAt),
+          ).map(w => {
+            const childBlocks = reduxBlocks.filter(b =>
+              w.blocks.find(b2 => b.id === b2.id),
+            );
+            return childBlocks.map(b => ({
+              ...b,
+              isArchived: w.isArchived,
+              isForJudge: !(
+                w.isEligibleForHonestOracle || w.isEligibleForMaliciousOracle
+              ),
+            }));
+          }),
+          exportLockStatusInfo: workspace.exportLockStatusInfo,
+          action,
+          availablePointers: this.getAvailablePointers(workspace),
+        }),
+      },
+    });
+
+    props.createSnapshot({
+      variables: {
+        userId: Auth.userId(),
+        assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
+        workspaceId: workspace.id,
+        actionType: action,
+        snapshot: JSON.stringify({
+          userId: Auth.userId(),
+          workspaceId: workspace.id,
+          workspace: reduxBlocks.filter(b =>
+            workspace.blocks.find(b2 => b.id === b2.id),
+          ),
+          children: _.sortBy(workspace.childWorkspaces, cw =>
+            Date.parse(cw.createdAt),
+          ).map(w => {
+            const childBlocks = reduxBlocks.filter(b =>
+              w.blocks.find(b2 => b.id === b2.id),
+            );
+            return childBlocks.map(b => ({
+              ...b,
+              isArchived: w.isArchived,
+              isForJudge: !(
+                w.isEligibleForHonestOracle || w.isEligibleForMaliciousOracle
+              ),
+            }));
+          }),
+          exportLockStatusInfo: workspace.exportLockStatusInfo,
+          action,
+          availablePointers: this.getAvailablePointers(workspace),
+        }),
+      },
+    });
+  }
+
+  public render() {
+    const workspace = this.props.workspace.workspace;
+
+    const availablePointers = this.getAvailablePointers(workspace);
+
     const questionProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceQuestion,
       workspace,
@@ -376,14 +483,16 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const isParentOracleWorkspace = workspace.isParentOracleWorkspace;
 
-    const oracleAnswerCandidateProps =
+    const hasParent = !!workspace.parentId;
+
+    const oracleAnswerCandidateProps: any =
       isOracleWorkspace &&
+      hasParent &&
       new WorkspaceBlockRelation(
         WorkspaceRelationTypes.WorkspaceOracleAnswerCandidate,
         workspace,
       ).blockEditorAttributes();
 
-    const hasParent = !!workspace.parentId;
     const hasSubquestions = workspace.childWorkspaces.length > 0;
     const isUserOracle = workspace.isUserOracleForTree;
     const isUserMaliciousOracle = workspace.isUserMaliciousOracleForTree;
@@ -481,6 +590,7 @@ export class WorkspaceView extends React.Component<any, any> {
         >
           {this.state.isAuthenticated && experimentId && (
             <EpisodeNav
+              snapshot={(action: string) => this.snapshot(this.props, action)}
               experimentId={experimentId}
               hasSubquestions={hasSubquestions}
               isActive={isActive}
@@ -779,6 +889,9 @@ export class WorkspaceView extends React.Component<any, any> {
                             </BlockBody>
                             {this.state.isAuthenticated && isActive && (
                               <ResponseFooter
+                                snapshot={(action: string) =>
+                                  this.snapshot(this.props, action)
+                                }
                                 isUserMaliciousOracle={isUserMaliciousOracle}
                                 isRequestingLazyUnlock={isRequestingLazyUnlock}
                                 hasChildren={
@@ -882,6 +995,9 @@ export class WorkspaceView extends React.Component<any, any> {
                                       },
                                     })
                                   }
+                                  snapshot={() =>
+                                    this.snapshot(this.props, "SELECT_A1")
+                                  }
                                 >
                                   Select A1
                                 </SelectAnswerBtn>
@@ -914,6 +1030,9 @@ export class WorkspaceView extends React.Component<any, any> {
                                         decision: 2,
                                       },
                                     })
+                                  }
+                                  snapshot={() =>
+                                    this.snapshot(this.props, "SELECT_A2")
                                   }
                                 >
                                   Select A2
@@ -993,8 +1112,11 @@ export class WorkspaceView extends React.Component<any, any> {
                                       {...oracleAnswerCandidateProps}
                                     />
                                   </BlockBody>
-                                  {isUserOracle && (
+                                  {isUserOracle && hasParent && (
                                     <OracleAnswerCandidateFooter
+                                      snapshot={(action: string) =>
+                                        this.snapshot(this.props, action)
+                                      }
                                       isUserMaliciousOracle={
                                         isUserMaliciousOracle
                                       }
@@ -1071,6 +1193,9 @@ export class WorkspaceView extends React.Component<any, any> {
                             !isRequestingLazyUnlock
                           ) && (
                             <ChildrenSidebar
+                              snapshot={(action: string) =>
+                                this.snapshot(this.props, action)
+                              }
                               doesAllowOracleBypass={
                                 workspace.rootWorkspace.tree
                                   .doesAllowOracleBypass
@@ -1245,6 +1370,7 @@ function visibleBlockIds(workspace: any) {
       w.blocks.filter(b => b.type !== "SCRATCHPAD"),
     ),
   ).map((b: any) => b.id);
+
   return [...directBlockIds, ...childBlockIds];
 }
 
@@ -1329,7 +1455,13 @@ function mapStateToProps(state: any, { workspace }: any) {
   }
 
   const { blocks } = state;
-  return { blocks, exportingPointers, inputCharCount, outputCharCount };
+  return {
+    reduxState: state,
+    blocks,
+    exportingPointers,
+    inputCharCount,
+    outputCharCount,
+  };
 }
 
 const LEAVE_CURRENT_WORKSPACE_MUTATION = gql`
@@ -1364,9 +1496,41 @@ const DECLINE_TO_CHALLENGE_MUTATION = gql`
   }
 `;
 
+const CREATE_SNAPSHOT_MUTATION = gql`
+  mutation createSnapshotMutation(
+    $userId: String
+    $workspaceId: String
+    $assignmentId: String
+    $actionType: String
+    $snapshot: String
+  ) {
+    createSnapshot(
+      userId: $userId
+      workspaceId: $workspaceId
+      assignmentId: $assignmentId
+      actionType: $actionType
+      snapshot: $snapshot
+    )
+  }
+`;
+
 const SELECT_ANSWER_CANDIDATE = gql`
   mutation selectAnswerCandidate($id: String, $decision: Int) {
     selectAnswerCandidate(id: $id, decision: $decision)
+  }
+`;
+
+const CURRENT_ASSIGNMENT_ID_QUERY = gql`
+  query currentAssignmentId(
+    $experimentId: String
+    $userId: String
+    $workspaceId: String
+  ) {
+    currentAssignmentId(
+      experimentId: $experimentId
+      userId: $userId
+      workspaceId: $workspaceId
+    )
   }
 `;
 
@@ -1421,8 +1585,23 @@ export const EpisodeShowPage = compose(
       refetchQueries: ["workspace"],
     },
   }),
+  graphql(CREATE_SNAPSHOT_MUTATION, {
+    name: "createSnapshot",
+  }),
   graphql(SELECT_ANSWER_CANDIDATE, {
     name: "selectAnswerCandidate",
+  }),
+  graphql(CURRENT_ASSIGNMENT_ID_QUERY, {
+    name: "currentAssignmentIdQuery",
+    options: ({ match }: any) => ({
+      variables: {
+        experimentId: getExperimentIdOrSerialIdFromQueryParams(
+          window.location.search,
+        ),
+        userId: Auth.userId(),
+        workspaceId: match.params.workspaceId,
+      },
+    }),
   }),
   connect(
     mapStateToProps,

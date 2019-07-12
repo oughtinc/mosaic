@@ -30,6 +30,7 @@ import Tree from "./tree";
 import ExportWorkspaceLockRelation from "./exportWorkspaceLockRelation";
 import Experiment from "./experiment";
 import Pointer from "./pointer";
+import Assignment from "./assignment";
 
 const Op = Sequelize.Op;
 
@@ -251,6 +252,7 @@ export default class Workspace extends Model<Workspace> {
         where: {
           workspaceId: this.get("id") as string,
         },
+        order: [["createdAt", "ASC"]],
       });
     })();
   }
@@ -328,6 +330,9 @@ export default class Workspace extends Model<Workspace> {
 
   @HasMany(() => Workspace, "parentId")
   public childWorkspaces: Workspace[];
+
+  @HasMany(() => Assignment)
+  public assignments: Assignment[];
 
   @HasMany(() => PointerImport)
   public pointerImports: PointerImport[];
@@ -491,6 +496,10 @@ export default class Workspace extends Model<Workspace> {
   }
 
   public static findByPkOrSerialId(pkOrSerialId) {
+    if (!pkOrSerialId || !pkOrSerialId.length) {
+      return;
+    }
+
     if (pkOrSerialId.length < 10) {
       return Workspace.findOne({
         where: { serialId: Number(pkOrSerialId) },

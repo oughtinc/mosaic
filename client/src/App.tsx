@@ -19,6 +19,7 @@ import { blockReducer } from "./modules/blocks/reducer";
 import { blockEditorReducer } from "./modules/blockEditor/reducer";
 import { WorkspaceSubtreePage } from "./pages/WorkspaceSubtreePage";
 import { CompactTreeView } from "./pages/CompactTreeView";
+import { WorkspaceHistoryView } from "./pages/SnapshotView";
 import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
 
@@ -96,6 +97,11 @@ const Routes = () => (
       exact={true}
       path="/w/:workspaceId/compactTree"
       component={CompactTreeView}
+    />
+    <Route
+      exact={true}
+      path="/snapshots/:workspaceId"
+      component={WorkspaceHistoryView}
     />
     <Route
       path="/authCallback"
