@@ -695,7 +695,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           }}
                         >
                           <span style={{ color: "darkGray" }}>
-                            Workspace #{workspace.serialId}{" "}
+                            Workspace #{workspace.serialId}
                           </span>
                           <BlockEditor
                             isActive={isActive}
@@ -996,7 +996,7 @@ export class WorkspaceView extends React.Component<any, any> {
                                     })
                                   }
                                   snapshot={() =>
-                                    this.snapshot(this.props, "SELECT_A2")
+                                    this.snapshot(this.props, "SELECT_A1")
                                   }
                                 >
                                   Select A1
