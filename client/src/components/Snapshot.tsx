@@ -100,8 +100,13 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
         {children.map(
           (blocks, i) =>
             blocks[0] && (
-              <React.Fragment key={i}>
-                <div>
+              <div key={i}>
+                {blocks[0].isForJudge && (
+                  <span style={{ color: "#777", fontSize: "11px" }}>
+                    Judge-to-judge
+                  </span>
+                )}
+                <div style={{ opacity: blocks[0].isArchived ? 0.25 : 1 }}>
                   <BlockContainer>
                     <BlockHeader>
                       {convertBlockTypeToReadableString(blocks[0].type)}
@@ -141,7 +146,7 @@ export class SnapshotPresentational extends React.PureComponent<any, any> {
                     </BlockContainer>
                   )}
                 </div>
-              </React.Fragment>
+              </div>
             ),
         )}
       </div>

@@ -104,6 +104,7 @@ const WORKSPACE_QUERY = gql`
         creatorId
         isArchived
         isEligibleForHonestOracle
+        isEligibleForMaliciousOracle
         isCurrentlyResolved
         isPublic
         allocatedBudget
@@ -407,7 +408,10 @@ export class WorkspaceView extends React.Component<any, any> {
             );
             return childBlocks.map(b => ({
               ...b,
-              isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
+              isArchived: w.isArchived,
+              isForJudge: !(
+                w.isEligibleForHonestOracle || w.isEligibleForMaliciousOracle
+              ),
             }));
           }),
           exportLockStatusInfo: workspace.exportLockStatusInfo,
@@ -437,7 +441,10 @@ export class WorkspaceView extends React.Component<any, any> {
             );
             return childBlocks.map(b => ({
               ...b,
-              isArchived: workspaceBlocks.find(b2 => b2.id === b.id).isArchived,
+              isArchived: w.isArchived,
+              isForJudge: !(
+                w.isEligibleForHonestOracle || w.isEligibleForMaliciousOracle
+              ),
             }));
           }),
           exportLockStatusInfo: workspace.exportLockStatusInfo,
