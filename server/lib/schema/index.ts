@@ -2254,7 +2254,11 @@ const schema = new GraphQLSchema({
           }
 
           if (snapshots.filter(s => s.actionType === actionType).length !== 0) {
-            await snapshots[0].update({
+            const snapshotToUpdate = snapshots.find(
+              s => s.actionType === actionType,
+            );
+
+            await snapshotToUpdate.update({
               userId,
               workspaceId,
               assignmentId,
