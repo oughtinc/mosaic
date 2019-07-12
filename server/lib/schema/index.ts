@@ -420,6 +420,10 @@ const schema = new GraphQLSchema({
           const workspace = await Workspace.findByPkOrSerialId(workspaceId);
           const experiment = await Experiment.findByPkOrSerialId(experimentId);
 
+          if (!workspace || !experiment) {
+            return;
+          }
+
           const assignments = await Assignment.findAll({
             order: [["createdAt", "DESC"]],
             where: {

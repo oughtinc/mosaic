@@ -496,6 +496,10 @@ export default class Workspace extends Model<Workspace> {
   }
 
   public static findByPkOrSerialId(pkOrSerialId) {
+    if (!pkOrSerialId || !pkOrSerialId.length) {
+      return;
+    }
+
     if (pkOrSerialId.length < 10) {
       return Workspace.findOne({
         where: { serialId: Number(pkOrSerialId) },
