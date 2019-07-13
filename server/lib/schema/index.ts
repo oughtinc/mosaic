@@ -1332,9 +1332,11 @@ const schema = new GraphQLSchema({
                       const blocks = (await workspace.$get(
                         "blocks",
                       )) as Block[];
+
                       const oracleAnswerCandidate = blocks.find(
                         b => b.type === "ORACLE_ANSWER_CANDIDATE",
                       );
+
                       const question = blocks.find(b => b.type === "QUESTION");
 
                       // create malicious child
@@ -1348,7 +1350,7 @@ const schema = new GraphQLSchema({
                         isPublic: false,
                         shouldOverrideToNormalUser: false,
                       });
-                    }, 10000);
+                    }, 20000);
                   }
 
                   if (workspace.isEligibleForMaliciousOracle) {
@@ -1356,9 +1358,11 @@ const schema = new GraphQLSchema({
                       const blocks = (await workspace.$get(
                         "blocks",
                       )) as Block[];
+
                       const oracleAnswerCandidate = blocks.find(
                         b => b.type === "ORACLE_ANSWER_CANDIDATE",
                       );
+
                       const question = blocks.find(b => b.type === "QUESTION");
 
                       const childQuestionValue = generateMaliciousAnswerDraftValue(
@@ -1374,8 +1378,6 @@ const schema = new GraphQLSchema({
                         isPublic: false,
                         shouldOverrideToNormalUser: false,
                       });
-
-                      5;
                     }, 20000);
                   }
                 }
