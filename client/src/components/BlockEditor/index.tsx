@@ -1,5 +1,4 @@
 import * as React from "react";
-import { graphql } from "react-apollo";
 import { Editor } from "slate-react";
 import { addBlocks, removeBlocks } from "../../modules/blocks/actions";
 import {
@@ -7,7 +6,6 @@ import {
   removeHoverItem,
   HOVER_ITEM_TYPES,
 } from "../../modules/blockEditor/actions";
-import { ORACLE_MODE_QUERY } from "../../graphqlQueries";
 import { compose } from "recompose";
 import { connect } from "react-redux";
 import SoftBreak from "slate-soft-break";
@@ -109,9 +107,8 @@ class BlockEditorPresentational extends React.Component<any, any> {
       visibleExportIds: newProps.visibleExportIds,
       exportLockStatusInfo: newProps.exportLockStatusInfo,
       unlockPointer: newProps.unlockPointer,
-      isInOracleModeAndIsUserOracle:
-        newProps.oracleModeQuery.oracleMode && newProps.isUserOracle,
-      isInOracleMode: newProps.oracleModeQuery.oracleMode,
+      isInOracleModeAndIsUserOracle: true && newProps.isUserOracle,
+      isInOracleMode: true,
       isUserOracle: newProps.isUserOracle,
       isActive: newProps.isActive,
     };
@@ -217,9 +214,6 @@ function mapStateToProps(state: any, { blockId }: any) {
 }
 
 export const BlockEditor: any = compose(
-  graphql(ORACLE_MODE_QUERY, {
-    name: "oracleModeQuery",
-  }),
   connect(
     mapStateToProps,
     { addBlocks, removeBlocks, changeHoverItem, removeHoverItem },
