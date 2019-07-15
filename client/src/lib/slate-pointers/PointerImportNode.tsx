@@ -106,8 +106,6 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       return;
     }
 
-    console.log("ZZZ");
-
     const isAdminNotInFlow = Auth.isAdmin() && !this.props.isActive;
     const isOracleInOracleMode =
       this.props.isInOracleMode && this.props.isUserOracle;
