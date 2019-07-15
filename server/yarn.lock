@@ -6679,6 +6679,11 @@ semver@^4.1.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-4.3.6.tgz#300bc6e0e86374f7ba61068b5b1ecd57fc6532da"
   integrity sha1-MAvG4OhjdPe6YQaLWx7NV/xlMto=
 
+semver@^6.1.1:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-6.2.0.tgz#4d813d9590aaf8a9192693d6c85b9344de5901db"
+  integrity sha512-jdFC1VdUGT/2Scgbimf7FSx9iJLXoqfglSF+gJeuNWVpiE37OIbc1jywR/GJyFdz3mnkz2/id0L0J/cr0izR5A==
+
 send@0.16.2:
   version "0.16.2"
   resolved "https://registry.yarnpkg.com/send/-/send-0.16.2.tgz#6ecca1e0f8c156d141597559848df64730a6bbc1"
@@ -6734,12 +6739,10 @@ sequelize-migration-pg-extras@^1.0.1:
   dependencies:
     pg "^4.0.0"
 
-sequelize-pool@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/sequelize-pool/-/sequelize-pool-1.0.2.tgz#89c767882bbdb8a41dac66922ed9820939a5401e"
-  integrity sha512-VMKl/gCCdIvB1gFZ7p+oqLFEyZEz3oMMYjkKvfEC7GoO9bBcxmfOOU9RdkoltfXGgBZFigSChihRly2gKtsh2w==
-  dependencies:
-    bluebird "^3.5.3"
+sequelize-pool@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/sequelize-pool/-/sequelize-pool-2.3.0.tgz#64f1fe8744228172c474f530604b6133be64993d"
+  integrity sha512-Ibz08vnXvkZ8LJTiUOxRcj1Ckdn7qafNZ2t59jYHMX1VIebTAOYefWdRYFt6z6+hy52WGthAHAoLc9hvk3onqA==
 
 sequelize-typescript@^1.0.0-beta.0:
   version "1.0.0-beta.0"
@@ -6749,10 +6752,10 @@ sequelize-typescript@^1.0.0-beta.0:
     "@types/node" "*"
     glob "7.1.2"
 
-sequelize@^5.7.6:
-  version "5.7.6"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.7.6.tgz#ed531a338d40749c7a80ba3a8a2120490d57b2ac"
-  integrity sha512-eBOgOnhNpoFaizRZpJm9Z3+PuVgVbJHApHqRaIkzkw7t049kYxdjQvTkKuQ4uZI8jncVIx9SlofRi5QhO7t/oA==
+sequelize@^5.10.1:
+  version "5.10.1"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.10.1.tgz#ac12614fee2fd40417c4df585dcc28ba2ccf2c57"
+  integrity sha512-wE7jOUABVD9Kr8pAchRqk5quHoqE3tUHfKJ/WdLyZjHx4oMK5YWv1MEiny9DmiOlXOf1JNXwbPL9imSvzFq7aw==
   dependencies:
     bluebird "^3.5.0"
     cls-bluebird "^2.1.0"
@@ -6763,8 +6766,8 @@ sequelize@^5.7.6:
     moment "^2.24.0"
     moment-timezone "^0.5.21"
     retry-as-promised "^3.1.0"
-    semver "^5.6.0"
-    sequelize-pool "^1.0.2"
+    semver "^6.1.1"
+    sequelize-pool "^2.3.0"
     toposort-class "^1.0.1"
     uuid "^3.2.1"
     validator "^10.11.0"
