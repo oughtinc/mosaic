@@ -15,7 +15,7 @@
     "apollo-link-http": "^1.5.3",
     "apollo-utilities": "^1.0.9",
     "auth0-js": "^9.10.1",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "final-form": "^4.2.1",
     "graphql": "^14.2.1",
     "graphql-tag": "^2.8.0",
