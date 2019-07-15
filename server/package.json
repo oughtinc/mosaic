@@ -34,7 +34,7 @@
     "@slack/web-api": "^5.0.1",
     "apollo": "^2.9.0",
     "apollo-server": "^2.4.8",
-    "apollo-server-express": "^2.4.8",
+    "apollo-server-express": "^2.6.9",
     "async": "^2.6.0",
     "asyncro": "^3.0.0",
     "auth0": "^2.17.0",
