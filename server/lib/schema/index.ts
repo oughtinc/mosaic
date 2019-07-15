@@ -2264,6 +2264,10 @@ const schema = new GraphQLSchema({
               s => s.actionType === actionType,
             );
 
+            if (snapshotToUpdate.actionType === "INITIALIZE") {
+              return;
+            }
+
             await snapshotToUpdate.update({
               userId,
               workspaceId,
