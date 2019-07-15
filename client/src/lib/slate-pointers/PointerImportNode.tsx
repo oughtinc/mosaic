@@ -98,7 +98,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       window.location.pathname.endsWith("subtree") ||
       window.location.pathname.endsWith("compactTree");
 
-    if (isOnTreePage) {
+    const isOnStandaloneSnapshotsPage = window.location.pathname.includes(
+      "/snapshots",
+    );
+
+    if (isOnTreePage || isOnStandaloneSnapshotsPage) {
       return;
     }
 
