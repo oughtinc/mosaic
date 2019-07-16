@@ -23,15 +23,9 @@ export const defaultReturningRootInstructions = `**Instructions**
 1. Let the experiment administrator know that you see this message
 2. Please navigate to the main experiment page and rejoin the experiment`;
 
-export const defaultReturningHonestOracleInstructions = `**Instructions**
+export const defaultReturningHonestOracleInstructions = defaultHonestOracleInstructions;
 
-1. Let the experiment administrator know that you see this message
-2. Please navigate to the main experiment page and rejoin the experiment`;
-
-export const defaultReturningMaliciousOracleInstructions = `**Instructions**
-
-1. Let the experiment administrator know that you see this message
-2. Please navigate to the main experiment page and rejoin the experiment`;
+export const defaultReturningMaliciousOracleInstructions = defaultMaliciousOracleInstructions;
 
 export const defaultLazyPointerUnlockInstructions = `**Instructions for unlocking lazy pointer**
 
