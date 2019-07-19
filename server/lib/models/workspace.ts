@@ -347,6 +347,9 @@ export default class Workspace extends Model<Workspace> {
   @Column(DataType.UUID)
   public rootWorkspaceId: string;
 
+  @BelongsTo(() => Workspace, "rootWorkspaceId")
+  public rootWorkspace: Workspace;
+
   @HasMany(() => Block)
   public blocks: Block[];
 
