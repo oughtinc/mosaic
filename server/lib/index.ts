@@ -3,6 +3,9 @@ import "babel-polyfill";
 import * as express from "express";
 import * as enforce from "express-sslify";
 
+import { print } from "graphql";
+import gql from "graphql-tag";
+
 import * as path from "path";
 import { ApolloServer } from "apollo-server-express";
 
@@ -28,11 +31,13 @@ if (process.env.SENTRY_DSN) {
 import { initializeDb } from "./models";
 import { testingRoutes } from "./testing/routes";
 import sendPendingNotifications from "./notifiers";
+const cors = require("cors");
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
 (async function() {
   const app = express();
+  app.use(cors());
   await initializeDb();
 
   // must wait until DB models have loaded before importing schema
@@ -44,7 +49,7 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
           schema,
           context: ({ req }) => {
             return {
-              authorization: req.headers.authorization,
+              authorization: req && req.headers && req.headers.authorization,
             };
           },
           engine: {
@@ -55,11 +60,69 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
           schema,
           context: ({ req }) => {
             return {
-              authorization: req.headers.authorization,
+              authorization: req && req.headers && req.headers.authorization,
             };
           },
         },
   );
+
+  app.get("/experimentActivity", async (req, res) => {
+    const jsonResponse = await server.executeOperation({
+      query: print(gql`
+        query assignments {
+          assignments {
+            id
+            createdAt
+            startAtTimestamp
+            endAtTimestamp
+            user {
+              id
+              email
+            }
+            workspace {
+              id
+              serialId
+              rootWorkspace {
+                id
+                serialId
+              }
+              isEligibleForHonestOracle
+              isEligibleForMaliciousOracle
+            }
+            experimentId
+            experiment {
+              id
+            }
+          }
+        }
+      `),
+    });
+    const data =
+      jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
+
+    data &&
+      data.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+
+    res.json(
+      data &&
+        data.map(assignment => ({
+          id: assignment.id,
+          duration: assignment.endAtTimestamp - assignment.startAtTimestamp,
+          userEmail: assignment.user.email,
+          workspaceType: assignment.workspace.isEligibleForHonestOracle
+            ? "HONEST"
+            : assignment.workspace.isEligibleForMaliciousOracle
+            ? "MALICIOUS"
+            : "JUDGE",
+          linkToHistory: `https://mosaic.ought.org/snapshots/${
+            assignment.workspace.serialId
+          }`,
+          linkToTree: `https://mosaic.ought.org/compactTree/${
+            assignment.workspace.rootWorkspace.serialId
+          }/expanded=true&activeWorkspace=${assignment.workspace.id}`,
+        })),
+    );
+  });
 
   if (!process.env.USING_DOCKER) {
     app.use(enforce.HTTPS({ trustProtoHeader: true }));

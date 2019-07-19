@@ -54,7 +54,7 @@ export default class Assignment extends Model<Assignment> {
   public experimentId: string;
 
   @BelongsTo(() => Experiment)
-  public Experiments: Experiment;
+  public Experiment: Experiment;
 
   @HasMany(() => Snapshot)
   public snapshots: Snapshot[];

@@ -83,6 +83,7 @@ export const workspaceType = makeObjectType(
     ["pointerImports", () => new GraphQLList(pointerImportType)],
     ["tree", () => treeType],
     ["assignments", () => new GraphQLList(assignmentType)],
+    ["rootWorkspace", () => workspaceType],
   ],
   {
     isParentOracleWorkspace: {
@@ -302,6 +303,7 @@ const assignmentType = makeObjectType(Assignment, [
   ["snapshots", () => new GraphQLList(snapshotType)],
   ["user", () => userType],
   ["workspace", () => workspaceType],
+  ["experiment", () => experimentType],
 ]);
 
 const OracleRelationsType = makeObjectType(UserTreeOracleRelation, [
@@ -652,6 +654,10 @@ const schema = new GraphQLSchema({
         args: { id: { type: GraphQLString } },
         resolve: resolver(Assignment),
       },
+      assignments: modelGraphQLFields(
+        new GraphQLList(assignmentType),
+        Assignment,
+      ),
       blocks: modelGraphQLFields(new GraphQLList(blockType), Block),
       snapshots: modelGraphQLFields(new GraphQLList(snapshotType), Snapshot),
       trees: modelGraphQLFields(new GraphQLList(treeType), Tree),
