@@ -2,9 +2,9 @@ import "babel-polyfill";
 
 import * as express from "express";
 import * as enforce from "express-sslify";
-
 import { print } from "graphql";
 import gql from "graphql-tag";
+import { Parser } from "json2csv";
 
 import * as path from "path";
 import { ApolloServer } from "apollo-server-express";
@@ -103,24 +103,29 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
     data &&
       data.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 
-    res.json(
+    const processedData =
       data &&
-        data.map(assignment => ({
-          userEmail: assignment.user.email,
-          duration: assignment.endAtTimestamp - assignment.startAtTimestamp,
-          workspaceType: assignment.workspace.isEligibleForHonestOracle
-            ? "HONEST"
-            : assignment.workspace.isEligibleForMaliciousOracle
-            ? "MALICIOUS"
-            : "JUDGE",
-          linkToHistory: `https://mosaic.ought.org/snapshots/${
-            assignment.workspace.serialId
-          }`,
-          linkToTree: `https://mosaic.ought.org/compactTree/${
-            assignment.workspace.rootWorkspace.serialId
-          }/expanded=true&activeWorkspace=${assignment.workspace.id}`,
-        })),
-    );
+      data.map(assignment => ({
+        "User Email": assignment.user.email,
+        Duration: assignment.endAtTimestamp - assignment.startAtTimestamp,
+        "Workspace Type": assignment.workspace.isEligibleForHonestOracle
+          ? "HONEST"
+          : assignment.workspace.isEligibleForMaliciousOracle
+          ? "MALICIOUS"
+          : "JUDGE",
+        "Link To History": `https://mosaic.ought.org/snapshots/${
+          assignment.workspace.serialId
+        }`,
+        "Link to Tree": `https://mosaic.ought.org/compactTree/${
+          assignment.workspace.rootWorkspace.serialId
+        }/expanded=true&activeWorkspace=${assignment.workspace.id}`,
+      }));
+
+    const parser = new Parser();
+
+    const csv = parser.parse(processedData);
+
+    res.end(csv);
   });
 
   if (!process.env.USING_DOCKER) {
