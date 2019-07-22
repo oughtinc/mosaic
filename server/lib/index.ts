@@ -2,9 +2,6 @@ import "babel-polyfill";
 
 import * as express from "express";
 import * as enforce from "express-sslify";
-import { print } from "graphql";
-import gql from "graphql-tag";
-import { Parser } from "json2csv";
 
 import * as path from "path";
 import { ApolloServer } from "apollo-server-express";
@@ -31,6 +28,7 @@ if (process.env.SENTRY_DSN) {
 import { initializeDb } from "./models";
 import { testingRoutes } from "./testing/routes";
 import sendPendingNotifications from "./notifiers";
+import { experimentActivityCSV } from "./experimentActivityCSV";
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
@@ -65,66 +63,7 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
   );
 
   app.get("/experimentActivity", async (req, res) => {
-    const jsonResponse = await server.executeOperation({
-      query: print(gql`
-        query assignments {
-          assignments {
-            id
-            createdAt
-            startAtTimestamp
-            endAtTimestamp
-            user {
-              id
-              email
-            }
-            workspace {
-              id
-              serialId
-              rootWorkspace {
-                id
-                serialId
-              }
-              isEligibleForHonestOracle
-              isEligibleForMaliciousOracle
-            }
-            experimentId
-            experiment {
-              id
-            }
-          }
-        }
-      `),
-    });
-    const data =
-      jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
-
-    data &&
-      data.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
-
-    const processedData =
-      data &&
-      data.map(assignment => ({
-        "User Email": assignment.user.email,
-        Duration: assignment.endAtTimestamp - assignment.startAtTimestamp,
-        "Workspace Type": assignment.workspace.isEligibleForHonestOracle
-          ? "HONEST"
-          : assignment.workspace.isEligibleForMaliciousOracle
-          ? "MALICIOUS"
-          : "JUDGE",
-        "Link To History": `https://mosaic.ought.org/snapshots/${
-          assignment.workspace.serialId
-        }`,
-        "Link to Tree": `https://mosaic.ought.org/compactTree/${
-          assignment.workspace.rootWorkspace.serialId
-        }/expanded=true&activeWorkspace=${assignment.workspace.id}`,
-      }));
-
-    const parser = new Parser();
-
-    const csv = parser.parse(processedData);
-
-    res.setHeader("Content-Type", "text/csv");
-    res.end(csv);
+    experimentActivityCSV(server, res);
   });
 
   if (!process.env.USING_DOCKER) {
