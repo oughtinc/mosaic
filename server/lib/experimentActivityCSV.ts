@@ -25,9 +25,9 @@ export async function experimentActivityCSV(server, res) {
             isEligibleForHonestOracle
             isEligibleForMaliciousOracle
           }
-          experimentId
           experiment {
             id
+            name
           }
         }
       }
@@ -44,7 +44,14 @@ export async function experimentActivityCSV(server, res) {
     data &&
     data.map(assignment => ({
       "User Email": assignment.user.email,
-      Duration: assignment.endAtTimestamp - assignment.startAtTimestamp,
+      Experiment: assignment.experiment.name,
+      Duration:
+        Math.round(
+          ((assignment.endAtTimestamp - assignment.startAtTimestamp) /
+            1000 /
+            60) *
+            100,
+        ) / 100, // minutes w/ 2 decimal places
       "Workspace Type": assignment.workspace.isEligibleForHonestOracle
         ? "HONEST"
         : assignment.workspace.isEligibleForMaliciousOracle
