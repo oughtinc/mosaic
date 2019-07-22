@@ -125,6 +125,7 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
 
     const csv = parser.parse(processedData);
 
+    res.setHeader("Content-Type", "text/csv");
     res.end(csv);
   });
 
