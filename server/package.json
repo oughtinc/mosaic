@@ -54,6 +54,7 @@
     "graphql-tag": "^2.5.0",
     "graphql-tools": "^4.0.4",
     "graphql-type-json": "^0.3.0",
+    "json2csv": "^4.5.2",
     "lodash": "^4.17.13",
     "pg": "^7.11.0",
     "pg-hstore": "^2.3.2",
