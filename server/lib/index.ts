@@ -106,9 +106,8 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
     res.json(
       data &&
         data.map(assignment => ({
-          id: assignment.id,
-          duration: assignment.endAtTimestamp - assignment.startAtTimestamp,
           userEmail: assignment.user.email,
+          duration: assignment.endAtTimestamp - assignment.startAtTimestamp,
           workspaceType: assignment.workspace.isEligibleForHonestOracle
             ? "HONEST"
             : assignment.workspace.isEligibleForMaliciousOracle
