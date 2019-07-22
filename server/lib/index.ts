@@ -31,13 +31,11 @@ if (process.env.SENTRY_DSN) {
 import { initializeDb } from "./models";
 import { testingRoutes } from "./testing/routes";
 import sendPendingNotifications from "./notifiers";
-const cors = require("cors");
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
 
 (async function() {
   const app = express();
-  app.use(cors());
   await initializeDb();
 
   // must wait until DB models have loaded before importing schema
