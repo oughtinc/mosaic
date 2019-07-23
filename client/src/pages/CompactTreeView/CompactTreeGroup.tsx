@@ -243,8 +243,11 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
     );
 
     const isThisActiveWorkspace =
-      activeWorkspaceId === (this.props.workspace && this.props.workspace.id) ||
-      (this.props.malicious && activeWorkspaceId === this.props.malicious.id);
+      activeWorkspaceId &&
+      (activeWorkspaceId ===
+        (this.props.workspace && this.props.workspace.id) ||
+        (this.props.malicious &&
+          activeWorkspaceId === this.props.malicious.id));
 
     return (
       <div
