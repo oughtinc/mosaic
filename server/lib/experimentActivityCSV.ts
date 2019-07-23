@@ -25,6 +25,8 @@ export async function experimentActivityCSV(server, res) {
             }
             isEligibleForHonestOracle
             isEligibleForMaliciousOracle
+            hasBeenSelectedByJudge
+            hasSelectedHonestAnswer
           }
           experiment {
             id
@@ -48,6 +50,9 @@ export async function experimentActivityCSV(server, res) {
       "Experiment Name": assignment.experiment.name,
       "Workspace Id": assignment.workspace.serialId,
       "Rootworkspace Id": assignment.workspace.rootWorkspace.serialId,
+      "Has Been Selected By Judge": assignment.workspace.hasBeenSelectedByJudge,
+      "Has Selected Honest Answer":
+        assignment.workspace.hasSelectedHonestAnswer,
       Duration:
         Math.round(
           ((assignment.endAtTimestamp - assignment.startAtTimestamp) /
