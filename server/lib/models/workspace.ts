@@ -157,6 +157,189 @@ export default class Workspace extends Model<Workspace> {
   }
 
   // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  public get hasBeenSelectedByJudge() {
+    return (async () => {
+      const curWorkspace = await Workspace.findByPk(this.get("id") as string);
+
+      if (curWorkspace === null) {
+        return;
+      }
+
+      const isRootWorkspace = !curWorkspace.parentId;
+
+      const isExpertWorkspace =
+        curWorkspace.isEligibleForHonestOracle ||
+        curWorkspace.isEligibleForMaliciousOracle;
+
+      if (isRootWorkspace || !isExpertWorkspace) {
+        return;
+      }
+
+      const workspaceWithAnswer = curWorkspace.isEligibleForHonestOracle
+        ? curWorkspace
+        : await Workspace.findByPk(curWorkspace.parentId);
+
+      const workspaceWithAnswerBlocks = await workspaceWithAnswer.$get(
+        "blocks",
+      );
+
+      const answerDraftBlock = workspaceWithAnswerBlocks.find(
+        b => b.type === "ANSWER_DRAFT",
+      );
+
+      const answerHasBeenSelected = answerDraftBlock.value;
+
+      if (!answerHasBeenSelected) {
+        return;
+      }
+
+      const honestWorkspace = curWorkspace.isEligibleForHonestOracle
+        ? curWorkspace
+        : await Workspace.findByPkOrSerialId(curWorkspace.parentId);
+
+      const maliciousWorkspace = curWorkspace.isEligibleForMaliciousOracle
+        ? curWorkspace
+        : await Workspace.findByPkOrSerialId(
+            curWorkspace.childWorkspaceOrder[0],
+          );
+
+      const normal =
+        maliciousWorkspace.childWorkspaceOrder[0] &&
+        (await Workspace.findByPkOrSerialId(
+          maliciousWorkspace.childWorkspaceOrder[0],
+        ));
+
+      const isHonestOracleCurrentlyResolved =
+        honestWorkspace.isCurrentlyResolved;
+
+      const didMaliciousDeclineToChallenge =
+        isHonestOracleCurrentlyResolved && !normal;
+
+      const honestAnswerDraftBlock = (await honestWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "ANSWER_DRAFT");
+
+      const idOfPointerInHonestAnswerDraft = _.get(
+        honestAnswerDraftBlock,
+        "value[0].nodes[1].data.pointerId",
+      );
+
+      const maliciousQuestionBlock = (await maliciousWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "QUESTION");
+
+      const idOf2ndPointerInMaliciousQuestion = _.get(
+        maliciousQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      const isSamePointerInHonestAnswerDraftAndMaliciousQuestion =
+        idOfPointerInHonestAnswerDraft === idOf2ndPointerInMaliciousQuestion;
+
+      const didHonestWin =
+        didMaliciousDeclineToChallenge || // this is here b/c in some older trees the follow disjunct is false in cases where the malicious oracle declines
+        (isHonestOracleCurrentlyResolved &&
+          isSamePointerInHonestAnswerDraftAndMaliciousQuestion);
+
+      const didMaliciousWin =
+        !didHonestWin && // this is here b/c in some older trees the follow two conjuncts are true in cases where the malicious oracle declines
+        isHonestOracleCurrentlyResolved &&
+        !isSamePointerInHonestAnswerDraftAndMaliciousQuestion;
+
+      if (curWorkspace.isEligibleForHonestOracle && didHonestWin) {
+        return true;
+      }
+
+      if (curWorkspace.isEligibleForMaliciousOracle && didMaliciousWin) {
+        return true;
+      }
+
+      return false;
+    })();
+  }
+
+  // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  public get hasSelectedHonestAnswer() {
+    return (async () => {
+      const curWorkspace = await Workspace.findByPk(this.get("id") as string);
+
+      if (curWorkspace === null) {
+        return;
+      }
+
+      const isRootWorkspace = !curWorkspace.parentId;
+
+      const isExpertWorkspace =
+        curWorkspace.isEligibleForHonestOracle ||
+        curWorkspace.isEligibleForMaliciousOracle;
+
+      if (isRootWorkspace || isExpertWorkspace) {
+        return;
+      }
+
+      const maliciousWorkspace = await Workspace.findByPk(
+        curWorkspace.parentId,
+      );
+
+      const honestWorkspace = await Workspace.findByPk(
+        maliciousWorkspace.parentId,
+      );
+
+      const workspaceWithAnswer = honestWorkspace;
+
+      const workspaceWithAnswerBlocks = await workspaceWithAnswer.$get(
+        "blocks",
+      );
+
+      const answerDraftBlock = workspaceWithAnswerBlocks.find(
+        b => b.type === "ANSWER_DRAFT",
+      );
+
+      const answerHasBeenSelected = answerDraftBlock.value;
+
+      if (!answerHasBeenSelected) {
+        return;
+      }
+
+      const isHonestOracleCurrentlyResolved =
+        honestWorkspace.isCurrentlyResolved;
+
+      const honestAnswerDraftBlock = (await honestWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "ANSWER_DRAFT");
+
+      const idOfPointerInHonestAnswerDraft = _.get(
+        honestAnswerDraftBlock,
+        "value[0].nodes[1].data.pointerId",
+      );
+
+      const maliciousQuestionBlock = (await maliciousWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "QUESTION");
+
+      const idOf2ndPointerInMaliciousQuestion = _.get(
+        maliciousQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      const isSamePointerInHonestAnswerDraftAndMaliciousQuestion =
+        idOfPointerInHonestAnswerDraft === idOf2ndPointerInMaliciousQuestion;
+
+      const didHonestWin =
+        isHonestOracleCurrentlyResolved &&
+        isSamePointerInHonestAnswerDraftAndMaliciousQuestion;
+
+      if (didHonestWin) {
+        return true;
+      }
+
+      return false;
+    })();
+  }
+
+  // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
   public get hasTimeBudgetOfRootParent() {
     return (async () => {
