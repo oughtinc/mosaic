@@ -51,6 +51,9 @@ export async function experimentActivityCSV(server, res) {
       "Workspace Id": assignment.workspace.serialId,
       "Rootworkspace Id": assignment.workspace.rootWorkspace.serialId,
       "Has Been Selected By Judge": assignment.workspace.hasBeenSelectedByJudge,
+      "Has Declined To Challenge": assignment.workspace.hasDeclinedToChallenge,
+      "Has Been Selected Because Malicious Declined":
+        assignment.workspace.hasBeenSelectedBecauseMaliciousDeclined,
       "Has Selected Honest Answer":
         assignment.workspace.hasSelectedHonestAnswer,
       Duration:
