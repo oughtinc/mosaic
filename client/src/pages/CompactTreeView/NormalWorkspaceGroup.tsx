@@ -17,7 +17,6 @@ export class NormalWorkspaceGroup extends React.PureComponent<any, any> {
     const {
       availablePointers,
       isExpanded,
-      isThisActiveWorkspace,
       oracleBypassAnswerBlockId,
       oracleBypassAnswerValue,
       questionBlockId,
@@ -42,11 +41,7 @@ export class NormalWorkspaceGroup extends React.PureComponent<any, any> {
           >
             <CompactTreeRowLabel>Q</CompactTreeRowLabel>
           </Link>
-          <CompactTreeRowContent
-            style={{
-              boxShadow: isThisActiveWorkspace && "0 0 0 5px yellow",
-            }}
-          >
+          <CompactTreeRowContent>
             <BlockEditor
               name={questionBlockId}
               blockId={questionBlockId}

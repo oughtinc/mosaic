@@ -9,12 +9,7 @@ import { databaseJSONToValue } from "../../lib/slateParser";
 
 export class LazyUnlockGroup extends React.PureComponent<any, any> {
   public render() {
-    const {
-      availablePointers,
-      isExpanded,
-      isThisActiveWorkspace,
-      workspace,
-    } = this.props;
+    const { availablePointers, isExpanded, workspace } = this.props;
 
     const oracleQuestionBlock = workspace.blocks.find(
       b => b.type === "QUESTION",
@@ -40,11 +35,7 @@ export class LazyUnlockGroup extends React.PureComponent<any, any> {
           >
             <CompactTreeRowLabel>🔑</CompactTreeRowLabel>
           </Link>
-          <CompactTreeRowContent
-            style={{
-              boxShadow: isThisActiveWorkspace && "0 0 0  5px yellow",
-            }}
-          >
+          <CompactTreeRowContent>
             <BlockEditor
               name={oracleQuestionBlock.id}
               blockId={oracleQuestionBlock.id}
