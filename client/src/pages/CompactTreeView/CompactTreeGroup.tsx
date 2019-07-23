@@ -33,8 +33,10 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
     );
 
     const isThisActiveWorkspace =
-      activeWorkspaceId === this.props.workspace.id ||
-      (this.props.malicious && activeWorkspaceId === this.props.malicious.id);
+      activeWorkspaceId &&
+      (activeWorkspaceId === this.props.workspace.id ||
+        (this.props.malicious &&
+          activeWorkspaceId === this.props.malicious.id));
 
     if (isThisActiveWorkspace) {
       setTimeout(() => {
