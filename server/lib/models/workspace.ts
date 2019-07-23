@@ -221,6 +221,10 @@ export default class Workspace extends Model<Workspace> {
       const didMaliciousDeclineToChallenge =
         isHonestOracleCurrentlyResolved && !normal;
 
+      if (didMaliciousDeclineToChallenge) {
+        return;
+      }
+
       const honestAnswerDraftBlock = (await honestWorkspace.$get(
         "blocks",
       )).find(b => b.type === "ANSWER_DRAFT");
@@ -243,9 +247,8 @@ export default class Workspace extends Model<Workspace> {
         idOfPointerInHonestAnswerDraft === idOf2ndPointerInMaliciousQuestion;
 
       const didHonestWin =
-        didMaliciousDeclineToChallenge || // this is here b/c in some older trees the follow disjunct is false in cases where the malicious oracle declines
-        (isHonestOracleCurrentlyResolved &&
-          isSamePointerInHonestAnswerDraftAndMaliciousQuestion);
+        isHonestOracleCurrentlyResolved &&
+        isSamePointerInHonestAnswerDraftAndMaliciousQuestion;
 
       const didMaliciousWin =
         !didHonestWin && // this is here b/c in some older trees the follow two conjuncts are true in cases where the malicious oracle declines
@@ -257,6 +260,109 @@ export default class Workspace extends Model<Workspace> {
       }
 
       if (curWorkspace.isEligibleForMaliciousOracle && didMaliciousWin) {
+        return true;
+      }
+
+      return false;
+    })();
+  }
+
+  // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  public get hasBeenSelectedBecauseMaliciousDeclined() {
+    return (async () => {
+      const curWorkspace = await Workspace.findByPk(this.get("id") as string);
+
+      if (curWorkspace === null) {
+        return;
+      }
+
+      const isRootWorkspace = !curWorkspace.parentId;
+
+      const isHonestWorkspace = curWorkspace.isEligibleForHonestOracle;
+
+      if (isRootWorkspace || !isHonestWorkspace) {
+        return;
+      }
+
+      const honestWorkspace = curWorkspace.isEligibleForHonestOracle
+        ? curWorkspace
+        : await Workspace.findByPkOrSerialId(curWorkspace.parentId);
+
+      const isHonestOracleCurrentlyResolved =
+        honestWorkspace.isCurrentlyResolved;
+
+      if (!isHonestOracleCurrentlyResolved) {
+        return;
+      }
+
+      const maliciousWorkspace = curWorkspace.isEligibleForMaliciousOracle
+        ? curWorkspace
+        : await Workspace.findByPkOrSerialId(
+            curWorkspace.childWorkspaceOrder[0],
+          );
+
+      const normal =
+        maliciousWorkspace.childWorkspaceOrder[0] &&
+        (await Workspace.findByPkOrSerialId(
+          maliciousWorkspace.childWorkspaceOrder[0],
+        ));
+
+      const didMaliciousDeclineToChallenge = !normal;
+
+      if (didMaliciousDeclineToChallenge) {
+        return true;
+      }
+
+      return false;
+    })();
+  }
+
+  // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
+  public get hasDeclinedToChallenge() {
+    return (async () => {
+      const curWorkspace = await Workspace.findByPk(this.get("id") as string);
+
+      if (curWorkspace === null) {
+        return;
+      }
+
+      const isRootWorkspace = !curWorkspace.parentId;
+
+      const isMaliciousWorkspace = curWorkspace.isEligibleForMaliciousOracle;
+
+      if (isRootWorkspace || !isMaliciousWorkspace) {
+        return;
+      }
+
+      const honestWorkspace = curWorkspace.isEligibleForHonestOracle
+        ? curWorkspace
+        : await Workspace.findByPkOrSerialId(curWorkspace.parentId);
+
+      const isHonestOracleCurrentlyResolved =
+        honestWorkspace.isCurrentlyResolved;
+
+      if (!isHonestOracleCurrentlyResolved) {
+        return;
+      }
+
+      const maliciousWorkspace = curWorkspace.isEligibleForMaliciousOracle
+        ? curWorkspace
+        : await Workspace.findByPkOrSerialId(
+            curWorkspace.childWorkspaceOrder[0],
+          );
+
+      const normal =
+        maliciousWorkspace.childWorkspaceOrder[0] &&
+        (await Workspace.findByPkOrSerialId(
+          maliciousWorkspace.childWorkspaceOrder[0],
+        ));
+
+      const didMaliciousDeclineToChallenge =
+        isHonestOracleCurrentlyResolved && !normal;
+
+      if (didMaliciousDeclineToChallenge) {
         return true;
       }
 
