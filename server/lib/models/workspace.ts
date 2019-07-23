@@ -300,7 +300,10 @@ export default class Workspace extends Model<Workspace> {
         b => b.type === "ANSWER_DRAFT",
       );
 
-      const answerHasBeenSelected = answerDraftBlock.value;
+      const answerHasBeenSelected = _.get(
+        answerDraftBlock,
+        "value[0].nodes[1].data.pointerId",
+      );
 
       if (!answerHasBeenSelected) {
         return;
