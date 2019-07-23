@@ -33,10 +33,8 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
     );
 
     const isThisActiveWorkspace =
-      activeWorkspaceId &&
-      (activeWorkspaceId === this.props.workspace.id ||
-        (this.props.malicious &&
-          activeWorkspaceId === this.props.malicious.id));
+      activeWorkspaceId === this.props.workspace.id ||
+      (this.props.malicious && activeWorkspaceId === this.props.malicious.id);
 
     if (isThisActiveWorkspace) {
       setTimeout(() => {
@@ -49,14 +47,6 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   }
 
   public render() {
-    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
-      window.location.search,
-    );
-
-    const isThisActiveWorkspace =
-      activeWorkspaceId === this.props.workspace.id ||
-      (this.props.malicious && activeWorkspaceId === this.props.malicious.id);
-
     if (this.props.isRequestingLazyUnlock) {
       return (
         <LazyUnlockGroup
