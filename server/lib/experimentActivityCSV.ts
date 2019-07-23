@@ -40,7 +40,9 @@ export async function experimentActivityCSV(server, res) {
   });
 
   const data =
-    jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
+    jsonResponse &&
+    jsonResponse.data &&
+    jsonResponse.data.assignments.slice(0, 100);
 
   data &&
     data.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
