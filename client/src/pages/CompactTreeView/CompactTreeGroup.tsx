@@ -32,7 +32,9 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
       window.location.search,
     );
 
-    const isThisActiveWorkspace = activeWorkspaceId === this.props.workspace.id;
+    const isThisActiveWorkspace =
+      activeWorkspaceId === this.props.workspace.id ||
+      (this.props.malicious && activeWorkspaceId === this.props.malicious.id);
 
     if (isThisActiveWorkspace) {
       setTimeout(() => {
@@ -45,18 +47,11 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
   }
 
   public render() {
-    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
-      window.location.search,
-    );
-
-    const isThisActiveWorkspace = activeWorkspaceId === this.props.workspace.id;
-
     if (this.props.isRequestingLazyUnlock) {
       return (
         <LazyUnlockGroup
           availablePointers={this.props.availablePointers}
           isExpanded={this.props.isExpanded}
-          isThisActiveWorkspace={isThisActiveWorkspace}
           workspace={this.props.workspace}
         />
       );
@@ -67,7 +62,6 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
         <NormalWorkspaceGroup
           availablePointers={this.props.availablePointers}
           isExpanded={this.props.isExpanded}
-          isThisActiveWorkspace={isThisActiveWorkspace}
           oracleBypassAnswerBlockId={this.props.oracleBypassAnswerBlockId}
           oracleBypassAnswerValue={this.props.oracleBypassAnswerValue}
           questionBlockId={this.props.questionBlockId}
@@ -88,11 +82,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
             >
               <CompactTreeRowLabel>Q</CompactTreeRowLabel>
             </Link>
-            <CompactTreeRowContent
-              style={{
-                boxShadow: isThisActiveWorkspace && "0 0 0  5px yellow",
-              }}
-            >
+            <CompactTreeRowContent>
               <BlockEditor
                 name={this.props.questionBlockId}
                 blockId={this.props.questionBlockId}
@@ -163,11 +153,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
           >
             <CompactTreeRowLabel>Q</CompactTreeRowLabel>
           </Link>
-          <CompactTreeRowContent
-            style={{
-              boxShadow: isThisActiveWorkspace && "0 0 0  5px yellow",
-            }}
-          >
+          <CompactTreeRowContent>
             <BlockEditor
               name={this.props.questionBlockId}
               blockId={this.props.questionBlockId}
@@ -242,6 +228,17 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
   };
 
   public render() {
+    const activeWorkspaceId = getActiveWorkspaceIdFromQueryParams(
+      window.location.search,
+    );
+
+    const isThisActiveWorkspace =
+      activeWorkspaceId &&
+      (activeWorkspaceId ===
+        (this.props.workspace && this.props.workspace.id) ||
+        (this.props.malicious &&
+          activeWorkspaceId === this.props.malicious.id));
+
     return (
       <div
         style={{
@@ -249,8 +246,8 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
           border: "1px solid #ddd",
           borderLeft: "2px solid #bbb",
           borderRadius: "3px",
-          boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05)",
+          boxShadow: `inset 0 1px 0 rgba(255,255,255,.25), 0 1px 2px rgba(0,0,0,.05)${isThisActiveWorkspace &&
+            ", 0 0 0  5px yellow"}`,
           marginTop: "35px",
           minHeight: "35px",
           padding: "10px",

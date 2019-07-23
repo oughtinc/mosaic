@@ -215,7 +215,7 @@ const RootTreeLink = ({ workspace }) => (
     target="_blank"
     to={`/w/${
       workspace.rootWorkspaceSerialId
-    }/subtree?expanded=true&activeWorkspace=${workspace.id}`}
+    }/compactTree?expanded=true&activeWorkspace=${workspace.id}`}
   >
     <Button bsStyle="default" bsSize="xsmall">
       Entire Tree »
