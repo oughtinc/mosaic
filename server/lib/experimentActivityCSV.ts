@@ -1,6 +1,7 @@
 import { print } from "graphql";
 import gql from "graphql-tag";
 import { Parser } from "json2csv";
+import { assign } from "apollo-utilities";
 
 export async function experimentActivityCSV(server, res) {
   const jsonResponse = await server.executeOperation({
@@ -44,7 +45,9 @@ export async function experimentActivityCSV(server, res) {
     data &&
     data.map(assignment => ({
       "User Email": assignment.user.email,
-      Experiment: assignment.experiment.name,
+      "Experiment Name": assignment.experiment.name,
+      "Workspace Id": assignment.workspace.serialId,
+      "Rootworkspace Id": assignment.workspace.rootWorkspace.serialId,
       Duration:
         Math.round(
           ((assignment.endAtTimestamp - assignment.startAtTimestamp) /
