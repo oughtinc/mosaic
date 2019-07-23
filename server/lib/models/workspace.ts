@@ -336,9 +336,7 @@ export default class Workspace extends Model<Workspace> {
         return;
       }
 
-      const honestWorkspace = curWorkspace.isEligibleForHonestOracle
-        ? curWorkspace
-        : await Workspace.findByPkOrSerialId(curWorkspace.parentId);
+      const honestWorkspace = await Workspace.findByPk(curWorkspace.parentId);
 
       const isHonestOracleCurrentlyResolved =
         honestWorkspace.isCurrentlyResolved;
