@@ -402,7 +402,11 @@ const WorkspaceInput = new GraphQLInputObjectType({
 function modelGraphQLFields(type: any, model: any) {
   return {
     type,
-    args: { where: { type: GraphQLJSON } },
+    args: {
+      where: { type: GraphQLJSON },
+      limit: { type: GraphQLInt },
+      order: { type: GraphQLString },
+    },
     resolve: resolver(model),
   };
 }

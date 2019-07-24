@@ -7,7 +7,7 @@ export async function experimentActivityCSV(server, res) {
   const jsonResponse = await server.executeOperation({
     query: print(gql`
       query assignments {
-        assignments {
+        assignments(limit: 100, order: "reverse:createdAt") {
           id
           createdAt
           startAtTimestamp
@@ -37,9 +37,6 @@ export async function experimentActivityCSV(server, res) {
 
   const data =
     jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
-
-  data &&
-    data.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 
   const processedData =
     data &&
