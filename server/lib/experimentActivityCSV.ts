@@ -7,7 +7,7 @@ export async function experimentActivityCSV(server, res) {
   const jsonResponse = await server.executeOperation({
     query: print(gql`
       query assignments {
-        assignments(limit: 100, order: "reverse:createdAt") {
+        assignments(limit: 200, order: "reverse:createdAt") {
           id
           createdAt
           startAtTimestamp
@@ -46,6 +46,7 @@ export async function experimentActivityCSV(server, res) {
     data &&
     data.map(assignment => ({
       "User Email": assignment.user.email,
+      "Assignment Started": assignment.createdAt,
       "Experiment Name": assignment.experiment.name,
       "Workspace Id": assignment.workspace.serialId,
       "Rootworkspace Id": assignment.workspace.rootWorkspace.serialId,
