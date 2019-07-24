@@ -70,9 +70,9 @@ export async function experimentActivityCSV(server, res) {
       "Link To History": `https://mosaic.ought.org/snapshots/${
         assignment.workspace.serialId
       }`,
-      "Link to Tree": `https://mosaic.ought.org/compactTree/${
+      "Link to Tree": `https://mosaic.ought.org/w/${
         assignment.workspace.rootWorkspace.serialId
-      }/expanded=true&activeWorkspace=${assignment.workspace.id}`,
+      }/compactTree?expanded=true&activeWorkspace=${assignment.workspace.id}`,
     }));
 
   const parser = new Parser();
