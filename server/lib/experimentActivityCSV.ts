@@ -25,10 +25,6 @@ export async function experimentActivityCSV(server, res) {
             }
             isEligibleForHonestOracle
             isEligibleForMaliciousOracle
-            hasBeenSelectedByJudge
-            hasSelectedHonestAnswer
-            hasDeclinedToChallenge
-            hasBeenSelectedBecauseMaliciousDeclined
           }
           experiment {
             id
@@ -40,9 +36,7 @@ export async function experimentActivityCSV(server, res) {
   });
 
   const data =
-    jsonResponse &&
-    jsonResponse.data &&
-    jsonResponse.data.assignments.slice(0, 100);
+    jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
 
   data &&
     data.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
@@ -54,11 +48,11 @@ export async function experimentActivityCSV(server, res) {
       "Experiment Name": assignment.experiment.name,
       "Workspace Id": assignment.workspace.serialId,
       "Rootworkspace Id": assignment.workspace.rootWorkspace.serialId,
-      "Selected By Judge": assignment.workspace.hasBeenSelectedByJudge,
-      "Declined To Challenge": assignment.workspace.hasDeclinedToChallenge,
-      "Selected Because Malicious Declined":
-        assignment.workspace.hasBeenSelectedBecauseMaliciousDeclined,
-      "Picked Honest Answer": assignment.workspace.hasSelectedHonestAnswer,
+      // "Selected By Judge": assignment.workspace.hasBeenSelectedByJudge,
+      // "Declined To Challenge": assignment.workspace.hasDeclinedToChallenge,
+      // "Selected Because Malicious Declined":
+      //   assignment.workspace.hasBeenSelectedBecauseMaliciousDeclined,
+      // "Picked Honest Answer": assignment.workspace.hasSelectedHonestAnswer,
       Duration:
         Math.round(
           ((assignment.endAtTimestamp - assignment.startAtTimestamp) /
