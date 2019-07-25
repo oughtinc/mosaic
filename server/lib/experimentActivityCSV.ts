@@ -1,13 +1,39 @@
 import { print } from "graphql";
 import gql from "graphql-tag";
+import * as _ from "lodash";
 import { Parser } from "json2csv";
-import { assign } from "apollo-utilities";
 
-export async function experimentActivityCSV(server, res) {
+let mostRecentId: string;
+
+export async function experimentActivityCSV(server, res, req) {
+  let offset = 0;
+
+  if (req.query.recent) {
+    const allAssignments = await server.executeOperation({
+      query: print(gql`
+        query assignments {
+          assignments(order: "createdAt", after: "2019-06-16") {
+            id
+          }
+        }
+      `),
+    });
+
+    const allAssignmentsData =
+      allAssignments && allAssignments.data && allAssignments.data.assignments;
+
+    offset = _.findIndex(allAssignmentsData, a => a.id === mostRecentId) + 1;
+  }
+
   const jsonResponse = await server.executeOperation({
     query: print(gql`
-      query assignments {
-        assignments(limit: 200, order: "reverse:createdAt") {
+      query assignments($offset: Int, $limit: Int) {
+        assignments(
+          offset: $offset
+          limit: $limit
+          order: "createdAt"
+          after: "2019-06-16"
+        ) {
           id
           createdAt
           startAtTimestamp
@@ -37,10 +63,18 @@ export async function experimentActivityCSV(server, res) {
         }
       }
     `),
+    variables: {
+      offset: Number(req.query.offset) || offset,
+      limit: Number(req.query.limit),
+    },
   });
 
   const data =
     jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
+
+  data.reverse();
+
+  mostRecentId = data[0] && data[0].id;
 
   const processedData =
     data &&

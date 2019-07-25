@@ -13,6 +13,7 @@ import {
 } from "graphql";
 import GraphQLJSON from "graphql-type-json";
 import * as Sequelize from "sequelize";
+import { Op } from "sequelize";
 
 import { requireAdmin, requireUser } from "./auth";
 
@@ -406,8 +407,30 @@ function modelGraphQLFields(type: any, model: any) {
       where: { type: GraphQLJSON },
       limit: { type: GraphQLInt },
       order: { type: GraphQLString },
+      offset: { type: GraphQLInt },
+      after: { type: GraphQLString },
     },
-    resolve: resolver(model),
+    resolve: resolver(model, {
+      before: async function(findOptions, args, context, info) {
+        if (args.offset) {
+          findOptions = {
+            ...findOptions,
+            offset: args.offset,
+          };
+        }
+        if (args.after) {
+          findOptions = {
+            ...findOptions,
+            where: {
+              createdAt: { [Op.gt]: new Date(args.after) },
+              ...findOptions.where,
+            },
+          };
+        }
+
+        return findOptions;
+      },
+    }),
   };
 }
 

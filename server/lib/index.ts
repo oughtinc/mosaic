@@ -63,7 +63,7 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
   );
 
   app.get("/experimentActivity", async (req, res) => {
-    experimentActivityCSV(server, res);
+    experimentActivityCSV(server, res, req);
   });
 
   if (!process.env.USING_DOCKER) {
