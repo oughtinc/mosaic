@@ -1,9 +1,9 @@
 import * as chai from "chai";
 import db from "../../../lib/models";
-import { createRootWorkspace } from "../../testHelpers/graphQLCalls";
+import { createRootWorkspace } from "../../testHelpers/graphqlCalls";
 import { rootWorkspaceQuestion } from "../../testHelpers/slateHelpers";
 
-describe("graphQL schema", () => {
+describe("graphql schema", () => {
   describe("createWorkspace", () => {
     beforeEach(() => db.sync({ force: true }));
 
