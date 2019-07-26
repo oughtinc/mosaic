@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 // Note: uses local storage instead of redux to persist across sessions
 // May consider alternate architecture ie through the redux-localstorage package
 import { Config } from "../config";
-import { client } from "../graphQLClient";
+import { client } from "../graphqlClient";
 
 const MOSAIC_PRE_AUTH_URL = "MOSAIC_PRE_AUTH_URL";
 

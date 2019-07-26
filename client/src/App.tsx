@@ -6,7 +6,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import thunk from "redux-thunk";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { client } from "./graphQLClient";
+import { client } from "./graphqlClient";
 
 import { EpisodeShowPage } from "./pages/EpisodeShowPage";
 import { ExperimentShowPage } from "./pages/ExperimentShowPage";
