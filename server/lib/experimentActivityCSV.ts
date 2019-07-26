@@ -76,6 +76,11 @@ export async function experimentActivityCSV(server, res, req) {
 
   mostRecentId = data[0] && data[0].id;
 
+  if (!data[0]) {
+    res.end("No data right now");
+    return;
+  }
+
   const processedData =
     data &&
     data.map(assignment => ({
