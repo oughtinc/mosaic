@@ -135,6 +135,11 @@ export default class Workspace extends Model<Workspace> {
   @Column(DataType.INTEGER)
   public allocatedBudget: number;
 
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isAwaitingHonestExpertDecision: boolean;
+
   // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasAncestorAnsweredByOracle() {
