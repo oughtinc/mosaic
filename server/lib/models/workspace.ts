@@ -500,11 +500,10 @@ export default class Workspace extends Model<Workspace> {
       return false;
     }
     const isParentRootWorkspace = !parentWorkspace.parentId;
-    const isParentOracleWorkspace =
-      parentWorkspace.isEligibleForHonestOracle ||
-      parentWorkspace.isEligibleForMaliciousOracle;
+    const isParentHonestOracleWorkspace =
+      parentWorkspace.isEligibleForHonestOracle;
 
-    if (isParentOracleWorkspace && !isParentRootWorkspace) {
+    if (isParentHonestOracleWorkspace && !isParentRootWorkspace) {
       return false;
     }
 
@@ -562,9 +561,12 @@ export default class Workspace extends Model<Workspace> {
     isEligibleForMaliciousOracle,
     shouldOverrideToNormalUser,
   }) {
+    let isAwaitingHonestExpertDecision;
+
     if (shouldOverrideToNormalUser) {
       isEligibleForHonestOracle = false;
       isEligibleForMaliciousOracle = false;
+      isAwaitingHonestExpertDecision = false;
     } else {
       isEligibleForHonestOracle =
         isEligibleForHonestOracle !== undefined
@@ -578,6 +580,10 @@ export default class Workspace extends Model<Workspace> {
           : await Workspace.isNewChildWorkspaceMaliciousOracleEligible({
               parentId,
             });
+      isAwaitingHonestExpertDecision =
+        isEligibleForHonestOracle &&
+        (await Workspace.findByPkOrSerialId(parentId))
+          .isEligibleForMaliciousOracle;
     }
 
     return await Workspace.create(
@@ -590,6 +596,7 @@ export default class Workspace extends Model<Workspace> {
         isRequestingLazyUnlock,
         isEligibleForHonestOracle,
         isEligibleForMaliciousOracle,
+        isAwaitingHonestExpertDecision,
       },
       { questionValue: question },
     );
