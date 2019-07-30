@@ -711,23 +711,24 @@ export class WorkspaceView extends React.Component<any, any> {
                           <span style={{ color: "darkGray" }}>
                             Workspace #{workspace.serialId}
                           </span>
-                          <BlockEditor
+                          {/* <BlockEditor
                             name={rootWorkspaceScratchPad.id}
                             blockId={rootWorkspaceScratchPad.id}
                             readOnly={true}
                             initialValue={rootWorkspaceScratchPad.value}
                             shouldAutosave={false}
                             availablePointers={[]}
-                          />
-                          {/* {rootWorkspaceScratchPadLink !== "" && (
+                          /> */}
+                          {rootWorkspaceScratchPadLink !== "" && (
                             <div>
-                              <Link
+                              <a
+                                href={rootWorkspaceScratchPadLink}
                                 style={{ color: "darkGray", fontSize: "14px" }}
                               >
                                 {rootWorkspaceScratchPadLink}
-                              </Link>
+                              </a>
                             </div>
-                          )} */}
+                          )}
                           <BlockEditor
                             isActive={isActive}
                             isUserOracle={isUserOracle}
