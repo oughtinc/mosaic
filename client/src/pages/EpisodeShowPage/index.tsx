@@ -336,11 +336,12 @@ export class WorkspaceView extends React.Component<any, any> {
     });
   };
 
+  /**
+   * All "otherBlocks" should be straight from a GraphQL response.
+   * This is why we need to use databaseJSONToValue on the value
+   * before passing it to findPointers.
+   */
   public getAvailablePointers(workspace: any, ...otherBlocks) {
-    // All "otherBlocks" should be straight from a GraphQL response.
-    // This is why we need to use databaseJSONToValue on the value
-    // before passing it to findPointers.
-
     const importedPointers = workspace.connectedPointers;
 
     // TODO: Figure out why allReadOnlyBlocks and readOnlyExportedPointers
