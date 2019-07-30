@@ -29,11 +29,9 @@ cd /data
 yarn test
 ```
 
-
 ## Development
 
 The code is written in [Typescript](https://www.typescriptlang.org/), but much of it is not correctly annotated. We use [Prettier](https://github.com/prettier/prettier) for code formatting.
-
 
 ## Deployment
 
@@ -41,10 +39,9 @@ The app is deployed on Heroku.
 
 To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page.
 
-When a branch is merged into master, the main deploy is updated automatically.
+When a branch is merged into master, CI runs. If the CI passes, the main deploy is updated automatically. Configure this setting at https://dashboard.heroku.com/apps/mosaic-prod/deploy/github.
 
 Note that `docker-compose.yml` and `package.json` at the root level must be kept in sync.
-
 
 ## Saving and restoring the database
 
@@ -72,11 +69,7 @@ Since the app doesn't currently support import/export of individual question-ans
 ### Autodump
 
 To automatically create new dumps when the db changes:
+
 1. If the app is not running, run it (`docker-compose up`)
 2. `cd server`
 3. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
-
-### Autodeploy
-
-Heroku will automatically deploy a merged branch to master to production. However
-this only happens if CI passes. Configure this setting at https://dashboard.heroku.com/apps/mosaic-prod/deploy/github
