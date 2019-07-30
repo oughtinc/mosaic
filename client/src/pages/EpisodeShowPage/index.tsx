@@ -734,18 +734,11 @@ export class WorkspaceView extends React.Component<any, any> {
                           {shouldShowRootWorkspaceScratchpad && (
                             <div
                               style={{
-                                backgroundColor: "#f8f8f8",
-                                border: "1px solid #ddd",
-                                borderRadius: "3px",
-                                fontSize: "14px",
-                                padding: "10px",
-                                marginBottom: "10px",
+                                fontSize: "18px",
+                                marginBottom: "20px",
                                 width: "550px",
                               }}
                             >
-                              <span style={{ fontWeight: 600 }}>
-                                Root-level scratchpad
-                              </span>
                               <BlockEditor
                                 isActive={isActive}
                                 isUserOracle={isUserOracle}
