@@ -67,6 +67,7 @@ Since the app doesn't currently support import/export of individual question-ans
 
 - One error case is that the scripts attempt to connect to the db with your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
 - Relatedly, you may get this error if you try to restore the DB while the code is recompiling: `ERROR: database "mosaic_dev" is being accessed by other users`. If you do, wait until the code is done compiling and try again.
+- If you get the issue `Cannot find module 'apollo-utilities'`, add a blank line to a .tsx file to reload Webpack and fix it. Uncertain why this works. Delete the newline after.
 
 ### Autodump
 
