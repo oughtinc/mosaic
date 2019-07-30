@@ -11,8 +11,8 @@ export function convertActionTypeToReadableString(actionType: string) {
     return "Wait for Answer";
   }
 
-  if (actionType === "NEEDS_MORE_WORK") {
-    return "Needs more work";
+  if (actionType === "SKIP_WORKSPACE") {
+    return "Skip Workspace";
   }
 
   if (actionType === "SUBMIT_ANSWER_CANDIDATE") {
