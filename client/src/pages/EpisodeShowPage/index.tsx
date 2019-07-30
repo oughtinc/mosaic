@@ -576,11 +576,10 @@ export class WorkspaceView extends React.Component<any, any> {
     const rootWorkspaceScratchPad = workspace.rootWorkspace.blocks.find(
       b => b.type === "SCRATCHPAD",
     );
-    const rootWorkspaceScratchPadNodes = workspace.rootWorkspace.blocks.find(
-      b => b.type === "SCRATCHPAD",
-    ).value[0].nodes;
-    const links = rootWorkspaceScratchPadNodes.find(n => n.type === "link");
-    const rootWorkspaceScratchPadLink = links ? links.data.href : "";
+    const linkNodes = rootWorkspaceScratchPad.value[0].nodes.find(
+      n => n.type === "link",
+    );
+    const rootWorkspaceScratchPadLink = linkNodes ? linkNodes.data.href : "";
 
     return (
       <div>
@@ -724,6 +723,7 @@ export class WorkspaceView extends React.Component<any, any> {
                               <a
                                 href={rootWorkspaceScratchPadLink}
                                 style={{ color: "darkGray", fontSize: "14px" }}
+                                target="_blank"
                               >
                                 {rootWorkspaceScratchPadLink}
                               </a>
