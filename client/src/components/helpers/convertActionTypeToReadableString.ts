@@ -1,4 +1,9 @@
 export function convertActionTypeToReadableString(actionType: string) {
+  /**
+   * If matches a condition, returns a string formatted for display
+   * Otherwise returns the actionType string
+   */
+
   if (actionType === "INITIALIZE") {
     return "Initialize";
   }
