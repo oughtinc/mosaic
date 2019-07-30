@@ -415,39 +415,6 @@ export class WorkspaceView extends React.Component<any, any> {
       value: b.value.toJSON(),
     }));
 
-    console.log("making snapshot", {
-      variables: {
-        userId: Auth.userId(),
-        assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
-        workspaceId: workspace.id,
-        actionType: action,
-        snapshot: JSON.stringify({
-          userId: Auth.userId(),
-          workspaceId: workspace.id,
-          workspace: augmentedBlocks.filter(b =>
-            workspace.blocks.find(b2 => b.id === b2.id),
-          ),
-          children: _.sortBy(workspace.childWorkspaces, cw =>
-            Date.parse(cw.createdAt),
-          ).map(w => {
-            const childBlocks = augmentedBlocks.filter(b =>
-              w.blocks.find(b2 => b.id === b2.id),
-            );
-            return childBlocks.map(b => ({
-              ...b,
-              isArchived: w.isArchived,
-              isForJudge: !(
-                w.isEligibleForHonestOracle || w.isEligibleForMaliciousOracle
-              ),
-            }));
-          }),
-          exportLockStatusInfo: workspace.exportLockStatusInfo,
-          action,
-          availablePointers: this.getAvailablePointers(workspace),
-        }),
-      },
-    });
-
     props.createSnapshot({
       variables: {
         userId: Auth.userId(),
