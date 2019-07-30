@@ -739,6 +739,7 @@ export class WorkspaceView extends React.Component<any, any> {
                                 fontSize: "14px",
                                 padding: "10px",
                                 marginBottom: "10px",
+                                width: "550px",
                               }}
                             >
                               <span style={{ fontWeight: 600 }}>
