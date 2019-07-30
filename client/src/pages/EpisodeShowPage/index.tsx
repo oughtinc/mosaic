@@ -46,6 +46,7 @@ import {
 } from "./WorkspaceRelations";
 
 import { ExpandAllPointersBtn } from "./ExpandAllPointersBtn";
+import { databaseJSONToValue } from "../../lib/slateParser";
 
 import {
   ORACLE_MODE_QUERY,
@@ -387,7 +388,17 @@ export class WorkspaceView extends React.Component<any, any> {
       workspace.blocks.concat(workspace.childWorkspaces.map(cw => cw.blocks)),
     );
 
-    const reduxBlocks = props.reduxState.blocks.blocks.map(b => ({
+    // We want to snapshot the Redux state of this workspace
+    // The Redux state will have captured any changes made to the blocks
+    // That what the next three consts are doing (until the console.log)
+
+    const reduxBlocks = props.reduxState.blocks.blocks;
+
+    const reduxBlocksAssociatedWithWorkspace = reduxBlocks.filter(b =>
+      workspaceBlocks.find((b2: any) => b.id === b2.id),
+    );
+
+    const augmentedBlocks = reduxBlocksAssociatedWithWorkspace.map(b => ({
       id: b.id,
       type: workspaceBlocks.find((b2: any) => b.id === b2.id).type,
       value: b.value.toJSON(),
@@ -402,13 +413,13 @@ export class WorkspaceView extends React.Component<any, any> {
         snapshot: JSON.stringify({
           userId: Auth.userId(),
           workspaceId: workspace.id,
-          workspace: reduxBlocks.filter(b =>
+          workspace: augmentedBlocks.filter(b =>
             workspace.blocks.find(b2 => b.id === b2.id),
           ),
           children: _.sortBy(workspace.childWorkspaces, cw =>
             Date.parse(cw.createdAt),
           ).map(w => {
-            const childBlocks = reduxBlocks.filter(b =>
+            const childBlocks = augmentedBlocks.filter(b =>
               w.blocks.find(b2 => b.id === b2.id),
             );
             return childBlocks.map(b => ({
@@ -435,13 +446,13 @@ export class WorkspaceView extends React.Component<any, any> {
         snapshot: JSON.stringify({
           userId: Auth.userId(),
           workspaceId: workspace.id,
-          workspace: reduxBlocks.filter(b =>
+          workspace: augmentedBlocks.filter(b =>
             workspace.blocks.find(b2 => b.id === b2.id),
           ),
           children: _.sortBy(workspace.childWorkspaces, cw =>
             Date.parse(cw.createdAt),
           ).map(w => {
-            const childBlocks = reduxBlocks.filter(b =>
+            const childBlocks = augmentedBlocks.filter(b =>
               w.blocks.find(b2 => b.id === b2.id),
             );
             return childBlocks.map(b => ({
@@ -710,23 +721,22 @@ export class WorkspaceView extends React.Component<any, any> {
                           <span style={{ color: "darkGray" }}>
                             Workspace #{workspace.serialId}
                           </span>
-                          {/* <BlockEditor
-                            name={rootWorkspaceScratchPad.id}
-                            blockId={rootWorkspaceScratchPad.id}
-                            readOnly={true}
-                            initialValue={rootWorkspaceScratchPad.value}
-                            shouldAutosave={false}
-                            availablePointers={[]}
-                          /> */}
-                          {rootWorkspaceScratchPadLink !== "" && (
-                            <div>
-                              <a
-                                href={rootWorkspaceScratchPadLink}
-                                style={{ color: "darkGray", fontSize: "14px" }}
-                                target="_blank"
-                              >
-                                {rootWorkspaceScratchPadLink}
-                              </a>
+                          {hasParent && isOracleWorkspace && (
+                            <div
+                              style={{ fontSize: "14px", marginBottom: "10px" }}
+                            >
+                              <BlockEditor
+                                name={rootWorkspaceScratchPad.id}
+                                blockId={rootWorkspaceScratchPad.id}
+                                readOnly={true}
+                                initialValue={databaseJSONToValue(
+                                  rootWorkspaceScratchPad.value,
+                                )}
+                                shouldAutosave={false}
+                                availablePointers={
+                                  [] /* this will work assuming root workspace scratchpad has no imports */
+                                }
+                              />
                             </div>
                           )}
                           <BlockEditor
