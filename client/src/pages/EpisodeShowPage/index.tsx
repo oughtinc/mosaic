@@ -611,13 +611,28 @@ export class WorkspaceView extends React.Component<any, any> {
       b => b.type === "SCRATCHPAD",
     );
 
+    const doesRootWorkspaceScratchpadValueContainOneNode =
+      _.get(rootWorkspaceScratchPad, "value[0].nodes.length") === 1;
+
+    const isRootWorkspaceScratchpadValueFirstTextNodeEmpty =
+      _.get(rootWorkspaceScratchPad, "value[0].nodes[0].leaves[0].text") === "";
+
+    const doesRootWorkspaceScratchpadContainRelevantContent = !(
+      doesRootWorkspaceScratchpadValueContainOneNode &&
+      isRootWorkspaceScratchpadValueFirstTextNodeEmpty
+    );
+
     // The root workspace scratchpad will be included
     // in any non-root expert workspace.
     // (It's of course already included in the root workspace.)
-    const availablePointers =
-      hasParent && isOracleWorkspace
-        ? this.getAvailablePointers(workspace, rootWorkspaceScratchPad)
-        : this.getAvailablePointers(workspace);
+    const shouldShowRootWorkspaceScratchpad =
+      hasParent &&
+      isOracleWorkspace &&
+      doesRootWorkspaceScratchpadContainRelevantContent;
+
+    const availablePointers = shouldShowRootWorkspaceScratchpad
+      ? this.getAvailablePointers(workspace, rootWorkspaceScratchPad)
+      : this.getAvailablePointers(workspace);
 
     return (
       <div>
@@ -748,7 +763,7 @@ export class WorkspaceView extends React.Component<any, any> {
                           <span style={{ color: "darkGray" }}>
                             Workspace #{workspace.serialId}
                           </span>
-                          {hasParent && isOracleWorkspace && (
+                          {shouldShowRootWorkspaceScratchpad && (
                             <div
                               style={{
                                 backgroundColor: "#f8f8f8",
