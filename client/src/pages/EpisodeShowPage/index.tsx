@@ -336,9 +336,15 @@ export class WorkspaceView extends React.Component<any, any> {
     });
   };
 
-  public getAvailablePointers(workspace: any) {
+  public getAvailablePointers(workspace: any, ...otherBlocks) {
+    // All "otherBlocks" should be straight from a GraphQL response.
+    // This is why we need to use databaseJSONToValue on the value
+    // before passing it to findPointers.
+
     const importedPointers = workspace.connectedPointers;
 
+    // TODO: Figure out why allReadOnlyBlocks and readOnlyExportedPointers
+    // was originally included and determine if its inclusion is necessary
     const allReadOnlyBlocks = new WorkspaceWithRelations(
       workspace,
     ).allReadOnlyBlocks();
@@ -358,11 +364,16 @@ export class WorkspaceView extends React.Component<any, any> {
       }
     }
 
+    const otherPointers = _.flatten(
+      otherBlocks.map(b => findPointers(databaseJSONToValue(b.value))),
+    );
+
     const unsortedAvailablePointers = _.uniqBy(
       [
         ...this.props.exportingPointers,
         ...importedPointers,
         ...readOnlyExportedPointers,
+        ...otherPointers,
       ],
       p => p.data.pointerId,
     );
@@ -474,23 +485,29 @@ export class WorkspaceView extends React.Component<any, any> {
   public render() {
     const workspace = this.props.workspace.workspace;
 
-    const availablePointers = this.getAvailablePointers(workspace);
-
     const questionProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceQuestion,
       workspace,
     ).blockEditorAttributes();
+
     const scratchpadProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceScratchpad,
       workspace,
     ).blockEditorAttributes();
+
     const subquestionDraftProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceSubquestionDraft,
       workspace,
     ).blockEditorAttributes();
+
     const answerDraftProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceAnswerDraft,
       workspace,
+    ).blockEditorAttributes();
+
+    const rootWorkspaceScratchpadProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.RootWorkspaceScratchpad,
+      workspace.rootWorkspace,
     ).blockEditorAttributes();
 
     const isOracleWorkspace =
@@ -584,13 +601,23 @@ export class WorkspaceView extends React.Component<any, any> {
       !isOracleWorkspace &&
       isParentOracleWorkspace;
 
+    // This (rootWorkspaceScratchPad) is included in expert workspaces.
+    // The purpose of including this in expert workspaces
+    // is to ensure that the expert always has access to essential information
+    // (such as the URL for an associated text). All such essential information
+    // should be included by the experiment creator in the root workspace
+    // scratchpad.
     const rootWorkspaceScratchPad = workspace.rootWorkspace.blocks.find(
       b => b.type === "SCRATCHPAD",
     );
-    const linkNodes = rootWorkspaceScratchPad.value[0].nodes.find(
-      n => n.type === "link",
-    );
-    const rootWorkspaceScratchPadLink = linkNodes ? linkNodes.data.href : "";
+
+    // The root workspace scratchpad will be included
+    // in any non-root expert workspace.
+    // (It's of course already included in the root workspace.)
+    const availablePointers =
+      hasParent && isOracleWorkspace
+        ? this.getAvailablePointers(workspace, rootWorkspaceScratchPad)
+        : this.getAvailablePointers(workspace);
 
     return (
       <div>
@@ -723,19 +750,23 @@ export class WorkspaceView extends React.Component<any, any> {
                           </span>
                           {hasParent && isOracleWorkspace && (
                             <div
-                              style={{ fontSize: "14px", marginBottom: "10px" }}
+                              style={{
+                                backgroundColor: "#f8f8f8",
+                                border: "1px solid #ddd",
+                                borderRadius: "3px",
+                                fontSize: "14px",
+                                padding: "10px",
+                                marginBottom: "10px",
+                              }}
                             >
+                              <span style={{ fontWeight: 600 }}>
+                                Root-level scratchpad
+                              </span>
                               <BlockEditor
-                                name={rootWorkspaceScratchPad.id}
-                                blockId={rootWorkspaceScratchPad.id}
-                                readOnly={true}
-                                initialValue={databaseJSONToValue(
-                                  rootWorkspaceScratchPad.value,
-                                )}
-                                shouldAutosave={false}
-                                availablePointers={
-                                  [] /* this will work assuming root workspace scratchpad has no imports */
-                                }
+                                isActive={isActive}
+                                isUserOracle={isUserOracle}
+                                availablePointers={availablePointers}
+                                {...rootWorkspaceScratchpadProps}
                               />
                             </div>
                           )}

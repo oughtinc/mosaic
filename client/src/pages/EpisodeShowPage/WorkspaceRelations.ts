@@ -15,6 +15,7 @@ export enum WorkspaceRelationTypes {
   SubworkspaceQuestion,
   SubworkspaceAnswer,
   SubworkspaceAnswerDraft,
+  RootWorkspaceScratchpad,
 }
 
 enum Permissions {
@@ -31,6 +32,7 @@ const ORACLE_ANSWER_CANDIDATE = "ORACLE_ANSWER_CANDIDATE";
 
 const WORKSPACE = "WORKSPACE";
 const SUBWORKSPACE = "SUBWORKSPACE";
+const ROOT_WORKSPACE = "ROOT_WORKSPACE";
 
 const isUserInExperiment = getIsUserInExperimentFromQueryParams(
   window.location.search,
@@ -92,6 +94,12 @@ const RelationTypeAttributes = [
     name: WorkspaceRelationTypes.SubworkspaceAnswerDraft,
     source: SUBWORKSPACE,
     blockType: ANSWER_DRAFT,
+    permission: Permissions.ReadOnly,
+  },
+  {
+    name: WorkspaceRelationTypes.RootWorkspaceScratchpad,
+    source: ROOT_WORKSPACE,
+    blockType: SCRATCHPAD,
     permission: Permissions.ReadOnly,
   },
 ];
@@ -171,6 +179,9 @@ export class WorkspaceWithRelations {
     this.workspace = workspace;
   }
 
+  // NOTE: There's an open TODO in EpisodeShowPage/index.tsx asking whether
+  // the single use of this method is required. If it turns out it's not
+  // required, we could remove this method and the methods that support it.
   public allReadOnlyBlocks() {
     return this.allReadOnlyBlockRelationships().map(b => b.findBlock());
   }
