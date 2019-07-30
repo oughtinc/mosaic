@@ -121,6 +121,11 @@ const WORKSPACE_QUERY = gql`
       }
       rootWorkspace {
         id
+        blocks {
+          id
+          value
+          type
+        }
         tree {
           id
           doesAllowOracleBypass
@@ -568,6 +573,15 @@ export class WorkspaceView extends React.Component<any, any> {
       !isOracleWorkspace &&
       isParentOracleWorkspace;
 
+    const rootWorkspaceScratchPad = workspace.rootWorkspace.blocks.find(
+      b => b.type === "SCRATCHPAD",
+    );
+    const rootWorkspaceScratchPadNodes = workspace.rootWorkspace.blocks.find(
+      b => b.type === "SCRATCHPAD",
+    ).value[0].nodes;
+    const links = rootWorkspaceScratchPadNodes.find(n => n.type === "link");
+    const rootWorkspaceScratchPadLink = links ? links.data.href : "";
+
     return (
       <div>
         <Helmet>
@@ -697,6 +711,23 @@ export class WorkspaceView extends React.Component<any, any> {
                           <span style={{ color: "darkGray" }}>
                             Workspace #{workspace.serialId}
                           </span>
+                          <BlockEditor
+                            name={rootWorkspaceScratchPad.id}
+                            blockId={rootWorkspaceScratchPad.id}
+                            readOnly={true}
+                            initialValue={rootWorkspaceScratchPad.value}
+                            shouldAutosave={false}
+                            availablePointers={[]}
+                          />
+                          {/* {rootWorkspaceScratchPadLink !== "" && (
+                            <div>
+                              <Link
+                                style={{ color: "darkGray", fontSize: "14px" }}
+                              >
+                                {rootWorkspaceScratchPadLink}
+                              </Link>
+                            </div>
+                          )} */}
                           <BlockEditor
                             isActive={isActive}
                             isUserOracle={isUserOracle}
