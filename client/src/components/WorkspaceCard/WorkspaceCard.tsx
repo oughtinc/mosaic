@@ -339,7 +339,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                       width: "100%",
                     }}
                   >
-                    Users who have passed on workspace with "Needs More Work":
+                    Users who have passed on workspace with "Skip Workspace":
                     <ul style={{ paddingInlineStart: "30px" }}>
                       {workspace.isNotStaleRelativeToUserFullInformation.map(
                         (user, i, arr) => {

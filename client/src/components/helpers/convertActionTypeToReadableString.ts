@@ -1,4 +1,9 @@
 export function convertActionTypeToReadableString(actionType: string) {
+  /**
+   * If matches a condition, returns a string formatted for display
+   * Otherwise returns the actionType string
+   */
+
   if (actionType === "INITIALIZE") {
     return "Initialize";
   }
@@ -11,8 +16,8 @@ export function convertActionTypeToReadableString(actionType: string) {
     return "Wait for Answer";
   }
 
-  if (actionType === "NEEDS_MORE_WORK") {
-    return "Needs more work";
+  if (actionType === "SKIP_WORKSPACE") {
+    return "Skip Workspace";
   }
 
   if (actionType === "SUBMIT_ANSWER_CANDIDATE") {

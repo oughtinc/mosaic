@@ -131,9 +131,9 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
               <TakeBreakBtn
                 bsStyle="primary"
                 experimentId={experimentId}
-                label="Needs more work"
+                label="Skip Workspace"
                 navHook={() => {
-                  snapshot("NEEDS_MORE_WORK");
+                  snapshot("SKIP_WORKSPACE");
                   if (markAsNotStaleRelativeToUser) {
                     markAsNotStaleRelativeToUser();
                   }

@@ -29,11 +29,9 @@ cd /data
 yarn test
 ```
 
-
 ## Development
 
 The code is written in [Typescript](https://www.typescriptlang.org/), but much of it is not correctly annotated. We use [Prettier](https://github.com/prettier/prettier) for code formatting.
-
 
 ## Deployment
 
@@ -41,10 +39,9 @@ The app is deployed on Heroku.
 
 To create a development build on your branch, create a pull request. A link to a development build with the latest version of your branch will be on your PR page.
 
-When a branch is merged into master, the main deploy is updated automatically.
+When a branch is merged into master, CI runs. If the CI passes, the main deploy is updated automatically. Configure this setting at https://dashboard.heroku.com/apps/mosaic-prod/deploy/github.
 
 Note that `docker-compose.yml` and `package.json` at the root level must be kept in sync.
-
 
 ## Saving and restoring the database
 
@@ -67,15 +64,12 @@ Since the app doesn't currently support import/export of individual question-ans
 
 - One error case is that the scripts attempt to connect to the db with your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
 - Relatedly, you may get this error if you try to restore the DB while the code is recompiling: `ERROR: database "mosaic_dev" is being accessed by other users`. If you do, wait until the code is done compiling and try again.
+- If you get the issue `Cannot find module 'apollo-utilities'`, add a blank line to a .tsx file to reload Webpack and fix it. Uncertain why this works. Delete the newline after.
 
 ### Autodump
 
 To automatically create new dumps when the db changes:
+
 1. If the app is not running, run it (`docker-compose up`)
 2. `cd server`
 3. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
-
-### Autodeploy
-
-Heroku will automatically deploy a merged branch to master to production. However
-this only happens if CI passes. Configure this setting at https://dashboard.heroku.com/apps/mosaic-prod/deploy/github
