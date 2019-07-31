@@ -2,8 +2,6 @@ import * as Sequelize from "sequelize";
 import { UUIDV4, IntegerDataType } from "sequelize";
 import * as uuidv4 from "uuid/v4";
 import * as _ from "lodash";
-import { createHonestOracleDefaultBlockValues } from "./helpers/defaultHonestOracleBlocks";
-import { createMaliciousOracleDefaultBlockValues } from "./helpers/defaultMaliciousOracleBlocks";
 import { createDefaultRootLevelBlockValues } from "./helpers/defaultRootLevelBlocks";
 
 import { isInOracleMode } from "../globals/isInOracleMode";
@@ -357,6 +355,7 @@ export default class Workspace extends Model<Workspace> {
 
   @AfterCreate
   public static async populateBlocks(workspace: Workspace, { questionValue }) {
+    // Every workspace gets a question block and a scratchpad block.
     if (questionValue) {
       await workspace.$create("block", {
         type: "QUESTION",
@@ -365,84 +364,61 @@ export default class Workspace extends Model<Workspace> {
     } else {
       await workspace.$create("block", { type: "QUESTION" });
     }
+    await workspace.$create("block", { type: "SCRATCHPAD" });
 
+    // Every workspace also gets an answer and answer draft block.
+    // In the case of the root workspace, however, the answer draft
+    // block gets default content, so creating this block has to be customized
+    // relative to the workspace type.
+    await workspace.$create("block", { type: "ANSWER" });
+
+    // Every workspace gets a subquesiton draft block, even though
+    // expert workspaces don't use it. This is because other parts of the
+    // codebase assume every workspace has a subuqestion draft block.
+    // TODO: Look into whether we could remove these assumptions and avoid
+    // creating a subquestion draft block for expert workspaces.
+    await workspace.$create("block", { type: "SUBQUESTION_DRAFT" });
+
+    // Not every workspace gets an oracle answer candidate block.
+    // Only non-root expert workspaces.
     if (workspace.isRequestingLazyUnlock) {
-      // no default content at the moment
+      await workspace.$create("block", {
+        type: "ANSWER_DRAFT",
+      });
     } else if (
       workspace.isEligibleForHonestOracle &&
       isInOracleMode.getValue()
     ) {
-      const {
-        scratchpadBlockValue,
-        answerDraftBlockValue,
-        responseBlockValue,
-      } = createHonestOracleDefaultBlockValues(questionValue);
       await workspace.$create("block", {
-        type: "SCRATCHPAD",
-        value: scratchpadBlockValue,
-      });
-      await workspace.$create("block", {
-        type: "SUBQUESTION_DRAFT",
-        value: answerDraftBlockValue,
+        type: "ORACLE_ANSWER_CANDIDATE",
       });
       await workspace.$create("block", {
         type: "ANSWER_DRAFT",
-        value: responseBlockValue,
-      });
-      await workspace.$create("block", {
-        type: "ORACLE_ANSWER_CANDIDATE",
       });
     } else if (
       workspace.isEligibleForMaliciousOracle &&
       isInOracleMode.getValue()
     ) {
       if (workspace.parentId) {
-        const {
-          scratchpadBlockValue,
-          answerDraftBlockValue,
-          responseBlockValue,
-        } = createMaliciousOracleDefaultBlockValues(questionValue);
-        await workspace.$create("block", {
-          type: "SCRATCHPAD",
-          value: scratchpadBlockValue,
-        });
-        await workspace.$create("block", {
-          type: "SUBQUESTION_DRAFT",
-          value: answerDraftBlockValue,
-        });
-        await workspace.$create("block", {
-          type: "ANSWER_DRAFT",
-          value: responseBlockValue,
-        });
         await workspace.$create("block", {
           type: "ORACLE_ANSWER_CANDIDATE",
         });
-      } else {
-        const {
-          scratchpadBlockValue,
-          answerDraftBlockValue,
-          responseBlockValue,
-        } = createDefaultRootLevelBlockValues();
-        await workspace.$create("block", {
-          type: "SCRATCHPAD",
-          value: scratchpadBlockValue,
-        });
-        await workspace.$create("block", {
-          type: "SUBQUESTION_DRAFT",
-          value: answerDraftBlockValue,
-        });
         await workspace.$create("block", {
           type: "ANSWER_DRAFT",
-          value: responseBlockValue,
+        });
+      } else {
+        const { answerDraftBlockValue } = createDefaultRootLevelBlockValues();
+        await workspace.$create("block", {
+          type: "ANSWER_DRAFT",
+          value: answerDraftBlockValue,
         });
       }
     } else {
-      await workspace.$create("block", { type: "SCRATCHPAD" });
-      await workspace.$create("block", { type: "SUBQUESTION_DRAFT" });
-      await workspace.$create("block", { type: "ANSWER_DRAFT" });
+      // This "else" means it's a judge workspace.
+      await workspace.$create("block", {
+        type: "ANSWER_DRAFT",
+      });
     }
-
-    await workspace.$create("block", { type: "ANSWER" });
   }
 
   @AfterCreate

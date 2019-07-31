@@ -39,8 +39,8 @@ import Pointer from "../models/pointer";
 import PointerImport from "../models/pointerImport";
 import ExportWorkspaceLockRelation from "../models/exportWorkspaceLockRelation";
 import NotificationRequest from "../models/notificationRequest";
-import { generateHonestAnswerDraftValue } from "../models/helpers/defaultHonestOracleBlocks";
-import { generateMaliciousAnswerDraftValue } from "../models/helpers/defaultMaliciousOracleBlocks";
+import { generateJudgeQuestionValue } from "../models/helpers/generateJudgeQuestionValue";
+import { generateMaliciousQuestionValue } from "../models/helpers/generateMaliciousQuestionValue";
 
 const generateReferences = references => {
   const all = {};
@@ -297,6 +297,7 @@ export const workspaceType = makeObjectType(
 
 import { UserActivityType } from "./UserActivity";
 import { WorkspaceActivityType } from "./WorkspaceActivity";
+import { generateMaliciousQuestionValue } from "../models/helpers/generateMaliciousQuestionValue";
 
 const assignmentType = makeObjectType(Assignment, [
   ["snapshots", () => new GraphQLList(snapshotType)],
@@ -573,7 +574,8 @@ const schema = new GraphQLSchema({
             // ANSWER or SCRATCHPAD block and that this was the reason for the
             // error on the frontend.
 
-            // Unclear how this could have occurred. But in order to prevent it
+            // Unclear how this could have occurred. Probably a race condition.
+            // But in order to prevent it
             // in the future, I added this graphql-sequelize "after" hook to
             // ensure the existence of the three required blocks.
 
@@ -1341,7 +1343,7 @@ const schema = new GraphQLSchema({
 
                       // create malicious child
                       await workspace.createChild({
-                        question: generateHonestAnswerDraftValue(
+                        question: generateMaliciousQuestionValue(
                           _.get(question, "value"),
                           _.get(oracleAnswerCandidate, "value"),
                         ),
@@ -1365,7 +1367,7 @@ const schema = new GraphQLSchema({
 
                       const question = blocks.find(b => b.type === "QUESTION");
 
-                      const childQuestionValue = generateMaliciousAnswerDraftValue(
+                      const childQuestionValue = generateJudgeQuestionValue(
                         _.get(question, "value"),
                         _.get(oracleAnswerCandidate, "value"),
                       );
@@ -2115,7 +2117,7 @@ const schema = new GraphQLSchema({
 
                   // create malicious child
                   const maliciousChild = await honestChild.createChild({
-                    question: generateHonestAnswerDraftValue(
+                    question: generateMaliciousQuestionValue(
                       _.get(question, "value"),
                       _.get(honestAnswerCandidate, "value"),
                     ),
@@ -2147,7 +2149,7 @@ const schema = new GraphQLSchema({
 
                     // create judge workspace
                     await maliciousChild.createChild({
-                      question: generateMaliciousAnswerDraftValue(
+                      question: generateJudgeQuestionValue(
                         _.get(question, "value"),
                         _.get(maliciousAnswerCandidate, "value"),
                       ),
