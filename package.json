@@ -6,7 +6,7 @@
   "description": "A web app for recursive question-answering with pointers",
   "scripts": {
     "heroku-prebuild": "HEROKU_BUILD=true && cd client && yarn install && yarn run build && cd ../server && yarn --production=false",
-    "start": "cd server && yarn run db:migrate && yarn run start"
+    "start": "cd server && yarn run start"
   },
   "engines": {
     "yarn": "1.x",
