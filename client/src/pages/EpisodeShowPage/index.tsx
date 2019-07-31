@@ -579,16 +579,47 @@ export class WorkspaceView extends React.Component<any, any> {
       b => b.type === "SCRATCHPAD",
     );
 
-    const doesRootWorkspaceScratchpadValueContainOneNode =
-      _.get(rootWorkspaceScratchPad, "value[0].nodes.length") === 1;
-
-    const isRootWorkspaceScratchpadValueFirstTextNodeEmpty =
-      _.get(rootWorkspaceScratchPad, "value[0].nodes[0].leaves[0].text") === "";
-
-    const doesRootWorkspaceScratchpadContainRelevantContent = !(
-      doesRootWorkspaceScratchpadValueContainOneNode &&
-      isRootWorkspaceScratchpadValueFirstTextNodeEmpty
+    // If the scratchpad value contains pointers or links,
+    // then it will contain more than one node.
+    //
+    // If it contains nothing but plain text, then it will contain
+    // only one node.
+    //
+    // We want to avoid showing the scratchpad in certain cases, and
+    // all of these cases are when the scratchpad contains nothing
+    // but plain text (and therefore just one node).
+    const numNodesInRootWorkspaceScratchpadValue = _.get(
+      rootWorkspaceScratchPad,
+      "value[0].nodes.length",
     );
+
+    const doesRootWorkspaceScratchpadValueContainMoreThanOneNode =
+      numNodesInRootWorkspaceScratchpadValue > 1;
+
+    const doesRootWorkspaceScratchpadValueContainExactlyOneNode =
+      numNodesInRootWorkspaceScratchpadValue === 1;
+
+    const rootWorkspaceScratchpadFirstText = _.get(
+      rootWorkspaceScratchPad,
+      "value[0].nodes[0].leaves[0].text",
+    );
+
+    const isRootWorkspaceScratchpadFirstTextEmpty =
+      typeof rootWorkspaceScratchpadFirstText === "string" &&
+      rootWorkspaceScratchpadFirstText.trim() === "";
+
+    const isRootWorkspaceScratchpadFirstTextDefaultValue =
+      typeof rootWorkspaceScratchpadFirstText === "string" &&
+      rootWorkspaceScratchpadFirstText.trim().toLowerCase() ===
+        "root-level scratchpad";
+
+    // The scratchpad content is relevant if either it contains >1 node or
+    // it contains only one node that's non-empty and non-default.
+    const doesRootWorkspaceScratchpadContainRelevantContent =
+      doesRootWorkspaceScratchpadValueContainMoreThanOneNode ||
+      (doesRootWorkspaceScratchpadValueContainExactlyOneNode &&
+        !isRootWorkspaceScratchpadFirstTextEmpty &&
+        !isRootWorkspaceScratchpadFirstTextDefaultValue);
 
     // The root workspace scratchpad will be included
     // in any non-root expert workspace.
@@ -736,7 +767,7 @@ export class WorkspaceView extends React.Component<any, any> {
                               style={{
                                 fontSize: "18px",
                                 marginBottom: "20px",
-                                width: "550px",
+                                minWidth: "550px",
                               }}
                             >
                               <BlockEditor
