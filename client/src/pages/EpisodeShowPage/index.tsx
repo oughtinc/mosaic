@@ -486,9 +486,12 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const hasParent = !!workspace.parentId;
 
+    const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
+
     const oracleAnswerCandidateProps: any =
       isOracleWorkspace &&
       hasParent &&
+      !isRequestingLazyUnlock &&
       new WorkspaceBlockRelation(
         WorkspaceRelationTypes.WorkspaceOracleAnswerCandidate,
         workspace,
@@ -555,8 +558,6 @@ export class WorkspaceView extends React.Component<any, any> {
       e => e.areNewWorkspacesOracleOnlyByDefault,
     );
     const isWorkspacePartOfOracleExperiment = isWorkspacePartOfExperimentWhereSomeNewWorkspacesOracleOnly;
-
-    const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
 
     const shouldShowResponseField =
       !isWorkspacePartOfOracleExperiment ||
