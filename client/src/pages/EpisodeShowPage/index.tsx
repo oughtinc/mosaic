@@ -582,12 +582,23 @@ export class WorkspaceView extends React.Component<any, any> {
     const doesRootWorkspaceScratchpadValueContainOneNode =
       _.get(rootWorkspaceScratchPad, "value[0].nodes.length") === 1;
 
+    const rootWorkspaceScratchpadText = _.get(
+      rootWorkspaceScratchPad,
+      "value[0].nodes[0].leaves[0].text",
+    );
+
     const isRootWorkspaceScratchpadValueFirstTextNodeEmpty =
-      _.get(rootWorkspaceScratchPad, "value[0].nodes[0].leaves[0].text") === "";
+      rootWorkspaceScratchpadText === "";
+
+    const isRootWorkspaceScratchpadValueFirstTextNodeDefaultText =
+      typeof rootWorkspaceScratchpadText === "string" &&
+      rootWorkspaceScratchpadText.trim().toLowerCase() ===
+        "root-level scratchpad";
 
     const doesRootWorkspaceScratchpadContainRelevantContent = !(
       doesRootWorkspaceScratchpadValueContainOneNode &&
-      isRootWorkspaceScratchpadValueFirstTextNodeEmpty
+      (isRootWorkspaceScratchpadValueFirstTextNodeEmpty ||
+        isRootWorkspaceScratchpadValueFirstTextNodeDefaultText)
     );
 
     // The root workspace scratchpad will be included
