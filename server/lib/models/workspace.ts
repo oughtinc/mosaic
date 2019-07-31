@@ -376,6 +376,9 @@ export default class Workspace extends Model<Workspace> {
       await workspace.$create("block", {
         type: "ORACLE_ANSWER_CANDIDATE",
       });
+      await workspace.$create("block", {
+        type: "ANSWER_DRAFT",
+      });
     } else if (
       workspace.isEligibleForMaliciousOracle &&
       isInOracleMode.getValue()
@@ -386,6 +389,9 @@ export default class Workspace extends Model<Workspace> {
         });
         await workspace.$create("block", {
           type: "ORACLE_ANSWER_CANDIDATE",
+        });
+        await workspace.$create("block", {
+          type: "ANSWER_DRAFT",
         });
       } else {
         const { answerDraftBlockValue } = createDefaultRootLevelBlockValues();
