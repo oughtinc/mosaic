@@ -588,8 +588,8 @@ export class WorkspaceView extends React.Component<any, any> {
     // We want to avoid showing the scratchpad in certain cases, and
     // all of these cases are when the scratchpad contains nothing
     // but plain text (and therefore just one node).
-    const doesRootWorkspaceScratchpadValueContainOneNode =
-      _.get(rootWorkspaceScratchPad, "value[0].nodes.length") === 1;
+    const doesRootWorkspaceScratchpadValueContainMoreThanOneNode =
+      _.get(rootWorkspaceScratchPad, "value[0].nodes.length") > 1;
 
     const rootWorkspaceScratchpadFirstText = _.get(
       rootWorkspaceScratchPad,
@@ -607,7 +607,7 @@ export class WorkspaceView extends React.Component<any, any> {
     // The scratchpad content is relevant if either it contains >1 node or
     // it contains only one node that's non-empty and non-default.
     const doesRootWorkspaceScratchpadContainRelevantContent =
-      !doesRootWorkspaceScratchpadValueContainOneNode ||
+      doesRootWorkspaceScratchpadValueContainMoreThanOneNode ||
       (!isRootWorkspaceScratchpadFirstTextEmpty &&
         !isRootWorkspaceScratchpadFirstTextDefaultValue);
 
