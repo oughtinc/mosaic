@@ -2,8 +2,6 @@ import * as Sequelize from "sequelize";
 import { UUIDV4, IntegerDataType } from "sequelize";
 import * as uuidv4 from "uuid/v4";
 import * as _ from "lodash";
-import { createHonestOracleDefaultBlockValues } from "./helpers/defaultHonestOracleBlocks";
-import { createMaliciousOracleDefaultBlockValues } from "./helpers/defaultMaliciousOracleBlocks";
 import { createDefaultRootLevelBlockValues } from "./helpers/defaultRootLevelBlocks";
 
 import { isInOracleMode } from "../globals/isInOracleMode";
@@ -372,22 +370,8 @@ export default class Workspace extends Model<Workspace> {
       workspace.isEligibleForHonestOracle &&
       isInOracleMode.getValue()
     ) {
-      const {
-        scratchpadBlockValue,
-        answerDraftBlockValue,
-        responseBlockValue,
-      } = createHonestOracleDefaultBlockValues(questionValue);
       await workspace.$create("block", {
         type: "SCRATCHPAD",
-        value: scratchpadBlockValue,
-      });
-      await workspace.$create("block", {
-        type: "SUBQUESTION_DRAFT",
-        value: answerDraftBlockValue,
-      });
-      await workspace.$create("block", {
-        type: "ANSWER_DRAFT",
-        value: responseBlockValue,
       });
       await workspace.$create("block", {
         type: "ORACLE_ANSWER_CANDIDATE",
@@ -397,43 +381,23 @@ export default class Workspace extends Model<Workspace> {
       isInOracleMode.getValue()
     ) {
       if (workspace.parentId) {
-        const {
-          scratchpadBlockValue,
-          answerDraftBlockValue,
-          responseBlockValue,
-        } = createMaliciousOracleDefaultBlockValues(questionValue);
         await workspace.$create("block", {
           type: "SCRATCHPAD",
-          value: scratchpadBlockValue,
-        });
-        await workspace.$create("block", {
-          type: "SUBQUESTION_DRAFT",
-          value: answerDraftBlockValue,
-        });
-        await workspace.$create("block", {
-          type: "ANSWER_DRAFT",
-          value: responseBlockValue,
         });
         await workspace.$create("block", {
           type: "ORACLE_ANSWER_CANDIDATE",
         });
       } else {
-        const {
-          scratchpadBlockValue,
-          answerDraftBlockValue,
-          responseBlockValue,
-        } = createDefaultRootLevelBlockValues();
+        const { answerDraftBlockValue } = createDefaultRootLevelBlockValues();
         await workspace.$create("block", {
           type: "SCRATCHPAD",
-          value: scratchpadBlockValue,
         });
         await workspace.$create("block", {
           type: "SUBQUESTION_DRAFT",
-          value: answerDraftBlockValue,
         });
         await workspace.$create("block", {
           type: "ANSWER_DRAFT",
-          value: responseBlockValue,
+          value: answerDraftBlockValue,
         });
       }
     } else {
