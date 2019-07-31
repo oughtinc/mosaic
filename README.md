@@ -33,6 +33,15 @@ yarn test
 
 The code is written in [Typescript](https://www.typescriptlang.org/), but much of it is not correctly annotated. We use [Prettier](https://github.com/prettier/prettier) for code formatting.
 
+### Offline development
+Mosaic uses Auth0 for authentication, which means you will not be able to login without internet access, even while developing locally. To get around this, follow these steps:
+
+- login with internet access
+- open your localStorage (google how to do this for your browser)
+- save your `user_id` and `access_token` values
+
+Now when you try to login in the future while offline, enter these values in your browser on localhost:3000, refresh the page, and you will be logged in.
+
 ## Deployment
 
 The app is deployed on Heroku.
