@@ -582,23 +582,23 @@ export class WorkspaceView extends React.Component<any, any> {
     const doesRootWorkspaceScratchpadValueContainOneNode =
       _.get(rootWorkspaceScratchPad, "value[0].nodes.length") === 1;
 
-    const rootWorkspaceScratchpadText = _.get(
+    const rootWorkspaceScratchpadFirstText = _.get(
       rootWorkspaceScratchPad,
       "value[0].nodes[0].leaves[0].text",
     );
 
-    const isRootWorkspaceScratchpadValueFirstTextNodeEmpty =
-      rootWorkspaceScratchpadText === "";
+    const isRootWorkspaceScratchpadFirstTextEmpty =
+      rootWorkspaceScratchpadFirstText === "";
 
-    const isRootWorkspaceScratchpadValueFirstTextNodeDefaultText =
-      typeof rootWorkspaceScratchpadText === "string" &&
-      rootWorkspaceScratchpadText.trim().toLowerCase() ===
+    const isRootWorkspaceScratchpadFirstTextDefaultValue =
+      typeof rootWorkspaceScratchpadFirstText === "string" &&
+      rootWorkspaceScratchpadFirstText.trim().toLowerCase() ===
         "root-level scratchpad";
 
     const doesRootWorkspaceScratchpadContainRelevantContent = !(
       doesRootWorkspaceScratchpadValueContainOneNode &&
-      (isRootWorkspaceScratchpadValueFirstTextNodeEmpty ||
-        isRootWorkspaceScratchpadValueFirstTextNodeDefaultText)
+      (isRootWorkspaceScratchpadFirstTextEmpty ||
+        isRootWorkspaceScratchpadFirstTextDefaultValue)
     );
 
     // The root workspace scratchpad will be included
@@ -747,7 +747,7 @@ export class WorkspaceView extends React.Component<any, any> {
                               style={{
                                 fontSize: "18px",
                                 marginBottom: "20px",
-                                width: "550px",
+                                minWidth: "550px",
                               }}
                             >
                               <BlockEditor
