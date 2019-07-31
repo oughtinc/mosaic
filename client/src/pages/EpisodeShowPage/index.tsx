@@ -605,6 +605,7 @@ export class WorkspaceView extends React.Component<any, any> {
     );
 
     const isRootWorkspaceScratchpadFirstTextEmpty =
+      typeof rootWorkspaceScratchpadFirstText === "string" &&
       rootWorkspaceScratchpadFirstText.trim() === "";
 
     const isRootWorkspaceScratchpadFirstTextDefaultValue =
