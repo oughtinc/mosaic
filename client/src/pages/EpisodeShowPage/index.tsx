@@ -46,6 +46,7 @@ import {
 } from "./WorkspaceRelations";
 
 import { ExpandAllPointersBtn } from "./ExpandAllPointersBtn";
+import { databaseJSONToValue } from "../../lib/slateParser";
 
 import {
   ORACLE_MODE_QUERY,
@@ -121,6 +122,11 @@ const WORKSPACE_QUERY = gql`
       }
       rootWorkspace {
         id
+        blocks {
+          id
+          value
+          type
+        }
         tree {
           id
           doesAllowOracleBypass
@@ -330,9 +336,16 @@ export class WorkspaceView extends React.Component<any, any> {
     });
   };
 
-  public getAvailablePointers(workspace: any) {
+  /**
+   * All "otherBlocks" should be straight from a GraphQL response.
+   * This is why we need to use databaseJSONToValue on the value
+   * before passing it to findPointers.
+   */
+  public getAvailablePointers(workspace: any, ...otherBlocks: any[]) {
     const importedPointers = workspace.connectedPointers;
 
+    // TODO: Figure out why allReadOnlyBlocks and readOnlyExportedPointers
+    // was originally included and determine if its inclusion is necessary
     const allReadOnlyBlocks = new WorkspaceWithRelations(
       workspace,
     ).allReadOnlyBlocks();
@@ -352,11 +365,16 @@ export class WorkspaceView extends React.Component<any, any> {
       }
     }
 
+    const otherPointers = _.flatten(
+      otherBlocks.map(b => findPointers(databaseJSONToValue(b.value))),
+    );
+
     const unsortedAvailablePointers = _.uniqBy(
       [
         ...this.props.exportingPointers,
         ...importedPointers,
         ...readOnlyExportedPointers,
+        ...otherPointers,
       ],
       p => p.data.pointerId,
     );
@@ -382,44 +400,21 @@ export class WorkspaceView extends React.Component<any, any> {
       workspace.blocks.concat(workspace.childWorkspaces.map(cw => cw.blocks)),
     );
 
-    const reduxBlocks = props.reduxState.blocks.blocks.map(b => ({
+    // We want to snapshot the Redux state of this workspace
+    // The Redux state will have captured any changes made to the blocks
+    // That what the next three consts are doing (until the console.log)
+
+    const reduxBlocks = props.reduxState.blocks.blocks;
+
+    const reduxBlocksAssociatedWithWorkspace = reduxBlocks.filter(b =>
+      workspaceBlocks.find((b2: any) => b.id === b2.id),
+    );
+
+    const augmentedBlocks = reduxBlocksAssociatedWithWorkspace.map(b => ({
       id: b.id,
       type: workspaceBlocks.find((b2: any) => b.id === b2.id).type,
       value: b.value.toJSON(),
     }));
-
-    console.log("making snapshot", {
-      variables: {
-        userId: Auth.userId(),
-        assignmentId: props.currentAssignmentIdQuery.currentAssignmentId,
-        workspaceId: workspace.id,
-        actionType: action,
-        snapshot: JSON.stringify({
-          userId: Auth.userId(),
-          workspaceId: workspace.id,
-          workspace: reduxBlocks.filter(b =>
-            workspace.blocks.find(b2 => b.id === b2.id),
-          ),
-          children: _.sortBy(workspace.childWorkspaces, cw =>
-            Date.parse(cw.createdAt),
-          ).map(w => {
-            const childBlocks = reduxBlocks.filter(b =>
-              w.blocks.find(b2 => b.id === b2.id),
-            );
-            return childBlocks.map(b => ({
-              ...b,
-              isArchived: w.isArchived,
-              isForJudge: !(
-                w.isEligibleForHonestOracle || w.isEligibleForMaliciousOracle
-              ),
-            }));
-          }),
-          exportLockStatusInfo: workspace.exportLockStatusInfo,
-          action,
-          availablePointers: this.getAvailablePointers(workspace),
-        }),
-      },
-    });
 
     props.createSnapshot({
       variables: {
@@ -430,13 +425,13 @@ export class WorkspaceView extends React.Component<any, any> {
         snapshot: JSON.stringify({
           userId: Auth.userId(),
           workspaceId: workspace.id,
-          workspace: reduxBlocks.filter(b =>
+          workspace: augmentedBlocks.filter(b =>
             workspace.blocks.find(b2 => b.id === b2.id),
           ),
           children: _.sortBy(workspace.childWorkspaces, cw =>
             Date.parse(cw.createdAt),
           ).map(w => {
-            const childBlocks = reduxBlocks.filter(b =>
+            const childBlocks = augmentedBlocks.filter(b =>
               w.blocks.find(b2 => b.id === b2.id),
             );
             return childBlocks.map(b => ({
@@ -458,23 +453,29 @@ export class WorkspaceView extends React.Component<any, any> {
   public render() {
     const workspace = this.props.workspace.workspace;
 
-    const availablePointers = this.getAvailablePointers(workspace);
-
     const questionProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceQuestion,
       workspace,
     ).blockEditorAttributes();
+
     const scratchpadProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceScratchpad,
       workspace,
     ).blockEditorAttributes();
+
     const subquestionDraftProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceSubquestionDraft,
       workspace,
     ).blockEditorAttributes();
+
     const answerDraftProps = new WorkspaceBlockRelation(
       WorkspaceRelationTypes.WorkspaceAnswerDraft,
       workspace,
+    ).blockEditorAttributes();
+
+    const rootWorkspaceScratchpadProps = new WorkspaceBlockRelation(
+      WorkspaceRelationTypes.RootWorkspaceScratchpad,
+      workspace.rootWorkspace,
     ).blockEditorAttributes();
 
     const isOracleWorkspace =
@@ -567,6 +568,39 @@ export class WorkspaceView extends React.Component<any, any> {
       isWorkspacePartOfOracleExperiment &&
       !isOracleWorkspace &&
       isParentOracleWorkspace;
+
+    // This (rootWorkspaceScratchPad) is included in expert workspaces.
+    // The purpose of including this in expert workspaces
+    // is to ensure that the expert always has access to essential information
+    // (such as the URL for an associated text). All such essential information
+    // should be included by the experiment creator in the root workspace
+    // scratchpad.
+    const rootWorkspaceScratchPad = workspace.rootWorkspace.blocks.find(
+      b => b.type === "SCRATCHPAD",
+    );
+
+    const doesRootWorkspaceScratchpadValueContainOneNode =
+      _.get(rootWorkspaceScratchPad, "value[0].nodes.length") === 1;
+
+    const isRootWorkspaceScratchpadValueFirstTextNodeEmpty =
+      _.get(rootWorkspaceScratchPad, "value[0].nodes[0].leaves[0].text") === "";
+
+    const doesRootWorkspaceScratchpadContainRelevantContent = !(
+      doesRootWorkspaceScratchpadValueContainOneNode &&
+      isRootWorkspaceScratchpadValueFirstTextNodeEmpty
+    );
+
+    // The root workspace scratchpad will be included
+    // in any non-root expert workspace.
+    // (It's of course already included in the root workspace.)
+    const shouldShowRootWorkspaceScratchpad =
+      hasParent &&
+      isOracleWorkspace &&
+      doesRootWorkspaceScratchpadContainRelevantContent;
+
+    const availablePointers = shouldShowRootWorkspaceScratchpad
+      ? this.getAvailablePointers(workspace, rootWorkspaceScratchPad)
+      : this.getAvailablePointers(workspace);
 
     return (
       <div>
@@ -697,6 +731,22 @@ export class WorkspaceView extends React.Component<any, any> {
                           <span style={{ color: "darkGray" }}>
                             Workspace #{workspace.serialId}
                           </span>
+                          {shouldShowRootWorkspaceScratchpad && (
+                            <div
+                              style={{
+                                fontSize: "18px",
+                                marginBottom: "20px",
+                                width: "550px",
+                              }}
+                            >
+                              <BlockEditor
+                                isActive={isActive}
+                                isUserOracle={isUserOracle}
+                                availablePointers={availablePointers}
+                                {...rootWorkspaceScratchpadProps}
+                              />
+                            </div>
+                          )}
                           <BlockEditor
                             isActive={isActive}
                             isUserOracle={isUserOracle}
