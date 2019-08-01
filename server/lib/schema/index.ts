@@ -297,7 +297,6 @@ export const workspaceType = makeObjectType(
 
 import { UserActivityType } from "./UserActivity";
 import { WorkspaceActivityType } from "./WorkspaceActivity";
-import { generateMaliciousQuestionValue } from "../models/helpers/generateMaliciousQuestionValue";
 
 const assignmentType = makeObjectType(Assignment, [
   ["snapshots", () => new GraphQLList(snapshotType)],
