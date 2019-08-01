@@ -31,7 +31,7 @@ export async function experimentActivityCSV(server, res, req) {
         assignments(
           offset: $offset
           limit: $limit
-          order: "createdAt"
+          order: "reverse:createdAt"
           after: "2019-06-16"
         ) {
           id
