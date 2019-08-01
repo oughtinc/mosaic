@@ -2071,8 +2071,10 @@ const schema = new GraphQLSchema({
                 );
 
                 // Make sure appropriate workspaces are stale based on answers provided
-
-                /* await */ workspace.update({ isStale: false });
+                // Honest child workspace is always created, so top-level question is never stale.
+                await workspace.update({
+                  isStale: false,
+                });
 
                 const tree = await Tree.create({
                   rootWorkspaceId: workspace.id,
@@ -2100,7 +2102,9 @@ const schema = new GraphQLSchema({
                   shouldOverrideToNormalUser: false,
                 });
 
-                /* await */ honestChild.update({ isStale: false });
+                await honestChild.update({
+                  isStale: honestAnswer ? false : true,
+                });
 
                 if (honestAnswer) {
                   const blocks = (await honestChild.$get("blocks")) as Block[];
@@ -2129,7 +2133,9 @@ const schema = new GraphQLSchema({
                     shouldOverrideToNormalUser: false,
                   });
 
-                  /* await */ maliciousChild.update({ isStale: false });
+                  await maliciousChild.update({
+                    isStale: maliciousAnswer ? false : true,
+                  });
 
                   if (maliciousAnswer) {
                     const blocks = (await maliciousChild.$get(
@@ -2150,7 +2156,7 @@ const schema = new GraphQLSchema({
                     const question = blocks.find(b => b.type === "QUESTION");
 
                     // create judge workspace
-                    await maliciousChild.createChild({
+                    const judgeChild = await maliciousChild.createChild({
                       question: generateJudgeQuestionValue(
                         _.get(question, "value"),
                         _.get(maliciousAnswerCandidate, "value"),
@@ -2159,6 +2165,10 @@ const schema = new GraphQLSchema({
                       creatorId: user.id,
                       isPublic: false,
                       shouldOverrideToNormalUser: false,
+                    });
+
+                    await judgeChild.update({
+                      isStale: maliciousAnswer && honestAnswer ? true : false,
                     });
                   }
                 }
