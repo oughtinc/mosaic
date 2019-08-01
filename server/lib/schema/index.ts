@@ -2070,6 +2070,8 @@ const schema = new GraphQLSchema({
                   },
                 );
 
+                // Make sure appropriate workspaces are stale based on answers provided
+
                 /* await */ workspace.update({ isStale: false });
 
                 const tree = await Tree.create({
