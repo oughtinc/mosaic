@@ -72,8 +72,6 @@ export async function experimentActivityCSV(server, res, req) {
   const data =
     jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
 
-  data.reverse();
-
   mostRecentId = data[0] && data[0].id;
 
   if (!data[0]) {
