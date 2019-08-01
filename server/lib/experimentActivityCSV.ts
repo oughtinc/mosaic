@@ -6,25 +6,6 @@ import { Parser } from "json2csv";
 let mostRecentId: string;
 
 export async function experimentActivityCSV(server, res, req) {
-  let offset = 0;
-
-  if (req.query.recent) {
-    const allAssignments = await server.executeOperation({
-      query: print(gql`
-        query assignments {
-          assignments(order: "createdAt", after: "2019-06-16") {
-            id
-          }
-        }
-      `),
-    });
-
-    const allAssignmentsData =
-      allAssignments && allAssignments.data && allAssignments.data.assignments;
-
-    offset = _.findIndex(allAssignmentsData, a => a.id === mostRecentId) + 1;
-  }
-
   const jsonResponse = await server.executeOperation({
     query: print(gql`
       query assignments($offset: Int, $limit: Int) {
@@ -64,15 +45,13 @@ export async function experimentActivityCSV(server, res, req) {
       }
     `),
     variables: {
-      offset: Number(req.query.offset) || offset,
+      offset: Number(req.query.offset) || 0,
       limit: Number(req.query.limit),
     },
   });
 
   const data =
     jsonResponse && jsonResponse.data && jsonResponse.data.assignments;
-
-  mostRecentId = data[0] && data[0].id;
 
   if (!data[0]) {
     res.end("No data right now");
