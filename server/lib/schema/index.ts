@@ -2155,7 +2155,7 @@ const schema = new GraphQLSchema({
                     const question = blocks.find(b => b.type === "QUESTION");
 
                     // create judge workspace
-                    const judgeChild = await maliciousChild.createChild({
+                    await maliciousChild.createChild({
                       question: generateJudgeQuestionValue(
                         _.get(question, "value"),
                         _.get(maliciousAnswerCandidate, "value"),
@@ -2166,9 +2166,6 @@ const schema = new GraphQLSchema({
                       shouldOverrideToNormalUser: false,
                     });
 
-                    await judgeChild.update({
-                      isStale: maliciousAnswer && honestAnswer ? true : false,
-                    });
                   }
                 }
 
