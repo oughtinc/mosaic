@@ -2069,7 +2069,6 @@ const schema = new GraphQLSchema({
                   },
                 );
 
-                // Make sure appropriate workspaces are stale based on answers provided
                 // Honest child workspace is always created, so top-level question is never stale.
                 await workspace.update({
                   isStale: false,
@@ -2165,7 +2164,6 @@ const schema = new GraphQLSchema({
                       isPublic: false,
                       shouldOverrideToNormalUser: false,
                     });
-
                   }
                 }
 
