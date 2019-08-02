@@ -297,7 +297,6 @@ export const workspaceType = makeObjectType(
 
 import { UserActivityType } from "./UserActivity";
 import { WorkspaceActivityType } from "./WorkspaceActivity";
-import { generateMaliciousQuestionValue } from "../models/helpers/generateMaliciousQuestionValue";
 
 const assignmentType = makeObjectType(Assignment, [
   ["snapshots", () => new GraphQLList(snapshotType)],
@@ -2070,7 +2069,10 @@ const schema = new GraphQLSchema({
                   },
                 );
 
-                /* await */ workspace.update({ isStale: false });
+                // Honest child workspace is always created, so top-level question is never stale.
+                await workspace.update({
+                  isStale: false,
+                });
 
                 const tree = await Tree.create({
                   rootWorkspaceId: workspace.id,
@@ -2098,7 +2100,9 @@ const schema = new GraphQLSchema({
                   shouldOverrideToNormalUser: false,
                 });
 
-                /* await */ honestChild.update({ isStale: false });
+                await honestChild.update({
+                  isStale: honestAnswer ? false : true,
+                });
 
                 if (honestAnswer) {
                   const blocks = (await honestChild.$get("blocks")) as Block[];
@@ -2127,7 +2131,9 @@ const schema = new GraphQLSchema({
                     shouldOverrideToNormalUser: false,
                   });
 
-                  /* await */ maliciousChild.update({ isStale: false });
+                  await maliciousChild.update({
+                    isStale: maliciousAnswer ? false : true,
+                  });
 
                   if (maliciousAnswer) {
                     const blocks = (await maliciousChild.$get(
