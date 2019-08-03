@@ -1326,6 +1326,8 @@ const schema = new GraphQLSchema({
                 await workspace.update({ isNotStaleRelativeToUser: [] });
               }
 
+              // TODO: A lot of important logic is in the following conditional
+              // Would be good to clean it up, DRY it out, etc.
               if (isCurrentlyResolved) {
                 // determine isOracleExperiment
                 const rootWorkspace = await workspace.getRootWorkspace();
@@ -1346,6 +1348,9 @@ const schema = new GraphQLSchema({
                   parent &&
                   !parent.isEligibleForHonestOracle &&
                   !parent.isEligibleForMaliciousOracle;
+
+                // TODO: relativize this to workspace boolean field
+                const isMIBWithoutRestarts = true;
 
                 if (
                   !isOracleExperiment ||
@@ -1406,37 +1411,46 @@ const schema = new GraphQLSchema({
                           "Grandparent does not exist (but should)",
                         );
                       }
+
+                      // Make honest ancestor resolved
                       await grandparentWorkspace.update({
                         isCurrentlyResolved,
                       });
-                      if (grandparentWorkspace.parentId) {
-                        const greatGrandparentWorkspace = await Workspace.findByPk(
-                          grandparentWorkspace.parentId,
-                        );
-                        if (greatGrandparentWorkspace === null) {
-                          throw new Error(
-                            "Great-grandparent does not exist (but should)",
+
+                      // If not "most interesting branch" w/o restarts
+                      if (!isMIBWithoutRestarts) {
+                        // If honest ancestor has judge parent
+                        if (grandparentWorkspace.parentId) {
+                          // Then see if judge parent has all subquestions resolved
+                          // And should therefore should be marked stale (i.e., eligible for scheduling)
+                          const greatGrandparentWorkspace = await Workspace.findByPk(
+                            grandparentWorkspace.parentId,
                           );
-                        }
-                        const isNotRoot = greatGrandparentWorkspace.parentId;
-                        if (isNotRoot) {
-                          const children = (await greatGrandparentWorkspace.$get(
-                            "childWorkspaces",
-                          )) as Workspace[];
-                          let allResolvedOrArchived = true;
-                          for (const child of children) {
-                            if (
-                              !(child.isCurrentlyResolved || child.isArchived)
-                            ) {
-                              allResolvedOrArchived = false;
-                              break;
-                            }
+                          if (greatGrandparentWorkspace === null) {
+                            throw new Error(
+                              "Great-grandparent does not exist (but should)",
+                            );
                           }
-                          if (allResolvedOrArchived) {
-                            await greatGrandparentWorkspace.update({
-                              isStale: true,
-                              isNotStaleRelativeToUser: [],
-                            });
+                          const isNotRoot = greatGrandparentWorkspace.parentId;
+                          if (isNotRoot) {
+                            const children = (await greatGrandparentWorkspace.$get(
+                              "childWorkspaces",
+                            )) as Workspace[];
+                            let allResolvedOrArchived = true;
+                            for (const child of children) {
+                              if (
+                                !(child.isCurrentlyResolved || child.isArchived)
+                              ) {
+                                allResolvedOrArchived = false;
+                                break;
+                              }
+                            }
+                            if (allResolvedOrArchived) {
+                              await greatGrandparentWorkspace.update({
+                                isStale: true,
+                                isNotStaleRelativeToUser: [],
+                              });
+                            }
                           }
                         }
                       }
