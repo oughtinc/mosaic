@@ -13,11 +13,11 @@ export function convertActionTypeToReadableString(actionType: string) {
   }
 
   if (actionType === "WAIT_FOR_ANSWER") {
-    return "Wait for Answer";
+    return "Wait for answer";
   }
 
   if (actionType === "SKIP_WORKSPACE") {
-    return "Skip Workspace";
+    return "Skip workspace";
   }
 
   if (actionType === "SUBMIT_ANSWER_CANDIDATE") {
@@ -38,6 +38,14 @@ export function convertActionTypeToReadableString(actionType: string) {
 
   if (actionType === "UNLOAD") {
     return "Unload";
+  }
+
+  if (actionType === "CONCEDE_TO_MALICIOUS") {
+    return "Concede to malicious";
+  }
+
+  if (actionType === "PLAY_OUT_SUBTREE") {
+    return "Play out subtree";
   }
 
   return actionType;

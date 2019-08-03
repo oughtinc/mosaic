@@ -574,16 +574,22 @@ export default class Workspace extends Model<Workspace> {
           : await Workspace.isNewChildWorkspaceHonestOracleEligible({
               parentId,
             });
+
       isEligibleForMaliciousOracle =
         isEligibleForMaliciousOracle !== undefined
           ? isEligibleForMaliciousOracle
           : await Workspace.isNewChildWorkspaceMaliciousOracleEligible({
               parentId,
             });
-      isAwaitingHonestExpertDecision =
+
+      const parentWorkspace = await Workspace.findByPkOrSerialId(parentId);
+
+      isAwaitingHonestExpertDecision = !!(
         isEligibleForHonestOracle &&
-        (await Workspace.findByPkOrSerialId(parentId))
-          .isEligibleForMaliciousOracle;
+        parentWorkspace &&
+        parentWorkspace.isEligibleForMaliciousOracle &&
+        parentWorkspace.parentId
+      ); // parent is non-root
     }
 
     return await Workspace.create(

@@ -21,6 +21,7 @@ import { userFromContext } from "./auth/userFromContext";
 
 import { getMessageForUser } from "./helpers/getMessageForUser";
 import { addExportsAndLinks } from "./helpers/addExportsAndLinks";
+import { extractMaliciousAnswerValueFromMaliciousQuestionAndJudgeQuestion } from "./helpers/extractMaliciousAnswerValueFromMaliciousQuestionAndJudgeQuestion";
 import { extractHonestAnswerValueFromMaliciousQuestion } from "./helpers/extractHonestAnswerValueFromMaliciousQuestion";
 import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFromQuestion";
 
@@ -78,7 +79,7 @@ export const workspaceType = makeObjectType(
   Workspace,
   [
     ["childWorkspaces", () => new GraphQLList(workspaceType)],
-    ["parentWorkspace", () => new GraphQLList(workspaceType)],
+    ["parentWorkspace", () => workspaceType],
     ["blocks", () => new GraphQLList(blockType)],
     ["pointerImports", () => new GraphQLList(pointerImportType)],
     ["tree", () => treeType],
@@ -1154,6 +1155,120 @@ const schema = new GraphQLSchema({
                 });
               }
             }
+
+            return true;
+          },
+        ),
+      },
+      concedeToMalicious: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to decline to challenge a workspace",
+          async (obj, { id, input }, context) => {
+            const workspace = await Workspace.findByPk(id);
+            if (workspace === null) {
+              return false;
+            }
+
+            const parentWorkspace = await Workspace.findByPk(
+              workspace.parentId,
+            );
+
+            if (parentWorkspace === null) {
+              return false;
+            }
+
+            const grandParentWorkspace = await Workspace.findByPk(
+              parentWorkspace.parentId,
+            );
+
+            if (grandParentWorkspace === null) {
+              return false;
+            }
+
+            const judgeBlocks = (await workspace.$get("blocks")) as Block[];
+            const judgeQuestion = judgeBlocks.find(b => b.type === "QUESTION");
+
+            const maliciousBlocks = (await parentWorkspace.$get(
+              "blocks",
+            )) as Block[];
+
+            const maliciousQuestion = maliciousBlocks.find(
+              b => b.type === "QUESTION",
+            );
+
+            // make honest response field equal to malicious answer candidate
+            const honestBlocks = (await grandParentWorkspace.$get(
+              "blocks",
+            )) as Block[];
+
+            const grandParentAnswerDraft = honestBlocks.find(
+              b => b.type === "ANSWER_DRAFT",
+            );
+
+            if (grandParentAnswerDraft && maliciousQuestion && judgeQuestion) {
+              const newAnswerDraftValue = extractMaliciousAnswerValueFromMaliciousQuestionAndJudgeQuestion(
+                maliciousQuestion.value,
+                judgeQuestion.value,
+              );
+
+              await grandParentAnswerDraft.update({
+                value: newAnswerDraftValue,
+              });
+            }
+
+            // mark honest as resolved
+            // and check to see if upsteam judge should be marked as stale
+            await grandParentWorkspace.update({ isCurrentlyResolved: true });
+            if (grandParentWorkspace.parentId) {
+              const upstreamJudge = await Workspace.findByPk(
+                grandParentWorkspace.parentId,
+              );
+              if (upstreamJudge === null) {
+                return false;
+              }
+              const children = (await upstreamJudge.$get(
+                "childWorkspaces",
+              )) as Workspace[];
+              let allResolvedOrArchived = true;
+              for (const child of children) {
+                if (!(child.isCurrentlyResolved || child.isArchived)) {
+                  allResolvedOrArchived = false;
+                  break;
+                }
+              }
+              if (allResolvedOrArchived) {
+                await upstreamJudge.update({
+                  isStale: true,
+                  isNotStaleRelativeToUser: [],
+                });
+              }
+            }
+
+            return true;
+          },
+        ),
+      },
+      playOutSubtree: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to decide to play out a subtree",
+          async (obj, { id, input }, context) => {
+            const workspace = await Workspace.findByPk(id);
+            if (workspace === null) {
+              return false;
+            }
+
+            await workspace.update({
+              isEligibleForHonestOracle: false,
+              isAwaitingHonestExpertDecision: false,
+            });
 
             return true;
           },

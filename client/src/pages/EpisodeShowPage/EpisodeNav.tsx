@@ -65,8 +65,12 @@ interface EpisodeNavProps {
   isTakingABreak?: boolean;
   isUserOracle: boolean;
   isUserMaliciousOracle: boolean;
+  isAwaitingHonestExpertDecision: boolean;
   snapshot(action: string): void;
   markAsNotStaleRelativeToUser(): void;
+  concedeToMalicious(): void;
+  markAsNotStale(): void;
+  playOutSubtree(): void;
 }
 
 // Note that there in the normal functioning of the app,
@@ -87,6 +91,10 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       isUserMaliciousOracle,
       markAsNotStaleRelativeToUser,
       snapshot,
+      isAwaitingHonestExpertDecision,
+      concedeToMalicious,
+      playOutSubtree,
+      markAsNotStale,
     } = this.props;
 
     if (isUserOracle && isInOracleMode) {
@@ -111,6 +119,33 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
               }}
             >
               {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
+              {isAwaitingHonestExpertDecision && (
+                <div>
+                  <TakeBreakBtn
+                    bsStyle="primary"
+                    experimentId={experimentId}
+                    label="Concede to malicious expert"
+                    navHook={() => {
+                      snapshot("CONCEDE_TO_MALICIOUS");
+                      if (concedeToMalicious) {
+                        markAsNotStale();
+                        concedeToMalicious();
+                      }
+                    }}
+                  />
+                  <TakeBreakBtn
+                    bsStyle="primary"
+                    experimentId={experimentId}
+                    label="Play out subtree"
+                    navHook={() => {
+                      snapshot("PLAY_OUT_SUBTREE");
+                      if (markAsNotStaleRelativeToUser) {
+                        playOutSubtree();
+                      }
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
         </EpisodeNavContainer>
