@@ -31,6 +31,9 @@ export default class Tree extends Model<Tree> {
   @Column(DataType.BOOLEAN)
   public doesAllowOracleBypass: boolean;
 
+  @Column(DataType.BOOLEAN)
+  public isMIBWithoutRestarts: boolean;
+
   @BelongsTo(() => Workspace)
   public rootWorkspace: Workspace;
 
