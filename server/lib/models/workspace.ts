@@ -499,18 +499,22 @@ export default class Workspace extends Model<Workspace> {
     if (parentWorkspace === null) {
       return false;
     }
+
+    const rootWorkspace = await parentWorkspace.getRootWorkspace();
+    const tree = (await rootWorkspace.$get("tree")) as Tree;
+    const isMIBWithoutRestarts = tree.isMIBWithoutRestarts;
+
     const isParentRootWorkspace = !parentWorkspace.parentId;
     const isParentHonestOracleWorkspace =
       parentWorkspace.isEligibleForHonestOracle;
+    const isParentMaliciousOracleWorkspace =
+      parentWorkspace.isEligibleForMaliciousOracle;
 
-    if (isParentHonestOracleWorkspace && !isParentRootWorkspace) {
+    // child of honest workspace never honest
+    if (isParentHonestOracleWorkspace) {
       return false;
     }
 
-    const rootWorkspace = await parentWorkspace.getRootWorkspace();
-
-    // get experiment id
-    const tree = (await rootWorkspace.$get("tree")) as Tree;
     const experiments = (await tree.$get("experiments")) as Experiment[];
 
     if (experiments.length === 0) {
@@ -518,7 +522,29 @@ export default class Workspace extends Model<Workspace> {
     }
 
     const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
-    return mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault;
+
+    // if experiment is non-oracle, then of course not honest
+    if (!mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault) {
+      return false;
+    }
+
+    // if parent is root, then honest
+    if (isParentRootWorkspace) {
+      return true;
+    }
+
+    // if parent is non-root malicious, and MIB w/o restarts, then honest
+    if (isParentMaliciousOracleWorkspace && isMIBWithoutRestarts) {
+      return true;
+    }
+
+    // If parent is non-expert, then honest
+    if (!isParentMaliciousOracleWorkspace && !isParentHonestOracleWorkspace) {
+      return true;
+    }
+
+    // Else not honest
+    return false;
   }
 
   public static async isNewChildWorkspaceMaliciousOracleEligible({ parentId }) {
@@ -583,13 +609,20 @@ export default class Workspace extends Model<Workspace> {
             });
 
       const parentWorkspace = await Workspace.findByPkOrSerialId(parentId);
+      const rootWorkspace = await parentWorkspace.getRootWorkspace();
+      const tree = (await rootWorkspace.$get("tree")) as Tree;
+      const isMIBWithoutRestarts = tree.isMIBWithoutRestarts;
 
-      isAwaitingHonestExpertDecision = !!(
-        isEligibleForHonestOracle &&
-        parentWorkspace &&
-        parentWorkspace.isEligibleForMaliciousOracle &&
-        parentWorkspace.parentId
-      ); // parent is non-root
+      if (isMIBWithoutRestarts) {
+        isAwaitingHonestExpertDecision = !!(
+          isEligibleForHonestOracle &&
+          parentWorkspace &&
+          parentWorkspace.isEligibleForMaliciousOracle &&
+          parentWorkspace.parentId
+        ); // parent is non-root
+      } else {
+        isAwaitingHonestExpertDecision = false;
+      }
     }
 
     return await Workspace.create(

@@ -1349,8 +1349,7 @@ const schema = new GraphQLSchema({
                   !parent.isEligibleForHonestOracle &&
                   !parent.isEligibleForMaliciousOracle;
 
-                // TODO: relativize this to workspace boolean field
-                const isMIBWithoutRestarts = true;
+                const isMIBWithoutRestarts = tree.isMIBWithoutRestarts;
 
                 if (
                   !isOracleExperiment ||
