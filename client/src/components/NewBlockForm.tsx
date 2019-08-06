@@ -59,13 +59,18 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     super(props);
     this.state = {
       pending: false,
+      hasSubmittedAQuestion: false,
       totalBudget: this.props.totalBudget || 90,
     };
   }
 
   public componentWillReceiveProps() {
     if (this.state.pending) {
-      this.setState({ pending: false, totalBudget: 90 });
+      this.setState({
+        pending: false,
+        hasSubmittedAQuestion: true,
+        totalBudget: 90,
+      });
     }
   }
 
@@ -320,8 +325,10 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               bsStyle="primary"
               data-cy="submit-new-question"
               disabled={
-                this.props.hasTimeBudget &&
-                this.props.availableBudget - 90 < this.state.totalBudget
+                (this.props.isMIBWithoutRestarts &&
+                  this.state.hasSubmittedAQuestion) ||
+                (this.props.hasTimeBudget &&
+                  this.props.availableBudget - 90 < this.state.totalBudget)
               }
               type="submit"
               onClick={() =>
@@ -343,6 +350,10 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 <Button
                   bsSize="xsmall"
                   bsStyle="danger"
+                  disabled={
+                    this.props.isMIBWithoutRestarts &&
+                    this.state.hasSubmittedAQuestion
+                  }
                   type="submit"
                   onClick={() =>
                     this.handleClick({ shouldOverrideToNormalUser: true })

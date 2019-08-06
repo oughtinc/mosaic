@@ -139,6 +139,7 @@ const WORKSPACE_QUERY = gql`
         tree {
           id
           doesAllowOracleBypass
+          isMIBWithoutRestarts
           experiments {
             id
             serialId
@@ -1338,6 +1339,10 @@ export class WorkspaceView extends React.Component<any, any> {
                               !isRequestingLazyUnlock
                             ) && (
                               <ChildrenSidebar
+                                isMIBWithoutRestarts={
+                                  workspace.rootWorkspace.tree
+                                    .isMIBWithoutRestarts
+                                }
                                 snapshot={(action: string) =>
                                   this.snapshot(this.props, action)
                                 }
