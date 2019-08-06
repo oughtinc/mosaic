@@ -3,8 +3,6 @@ import * as _ from "lodash";
 import { databaseJSONToValue } from "../../lib/slateParser";
 import { Auth } from "../../auth";
 
-import { getIsUserInExperimentFromQueryParams } from "../../helpers/getIsUserInExperimentFromQueryParams";
-
 export enum WorkspaceRelationTypes {
   WorkspaceQuestion = 0,
   WorkspaceScratchpad,
@@ -34,19 +32,12 @@ const WORKSPACE = "WORKSPACE";
 const SUBWORKSPACE = "SUBWORKSPACE";
 const ROOT_WORKSPACE = "ROOT_WORKSPACE";
 
-const isUserInExperiment = getIsUserInExperimentFromQueryParams(
-  window.location.search,
-);
-
 const RelationTypeAttributes = [
   {
     name: WorkspaceRelationTypes.WorkspaceQuestion,
     source: WORKSPACE,
     blockType: QUESTION,
-    permission:
-      Auth.isAdmin() && !isUserInExperiment
-        ? Permissions.Editable
-        : Permissions.ReadOnly,
+    permission: Permissions.ReadOnly,
   },
   {
     name: WorkspaceRelationTypes.WorkspaceScratchpad,

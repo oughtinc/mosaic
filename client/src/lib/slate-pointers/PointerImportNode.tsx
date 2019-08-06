@@ -181,7 +181,14 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 
   public isLocked() {
     const onHomepageOrTreeView = !this.props.exportLockStatusInfo;
-    if (onHomepageOrTreeView || this.props.isInOracleModeAndIsUserOracle) {
+    if (
+      onHomepageOrTreeView ||
+      (this.props.isActive && this.props.isInOracleModeAndIsUserOracle)
+      // non-active expert see locks,
+      // this was added after MIB w/o restarts
+      // allowed honest expert to view original judge workspace
+      // before deciding whether to concede or play out subtree
+    ) {
       return false;
     }
 
