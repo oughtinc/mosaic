@@ -82,3 +82,6 @@ To automatically create new dumps when the db changes:
 1. If the app is not running, run it (`docker-compose up`)
 2. `cd server`
 3. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
+
+## Support
+Mosaic uses Intercom for chat support. Login and enter https://app.intercom.io/a/apps/gmkvd6s1/inbox to view the latest messages. 

@@ -22,7 +22,6 @@ import { CompactTreeView } from "./pages/CompactTreeView";
 import { WorkspaceHistoryView } from "./pages/SnapshotView";
 import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
-
 import { Auth } from "./auth";
 
 // set up FullStory identity
