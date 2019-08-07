@@ -24,13 +24,12 @@ import { ListenerThatClosesPointersOnPathnameChange } from "./components/Listene
 import { Header } from "./components/Header";
 
 import { Auth } from "./auth";
-
+// For TS to recognize window.Intercom
 declare global {
   interface Window {
     Intercom: any;
   }
 }
-
 window.Intercom = window.Intercom || {};
 
 // set up FullStory identity
