@@ -137,6 +137,7 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
               maliciousAnswerBlockId={this.props.maliciousAnswerBlockId}
               maliciousAnswerValue={this.props.maliciousAnswerValue}
               normal={this.props.normal}
+              didHonestDecideToConcede={this.props.didHonestDecideToConcede}
             />
           )}
         </Element>
@@ -215,6 +216,8 @@ export class CompactTreeGroupPresentationl extends React.PureComponent<
             maliciousAnswerBlockId={this.props.maliciousAnswerBlockId}
             maliciousAnswerValue={this.props.maliciousAnswerValue}
             normal={this.props.normal}
+            isAwaitingHonestDecision={this.props.isAwaitingHonestDecision}
+            didHonestDecideToConcede={this.props.didHonestDecideToConcede}
           />
         )}
       </Element>
@@ -346,6 +349,9 @@ export class CompactTreeGroupContainer extends React.PureComponent<any, any> {
               questionBlockId={this.props.questionBlockId}
               questionValue={this.props.questionValue}
               workspace={this.props.workspace}
+              isAwaitingHonestDecision={this.props.isAwaitingHonestDecision}
+              didHonestDecideToConcede={this.props.didHonestDecideToConcede}
+              didHonestDecideToPlayOut={this.props.didHonestDecideToPlayOut}
             />
           </div>
         ) : (

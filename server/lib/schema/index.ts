@@ -1173,6 +1173,10 @@ const schema = new GraphQLSchema({
               return false;
             }
 
+            await workspace.update({
+              isAwaitingHonestExpertDecision: false,
+            });
+
             const parentWorkspace = await Workspace.findByPk(
               workspace.parentId,
             );
@@ -1221,7 +1225,7 @@ const schema = new GraphQLSchema({
             }
 
             // mark honest as resolved
-            // and check to see if upsteam judge should be marked as stale
+            // and check to see if upstream judge should be marked as stale
             await grandParentWorkspace.update({ isCurrentlyResolved: true });
             if (grandParentWorkspace.parentId) {
               const upstreamJudge = await Workspace.findByPk(
