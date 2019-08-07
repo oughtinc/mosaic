@@ -22,15 +22,7 @@ import { CompactTreeView } from "./pages/CompactTreeView";
 import { WorkspaceHistoryView } from "./pages/SnapshotView";
 import { ListenerThatClosesPointersOnPathnameChange } from "./components/ListenerThatClosesPointersOnPathnameChange";
 import { Header } from "./components/Header";
-
 import { Auth } from "./auth";
-// For TS to recognize window.Intercom
-declare global {
-  interface Window {
-    Intercom: any;
-  }
-}
-window.Intercom = window.Intercom || {};
 
 // set up FullStory identity
 if (Auth.isAuthenticated()) {
@@ -128,10 +120,6 @@ const Routes = () => (
 
 class App extends React.Component {
   public render() {
-    window.Intercom("boot", {
-      app_id: "gmkvd6s1",
-    });
-
     return (
       <ApolloProvider client={client}>
         <Provider store={store}>
