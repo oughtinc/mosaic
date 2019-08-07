@@ -25,6 +25,14 @@ import { Header } from "./components/Header";
 
 import { Auth } from "./auth";
 
+declare global {
+  interface Window {
+    Intercom: any;
+  }
+}
+
+window.Intercom = window.Intercom || {};
+
 // set up FullStory identity
 if (Auth.isAuthenticated()) {
   Auth.getProfile(() => {
@@ -121,6 +129,10 @@ const Routes = () => (
 
 class App extends React.Component {
   public render() {
+    window.Intercom("boot", {
+      app_id: "gmkvd6s1",
+    });
+
     return (
       <ApolloProvider client={client}>
         <Provider store={store}>
