@@ -45,6 +45,9 @@ export class Auth {
     if (window.FS) {
       window.FS.identify(false);
     }
+    if (window.Intercom) {
+      window.Intercom("shutdown");
+    }
   }
 
   public static handleAuthentication(callback: () => void): void {
@@ -101,10 +104,19 @@ export class Auth {
 
       localStorage.setItem("is_admin", user.isAdmin);
 
+      const name = `${user.givenName} ${user.familyName}`;
       // configure FullStory & Intercom
       if (window.FS) {
         window.FS.identify(user.id, {
-          displayName: `${user.givenName} ${user.familyName}`,
+          displayName: name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        });
+      }
+      if (window.Intercom) {
+        window.Intercom("update", {
+          user_id: user.id,
+          name,
           email: user.email,
           isAdmin: user.isAdmin,
         });
@@ -124,10 +136,19 @@ export class Auth {
         }
         localStorage.setItem("user_id", profile.sub);
 
+        const name = `${profile.given_name} ${profile.family_name}`;
         // configure FullStory
         if (window.FS) {
           window.FS.identify(profile.sub, {
-            displayName: `${profile.given_name} ${profile.family_name}`,
+            displayName: name,
+            email: profile.email,
+            isAdmin: appMetadata ? appMetadata.is_admin : false,
+          });
+        }
+        if (window.Intercom) {
+          window.Intercom("update", {
+            user_id: profile.sub,
+            name,
             email: profile.email,
             isAdmin: appMetadata ? appMetadata.is_admin : false,
           });
