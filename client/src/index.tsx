@@ -3,13 +3,15 @@ import * as ReactDOM from "react-dom";
 import { App } from "./App";
 import "./index.css";
 
-// For TS to recognize window.Intercom
+// For TS to recognize Intercom & FullStory
 declare global {
   interface Window {
     Intercom: any;
+    FS: any;
   }
 }
 window.Intercom = window.Intercom || {};
+window.FS = window.FS || {};
 
 window.Intercom("boot", {
   app_id: "gmkvd6s1",

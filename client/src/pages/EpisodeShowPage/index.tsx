@@ -356,9 +356,7 @@ export class WorkspaceView extends React.Component<any, any> {
         allReadOnlyBlocks.map(b => findPointers(b.value)),
       );
     } catch (err) {
-      // @ts-ignore
       if (window.FS && window.FS.log) {
-        // @ts-ignore
         window.FS.log("error", err.toString());
       } else {
         console.log(err);
