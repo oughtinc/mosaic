@@ -42,9 +42,7 @@ export class Auth {
     localStorage.removeItem("user_id");
 
     // log out of FullStory
-    // @ts-ignore
     if (window.FS) {
-      // @ts-ignore
       window.FS.identify(false);
     }
   }
@@ -103,10 +101,8 @@ export class Auth {
 
       localStorage.setItem("is_admin", user.isAdmin);
 
-      // configure FullStory
-      // @ts-ignore
+      // configure FullStory & Intercom
       if (window.FS) {
-        // @ts-ignore
         window.FS.identify(user.id, {
           displayName: `${user.givenName} ${user.familyName}`,
           email: user.email,
@@ -129,9 +125,7 @@ export class Auth {
         localStorage.setItem("user_id", profile.sub);
 
         // configure FullStory
-        // @ts-ignore
         if (window.FS) {
-          // @ts-ignore
           window.FS.identify(profile.sub, {
             displayName: `${profile.given_name} ${profile.family_name}`,
             email: profile.email,
