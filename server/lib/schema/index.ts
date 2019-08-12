@@ -381,8 +381,8 @@ const TreeInputForAPI = new GraphQLInputObjectType({
     maliciousAnswer: { type: GraphQLString },
     emailsOfHonestOracles: { type: new GraphQLList(GraphQLString) },
     emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
-    doesAllowJudgeToJudge: {type: GraphQLBoolean },
-    isMIBWithoutRestarts: {type: GraphQLBoolean },
+    doesAllowJudgeToJudge: { type: GraphQLBoolean },
+    isMIBWithoutRestarts: { type: GraphQLBoolean },
   },
 });
 
