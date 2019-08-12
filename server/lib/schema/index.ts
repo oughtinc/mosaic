@@ -1031,6 +1031,24 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeIsMIBWithoutRestarts: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          isMIBWithoutRestarts: { type: GraphQLBoolean },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to toggle MIB w/o restarts",
+          async (_, { treeId, isMIBWithoutRestarts }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ isMIBWithoutRestarts });
+            return true;
+          },
+        ),
+      },
       updateWorkspaceChildren: {
         type: workspaceType,
         args: {
