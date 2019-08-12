@@ -381,6 +381,8 @@ const TreeInputForAPI = new GraphQLInputObjectType({
     maliciousAnswer: { type: GraphQLString },
     emailsOfHonestOracles: { type: new GraphQLList(GraphQLString) },
     emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
+    doesAllowJudgeToJudge: {type: GraphQLBoolean },
+    isMIBWithoutRestarts: {type: GraphQLBoolean },
   },
 });
 
@@ -2204,6 +2206,8 @@ const schema = new GraphQLSchema({
                   maliciousAnswer,
                   emailsOfHonestOracles = [],
                   emailsOfMaliciousOracles = [],
+                  doesAllowJudgeToJudge = false,
+                  isMIBWithoutRestarts = false,
                 } = treeInfo;
 
                 const workspace = await Workspace.create(
@@ -2226,6 +2230,11 @@ const schema = new GraphQLSchema({
 
                 const tree = await Tree.create({
                   rootWorkspaceId: workspace.id,
+                });
+
+                await tree.update({
+                  doesAllowOracleBypass: doesAllowJudgeToJudge,
+                  isMIBWithoutRestarts,
                 });
 
                 await experiment.$add("tree", tree);
