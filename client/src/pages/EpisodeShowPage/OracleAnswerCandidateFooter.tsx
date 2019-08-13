@@ -58,6 +58,7 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
       markAsNotStale,
       responseIsEmpty,
       snapshot,
+      isGrandparentRootWorkspace,
     } = this.props;
 
     return (
@@ -85,18 +86,21 @@ class OracleAnswerCandidateFooterPresentational extends React.Component<
               markAsCurrentlyResolved();
             }}
           />
-          {isUserMaliciousOracle && !isRequestingLazyUnlock && hasParent && (
-            <TakeBreakBtn
-              experimentId={experimentId}
-              bsStyle="danger"
-              label={`Decline to Challenge!`}
-              navHook={() => {
-                snapshot("DECLINE_TO_CHALLENGE");
-                markAsNotStale();
-                declineToChallenge();
-              }}
-            />
-          )}
+          {isUserMaliciousOracle &&
+            !isRequestingLazyUnlock &&
+            hasParent &&
+            !isGrandparentRootWorkspace && (
+              <TakeBreakBtn
+                experimentId={experimentId}
+                bsStyle="danger"
+                label={`Decline to Challenge!`}
+                navHook={() => {
+                  snapshot("DECLINE_TO_CHALLENGE");
+                  markAsNotStale();
+                  declineToChallenge();
+                }}
+              />
+            )}
         </div>
       </div>
     );

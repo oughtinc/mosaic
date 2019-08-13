@@ -444,6 +444,9 @@ export class ChildrenSidebar extends React.Component<any, any> {
         )}
         {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
           <NewBlockForm
+            snapshot={this.props.snapshot}
+            markAsNotStale={this.props.markAsNotStale}
+            experimentId={this.props.experimentId}
             isMIBWithoutRestarts={this.props.isMIBWithoutRestarts}
             doesAllowOracleBypass={this.props.doesAllowOracleBypass}
             isWorkspacePartOfOracleExperiment={

@@ -66,6 +66,7 @@ interface EpisodeNavProps {
   isUserOracle: boolean;
   isUserMaliciousOracle: boolean;
   isAwaitingHonestExpertDecision: boolean;
+  isGreatGrandparentRootWorkspace: boolean;
   snapshot(action: string): void;
   markAsNotStaleRelativeToUser(): void;
   concedeToMalicious(): void;
@@ -95,6 +96,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
       concedeToMalicious,
       playOutSubtree,
       markAsNotStale,
+      isGreatGrandparentRootWorkspace,
     } = this.props;
 
     if (isUserOracle && isInOracleMode) {
@@ -120,22 +122,26 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
               {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
               {isAwaitingHonestExpertDecision && (
                 <div>
+                  {!isGreatGrandparentRootWorkspace && (
+                    <TakeBreakBtn
+                      bsStyle="primary"
+                      experimentId={experimentId}
+                      label="Concede to malicious expert"
+                      navHook={() => {
+                        snapshot("CONCEDE_TO_MALICIOUS");
+                        if (concedeToMalicious) {
+                          markAsNotStale();
+                          concedeToMalicious();
+                        }
+                      }}
+                    />
+                  )}
                   <TakeBreakBtn
                     bsStyle="primary"
                     experimentId={experimentId}
-                    label="Concede to malicious expert"
-                    navHook={() => {
-                      snapshot("CONCEDE_TO_MALICIOUS");
-                      if (concedeToMalicious) {
-                        markAsNotStale();
-                        concedeToMalicious();
-                      }
-                    }}
-                  />
-                  <TakeBreakBtn
-                    bsStyle="primary"
-                    experimentId={experimentId}
-                    label="Play out subtree"
+                    label={`Play out subtree${
+                      isGreatGrandparentRootWorkspace ? " (required)" : ""
+                    }`}
                     navHook={() => {
                       snapshot("PLAY_OUT_SUBTREE");
                       if (markAsNotStaleRelativeToUser) {

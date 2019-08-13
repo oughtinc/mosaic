@@ -76,6 +76,7 @@ const WORKSPACE_QUERY = gql`
       parentId
       parentWorkspace {
         parentWorkspace {
+          id
           parentWorkspace {
             id
             serialId
@@ -504,6 +505,27 @@ export class WorkspaceView extends React.Component<any, any> {
 
     const hasParent = !!workspace.parentId;
 
+    const hasGrandparent =
+      workspace.parentWorkspace && workspace.parentWorkspace.parentWorkspace;
+
+    const grandparent =
+      hasGrandparent && workspace.parentWorkspace.parentWorkspace;
+
+    const isGrandparentRootWorkspace =
+      grandparent.id === workspace.rootWorkspaceId;
+
+    const hasGreatGrandparent =
+      workspace.parentWorkspace &&
+      workspace.parentWorkspace.parentWorkspace &&
+      workspace.parentWorkspace.parentWorkspace.parentWorkspace;
+
+    const greatGrandparent =
+      hasGreatGrandparent &&
+      workspace.parentWorkspace.parentWorkspace.parentWorkspace;
+
+    const isGreatGrandparentRootWorkspace =
+      greatGrandparent.id === workspace.rootWorkspaceId;
+
     const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
 
     const oracleAnswerCandidateProps: any =
@@ -674,6 +696,7 @@ export class WorkspaceView extends React.Component<any, any> {
         >
           {this.state.isAuthenticated && experimentId && (
             <EpisodeNav
+              isGreatGrandparentRootWorkspace={isGreatGrandparentRootWorkspace}
               markAsNotStale={() =>
                 this.props.updateWorkspace({
                   variables: {
@@ -820,61 +843,6 @@ export class WorkspaceView extends React.Component<any, any> {
                               />
                             </div>
                           )}
-                          <div>
-                            {hasParent && !isIsolatedWorkspace && (
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  marginBottom: "6px",
-                                }}
-                              >
-                                <ParentLink
-                                  parentSerialId={workspace.parentSerialId}
-                                />
-                              </span>
-                            )}
-                            {workspace.isAwaitingHonestExpertDecision && (
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  marginBottom: "6px",
-                                }}
-                              >
-                                <GreatGrandParentLink
-                                  greatGrandParentSerialId={
-                                    workspace.parentWorkspace.parentWorkspace
-                                      .parentWorkspace.serialId
-                                  }
-                                />
-                              </span>
-                            )}
-                            {workspace && !isIsolatedWorkspace && (
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  marginBottom: "6px",
-                                }}
-                              >
-                                <SubtreeLink workspace={workspace} />
-                              </span>
-                            )}
-                            {workspace && (
-                              <span
-                                style={{
-                                  display: "inline-block",
-                                  marginBottom: "6px",
-                                }}
-                              >
-                                {(isUserMaliciousOracle ||
-                                  (Auth.isAdmin() && !isActive)) && (
-                                  <span style={{ marginRight: "10px" }}>
-                                    <RootTreeLink workspace={workspace} />
-                                  </span>
-                                )}
-                                <ExpandAllPointersBtn />
-                              </span>
-                            )}
-                          </div>
                           <BlockEditor
                             isActive={isActive}
                             isUserOracle={isUserOracle}
@@ -897,6 +865,35 @@ export class WorkspaceView extends React.Component<any, any> {
                               this.state.pastedExportFormat
                             }
                           />
+                          <div style={{ marginTop: "6px" }}>
+                            {hasParent && !isIsolatedWorkspace && (
+                              <ParentLink
+                                parentSerialId={workspace.parentSerialId}
+                              />
+                            )}
+                            {workspace.isAwaitingHonestExpertDecision && (
+                              <GreatGrandParentLink
+                                greatGrandParentSerialId={
+                                  workspace.parentWorkspace.parentWorkspace
+                                    .parentWorkspace.serialId
+                                }
+                              />
+                            )}
+                            {workspace && !isIsolatedWorkspace && (
+                              <SubtreeLink workspace={workspace} />
+                            )}
+                            {workspace && (
+                              <React.Fragment>
+                                {(isUserMaliciousOracle ||
+                                  (Auth.isAdmin() && !isActive)) && (
+                                  <span style={{ marginRight: "10px" }}>
+                                    <RootTreeLink workspace={workspace} />
+                                  </span>
+                                )}
+                                <ExpandAllPointersBtn />
+                              </React.Fragment>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </Col>
@@ -1258,6 +1255,9 @@ export class WorkspaceView extends React.Component<any, any> {
                                     </BlockBody>
                                     {isUserOracle && hasParent && (
                                       <OracleAnswerCandidateFooter
+                                        isGrandparentRootWorkspace={
+                                          isGrandparentRootWorkspace
+                                        }
                                         snapshot={(action: string) =>
                                           this.snapshot(this.props, action)
                                         }

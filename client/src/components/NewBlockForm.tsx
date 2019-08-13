@@ -66,6 +66,14 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
 
   public componentWillReceiveProps() {
     if (this.state.pending) {
+      if (this.props.isMIBWithoutRestarts) {
+        this.props.snapshot("WAIT_FOR_ANSWER");
+        this.props.markAsNotStale();
+        window.location.href = `${window.location.origin}/break?e=${
+          this.props.experimentId
+        }`;
+      }
+
       this.setState({
         pending: false,
         hasSubmittedAQuestion: true,
