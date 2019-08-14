@@ -697,20 +697,6 @@ export class WorkspaceView extends React.Component<any, any> {
         >
           {this.state.isAuthenticated && experimentId && (
             <EpisodeNav
-              isGreatGrandparentRootWorkspace={isGreatGrandparentRootWorkspace}
-              markAsNotStale={() =>
-                this.props.updateWorkspace({
-                  variables: {
-                    id: workspace.id,
-                    input: {
-                      isStale: false,
-                    },
-                  },
-                })
-              }
-              isAwaitingHonestExpertDecision={
-                workspace.isAwaitingHonestExpertDecision
-              }
               snapshot={(action: string) => this.snapshot(this.props, action)}
               experimentId={experimentId}
               hasSubquestions={hasSubquestions}
@@ -736,16 +722,6 @@ export class WorkspaceView extends React.Component<any, any> {
                       isEligibleForHonestOracle,
                     },
                   },
-                })
-              }
-              concedeToMalicious={() =>
-                this.props.concedeToMalicious({
-                  variables: { id: workspace.id },
-                })
-              }
-              playOutSubtree={() =>
-                this.props.playOutSubtree({
-                  variables: { id: workspace.id },
                 })
               }
             />
