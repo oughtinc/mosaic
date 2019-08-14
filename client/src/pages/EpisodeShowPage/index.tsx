@@ -512,7 +512,7 @@ export class WorkspaceView extends React.Component<any, any> {
       hasGrandparent && workspace.parentWorkspace.parentWorkspace;
 
     const isGrandparentRootWorkspace =
-      grandparent.id === workspace.rootWorkspaceId;
+      hasGrandparent && grandparent.id === workspace.rootWorkspaceId;
 
     const hasGreatGrandparent =
       workspace.parentWorkspace &&
@@ -524,7 +524,7 @@ export class WorkspaceView extends React.Component<any, any> {
       workspace.parentWorkspace.parentWorkspace.parentWorkspace;
 
     const isGreatGrandparentRootWorkspace =
-      greatGrandparent.id === workspace.rootWorkspaceId;
+      hasGreatGrandparent && greatGrandparent.id === workspace.rootWorkspaceId;
 
     const isRequestingLazyUnlock = workspace.isRequestingLazyUnlock;
 
