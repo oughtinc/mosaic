@@ -16,6 +16,7 @@ import { OracleAnswerCandidateFooter } from "./OracleAnswerCandidateFooter";
 import { ResponseFooter } from "./ResponseFooter";
 import { SelectAnswerBtn } from "./SelectAnswerBtn";
 import { CharCountDisplays } from "./CharCountDisplays";
+import { HonestExpertDecisionBtns } from "./HonestExpertDecisionBtns";
 import { TimerAndTimeBudgetInfo } from "./TimerAndTimeBudgetInfo";
 import { TimerWhenNoTimeBudget } from "./TimerWhenNoTimeBudget";
 import { ChildrenSidebar } from "./ChildrenSidebar";
@@ -898,6 +899,38 @@ export class WorkspaceView extends React.Component<any, any> {
                       </div>
                     </Col>
                   </Row>
+
+                  {workspace.isAwaitingHonestExpertDecision && (
+                    <HonestExpertDecisionBtns
+                      experimentId={experimentId}
+                      snapshot={(action: string) =>
+                        this.snapshot(this.props, action)
+                      }
+                      concedeToMalicious={() =>
+                        this.props.concedeToMalicious({
+                          variables: { id: workspace.id },
+                        })
+                      }
+                      playOutSubtree={() =>
+                        this.props.playOutSubtree({
+                          variables: { id: workspace.id },
+                        })
+                      }
+                      markAsNotStale={() =>
+                        this.props.updateWorkspace({
+                          variables: {
+                            id: workspace.id,
+                            input: {
+                              isStale: false,
+                            },
+                          },
+                        })
+                      }
+                      isGreatGrandparentRootWorkspace={
+                        isGreatGrandparentRootWorkspace
+                      }
+                    />
+                  )}
 
                   {!workspace.isAwaitingHonestExpertDecision && (
                     <Row>
