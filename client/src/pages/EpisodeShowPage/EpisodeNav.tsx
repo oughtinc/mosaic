@@ -65,13 +65,8 @@ interface EpisodeNavProps {
   isTakingABreak?: boolean;
   isUserOracle: boolean;
   isUserMaliciousOracle: boolean;
-  isAwaitingHonestExpertDecision: boolean;
-  isGreatGrandparentRootWorkspace: boolean;
   snapshot(action: string): void;
   markAsNotStaleRelativeToUser(): void;
-  concedeToMalicious(): void;
-  markAsNotStale(): void;
-  playOutSubtree(): void;
 }
 
 // Note that there in the normal functioning of the app,
@@ -112,6 +107,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
               style={{
                 color: isUserMaliciousOracle ? "#a66" : "#6a6",
                 fontSize: "24px",
+                fontVariant: "small-caps",
               }}
             >
               {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
