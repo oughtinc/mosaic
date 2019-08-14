@@ -7,6 +7,7 @@ import { valueToDatabaseJSON } from "../lib/slateParser";
 import { Button } from "react-bootstrap";
 import { resetBlock } from "../modules/blocks/actions";
 import { ChildBudgetBadge } from "./ChildBudgetBadge";
+import { Redirect } from "react-router-dom";
 
 import {
   blockBorderAndBoxShadow,
@@ -59,7 +60,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     super(props);
     this.state = {
       pending: false,
-      hasSubmittedAQuestion: false,
+      shouldRedirectToBreakPage: false,
       totalBudget: this.props.totalBudget || 90,
     };
   }
@@ -69,14 +70,13 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
       if (this.props.isMIBWithoutRestarts) {
         this.props.snapshot("WAIT_FOR_ANSWER");
         this.props.markAsNotStale();
-        window.location.href = `${window.location.origin}/break?e=${
-          this.props.experimentId
-        }`;
+        this.setState({
+          shouldRedirectToBreakPage: true,
+        });
       }
 
       this.setState({
         pending: false,
-        hasSubmittedAQuestion: true,
         totalBudget: 90,
       });
     }
@@ -100,6 +100,9 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
             : 1,
         }}
       >
+        {this.state.shouldRedirectToBreakPage && (
+          <Redirect to={`/break?e=${this.props.experimentId}`} />
+        )}
         <BlockContainer>
           <BlockHeader>New Question</BlockHeader>
           <BlockBody>
@@ -333,10 +336,8 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
               bsStyle="primary"
               data-cy="submit-new-question"
               disabled={
-                (this.props.isMIBWithoutRestarts &&
-                  this.state.hasSubmittedAQuestion) ||
-                (this.props.hasTimeBudget &&
-                  this.props.availableBudget - 90 < this.state.totalBudget)
+                this.props.hasTimeBudget &&
+                this.props.availableBudget - 90 < this.state.totalBudget
               }
               type="submit"
               onClick={() =>
@@ -358,10 +359,6 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
                 <Button
                   bsSize="xsmall"
                   bsStyle="danger"
-                  disabled={
-                    this.props.isMIBWithoutRestarts &&
-                    this.state.hasSubmittedAQuestion
-                  }
                   type="submit"
                   onClick={() =>
                     this.handleClick({ shouldOverrideToNormalUser: true })
