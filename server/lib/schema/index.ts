@@ -1259,7 +1259,7 @@ const schema = new GraphQLSchema({
               )) as Workspace[];
               let allResolvedOrArchived = true;
               for (const child of children) {
-                if (!(child.isCurrentlyResolved || child.isArchived)) {
+                if (!child.isCurrentlyResolved && !child.isArchived) {
                   allResolvedOrArchived = false;
                   break;
                 }
