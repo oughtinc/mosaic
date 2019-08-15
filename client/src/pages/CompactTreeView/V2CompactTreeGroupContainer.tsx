@@ -130,6 +130,10 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
           !isSamePointerInHonestAnswerDraftAndMaliciousQuestion) ||
         didHonestDecideToConcede;
 
+      if (didHonestWin && didMaliciousWin) {
+        throw Error("Honest and malicious both can't win");
+      }
+
       const maliciousAnswerCandidateBlock = malicious.blocks.find(
         b => b.type === "ORACLE_ANSWER_CANDIDATE",
       );
