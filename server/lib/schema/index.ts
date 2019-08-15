@@ -1454,12 +1454,17 @@ const schema = new GraphQLSchema({
                               "Great-grandparent does not exist (but should)",
                             );
                           }
-                          const isNotRoot = greatGrandparentWorkspace.parentId;
-                          if (isNotRoot) {
+                          const isRoot = _.isNil(
+                            greatGrandparentWorkspace.parentId,
+                          );
+
+                          if (!isRoot) {
                             const children = (await greatGrandparentWorkspace.$get(
                               "childWorkspaces",
                             )) as Workspace[];
+
                             let allResolvedOrArchived = true;
+
                             for (const child of children) {
                               if (
                                 !(child.isCurrentlyResolved || child.isArchived)
@@ -1468,6 +1473,7 @@ const schema = new GraphQLSchema({
                                 break;
                               }
                             }
+
                             if (allResolvedOrArchived) {
                               await greatGrandparentWorkspace.update({
                                 isStale: true,
