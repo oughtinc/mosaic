@@ -113,6 +113,7 @@ export class Auth {
           isAdmin: user.isAdmin,
         });
       }
+
       if (window.Intercom) {
         window.Intercom("update", {
           user_id: user.id,
@@ -120,6 +121,10 @@ export class Auth {
           email: user.email,
           isAdmin: user.isAdmin,
         });
+      }
+
+      if (window.heap) {
+        window.heap.identify(user.email || user.id);
       }
 
       callback();

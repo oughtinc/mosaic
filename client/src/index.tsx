@@ -8,6 +8,9 @@ declare global {
   interface Window {
     Intercom: any;
     FS: any;
+    heap: {
+      identify: (id: any) => void;
+    };
   }
 }
 window.Intercom = window.Intercom || {};
