@@ -150,6 +150,7 @@ export class Auth {
             isAdmin: appMetadata ? appMetadata.is_admin : false,
           });
         }
+
         if (window.Intercom) {
           window.Intercom("update", {
             user_id: profile.sub,
@@ -157,6 +158,10 @@ export class Auth {
             email: profile.email,
             isAdmin: appMetadata ? appMetadata.is_admin : false,
           });
+        }
+
+        if (window.heap) {
+          window.heap.identify(profile.email || profile.sub);
         }
 
         callback();
