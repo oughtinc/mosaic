@@ -55,6 +55,12 @@ export class NextMaybeSuboptimalEpisodeShowPagePresentational extends React.Comp
     }
 
     if (schedulingFailed) {
+      if (window.heap) {
+        window.heap.track("No workspace available", {
+          experimentId,
+          acceptSuboptimalWorkspace: true,
+        });
+      }
       this.setState({ schedulingFailed });
     } else if (response) {
       const workspaceId =

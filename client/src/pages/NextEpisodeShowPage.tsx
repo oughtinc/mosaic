@@ -115,6 +115,14 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         e.message === "GraphQL error: No eligible workspace";
     }
 
+    const schedulingFailed = oracleSchedulingFailed || normalSchedulingFailed;
+    if (window.heap && schedulingFailed) {
+      window.heap.track("No workspace available", {
+        experimentId,
+        acceptSuboptimalWorkspace: false,
+      });
+    }
+
     if (oracleSchedulingFailed) {
       this.setState({ oracleSchedulingFailed });
       this.startCountingDown();
