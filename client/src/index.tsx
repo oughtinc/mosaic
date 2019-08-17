@@ -10,6 +10,7 @@ declare global {
     FS: any;
     heap: {
       identify: (id: any) => void;
+      track: (name: string, properties: any) => void;
     };
   }
 }
