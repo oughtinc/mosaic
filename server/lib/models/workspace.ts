@@ -204,9 +204,11 @@ export default class Workspace extends Model<Workspace> {
         return;
       }
 
+      // The honest workspace has the honest answer candidate, but
+      // not the pointer containing the honest answer candidate.
+      // This pointer is contained in the malicious question.
       const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
 
-      // hacky way of getting honest answer candidate pointer
       const maliciousQuestionBlock = (await maliciousWorkspace.$get(
         "blocks",
       )).find(b => b.type === "QUESTION");
@@ -235,9 +237,13 @@ export default class Workspace extends Model<Workspace> {
         return;
       }
 
+      // The pointer containing the malicious answer candidate
+      // first appears in the judge question. But to distinguish
+      // it from the honest answer candidate, we need to know which pointer
+      // contains the honest answer candidate, and this first appears in the
+      // malicious question.
       const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
 
-      // hacky way of getting honest answer candidate pointer
       const maliciousQuestionBlock = (await maliciousWorkspace.$get(
         "blocks",
       )).find(b => b.type === "QUESTION");
@@ -263,9 +269,12 @@ export default class Workspace extends Model<Workspace> {
         "value[0].nodes[5].data.pointerId",
       );
 
-      return idOfHonestAnswerCandidatePointer === idOfA1AnswerCandidate
-        ? idOfA2AnswerCandidate
-        : idOfA1AnswerCandidate;
+      const idOfMaliciousAnswerCandidatePointer =
+        idOfHonestAnswerCandidatePointer === idOfA1AnswerCandidate
+          ? idOfA2AnswerCandidate
+          : idOfA1AnswerCandidate;
+
+      return idOfMaliciousAnswerCandidatePointer;
     })();
   }
 
