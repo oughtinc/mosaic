@@ -86,6 +86,8 @@ const WORKSPACE_QUERY = gql`
       }
       parentSerialId
       creatorId
+      idOfHonestAnswerCandidate
+      idOfMaliciousAnswerCandidate
       isAwaitingHonestExpertDecision
       isPublic
       isStale
@@ -840,6 +842,15 @@ export class WorkspaceView extends React.Component<any, any> {
                               !isActive &&
                               Auth.isAdmin() &&
                               this.state.pastedExportFormat
+                            }
+                            idOfHonestAnswerCandidate={
+                              workspace.idOfHonestAnswerCandidate
+                            }
+                            idOfMaliciousAnswerCandidate={
+                              workspace.idOfMaliciousAnswerCandidate
+                            }
+                            isAwaitingHonestExpertDecision={
+                              workspace.isAwaitingHonestExpertDecision
                             }
                           />
                           <div style={{ marginTop: "6px" }}>

@@ -110,6 +110,11 @@ function SlatePointers(options: any = {}) {
       if (node.type === "pointerImport") {
         return (
           <PointerImportNode
+            idOfHonestAnswerCandidate={options.idOfHonestAnswerCandidate}
+            idOfMaliciousAnswerCandidate={options.idOfMaliciousAnswerCandidate}
+            isAwaitingHonestExpertDecision={
+              options.isAwaitingHonestExpertDecision
+            }
             isActive={options.isActive}
             visibleExportIds={options.visibleExportIds}
             exportLockStatusInfo={options.exportLockStatusInfo}
