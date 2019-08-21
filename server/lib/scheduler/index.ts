@@ -52,7 +52,7 @@ export async function createScheduler(experimentId) {
             startAtTimestamp: Number(a.dataValues.startAtTimestamp),
             endAtTimestamp: a.dataValues.endAtTimestamp
               ? Number(a.dataValues.endAtTimestamp)
-              : Date.now(),
+              : null,
           },
           workspace,
         };

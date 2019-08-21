@@ -85,7 +85,7 @@ class UserSchedule {
       userId: this.userId,
       workspace,
       startAtTimestamp,
-      endAtTimestamp: endAtTimestamp || Date.now(),
+      endAtTimestamp,
       isAlreadySavedToDb: true,
     });
 
