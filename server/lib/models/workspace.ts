@@ -218,6 +218,13 @@ export default class Workspace extends Model<Workspace> {
         "value[0].nodes[3].data.pointerId",
       );
 
+      if (!idOf2ndPointerInMaliciousQuestion) {
+        throw Error(
+          `Slate structure of malicious question incorrect:
+          idOf2ndPointerInMaliciousQuestion: ${idOf2ndPointerInMaliciousQuestion}`,
+        );
+      }
+
       return idOf2ndPointerInMaliciousQuestion;
     })();
   }
@@ -268,6 +275,14 @@ export default class Workspace extends Model<Workspace> {
         judgeQuestionBlock,
         "value[0].nodes[5].data.pointerId",
       );
+
+      if (!idOfA1AnswerCandidate || !idOfA2AnswerCandidate) {
+        throw Error(
+          `Slate structure of judge question incorrect:
+          idOfA1AnswerCandidate: ${idOfA1AnswerCandidate},
+          idOfA2AnswerCandidate: ${idOfA2AnswerCandidate}`,
+        );
+      }
 
       const idOfMaliciousAnswerCandidatePointer =
         idOfHonestAnswerCandidatePointer === idOfA1AnswerCandidate
