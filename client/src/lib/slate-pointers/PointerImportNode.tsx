@@ -42,7 +42,7 @@ const OpenPointerImport: any = styled.span`
       ? "rgba(255, 0, 0, 0.1)"
       : props.isKnownAsHonestAnswerCandidate
       ? "lightGreen"
-      : props.isLazy
+      : props.isLazyPointer
       ? "rgba(244, 158, 158)"
       : props.isSelected
       ? "rgba(111, 186, 209, 0.66)"
@@ -60,7 +60,7 @@ const Brackets: any = styled.span`
         ? "red"
         : props.isKnownAsHonestAnswerCandidate
         ? "green"
-        : props.isLazy
+        : props.isLazyPointer
         ? "red"
         : unlockedImportBgColor};
     content: "[";
@@ -73,7 +73,7 @@ const Brackets: any = styled.span`
         ? "red"
         : props.isKnownAsHonestAnswerCandidate
         ? "green"
-        : props.isLazy
+        : props.isLazyPointer
         ? "red"
         : unlockedImportBgColor};
     content: "]";
@@ -401,7 +401,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         <OpenPointerImport
           isKnownAsHonestAnswerCandidate={isKnownAsHonestAnswerCandidate}
           isKnownAsMaliciousAnswerCandidate={isKnownAsMaliciousAnswerCandidate}
-          isLazy={isLazyPointer}
+          isLazyPointer={isLazyPointer}
           isSelected={isSelected}
           onClick={e =>
             this.handleOpenPointerClick(e, pointerId, exportPointerId)
@@ -410,7 +410,7 @@ class PointerImportNodePresentational extends React.Component<any, any> {
           <span className={css(styles.OuterPointerImportStyle)}>
             <span onClick={e => e.stopPropagation()}>
               <Brackets
-                isLazy={isLazyPointer}
+                isLazyPointer={isLazyPointer}
                 isKnownAsHonestAnswerCandidate={isKnownAsHonestAnswerCandidate}
                 isKnownAsMaliciousAnswerCandidate={
                   isKnownAsMaliciousAnswerCandidate
