@@ -189,6 +189,110 @@ export default class Workspace extends Model<Workspace> {
     })();
   }
 
+  // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
+  public get idOfHonestAnswerCandidate() {
+    return (async () => {
+      const workspace = await Workspace.findByPk(this.get("id") as string);
+
+      const isExpertWorkspace =
+        workspace.isEligibleForMaliciousOracle ||
+        (workspace.isEligibleForHonestOracle &&
+          !workspace.isAwaitingHonestExpertDecision);
+
+      if (isExpertWorkspace) {
+        return;
+      }
+
+      // The honest workspace has the honest answer candidate, but
+      // not the pointer containing the honest answer candidate.
+      // This pointer is contained in the malicious question.
+      const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
+
+      const maliciousQuestionBlock = (await maliciousWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "QUESTION");
+
+      const idOf2ndPointerInMaliciousQuestion = _.get(
+        maliciousQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      if (!idOf2ndPointerInMaliciousQuestion) {
+        throw Error(
+          `Slate structure of malicious question incorrect:
+          idOf2ndPointerInMaliciousQuestion: ${idOf2ndPointerInMaliciousQuestion}`,
+        );
+      }
+
+      return idOf2ndPointerInMaliciousQuestion;
+    })();
+  }
+
+  // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
+  public get idOfMaliciousAnswerCandidate() {
+    return (async () => {
+      const workspace = await Workspace.findByPk(this.get("id") as string);
+
+      const isExpertWorkspace =
+        workspace.isEligibleForMaliciousOracle ||
+        (workspace.isEligibleForHonestOracle &&
+          !workspace.isAwaitingHonestExpertDecision);
+
+      if (isExpertWorkspace) {
+        return;
+      }
+
+      // The pointer containing the malicious answer candidate
+      // first appears in the judge question. But to distinguish
+      // it from the honest answer candidate, we need to know which pointer
+      // contains the honest answer candidate, and this first appears in the
+      // malicious question.
+      const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
+
+      const maliciousQuestionBlock = (await maliciousWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "QUESTION");
+
+      const idOf2ndPointerInMaliciousQuestion = _.get(
+        maliciousQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      const idOfHonestAnswerCandidatePointer = idOf2ndPointerInMaliciousQuestion;
+
+      const judgeQuestionBlock = (await workspace.$get("blocks")).find(
+        b => b.type === "QUESTION",
+      );
+
+      const idOfA1AnswerCandidate = _.get(
+        judgeQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      const idOfA2AnswerCandidate = _.get(
+        judgeQuestionBlock,
+        "value[0].nodes[5].data.pointerId",
+      );
+
+      if (!idOfA1AnswerCandidate || !idOfA2AnswerCandidate) {
+        throw Error(
+          `Slate structure of judge question incorrect:
+          idOfA1AnswerCandidate: ${idOfA1AnswerCandidate},
+          idOfA2AnswerCandidate: ${idOfA2AnswerCandidate}`,
+        );
+      }
+
+      const idOfMaliciousAnswerCandidatePointer =
+        idOfHonestAnswerCandidatePointer === idOfA1AnswerCandidate
+          ? idOfA2AnswerCandidate
+          : idOfA1AnswerCandidate;
+
+      return idOfMaliciousAnswerCandidatePointer;
+    })();
+  }
+
   @Column(
     // @ts-ignore
     new DataType.VIRTUAL(DataType.INTEGER, ["totalBudget", "allocatedBudget"]),
