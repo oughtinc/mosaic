@@ -60,6 +60,21 @@ class AdminControlsPresentational extends React.Component<any, any> {
             allow judge-to-judge questions
           </Checkbox>
         </div>
+        <div>
+          <Checkbox
+            checked={workspace.tree.isMIBWithoutRestarts}
+            onChange={(e: any) => {
+              this.props.updateTreeIsMIBWithoutRestarts({
+                variables: {
+                  treeId: workspace.tree.id,
+                  isMIBWithoutRestarts: e.target.checked,
+                },
+              });
+            }}
+          >
+            is MIB without restarts
+          </Checkbox>
+        </div>
         <ExperimentsCheckboxes workspace={workspace} />
         <UserOracleControls workspace={workspace} />
       </div>
@@ -75,6 +90,18 @@ const UPDATE_TREE_DOES_ALLOW_ORACLE_BYPASS = gql`
     updateTreeDoesAllowOracleBypass(
       treeId: $treeId
       doesAllowOracleBypass: $doesAllowOracleBypass
+    )
+  }
+`;
+
+const UPDATE_TREE_IS_MIB_WITHOUT_RESTARTS = gql`
+  mutation updateTreeIsMIBWithoutRestarts(
+    $treeId: String
+    $isMIBWithoutRestarts: Boolean
+  ) {
+    updateTreeIsMIBWithoutRestarts(
+      treeId: $treeId
+      isMIBWithoutRestarts: $isMIBWithoutRestarts
     )
   }
 `;
@@ -100,6 +127,12 @@ const AdminControls: any = compose(
   }),
   graphql(UPDATE_TREE_DOES_ALLOW_ORACLE_BYPASS, {
     name: "updateTreeDoesAllowOracleBypass",
+    options: (props: any) => ({
+      refetchQueries: props.refetchQueries,
+    }),
+  }),
+  graphql(UPDATE_TREE_IS_MIB_WITHOUT_RESTARTS, {
+    name: "updateTreeIsMIBWithoutRestarts",
     options: (props: any) => ({
       refetchQueries: props.refetchQueries,
     }),

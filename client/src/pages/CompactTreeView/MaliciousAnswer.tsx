@@ -21,48 +21,54 @@ export class MaliciousAnswer extends React.PureComponent<any, any> {
       maliciousAnswerBlockId,
       maliciousAnswerValue,
       normal,
+      didHonestDecideToConcede,
     } = this.props;
 
     return (
-      <CompactTreeRow>
-        <CompactTreeRowLabel>
-          {didMaliciousWin && (
+      <React.Fragment>
+        <CompactTreeRow>
+          <CompactTreeRowLabel>
+            {didMaliciousWin && (
+              <Link
+                style={{ textDecoration: "none" }}
+                target="_blank"
+                to={`/w/${normal.id}`}
+              >
+                <Checkmark color="red" />
+              </Link>
+            )}{" "}
             <Link
-              style={{ textDecoration: "none" }}
+              style={{
+                color: "red",
+                textDecoration: "none",
+              }}
               target="_blank"
-              to={`/w/${normal.id}`}
+              to={`/w/${malicious.id}`}
             >
-              <Checkmark color="red" />
+              M
             </Link>
-          )}{" "}
-          <Link
-            style={{
-              color: "red",
-              textDecoration: "none",
-            }}
-            target="_blank"
-            to={`/w/${malicious.id}`}
-          >
-            M
-          </Link>
-        </CompactTreeRowLabel>
-        {didMaliciousDeclineToChallenge ? (
-          <span style={{ color: "red" }}>No challenge</span>
-        ) : normal ? (
-          <CompactTreeRowContent>
-            <BlockEditor
-              name={maliciousAnswerBlockId}
-              blockId={maliciousAnswerBlockId}
-              readOnly={true}
-              initialValue={maliciousAnswerValue}
-              shouldAutosave={false}
-              availablePointers={availablePointers}
-            />
-          </CompactTreeRowContent>
-        ) : (
-          <span style={{ color: "#999" }}>Waiting for response</span>
+          </CompactTreeRowLabel>
+          {didMaliciousDeclineToChallenge ? (
+            <span style={{ color: "red" }}>No challenge</span>
+          ) : normal ? (
+            <CompactTreeRowContent>
+              <BlockEditor
+                name={maliciousAnswerBlockId}
+                blockId={maliciousAnswerBlockId}
+                readOnly={true}
+                initialValue={maliciousAnswerValue}
+                shouldAutosave={false}
+                availablePointers={availablePointers}
+              />
+            </CompactTreeRowContent>
+          ) : (
+            <span style={{ color: "#999" }}>Waiting for response</span>
+          )}
+        </CompactTreeRow>
+        {didHonestDecideToConcede && (
+          <div style={{ color: "#777" }}>Honest conceded</div>
         )}
-      </CompactTreeRow>
+      </React.Fragment>
     );
   }
 }

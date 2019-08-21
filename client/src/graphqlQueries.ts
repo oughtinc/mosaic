@@ -73,6 +73,8 @@ export const WORKSPACES_QUERY = gql`
       hasTimeBudget
       tree {
         id
+        doesAllowOracleBypass
+        isMIBWithoutRestarts
         experiments {
           id
           serialId

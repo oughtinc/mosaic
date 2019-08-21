@@ -111,6 +111,9 @@ class BlockEditorPresentational extends React.Component<any, any> {
       isInOracleMode: true,
       isUserOracle: newProps.isUserOracle,
       isActive: newProps.isActive,
+      idOfHonestAnswerCandidate: newProps.idOfHonestAnswerCandidate,
+      idOfMaliciousAnswerCandidate: newProps.idOfMaliciousAnswerCandidate,
+      isAwaitingHonestExpertDecision: newProps.isAwaitingHonestExpertDecision,
     };
     this.setState({
       plugins: [

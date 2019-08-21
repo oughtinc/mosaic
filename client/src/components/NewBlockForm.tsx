@@ -7,6 +7,7 @@ import { valueToDatabaseJSON } from "../lib/slateParser";
 import { Button } from "react-bootstrap";
 import { resetBlock } from "../modules/blocks/actions";
 import { ChildBudgetBadge } from "./ChildBudgetBadge";
+import { Redirect } from "react-router-dom";
 
 import {
   blockBorderAndBoxShadow,
@@ -59,13 +60,25 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     super(props);
     this.state = {
       pending: false,
+      shouldRedirectToBreakPage: false,
       totalBudget: this.props.totalBudget || 90,
     };
   }
 
   public componentWillReceiveProps() {
     if (this.state.pending) {
-      this.setState({ pending: false, totalBudget: 90 });
+      if (this.props.isMIBWithoutRestarts) {
+        this.props.snapshot("WAIT_FOR_ANSWER");
+        this.props.markAsNotStale();
+        this.setState({
+          shouldRedirectToBreakPage: true,
+        });
+      }
+
+      this.setState({
+        pending: false,
+        totalBudget: 90,
+      });
     }
   }
 
@@ -87,6 +100,9 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
             : 1,
         }}
       >
+        {this.state.shouldRedirectToBreakPage && (
+          <Redirect to={`/break?e=${this.props.experimentId}`} />
+        )}
         <BlockContainer>
           <BlockHeader>New Question</BlockHeader>
           <BlockBody>

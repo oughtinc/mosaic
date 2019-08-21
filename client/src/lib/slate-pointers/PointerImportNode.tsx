@@ -38,7 +38,11 @@ const ClosedPointerImport: any = styled.span``;
 
 const OpenPointerImport: any = styled.span`
   background: ${(props: any) =>
-    props.isLazy
+    props.isKnownAsMaliciousAnswerCandidate
+      ? "rgba(255, 0, 0, 0.1)"
+      : props.isKnownAsHonestAnswerCandidate
+      ? "lightGreen"
+      : props.isLazyPointer
       ? "rgba(244, 158, 158)"
       : props.isSelected
       ? "rgba(111, 186, 209, 0.66)"
@@ -51,13 +55,27 @@ const OpenPointerImport: any = styled.span`
 
 const Brackets: any = styled.span`
   &:before {
-    color: ${(props: any) => (props.isLazy ? "red" : unlockedImportBgColor)};
+    color: ${(props: any) =>
+      props.isKnownAsMaliciousAnswerCandidate
+        ? "red"
+        : props.isKnownAsHonestAnswerCandidate
+        ? "green"
+        : props.isLazyPointer
+        ? "red"
+        : unlockedImportBgColor};
     content: "[";
     font: ${bracketFont};
   }
 
   &:after {
-    color: ${(props: any) => (props.isLazy ? "red" : unlockedImportBgColor)};
+    color: ${(props: any) =>
+      props.isKnownAsMaliciousAnswerCandidate
+        ? "red"
+        : props.isKnownAsHonestAnswerCandidate
+        ? "green"
+        : props.isLazyPointer
+        ? "red"
+        : unlockedImportBgColor};
     content: "]";
     font: ${bracketFont};
   }
@@ -181,7 +199,14 @@ class PointerImportNodePresentational extends React.Component<any, any> {
 
   public isLocked() {
     const onHomepageOrTreeView = !this.props.exportLockStatusInfo;
-    if (onHomepageOrTreeView || this.props.isInOracleModeAndIsUserOracle) {
+    if (
+      onHomepageOrTreeView ||
+      (this.props.isActive && this.props.isInOracleModeAndIsUserOracle)
+      // non-active expert see locks,
+      // this was added after MIB w/o restarts
+      // allowed honest expert to view original judge workspace
+      // before deciding whether to concede or play out subtree
+    ) {
       return false;
     }
 
@@ -206,7 +231,20 @@ class PointerImportNodePresentational extends React.Component<any, any> {
       blockEditor,
       visibleExportIds,
       nodeAsJson,
+      idOfHonestAnswerCandidate,
+      idOfMaliciousAnswerCandidate,
+      isAwaitingHonestExpertDecision,
     } = this.props;
+
+    const exportPointerId = this.props.nodeAsJson.data.pointerId;
+
+    const isKnownAsMaliciousAnswerCandidate =
+      isAwaitingHonestExpertDecision &&
+      idOfMaliciousAnswerCandidate === exportPointerId;
+
+    const isKnownAsHonestAnswerCandidate =
+      isAwaitingHonestExpertDecision &&
+      idOfHonestAnswerCandidate === exportPointerId;
 
     const {
       importingPointer,
@@ -233,7 +271,6 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     const isLocked = this.state.isLocked && this.isLocked();
 
     const pointerId: string = this.props.nodeAsJson.data.internalReferenceId;
-    const exportPointerId: string = this.props.nodeAsJson.data.pointerId;
 
     const exportPointer = availablePointers.find(
       p => p.data.pointerId === exportPointerId,
@@ -251,7 +288,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     const styles = StyleSheet.create({
       OuterPointerImportStyle: {
         ":before": {
-          backgroundColor: isLazyPointer
+          backgroundColor: isKnownAsMaliciousAnswerCandidate
+            ? "red"
+            : isKnownAsHonestAnswerCandidate
+            ? "green"
+            : isLazyPointer
             ? "red"
             : isLocked
             ? lockedPointerImportBgColor
@@ -263,7 +304,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         },
       },
       ClosedPointerImportStyle: {
-        backgroundColor: isLazyPointer
+        backgroundColor: isKnownAsMaliciousAnswerCandidate
+          ? "red"
+          : isKnownAsHonestAnswerCandidate
+          ? "green"
+          : isLazyPointer
           ? "red"
           : isLocked
           ? lockedPointerImportBgColor
@@ -275,7 +320,11 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         transition: "background-color 0.4s",
         whiteSpace: "nowrap",
         ":hover": {
-          backgroundColor: isLazyPointer
+          backgroundColor: isKnownAsMaliciousAnswerCandidate
+            ? "red"
+            : isKnownAsHonestAnswerCandidate
+            ? "green"
+            : isLazyPointer
             ? "red"
             : isLocked
             ? lockedPointerImportBgColorOnHover
@@ -350,7 +399,9 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     } else {
       return (
         <OpenPointerImport
-          isLazy={isLazyPointer}
+          isKnownAsHonestAnswerCandidate={isKnownAsHonestAnswerCandidate}
+          isKnownAsMaliciousAnswerCandidate={isKnownAsMaliciousAnswerCandidate}
+          isLazyPointer={isLazyPointer}
           isSelected={isSelected}
           onClick={e =>
             this.handleOpenPointerClick(e, pointerId, exportPointerId)
@@ -358,7 +409,13 @@ class PointerImportNodePresentational extends React.Component<any, any> {
         >
           <span className={css(styles.OuterPointerImportStyle)}>
             <span onClick={e => e.stopPropagation()}>
-              <Brackets isLazy={isLazyPointer}>
+              <Brackets
+                isLazyPointer={isLazyPointer}
+                isKnownAsHonestAnswerCandidate={isKnownAsHonestAnswerCandidate}
+                isKnownAsMaliciousAnswerCandidate={
+                  isKnownAsMaliciousAnswerCandidate
+                }
+              >
                 <ShowExpandedPointer
                   isActive={this.props.isActive}
                   ancestorPointerIds={

@@ -299,6 +299,7 @@ const EXPERIMENT_QUERY = gql`
           tree {
             id
             doesAllowOracleBypass
+            isMIBWithoutRestarts
             experiments {
               id
               serialId

@@ -107,15 +107,32 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
       const didMaliciousDeclineToChallenge =
         isHonestOracleCurrentlyResolved && !normal;
 
+      const isAwaitingHonestDecision =
+        normal && normal.isAwaitingHonestExpertDecision;
+
+      const didHonestDecideToConcede =
+        normal && normal.isEligibleForHonestOracle && !isAwaitingHonestDecision;
+
+      const didHonestDecideToPlayOut =
+        normal &&
+        !normal.isEligibleForHonestOracle &&
+        !isAwaitingHonestDecision;
+
       const didHonestWin =
         didMaliciousDeclineToChallenge || // this is here b/c in some older trees the follow disjunct is false in cases where the malicious oracle declines
-        (isHonestOracleCurrentlyResolved &&
+        (didHonestDecideToPlayOut &&
+          isHonestOracleCurrentlyResolved &&
           isSamePointerInHonestAnswerDraftAndMaliciousQuestion);
 
       const didMaliciousWin =
-        !didHonestWin && // this is here b/c in some older trees the follow two conjuncts are true in cases where the malicious oracle declines
-        isHonestOracleCurrentlyResolved &&
-        !isSamePointerInHonestAnswerDraftAndMaliciousQuestion;
+        (!didHonestWin && // this is here b/c in some older trees the follow two conjuncts are true in cases where the malicious oracle declines
+          isHonestOracleCurrentlyResolved &&
+          !isSamePointerInHonestAnswerDraftAndMaliciousQuestion) ||
+        didHonestDecideToConcede;
+
+      if (didHonestWin && didMaliciousWin) {
+        throw Error("Honest and malicious both can't win");
+      }
 
       const maliciousAnswerCandidateBlock = malicious.blocks.find(
         b => b.type === "ORACLE_ANSWER_CANDIDATE",
@@ -148,6 +165,9 @@ export class CompactTreeGroupContainerBase extends React.PureComponent<
           questionBlockId={questionBlock.id}
           questionValue={questionValue}
           workspace={workspace}
+          isAwaitingHonestDecision={isAwaitingHonestDecision}
+          didHonestDecideToConcede={didHonestDecideToConcede}
+          didHonestDecideToPlayOut={didHonestDecideToPlayOut}
         />
       );
     }
@@ -191,6 +211,8 @@ export const GROUP_QUERY = gql`
             createdAt
             isRequestingLazyUnlock
           }
+          isEligibleForHonestOracle
+          isAwaitingHonestExpertDecision
         }
       }
     }

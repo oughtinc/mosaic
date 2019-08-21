@@ -21,6 +21,7 @@ import { userFromContext } from "./auth/userFromContext";
 
 import { getMessageForUser } from "./helpers/getMessageForUser";
 import { addExportsAndLinks } from "./helpers/addExportsAndLinks";
+import { extractMaliciousAnswerValueFromMaliciousQuestionAndJudgeQuestion } from "./helpers/extractMaliciousAnswerValueFromMaliciousQuestionAndJudgeQuestion";
 import { extractHonestAnswerValueFromMaliciousQuestion } from "./helpers/extractHonestAnswerValueFromMaliciousQuestion";
 import { extractAnswerValueFromQuestion } from "./helpers/extractAnswerValueFromQuestion";
 
@@ -78,7 +79,7 @@ export const workspaceType = makeObjectType(
   Workspace,
   [
     ["childWorkspaces", () => new GraphQLList(workspaceType)],
-    ["parentWorkspace", () => new GraphQLList(workspaceType)],
+    ["parentWorkspace", () => workspaceType],
     ["blocks", () => new GraphQLList(blockType)],
     ["pointerImports", () => new GraphQLList(pointerImportType)],
     ["tree", () => treeType],
@@ -380,6 +381,8 @@ const TreeInputForAPI = new GraphQLInputObjectType({
     maliciousAnswer: { type: GraphQLString },
     emailsOfHonestOracles: { type: new GraphQLList(GraphQLString) },
     emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
+    doesAllowJudgeToJudge: { type: GraphQLBoolean },
+    isMIBWithoutRestarts: { type: GraphQLBoolean },
   },
 });
 
@@ -1030,6 +1033,24 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeIsMIBWithoutRestarts: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          isMIBWithoutRestarts: { type: GraphQLBoolean },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to toggle MIB w/o restarts",
+          async (_, { treeId, isMIBWithoutRestarts }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ isMIBWithoutRestarts });
+            return true;
+          },
+        ),
+      },
       updateWorkspaceChildren: {
         type: workspaceType,
         args: {
@@ -1159,6 +1180,124 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      concedeToMalicious: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to decline to challenge a workspace",
+          async (obj, { id, input }, context) => {
+            const workspace = await Workspace.findByPk(id);
+            if (workspace === null) {
+              return false;
+            }
+
+            await workspace.update({
+              isAwaitingHonestExpertDecision: false,
+            });
+
+            const parentWorkspace = await Workspace.findByPk(
+              workspace.parentId,
+            );
+
+            if (parentWorkspace === null) {
+              return false;
+            }
+
+            const grandParentWorkspace = await Workspace.findByPk(
+              parentWorkspace.parentId,
+            );
+
+            if (grandParentWorkspace === null) {
+              return false;
+            }
+
+            const judgeBlocks = (await workspace.$get("blocks")) as Block[];
+            const judgeQuestion = judgeBlocks.find(b => b.type === "QUESTION");
+
+            const maliciousBlocks = (await parentWorkspace.$get(
+              "blocks",
+            )) as Block[];
+
+            const maliciousQuestion = maliciousBlocks.find(
+              b => b.type === "QUESTION",
+            );
+
+            // make honest response field equal to malicious answer candidate
+            const honestBlocks = (await grandParentWorkspace.$get(
+              "blocks",
+            )) as Block[];
+
+            const grandParentAnswerDraft = honestBlocks.find(
+              b => b.type === "ANSWER_DRAFT",
+            );
+
+            if (grandParentAnswerDraft && maliciousQuestion && judgeQuestion) {
+              const newAnswerDraftValue = extractMaliciousAnswerValueFromMaliciousQuestionAndJudgeQuestion(
+                maliciousQuestion.value,
+                judgeQuestion.value,
+              );
+
+              await grandParentAnswerDraft.update({
+                value: newAnswerDraftValue,
+              });
+            }
+
+            // mark honest as resolved
+            // and check to see if upstream judge should be marked as stale
+            await grandParentWorkspace.update({ isCurrentlyResolved: true });
+            if (grandParentWorkspace.parentId) {
+              const upstreamJudge = await Workspace.findByPk(
+                grandParentWorkspace.parentId,
+              );
+              if (upstreamJudge === null) {
+                return false;
+              }
+              const children = (await upstreamJudge.$get(
+                "childWorkspaces",
+              )) as Workspace[];
+              let allResolvedOrArchived = true;
+              for (const child of children) {
+                if (!child.isCurrentlyResolved && !child.isArchived) {
+                  allResolvedOrArchived = false;
+                  break;
+                }
+              }
+              if (allResolvedOrArchived) {
+                await upstreamJudge.update({
+                  isStale: true,
+                  isNotStaleRelativeToUser: [],
+                });
+              }
+            }
+
+            return true;
+          },
+        ),
+      },
+      playOutSubtree: {
+        type: GraphQLBoolean,
+        args: {
+          id: { type: GraphQLString },
+        },
+        resolve: requireUser(
+          "You must be logged in to decide to play out a subtree",
+          async (obj, { id, input }, context) => {
+            const workspace = await Workspace.findByPk(id);
+            if (workspace === null) {
+              return false;
+            }
+
+            await workspace.update({
+              isEligibleForHonestOracle: false,
+              isAwaitingHonestExpertDecision: false,
+            });
+
+            return true;
+          },
+        ),
+      },
       updateWorkspace: {
         type: workspaceType,
         args: {
@@ -1211,6 +1350,8 @@ const schema = new GraphQLSchema({
                 await workspace.update({ isNotStaleRelativeToUser: [] });
               }
 
+              // TODO: A lot of important logic is in the following conditional
+              // Would be good to clean it up, DRY it out, etc.
               if (isCurrentlyResolved) {
                 // determine isOracleExperiment
                 const rootWorkspace = await workspace.getRootWorkspace();
@@ -1231,6 +1372,8 @@ const schema = new GraphQLSchema({
                   parent &&
                   !parent.isEligibleForHonestOracle &&
                   !parent.isEligibleForMaliciousOracle;
+
+                const isMIBWithoutRestarts = tree.isMIBWithoutRestarts;
 
                 if (
                   !isOracleExperiment ||
@@ -1291,37 +1434,52 @@ const schema = new GraphQLSchema({
                           "Grandparent does not exist (but should)",
                         );
                       }
+
+                      // Make honest ancestor resolved
                       await grandparentWorkspace.update({
                         isCurrentlyResolved,
                       });
-                      if (grandparentWorkspace.parentId) {
-                        const greatGrandparentWorkspace = await Workspace.findByPk(
-                          grandparentWorkspace.parentId,
-                        );
-                        if (greatGrandparentWorkspace === null) {
-                          throw new Error(
-                            "Great-grandparent does not exist (but should)",
+
+                      // If not "most interesting branch" w/o restarts
+                      if (!isMIBWithoutRestarts) {
+                        // If honest ancestor has judge parent
+                        if (grandparentWorkspace.parentId) {
+                          // Then see if judge parent has all subquestions resolved
+                          // And should therefore should be marked stale (i.e., eligible for scheduling)
+                          const greatGrandparentWorkspace = await Workspace.findByPk(
+                            grandparentWorkspace.parentId,
                           );
-                        }
-                        const isNotRoot = greatGrandparentWorkspace.parentId;
-                        if (isNotRoot) {
-                          const children = (await greatGrandparentWorkspace.$get(
-                            "childWorkspaces",
-                          )) as Workspace[];
-                          let allResolvedOrArchived = true;
-                          for (const child of children) {
-                            if (
-                              !(child.isCurrentlyResolved || child.isArchived)
-                            ) {
-                              allResolvedOrArchived = false;
-                              break;
-                            }
+                          if (greatGrandparentWorkspace === null) {
+                            throw new Error(
+                              "Great-grandparent does not exist (but should)",
+                            );
                           }
-                          if (allResolvedOrArchived) {
-                            await greatGrandparentWorkspace.update({
-                              isStale: true,
-                              isNotStaleRelativeToUser: [],
-                            });
+                          const isRoot = _.isNil(
+                            greatGrandparentWorkspace.parentId,
+                          );
+
+                          if (!isRoot) {
+                            const children = (await greatGrandparentWorkspace.$get(
+                              "childWorkspaces",
+                            )) as Workspace[];
+
+                            let allResolvedOrArchived = true;
+
+                            for (const child of children) {
+                              if (
+                                !(child.isCurrentlyResolved || child.isArchived)
+                              ) {
+                                allResolvedOrArchived = false;
+                                break;
+                              }
+                            }
+
+                            if (allResolvedOrArchived) {
+                              await greatGrandparentWorkspace.update({
+                                isStale: true,
+                                isNotStaleRelativeToUser: [],
+                              });
+                            }
                           }
                         }
                       }
@@ -2054,6 +2212,8 @@ const schema = new GraphQLSchema({
                   maliciousAnswer,
                   emailsOfHonestOracles = [],
                   emailsOfMaliciousOracles = [],
+                  doesAllowJudgeToJudge = false,
+                  isMIBWithoutRestarts = false,
                 } = treeInfo;
 
                 const workspace = await Workspace.create(
@@ -2076,6 +2236,11 @@ const schema = new GraphQLSchema({
 
                 const tree = await Tree.create({
                   rootWorkspaceId: workspace.id,
+                });
+
+                await tree.update({
+                  doesAllowOracleBypass: doesAllowJudgeToJudge,
+                  isMIBWithoutRestarts,
                 });
 
                 await experiment.$add("tree", tree);

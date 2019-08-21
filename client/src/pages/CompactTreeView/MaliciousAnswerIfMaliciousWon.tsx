@@ -17,6 +17,7 @@ export class MaliciousAnswerIfMaliciousWon extends React.PureComponent<
         maliciousAnswerBlockId={this.props.maliciousAnswerBlockId}
         maliciousAnswerValue={this.props.maliciousAnswerValue}
         normal={this.props.normal}
+        didHonestDecideToConcede={this.props.didHonestDecideToConcede}
       />
     );
   }

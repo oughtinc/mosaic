@@ -3,6 +3,7 @@ import {
   BelongsToMany,
   Column,
   DataType,
+  Default,
   ForeignKey,
   HasMany,
   Model,
@@ -30,6 +31,10 @@ export default class Tree extends Model<Tree> {
 
   @Column(DataType.BOOLEAN)
   public doesAllowOracleBypass: boolean;
+
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isMIBWithoutRestarts: boolean;
 
   @BelongsTo(() => Workspace)
   public rootWorkspace: Workspace;

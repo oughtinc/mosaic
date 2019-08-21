@@ -135,6 +135,11 @@ export default class Workspace extends Model<Workspace> {
   @Column(DataType.INTEGER)
   public allocatedBudget: number;
 
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  public isAwaitingHonestExpertDecision: boolean;
+
   // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["id"]))
   public get hasAncestorAnsweredByOracle() {
@@ -181,6 +186,110 @@ export default class Workspace extends Model<Workspace> {
         return false;
       }
       return rootWorkspace.hasIOConstraints;
+    })();
+  }
+
+  // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
+  public get idOfHonestAnswerCandidate() {
+    return (async () => {
+      const workspace = await Workspace.findByPk(this.get("id") as string);
+
+      const isExpertWorkspace =
+        workspace.isEligibleForMaliciousOracle ||
+        (workspace.isEligibleForHonestOracle &&
+          !workspace.isAwaitingHonestExpertDecision);
+
+      if (isExpertWorkspace) {
+        return;
+      }
+
+      // The honest workspace has the honest answer candidate, but
+      // not the pointer containing the honest answer candidate.
+      // This pointer is contained in the malicious question.
+      const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
+
+      const maliciousQuestionBlock = (await maliciousWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "QUESTION");
+
+      const idOf2ndPointerInMaliciousQuestion = _.get(
+        maliciousQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      if (!idOf2ndPointerInMaliciousQuestion) {
+        throw Error(
+          `Slate structure of malicious question incorrect:
+          idOf2ndPointerInMaliciousQuestion: ${idOf2ndPointerInMaliciousQuestion}`,
+        );
+      }
+
+      return idOf2ndPointerInMaliciousQuestion;
+    })();
+  }
+
+  // @ts-ignore
+  @Column(new DataType.VIRTUAL(DataType.STRING, ["id"]))
+  public get idOfMaliciousAnswerCandidate() {
+    return (async () => {
+      const workspace = await Workspace.findByPk(this.get("id") as string);
+
+      const isExpertWorkspace =
+        workspace.isEligibleForMaliciousOracle ||
+        (workspace.isEligibleForHonestOracle &&
+          !workspace.isAwaitingHonestExpertDecision);
+
+      if (isExpertWorkspace) {
+        return;
+      }
+
+      // The pointer containing the malicious answer candidate
+      // first appears in the judge question. But to distinguish
+      // it from the honest answer candidate, we need to know which pointer
+      // contains the honest answer candidate, and this first appears in the
+      // malicious question.
+      const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
+
+      const maliciousQuestionBlock = (await maliciousWorkspace.$get(
+        "blocks",
+      )).find(b => b.type === "QUESTION");
+
+      const idOf2ndPointerInMaliciousQuestion = _.get(
+        maliciousQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      const idOfHonestAnswerCandidatePointer = idOf2ndPointerInMaliciousQuestion;
+
+      const judgeQuestionBlock = (await workspace.$get("blocks")).find(
+        b => b.type === "QUESTION",
+      );
+
+      const idOfA1AnswerCandidate = _.get(
+        judgeQuestionBlock,
+        "value[0].nodes[3].data.pointerId",
+      );
+
+      const idOfA2AnswerCandidate = _.get(
+        judgeQuestionBlock,
+        "value[0].nodes[5].data.pointerId",
+      );
+
+      if (!idOfA1AnswerCandidate || !idOfA2AnswerCandidate) {
+        throw Error(
+          `Slate structure of judge question incorrect:
+          idOfA1AnswerCandidate: ${idOfA1AnswerCandidate},
+          idOfA2AnswerCandidate: ${idOfA2AnswerCandidate}`,
+        );
+      }
+
+      const idOfMaliciousAnswerCandidatePointer =
+        idOfHonestAnswerCandidatePointer === idOfA1AnswerCandidate
+          ? idOfA2AnswerCandidate
+          : idOfA1AnswerCandidate;
+
+      return idOfMaliciousAnswerCandidatePointer;
     })();
   }
 
@@ -494,19 +603,22 @@ export default class Workspace extends Model<Workspace> {
     if (parentWorkspace === null) {
       return false;
     }
+
+    const rootWorkspace = await parentWorkspace.getRootWorkspace();
+    const tree = (await rootWorkspace.$get("tree")) as Tree;
+    const isMIBWithoutRestarts = tree.isMIBWithoutRestarts;
+
     const isParentRootWorkspace = !parentWorkspace.parentId;
-    const isParentOracleWorkspace =
-      parentWorkspace.isEligibleForHonestOracle ||
+    const isParentHonestOracleWorkspace =
+      parentWorkspace.isEligibleForHonestOracle;
+    const isParentMaliciousOracleWorkspace =
       parentWorkspace.isEligibleForMaliciousOracle;
 
-    if (isParentOracleWorkspace && !isParentRootWorkspace) {
+    // child of honest workspace never honest
+    if (isParentHonestOracleWorkspace) {
       return false;
     }
 
-    const rootWorkspace = await parentWorkspace.getRootWorkspace();
-
-    // get experiment id
-    const tree = (await rootWorkspace.$get("tree")) as Tree;
     const experiments = (await tree.$get("experiments")) as Experiment[];
 
     if (experiments.length === 0) {
@@ -514,7 +626,29 @@ export default class Workspace extends Model<Workspace> {
     }
 
     const mostRecentExperiment = _.sortBy(experiments, e => -e.createdAt)[0];
-    return mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault;
+
+    // if experiment is non-oracle, then of course not honest
+    if (!mostRecentExperiment.areNewWorkspacesOracleOnlyByDefault) {
+      return false;
+    }
+
+    // if parent is root, then honest
+    if (isParentRootWorkspace) {
+      return true;
+    }
+
+    // if parent is non-root malicious, and MIB w/o restarts, then honest
+    if (isParentMaliciousOracleWorkspace && isMIBWithoutRestarts) {
+      return true;
+    }
+
+    // If parent is non-expert, then honest
+    if (!isParentMaliciousOracleWorkspace && !isParentHonestOracleWorkspace) {
+      return true;
+    }
+
+    // Else not honest
+    return false;
   }
 
   public static async isNewChildWorkspaceMaliciousOracleEligible({ parentId }) {
@@ -557,9 +691,12 @@ export default class Workspace extends Model<Workspace> {
     isEligibleForMaliciousOracle,
     shouldOverrideToNormalUser,
   }) {
+    let isAwaitingHonestExpertDecision;
+
     if (shouldOverrideToNormalUser) {
       isEligibleForHonestOracle = false;
       isEligibleForMaliciousOracle = false;
+      isAwaitingHonestExpertDecision = false;
     } else {
       isEligibleForHonestOracle =
         isEligibleForHonestOracle !== undefined
@@ -567,12 +704,29 @@ export default class Workspace extends Model<Workspace> {
           : await Workspace.isNewChildWorkspaceHonestOracleEligible({
               parentId,
             });
+
       isEligibleForMaliciousOracle =
         isEligibleForMaliciousOracle !== undefined
           ? isEligibleForMaliciousOracle
           : await Workspace.isNewChildWorkspaceMaliciousOracleEligible({
               parentId,
             });
+
+      const parentWorkspace = await Workspace.findByPkOrSerialId(parentId);
+      const rootWorkspace = await parentWorkspace.getRootWorkspace();
+      const tree = (await rootWorkspace.$get("tree")) as Tree;
+      const isMIBWithoutRestarts = tree.isMIBWithoutRestarts;
+
+      if (isMIBWithoutRestarts) {
+        isAwaitingHonestExpertDecision = !!(
+          isEligibleForHonestOracle &&
+          parentWorkspace &&
+          parentWorkspace.isEligibleForMaliciousOracle &&
+          parentWorkspace.parentId
+        ); // parent is non-root
+      } else {
+        isAwaitingHonestExpertDecision = false;
+      }
     }
 
     return await Workspace.create(
@@ -585,6 +739,7 @@ export default class Workspace extends Model<Workspace> {
         isRequestingLazyUnlock,
         isEligibleForHonestOracle,
         isEligibleForMaliciousOracle,
+        isAwaitingHonestExpertDecision,
       },
       { questionValue: question },
     );

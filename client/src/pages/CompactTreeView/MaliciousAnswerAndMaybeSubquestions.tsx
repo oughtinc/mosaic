@@ -17,6 +17,7 @@ export class MaliciousAnswerAndMaybeSubquestions extends React.PureComponent<
       maliciousAnswerBlockId,
       maliciousAnswerValue,
       normal,
+      isAwaitingHonestDecision,
     } = this.props;
 
     return (
@@ -30,7 +31,11 @@ export class MaliciousAnswerAndMaybeSubquestions extends React.PureComponent<
           maliciousAnswerBlockId={maliciousAnswerBlockId}
           maliciousAnswerValue={maliciousAnswerValue}
           normal={normal}
+          didHonestDecideToConcede={this.props.didHonestDecideToConcede}
         />
+        {isAwaitingHonestDecision && (
+          <div style={{ color: "#777" }}>Waiting for honest decision</div>
+        )}
         {!didMaliciousDeclineToChallenge &&
           normal &&
           normal.childWorkspaces.length > 0 && (

@@ -108,31 +108,58 @@ function SlatePointers(options: any = {}) {
         );
       }
       if (node.type === "pointerImport") {
+        const isHonestAnswerCandidate =
+          node.toJSON().data.pointerId === options.idOfHonestAnswerCandidate;
+
+        const shouldShowHonestIcon =
+          options.isAwaitingHonestExpertDecision && isHonestAnswerCandidate;
+
+        const isMaliciousAnswerCandidate =
+          node.toJSON().data.pointerId === options.idOfMaliciousAnswerCandidate;
+
+        const shouldShowMaliciousIcon =
+          options.isAwaitingHonestExpertDecision && isMaliciousAnswerCandidate;
+
         return (
-          <PointerImportNode
-            isActive={options.isActive}
-            visibleExportIds={options.visibleExportIds}
-            exportLockStatusInfo={options.exportLockStatusInfo}
-            isInOracleMode={options.isInOracleMode}
-            isUserOracle={options.isUserOracle}
-            isInOracleModeAndIsUserOracle={
-              options.isInOracleModeAndIsUserOracle
-            }
-            unlockPointer={options.unlockPointer}
-            nodeAsJson={node.toJSON()}
-            blockEditor={options.blockEditor}
-            availablePointers={options.availablePointers}
-            onMouseOver={({ left, right, top, bottom, id }) => {
-              options.onMouseOverPointerImport({
-                left,
-                right,
-                top,
-                bottom,
-                id,
-              });
-            }}
-            isHoverable={true}
-          />
+          <React.Fragment>
+            {shouldShowHonestIcon && (
+              <span style={{ position: "relative", top: "1px" }}>💚 </span>
+            )}
+            {shouldShowMaliciousIcon && (
+              <span style={{ position: "relative", top: "2px" }}>😈 </span>
+            )}
+            <PointerImportNode
+              idOfHonestAnswerCandidate={options.idOfHonestAnswerCandidate}
+              idOfMaliciousAnswerCandidate={
+                options.idOfMaliciousAnswerCandidate
+              }
+              isAwaitingHonestExpertDecision={
+                options.isAwaitingHonestExpertDecision
+              }
+              isActive={options.isActive}
+              visibleExportIds={options.visibleExportIds}
+              exportLockStatusInfo={options.exportLockStatusInfo}
+              isInOracleMode={options.isInOracleMode}
+              isUserOracle={options.isUserOracle}
+              isInOracleModeAndIsUserOracle={
+                options.isInOracleModeAndIsUserOracle
+              }
+              unlockPointer={options.unlockPointer}
+              nodeAsJson={node.toJSON()}
+              blockEditor={options.blockEditor}
+              availablePointers={options.availablePointers}
+              onMouseOver={({ left, right, top, bottom, id }) => {
+                options.onMouseOverPointerImport({
+                  left,
+                  right,
+                  top,
+                  bottom,
+                  id,
+                });
+              }}
+              isHoverable={true}
+            />
+          </React.Fragment>
         );
       } else {
         return;
