@@ -237,12 +237,15 @@ class PointerImportNodePresentational extends React.Component<any, any> {
     } = this.props;
 
     const exportPointerId = this.props.nodeAsJson.data.pointerId;
-    const isKnownAsHonestAnswerCandidate =
-      isAwaitingHonestExpertDecision &&
-      idOfHonestAnswerCandidate === exportPointerId;
+
     const isKnownAsMaliciousAnswerCandidate =
       isAwaitingHonestExpertDecision &&
       idOfMaliciousAnswerCandidate === exportPointerId;
+
+    const isKnownAsHonestAnswerCandidate =
+      isAwaitingHonestExpertDecision &&
+      idOfHonestAnswerCandidate === exportPointerId;
+
     const {
       importingPointer,
       isSelected,
