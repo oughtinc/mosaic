@@ -12,6 +12,14 @@ const SavingIconStyle = styled.span`
   margin-top: 1px;
 `;
 
+const CharacterCounterStyle = styled.span`
+  float: right;
+  fontsize: 0.25em
+  margin-top: -1px;
+  margin-right: 1px;
+  color: gray;
+`;
+
 const Icons = {
   [MutationStatus.NotStarted]: null,
   [MutationStatus.Loading]: (
@@ -50,10 +58,45 @@ const SavingIcon = ({
   }
 };
 
+function getLocalCharCount(nodeOrNodes: any): number {
+  let nodes;
+  if (Array.isArray(nodeOrNodes)) {
+    nodes = nodeOrNodes;
+  } else {
+    nodes = nodeOrNodes.nodes;
+  }
+
+  let result = 0;
+
+  for (const node of nodes) {
+    if (node.object === "leaf" || node.object === "text") {
+      result += node.leaves
+        .reduce((acc: string, val) => {
+          return `${acc}${val.text}`;
+        }, "")
+        .split("").length;
+    } else if (node.nodes) {
+      result += getLocalCharCount(node.nodes);
+    }
+  }
+
+  return result;
+}
+
+const CharacterCounter = ({ value }) => {
+  if (!value) {
+    return <span />;
+  }
+
+  const characterCount = getLocalCharCount(value.document.toJSON());
+  return <CharacterCounterStyle>{characterCount}</CharacterCounterStyle>;
+};
+
 export const MenuBar = ({
   mutationStatus,
   hasChangedSinceDatabaseSave,
   blockEditor,
+  value,
 }) => (
   <div>
     <SavingIcon
@@ -61,5 +104,6 @@ export const MenuBar = ({
       mutationStatus={mutationStatus}
       blockEditor={blockEditor}
     />
+    <CharacterCounter value={value} />
   </div>
 );

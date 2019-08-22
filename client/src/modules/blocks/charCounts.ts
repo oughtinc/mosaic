@@ -54,17 +54,6 @@ export function outputCharCountSelector(state: any, blockIds: string[]) {
   return charCount;
 }
 
-export function localCharCountSelector(state: any, blockIds: string[]) {
-  const blocks = state.blocks.blocks;
-  const relevantBlocks = blocks.filter(b => _.includes(blockIds, b.id));
-
-  const charCount: number = relevantBlocks.reduce((acc: number, b) => {
-    return acc + getLocalCharCount(b.value.document.toJSON());
-  });
-
-  return charCount;
-}
-
 export function getInputCharCount(nodeOrNodes: any): number {
   let nodes;
   if (Array.isArray(nodeOrNodes)) {
@@ -118,28 +107,5 @@ function getOutputCharCount(nodeOrNodes: any) {
     }
   }
 
-  return result;
-}
-
-function getLocalCharCount(nodeOrNodes: any): number {
-  let nodes;
-  if (Array.isArray(nodeOrNodes)) {
-    nodes = nodeOrNodes;
-  } else {
-    nodes = nodeOrNodes.nodes;
-  }
-
-  let result = 0;
-
-  for (const node of nodes) {
-    if (node.object === "text") {
-      result += node.leaves
-        .reduce((acc: string, val) => {
-          return `${acc}${val.text}`;
-        }, "")
-        .split("")
-        .filter(char => char !== POINTER_EDGE_SPACE).length;
-    }
-  }
   return result;
 }

@@ -255,6 +255,7 @@ export class BlockEditorEditingPresentational extends React.Component<
       <div>
         <MenuBar
           blockEditor={this.props.blockEditor}
+          value={this.props.value}
           mutationStatus={this.props.mutationStatus}
           hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
         />
