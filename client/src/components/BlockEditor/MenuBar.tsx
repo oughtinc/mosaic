@@ -14,9 +14,10 @@ const SavingIconStyle = styled.span`
 
 const CharacterCounterStyle = styled.span`
   float: right;
-  fontsize: 0.25em
-  margin-top: -1px;
-  margin-right: 1px;
+  font-size: 0.7em
+  margin-top: 1px;
+  margin-right: 3px;
+  margin-left: 5px;
   color: gray;
 `;
 
