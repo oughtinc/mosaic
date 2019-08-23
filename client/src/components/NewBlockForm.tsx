@@ -74,14 +74,15 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
         this.props.snapshot("WAIT_FOR_ANSWER");
         this.props.markAsNotStale();
         this.setState({
+          pending: false,
           shouldRedirectToBreakPage: true,
         });
+      } else {
+        this.setState({
+          pending: false,
+          totalBudget: 90,
+        });
       }
-
-      this.setState({
-        pending: false,
-        totalBudget: 90,
-      });
     }
   }
 
