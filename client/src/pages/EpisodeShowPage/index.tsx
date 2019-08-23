@@ -984,7 +984,7 @@ export class WorkspaceView extends React.Component<any, any> {
                                   </span>
                                   Please email developer Zak Miller at{" "}
                                   <a href="mailto:name@mydomain.com">
-                                    zachary.john.miller@gmail.com
+                                    zak@ought.org
                                   </a>{" "}
                                   to let him know you've seen this message.
                                   Please include the workspace # in your email.
