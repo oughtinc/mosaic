@@ -129,6 +129,17 @@ export async function createScheduler(experimentId) {
         return _.some(experiments, e => e.id === experimentId);
       });
 
+      // add schedulingPriority to root workspace object
+      await map(eligibleRootWorkspaces, async w => {
+        const tree = await Tree.findOne({
+          where: {
+            rootWorkspaceId: w.id,
+          },
+        });
+
+        w.schedulingPriority = tree.schedulingPriority;
+      });
+
       return eligibleRootWorkspaces;
     },
     getFallbackScheduler: async () => {
