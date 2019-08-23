@@ -5,6 +5,7 @@ import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
 import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
 import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
 import { MutationStatus } from "./types";
+import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
 
 const SavingIconStyle = styled.span`
   float: right;
@@ -75,8 +76,11 @@ function getLocalCharCount(nodeOrNodes: any): number {
         .reduce((acc: string, val) => {
           return `${acc}${val.text}`;
         }, "")
-        .split("").length;
-    } else if (node.nodes) {
+        .split("")
+        .filter(char => char !== POINTER_EDGE_SPACE).length;
+    } else if (node.type === "pointerImport") {
+      result += 1;
+    } else if (node.type !== "pointerExport" && node.nodes) {
       result += getLocalCharCount(node.nodes);
     }
   }
