@@ -65,8 +65,11 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     };
   }
 
-  public componentWillReceiveProps() {
-    if (this.state.pending) {
+  public componentWillReceiveProps(newProps) {
+    if (
+      this.state.pending &&
+      newProps.numBlocksInRedux > this.props.numBlocksInRedux // This checks whether the newly asked sub-question has made it into Redux
+    ) {
       if (this.props.isMIBWithoutRestarts) {
         this.props.snapshot("WAIT_FOR_ANSWER");
         this.props.markAsNotStale();
@@ -388,11 +391,15 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
   };
 }
 
+const mapStateToProps = state => ({
+  numBlocksInRedux: state.blocks.blocks.length,
+});
+
 const mapDispatchToProps = dispatch => ({
   resetBlock: ({ id }) => dispatch(resetBlock({ id })),
 });
 
 export const NewBlockForm = connect(
-  undefined,
+  mapStateToProps,
   mapDispatchToProps,
 )(NewBlockFormPresentational);
