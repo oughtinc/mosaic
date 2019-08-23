@@ -106,23 +106,36 @@ class AdminControlsPresentational extends React.Component<any, any> {
           <div style={{ fontWeight: 600, fontSize: "12px" }}>
             To change, edit and press enter
           </div>
+          <div
+            style={{
+              color: "red",
+              display: isNaN(this.state.schedulingPriority) ? "block" : "none",
+              fontWeight: 600,
+              fontSize: "12px",
+            }}
+          >
+            Error: non-numeric value entered
+          </div>
           <FormControl
             onChange={e => {
               const target = e.target as HTMLInputElement;
 
               this.setState({
-                schedulingPriority: Number(target.value),
+                schedulingPriority: target.value,
               });
             }}
             onKeyDown={e => {
               const wasEnterKeyPressed = e.key === "Enter";
 
+              const isInputValueNumeric = !isNaN(this.state.schedulingPriority); // note isNaN works with strings
+
               const doesInputValueDifferFromTreeSchedulingPriority =
-                this.state.schedulingPriority !==
+                Number(this.state.schedulingPriority) !==
                 workspace.tree.schedulingPriority;
 
               if (
                 wasEnterKeyPressed &&
+                isInputValueNumeric &&
                 doesInputValueDifferFromTreeSchedulingPriority
               ) {
                 this.setState({ isSchedulingPriorityUpdatePending: true });
@@ -130,12 +143,13 @@ class AdminControlsPresentational extends React.Component<any, any> {
                 this.props.updateTreeSchedulingPriority({
                   variables: {
                     treeId: workspace.tree.id,
-                    schedulingPriority: this.state.schedulingPriority,
+                    schedulingPriority: Number(this.state.schedulingPriority),
                   },
                 });
               }
             }}
             style={{
+              border: isNaN(this.state.schedulingPriority) && "1px solid red",
               display: "inline-block",
               marginBottom: "5px",
               width: "150px",
