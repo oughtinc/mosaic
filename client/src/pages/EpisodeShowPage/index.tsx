@@ -969,7 +969,8 @@ export class WorkspaceView extends React.Component<any, any> {
                         {!(this.state.isAuthenticated && !isActive) &&
                           workspace.message && (
                             <Alert style={{ border: "1px solid #ddd" }}>
-                              {workspace.childWorkspaces &&
+                              {hasParent &&
+                              workspace.childWorkspaces &&
                               workspace.childWorkspaces.length > 0 ? (
                                 <span style={{ color: "#666" }}>
                                   <span
