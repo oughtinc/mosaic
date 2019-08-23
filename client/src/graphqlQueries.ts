@@ -75,6 +75,7 @@ export const WORKSPACES_QUERY = gql`
         id
         doesAllowOracleBypass
         isMIBWithoutRestarts
+        schedulingPriority
         experiments {
           id
           serialId

@@ -75,6 +75,7 @@ class AdminControlsPresentational extends React.Component<any, any> {
             is MIB without restarts
           </Checkbox>
         </div>
+        <div>Scheduling priority: {workspace.tree.schedulingPriority}</div>
         <ExperimentsCheckboxes workspace={workspace} />
         <UserOracleControls workspace={workspace} />
       </div>
