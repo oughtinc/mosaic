@@ -1052,6 +1052,24 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeSchedulingPriority: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          schedulingPriority: { type: GraphQLInt },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to change tree priority",
+          async (_, { treeId, schedulingPriority }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ schedulingPriority });
+            return true;
+          },
+        ),
+      },
       updateWorkspaceChildren: {
         type: workspaceType,
         args: {
