@@ -2360,6 +2360,12 @@ const schema = new GraphQLSchema({
                     },
                   });
 
+                  if (!user) {
+                    throw new Error(
+                      `No user with email address ${emailOfHonestOracle}`,
+                    );
+                  }
+
                   await tree.$add("oracle", user);
                 }
 
@@ -2369,6 +2375,12 @@ const schema = new GraphQLSchema({
                       email: emailsOfMaliciousOracle,
                     },
                   });
+
+                  if (!user) {
+                    throw new Error(
+                      `No user with email address ${emailsOfMaliciousOracle}`,
+                    );
+                  }
 
                   await tree.$add("oracle", user);
 
