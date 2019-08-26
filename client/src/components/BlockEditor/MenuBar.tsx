@@ -5,7 +5,7 @@ import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
 import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
 import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
 import { MutationStatus } from "./types";
-import { POINTER_EDGE_SPACE } from "../../lib/slate-pointers/exportedPointerSpacer";
+import { getInputCharCount } from "../../modules/blocks/charCounts";
 
 const SavingIconStyle = styled.span`
   float: right;
@@ -60,40 +60,11 @@ const SavingIcon = ({
   }
 };
 
-function getLocalCharCount(nodeOrNodes: any): number {
-  let nodes;
-  if (Array.isArray(nodeOrNodes)) {
-    nodes = nodeOrNodes;
-  } else {
-    nodes = nodeOrNodes.nodes;
-  }
-
-  let result = 0;
-
-  for (const node of nodes) {
-    if (node.object === "leaf" || node.object === "text") {
-      result += node.leaves
-        .reduce((acc: string, val) => {
-          return `${acc}${val.text}`;
-        }, "")
-        .split("")
-        .filter(char => char !== POINTER_EDGE_SPACE).length;
-    } else if (node.type === "pointerImport") {
-      result += 1;
-    } else if (node.type !== "pointerExport" && node.nodes) {
-      result += getLocalCharCount(node.nodes);
-    }
-  }
-
-  return result;
-}
-
 const CharacterCounter = ({ value }) => {
   if (!value) {
     return <span />;
   }
-
-  const characterCount = getLocalCharCount(value.document.toJSON());
+  const characterCount = getInputCharCount(value.document.toJSON());
   return <CharacterCounterStyle>{characterCount}</CharacterCounterStyle>;
 };
 
