@@ -300,6 +300,7 @@ const EXPERIMENT_QUERY = gql`
             id
             doesAllowOracleBypass
             isMIBWithoutRestarts
+            schedulingPriority
             experiments {
               id
               serialId
