@@ -39,7 +39,7 @@ const RegisterForEmailNotification = ({ onClick, registrationStatus }) => (
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      height: "200px",
+      height: "100px",
       marginBottom: "10px",
       marginRight: "10px",
       padding: "20px",
