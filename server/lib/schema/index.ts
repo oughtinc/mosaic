@@ -2356,29 +2356,29 @@ const schema = new GraphQLSchema({
                 for (const emailOfHonestOracle of emailsOfHonestOracles) {
                   const user = await User.findOne({
                     where: {
-                      email: emailOfHonestOracle,
+                      email: emailOfHonestOracle.toLowerCase(),
                     },
                   });
 
                   if (!user) {
                     throw new Error(
-                      `No user with email address ${emailOfHonestOracle}`,
+                      `No user with email address ${emailOfHonestOracle.toLowerCase()}`,
                     );
                   }
 
                   await tree.$add("oracle", user);
                 }
 
-                for (const emailsOfMaliciousOracle of emailsOfMaliciousOracles) {
+                for (const emailOfMaliciousOracle of emailsOfMaliciousOracles) {
                   const user = await User.findOne({
                     where: {
-                      email: emailsOfMaliciousOracle,
+                      email: emailOfMaliciousOracle.toLowerCase(),
                     },
                   });
 
                   if (!user) {
                     throw new Error(
-                      `No user with email address ${emailsOfMaliciousOracle}`,
+                      `No user with email address ${emailOfMaliciousOracle.toLowerCase()}`,
                     );
                   }
 
