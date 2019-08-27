@@ -53,7 +53,9 @@ export class ExperimentTreesPresentational extends React.Component<any, any> {
 const EXPERIMENT_QUERY = gql`
   query experimentQuery($id: String) {
     experiment(id: $id) {
+      id
       trees {
+        id
         rootWorkspace {
           id
           serialId
