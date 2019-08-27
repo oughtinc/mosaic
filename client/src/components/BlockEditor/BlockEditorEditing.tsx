@@ -266,16 +266,33 @@ export class BlockEditorEditingPresentational extends React.Component<
         >
           <div
             style={{
+              backgroundColor: "#333",
+              bottom: 0,
+              display:
+                this.props.mutationStatus.status === MutationStatus.Error
+                  ? "block"
+                  : "none",
+              left: 0,
+              position: "fixed",
+              right: 0,
+              top: 0,
+              zIndex: 99,
+            }}
+          />
+          <div
+            style={{
               alignItems: "center",
               backgroundColor: "#eaa",
               border: "1px solid #aaa",
               borderRadius: "4px",
-              boxShadow: "1px 1px 6px #bbb",
+              boxShadow: "1px 1px 6px #000",
               display:
                 this.props.mutationStatus.status === MutationStatus.Error
                   ? "flex"
                   : "none",
-              justifyContent: "space-around",
+              flexDirection: "column",
+              fontSize: "24px",
+              justifyContent: "center",
               left: "50%",
               marginLeft: "-300px",
               padding: "10px",
