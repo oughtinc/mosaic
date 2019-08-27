@@ -11,7 +11,7 @@ export class ExperimentTreesPresentational extends React.Component<any, any> {
     const haveTreesLoaded = this.props.experimentQuery.experiment;
 
     if (!haveTreesLoaded) {
-      return <div>Loading trees...</div>;
+      return <div style={{ marginTop: "25px" }}>Loading trees...</div>;
     }
 
     const experiment = this.props.experimentQuery.experiment;
