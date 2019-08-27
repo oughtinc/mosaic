@@ -76,6 +76,7 @@ const WORKSPACE_QUERY = gql`
       serialId
       parentId
       parentWorkspace {
+        id
         parentWorkspace {
           id
           parentWorkspace {
