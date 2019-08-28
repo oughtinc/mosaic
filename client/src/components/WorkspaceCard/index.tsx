@@ -125,7 +125,9 @@ export class WorkspaceCardContainer extends React.PureComponent<any, any> {
 const WORKSPACE_ACTIVITY_QUERY = gql`
   query workspaceActivityQuery($workspaceId: String) {
     workspace(id: $workspaceId) {
+      id
       assignments {
+        id
         endAtTimestamp
         startAtTimestamp
         user {

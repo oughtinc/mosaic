@@ -1,4 +1,5 @@
 import {
+  AllowNull,
   BelongsTo,
   BelongsToMany,
   Column,
@@ -35,6 +36,11 @@ export default class Tree extends Model<Tree> {
   @Default(false)
   @Column(DataType.BOOLEAN)
   public isMIBWithoutRestarts: boolean;
+
+  @AllowNull(false)
+  @Default(1)
+  @Column(DataType.INTEGER)
+  public schedulingPriority: number;
 
   @BelongsTo(() => Workspace)
   public rootWorkspace: Workspace;

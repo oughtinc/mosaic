@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import gql from "graphql-tag";
 import * as React from "react";
 import { graphql } from "react-apollo";
@@ -8,6 +7,7 @@ import { Link } from "react-router-dom";
 import { compose } from "recompose";
 import styled from "styled-components";
 
+import { ExperimentTrees } from "./ExperimentTrees";
 import { NewRootWorkspaceForExperimentForm } from "./NewRootWorkspaceForExperimentForm";
 import { ContentContainer } from "../../components/ContentContainer";
 import { Auth } from "../../auth";
@@ -15,7 +15,6 @@ import { CREATE_ROOT_WORKSPACE } from "../../graphqlQueries";
 import { MetaDataEditor } from "../../components/MetadataEditor";
 import { InstructionsEditor } from "../../components/InstructionsEditor";
 import { ExperimentControl } from "../RootWorkspacePage/ExperimentsControls/ExperimentControl";
-import { RootWorkspace } from "../RootWorkspacePage/RootWorkspace";
 
 import { blockBorderAndBoxShadow, blockBodyCSS } from "../../styles";
 
@@ -139,32 +138,8 @@ export class ExperimentShowPagePresentational extends React.Component<
               Please login to participate in this experiment!
             </span>
           ))}
-        {(!isExperimentActive || isUserAdmin) && experiment.trees.length > 0 && (
-          <div>
-            <h2
-              style={{
-                fontSize: "24px",
-                fontWeight: 600,
-              }}
-            >
-              Workspaces
-            </h2>
-            {_.sortBy(experiment.trees, t =>
-              Date.parse(t.rootWorkspace.createdAt),
-            ).map(tree => (
-              <div
-                key={`${tree.rootWorkspace.id}`}
-                style={{
-                  marginBottom: "10px",
-                }}
-              >
-                <RootWorkspace
-                  sourceQueries={["experimentQuery"]}
-                  workspace={tree.rootWorkspace}
-                />
-              </div>
-            ))}
-          </div>
+        {(!isExperimentActive || isUserAdmin) && (
+          <ExperimentTrees experimentId={experiment.id} />
         )}
         {isUserAdmin && (
           <React.Fragment>
@@ -282,36 +257,6 @@ const EXPERIMENT_QUERY = gql`
         serialId
         createdAt
         name
-      }
-      trees {
-        rootWorkspace {
-          id
-          serialId
-          createdAt
-          parentId
-          totalBudget
-          allocatedBudget
-          blocks {
-            id
-            type
-            value
-          }
-          tree {
-            id
-            doesAllowOracleBypass
-            isMIBWithoutRestarts
-            experiments {
-              id
-              serialId
-              createdAt
-              name
-            }
-          }
-          isEligibleForAssignment
-          canShowCompactTreeView
-          hasIOConstraints
-          hasTimeBudget
-        }
       }
     }
   }
