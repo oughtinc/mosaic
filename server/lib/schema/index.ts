@@ -2094,6 +2094,27 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeExpertAssignments: { 
+        type: GraphQLBoolean,
+        args: { // TODO: Replace with a tree object list
+          treeIds: { type: new GraphQLList(GraphQLString)},
+          emailsOfHonest1Oracles: { type: new GraphQLList(GraphQLString) },
+          emailsOfHonest2Oracles: { type: new GraphQLList(GraphQLString) },
+          emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
+        },
+        resolve:requireAdmin(
+          "You must be logged in as an admin to update experiment expert assignments",
+          async(_, {treeIds, emailsOfHonest1Oracles, emailsOfHonest2Oracles, emailsOfMaliciousOracles}, context) => {
+            
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              return false;
+            }            
+
+            return true;
+          }
+        )
+      }
       markWorkspaceStaleForUser: {
         type: GraphQLBoolean,
         args: {
