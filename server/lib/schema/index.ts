@@ -2094,27 +2094,38 @@ const schema = new GraphQLSchema({
           },
         ),
       },
-      updateTreeExpertAssignments: { 
+      updateTreeExpertAssignments: {
         type: GraphQLBoolean,
-        args: { // TODO: Replace with a tree object list
-          treeIds: { type: new GraphQLList(GraphQLString)},
-          emailsOfHonest1Oracles: { type: new GraphQLList(GraphQLString) },
-          emailsOfHonest2Oracles: { type: new GraphQLList(GraphQLString) },
-          emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
+        args: {
+          treeId: { type: GraphQLString },
+          honest1Email: { type: GraphQLString },
+          honest2Email: { type: GraphQLString },
+          maliciousEmail: { type: GraphQLString },
         },
-        resolve:requireAdmin(
+        resolve: requireAdmin(
           "You must be logged in as an admin to update experiment expert assignments",
-          async(_, {treeIds, emailsOfHonest1Oracles, emailsOfHonest2Oracles, emailsOfMaliciousOracles}, context) => {
-            
-            const tree = await Tree.findByPk(treeId);
+          async (
+            _,
+            { treeId, honest1Email, honest2Email, maliciousEmail },
+            context,
+          ) => {
+            const tree: Tree = await Tree.findByPk(treeId);
             if (tree === null) {
               return false;
-            }            
+            }
+            const honest1User = await User.userOrNullForEmail(honest1Email);
+            const honest2User = await User.userOrNullForEmail(honest2Email);
+            const maliciousUser = await User.userOrNullForEmail(maliciousEmail);
+            oracleRelations = [];
+
+            await tree.update({
+              oracleRelations,
+            });
 
             return true;
-          }
-        )
-      }
+          },
+        ),
+      },
       markWorkspaceStaleForUser: {
         type: GraphQLBoolean,
         args: {

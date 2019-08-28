@@ -47,4 +47,14 @@ export default class User extends Model<User> {
 
   @HasMany(() => NotificationRequest, "userId")
   public notificationRequests: NotificationRequest[];
+
+  public static async userOrNullForEmail(email: string): Promise<User | null> {
+    if (email !== "") {
+      return User.findOne({
+        where: { email },
+      });
+    } else {
+      return Promise.resolve(null);
+    }
+  }
 }
