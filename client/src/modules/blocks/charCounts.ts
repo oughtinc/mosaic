@@ -72,9 +72,9 @@ export function getInputCharCount(nodeOrNodes: any): number {
         }, "")
         .split("")
         .filter(char => char !== POINTER_EDGE_SPACE).length;
-    } else if (node.type === "pointerImport") {
+    } else if (node.type === "pointerImport" || node.type === "pointerExport") {
       result += 1;
-    } else if (node.type !== "pointerExport" && node.nodes) {
+    } else if (node.nodes) {
       result += getInputCharCount(node.nodes);
     }
   }
