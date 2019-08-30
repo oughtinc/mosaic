@@ -2098,29 +2098,55 @@ const schema = new GraphQLSchema({
         type: GraphQLBoolean,
         args: {
           treeId: { type: GraphQLString },
-          honest1Email: { type: GraphQLString },
-          honest2Email: { type: GraphQLString },
-          maliciousEmail: { type: GraphQLString },
+          honestEmails: { type: GraphQLList(GraphQLString) },
+          maliciousEmails: { type: GraphQLList(GraphQLString) },
         },
         resolve: requireAdmin(
           "You must be logged in as an admin to update experiment expert assignments",
-          async (
-            _,
-            { treeId, honest1Email, honest2Email, maliciousEmail },
-            context,
-          ) => {
+          async (_, { treeId, honestEmails, maliciousEmails }, context) => {
             const tree: Tree = await Tree.findByPk(treeId);
             if (tree === null) {
               return false;
             }
-            const honest1User = await User.userOrNullForEmail(honest1Email);
-            const honest2User = await User.userOrNullForEmail(honest2Email);
-            const maliciousUser = await User.userOrNullForEmail(maliciousEmail);
-            oracleRelations = [];
 
-            await tree.update({
-              oracleRelations,
+            await UserTreeOracleRelation.destroy({
+              where: {
+                TreeId: tree.id,
+              },
             });
+
+            for (const emailOfHonestOracle of honestEmails) {
+              const user = await User.findOne({
+                where: {
+                  email: emailOfHonestOracle,
+                },
+              });
+
+              await tree.$add("oracle", user);
+            }
+
+            for (const emailOfMaliciousOracle of maliciousEmails) {
+              const user = await User.findOne({
+                where: {
+                  email: emailOfMaliciousOracle,
+                },
+              });
+
+              await tree.$add("oracle", user);
+
+              const oracleRelation = await UserTreeOracleRelation.findOne({
+                where: {
+                  UserId: user.id,
+                  TreeId: tree.id,
+                },
+              });
+
+              if (oracleRelation === null) {
+                return false;
+              }
+
+              await oracleRelation.update({ isMalicious: true });
+            }
 
             return true;
           },
