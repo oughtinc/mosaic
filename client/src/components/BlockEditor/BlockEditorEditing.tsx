@@ -264,55 +264,52 @@ export class BlockEditorEditingPresentational extends React.Component<
             position: "relative",
           }}
         >
-          <div
-            style={{
-              backgroundColor: "#333",
-              bottom: 0,
-              display:
-                this.props.mutationStatus.status === MutationStatus.Error
-                  ? "block"
-                  : "none",
-              left: 0,
-              position: "fixed",
-              right: 0,
-              top: 0,
-              zIndex: 99,
-            }}
-          />
-          <div
-            style={{
-              alignItems: "center",
-              backgroundColor: "#eaa",
-              border: "1px solid #aaa",
-              borderRadius: "4px",
-              boxShadow: "1px 1px 6px #000",
-              display:
-                this.props.mutationStatus.status === MutationStatus.Error
-                  ? "flex"
-                  : "none",
-              flexDirection: "column",
-              fontSize: "24px",
-              justifyContent: "center",
-              left: "50%",
-              marginLeft: "-300px",
-              padding: "10px",
-              position: "fixed",
-              top: "150px",
-              width: "600px",
-              zIndex: 1000,
-            }}
-          >
-            {this.props.mutationStatus &&
-              this.props.mutationStatus.error &&
-              this.props.mutationStatus.error.message.slice(15)}
-            {isUserInExperiment && (
-              <NextWorkspaceBtn
-                bsStyle="default"
-                experimentId={experimentId}
-                label={"Find assigned workspace"}
+          {this.props.mutationStatus.status === MutationStatus.Error && (
+            <React.Fragment>
+              <div
+                style={{
+                  backgroundColor: "#333",
+                  bottom: 0,
+                  left: 0,
+                  position: "fixed",
+                  right: 0,
+                  top: 0,
+                  zIndex: 99,
+                }}
               />
-            )}
-          </div>
+              <div
+                style={{
+                  alignItems: "center",
+                  backgroundColor: "#eaa",
+                  border: "1px solid #aaa",
+                  borderRadius: "4px",
+                  boxShadow: "1px 1px 6px #000",
+                  display: "flex",
+                  flexDirection: "column",
+                  fontSize: "24px",
+                  justifyContent: "center",
+                  left: "50%",
+                  marginLeft: "-300px",
+                  padding: "10px",
+                  position: "fixed",
+                  top: "150px",
+                  width: "600px",
+                  zIndex: 1000,
+                }}
+              >
+                {this.props.mutationStatus &&
+                  this.props.mutationStatus.error &&
+                  this.props.mutationStatus.error.message.slice(15)}
+                {isUserInExperiment && (
+                  <NextWorkspaceBtn
+                    bsStyle="default"
+                    experimentId={experimentId}
+                    label={"Find assigned workspace"}
+                  />
+                )}
+              </div>
+            </React.Fragment>
+          )}
           <Editor
             placeholder={this.props.placeholder}
             value={this.state.editorValue}
