@@ -2094,41 +2094,53 @@ const schema = new GraphQLSchema({
           },
         ),
       },
-      updateTreeExpertAssignments: {
+      updateTreeExperts: {
         type: GraphQLBoolean,
         args: {
           treeId: { type: GraphQLString },
-          honestEmails: { type: GraphQLList(GraphQLString) },
-          maliciousEmails: { type: GraphQLList(GraphQLString) },
+          replaceOracles: { type: GraphQLBoolean },
+          emailsOfHonestOracles: { type: GraphQLList(GraphQLString) },
+          emailsOfMaliciousOracles: { type: GraphQLList(GraphQLString) },
         },
         resolve: requireAdmin(
-          "You must be logged in as an admin to update experiment expert assignments",
-          async (_, { treeId, honestEmails, maliciousEmails }, context) => {
+          "You must be logged in as an admin to update tree expperts",
+          async (
+            _,
+            {
+              treeId,
+              replaceOracles,
+              emailsOfHonestOracles,
+              emailsOfMaliciousOracles,
+            },
+            context,
+          ) => {
             const tree: Tree = await Tree.findByPk(treeId);
             if (tree === null) {
               return false;
             }
 
-            await UserTreeOracleRelation.destroy({
-              where: {
-                TreeId: tree.id,
-              },
-            });
+            if (replaceOracles) {
+              await UserTreeOracleRelation.destroy({
+                where: {
+                  TreeId: tree.id,
+                },
+              });
+            }
 
-            for (const emailOfHonestOracle of honestEmails) {
+            for (const email of emailsOfHonestOracles) {
               const user = await User.findOne({
                 where: {
-                  email: emailOfHonestOracle,
+                  email,
                 },
               });
 
               await tree.$add("oracle", user);
             }
 
-            for (const emailOfMaliciousOracle of maliciousEmails) {
+            for (const email of emailsOfMaliciousOracles) {
               const user = await User.findOne({
                 where: {
-                  email: emailOfMaliciousOracle,
+                  email,
                 },
               });
 
@@ -2400,10 +2412,10 @@ const schema = new GraphQLSchema({
                   await tree.$add("oracle", user);
                 }
 
-                for (const emailsOfMaliciousOracle of emailsOfMaliciousOracles) {
+                for (const emailOfMaliciousOracle of emailsOfMaliciousOracles) {
                   const user = await User.findOne({
                     where: {
-                      email: emailsOfMaliciousOracle,
+                      email: emailOfMaliciousOracle,
                     },
                   });
 
