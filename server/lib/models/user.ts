@@ -47,3 +47,4 @@ export default class User extends Model<User> {
 
   @HasMany(() => NotificationRequest, "userId")
   public notificationRequests: NotificationRequest[];
+}
