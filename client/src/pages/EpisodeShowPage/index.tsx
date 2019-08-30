@@ -1252,6 +1252,7 @@ export class WorkspaceView extends React.Component<any, any> {
                                     <BlockHeader>Answer Candidate</BlockHeader>
                                     <BlockBody>
                                       <BlockEditor
+                                        shouldShowCharCount={true}
                                         isActive={isActive}
                                         isUserOracle={isUserOracle}
                                         availablePointers={availablePointers}

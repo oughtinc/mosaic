@@ -73,6 +73,7 @@ export const MenuBar = ({
   hasChangedSinceDatabaseSave,
   blockEditor,
   value,
+  shouldShowCharCount,
 }) => (
   <div>
     <SavingIcon
@@ -80,6 +81,6 @@ export const MenuBar = ({
       mutationStatus={mutationStatus}
       blockEditor={blockEditor}
     />
-    <CharacterCounter value={value} />
+    {shouldShowCharCount && <CharacterCounter value={value} />}
   </div>
 );

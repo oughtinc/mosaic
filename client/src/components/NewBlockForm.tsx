@@ -107,6 +107,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
           <BlockHeader>New Question</BlockHeader>
           <BlockBody>
             <BlockEditor
+              shouldShowCharCount={true}
               isActive={this.props.isActive}
               isUserOracle={this.props.isUserOracle}
               pastedExportFormat={this.props.pastedExportFormat}
