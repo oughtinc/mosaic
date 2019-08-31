@@ -2269,6 +2269,7 @@ const schema = new GraphQLSchema({
               } else {
                 experiment = await Experiment.create({
                   name: experimentName,
+                  eligibilityRank: 1,
                 });
               }
 
