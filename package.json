@@ -8,6 +8,10 @@
     "heroku-prebuild": "HEROKU_BUILD=true && cd client && yarn install && yarn run build && cd ../server && yarn --production=false",
     "start": "cd server && yarn run db:migrate && yarn run start"
   },
+  "cacheDirectories": [
+    "client/node_modules",
+    "server/node_modules"
+  ],
   "engines": {
     "yarn": "1.x",
     "node": "10.x",
