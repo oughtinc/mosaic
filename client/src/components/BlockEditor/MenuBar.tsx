@@ -5,11 +5,21 @@ import faSpinner = require("@fortawesome/fontawesome-free-solid/faSpinner");
 import faCheck = require("@fortawesome/fontawesome-free-solid/faCheck");
 import faExclamationTriangle = require("@fortawesome/fontawesome-free-solid/faExclamationTriangle");
 import { MutationStatus } from "./types";
+import { getInputCharCount } from "../../modules/blocks/charCounts";
 
 const SavingIconStyle = styled.span`
   float: right;
   font-size: 0.7em;
   margin-top: 1px;
+`;
+
+const CharacterCounterStyle = styled.span`
+  float: right;
+  font-size: 0.7em
+  margin-top: 1px;
+  margin-right: 3px;
+  margin-left: 5px;
+  color: gray;
 `;
 
 const Icons = {
@@ -50,10 +60,20 @@ const SavingIcon = ({
   }
 };
 
+const CharacterCounter = ({ value }) => {
+  if (!value) {
+    return <span />;
+  }
+  const characterCount = getInputCharCount(value.document.toJSON());
+  return <CharacterCounterStyle>{characterCount}</CharacterCounterStyle>;
+};
+
 export const MenuBar = ({
   mutationStatus,
   hasChangedSinceDatabaseSave,
   blockEditor,
+  value,
+  shouldShowCharCount,
 }) => (
   <div>
     <SavingIcon
@@ -61,5 +81,6 @@ export const MenuBar = ({
       mutationStatus={mutationStatus}
       blockEditor={blockEditor}
     />
+    {shouldShowCharCount && <CharacterCounter value={value} />}
   </div>
 );

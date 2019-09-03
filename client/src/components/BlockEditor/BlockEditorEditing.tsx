@@ -83,6 +83,7 @@ function inlinePointerImportJSON(pointerId: string) {
 
 // Eventually we'll type out many of these items more spefically, but that's a future refactor.
 interface BlockEditorEditingPresentationalProps {
+  shouldShowCharCount?: boolean;
   pastedExportFormat: string;
   shouldAutoExport?: boolean;
   placeholder?: string;
@@ -257,6 +258,8 @@ export class BlockEditorEditingPresentational extends React.Component<
           blockEditor={this.props.blockEditor}
           mutationStatus={this.props.mutationStatus}
           hasChangedSinceDatabaseSave={this.state.hasChangedSinceDatabaseSave}
+          value={this.props.value}
+          shouldShowCharCount={this.props.shouldShowCharCount}
         />
         <div
           style={{
