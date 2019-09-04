@@ -103,7 +103,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
               label={"Start on next workspace (Oracle Mode)"}
             />
           ) : (
-            <div>
+            <React.Fragment>
               <div
                 style={{
                   color: isUserMaliciousOracle ? "#a66" : "#6a6",
@@ -128,7 +128,7 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
                   }}
                 />
               </div>
-            </div>
+            </React.Fragment>
           )}
         </EpisodeNavContainer>
       );
