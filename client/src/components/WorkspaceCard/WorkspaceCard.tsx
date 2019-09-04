@@ -339,7 +339,8 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                       width: "100%",
                     }}
                   >
-                    Users who have passed on workspace with "Skip Workspace":
+                    Users who cannot be assigned to this workspace because they
+                    clicked "Skip Workspace":
                     <ul style={{ paddingInlineStart: "30px" }}>
                       {workspace.isNotStaleRelativeToUserFullInformation.map(
                         (user, i, arr) => {
@@ -378,7 +379,7 @@ export class WorkspaceCardPresentational extends React.PureComponent<
                                 }}
                                 style={{ marginLeft: "8px" }}
                               >
-                                make stale for user
+                                undo
                               </Button>
                             </li>
                           );

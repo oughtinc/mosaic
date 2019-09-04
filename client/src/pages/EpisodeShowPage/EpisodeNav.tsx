@@ -103,14 +103,31 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
               label={"Start on next workspace (Oracle Mode)"}
             />
           ) : (
-            <div
-              style={{
-                color: isUserMaliciousOracle ? "#a66" : "#6a6",
-                fontSize: "24px",
-                fontVariant: "small-caps",
-              }}
-            >
-              {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
+            <div>
+              <div
+                style={{
+                  color: isUserMaliciousOracle ? "#a66" : "#6a6",
+                  fontSize: "24px",
+                  fontVariant: "small-caps",
+                  marginBottom: "5px",
+                }}
+              >
+                {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
+              </div>
+
+              <div>
+                <TakeBreakBtn
+                  bsStyle="primary"
+                  experimentId={experimentId}
+                  label="Skip workspace"
+                  navHook={() => {
+                    snapshot("SKIP_WORKSPACE");
+                    if (markAsNotStaleRelativeToUser) {
+                      markAsNotStaleRelativeToUser();
+                    }
+                  }}
+                />
+              </div>
             </div>
           )}
         </EpisodeNavContainer>
