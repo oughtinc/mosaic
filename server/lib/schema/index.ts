@@ -2204,13 +2204,10 @@ const schema = new GraphQLSchema({
               await transaction.commit();
               return true;
             } catch (err) {
-              if (err) {
-                console.error("updateTreeExperts error", err);
-                await transaction.rollback();
-                return false;
-              }
+              console.error("updateTreeExperts error", err);
+              await transaction.rollback();
+              return false;
             }
-            return false;
           },
         ),
       },
