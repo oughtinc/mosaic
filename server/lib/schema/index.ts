@@ -395,6 +395,16 @@ const ExperimentInput = new GraphQLInputObjectType({
   },
 });
 
+const TreeReplaceExpertInput = new GraphQLInputObjectType({
+  name: "treeReplaceExpertInput",
+  fields: {
+    treeId: { type: GraphQLString },
+    replaceOracles: { type: GraphQLBoolean },
+    emailsOfHonestOracles: { type: GraphQLList(GraphQLString) },
+    emailsOfMaliciousOracles: { type: GraphQLList(GraphQLString) },
+  },
+});
+
 const WorkspaceInput = new GraphQLInputObjectType({
   name: "WorkspaceInput",
   fields: attributeFields(Workspace, { allowNull: true }),
@@ -2097,70 +2107,91 @@ const schema = new GraphQLSchema({
       updateTreeExperts: {
         type: GraphQLBoolean,
         args: {
-          treeId: { type: GraphQLString },
-          replaceOracles: { type: GraphQLBoolean },
-          emailsOfHonestOracles: { type: GraphQLList(GraphQLString) },
-          emailsOfMaliciousOracles: { type: GraphQLList(GraphQLString) },
+          bulkTreeInputs: { type: new GraphQLList(TreeReplaceExpertInput) },
         },
         resolve: requireAdmin(
-          "You must be logged in as an admin to update tree expperts",
-          async (
-            _,
-            {
-              treeId,
-              replaceOracles,
-              emailsOfHonestOracles,
-              emailsOfMaliciousOracles,
-            },
-            context,
-          ) => {
-            const tree: Tree = await Tree.findByPk(treeId);
-            if (tree === null) {
-              return false;
-            }
+          "You must be logged in as an admin to update tree experts",
+          async (_, { bulkTreeInputs }, context) => {
+            let transaction;
+            try {
+              transaction = await Sequelize.transaction();
+              for (const treeInput of bulkTreeInputs) {
+                const {
+                  treeId,
+                  emailsOfHonestOracles,
+                  emailsOfMaliciousOracles,
+                  replaceOracles,
+                } = treeInput;
 
-            if (replaceOracles) {
-              await UserTreeOracleRelation.destroy({
-                where: {
-                  TreeId: tree.id,
-                },
-              });
-            }
+                const tree: Tree = await Tree.findByPk(treeId);
+                if (tree === null) {
+                  throw new Error(`No tree found for TreeId {treeId}`);
+                }
 
-            for (const email of emailsOfHonestOracles) {
-              const user = await User.findOne({
-                where: {
-                  email,
-                },
-              });
+                if (replaceOracles) {
+                  await UserTreeOracleRelation.destroy({
+                    where: {
+                      TreeId: tree.id,
+                    },
+                    transaction,
+                  });
+                }
 
-              await tree.$add("oracle", user);
-            }
+                for (const email of emailsOfHonestOracles) {
+                  const user = await User.findOne({
+                    where: {
+                      email,
+                    },
+                  });
+                  if (user === null) {
+                    throw new Error(
+                      `No user found for honest user email {email}`,
+                    );
+                  }
 
-            for (const email of emailsOfMaliciousOracles) {
-              const user = await User.findOne({
-                where: {
-                  email,
-                },
-              });
+                  tree.$add("oracle", user, transaction);
+                }
 
-              await tree.$add("oracle", user);
+                for (const email of emailsOfMaliciousOracles) {
+                  const user = await User.findOne({
+                    where: {
+                      email,
+                    },
+                  });
+                  if (user === null) {
+                    throw new Error(
+                      `No user found for malicious user email {email}`,
+                    );
+                  }
 
-              const oracleRelation = await UserTreeOracleRelation.findOne({
-                where: {
-                  UserId: user.id,
-                  TreeId: tree.id,
-                },
-              });
+                  tree.$add("oracle", user, transaction);
 
-              if (oracleRelation === null) {
+                  const oracleRelation = await UserTreeOracleRelation.findOne({
+                    where: {
+                      UserId: user.id,
+                      TreeId: tree.id,
+                    },
+                  });
+
+                  if (oracleRelation === null) {
+                    throw new Error(
+                      `No oracle relation found for UserId {user.id} and TreeId {tree.id}`,
+                    );
+                  }
+
+                  oracleRelation.update({ isMalicious: true }, transaction);
+                }
+              }
+              await transaction.commit();
+              return true;
+            } catch (err) {
+              if (err) {
+                console.error("updateTreeExperts error", err);
+                await transaction.rollback();
                 return false;
               }
-
-              await oracleRelation.update({ isMalicious: true });
             }
-
-            return true;
+            return false;
           },
         ),
       },
