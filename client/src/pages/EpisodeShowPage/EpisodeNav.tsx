@@ -8,6 +8,7 @@ interface NextWorkspaceBtnProps {
   experimentId: string;
   label: string;
   navHook?: () => void;
+  style?: any;
 }
 
 const NextWorkspaceBtn = ({
@@ -34,12 +35,13 @@ const TakeBreakBtn = ({
   experimentId,
   label,
   navHook,
+  style,
 }: NextWorkspaceBtnProps) => {
   return (
     <Link
       onClick={navHook}
       to={`/break?e=${experimentId}`}
-      style={{ margin: "0 5px" }}
+      style={{ ...style, margin: "0 5px" }}
     >
       <Button bsSize="small" bsStyle={bsStyle}>
         {label} »
@@ -96,40 +98,50 @@ class EpisodeNavPresentational extends React.Component<EpisodeNavProps, any> {
             backgroundColor: isUserMaliciousOracle ? "#ffcccc" : "#ccffcc",
           }}
         >
-          {isTakingABreak ? (
-            <NextWorkspaceBtn
-              bsStyle="default"
-              experimentId={experimentId}
-              label={"Start on next workspace (Oracle Mode)"}
-            />
-          ) : (
-            <React.Fragment>
-              <div
-                style={{
-                  color: isUserMaliciousOracle ? "#a66" : "#6a6",
-                  fontSize: "24px",
-                  fontVariant: "small-caps",
-                  marginBottom: "5px",
-                }}
-              >
-                {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
-              </div>
-
-              <div>
-                <TakeBreakBtn
-                  bsStyle="primary"
-                  experimentId={experimentId}
-                  label="Skip workspace"
-                  navHook={() => {
-                    snapshot("SKIP_WORKSPACE");
-                    if (markAsNotStaleRelativeToUser) {
-                      markAsNotStaleRelativeToUser();
-                    }
+          <div
+            className="container"
+            style={{
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            {isTakingABreak ? (
+              <NextWorkspaceBtn
+                bsStyle="default"
+                experimentId={experimentId}
+                label={"Start on next workspace (Oracle Mode)"}
+              />
+            ) : (
+              <React.Fragment>
+                <div style={{ width: "30%" }} />
+                <div
+                  style={{
+                    color: isUserMaliciousOracle ? "#a66" : "#6a6",
+                    fontSize: "24px",
+                    fontVariant: "small-caps",
+                    textAlign: "center",
+                    width: "40%",
                   }}
-                />
-              </div>
-            </React.Fragment>
-          )}
+                >
+                  {isUserMaliciousOracle ? "malicious" : "honest"} expert mode
+                </div>
+                <div style={{ textAlign: "right", width: "30%" }}>
+                  <TakeBreakBtn
+                    bsStyle="default"
+                    experimentId={experimentId}
+                    label="Skip workspace"
+                    navHook={() => {
+                      snapshot("SKIP_WORKSPACE");
+                      if (markAsNotStaleRelativeToUser) {
+                        markAsNotStaleRelativeToUser();
+                      }
+                    }}
+                  />
+                </div>
+              </React.Fragment>
+            )}
+          </div>
         </EpisodeNavContainer>
       );
     }
