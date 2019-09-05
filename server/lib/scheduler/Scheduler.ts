@@ -170,6 +170,13 @@ class Scheduler {
     const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
     const isThisAssignmentTimed = await assignedWorkspace.hasTimeBudgetOfRootParent;
 
+    // This is intended to mitigate a race condition where two users
+    // are both looking for a new assignment at the same time and
+    // get assigned to the same workspace due to async code in the scheduler
+    if (this.schedule.isWorkspaceCurrentlyBeingWorkedOn(assignedWorkspace)) {
+      return await this.assignNextWorkspace(userId, maybeSuboptimal);
+    }
+
     await this.schedule.assignWorkspaceToUser({
       experimentId: this.experimentId,
       userId,
