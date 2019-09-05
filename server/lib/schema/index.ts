@@ -383,6 +383,7 @@ const TreeInputForAPI = new GraphQLInputObjectType({
     emailsOfMaliciousOracles: { type: new GraphQLList(GraphQLString) },
     doesAllowJudgeToJudge: { type: GraphQLBoolean },
     isMIBWithoutRestarts: { type: GraphQLBoolean },
+    schedulingPriority: { type: GraphQLInt },
   },
 });
 
@@ -1057,6 +1058,24 @@ const schema = new GraphQLSchema({
               throw new Error("Tree ID does not exist");
             }
             await tree.update({ isMIBWithoutRestarts });
+            return true;
+          },
+        ),
+      },
+      updateTreeSchedulingPriority: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          schedulingPriority: { type: GraphQLInt },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to change tree priority",
+          async (_, { treeId, schedulingPriority }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ schedulingPriority });
             return true;
           },
         ),
@@ -2140,7 +2159,7 @@ const schema = new GraphQLSchema({
                 for (const email of emailsOfHonestOracles) {
                   const user = await User.findOne({
                     where: {
-                      email,
+                      email: email.toLowerCase(),
                     },
                   });
                   if (user === null) {
@@ -2155,7 +2174,7 @@ const schema = new GraphQLSchema({
                 for (const email of emailsOfMaliciousOracles) {
                   const user = await User.findOne({
                     where: {
-                      email,
+                      email: email.toLowerCase(),
                     },
                   });
                   if (user === null) {
@@ -2316,6 +2335,7 @@ const schema = new GraphQLSchema({
                   emailsOfMaliciousOracles = [],
                   doesAllowJudgeToJudge = false,
                   isMIBWithoutRestarts = false,
+                  schedulingPriority = 1,
                 } = treeInfo;
 
                 const workspace = await Workspace.create(
@@ -2343,6 +2363,7 @@ const schema = new GraphQLSchema({
                 await tree.update({
                   doesAllowOracleBypass: doesAllowJudgeToJudge,
                   isMIBWithoutRestarts,
+                  schedulingPriority,
                 });
 
                 await experiment.$add("tree", tree);
@@ -2437,9 +2458,15 @@ const schema = new GraphQLSchema({
                 for (const emailOfHonestOracle of emailsOfHonestOracles) {
                   const user = await User.findOne({
                     where: {
-                      email: emailOfHonestOracle,
+                      email: emailOfHonestOracle.toLowerCase(),
                     },
                   });
+
+                  if (!user) {
+                    throw new Error(
+                      `No user with email address ${emailOfHonestOracle.toLowerCase()}`,
+                    );
+                  }
 
                   await tree.$add("oracle", user);
                 }
@@ -2447,9 +2474,15 @@ const schema = new GraphQLSchema({
                 for (const emailOfMaliciousOracle of emailsOfMaliciousOracles) {
                   const user = await User.findOne({
                     where: {
-                      email: emailOfMaliciousOracle,
+                      email: emailOfMaliciousOracle.toLowerCase(),
                     },
                   });
+
+                  if (!user) {
+                    throw new Error(
+                      `No user with email address ${emailOfMaliciousOracle.toLowerCase()}`,
+                    );
+                  }
 
                   await tree.$add("oracle", user);
 

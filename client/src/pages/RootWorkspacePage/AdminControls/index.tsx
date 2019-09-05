@@ -12,9 +12,29 @@ import {
   UPDATE_WORKSPACE_HAS_TIME_BUDGET,
   UPDATE_WORKSPACE_IS_PUBLIC,
 } from "../../../graphqlQueries";
-import { Checkbox } from "react-bootstrap";
+import { Checkbox, FormControl } from "react-bootstrap";
 
 class AdminControlsPresentational extends React.Component<any, any> {
+  public state = {
+    isSchedulingPriorityUpdatePending: false,
+    schedulingPriority: this.props.workspace.tree.schedulingPriority,
+  };
+
+  public componentDidUpdate(oldProps: any) {
+    const hasReceivedSchedulingPriorityUpdate =
+      oldProps.workspace.tree.schedulingPriority !==
+      this.props.workspace.tree.schedulingPriority;
+
+    if (
+      this.state.isSchedulingPriorityUpdatePending &&
+      hasReceivedSchedulingPriorityUpdate
+    ) {
+      this.setState({
+        isSchedulingPriorityUpdatePending: false,
+      });
+    }
+  }
+
   public render() {
     const workspace = this.props.workspace;
 
@@ -75,6 +95,69 @@ class AdminControlsPresentational extends React.Component<any, any> {
             is MIB without restarts
           </Checkbox>
         </div>
+        <div
+          style={{
+            marginBottom: "25px",
+            marginTop: "25px",
+            opacity: this.state.isSchedulingPriorityUpdatePending ? 0.5 : 1,
+          }}
+        >
+          Scheduling Priority
+          <div style={{ fontWeight: 600, fontSize: "12px" }}>
+            To change, edit and press enter
+          </div>
+          <div
+            style={{
+              color: "red",
+              display: isNaN(this.state.schedulingPriority) ? "block" : "none",
+              fontWeight: 600,
+              fontSize: "12px",
+            }}
+          >
+            Error: non-numeric value entered
+          </div>
+          <FormControl
+            onChange={e => {
+              const target = e.target as HTMLInputElement;
+
+              this.setState({
+                schedulingPriority: target.value,
+              });
+            }}
+            onKeyDown={e => {
+              const wasEnterKeyPressed = e.key === "Enter";
+
+              const isInputValueNumeric = !isNaN(this.state.schedulingPriority); // note isNaN works with strings
+
+              const doesInputValueDifferFromTreeSchedulingPriority =
+                Number(this.state.schedulingPriority) !==
+                workspace.tree.schedulingPriority;
+
+              if (
+                wasEnterKeyPressed &&
+                isInputValueNumeric &&
+                doesInputValueDifferFromTreeSchedulingPriority
+              ) {
+                this.setState({ isSchedulingPriorityUpdatePending: true });
+
+                this.props.updateTreeSchedulingPriority({
+                  variables: {
+                    treeId: workspace.tree.id,
+                    schedulingPriority: Number(this.state.schedulingPriority),
+                  },
+                });
+              }
+            }}
+            style={{
+              border: isNaN(this.state.schedulingPriority) && "1px solid red",
+              display: "inline-block",
+              marginBottom: "5px",
+              width: "150px",
+            }}
+            type="text"
+            value={this.state.schedulingPriority}
+          />
+        </div>
         <ExperimentsCheckboxes workspace={workspace} />
         <UserOracleControls workspace={workspace} />
       </div>
@@ -106,6 +189,18 @@ const UPDATE_TREE_IS_MIB_WITHOUT_RESTARTS = gql`
   }
 `;
 
+const UPDATE_TREE_SCHEDULING_PRIORITY = gql`
+  mutation updateTreeSchedulingPriority(
+    $treeId: String
+    $schedulingPriority: Int
+  ) {
+    updateTreeSchedulingPriority(
+      treeId: $treeId
+      schedulingPriority: $schedulingPriority
+    )
+  }
+`;
+
 const AdminControls: any = compose(
   graphql(UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS, {
     name: "updateWorkspaceHasIOConstraints",
@@ -133,6 +228,12 @@ const AdminControls: any = compose(
   }),
   graphql(UPDATE_TREE_IS_MIB_WITHOUT_RESTARTS, {
     name: "updateTreeIsMIBWithoutRestarts",
+    options: (props: any) => ({
+      refetchQueries: props.refetchQueries,
+    }),
+  }),
+  graphql(UPDATE_TREE_SCHEDULING_PRIORITY, {
+    name: "updateTreeSchedulingPriority",
     options: (props: any) => ({
       refetchQueries: props.refetchQueries,
     }),

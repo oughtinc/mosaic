@@ -3,7 +3,7 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 import { Button } from "react-bootstrap";
 import { Helmet } from "react-helmet";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 
 import { ContentContainer } from "../components/ContentContainer";
@@ -39,7 +39,6 @@ const RegisterForEmailNotification = ({ onClick, registrationStatus }) => (
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      height: "200px",
       marginBottom: "10px",
       marginRight: "10px",
       padding: "20px",
@@ -177,41 +176,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
               onClick={this.registerForNotification}
               registrationStatus={this.state.notificationRegistrationState}
             />
-            <div
-              style={{
-                backgroundColor: "rgba(255, 0, 0, 0.05)",
-                border: "1px solid rgb(175, 0, 0)",
-                borderRadius: "8px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                height: "200px",
-                color: "darkRed",
-                padding: "20px",
-                textAlign: "justify",
-              }}
-            >
-              <span>
-                Another option is to search for a workspace that is "suboptimal"
-                in the sense that you might have already worked on a workspace
-                close to this one.
-              </span>
-              <div
-                style={{
-                  alignItems: "center",
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: "20px",
-                }}
-              >
-                <Link
-                  to={`/nextMaybeSuboptimal?e=${experimentId}`}
-                  style={{ margin: "0 5px" }}
-                >
-                  <Button bsStyle="danger">Find Suboptimal Workspace »</Button>
-                </Link>
-              </div>
-            </div>
           </div>
         </ContentContainer>
       );
