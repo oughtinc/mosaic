@@ -57,8 +57,8 @@ Note that `docker-compose.yml` and `package.json` at the root level must be kept
 
 All code changes should be made via PRs (as opposed to e.g. via just pushing to master). The PR process is:
 
-1. PR author makes the PR on Github and assigns at least one reviewer
-2. At least one reviewer reviews the PR. Either:
+1. PR author makes the PR on Github and assigns Zak as a reviewer, plus anyone else they'd like to review the PR
+2. Zak (and any other reviewers) review the PR. Either:
    a. The reviewer suggests (more) changes (proceed to step 3).
    b. The reviewer OKs the PR and notifies the author (proceed to step 4)
 3. PR author makes changes based on the review comments, then notifies the reviewer (proceed to step 2)
