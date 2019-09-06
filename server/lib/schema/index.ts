@@ -2174,7 +2174,7 @@ const schema = new GraphQLSchema({
                 }
 
                 for (const email of emailsOfMaliciousOracles) {
-                  const user: User | null  = await User.findOne({
+                  const user: User | null = await User.findOne({
                     where: {
                       email: email.toLowerCase(),
                     },
@@ -2187,16 +2187,20 @@ const schema = new GraphQLSchema({
 
                   await tree.$add("oracle", user, transaction);
 
-                  const oracleRelation: UserTreeOracleRelation | null = await UserTreeOracleRelation.findOne({
-                    where: {
-                      UserId: user.id,
-                      TreeId: tree.id,
+                  const oracleRelation: UserTreeOracleRelation | null = await UserTreeOracleRelation.findOne(
+                    {
+                      where: {
+                        UserId: user.id,
+                        TreeId: tree.id,
+                      },
                     },
-                  });
+                  );
 
                   if (oracleRelation === null) {
                     throw new Error(
-                      `No oracle relation found for UserId ${user.id} and TreeId ${tree.id}`,
+                      `No oracle relation found for UserId ${
+                        user.id
+                      } and TreeId ${tree.id}`,
                     );
                   }
 
