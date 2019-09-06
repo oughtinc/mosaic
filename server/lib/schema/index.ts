@@ -43,7 +43,7 @@ import NotificationRequest from "../models/notificationRequest";
 import { generateJudgeQuestionValue } from "../models/helpers/generateJudgeQuestionValue";
 import { generateMaliciousQuestionValue } from "../models/helpers/generateMaliciousQuestionValue";
 
-import * as sequelize from "../models/index";
+import * as models from "../models/index";
 
 const generateReferences = references => {
   const all = {};
@@ -402,7 +402,7 @@ const TreeReplaceExpertInput = new GraphQLInputObjectType({
   name: "treeReplaceExpertInput",
   fields: {
     treeId: { type: GraphQLString },
-    replaceOracles: { type: GraphQLBoolean },
+    shouldReplaceOracles: { type: GraphQLBoolean },
     emailsOfHonestOracles: { type: GraphQLList(GraphQLString) },
     emailsOfMaliciousOracles: { type: GraphQLList(GraphQLString) },
   },
@@ -2135,13 +2135,13 @@ const schema = new GraphQLSchema({
           async (_, { bulkTreeInputs }, context) => {
             let transaction;
             try {
-              transaction = await sequelize.default.transaction();
+              transaction = await models.default.transaction();
               for (const treeInput of bulkTreeInputs) {
                 const {
                   treeId,
                   emailsOfHonestOracles,
                   emailsOfMaliciousOracles,
-                  replaceOracles,
+                  shouldReplaceOracles,
                 } = treeInput;
 
                 const tree: Tree = await Tree.findByPk(treeId);
@@ -2149,7 +2149,7 @@ const schema = new GraphQLSchema({
                   throw new Error(`No tree found for TreeId ${treeId}`);
                 }
 
-                if (replaceOracles) {
+                if (shouldReplaceOracles) {
                   await UserTreeOracleRelation.destroy({
                     where: {
                       TreeId: tree.id,
@@ -2210,9 +2210,8 @@ const schema = new GraphQLSchema({
               await transaction.commit();
               return true;
             } catch (err) {
-              console.error("updateTreeExperts error", err);
               await transaction.rollback();
-              return false;
+              throw err;
             }
           },
         ),
