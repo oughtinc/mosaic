@@ -43,6 +43,8 @@ import NotificationRequest from "../models/notificationRequest";
 import { generateJudgeQuestionValue } from "../models/helpers/generateJudgeQuestionValue";
 import { generateMaliciousQuestionValue } from "../models/helpers/generateMaliciousQuestionValue";
 
+import * as sequelize from "../models/index";
+
 const generateReferences = references => {
   const all = {};
   references.map(([fieldName, graphqlType]) => {
@@ -2133,7 +2135,7 @@ const schema = new GraphQLSchema({
           async (_, { bulkTreeInputs }, context) => {
             let transaction;
             try {
-              transaction = await Sequelize.transaction();
+              transaction = await sequelize.default.transaction();
               for (const treeInput of bulkTreeInputs) {
                 const {
                   treeId,
@@ -2157,14 +2159,14 @@ const schema = new GraphQLSchema({
                 }
 
                 for (const email of emailsOfHonestOracles) {
-                  const user = await User.findOne({
+                  const user: User | null = await User.findOne({
                     where: {
                       email: email.toLowerCase(),
                     },
                   });
                   if (user === null) {
                     throw new Error(
-                      `No user found for honest user email {email}`,
+                      `No user found for honest user email ${email}`,
                     );
                   }
 
@@ -2172,20 +2174,20 @@ const schema = new GraphQLSchema({
                 }
 
                 for (const email of emailsOfMaliciousOracles) {
-                  const user = await User.findOne({
+                  const user: User | null  = await User.findOne({
                     where: {
                       email: email.toLowerCase(),
                     },
                   });
                   if (user === null) {
                     throw new Error(
-                      `No user found for malicious user email {email}`,
+                      `No user found for malicious user email ${email}`,
                     );
                   }
 
-                  tree.$add("oracle", user, transaction);
+                  await tree.$add("oracle", user, transaction);
 
-                  const oracleRelation = await UserTreeOracleRelation.findOne({
+                  const oracleRelation: UserTreeOracleRelation | null = await UserTreeOracleRelation.findOne({
                     where: {
                       UserId: user.id,
                       TreeId: tree.id,
@@ -2194,7 +2196,7 @@ const schema = new GraphQLSchema({
 
                   if (oracleRelation === null) {
                     throw new Error(
-                      `No oracle relation found for UserId {user.id} and TreeId {tree.id}`,
+                      `No oracle relation found for UserId ${user.id} and TreeId ${tree.id}`,
                     );
                   }
 
