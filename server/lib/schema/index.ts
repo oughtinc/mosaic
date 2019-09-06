@@ -2146,7 +2146,7 @@ const schema = new GraphQLSchema({
 
                 const tree: Tree = await Tree.findByPk(treeId);
                 if (tree === null) {
-                  throw new Error(`No tree found for TreeId {treeId}`);
+                  throw new Error(`No tree found for TreeId ${treeId}`);
                 }
 
                 if (replaceOracles) {
