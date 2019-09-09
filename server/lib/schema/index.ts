@@ -1071,6 +1071,24 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeDepthLimit: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          depthLimit: { type: GraphQLInt },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to change tree priority",
+          async (_, { treeId, depthLimit }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ depthLimit });
+            return true;
+          },
+        ),
+      },
       updateWorkspaceChildren: {
         type: workspaceType,
         args: {
