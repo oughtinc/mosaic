@@ -34,6 +34,7 @@ yarn test
 The code is written in [Typescript](https://www.typescriptlang.org/), but much of it is not correctly annotated. We use [Prettier](https://github.com/prettier/prettier) for code formatting.
 
 ### Offline development
+
 Mosaic uses Auth0 for authentication, which means you will not be able to login without internet access, even while developing locally. To get around this, follow these steps:
 
 - login with internet access
@@ -52,36 +53,17 @@ When a branch is merged into master, CI runs. If the CI passes, the main deploy 
 
 Note that `docker-compose.yml` and `package.json` at the root level must be kept in sync.
 
-## Saving and restoring the database
+## PR review
 
-Since the app doesn't currently support import/export of individual question-answer trees, it can be helpful to save and restore the entire database.
+All code changes should be made via PRs (as opposed to e.g. via just pushing to master). The PR process is:
 
-### Saving
-
-1. If the app is not running, run it (`docker-compose up`)
-2. `cd server`
-3. `scripts/dumpDB.sh` with a filepath for your dump, e.g. `scripts/dumpDB.sh ./dbDumps/myDump.db`
-
-### Restoring
-
-1. If the app is not running, run it (`docker-compose up`)
-2. Close all external connections to the database (e.g. from pgadmin)
-3. `cd server`
-4. `scripts/restoreDB.sh` with a filepath for the dump you're restoring, e.g. `scripts/restoreDB.sh ./dbDumps/myDump.db`
-
-### Troubleshooting
-
-- One error case is that the scripts attempt to connect to the db with your system username, which probably won't work. If this happens, it's probably b/c you have an open connection to the db other than the script. (For some reason this causes the scripts to ignore the configs that you pass in and attempt to connect as the "default" user, which is your system user.) Perhaps you're running a tool like pgadmin or PSequel. Obviously the fix is to kill those other connections and try again.
-- Relatedly, you may get this error if you try to restore the DB while the code is recompiling: `ERROR: database "mosaic_dev" is being accessed by other users`. If you do, wait until the code is done compiling and try again.
-- If you get the issue `Cannot find module 'apollo-utilities'`, add a blank line to a .tsx file to reload Webpack and fix it. Uncertain why this works. Delete the newline after.
-
-### Autodump
-
-To automatically create new dumps when the db changes:
-
-1. If the app is not running, run it (`docker-compose up`)
-2. `cd server`
-3. `scripts/autodump.sh` with a filepath for the directory to save the dumps to and the number of seconds to wait between checking whether the db has changed, e.g. `scripts/autodump.sh autodumps 30`
+1. PR author makes the PR on Github and assigns Zak as a reviewer, plus anyone else they'd like to review the PR
+2. Zak (and any other reviewers) review the PR. Either:
+   a. The reviewer suggests (more) changes (proceed to step 3).
+   b. The reviewer OKs the PR and notifies the author (proceed to step 4)
+3. PR author makes changes based on the review comments, then notifies the reviewer (proceed to step 2)
+4. The author (NOT reviewer) merges the PR
 
 ## Support
-Mosaic uses Intercom for chat support. Login and enter https://app.intercom.io/a/apps/gmkvd6s1/inbox to view the latest messages. 
+
+Mosaic uses Intercom for chat support. Login and enter https://app.intercom.io/a/apps/gmkvd6s1/inbox to view the latest messages.
