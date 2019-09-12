@@ -118,36 +118,23 @@ class AdminControlsPresentational extends React.Component<any, any> {
           <div style={{ fontWeight: 600, fontSize: "12px" }}>
             To change, edit and press enter
           </div>
-          <div
-            style={{
-              color: "red",
-              display: isNaN(this.state.schedulingPriority) ? "block" : "none",
-              fontWeight: 600,
-              fontSize: "12px",
-            }}
-          >
-            Error: non-numeric value entered
-          </div>
           <FormControl
             onChange={e => {
               const target = e.target as HTMLInputElement;
-
-              this.setState({
-                schedulingPriority: target.value,
-              });
+              const regex = /^[0-9\b]+$/;
+              if (target.value === "" || regex.test(target.value)) {
+                this.setState({ schedulingPriority: Number(target.value) });
+              }
             }}
             onKeyDown={e => {
               const wasEnterKeyPressed = e.key === "Enter";
 
-              const isInputValueNumeric = !isNaN(this.state.schedulingPriority); // note isNaN works with strings
-
               const doesInputValueDifferFromTreeSchedulingPriority =
-                Number(this.state.schedulingPriority) !==
+                this.state.schedulingPriority !==
                 workspace.tree.schedulingPriority;
 
               if (
                 wasEnterKeyPressed &&
-                isInputValueNumeric &&
                 doesInputValueDifferFromTreeSchedulingPriority
               ) {
                 this.setState({ isSchedulingPriorityUpdatePending: true });
@@ -155,13 +142,12 @@ class AdminControlsPresentational extends React.Component<any, any> {
                 this.props.updateTreeSchedulingPriority({
                   variables: {
                     treeId: workspace.tree.id,
-                    schedulingPriority: Number(this.state.schedulingPriority),
+                    schedulingPriority: this.state.schedulingPriority,
                   },
                 });
               }
             }}
             style={{
-              border: isNaN(this.state.schedulingPriority) && "1px solid red",
               display: "inline-block",
               marginBottom: "5px",
               width: "150px",
@@ -181,35 +167,22 @@ class AdminControlsPresentational extends React.Component<any, any> {
           <div style={{ fontWeight: 600, fontSize: "12px" }}>
             To change, edit and press enter
           </div>
-          <div
-            style={{
-              color: "red",
-              display: isNaN(this.state.depthLimit) ? "block" : "none",
-              fontWeight: 600,
-              fontSize: "12px",
-            }}
-          >
-            Error: non-numeric value entered
-          </div>
           <FormControl
             onChange={e => {
               const target = e.target as HTMLInputElement;
-
-              this.setState({
-                depthLimit: target.value,
-              });
+              const regex = /^[0-9\b]+$/;
+              if (target.value === "" || regex.test(target.value)) {
+                this.setState({ depthLimit: Number(target.value) });
+              }
             }}
             onKeyDown={e => {
               const wasEnterKeyPressed = e.key === "Enter";
 
-              const isInputValueNumeric = !isNaN(this.state.depthLimit); // note isNaN works with strings
-
               const doesInputValueDifferFromTreeDepthLimit =
-                Number(this.state.depthLimit) !== workspace.tree.depthLimit;
+                this.state.depthLimit !== workspace.tree.depthLimit;
 
               if (
                 wasEnterKeyPressed &&
-                isInputValueNumeric &&
                 doesInputValueDifferFromTreeDepthLimit
               ) {
                 this.setState({ isDepthLimitUpdatePending: true });
@@ -217,13 +190,12 @@ class AdminControlsPresentational extends React.Component<any, any> {
                 this.props.updateTreeDepthLimit({
                   variables: {
                     treeId: workspace.tree.id,
-                    depthLimit: Number(this.state.depthLimit),
+                    depthLimit: this.state.depthLimit,
                   },
                 });
               }
             }}
             style={{
-              border: isNaN(this.state.depthLimit) && "1px solid red",
               display: "inline-block",
               marginBottom: "5px",
               width: "150px",
