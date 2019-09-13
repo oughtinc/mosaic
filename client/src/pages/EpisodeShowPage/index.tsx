@@ -150,6 +150,7 @@ const WORKSPACE_QUERY = gql`
             serialId
             areNewWorkspacesOracleOnlyByDefault
           }
+          depthLimit
         }
       }
     }
@@ -752,7 +753,10 @@ export class WorkspaceView extends React.Component<any, any> {
                           }}
                         >
                           {isWorkspacePartOfOracleExperiment && (
-                            <DepthDisplay depth={workspace.depth} />
+                            <DepthDisplay
+                              depth={workspace.depth}
+                              depthLimit={workspace.rootWorkspace.tree.depthLimit}
+                            />
                           )}
                           {hasIOConstraints &&
                           !(isUserOracle && isInOracleMode) ? (

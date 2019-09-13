@@ -386,6 +386,7 @@ const TreeInputForAPI = new GraphQLInputObjectType({
     doesAllowJudgeToJudge: { type: GraphQLBoolean },
     isMIBWithoutRestarts: { type: GraphQLBoolean },
     schedulingPriority: { type: GraphQLInt },
+    depthLimit: { type: GraphQLInt },
   },
 });
 
@@ -1078,6 +1079,24 @@ const schema = new GraphQLSchema({
               throw new Error("Tree ID does not exist");
             }
             await tree.update({ schedulingPriority });
+            return true;
+          },
+        ),
+      },
+      updateTreeDepthLimit: {
+        type: GraphQLBoolean,
+        args: {
+          treeId: { type: GraphQLString },
+          depthLimit: { type: GraphQLInt },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to change tree priority",
+          async (_, { treeId, depthLimit }) => {
+            const tree = await Tree.findByPk(treeId);
+            if (tree === null) {
+              throw new Error("Tree ID does not exist");
+            }
+            await tree.update({ depthLimit });
             return true;
           },
         ),
@@ -2338,6 +2357,7 @@ const schema = new GraphQLSchema({
                   doesAllowJudgeToJudge = false,
                   isMIBWithoutRestarts = false,
                   schedulingPriority = 1,
+                  depthLimit = 6,
                 } = treeInfo;
 
                 const workspace = await Workspace.create(
@@ -2360,12 +2380,10 @@ const schema = new GraphQLSchema({
 
                 const tree = await Tree.create({
                   rootWorkspaceId: workspace.id,
-                });
-
-                await tree.update({
                   doesAllowOracleBypass: doesAllowJudgeToJudge,
                   isMIBWithoutRestarts,
                   schedulingPriority,
+                  depthLimit,
                 });
 
                 await experiment.$add("tree", tree);

@@ -42,6 +42,11 @@ export default class Tree extends Model<Tree> {
   @Column(DataType.INTEGER)
   public schedulingPriority: number;
 
+  @AllowNull(false)
+  @Default(6)
+  @Column(DataType.INTEGER)
+  public depthLimit: number;
+
   @BelongsTo(() => Workspace)
   public rootWorkspace: Workspace;
 

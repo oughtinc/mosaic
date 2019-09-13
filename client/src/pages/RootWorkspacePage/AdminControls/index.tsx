@@ -16,8 +16,10 @@ import { Checkbox, FormControl } from "react-bootstrap";
 
 class AdminControlsPresentational extends React.Component<any, any> {
   public state = {
+    isDepthLimitUpdatePending: false,
     isSchedulingPriorityUpdatePending: false,
     schedulingPriority: this.props.workspace.tree.schedulingPriority,
+    depthLimit: this.props.workspace.tree.depthLimit,
   };
 
   public componentDidUpdate(oldProps: any) {
@@ -25,12 +27,22 @@ class AdminControlsPresentational extends React.Component<any, any> {
       oldProps.workspace.tree.schedulingPriority !==
       this.props.workspace.tree.schedulingPriority;
 
+    const hasReceivedDepthLimitUpdate =
+      oldProps.workspace.tree.depthLimit !==
+      this.props.workspace.tree.depthLimit;
+
     if (
       this.state.isSchedulingPriorityUpdatePending &&
       hasReceivedSchedulingPriorityUpdate
     ) {
       this.setState({
         isSchedulingPriorityUpdatePending: false,
+      });
+    }
+
+    if (this.state.isDepthLimitUpdatePending && hasReceivedDepthLimitUpdate) {
+      this.setState({
+        isDepthLimitUpdatePending: false,
       });
     }
   }
@@ -106,36 +118,23 @@ class AdminControlsPresentational extends React.Component<any, any> {
           <div style={{ fontWeight: 600, fontSize: "12px" }}>
             To change, edit and press enter
           </div>
-          <div
-            style={{
-              color: "red",
-              display: isNaN(this.state.schedulingPriority) ? "block" : "none",
-              fontWeight: 600,
-              fontSize: "12px",
-            }}
-          >
-            Error: non-numeric value entered
-          </div>
           <FormControl
             onChange={e => {
               const target = e.target as HTMLInputElement;
-
-              this.setState({
-                schedulingPriority: target.value,
-              });
+              const regex = /^[0-9\b]+$/;
+              if (target.value === "" || regex.test(target.value)) {
+                this.setState({ schedulingPriority: Number(target.value) });
+              }
             }}
             onKeyDown={e => {
               const wasEnterKeyPressed = e.key === "Enter";
 
-              const isInputValueNumeric = !isNaN(this.state.schedulingPriority); // note isNaN works with strings
-
               const doesInputValueDifferFromTreeSchedulingPriority =
-                Number(this.state.schedulingPriority) !==
+                this.state.schedulingPriority !==
                 workspace.tree.schedulingPriority;
 
               if (
                 wasEnterKeyPressed &&
-                isInputValueNumeric &&
                 doesInputValueDifferFromTreeSchedulingPriority
               ) {
                 this.setState({ isSchedulingPriorityUpdatePending: true });
@@ -143,19 +142,66 @@ class AdminControlsPresentational extends React.Component<any, any> {
                 this.props.updateTreeSchedulingPriority({
                   variables: {
                     treeId: workspace.tree.id,
-                    schedulingPriority: Number(this.state.schedulingPriority),
+                    schedulingPriority: this.state.schedulingPriority,
                   },
                 });
               }
             }}
             style={{
-              border: isNaN(this.state.schedulingPriority) && "1px solid red",
               display: "inline-block",
               marginBottom: "5px",
               width: "150px",
             }}
             type="text"
             value={this.state.schedulingPriority}
+          />
+        </div>
+        <div
+          style={{
+            marginBottom: "25px",
+            marginTop: "25px",
+            opacity: this.state.isDepthLimitUpdatePending ? 0.5 : 1,
+          }}
+        >
+          Depth Limit
+          <div style={{ fontWeight: 600, fontSize: "12px" }}>
+            To change, edit and press enter
+          </div>
+          <FormControl
+            onChange={e => {
+              const target = e.target as HTMLInputElement;
+              const regex = /^[0-9\b]+$/;
+              if (target.value === "" || regex.test(target.value)) {
+                this.setState({ depthLimit: Number(target.value) });
+              }
+            }}
+            onKeyDown={e => {
+              const wasEnterKeyPressed = e.key === "Enter";
+
+              const doesInputValueDifferFromTreeDepthLimit =
+                this.state.depthLimit !== workspace.tree.depthLimit;
+
+              if (
+                wasEnterKeyPressed &&
+                doesInputValueDifferFromTreeDepthLimit
+              ) {
+                this.setState({ isDepthLimitUpdatePending: true });
+
+                this.props.updateTreeDepthLimit({
+                  variables: {
+                    treeId: workspace.tree.id,
+                    depthLimit: this.state.depthLimit,
+                  },
+                });
+              }
+            }}
+            style={{
+              display: "inline-block",
+              marginBottom: "5px",
+              width: "150px",
+            }}
+            type="text"
+            value={this.state.depthLimit}
           />
         </div>
         <ExperimentsCheckboxes workspace={workspace} />
@@ -201,6 +247,12 @@ const UPDATE_TREE_SCHEDULING_PRIORITY = gql`
   }
 `;
 
+const UPDATE_TREE_DEPTH_LIMIT = gql`
+  mutation updateTreeDepthLimit($treeId: String, $depthLimit: Int) {
+    updateTreeDepthLimit(treeId: $treeId, depthLimit: $depthLimit)
+  }
+`;
+
 const AdminControls: any = compose(
   graphql(UPDATE_WORKSPACE_HAS_IO_CONSTRAINTS, {
     name: "updateWorkspaceHasIOConstraints",
@@ -234,6 +286,12 @@ const AdminControls: any = compose(
   }),
   graphql(UPDATE_TREE_SCHEDULING_PRIORITY, {
     name: "updateTreeSchedulingPriority",
+    options: (props: any) => ({
+      refetchQueries: props.refetchQueries,
+    }),
+  }),
+  graphql(UPDATE_TREE_DEPTH_LIMIT, {
+    name: "updateTreeDepthLimit",
     options: (props: any) => ({
       refetchQueries: props.refetchQueries,
     }),

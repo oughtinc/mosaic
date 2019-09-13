@@ -31,8 +31,8 @@ class DepthDisplayPresentational extends React.Component<any, any> {
             <div
               style={{
                 color:
-                  6 - this.props.depth <= 1
-                    ? 6 - this.props.depth === 1
+                  this.props.depthLimit - this.props.depth <= 1
+                    ? this.props.depthLimit - this.props.depth === 1
                       ? "yellow"
                       : "red"
                     : "#666",
@@ -45,7 +45,7 @@ class DepthDisplayPresentational extends React.Component<any, any> {
                   "0 0 1px #333",
               }}
             >
-              {6 - this.props.depth}
+              {this.props.depthLimit - this.props.depth}
             </div>
           </span>
         </span>
