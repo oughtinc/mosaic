@@ -43,6 +43,8 @@ import NotificationRequest from "../models/notificationRequest";
 import { generateJudgeQuestionValue } from "../models/helpers/generateJudgeQuestionValue";
 import { generateMaliciousQuestionValue } from "../models/helpers/generateMaliciousQuestionValue";
 
+import * as models from "../models/index";
+
 const generateReferences = references => {
   const all = {};
   references.map(([fieldName, graphqlType]) => {
@@ -393,6 +395,16 @@ const ExperimentInput = new GraphQLInputObjectType({
     experimentName: { type: GraphQLString },
     experimentId: { type: GraphQLString },
     trees: { type: new GraphQLList(TreeInputForAPI) },
+  },
+});
+
+const TreeReplaceExpertInput = new GraphQLInputObjectType({
+  name: "treeReplaceExpertInput",
+  fields: {
+    treeId: { type: GraphQLString },
+    shouldReplaceOracles: { type: GraphQLBoolean },
+    emailsOfHonestOracles: { type: GraphQLList(GraphQLString) },
+    emailsOfMaliciousOracles: { type: GraphQLList(GraphQLString) },
   },
 });
 
@@ -2113,6 +2125,97 @@ const schema = new GraphQLSchema({
           },
         ),
       },
+      updateTreeExperts: {
+        type: GraphQLBoolean,
+        args: {
+          bulkTreeInputs: { type: new GraphQLList(TreeReplaceExpertInput) },
+        },
+        resolve: requireAdmin(
+          "You must be logged in as an admin to update tree experts",
+          async (_, { bulkTreeInputs }, context) => {
+            let transaction;
+            try {
+              transaction = await models.default.transaction();
+              for (const treeInput of bulkTreeInputs) {
+                const {
+                  treeId,
+                  emailsOfHonestOracles,
+                  emailsOfMaliciousOracles,
+                  shouldReplaceOracles,
+                } = treeInput;
+
+                const tree: Tree = await Tree.findByPk(treeId);
+                if (tree === null) {
+                  throw new Error(`No tree found for TreeId ${treeId}`);
+                }
+
+                if (shouldReplaceOracles) {
+                  await UserTreeOracleRelation.destroy({
+                    where: {
+                      TreeId: tree.id,
+                    },
+                    transaction,
+                  });
+                }
+
+                for (const email of emailsOfHonestOracles) {
+                  const user: User | null = await User.findOne({
+                    where: {
+                      email: email.toLowerCase(),
+                    },
+                  });
+                  if (user === null) {
+                    throw new Error(
+                      `No user found for honest user email ${email}`,
+                    );
+                  }
+
+                  tree.$add("oracle", user, transaction);
+                }
+
+                for (const email of emailsOfMaliciousOracles) {
+                  const user: User | null = await User.findOne({
+                    where: {
+                      email: email.toLowerCase(),
+                    },
+                  });
+                  if (user === null) {
+                    throw new Error(
+                      `No user found for malicious user email ${email}`,
+                    );
+                  }
+
+                  await tree.$add("oracle", user, transaction);
+
+                  const oracleRelation: UserTreeOracleRelation | null = await UserTreeOracleRelation.findOne(
+                    {
+                      where: {
+                        UserId: user.id,
+                        TreeId: tree.id,
+                      },
+                    },
+                  );
+
+                  if (oracleRelation === null) {
+                    throw new Error(
+                      `No oracle relation found for UserId ${
+                        user.id
+                      } and TreeId ${tree.id}`,
+                    );
+                  }
+
+                  oracleRelation.update({ isMalicious: true }, transaction);
+                }
+              }
+              await transaction.commit();
+              return true;
+            } catch (err) {
+              await transaction.rollback();
+              throw err;
+            }
+          },
+        ),
+      },
       markWorkspaceStaleForUser: {
         type: GraphQLBoolean,
         args: {
@@ -2218,6 +2321,7 @@ const schema = new GraphQLSchema({
               } else {
                 experiment = await Experiment.create({
                   name: experimentName,
+                  eligibilityRank: 1,
                 });
               }
 
