@@ -2189,7 +2189,7 @@ const schema = new GraphQLSchema({
                     );
                   }
 
-                  tree.$add("oracle", user, transaction);
+                  await tree.$add("oracle", user, { transaction });
                 }
 
                 for (const email of emailsOfMaliciousOracles) {
@@ -2204,7 +2204,7 @@ const schema = new GraphQLSchema({
                     );
                   }
 
-                  await tree.$add("oracle", user, transaction);
+                  await tree.$add("oracle", user, { transaction });
 
                   const oracleRelation: UserTreeOracleRelation | null = await UserTreeOracleRelation.findOne(
                     {
@@ -2212,6 +2212,8 @@ const schema = new GraphQLSchema({
                         UserId: user.id,
                         TreeId: tree.id,
                       },
+
+                      transaction,
                     },
                   );
 
@@ -2223,7 +2225,10 @@ const schema = new GraphQLSchema({
                     );
                   }
 
-                  oracleRelation.update({ isMalicious: true }, transaction);
+                  await oracleRelation.update(
+                    { isMalicious: true },
+                    { transaction },
+                  );
                 }
               }
               await transaction.commit();
