@@ -2182,6 +2182,7 @@ const schema = new GraphQLSchema({
                     where: {
                       email: email.toLowerCase(),
                     },
+                    transaction
                   });
                   if (user === null) {
                     throw new Error(
@@ -2197,6 +2198,7 @@ const schema = new GraphQLSchema({
                     where: {
                       email: email.toLowerCase(),
                     },
+                    transaction
                   });
                   if (user === null) {
                     throw new Error(
@@ -2212,7 +2214,6 @@ const schema = new GraphQLSchema({
                         UserId: user.id,
                         TreeId: tree.id,
                       },
-
                       transaction,
                     },
                   );
