@@ -212,7 +212,7 @@ export class Child extends React.Component<any, any> {
               </Button>
             </Link>
           )}
-          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && this.props.workspace.isRootWorkspace() && (
             <Button
               bsSize="xsmall"
               bsStyle="default"
