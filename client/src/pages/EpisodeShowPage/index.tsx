@@ -113,6 +113,7 @@ const WORKSPACE_QUERY = gql`
       }
       childWorkspaces {
         id
+        rootWorkspaceId
         serialId
         createdAt
         totalBudget

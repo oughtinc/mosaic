@@ -212,16 +212,17 @@ export class Child extends React.Component<any, any> {
               </Button>
             </Link>
           )}
-          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && this.props.workspace.isRootWorkspace() && (
-            <Button
-              bsSize="xsmall"
-              bsStyle="default"
-              onClick={this.props.onDelete}
-              style={{ marginRight: "5px" }}
-            >
-              Archive
-            </Button>
-          )}
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
+            this.props.workspace.rootWorkspaceId === null && (
+              <Button
+                bsSize="xsmall"
+                bsStyle="default"
+                onClick={this.props.onDelete}
+                style={{ marginRight: "5px" }}
+              >
+                Archive
+              </Button>
+            )}
           {Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
             hasTimeBudget && (
               <Button
