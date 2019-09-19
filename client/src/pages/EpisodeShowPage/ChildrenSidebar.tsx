@@ -212,8 +212,9 @@ export class Child extends React.Component<any, any> {
               </Button>
             </Link>
           )}
-          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
-            this.props.workspace.rootWorkspaceId === null && (
+          {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && // only show on root workspace
+            this.props.workspace.rootWorkspaceId ===
+              this.props.workspace.parentWorkspace.id && (
               <Button
                 bsSize="xsmall"
                 bsStyle="default"
