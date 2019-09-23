@@ -117,16 +117,18 @@ export class Child extends React.Component<any, any> {
           </div>
 
           <div style={{ marginTop: "0.5em" }}>
-            {Auth.isAuthorizedToEditWorkspace(this.props.workspace) && (
-              <Button
-                bsSize="xsmall"
-                bsStyle="default"
-                onClick={this.props.onDelete}
-                style={{ marginRight: "5px" }}
-              >
-                Unarchive
-              </Button>
-            )}
+            {Auth.isAuthorizedToEditWorkspace(this.props.workspace) &&
+              this.props.workspace.rootWorkspaceId ===
+                this.props.workspace.parentWorkspace.id && (
+                <Button
+                  bsSize="xsmall"
+                  bsStyle="default"
+                  onClick={this.props.onDelete}
+                  style={{ marginRight: "5px" }}
+                >
+                  Unarchive
+                </Button>
+              )}
             <div style={{ float: "right", opacity: 0.5 }}>
               {hasTimeBudget && (
                 <ChildBudgetBadge
