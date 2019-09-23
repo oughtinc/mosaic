@@ -65,7 +65,7 @@ export class NewBlockFormPresentational extends React.Component<any, any> {
     };
   }
 
-  public componentWillReceiveProps(newProps) {
+  public componentWillReceiveProps(newProps: any) {
     if (
       this.state.pending &&
       newProps.numBlocksInRedux > this.props.numBlocksInRedux // This checks whether the newly asked sub-question has made it into Redux
