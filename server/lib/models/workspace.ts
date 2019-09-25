@@ -570,10 +570,9 @@ export default class Workspace extends Model<Workspace> {
       await Promise.all(
         children.map(async child => {
           await child.update({
-            rootWorkspaceId:
-              workspace.rootWorkspaceId === null
-                ? workspace.id
-                : workspace.rootWorkspaceId,
+            rootWorkspaceId: workspace.isRootWorkspace()
+              ? workspace.id
+              : workspace.rootWorkspaceId,
           });
         }),
       );
@@ -745,8 +744,12 @@ export default class Workspace extends Model<Workspace> {
     );
   }
 
+  public isRootWorkspace(): boolean {
+    return this.rootWorkspaceId === null;
+  }
+
   public async getRootWorkspace() {
-    if (this.rootWorkspaceId === null) {
+    if (this.isRootWorkspace()) {
       // this is a root
       return this;
     }
