@@ -683,11 +683,11 @@ export class WorkspaceView extends React.Component<any, any> {
       !isOracleWorkspace &&
       doesRootWorkspaceScratchpadContainRelevantContent;
 
-    const judgeRegex = /(?<=<judge>)(.*)(?=<judge>)/;
+    const judgeRegex = /<judge>(.*)<\/judge>/;
     const judgeTextArray = judgeRegex.exec(
       listOfSlateNodesToText(_.get(rootWorkspaceScratchPad, "value"), false),
     );
-    const judgeText = judgeTextArray ? judgeTextArray[0] : null;
+    const judgeText = judgeTextArray ? judgeTextArray[1] : null;
 
     return (
       <div>
