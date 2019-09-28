@@ -432,16 +432,17 @@ export class ChildrenSidebar extends React.Component<any, any> {
                     padding: "10px",
                   }}
                 >
-                  {!(this.props.isUserOracle && this.props.isInOracleMode) && (
-                    <TakeBreakBtn
-                      experimentId={this.props.experimentId}
-                      label="Wait for an answer"
-                      navHook={() => {
-                        this.props.snapshot("WAIT_FOR_ANSWER");
-                        this.props.markAsNotStale();
-                      }}
-                    />
-                  )}
+                  {!(this.props.isUserOracle && this.props.isInOracleMode) &&
+                    !this.props.isMIBWithoutRestarts && (
+                      <TakeBreakBtn
+                        experimentId={this.props.experimentId}
+                        label="Wait for an answer"
+                        navHook={() => {
+                          this.props.snapshot("WAIT_FOR_ANSWER");
+                          this.props.markAsNotStale();
+                        }}
+                      />
+                    )}
                 </div>
               )}
           </BlockContainer>
