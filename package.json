@@ -9,7 +9,7 @@
     "start": "cd server && yarn run start"
   },
   "engines": {
-    "yarn": "1.x",
+    "yarn": "1.18.0",
     "node": "10.x",
     "npm": "6.x"
   }
