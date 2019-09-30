@@ -48,6 +48,7 @@ import {
 
 import { ExpandAllPointersBtn } from "./ExpandAllPointersBtn";
 import { databaseJSONToValue } from "../../lib/slateParser";
+import { listOfSlateNodesToText } from "../../lib/slateParser";
 
 import {
   ORACLE_MODE_QUERY,
@@ -681,6 +682,17 @@ export class WorkspaceView extends React.Component<any, any> {
       ? this.getAvailablePointers(workspace, rootWorkspaceScratchPad)
       : this.getAvailablePointers(workspace);
 
+    const shouldShowJudgeTextFromScratchpad =
+      hasParent &&
+      !isOracleWorkspace &&
+      doesRootWorkspaceScratchpadContainRelevantContent;
+
+    const judgeRegex = /<judge>(.*)<\/judge>/;
+    const judgeTextArray = judgeRegex.exec(
+      listOfSlateNodesToText(_.get(rootWorkspaceScratchPad, "value"), false),
+    );
+    const judgeText = judgeTextArray ? judgeTextArray[1] : null;
+
     return (
       <div>
         <Helmet>
@@ -759,7 +771,9 @@ export class WorkspaceView extends React.Component<any, any> {
                           {isWorkspacePartOfOracleExperiment && (
                             <DepthDisplay
                               depth={workspace.depth}
-                              depthLimit={workspace.rootWorkspace.tree.depthLimit}
+                              depthLimit={
+                                workspace.rootWorkspace.tree.depthLimit
+                              }
                             />
                           )}
                           {hasIOConstraints &&
@@ -827,6 +841,17 @@ export class WorkspaceView extends React.Component<any, any> {
                                 availablePointers={availablePointers}
                                 {...rootWorkspaceScratchpadProps}
                               />
+                            </div>
+                          )}
+                          {shouldShowJudgeTextFromScratchpad && (
+                            <div
+                              style={{
+                                fontSize: "18px",
+                                marginBottom: "20px",
+                                minWidth: "550px",
+                              }}
+                            >
+                              <p>{judgeText}</p>
                             </div>
                           )}
                           <BlockEditor
