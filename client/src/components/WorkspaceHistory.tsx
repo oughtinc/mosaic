@@ -1,4 +1,5 @@
 import gql from "graphql-tag";
+import * as _ from "lodash";
 import * as React from "react";
 import { graphql } from "react-apollo";
 import { compose } from "recompose";
@@ -29,13 +30,13 @@ export class WorkspaceHistoryPresentational extends React.PureComponent<
             flexDirection: "column",
           }}
         >
-          {this.props.workspaceHistoryQuery.workspace.assignments.map(
-            (assignment, i) => (
-              <AssignmentContainer key={i}>
-                <Assignment assignmentId={assignment.id} />
-              </AssignmentContainer>
-            ),
-          )}
+          {_.sortBy(this.props.workspaceHistoryQuery.workspace.assignments, a =>
+            Number(a.startAtTimestamp),
+          ).map((assignment, i) => (
+            <AssignmentContainer key={i}>
+              <Assignment assignmentId={assignment.id} />
+            </AssignmentContainer>
+          ))}
         </div>
       );
     } else {
@@ -50,6 +51,7 @@ const WORKSPACE_HISTORY = gql`
       id
       assignments {
         id
+        startAtTimestamp
       }
     }
   }
