@@ -167,25 +167,27 @@ class Scheduler {
       throw new Error("No eligible workspace");
     }
 
-    const assignedWorkspace = pickRandomItemFromArray(actionableWorkspaces);
-    const isThisAssignmentTimed = await assignedWorkspace.hasTimeBudgetOfRootParent;
+    const shuffledActionableWorkspaces = _.shuffle(actionableWorkspaces);
+    for (const candidateWorkspace of shuffledActionableWorkspaces) {
+      // This is intended to mitigate a race condition where two users
+      // are both looking for a new assignment at the same time and
+      // get assigned to the same workspace due to async code in the scheduler
+      if (
+        !this.schedule.isWorkspaceCurrentlyBeingWorkedOn(candidateWorkspace)
+      ) {
+        const isThisAssignmentTimed = await candidateWorkspace.hasTimeBudgetOfRootParent;
+        await this.schedule.assignWorkspaceToUser({
+          experimentId: this.experimentId,
+          userId,
+          workspace: candidateWorkspace,
+          isOracle: false,
+          isLastAssignmentTimed: isThisAssignmentTimed,
+        });
 
-    // This is intended to mitigate a race condition where two users
-    // are both looking for a new assignment at the same time and
-    // get assigned to the same workspace due to async code in the scheduler
-    if (this.schedule.isWorkspaceCurrentlyBeingWorkedOn(assignedWorkspace)) {
-      return await this.assignNextWorkspace(userId, maybeSuboptimal);
+        return candidateWorkspace.id;
+      }
     }
-
-    await this.schedule.assignWorkspaceToUser({
-      experimentId: this.experimentId,
-      userId,
-      workspace: assignedWorkspace,
-      isOracle: false,
-      isLastAssignmentTimed: isThisAssignmentTimed,
-    });
-
-    return assignedWorkspace.id;
+    return await this.assignNextWorkspace(userId, maybeSuboptimal);
   }
 
   public async isWorkspaceAvailable(userId: string) {
@@ -233,6 +235,11 @@ class Scheduler {
     this.schedule.reset();
   }
 
+  // Possible alternative approach:
+  // What if you just took a random sample of root workspaces and checked them
+  // Need to consider MIB, but putting that aside for now
+  // Essentially, what is the likelihood a 1/n set of workspaces have an available tree
+  // Or could you consider a tree
   private async getActionableWorkspaces({ maybeSuboptimal, userId }) {
     let treesToConsider = await this.fetchAllRootWorkspaces();
 
