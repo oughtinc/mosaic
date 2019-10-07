@@ -175,18 +175,21 @@ class Scheduler {
       if (
         !this.schedule.isWorkspaceCurrentlyBeingWorkedOn(candidateWorkspace)
       ) {
-        const isThisAssignmentTimed = await candidateWorkspace.hasTimeBudgetOfRootParent;
+        const isLastAssignmentTimed = await candidateWorkspace.hasTimeBudgetOfRootParent;
+
         await this.schedule.assignWorkspaceToUser({
           experimentId: this.experimentId,
           userId,
           workspace: candidateWorkspace,
           isOracle: false,
-          isLastAssignmentTimed: isThisAssignmentTimed,
+          isLastAssignmentTimed,
         });
 
         return candidateWorkspace.id;
       }
     }
+
+    // actionable workspaces exist but are taken at the moment, try rechecking
     return await this.assignNextWorkspace(userId, maybeSuboptimal);
   }
 
