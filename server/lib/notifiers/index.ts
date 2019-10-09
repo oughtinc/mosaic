@@ -15,6 +15,7 @@ async function sendNotifications(notificationRequest: NotificationRequest) {
 }
 
 export default async function sendPendingNotifications() {
-  const requestsWithWorkAvailable = await NotificationRequest.findAllWithWorkAvailable();
-  await Promise.all(requestsWithWorkAvailable.map(sendNotifications));
+  // Notification system disabled
+  // const requestsWithWorkAvailable = await NotificationRequest.findAllWithWorkAvailable();
+  // await Promise.all(requestsWithWorkAvailable.map(sendNotifications));
 }

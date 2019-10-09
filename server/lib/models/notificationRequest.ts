@@ -30,32 +30,34 @@ export default class NotificationRequest extends Model<NotificationRequest> {
   public user: User;
 
   public static async findAllWithWorkAvailable() {
-    return await NotificationRequest.findAll({ include: [User, Experiment] })
-      .then(notificationRequests =>
-        notificationRequests.filter(notificationRequest =>
-          notificationRequest.experiment.isActive(),
-        ),
-      )
-      .then(notificationRequests =>
-        Promise.all(
-          notificationRequests.map(async notificationRequest => [
-            notificationRequest,
-            await notificationRequest.isWorkAvailable(),
-          ]),
-        ),
-      )
-      .then(requestPendingPairs =>
-        requestPendingPairs.filter(([_, isWorkPending]) => isWorkPending),
-      )
-      .then(requestPendingPairs =>
-        requestPendingPairs.map(
-          ([notificationRequest, _]) => notificationRequest,
-        ),
-      );
+    // Notification system disabled
+    // return await NotificationRequest.findAll({ include: [User, Experiment] })
+    //   .then(notificationRequests =>
+    //     notificationRequests.filter(notificationRequest =>
+    //       notificationRequest.experiment.isActive(),
+    //     ),
+    //   )
+    //   .then(notificationRequests =>
+    //     Promise.all(
+    //       notificationRequests.map(async notificationRequest => [
+    //         notificationRequest,
+    //         await notificationRequest.isWorkAvailable(),
+    //       ]),
+    //     ),
+    //   )
+    //   .then(requestPendingPairs =>
+    //     requestPendingPairs.filter(([_, isWorkPending]) => isWorkPending),
+    //   )
+    //   .then(requestPendingPairs =>
+    //     requestPendingPairs.map(
+    //       ([notificationRequest, _]) => notificationRequest,
+    //     ),
+    //   );
   }
 
   public async isWorkAvailable() {
-    const scheduler = await getScheduler(this.experimentId);
-    return scheduler.isWorkspaceAvailable(this.userId);
+    // Notification system disabled
+    // const scheduler = await getScheduler(this.experimentId);
+    // return scheduler.isWorkspaceAvailable(this.userId);
   }
 }
