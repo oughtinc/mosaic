@@ -22,6 +22,12 @@ const NINETY_SECONDS = 1000 * 90;
 //  Assignment classes) from Sequelize & Postgres
 
 const fetchAllWorkspacesInTree = async rootWorkspace => {
+  // const children = rootWorkspace.getChildWorkspaces({
+  //   where: { isArchived: false, isStale: true },
+  //   include: [{ model: Workspace, nested: true }],
+  // });
+  // return [rootWorkspace, ...children];
+
   const result = [rootWorkspace];
   const children = await rootWorkspace.getChildWorkspaces({
     where: { isArchived: false },
@@ -104,6 +110,32 @@ export async function createScheduler(experimentId) {
         },
       });
       return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
+    },
+    fetchTreesAvailableToUser: async userId => {
+      const trees: Tree[] = await Tree.findAll({
+        include: [
+          {
+            model: Experiment,
+            required: true,
+            attributes: ["id"],
+            where: { id: experimentId },
+          },
+          {
+            model: Workspace,
+            required: true,
+            attributes: ["id", "isArchived"],
+            where: { isArchived: false },
+          },
+          {
+            model: UserTreeOracleRelation,
+            required: false,
+            attributes: ["isMalicious", "UserId"],
+            where: { UserId: userId },
+          },
+        ],
+      });
+
+      return trees;
     },
     fetchAllRootWorkspaces: async () => {
       const rootWorkspaces = await Workspace.findAll({

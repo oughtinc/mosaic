@@ -83,6 +83,9 @@ const GRAPHQL_PORT = process.env.PORT || 8080;
       "Express/GraphQL server now listening. React server (web_1) may still be loading.",
     );
 
+    // Overhauls have been made to the scheduling system.
+    // `sendPendingNotifications` is not updated.
+    // Message Andrew Schreiber before uncommenting below.
     //setInterval(sendPendingNotifications, 1000 * 60 * 60 * 2);
   });
 })();

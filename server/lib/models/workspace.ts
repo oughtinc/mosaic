@@ -163,7 +163,7 @@ export default class Workspace extends Model<Workspace> {
 
   // @ts-ignore
   @Column(new DataType.VIRTUAL(DataType.BOOLEAN, ["rootWorkspaceId"]))
-  public get hasTimeBudgetOfRootParent() {
+  public get hasTimeBudgetOfRootParent(): Promise<boolean> {
     return (async () => {
       const rootWorkspace = await Workspace.findByPk(this.get(
         "rootWorkspaceId",

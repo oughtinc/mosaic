@@ -1,30 +1,30 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "attach",
-            "name": "Backend: Node Launch",
-            "address": "localhost",
-            "port": 9229,
-            "restart": true,
-            "sourceMaps": true,
-            "localRoot": "${workspaceRoot}/server",
-            "remoteRoot": "/data",
-            "protocol": "auto"
-        },
-        {
-            "name": "Front End: Chrome Launch",
-            "type": "chrome",
-            "request": "launch",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceRoot}/client/src",
-            "sourceMapPathOverrides": {
-                "/data/src/*": "${webRoot}/*"
-            }
-          }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Backend: Node Launch",
+      "address": "localhost",
+      "port": 9229,
+      "restart": true,
+      "sourceMaps": true,
+      "localRoot": "${workspaceRoot}/server",
+      "remoteRoot": "/data",
+      "protocol": "auto"
+    },
+    {
+      "name": "Front End: Chrome Launch",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceRoot}/client/src",
+      "sourceMapPathOverrides": {
+        "/data/src/*": "${webRoot}/*"
+      }
+    }
+  ]
 }
