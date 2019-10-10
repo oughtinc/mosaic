@@ -232,9 +232,6 @@ class Scheduler {
           userId,
           oracleTreesToConsider,
         );
-        if (!randomlySelectedRootWorkspace) {
-          break;
-        }
         const selectedTree: Tree = _.find(oracleTreesToConsider, tree => {
           return tree.rootWorkspace.id === randomlySelectedRootWorkspace.id;
         });
@@ -282,9 +279,6 @@ class Scheduler {
           userId,
           oracleTreesToConsider,
         );
-        if (!randomlySelectedRootWorkspace) {
-          break;
-        }
 
         const judgeEligibleWorkspaces = await this.getActionableWorkspacesForTree(
           randomlySelectedRootWorkspace,
@@ -484,13 +478,21 @@ class Scheduler {
   private getRandomTreeRootWorkspaceWorkedOnLeastRecentlyByUser(
     userId: string,
     trees: Tree[],
-  ): Workspace | undefined {
+  ): Workspace {
     const rootWorkspacesOfTrees: Workspace[] = trees.map(t => t.rootWorkspace);
     const treesWorkedOnLeastRecentlyByUser = this.schedule.getTreesWorkedOnLeastRecentlyByUser(
       rootWorkspacesOfTrees,
       userId,
     );
-    return pickRandomItemFromArray(treesWorkedOnLeastRecentlyByUser);
+    const rootWorkspace = pickRandomItemFromArray(
+      treesWorkedOnLeastRecentlyByUser,
+    );
+    if (!rootWorkspace) {
+      throw new Error(
+        "Unable to retrieve workspace from least recently worked on trees",
+      );
+    }
+    return rootWorkspace;
   }
 
   private async filterByWhetherCurrentlyBeingWorkedOn(workspaces) {
