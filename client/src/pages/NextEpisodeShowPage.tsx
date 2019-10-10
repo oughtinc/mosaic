@@ -161,7 +161,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     if (this.state.refreshCountdown === 0) {
       location.reload();
     }
-    console.log("Oracle Scheduling failed?", this.state.oracleSchedulingFailed);
 
     if (this.state.oracleSchedulingErrored) {
       return (
