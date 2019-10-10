@@ -168,7 +168,7 @@ class Scheduler {
   }
 
   public async isWorkspaceAvailable(userId: string) {
-    // Notification system depreciated
+    // Notification system deprecated
     // this.resetCaches();
     // const actionableWorkspaces = await this.getActionableWorkspacesInOracleMode(
     //   userId,
@@ -186,7 +186,7 @@ class Scheduler {
   }
 
   public async assignNextMaybeSuboptimalWorkspace(userId) {
-    // Depreciated, suboptimality is controlled within getActionableWorkspaces for speed
+    // deprecated, suboptimality is controlled within getActionableWorkspaces for speed
     return await this.assignNextWorkspace(userId);
   }
 
@@ -204,7 +204,7 @@ class Scheduler {
   }
 
   private async getActionableWorkspaces({ maybeSuboptimal, userId }) {
-    // Depreciated / unused
+    // deprecated
     let treesToConsider = await this.fetchAllRootWorkspaces();
 
     while (treesToConsider.length > 0) {
