@@ -1787,7 +1787,16 @@ const schema = new GraphQLSchema({
 
           const scheduler = await getScheduler(experimentId);
 
-          const workspaceId = await scheduler.assignNextWorkspace(user.id);
+          let workspaceId;
+          try {
+            workspaceId = await scheduler.assignNextWorkspace(user.id);
+          } catch (err) {
+            throw err;
+          }
+
+          if (!workspaceId) {
+            throw new Error("No workspaces found. Please try later.");
+          }
 
           const workspace = await Workspace.findByPk(workspaceId);
 

@@ -81,8 +81,9 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   public constructor(props: any) {
     super(props);
     this.state = {
-      normalSchedulingFailed: false,
       oracleSchedulingFailed: false,
+      oracleSchedulingErrored: false,
+      oracleSchedulingErrorMessage: null,
       refreshCountdown: 10,
       workspaceId: undefined,
       isCountingDown: false,
@@ -95,7 +96,10 @@ export class NextEpisodeShowPagePresentational extends React.Component<
   }
 
   public async componentDidMount() {
-    let response, normalSchedulingFailed, oracleSchedulingFailed;
+    let response,
+      oracleSchedulingFailed,
+      oracleSchedulingErrored,
+      oracleSchedulingErrorMessage;
 
     const experimentId = getExperimentIdOrSerialIdFromQueryParams(
       window.location.search,
@@ -108,26 +112,37 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         },
       });
     } catch (e) {
-      oracleSchedulingFailed =
-        e.message === "GraphQL error: No eligible workspace for oracle";
-      normalSchedulingFailed =
-        e.message === "GraphQL error: No eligible workspace";
+      oracleSchedulingErrored =
+        e.message !== "GraphQL error: No workspaces found. Please try later.";
+      oracleSchedulingErrorMessage = e.message;
+
+      oracleSchedulingFailed = true;
     }
 
-    const schedulingFailed = oracleSchedulingFailed || normalSchedulingFailed;
-    if (window.heap && schedulingFailed) {
+    if (window.heap && oracleSchedulingFailed) {
       window.heap.track("No workspace available", {
         experimentId,
         acceptSuboptimalWorkspace: false,
       });
+      if (oracleSchedulingErrored) {
+        window.heap.track("Scheduling Errored", {
+          experimentId,
+          oracleSchedulingErrorMessage,
+        });
+      }
     }
 
     if (oracleSchedulingFailed) {
-      this.setState({ oracleSchedulingFailed });
-      this.startCountingDown();
-    } else if (normalSchedulingFailed) {
-      this.setState({ normalSchedulingFailed });
-      this.startCountingDown();
+      if (oracleSchedulingErrored) {
+        this.setState({
+          oracleSchedulingFailed,
+          oracleSchedulingErrored,
+          oracleSchedulingErrorMessage,
+        });
+      } else {
+        this.setState({ oracleSchedulingFailed });
+        this.startCountingDown();
+      }
     } else if (response) {
       const workspaceId = response.data.findNextWorkspace.serialId;
       this.setState({ workspaceId });
@@ -146,8 +161,26 @@ export class NextEpisodeShowPagePresentational extends React.Component<
     if (this.state.refreshCountdown === 0) {
       location.reload();
     }
+    console.log("Oracle Scheduling failed?", this.state.oracleSchedulingFailed);
 
-    if (this.state.normalSchedulingFailed) {
+    if (this.state.oracleSchedulingErrored) {
+      return (
+        <ContentContainer>
+          <Helmet>
+            <title>No Assignment Found - Mosaic</title>
+          </Helmet>
+          <RedExclamation />
+          <span style={{ color: "black" }}>
+            The scheduler ran into an error while attempting to find you a
+            workspace. Please let us know!
+          </span>
+          <div />
+          <span style={{ color: "darkRed" }}>
+            {this.state.oracleSchedulingErrorMessage}
+          </span>
+        </ContentContainer>
+      );
+    } else if (this.state.oracleSchedulingFailed) {
       return (
         <ContentContainer>
           <Helmet>
@@ -157,38 +190,6 @@ export class NextEpisodeShowPagePresentational extends React.Component<
           <span style={{ color: "darkRed" }}>
             There is no eligible workspace at this time. Please wait and refresh
             this page to try again.
-            {this.state.isCountingDown && (
-              <React.Fragment>
-                {" "}
-                Automatically refreshing in {this.state.refreshCountdown} second
-                {this.state.refreshCountdown !== 1 ? "s" : ""}.
-              </React.Fragment>
-            )}
-          </span>
-
-          <div
-            style={{
-              display: "flex",
-              marginTop: "50px",
-            }}
-          >
-            <RegisterForEmailNotification
-              onClick={this.registerForNotification}
-              registrationStatus={this.state.notificationRegistrationState}
-            />
-          </div>
-        </ContentContainer>
-      );
-    } else if (this.state.oracleSchedulingFailed) {
-      return (
-        <ContentContainer>
-          <Helmet>
-            <title>No (Oracle) Assignment Found - Mosaic</title>
-          </Helmet>
-          <RedExclamation />
-          <span style={{ color: "darkRed" }}>
-            There is no oracle eligible workspace at this time. Please wait and
-            refresh this page to try again.
             {this.state.isCountingDown && (
               <React.Fragment>
                 {" "}

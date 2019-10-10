@@ -127,7 +127,7 @@ class Scheduler {
     }
   }
 
-  public async assignNextWorkspace(userId: string): Promise<string> {
+  public async assignNextWorkspace(userId: string): Promise<string | null> {
     this.resetCaches();
     this.schedule.leaveCurrentWorkspace(userId);
 
@@ -143,18 +143,8 @@ class Scheduler {
     );
 
     if (!actionableWorkspace) {
-      throw new Error("No eligible workspace");
+      return null;
     }
-
-    // Fallback scheduler not in use
-    // const fallbackScheduler = await this.getFallbackScheduler();
-    // if (fallbackScheduler) {
-    //   const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspace(
-    //     userId,
-    //   );
-    //   return assignedWorkspaceId;
-    // }
-
     const isLastAssignmentTimed = await actionableWorkspace.hasTimeBudgetOfRootParent;
 
     await this.schedule.assignWorkspaceToUser({
@@ -166,6 +156,15 @@ class Scheduler {
     });
 
     return actionableWorkspace.id;
+
+    // Fallback scheduler not in use
+    // const fallbackScheduler = await this.getFallbackScheduler();
+    // if (fallbackScheduler) {
+    //   const assignedWorkspaceId = await fallbackScheduler.assignNextWorkspace(
+    //     userId,
+    //   );
+    //   return assignedWorkspaceId;
+    // }
   }
 
   public async isWorkspaceAvailable(userId: string) {
@@ -248,10 +247,12 @@ class Scheduler {
         treesToConsider,
       );
 
-      let oracleTreesToConsider = await filter(highestPriorityTrees, t => {
+      const oracleTrees = await filter(highestPriorityTrees, t => {
         // TODO: make sure fetchTrees.. is properly getting the oracle relations array
         return t.oracleRelations.length > 0;
       });
+
+      let oracleTreesToConsider = oracleTrees;
 
       while (oracleTreesToConsider.length > 0) {
         const rootWorkspacesOfTrees: Workspace[] = oracleTreesToConsider.map(
@@ -261,7 +262,6 @@ class Scheduler {
           userId,
           rootWorkspacesOfTrees,
         );
-
         const randomlySelectedRootWorkspace = pickRandomItemFromArray(
           leastRecentlyWorkedOnTreeRootWorkspaces,
         );
@@ -277,16 +277,15 @@ class Scheduler {
           randomlySelectedRootWorkspace,
         );
 
-        let oracleEligibleWorkspaces: Workspace[] = isMalicious
+        const oracleEligibleWorkspaces: Workspace[] = isMalicious
           ? this.filterByWhetherEligibleForMaliciousOracle(workspacesInTree)
           : this.filterByWhetherEligibleForHonestOracle(workspacesInTree);
 
-        oracleEligibleWorkspaces = this.filterByStaleness(
+        const staleOracleEligibleWorkspaces = this.filterByStaleness(
           userId,
           oracleEligibleWorkspaces,
         );
-
-        if (oracleEligibleWorkspaces.length > 0) {
+        if (staleOracleEligibleWorkspaces.length > 0) {
           // we want to prioritize older workspaces
           oracleEligibleWorkspaces.sort(
             (w1, w2) => w1.createdAt - w2.createdAt,
@@ -308,11 +307,11 @@ class Scheduler {
 
       let judgeTreesToConsider = _.difference(
         highestPriorityTrees,
-        oracleTreesToConsider,
+        oracleTrees,
       );
 
       while (judgeTreesToConsider.length > 0) {
-        const rootWorkspacesOfTrees: Workspace[] = oracleTreesToConsider.map(
+        const rootWorkspacesOfTrees: Workspace[] = judgeTreesToConsider.map(
           t => t.rootWorkspace,
         );
         const leastRecentlyWorkedOnTreeRootWorkspaces: Workspace[] = await this.getTreesWorkedOnLeastRecentlyByUser(
@@ -334,7 +333,7 @@ class Scheduler {
             return w;
           }
         }
-        const selectedTree: Tree = _.find(oracleTreesToConsider, tree => {
+        const selectedTree: Tree = _.find(judgeTreesToConsider, tree => {
           return tree.rootWorkspace.id === randomlySelectedRootWorkspace.id;
         });
 
@@ -408,6 +407,7 @@ class Scheduler {
     ) {
       eligibleWorkspaces = previouslyWorkedOnWorkspaces;
     } else {
+      const maybeSuboptimal = false;
       const workspacesExceedingDistCuoff = await this.getWorkspacesExceedingMinDistFromWorkedOnWorkspace(
         {
           minDist: maybeSuboptimal ? 1 : 2,

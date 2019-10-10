@@ -22,12 +22,6 @@ const NINETY_SECONDS = 1000 * 90;
 //  Assignment classes) from Sequelize & Postgres
 
 const fetchAllWorkspacesInTree = async rootWorkspace => {
-  // const children = rootWorkspace.getChildWorkspaces({
-  //   where: { isArchived: false, isStale: true },
-  //   include: [{ model: Workspace, nested: true }],
-  // });
-  // return [rootWorkspace, ...children];
-
   const result = [rootWorkspace];
   const children = await rootWorkspace.getChildWorkspaces({
     where: { isArchived: false },
@@ -38,6 +32,14 @@ const fetchAllWorkspacesInTree = async rootWorkspace => {
     result.push(...allWorkspacesInChildsTree);
   }
   return result;
+
+  // Possible higher-performance implementation
+  // const children = rootWorkspace.getChildWorkspaces({
+  //   where: { isArchived: false, isStale: true },
+  //   include: [{ model: Workspace, nested: true }],
+  // });
+  // const parsedChildren = //implement
+  // return [rootWorkspace, ...parsedChildren];
 };
 
 export const schedulers = new Map();
@@ -123,7 +125,18 @@ export async function createScheduler(experimentId) {
           {
             model: Workspace,
             required: true,
-            attributes: ["id", "isArchived"],
+            attributes: [
+              "id",
+              "isArchived",
+              "isStale",
+              "totalBudget",
+              "allocatedBudget",
+              "wasAnsweredByOracle",
+              "isNotStaleRelativeToUser",
+              "isEligibleForHonestOracle",
+              "isEligibleForMaliciousOracle",
+              "hasTimeBudget",
+            ],
             where: { isArchived: false },
           },
           {
