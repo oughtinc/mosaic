@@ -277,7 +277,7 @@ class Scheduler {
       while (judgeTreesToConsider.length > 0) {
         const randomlySelectedRootWorkspace = this.getRandomTreeRootWorkspaceWorkedOnLeastRecentlyByUser(
           userId,
-          oracleTreesToConsider,
+          judgeTreesToConsider,
         );
 
         const judgeEligibleWorkspaces = await this.getActionableWorkspacesForTree(
