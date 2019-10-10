@@ -270,14 +270,14 @@ class Scheduler {
           return tree.rootWorkspace.id === randomlySelectedRootWorkspace.id;
         });
 
-        const isMalicious: boolean =
+        const isMaliciousInTree: boolean =
           selectedTree.oracleRelations[0].isMalicious;
 
         const workspacesInTree: Workspace[] = await this.fetchAllWorkspacesInTree(
           randomlySelectedRootWorkspace,
         );
 
-        const oracleEligibleWorkspaces: Workspace[] = isMalicious
+        const oracleEligibleWorkspaces: Workspace[] = isMaliciousInTree
           ? this.filterByWhetherEligibleForMaliciousOracle(workspacesInTree)
           : this.filterByWhetherEligibleForHonestOracle(workspacesInTree);
 
@@ -285,18 +285,16 @@ class Scheduler {
           userId,
           oracleEligibleWorkspaces,
         );
-        if (staleOracleEligibleWorkspaces.length > 0) {
-          // we want to prioritize older workspaces
-          oracleEligibleWorkspaces.sort(
-            (w1, w2) => w1.createdAt - w2.createdAt,
-          );
-          for (const w of oracleEligibleWorkspaces) {
-            // This is intended to mitigate a race condition where two users
-            // are both looking for a new assignment at the same time and
-            // get assigned to the same workspace due to async code in the scheduler
-            if (!this.schedule.isWorkspaceCurrentlyBeingWorkedOn(w)) {
-              return w;
-            }
+        // we want to prioritize older workspaces
+        oracleEligibleWorkspaces.sort((w1, w2) => w1.createdAt - w2.createdAt);
+        for (const oracleWorkspace of oracleEligibleWorkspaces) {
+          // This is intended to mitigate a race condition where two users
+          // are both looking for a new assignment at the same time and
+          // get assigned to the same workspace due to async code in the scheduler
+          if (
+            !this.schedule.isWorkspaceCurrentlyBeingWorkedOn(oracleWorkspace)
+          ) {
+            return oracleWorkspace;
           }
         }
 
@@ -328,9 +326,9 @@ class Scheduler {
           userId,
         );
 
-        for (const w of judgeEligibleWorkspaces) {
-          if (!this.schedule.isWorkspaceCurrentlyBeingWorkedOn(w)) {
-            return w;
+        for (const judgeWorkpace of judgeEligibleWorkspaces) {
+          if (!this.schedule.isWorkspaceCurrentlyBeingWorkedOn(judgeWorkpace)) {
+            return judgeWorkpace;
           }
         }
         const selectedTree: Tree = _.find(judgeTreesToConsider, tree => {

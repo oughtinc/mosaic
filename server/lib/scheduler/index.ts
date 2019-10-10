@@ -33,13 +33,8 @@ const fetchAllWorkspacesInTree = async rootWorkspace => {
   }
   return result;
 
-  // Possible higher-performance implementation
-  // const children = rootWorkspace.getChildWorkspaces({
-  //   where: { isArchived: false, isStale: true },
-  //   include: [{ model: Workspace, nested: true }],
-  // });
-  // const parsedChildren = //implement
-  // return [rootWorkspace, ...parsedChildren];
+  // TODO: condense this into a single query for performance
+  // https://www.npmjs.com/package/sequelize-hierarchy
 };
 
 export const schedulers = new Map();
@@ -125,18 +120,6 @@ export async function createScheduler(experimentId) {
           {
             model: Workspace,
             required: true,
-            attributes: [
-              "id",
-              "isArchived",
-              "isStale",
-              "totalBudget",
-              "allocatedBudget",
-              "wasAnsweredByOracle",
-              "isNotStaleRelativeToUser",
-              "isEligibleForHonestOracle",
-              "isEligibleForMaliciousOracle",
-              "hasTimeBudget",
-            ],
             where: { isArchived: false },
           },
           {
