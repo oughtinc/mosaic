@@ -134,7 +134,7 @@ class Scheduler {
     // Should always be in oracle mode
     if (!this.isInOracleMode.getValue()) {
       throw new Error(
-        "Not in Oracle Mode. If you see this, please contact us. Then try logging out and logging back in.",
+        "Not in Oracle Mode. If you see this, please contact us.",
       );
     }
 
@@ -147,15 +147,18 @@ class Scheduler {
     }
     const isLastAssignmentTimed = await actionableWorkspace.hasTimeBudgetOfRootParent;
 
-    await this.schedule.assignWorkspaceToUser({
-      experimentId: this.experimentId,
-      userId,
-      workspace: actionableWorkspace,
-      isOracle: false,
-      isLastAssignmentTimed,
-    });
-
-    return actionableWorkspace.id;
+    if (!this.schedule.isWorkspaceCurrentlyBeingWorkedOn(actionableWorkspace)) {
+      await this.schedule.assignWorkspaceToUser({
+        experimentId: this.experimentId,
+        userId,
+        workspace: actionableWorkspace,
+        isOracle: false,
+        isLastAssignmentTimed,
+      });
+      return actionableWorkspace.id;
+    } else {
+      return await this.assignNextWorkspace(userId);
+    }
 
     // Fallback scheduler not in use
     // const fallbackScheduler = await this.getFallbackScheduler();
@@ -277,11 +280,11 @@ class Scheduler {
           randomlySelectedRootWorkspace,
         );
 
-        const oracleEligibleWorkspaces: Workspace[] = isMaliciousInTree
+        let oracleEligibleWorkspaces: Workspace[] = isMaliciousInTree
           ? this.filterByWhetherEligibleForMaliciousOracle(workspacesInTree)
           : this.filterByWhetherEligibleForHonestOracle(workspacesInTree);
 
-        const staleOracleEligibleWorkspaces = this.filterByStaleness(
+        oracleEligibleWorkspaces = this.filterByStaleness(
           userId,
           oracleEligibleWorkspaces,
         );
