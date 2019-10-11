@@ -110,131 +110,132 @@ describe("Scheduler class", function() {
     });
   });
 
-  describe("getActionableWorkspaces", function() {
-    it("works in a straightforward case", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE / 2);
-      this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
+  // TODO: Replace with getActionableWorkspacesInOracleMode tests
+  // describe("getActionableWorkspaces", function() {
+  //   it("works in a straightforward case", async function() {
+  //     this.schedule.assignWorkspaceToUser(USER_ID_1, workspaces.get("1-1"));
+  //     this.clock.tick(ONE_MINUTE / 2);
+  //     this.schedule.assignWorkspaceToUser(USER_ID_2, workspaces.get("2"));
 
-      const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
-      expect(result[0]).to.be.oneOf([
-        workspaces.get("2"),
-        workspaces.get("2-1"),
-        workspaces.get("2-2"),
-        workspaces.get("3"),
-        workspaces.get("4"),
-        workspaces.get("5"),
-        workspaces.get("5-1"),
-        workspaces.get("5-3"),
-        workspaces.get("5-4"),
-      ]);
-    });
+  //     const result = await this.scheduler.getActionableWorkspaces(USER_ID_1);
+  //     expect(result[0]).to.be.oneOf([
+  //       workspaces.get("2"),
+  //       workspaces.get("2-1"),
+  //       workspaces.get("2-2"),
+  //       workspaces.get("3"),
+  //       workspaces.get("4"),
+  //       workspaces.get("5"),
+  //       workspaces.get("5-1"),
+  //       workspaces.get("5-3"),
+  //       workspaces.get("5-4"),
+  //     ]);
+  //   });
 
-    it("works when all trees assigned at least once", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("4"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("3"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
+  //   it("works when all trees assigned at least once", async function() {
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("4"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("3"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
 
-      const result = await this.scheduler.getActionableWorkspaces(USER_ID);
-      expect(result.length).to.equal(3);
+  //     const result = await this.scheduler.getActionableWorkspaces(USER_ID);
+  //     expect(result.length).to.equal(3);
 
-      expect(result).to.have.deep.members(
-        workspaces.filter(
-          w =>
-            w === workspaces.get("5-1") ||
-            w === workspaces.get("5-3") ||
-            w === workspaces.get("5-4"),
-        ),
-      );
-    });
+  //     expect(result).to.have.deep.members(
+  //       workspaces.filter(
+  //         w =>
+  //           w === workspaces.get("5-1") ||
+  //           w === workspaces.get("5-3") ||
+  //           w === workspaces.get("5-4"),
+  //       ),
+  //     );
+  //   });
 
-    it("works when all workspaces assigned at least once", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-2"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-3"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-4"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("4"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("3"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-2"));
+  //   it("works when all workspaces assigned at least once", async function() {
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-2"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-3"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-4"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("4"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("3"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-2"));
 
-      const result = await this.scheduler.getActionableWorkspaces(USER_ID);
-      expect(result.length).to.equal(3);
+  //     const result = await this.scheduler.getActionableWorkspaces(USER_ID);
+  //     expect(result.length).to.equal(3);
 
-      expect(result).to.have.deep.members(
-        workspaces.filter(
-          w =>
-            w === workspaces.get("5-1") ||
-            w === workspaces.get("5-3") ||
-            w === workspaces.get("5-4"),
-        ),
-      );
-    });
+  //     expect(result).to.have.deep.members(
+  //       workspaces.filter(
+  //         w =>
+  //           w === workspaces.get("5-1") ||
+  //           w === workspaces.get("5-3") ||
+  //           w === workspaces.get("5-4"),
+  //       ),
+  //     );
+  //   });
 
-    it("works when all workspaces assigned at least once and no remaining budget among least recent tree", async function() {
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-2"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-3"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-4"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("4"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("3"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-2"));
-      this.clock.tick(ONE_MINUTE);
-      this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5"));
+  //   it("works when all workspaces assigned at least once and no remaining budget among least recent tree", async function() {
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-2"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-3"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1-1-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-4"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5-1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("1"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("4"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("3"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("2-2"));
+  //     this.clock.tick(ONE_MINUTE);
+  //     this.schedule.assignWorkspaceToUser(USER_ID, workspaces.get("5"));
 
-      const result = await this.scheduler.getActionableWorkspaces(USER_ID);
-      expect(result.length).to.equal(1);
+  //     const result = await this.scheduler.getActionableWorkspaces(USER_ID);
+  //     expect(result.length).to.equal(1);
 
-      expect(result).to.have.deep.members(
-        workspaces.filter(w => w == workspaces.get("1-1-1")),
-      );
-    });
-  });
+  //     expect(result).to.have.deep.members(
+  //       workspaces.filter(w => w == workspaces.get("1-1-1")),
+  //     );
+  //   });
+  // });
 
   describe("assignNextWorkspace", function() {
     it("works in a straightforward case", async function() {

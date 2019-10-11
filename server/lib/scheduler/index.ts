@@ -32,6 +32,9 @@ const fetchAllWorkspacesInTree = async rootWorkspace => {
     result.push(...allWorkspacesInChildsTree);
   }
   return result;
+
+  // TODO: condense this into a single query for performance
+  // https://www.npmjs.com/package/sequelize-hierarchy
 };
 
 export const schedulers = new Map();
@@ -104,6 +107,31 @@ export async function createScheduler(experimentId) {
         },
       });
       return userTreeOracleRelation && userTreeOracleRelation.isMalicious;
+    },
+    fetchTreesAvailableToUser: async userId => {
+      const trees: Tree[] = await Tree.findAll({
+        include: [
+          {
+            model: Experiment,
+            required: true,
+            attributes: ["id"],
+            where: { id: experimentId },
+          },
+          {
+            model: Workspace,
+            required: true,
+            where: { isArchived: false },
+          },
+          {
+            model: UserTreeOracleRelation,
+            required: false,
+            attributes: ["isMalicious", "UserId"],
+            where: { UserId: userId },
+          },
+        ],
+      });
+
+      return trees;
     },
     fetchAllRootWorkspaces: async () => {
       const rootWorkspaces = await Workspace.findAll({
