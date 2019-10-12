@@ -115,7 +115,7 @@ export class NextEpisodeShowPagePresentational extends React.Component<
       oracleSchedulingErrorMessage = e.message;
       oracleSchedulingErrored = true;
     }
-    if (!response) {
+    if (!response.data.findNextWorkspace) {
       oracleSchedulingFailed = true;
     }
 
