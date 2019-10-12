@@ -112,10 +112,10 @@ export class NextEpisodeShowPagePresentational extends React.Component<
         },
       });
     } catch (e) {
-      oracleSchedulingErrored =
-        e.message !== "GraphQL error: No workspaces found. Please try later.";
       oracleSchedulingErrorMessage = e.message;
-
+      oracleSchedulingErrored = true;
+    }
+    if (!response) {
       oracleSchedulingFailed = true;
     }
 

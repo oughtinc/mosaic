@@ -1795,7 +1795,7 @@ const schema = new GraphQLSchema({
           }
 
           if (!workspaceId) {
-            throw new Error("No workspaces found. Please try later.");
+            return null;
           }
 
           const workspace = await Workspace.findByPk(workspaceId);
