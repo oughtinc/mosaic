@@ -212,8 +212,6 @@ export default class Workspace extends Model<Workspace> {
         return;
       }
 
-      // TODO: How to handle when workspace can be null
-
       const maliciousQuestionBlock = (await maliciousWorkspace.$get(
         "blocks",
       )).find(b => b.type === "QUESTION");
@@ -271,7 +269,6 @@ export default class Workspace extends Model<Workspace> {
 
       const idOfHonestAnswerCandidatePointer = idOf2ndPointerInMaliciousQuestion;
 
-      // TODO: How to handle when workspace can be null
       const judgeQuestionBlock = (await workspace.$get("blocks")).find(
         b => b.type === "QUESTION",
       );
