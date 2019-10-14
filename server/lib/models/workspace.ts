@@ -208,7 +208,10 @@ export default class Workspace extends Model<Workspace> {
       // not the pointer containing the honest answer candidate.
       // This pointer is contained in the malicious question.
       const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
-      if (!maliciousWorkspace) {
+      if (
+        !maliciousWorkspace ||
+        !maliciousWorkspace.isEligibleForMaliciousOracle
+      ) {
         return;
       }
 
@@ -254,10 +257,12 @@ export default class Workspace extends Model<Workspace> {
       // contains the honest answer candidate, and this first appears in the
       // malicious question.
       const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
-      if (!maliciousWorkspace) {
+      if (
+        !maliciousWorkspace ||
+        !maliciousWorkspace.isEligibleForMaliciousOracle
+      ) {
         return;
       }
-
       const maliciousQuestionBlock = (await maliciousWorkspace.$get(
         "blocks",
       )).find(b => b.type === "QUESTION");
