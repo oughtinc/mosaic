@@ -208,6 +208,12 @@ export default class Workspace extends Model<Workspace> {
       // not the pointer containing the honest answer candidate.
       // This pointer is contained in the malicious question.
       const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
+      if (
+        !maliciousWorkspace ||
+        !maliciousWorkspace.isEligibleForMaliciousOracle
+      ) {
+        return;
+      }
 
       const maliciousQuestionBlock = (await maliciousWorkspace.$get(
         "blocks",
@@ -219,6 +225,7 @@ export default class Workspace extends Model<Workspace> {
       );
 
       if (!idOf2ndPointerInMaliciousQuestion) {
+        // TODO: Handle case when idOf2ndPointerInMaliciousQuestion is undefined
         throw Error(
           `Slate structure of malicious question incorrect:
           idOf2ndPointerInMaliciousQuestion: ${idOf2ndPointerInMaliciousQuestion}`,
@@ -250,7 +257,12 @@ export default class Workspace extends Model<Workspace> {
       // contains the honest answer candidate, and this first appears in the
       // malicious question.
       const maliciousWorkspace = await Workspace.findByPk(workspace.parentId);
-
+      if (
+        !maliciousWorkspace ||
+        !maliciousWorkspace.isEligibleForMaliciousOracle
+      ) {
+        return;
+      }
       const maliciousQuestionBlock = (await maliciousWorkspace.$get(
         "blocks",
       )).find(b => b.type === "QUESTION");
@@ -277,6 +289,7 @@ export default class Workspace extends Model<Workspace> {
       );
 
       if (!idOfA1AnswerCandidate || !idOfA2AnswerCandidate) {
+        // TODO: Handle case where idOfA1AnswerCandidate is of varied values, idOfA2AnswerCandidate is always undefined
         throw Error(
           `Slate structure of judge question incorrect:
           idOfA1AnswerCandidate: ${idOfA1AnswerCandidate},
