@@ -21,7 +21,7 @@
     "graphql-tag": "^2.8.0",
     "is-url": "^1.2.4",
     "keyboardjs": "^2.5.1",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.21",
     "luxon": "^1.12.1",
     "moment": "^2.21.0",
     "parse-duration": "^0.1.1",
