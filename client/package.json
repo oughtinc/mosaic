@@ -23,7 +23,7 @@
     "keyboardjs": "^2.5.1",
     "lodash": "^4.17.13",
     "luxon": "^1.12.1",
-    "moment": "^2.21.0",
+    "moment": "^2.29.2",
     "parse-duration": "^0.1.1",
     "query-string": "^6.1.0",
     "react": "^16.8.6",
